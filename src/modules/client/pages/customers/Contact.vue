@@ -3,7 +3,7 @@
     <ni-title-header title="Contact" class="q-mb-xl" />
     <div class="referent-container" v-if="referent">
       Pour toutes les questions concernant l’organisation des interventions et le planning, nous vous invitons à
-      contacter votre auxiliaire référent.
+      contacter votre auxiliaire référent(e).
       <div class="items-center row">
         <img :src="referentAvatar" class="avatar q-mr-sm">
         <div class="referent-info">

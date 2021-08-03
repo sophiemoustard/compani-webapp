@@ -26,7 +26,7 @@
           type="checkbox" required-field inline :error="validations.events.$error" @input="update($event, 'events')" />
       </template>
       <div v-if="newCreditNoteHasNoEvents" class="text-orange-700">
-        <p>Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données.</p>
+        <p>Il n'y a aucune intervention facturée pour le/la bénéficiaire aux dates données.</p>
       </div>
       <div class="row justify-between items-baseline">
         <div class="col-6 light">

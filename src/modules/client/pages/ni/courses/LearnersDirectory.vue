@@ -13,7 +13,7 @@
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un apprenant"
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="learnerCreationModal = true" :disable="tableLoading" />
 
       <!-- New learner modal -->
@@ -110,11 +110,11 @@ export default {
         if (!userInfo.user.company && userInfo.user._id) return this.updateLearner(userInfo.user._id);
 
         return get(userInfo, 'user.company') === this.company._id
-          ? NotifyWarning('L\'apprenant est déjà ajouté.')
-          : NotifyNegative('L\'apprenant n\'est pas relié à cette structure.');
+          ? NotifyWarning('L\'apprenant(e) est déjà ajouté(e).')
+          : NotifyNegative('L\'apprenant(e) n\'est pas relié(e) à cette structure.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant.');
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
       } finally {
         this.learnerCreationModalLoading = false;
       }
@@ -126,14 +126,14 @@ export default {
     async updateLearner (userId) {
       try {
         await Users.updateById(userId, { company: this.company._id });
-        NotifyPositive('Apprenant ajouté avec succès.');
+        NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
 
         this.learnerCreationModal = false;
         await this.getLearnerList(this.company._id);
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant.');
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
       }
     },
     formatUserPayload () {
@@ -150,7 +150,7 @@ export default {
 
         const payload = await this.formatUserPayload();
         await Users.create(payload);
-        NotifyPositive('Apprenant ajouté avec succès.');
+        NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
 
         await this.sendWelcome();
 
@@ -159,7 +159,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant.');
+        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
       } finally {
         this.learnerCreationModalLoading = false;
       }

@@ -330,7 +330,7 @@ export default {
       } catch (e) {
         this.creditNoteEvents = [];
         console.error(e);
-        NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire.');
+        NotifyNegative('Impossible de récupérer les évènements facturés.');
       }
     },
     async getEditionEvents (field) {
@@ -585,7 +585,7 @@ export default {
       const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr de vouloir supprimer cet avoir '
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet avoir '
           + `${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
         ok: 'OK',
         cancel: 'Annuler',

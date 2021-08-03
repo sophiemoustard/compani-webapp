@@ -24,7 +24,7 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Auxiliaire référent</p>
+        <p class="text-weight-bold">Auxiliaire référent(e)</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-md-6 col-xs-12 referent items-center">
@@ -41,7 +41,7 @@
       <div class="row gutter-profile">
         <ni-select caption="Situation" v-model="customer.followUp.situation" @focus="saveTmp('followUp.situation')"
           @input="updateCustomer('followUp.situation')" :options="situationOptions" />
-        <ni-input caption="Environnement du bénéficiaire" v-model="customer.followUp.environment"
+        <ni-input caption="Environnement du/de la bénéficiaire" v-model="customer.followUp.environment"
           @blur="updateCustomer('followUp.environment')" @focus="saveTmp('followUp.environment')" type="textarea" />
         <ni-input caption="Objectifs de l’accompagnement" v-model="customer.followUp.objectives"
           @blur="updateCustomer('followUp.objectives')" @focus="saveTmp('followUp.objectives')" type="textarea" />
@@ -103,7 +103,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un(e) partenaire" :disable="partnersLoading"
             @click="openNewPartnerModal" />
         </q-card-actions>
       </q-card>
@@ -328,7 +328,7 @@ export default {
       return !!get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
     auxiliariesOptions () {
-      const auxiliariesOptions = [{ label: 'Pas d\'auxiliaire référent', value: '' }];
+      const auxiliariesOptions = [{ label: 'Pas d\'auxiliaire référent(e)', value: '' }];
       const referentId = get(this.customer, 'referent._id') || null;
       if (this.auxiliaries.length) {
         auxiliariesOptions.push(...formatAndSortIdentityOptions(this.auxiliaries));
@@ -342,7 +342,7 @@ export default {
     auxiliaryPlaceholder () {
       return (this.customer.referent.identity)
         ? formatIdentity(this.customer.referent.identity, 'FL')
-        : 'Pas d\'auxiliaire référent';
+        : 'Pas d\'auxiliaire référent(e)';
     },
     partnersNotAdded () {
       return this.partnersList.filter(partner => !this.partners.map(p => p._id).includes(partner._id));
@@ -466,7 +466,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du partenaire.');
+        NotifyNegative('Erreur lors de l\'ajout du/de la partenaire.');
       } finally {
         this.modalLoading = false;
       }
@@ -488,7 +488,7 @@ export default {
         await this.refreshCustomerPartners();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition du partenaire.');
+        NotifyNegative('Erreur lors de l\'édition du/de la partenaire.');
       }
     },
     async deletePartner (customerPartnerId) {
@@ -499,13 +499,13 @@ export default {
         NotifyPositive('Partenaire supprimé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du partenaire.');
+        NotifyNegative('Erreur lors de la suppression du/de la partenaire.');
       }
     },
     validatePartnerDeletion (customerPartnerId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr de vouloir retirer ce partenaire ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer le/la partenaire ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deletePartner(customerPartnerId))

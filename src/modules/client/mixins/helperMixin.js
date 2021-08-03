@@ -145,8 +145,9 @@ export const helperMixin = {
 
         const sameOrNoCompany = (!user.company && user._id) || user.company === this.company._id;
         if (!userInfo.exists) this.firstStep = false;
-        else if (get(user, 'role.client') || !sameOrNoCompany) NotifyNegative('Utilisateur déjà existant');
-        else {
+        else if (get(user, 'role.client') || !sameOrNoCompany) {
+          NotifyNegative('Compte déjà existant.');
+        } else {
           const roles = await Roles.list({ name: HELPER });
           if (roles.length === 0) throw new Error('Role not found');
 
@@ -210,7 +211,7 @@ export const helperMixin = {
         await this.getUserHelpers();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'aidant référent.');
+        NotifyNegative('Erreur lors de l\'édition de l\'aidant(e) référent(e).');
       }
     },
     // Deletion
@@ -228,7 +229,7 @@ export const helperMixin = {
     validateHelperDeletion (helperId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet aidant ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer l\'aidant(e) ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteHelper(helperId))

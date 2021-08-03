@@ -19,7 +19,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter un testeur" :disable="loading"
+          <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
             @click="testerCreationModal = true" />
         </q-card-actions>
       </q-card>
@@ -119,7 +119,7 @@ export default {
         if (userInfo.exists) {
           await Programs.addTester(this.programId, { local: { email: this.newTester.local.email } });
 
-          NotifyPositive('Testeur ajouté avec succès.');
+          NotifyPositive('Testeur(euse) ajouté(e) avec succès.');
           this.resetTesterCreationModal();
           this.$emit('refresh');
         } else {
@@ -127,7 +127,7 @@ export default {
         }
       } catch (e) {
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du testeur.');
+        NotifyNegative('Erreur lors de l\'ajout du/de la testeur(euse).');
       } finally {
         this.modalLoading = false;
       }
@@ -139,7 +139,7 @@ export default {
 
         this.modalLoading = true;
         await Programs.addTester(this.programId, this.newTester);
-        NotifyPositive('Testeur ajouté avec succès.');
+        NotifyPositive('Testeu(euse) ajouté(e) avec succès.');
 
         await this.sendWelcome();
         this.resetTesterCreationModal();
@@ -147,7 +147,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du testeur.');
+        NotifyNegative('Erreur lors de l\'ajout du/de la testeur(euse).');
       } finally {
         this.modalLoading = false;
       }
@@ -174,7 +174,7 @@ export default {
     validateTesterDeletion (testerId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir retirer ce testeur du programme ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer le/la testeur(euse) du programme ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteTester(testerId))
@@ -184,10 +184,10 @@ export default {
       try {
         await Programs.removeTester(this.programId, testerId);
         this.$emit('refresh');
-        NotifyPositive('Testeur supprimé.');
+        NotifyPositive('Testeur(euse) supprimé(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du testeur.');
+        NotifyNegative('Erreur lors de la suppression du/de la testeur(euse).');
       }
     },
   },

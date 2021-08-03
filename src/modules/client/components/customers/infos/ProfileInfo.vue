@@ -95,7 +95,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true"
+          <ni-button icon="add" label="Ajouter un(e) aidant(e)" @click="openNewHelperModal = true"
             :disable="helpersLoading" />
         </q-card-actions>
       </q-card>
@@ -623,7 +623,7 @@ export default {
     customerParticipationRateErrorMessage (validations) {
       if (!validations.customerParticipationRate.required) return REQUIRED_LABEL;
       if (!validations.customerParticipationRate.minValue || !validations.customerParticipationRate.maxValue) {
-        return 'Taux de participation du bénéficiaire invalide';
+        return 'Taux de participation du/de la bénéficiaire invalide';
       }
       return '';
     },

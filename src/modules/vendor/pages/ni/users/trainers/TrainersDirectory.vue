@@ -1,10 +1,10 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un formateur"
+    <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un profil"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @go-to="goToTrainerProfile" />
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un formateur"
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="trainerCreationModal = true" :disable="tableLoading" />
 
     <trainer-creation-modal v-model="trainerCreationModal" @hide="resetCreationModal" @submit="createTrainer"
@@ -74,12 +74,12 @@ export default {
         const userInfo = await Users.exists({ email: this.newTrainer.local.email });
 
         if (userInfo.exists && get(userInfo, 'user.role.vendor')) {
-          NotifyNegative('Utilisateur déjà existant');
+          NotifyNegative('Compte déjà existant.');
         } else if (userInfo.exists) {
           const roles = await Roles.list({ name: TRAINER });
           if (roles.length === 0) throw new Error('Role not found');
           await Users.updateById(userInfo.user._id, { role: roles[0]._id });
-          NotifyPositive('Formateur créé');
+          NotifyPositive('Compte créé');
           await this.refreshTrainers();
           this.resetCreationModal();
           this.trainerCreationModal = false;
@@ -87,7 +87,7 @@ export default {
           this.firstStep = false;
         }
       } catch (e) {
-        NotifyNegative('Erreur lors de la création du formateur');
+        NotifyNegative('Erreur lors de la création du compte.');
         this.resetCreationModal();
       } finally {
         this.modalLoading = false;
@@ -141,14 +141,14 @@ export default {
 
         await Users.create({ ...this.newTrainer, role: roles[0]._id });
         this.trainerCreationModal = false;
-        NotifyPositive('Formateur créé.');
+        NotifyPositive('Compte créé.');
 
         await this.sendWelcome();
         await this.refreshTrainers();
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative('Formateur déjà existant.');
-        NotifyNegative('Erreur lors de la création du formateur.');
+        if (e.status === 409) return NotifyNegative('Compte déjà existant.');
+        NotifyNegative('Erreur lors de la création du compte.');
       } finally {
         this.modalLoading = false;
       }

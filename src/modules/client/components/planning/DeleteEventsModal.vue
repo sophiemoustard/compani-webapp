@@ -78,7 +78,7 @@ export default {
     validateEventsDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr de vouloir supprimer ces évènements ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ces évènements ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteEvents)

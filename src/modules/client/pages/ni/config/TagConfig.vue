@@ -20,9 +20,9 @@ export default {
   data () {
     return {
       tags: {
-        customerFirstname: 'Prénom du bénéficiaire',
-        customerLastname: 'Nom du bénéficiaire',
-        customerAddress: 'Adresse du bénéficiaire',
+        customerFirstname: 'Prénom du/de la bénéficiaire',
+        customerLastname: 'Nom du/de la bénéficiaire',
+        customerAddress: 'Adresse du/de la bénéficiaire',
         ics: 'ICS',
         rum: 'RUM',
         iban: 'IBAN',
