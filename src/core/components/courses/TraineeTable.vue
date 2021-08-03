@@ -215,7 +215,7 @@ export default {
               this.newTrainee.company = this.course.company._id;
               await this.addTrainee();
             } else if (get(userInfo, 'user.company') === this.course.company._id) await this.addTrainee();
-            else return NotifyNegative('Le/la stagiaire n\'est pas relié(e) à la structure de la formation.');
+            else return NotifyNegative('Ce compte n\'est pas relié à la structure de la formation.');
           } else if (userInfo.user.company) await this.addTrainee();
           else this.firstStep = false;
         } else {
@@ -225,7 +225,7 @@ export default {
         }
         this.$v.newTrainee.$reset();
       } catch (e) {
-        NotifyNegative('Erreur lors de l\'ajout du/de la stagiaire.');
+        NotifyNegative('Erreur lors de l\'ajout de la personne.');
       } finally {
         this.traineeCreationModalLoading = false;
       }

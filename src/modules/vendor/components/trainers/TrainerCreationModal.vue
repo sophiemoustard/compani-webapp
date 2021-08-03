@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-      Créer une nouvelle<span class="text-weight-bold">fiche formateur</span>
+      Créer une nouvelle <span class="text-weight-bold">fiche formateur</span>
     </template>
     <ni-input in-modal :value="newTrainer.local.email" @input="update($event.trim(), 'local.email')" required-field
       @blur="validations.local.email.$touch" caption="Email" :error="validations.local.email.$error"

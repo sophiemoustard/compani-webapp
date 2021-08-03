@@ -18,7 +18,7 @@ import { TRAINER } from '@data/constants';
 
 export default {
   name: 'TrainerProfile',
-  metaInfo: { title: 'Fiche formateur/formatrice' },
+  metaInfo: { title: 'Fiche formateur' },
   props: {
     trainerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },

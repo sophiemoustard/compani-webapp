@@ -63,7 +63,7 @@ export const CONTRACT = 'contract';
 export const CONTRACT_VERSION = 'contract_version';
 export const OTHER = 'other';
 export const END_CONTRACT_REASONS = [
-  { label: 'Rupture période d’essai employeur(euse)', value: 'employer_trial_period_termination' },
+  { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
   { label: 'Rupture période d’essai salarié(e)', value: 'employee_trial_period_termination' },
   { label: 'Démission', value: 'resignation' },
   { label: 'Licenciement faute grave', value: 'serious_misconduct_layoff' },
@@ -187,7 +187,7 @@ export const TRAINER = 'trainer';
 
 // ROLE TRANSLATION
 export const ROLES_TRANSLATION = {
-  [CLIENT_ADMIN]: 'Administrateur',
+  [CLIENT_ADMIN]: 'Administrateur(rice)',
   [COACH]: 'Coach',
 };
 

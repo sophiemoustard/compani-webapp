@@ -74,12 +74,12 @@ export default {
         const userInfo = await Users.exists({ email: this.newTrainer.local.email });
 
         if (userInfo.exists && get(userInfo, 'user.role.vendor')) {
-          NotifyNegative('Utilisateur/utilisatrice déjà existant(e).');
+          NotifyNegative('Compte déjà existant.');
         } else if (userInfo.exists) {
           const roles = await Roles.list({ name: TRAINER });
           if (roles.length === 0) throw new Error('Role not found');
           await Users.updateById(userInfo.user._id, { role: roles[0]._id });
-          NotifyPositive('Formateur/formatrice créé(e)');
+          NotifyPositive('Compte créé');
           await this.refreshTrainers();
           this.resetCreationModal();
           this.trainerCreationModal = false;
@@ -87,7 +87,7 @@ export default {
           this.firstStep = false;
         }
       } catch (e) {
-        NotifyNegative('Erreur lors de la création du formateur/de la formatrice.');
+        NotifyNegative('Erreur lors de la création du compte.');
         this.resetCreationModal();
       } finally {
         this.modalLoading = false;
@@ -141,14 +141,14 @@ export default {
 
         await Users.create({ ...this.newTrainer, role: roles[0]._id });
         this.trainerCreationModal = false;
-        NotifyPositive('Formateur/formatrice créé(e).');
+        NotifyPositive('Compte créé.');
 
         await this.sendWelcome();
         await this.refreshTrainers();
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative('Formateur/formatrice déjà existant(e).');
-        NotifyNegative('Erreur lors de la création du formateur/de la formatrice.');
+        if (e.status === 409) return NotifyNegative('Compte déjà existant.');
+        NotifyNegative('Erreur lors de la création du compte.');
       } finally {
         this.modalLoading = false;
       }

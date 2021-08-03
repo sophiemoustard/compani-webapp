@@ -146,7 +146,7 @@ export const helperMixin = {
         const sameOrNoCompany = (!user.company && user._id) || user.company === this.company._id;
         if (!userInfo.exists) this.firstStep = false;
         else if (get(user, 'role.client') || !sameOrNoCompany) {
-          NotifyNegative('Utilisateur/utilisatrice déjà existant(e).');
+          NotifyNegative('Compte déjà existant.');
         } else {
           const roles = await Roles.list({ name: HELPER });
           if (roles.length === 0) throw new Error('Role not found');

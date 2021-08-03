@@ -21,15 +21,15 @@ export const learnerMixin = {
         case AUXILIARY_WITHOUT_COMPANY:
           return 'Auxiliaire';
         case CLIENT_ADMIN:
-          return 'Administrateur/administratrice';
+          return 'Administrateur(rice)';
         case VENDOR_ADMIN:
-          return 'Administrateur/administratrice Vendeur';
+          return 'Administrateur(rice) Vendeur';
         case COACH:
           return 'Coach';
         case TRAINING_ORGANISATION_MANAGER:
           return 'Responsable Formation';
         case TRAINER:
-          return 'Formateur/formatrice';
+          return 'Formateur(rice)';
         default:
           return '';
       }

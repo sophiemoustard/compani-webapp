@@ -330,7 +330,7 @@ export default {
       } catch (e) {
         this.creditNoteEvents = [];
         console.error(e);
-        NotifyNegative('Impossible de récupérer les évènements facturés de le/la bénéficiaire.');
+        NotifyNegative('Impossible de récupérer les évènements facturés.');
       }
     },
     async getEditionEvents (field) {

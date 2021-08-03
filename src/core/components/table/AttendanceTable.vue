@@ -42,7 +42,7 @@
         </q-tr>
       </template>
       <template #no-data>
-        <div class="text-center text-italic">Aucun(e) apprenant(e) n'a été ajouté(e) à cette formation</div>
+        <div class="text-center text-italic">Aucun(e) participant(e) n'a été ajouté(e) à cette formation</div>
       </template>
     </q-table>
     <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
@@ -140,7 +140,7 @@ export default {
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         {
           name: 'trainee',
-          label: 'Nom de l\'apprenant(e)',
+          label: 'Participants',
           align: 'left',
           field: row => (this.traineesWithAttendance.find(trainee => trainee._id === row.trainee._id)),
           format: value => ({

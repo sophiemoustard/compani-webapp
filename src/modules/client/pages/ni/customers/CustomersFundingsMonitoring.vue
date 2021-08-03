@@ -196,7 +196,7 @@ export default {
       const csvData = [[
         'Financeur',
         'Bénéficiaire',
-        'Référent',
+        'Référent(e)',
         'Equipe',
         'Taux participation du/de la bénéficiaire',
         'Prix unitaire',
