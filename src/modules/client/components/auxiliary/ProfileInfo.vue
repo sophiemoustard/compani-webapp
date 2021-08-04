@@ -36,13 +36,13 @@
           @focus="saveTmp('identity.lastname')" />
         <ni-select caption="Nationalité" :error="$v.userProfile.identity.nationality.$error"
           :options="nationalitiesOptions" v-model="userProfile.identity.nationality"
-          @focus="saveTmp('identity.nationality')" in-form @blur="updateUser('identity.nationality')" />
+          @focus="saveTmp('identity.nationality')" @blur="updateUser('identity.nationality')" />
         <ni-date-input caption="Date de naissance" :error="$v.userProfile.identity.birthDate.$error"
           v-model="userProfile.identity.birthDate" @focus="saveTmp('identity.birthDate')"
           content-class="col-xs-12 col-md-6" @input="updateUser('identity.birthDate')" />
         <ni-select caption="Pays de naissance" :error="$v.userProfile.identity.birthCountry.$error"
           :options="countriesOptions" v-model="userProfile.identity.birthCountry"
-          @focus="saveTmp('identity.birthCountry')" in-form @blur="updateUser('identity.birthCountry')" />
+          @focus="saveTmp('identity.birthCountry')" @blur="updateUser('identity.birthCountry')" />
         <ni-input caption="Département de naissance" :error="$v.userProfile.identity.birthState.$error"
           :error-message="birthStateError" v-model="userProfile.identity.birthState"
           @blur="updateUser('identity.birthState')" @focus="saveTmp('identity.birthState')"
