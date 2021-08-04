@@ -5,7 +5,7 @@
         <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12">
-              <ni-select :options="periodOptions" v-model="period" />
+              <ni-select :options="periodOptions" v-model="period" caption="Période" />
             </div>
           </div>
         </div>

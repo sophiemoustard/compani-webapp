@@ -5,7 +5,7 @@
         <ni-button icon="save_alt" @click="exportToCSV" class="q-ml-sm" :disable="!allCustomersFundings.length" />
       </template>
       <template slot="content">
-        <div class=" col-xs-12 header-selects">
+        <div class="col-xs-12 header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-6">
               <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector" allow-null-option />
