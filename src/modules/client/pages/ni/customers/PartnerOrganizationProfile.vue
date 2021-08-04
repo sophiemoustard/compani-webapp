@@ -235,7 +235,8 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id', 'customerPartners']));
+        const payload = omit(this.editedPartner, ['_id', 'customerPartners', 'partnerOrganization']);
+        await Partner.updateById(this.editedPartner._id, payload);
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');
