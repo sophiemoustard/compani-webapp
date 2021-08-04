@@ -2,7 +2,7 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="À facturer" padding>
       <template slot="content">
-        <div class="flex-row header-selects">
+        <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-4">
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />

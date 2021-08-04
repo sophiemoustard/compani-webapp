@@ -5,7 +5,7 @@
         <ni-button icon="save_alt" @click="exportToCSV" :disable="displayedDraftPay.length === 0" class="q-ml-sm" />
       </template>
       <template slot="content">
-        <div class="flex-row header-selects">
+        <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-4">
               <ni-select class="q-ma-sm" :options="sortOptions" v-model="sortOption" caption="Trier par" />
