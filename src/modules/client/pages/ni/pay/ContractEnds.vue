@@ -5,7 +5,7 @@
         <div class="flex-row header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12">
-              <ni-select :options="periodOptions" v-model="period" separator in-form />
+              <ni-select :options="periodOptions" v-model="period" />
             </div>
           </div>
         </div>

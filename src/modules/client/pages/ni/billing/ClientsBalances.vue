@@ -6,7 +6,7 @@
       </template>
       <template slot="content">
         <div class="col-xs-12 col-md-6 on-left">
-          <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" separator />
+          <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" />
         </div>
       </template>
     </ni-title-header>
