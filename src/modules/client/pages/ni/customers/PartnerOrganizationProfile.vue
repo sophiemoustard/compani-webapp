@@ -228,6 +228,9 @@ export default {
       this.editedPartner = cloneDeep(row);
       this.partnerEditionModal = true;
     },
+    formatPayload (payload) {
+      return omit(payload, ['_id', 'customerPartners', 'partnerOrganization']);
+    },
     async updatePartner () {
       try {
         this.modalLoading = true;
@@ -235,7 +238,7 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id', 'customerPartners']));
+        await Partner.updateById(this.editedPartner._id, this.formatPayload(this.editedPartner));
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');
