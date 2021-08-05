@@ -126,7 +126,7 @@ export default {
     // Filters
     initFilters () {
       if (this.targetedCustomer) {
-        this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedCustomer.identity, 'FL')]);
+        this.$refs.planningManager.restoreFilter([this.targetedCustomer._id]);
       } else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Customers');
       } else {

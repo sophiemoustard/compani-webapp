@@ -1,11 +1,11 @@
 <template>
-  <q-select dense borderless bg-color="white" multiple behavior="menu" use-chips use-input ref="refFilter" emit-value
-    :value="value" :options="options" @filter="search" @input="input" @add="addEvent" @remove="removeEvent"
-    input-debounce="0" :style="disable && { width: '40px'}" :data-cy="dataCy">
-    <template #prepend>
-      <q-icon name="search" size="xs" />
-    </template>
-  </q-select>
+    <q-select dense borderless bg-color="white" multiple behavior="menu" use-chips use-input ref="refFilter" emit-value
+      :value="value" :options="options" @filter="search" @input="input" @add="addEvent" @remove="removeEvent"
+      input-debounce="0" :style="disable && { width: '40px'}" :data-cy="dataCy" map-options>
+      <template #prepend>
+        <q-icon name="search" size="xs" />
+      </template>
+    </q-select>
 </template>
 
 <script>
@@ -30,7 +30,7 @@ export default {
   computed: {
     ...mapState('planning', ['elementToAdd']),
     noDiacriticFilters () {
-      return this.filters.map(el => ({ ...el, noDiacriticsValue: removeDiacritics(el.value) }));
+      return this.filters.map(el => ({ ...el, noDiacriticsLabel: removeDiacritics(el.label) }));
     },
   },
   methods: {
@@ -49,7 +49,7 @@ export default {
       try {
         const formattedString = escapeRegExp(removeDiacritics(terms));
         this.options = this.noDiacriticFilters
-          .filter(el => el.noDiacriticsValue.match(new RegExp(formattedString, 'i')));
+          .filter(el => el.noDiacriticsLabel.match(new RegExp(formattedString, 'i')));
         done(this.options);
       } catch (e) {
         done([]);
