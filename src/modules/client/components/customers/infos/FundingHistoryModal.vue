@@ -15,7 +15,7 @@ import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
 import { FIXED } from '@data/constants';
 
 export default {
-  name: 'FundingDetailsModal',
+  name: 'FundingHistoryModal',
   props: {
     value: { type: Boolean, default: false },
     selected: { type: Object, default: () => ({}) },

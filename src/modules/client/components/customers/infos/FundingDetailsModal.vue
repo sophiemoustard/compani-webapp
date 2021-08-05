@@ -3,7 +3,7 @@
     <template slot="title">
       Détail du financement <span class="text-weight-bold">{{ selected.thirdPartyPayer.name }}</span>
     </template>
-    <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
+    <ni-funding-grid-table :data="[fundingDetailsData]" :columns="fundingsColumns"
       :visible-columns="visibleColumns" />
   </ni-modal>
 </template>
@@ -19,7 +19,7 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     selected: { type: Object, default: () => ({}) },
-    fundingDetailsData: { type: Array, default: () => [] },
+    fundingDetailsData: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -30,7 +30,7 @@ export default {
   ],
   computed: {
     visibleColumns () {
-      const visibleColumns = this.fundingDetailsData[0].nature === FIXED
+      const visibleColumns = this.fundingDetailsData.nature === FIXED
         ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
         : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
 

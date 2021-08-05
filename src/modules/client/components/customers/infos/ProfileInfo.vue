@@ -422,7 +422,7 @@ export default {
       fundingCreationModal: false,
       fundingEditionModal: false,
       fundingDetailsModal: false,
-      fundingDetailsData: [],
+      fundingDetailsData: {},
       editedFunding: {},
       pagination: {
         sortBy: 'createdAt',
@@ -1004,12 +1004,12 @@ export default {
     },
     showFundingDetails (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
-      this.fundingDetailsData.push(this.selectedFunding);
+      this.fundingDetailsData = { ...this.selectedFunding };
       this.fundingDetailsModal = true;
     },
     resetFundingDetailsData () {
       this.selectedFunding = {};
-      this.fundingDetailsData = [];
+      this.fundingDetailsData = {};
     },
     openFundingEditionModal (id) {
       this.editedFunding = { ...this.fundings.find(fund => fund._id === id) };
