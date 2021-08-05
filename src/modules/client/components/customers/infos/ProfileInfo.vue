@@ -254,8 +254,8 @@
       @hide="resetSubscriptionHistoryData" />
 
     <!-- Funding details modal -->
-    <funding-details-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
-      :selected="selectedFunding" :funding-details-data="fundingDetailsData" @hide="resetFundingDetailsData" />
+    <funding-details-modal v-if="Object.keys(fundingDetailsData).length > 0" v-model="fundingDetailsModal"
+      :funding="fundingDetailsData" @hide="resetFundingDetailsData" />
 
     <!-- Funding history modal -->
     <funding-history-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
@@ -1003,12 +1003,10 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showFundingDetails (id) {
-      this.selectedFunding = this.fundings.find(sub => sub._id === id);
-      this.fundingDetailsData = { ...this.selectedFunding };
+      this.fundingDetailsData = this.fundings.find(sub => sub._id === id);
       this.fundingDetailsModal = true;
     },
     resetFundingDetailsData () {
-      this.selectedFunding = {};
       this.fundingDetailsData = {};
     },
     openFundingEditionModal (id) {
