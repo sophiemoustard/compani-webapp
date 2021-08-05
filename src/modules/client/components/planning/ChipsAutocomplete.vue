@@ -1,11 +1,11 @@
 <template>
-    <q-select dense borderless bg-color="white" multiple behavior="menu" use-chips use-input ref="refFilter" emit-value
-      :value="value" :options="options" @filter="search" @input="input" @add="addEvent" @remove="removeEvent"
-      input-debounce="0" :style="disable && { width: '40px'}" :data-cy="dataCy" map-options>
-      <template #prepend>
-        <q-icon name="search" size="xs" />
-      </template>
-    </q-select>
+  <q-select dense borderless bg-color="white" multiple behavior="menu" use-chips use-input ref="refFilter"
+    :value="value" :options="options" @filter="search" @input="input" @add="addEvent" @remove="removeEvent"
+    input-debounce="0" :style="disable && { width: '40px'}" :data-cy="dataCy" map-options>
+    <template #prepend>
+      <q-icon name="search" size="xs" />
+    </template>
+  </q-select>
 </template>
 
 <script>
@@ -35,15 +35,15 @@ export default {
   },
   methods: {
     addEvent (el) {
-      this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el.value));
+      this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el.value.value));
       this.$refs.refFilter.hidePopup();
       this.$refs.refFilter.inputValue = '';
     },
-    input (el) {
-      this.$emit('input', el);
+    input (list) {
+      this.$emit('input', list);
     },
     removeEvent (el) {
-      this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value));
+      this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value.value));
     },
     async search (terms, done) {
       try {
