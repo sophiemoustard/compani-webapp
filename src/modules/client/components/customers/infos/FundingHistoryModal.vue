@@ -1,9 +1,9 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-      Historique du financement <span class="text-weight-bold">{{ selected.thirdPartyPayer.name }}</span>
+      Historique du financement <span class="text-weight-bold">{{ funding.thirdPartyPayer.name }}</span>
     </template>
-    <ni-funding-grid-table :data="selected.versions" :columns="fundingsColumns"
+    <ni-funding-grid-table :data="funding.versions" :columns="fundingsColumns"
       :visible-columns="visibleColumns" />
   </ni-modal>
 </template>
@@ -18,7 +18,7 @@ export default {
   name: 'FundingHistoryModal',
   props: {
     value: { type: Boolean, default: false },
-    selected: { type: Object, default: () => ({}) },
+    funding: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -29,7 +29,7 @@ export default {
   ],
   computed: {
     visibleColumns () {
-      return this.selectedFunding.nature === FIXED
+      return this.funding.nature === FIXED
         ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
         : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     },
