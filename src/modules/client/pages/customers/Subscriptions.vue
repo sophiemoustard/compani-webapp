@@ -16,8 +16,9 @@
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="primary" icon="history" @click="showHistory(col.value)"
                         data-cy="show-subscription-history" />
-                      <q-btn :disable="!getFunding(col.value).length" flat round small color="primary"
-                        icon="mdi-calculator" @click="showFunding(col.value)" data-cy="show-fundings-history" />
+                      <q-btn :disable="!getSubscriptionFundings(col.value).length" flat round small color="primary"
+                        icon="mdi-calculator" @click="showSubscriptionFundings(col.value)"
+                        data-cy="show-fundings-history" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -425,11 +426,11 @@ export default {
         console.error(e);
       }
     },
-    getFunding (subscriptionId) {
+    getSubscriptionFundings (subscriptionId) {
       return this.fundings.filter(fund => fund.subscription._id === subscriptionId);
     },
-    showFunding (subscriptionId) {
-      this.fundingData = this.getFunding(subscriptionId);
+    showSubscriptionFundings (subscriptionId) {
+      this.fundingData = this.getSubscriptionFundings(subscriptionId);
       this.fundingModal = true;
     },
     resetFundingData () {

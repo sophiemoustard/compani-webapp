@@ -30,13 +30,7 @@ export default {
   },
   data () {
     return {
-      fixedFundingColumns: [
-        'thirdPartyPayer',
-        'folderNumber',
-        'startDate',
-        'frequency',
-        'amountTTC',
-      ],
+      fixedFundingColumns: ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC'],
       hourlyFundingColumns: [
         'thirdPartyPayer',
         'folderNumber',
@@ -55,18 +49,13 @@ export default {
   },
   methods: {
     filterCols (cols) {
-      if (!this.visibleColumns.length) {
-        const isFixedFunding = cols.some((col) => {
-          const natureOption = NATURE_OPTIONS.find(opt => opt.label === col.value);
-          return natureOption && natureOption.value === FIXED;
-        });
+      if (this.visibleColumns.length) return cols;
 
-        return isFixedFunding
-          ? cols.filter(col => this.fixedFundingColumns.includes(col.name))
-          : cols.filter(col => this.hourlyFundingColumns.includes(col.name));
-      }
+      const isFixed = cols.some(col => NATURE_OPTIONS.some(o => o.label === col.value && o.value === FIXED));
 
-      return cols;
+      return isFixed
+        ? cols.filter(col => this.fixedFundingColumns.includes(col.name))
+        : cols.filter(col => this.hourlyFundingColumns.includes(col.name));
     },
   },
 };
