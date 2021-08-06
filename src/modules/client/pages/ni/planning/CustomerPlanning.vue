@@ -126,7 +126,13 @@ export default {
     // Filters
     initFilters () {
       if (this.targetedCustomer) {
-        this.$refs.planningManager.restoreFilter([this.targetedCustomer._id]);
+        const formatedTargetedCustomer = {
+          value: this.targetedCustomer._id,
+          label: formatIdentity(this.targetedCustomer.identity, 'FL'),
+          ...this.targetedCustomer,
+        };
+
+        this.$refs.planningManager.restoreFilter([formatedTargetedCustomer]);
       } else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Customers');
       } else {
