@@ -14,11 +14,9 @@
                   :style="col.style" :data-cy="`col-${col.name}`">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="primary" icon="history" @click="showHistory(col.value)"
-                        data-cy="show-subscription-history" />
-                      <q-btn :disable="!getSubscriptionFundings(col.value).length" flat round small color="primary"
-                        icon="mdi-calculator" @click="showSubscriptionFundings(col.value)"
-                        data-cy="show-fundings-history" />
+                      <ni-button icon="history" @click="showHistory(col.value)" data-cy="show-subscription-history" />
+                      <ni-button :disable="!getSubscriptionFundings(col.value).length" icon="mdi-calculator"
+                        @click="showSubscriptionFundings(col.value)" data-cy="show-fundings-history" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -84,10 +82,8 @@
                   :style="col.style">
                   <template v-if="col.name === 'sign'">
                     <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{ getSignatureDate(props.row) }}</p>
-                    <q-btn color="primary" @click="preOpenESignModal(props.row)" data-cy="open-mandate"
-                      v-else-if="displaySignButton(props.row)">
-                      Signer
-                    </q-btn>
+                    <ni-button v-else-if="displaySignButton(props.row)" label="Signer" class="bg-primary"
+                      color="copper-grey-50" data-cy="open-mandate" @click="preOpenESignModal(props.row)" />
                   </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
