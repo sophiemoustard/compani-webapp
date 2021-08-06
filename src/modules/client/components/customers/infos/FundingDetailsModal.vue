@@ -1,9 +1,9 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-      Détail du financement <span class="text-weight-bold">{{ selected.thirdPartyPayer.name }}</span>
+      Détail du financement <span class="text-weight-bold">{{ funding.thirdPartyPayer.name }}</span>
     </template>
-    <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
+    <ni-funding-grid-table :data="[funding]" :columns="fundingsColumns"
       :visible-columns="visibleColumns" />
   </ni-modal>
 </template>
@@ -18,8 +18,7 @@ export default {
   name: 'FundingDetailsModal',
   props: {
     value: { type: Boolean, default: false },
-    selected: { type: Object, default: () => ({}) },
-    fundingDetailsData: { type: Array, default: () => [] },
+    funding: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -30,10 +29,11 @@ export default {
   ],
   computed: {
     visibleColumns () {
-      const visibleColumns = this.selectedFunding.nature === FIXED
-        ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
+      const visibleColumns = this.funding.nature === FIXED
+        ? ['frequency', 'amountTTC', 'careDays', 'subscription']
         : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
-      if (this.selected.fundingPlanId) visibleColumns.push('fundingPlanId');
+
+      if (this.funding.fundingPlanId) visibleColumns.push('fundingPlanId');
 
       return visibleColumns;
     },

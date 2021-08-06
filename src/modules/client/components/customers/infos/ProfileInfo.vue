@@ -250,16 +250,16 @@
       @submit="updateSubscription" />
 
     <!-- Subscription history modal -->
-    <subscription-history-modal v-model="subscriptionHistoryModal" :selected="selectedSubscription"
+    <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
       @hide="resetSubscriptionHistoryData" />
 
     <!-- Funding details modal -->
     <funding-details-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
-      :selected="selectedFunding" :funding-details-data="fundingDetailsData" @hide="resetFundingDetailsData" />
+      :funding="selectedFunding" @hide="resetFundingDetailsData" />
 
     <!-- Funding history modal -->
     <funding-history-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
-      :selected="selectedFunding" @hide="resetFundingHistoryData" />
+      :funding="selectedFunding" @hide="resetFundingHistoryData" />
 
     <!-- Funding creation modal -->
     <funding-creation-modal v-model="fundingCreationModal" :new-funding.sync="newFunding" :third-party-payers="ttpList"
@@ -422,7 +422,7 @@ export default {
       fundingCreationModal: false,
       fundingEditionModal: false,
       fundingDetailsModal: false,
-      fundingDetailsData: [],
+      selectedFunding: {},
       editedFunding: {},
       pagination: {
         sortBy: 'createdAt',
@@ -1004,12 +1004,10 @@ export default {
     },
     showFundingDetails (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
-      this.fundingDetailsData.push(this.selectedFunding);
       this.fundingDetailsModal = true;
     },
     resetFundingDetailsData () {
       this.selectedFunding = {};
-      this.fundingDetailsData = [];
     },
     openFundingEditionModal (id) {
       this.editedFunding = { ...this.fundings.find(fund => fund._id === id) };
