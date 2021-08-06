@@ -30,7 +30,7 @@ export default {
   computed: {
     visibleColumns () {
       return this.funding.nature === FIXED
-        ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
+        ? ['startDate', 'endDate', 'amountTTC', 'careDays']
         : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     },
   },

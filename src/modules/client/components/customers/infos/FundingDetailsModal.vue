@@ -30,7 +30,7 @@ export default {
   computed: {
     visibleColumns () {
       const visibleColumns = this.funding.nature === FIXED
-        ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
+        ? ['frequency', 'amountTTC', 'careDays', 'subscription']
         : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
 
       if (this.funding.fundingPlanId) visibleColumns.push('fundingPlanId');
