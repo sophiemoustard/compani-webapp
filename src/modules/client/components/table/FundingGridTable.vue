@@ -22,7 +22,7 @@
 import { NATURE_OPTIONS, FIXED } from '@data/constants';
 
 export default {
-  name: 'GridTable',
+  name: 'FundingGridTable',
   props: {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
@@ -36,9 +36,8 @@ export default {
         'startDate',
         'frequency',
         'amountTTC',
-        'customerParticipationRate',
       ],
-      otherFundingColumns: [
+      hourlyFundingColumns: [
         'thirdPartyPayer',
         'folderNumber',
         'startDate',
@@ -56,7 +55,7 @@ export default {
   },
   methods: {
     filterCols (cols) {
-      if (!this.visibleColumns) {
+      if (!this.visibleColumns.length) {
         const isFixedFunding = cols.some((col) => {
           const natureOption = NATURE_OPTIONS.find(opt => opt.label === col.value);
           return natureOption && natureOption.value === FIXED;
@@ -64,7 +63,7 @@ export default {
 
         return isFixedFunding
           ? cols.filter(col => this.fixedFundingColumns.includes(col.name))
-          : cols.filter(col => this.otherFundingColumns.includes(col.name));
+          : cols.filter(col => this.hourlyFundingColumns.includes(col.name));
       }
 
       return cols;
