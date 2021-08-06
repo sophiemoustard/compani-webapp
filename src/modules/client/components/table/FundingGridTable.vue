@@ -4,11 +4,11 @@
     <template #item="props">
       <q-card class="full-width q-mb-md" flat bordered>
         <q-list separator dense>
-          <q-item v-for="col in filterCols(props.cols)" :key="col.name">
-            <q-item-section>
+          <q-item v-for="col in filterCols(props.cols)" :key="col.name" class="row">
+            <q-item-section class="col-5">
               <q-item-label :data-cy="`col-${col.name}`">{{ col.label }}</q-item-label>
             </q-item-section>
-            <q-item-section side>
+            <q-item-section class="col-7" side>
               <q-item-label caption :data-cy="`col-side-${col.name}`">{{ col.value }}</q-item-label>
             </q-item-section>
           </q-item>
@@ -66,4 +66,7 @@ export default {
   .q-item__section--main
     & > .q-item__label
       font-size: 0.80rem
+  .q-item__section--side
+    & > .q-item__label
+      text-align: right
 </style>
