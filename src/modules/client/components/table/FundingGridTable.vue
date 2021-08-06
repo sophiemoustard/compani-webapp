@@ -30,7 +30,7 @@ export default {
   },
   data () {
     return {
-      fixedFundingColumns: ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC'],
+      fixedFundingColumns: ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC', 'careDays'],
       hourlyFundingColumns: [
         'thirdPartyPayer',
         'folderNumber',
@@ -39,6 +39,7 @@ export default {
         'unitTTCRate',
         'careHours',
         'customerParticipationRate',
+        'careDays',
       ],
     };
   },
