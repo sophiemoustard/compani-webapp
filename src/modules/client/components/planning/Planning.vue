@@ -170,9 +170,9 @@ export default {
   beforeDestroy () {
     if (this.isCoach) {
       if (!this.isCustomerPlanning) {
-        this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.terms));
+        this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.termIds));
       } else {
-        this.$q.localStorage.set('lastSearchCustomers', JSON.stringify(this.terms));
+        this.$q.localStorage.set('lastSearchCustomers', JSON.stringify(this.termIds));
       }
     }
     clearTimeout(this.timeout);
@@ -196,6 +196,9 @@ export default {
     uniqPersons () {
       return uniqBy(this.persons, '_id');
     },
+    termIds () {
+      return this.terms.map(t => t._id || t);
+    },
   },
   methods: {
     hideDeleteEventsModal () {
@@ -210,17 +213,19 @@ export default {
         this.customersWithInterventions = [];
         this.deleteEventsModal = false;
         console.error(e);
-        NotifyNegative('Error lors de la récupération des bénéficiaires.');
+        NotifyNegative('Erreur lors de la récupération des bénéficiaires.');
       }
     },
     toggleAllSectors () {
-      this.$emit('toggle-all-sectors', this.terms);
+      this.$emit('toggle-all-sectors', this.termIds);
       this.terms = [];
     },
     getSector (sectorId) {
       return this.filteredSectors.find(s => s._id === sectorId);
     },
-    restoreFilter (terms) {
+    restoreFilter (termIds) {
+      const terms = this.filters.filter(f => termIds.find(t => t === f._id));
+
       for (const term of terms) {
         setTimeout(() => this.$refs.refFilter.add(term), 100);
       }

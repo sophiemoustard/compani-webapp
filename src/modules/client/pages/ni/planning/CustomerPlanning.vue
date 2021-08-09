@@ -36,7 +36,6 @@ import {
   SECTOR,
   COACH_ROLES,
 } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { isAfter } from '@helpers/date';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
@@ -125,19 +124,12 @@ export default {
     },
     // Filters
     initFilters () {
-      if (this.targetedCustomer) {
-        const formatedTargetedCustomer = {
-          value: this.targetedCustomer._id,
-          label: formatIdentity(this.targetedCustomer.identity, 'FL'),
-          ...this.targetedCustomer,
-        };
-
-        this.$refs.planningManager.restoreFilter([formatedTargetedCustomer]);
-      } else if (COACH_ROLES.includes(this.clientRole)) {
+      if (this.targetedCustomer) this.$refs.planningManager.restoreFilter([this.targetedCustomer._id]);
+      else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.loggedUser.sector);
-        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector]);
+        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector._id]);
       }
     },
     // Refresh
