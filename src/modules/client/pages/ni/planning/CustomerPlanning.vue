@@ -137,7 +137,7 @@ export default {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.loggedUser.sector);
-        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
+        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector]);
       }
     },
     // Refresh

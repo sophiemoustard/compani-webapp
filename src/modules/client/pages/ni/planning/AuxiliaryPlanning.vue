@@ -142,12 +142,18 @@ export default {
     // Filters
     initFilters () {
       if (this.targetedAuxiliary) {
-        this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
+        const formattedTargetedAuxiliary = {
+          value: this.targetedAuxiliary._id,
+          label: formatIdentity(this.targetedAuxiliary.identity, 'FL'),
+          ...this.targetedAuxiliary,
+        };
+
+        this.$refs.planningManager.restoreFilter([formattedTargetedAuxiliary]);
       } else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.loggedUser.sector);
-        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
+        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector]);
       }
     },
     // History
