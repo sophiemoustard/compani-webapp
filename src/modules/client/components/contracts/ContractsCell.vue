@@ -89,10 +89,10 @@ import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, getMonthlyHours } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
-import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
+import { getContractTags } from 'src/modules/client/helpers/tags';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
@@ -223,10 +223,12 @@ export default {
     },
     async dlTemplate (contractVersion, parentContract, contractIndex) {
       try {
-        const data = generateContractFields({
+        const initialContractMonthlyHours = getMonthlyHours(parentContract.versions[0]);
+        const data = getContractTags({
           user: this.user,
           contract: contractVersion,
           initialContractStartDate: parentContract.startDate,
+          initialContractMonthlyHours,
         });
         if (!this.canDownload(contractVersion, contractIndex)) {
           return NotifyNegative('Impossible de télécharger le contrat.');
