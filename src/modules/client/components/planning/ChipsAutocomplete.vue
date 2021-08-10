@@ -45,15 +45,11 @@ export default {
     removeEvent (el) {
       this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value.value));
     },
-    async search (terms, done) {
-      try {
-        const formattedString = escapeRegExp(removeDiacritics(terms));
-        this.options = this.noDiacriticFilters
-          .filter(el => el.noDiacriticsLabel.match(new RegExp(formattedString, 'i')));
-        done(this.options);
-      } catch (e) {
-        done([]);
-      }
+    search (terms, done) {
+      const formattedString = escapeRegExp(removeDiacritics(terms));
+      this.options = this.noDiacriticFilters
+        .filter(el => el.noDiacriticsLabel.match(new RegExp(formattedString, 'i')));
+      done(this.options);
     },
     add (el) {
       this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el));
