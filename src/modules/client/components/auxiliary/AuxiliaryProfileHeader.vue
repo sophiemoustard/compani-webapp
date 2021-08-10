@@ -155,7 +155,7 @@ export default {
       this.smsModal = true;
     },
     goToPlanning () {
-      this.$router.push({ name: 'ni planning auxiliaries', params: { targetedAuxiliary: this.userProfile } });
+      this.$router.push({ name: 'ni planning auxiliaries', params: { targetedAuxiliaryId: this.userProfile._id } });
     },
     async sendMessage () {
       this.loading = true;

@@ -53,7 +53,7 @@ export default {
     'ni-planning-manager': Planning,
   },
   props: {
-    targetedCustomer: { type: Object, default: null },
+    targetedCustomerId: { type: String, default: '' },
   },
   data () {
     return {
@@ -124,7 +124,7 @@ export default {
     },
     // Filters
     initFilters () {
-      if (this.targetedCustomer) this.$refs.planningManager.restoreFilter([this.targetedCustomer._id]);
+      if (this.targetedCustomerId) this.$refs.planningManager.restoreFilter([this.targetedCustomerId]);
       else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Customers');
       } else {

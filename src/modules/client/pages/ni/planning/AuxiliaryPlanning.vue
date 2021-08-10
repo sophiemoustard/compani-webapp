@@ -49,7 +49,7 @@ export default {
     'ni-event-edition-modal': EventEditionModal,
   },
   props: {
-    targetedAuxiliary: { type: Object, default: null },
+    targetedAuxiliaryId: { type: String, default: '' },
   },
   data () {
     return {
@@ -121,7 +121,7 @@ export default {
         .filter(f => f.type === SECTOR ||
           this.hasContractOnEvent(f, moment(this.startOfWeek), this.endOfWeek) ||
           // add targeted auxiliary even if not active on strat of week to display future events
-          (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id));
+          (this.targetedAuxiliaryId && f._id === this.targetedAuxiliaryId));
     },
   },
   methods: {
@@ -140,7 +140,7 @@ export default {
     },
     // Filters
     initFilters () {
-      if (this.targetedAuxiliary) this.$refs.planningManager.restoreFilter([this.targetedAuxiliary._id]);
+      if (this.targetedAuxiliaryId) this.$refs.planningManager.restoreFilter([this.targetedAuxiliaryId]);
       else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Auxiliaries');
       } else {

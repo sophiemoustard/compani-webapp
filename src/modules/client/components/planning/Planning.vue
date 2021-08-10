@@ -197,7 +197,7 @@ export default {
       return uniqBy(this.persons, '_id');
     },
     termIds () {
-      return this.terms.map(t => t._id || t);
+      return this.terms.map(t => t._id);
     },
   },
   methods: {
