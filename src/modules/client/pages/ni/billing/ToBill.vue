@@ -66,7 +66,6 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { MONTH } from '@data/constants';
 import { formatPrice, formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
-import { isAfter } from '@helpers/date';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -202,7 +201,7 @@ export default {
       }
     },
     async getDraftBills () {
-      if (isAfter(this.billingDates.startDate, this.billingDates.endDate)) return;
+      if (this.billingDatesHasError) return;
 
       try {
         this.tableLoading = true;
