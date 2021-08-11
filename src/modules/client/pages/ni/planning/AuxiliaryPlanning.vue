@@ -33,7 +33,6 @@ import Events from '@api/Events';
 import EventHistories from '@api/EventHistories';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES, DAILY } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
@@ -50,7 +49,7 @@ export default {
     'ni-event-edition-modal': EventEditionModal,
   },
   props: {
-    targetedAuxiliary: { type: Object, default: null },
+    targetedAuxiliaryId: { type: String, default: '' },
   },
   data () {
     return {
@@ -122,7 +121,7 @@ export default {
         .filter(f => f.type === SECTOR ||
           this.hasContractOnEvent(f, moment(this.startOfWeek), this.endOfWeek) ||
           // add targeted auxiliary even if not active on strat of week to display future events
-          (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id));
+          (this.targetedAuxiliaryId && f._id === this.targetedAuxiliaryId));
     },
   },
   methods: {
@@ -141,13 +140,12 @@ export default {
     },
     // Filters
     initFilters () {
-      if (this.targetedAuxiliary) {
-        this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
-      } else if (COACH_ROLES.includes(this.clientRole)) {
+      if (this.targetedAuxiliaryId) this.$refs.planningManager.restoreFilter([this.targetedAuxiliaryId]);
+      else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.loggedUser.sector);
-        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
+        if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector._id]);
       }
     },
     // History
