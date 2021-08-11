@@ -113,14 +113,14 @@ export const helperMixin = {
 
         const payload = await this.formatHelper();
         await Users.create(pickBy(payload));
-        NotifyPositive('Aidant créé');
+        NotifyPositive('Aidant(e) créé(e)');
         await this.getUserHelpers();
         this.openNewHelperModal = false;
 
         await this.sendWelcome();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'aidant.');
+        NotifyNegative('Erreur lors de la création de l\'aidant(e).');
       } finally {
         this.loading = false;
       }
@@ -155,14 +155,14 @@ export const helperMixin = {
           if (!user.company) payload.company = this.customer.company;
 
           await Users.updateById(user._id, payload);
-          NotifyPositive('Aidant créé');
+          NotifyPositive('Aidant(e) créé(e)');
 
           this.getUserHelpers();
           this.openNewHelperModal = false;
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'aidant.');
+        NotifyNegative('Erreur lors de la création de l\'aidant(e).');
       } finally {
         this.loading = false;
       }
@@ -185,13 +185,13 @@ export const helperMixin = {
         const payload = { ...omit(this.editedHelper, ['_id']) };
         delete payload.local;
         await Users.updateById(this.editedHelper._id, payload);
-        NotifyPositive('Aidant modifié');
+        NotifyPositive('Aidant(e) modifié(e)');
 
         await this.getUserHelpers();
         this.openEditedHelperModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'aidant.');
+        NotifyNegative('Erreur lors de la modification de l\'aidant(e).');
       } finally {
         this.loading = false;
       }
@@ -220,10 +220,10 @@ export const helperMixin = {
         await Users.deleteById(helperId);
 
         await this.getUserHelpers();
-        NotifyPositive('Aidant supprimé.');
+        NotifyPositive('Aidant(e) supprimé(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'aidant.');
+        NotifyNegative('Erreur lors de la suppression de l\'aidant(e).');
       }
     },
     validateHelperDeletion (helperId) {
