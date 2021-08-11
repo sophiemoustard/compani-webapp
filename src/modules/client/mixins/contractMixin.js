@@ -6,7 +6,7 @@ import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import nationalities from '@data/nationalities';
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatIdentity, getMonthlyHours } from '@helpers/utils';
+import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { getContractTags } from 'src/modules/client/helpers/tags';
 
@@ -86,18 +86,11 @@ export const contractMixin = {
       this.$v.editedVersion.$reset();
     },
     getSignaturePayload (contract, title, template) {
-      const initialContractMonthlyHours = getMonthlyHours(this.selectedContract.versions[0]);
-
       return {
         ...this.esignRedirection,
         templateId: template.driveId,
         meta: { auxiliaryDriveId: this.auxiliary.administrative.driveFolder.driveId },
-        fields: getContractTags({
-          user: this.auxiliary,
-          contract,
-          initialContractStartDate: this.selectedContract.startDate,
-          initialContractMonthlyHours,
-        }),
+        fields: getContractTags({ user: this.auxiliary, version: contract, contract: this.selectedContract }),
         signers: [
           { id: '1', name: this.userFullName, email: this.auxiliary.local.email },
           { id: '2', name: formatIdentity(this.loggedUser.identity, 'FL'), email: this.loggedUser.local.email },

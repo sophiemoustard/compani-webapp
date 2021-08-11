@@ -804,14 +804,14 @@ export default {
         NotifyNegative('Erreur lors de la modification.');
       }
     },
-    async downloadMandate (doc) {
+    async downloadMandate (mandate) {
       try {
         const mandateDriveId = get(this.company, 'customersConfig.templates.debitMandate.driveId', null);
         if (!mandateDriveId) {
           return NotifyWarning('Template manquant');
         }
 
-        const data = getMandateTags({ customer: this.customer, company: this.company }, doc);
+        const data = getMandateTags(this.customer, this.company, mandate);
         const params = { driveId: mandateDriveId };
 
         await downloadDriveDocx(params, data, 'mandat.docx');
@@ -829,12 +829,12 @@ export default {
     getQuoteLink (quote) {
       return get(quote, 'drive.link') || false;
     },
-    async downloadQuote (doc) {
+    async downloadQuote (quote) {
       try {
         const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);
         if (!quoteDriveId) return NotifyWarning('Template manquant');
 
-        doc.subscriptions = doc.subscriptions.map(subscription => ({
+        const subscriptions = quote.subscriptions.map(subscription => ({
           ...subscription,
           nature: this.subscriptions
             .filter(s => s.service.name === subscription.serviceName)
@@ -843,7 +843,7 @@ export default {
             .filter(s => s.service.name === subscription.serviceName)[0]),
         }));
 
-        const data = getQuoteTags({ customer: this.customer, company: this.company }, doc);
+        const data = getQuoteTags(this.customer, this.company, { ...quote, subscriptions });
         const params = { driveId: quoteDriveId };
         await downloadDriveDocx(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
@@ -854,8 +854,7 @@ export default {
     },
     async generateQuote () {
       try {
-        const subscriptions = this.subscriptions.map(getSubscriptionQuoteTags);
-        const payload = { subscriptions };
+        const payload = { subscriptions: this.subscriptions.map(getSubscriptionQuoteTags) };
         await Customers.addQuote(this.customer._id, payload);
 
         await this.refreshQuotes();

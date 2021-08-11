@@ -82,12 +82,12 @@ export default {
         serviceName: 'Nom du service',
         serviceNature: 'Nature du service',
         unitTTCRate: 'Tarif horaire TTC',
+        weeklyRate: 'Tarif hebdomadaire estimé',
         weeklyVolume: 'Volume hebdomadaire estimé total',
         sundays: 'Dont dimanche',
         evenings: 'Dont soir après 20h',
         quoteNumber: 'Numéro du devis',
         subscriptions: 'Liste des services souscrits',
-        weeklyRate: 'Tarif hebdomadaire estimé',
       },
     };
   },

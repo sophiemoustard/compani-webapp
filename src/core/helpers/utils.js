@@ -2,7 +2,6 @@ import transform from 'lodash/transform';
 import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
-import { WEEKS_PER_MONTH } from '@data/constants';
 import moment from '@helpers/moment';
 
 export const extend = (...sources) => {
@@ -143,5 +142,3 @@ export const formatAndSortIdentityOptions = (array, field = null) => array
   .sort((a, b) => a.label.localeCompare(b.label));
 
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
-
-export const getMonthlyHours = contract => Number.parseFloat(contract.weeklyHours * WEEKS_PER_MONTH).toFixed(1);

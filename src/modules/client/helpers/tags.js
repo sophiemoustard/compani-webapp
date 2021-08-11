@@ -1,91 +1,82 @@
 import get from 'lodash/get';
-import moment from '@helpers/moment';
 
-import { CIVILITY_OPTIONS, NATURE_OPTIONS } from '@data/constants';
+import { CIVILITY_OPTIONS, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import nationalities from '@data/nationalities';
-import { getMonthlyHours } from '@helpers/utils';
+import { formatPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 
+const getMonthlyHours = contract => Number.parseFloat(contract.weeklyHours * WEEKS_PER_MONTH).toFixed(1);
+
 export const getContractTags = (data) => {
-  const monthlyHours = getMonthlyHours(data.contract);
+  const monthlyHours = getMonthlyHours(data.version);
   const civility = CIVILITY_OPTIONS.find(opt => opt.value === data.user.identity.title);
   return {
     auxiliaryTitle: civility ? civility.label : '',
-    auxiliaryFirstname: data.user.identity.firstname,
-    auxiliaryLastname: data.user.identity.lastname,
-    auxiliaryAddress: data.user.contact.address.fullAddress,
-    auxiliaryCity: data.user.contact.address.street,
-    auxiliaryZipCode: data.user.contact.address.zipCode,
-    auxiliaryBirthCountry: data.user.identity.birthCountry,
-    auxiliaryBirthState: data.user.identity.birthState,
-    auxiliaryBirthDate: moment(data.user.identity.birthDate).format('DD/MM/YYYY'),
-    auxiliaryNationality: nationalities[data.user.identity.nationality],
-    auxiliarySSN: data.user.identity.socialSecurityNumber,
-    grossHourlyRate: data.contract.grossHourlyRate,
+    auxiliaryFirstname: get(data, 'user.identity.firstname') || '',
+    auxiliaryLastname: get(data, 'user.identity.lastname') || '',
+    auxiliaryAddress: get(data, 'user.contact.address.fullAddress') || '',
+    auxiliaryCity: get(data, 'user.contact.address.street') || '',
+    auxiliaryZipCode: get(data, 'user.contact.address.zipCode') || '',
+    auxiliaryBirthCountry: get(data, 'user.identity.birthCountry') || '',
+    auxiliaryBirthState: get(data, 'user.identity.birthState') || '',
+    auxiliaryBirthDate: get(data, 'user.identity.birthDate') ? formatDate(data.user.identity.birthDate) : '',
+    auxiliaryNationality: get(data, 'user.identity.nationality') ? nationalities[data.user.identity.nationality] : '',
+    auxiliarySSN: get(data, 'user.identity.socialSecurityNumber') || '',
+    grossHourlyRate: get(data, 'version.grossHourlyRate') || '',
     monthlyHours,
-    salary: monthlyHours * data.contract.grossHourlyRate,
-    startDate: moment(data.contract.startDate).format('DD/MM/YYYY'),
-    weeklyHours: data.contract.weeklyHours,
-    yearlyHours: data.contract.weeklyHours * 52,
-    uploadDate: moment().format('DD/MM/YYYY'),
-    initialContractStartDate: moment(data.initialContractStartDate).format('DD/MM/YYYY'),
-    initialContractMonthlyHours: data.initialContractMonthlyHours,
+    salary: get(data, 'version.grossHourlyRate') ? monthlyHours * data.version.grossHourlyRate : '',
+    startDate: get(data, 'version.startDate') ? formatDate(data.version.startDate) : '',
+    weeklyHours: get(data, 'version.weeklyHours') || '',
+    yearlyHours: get(data, 'version.weeklyHours') ? data.version.weeklyHours * 52 : '',
+    uploadDate: formatDate(Date.now()),
+    initialContractStartDate: get(data, 'contract.startDate') ? formatDate(data.contract.startDate) : '',
+    initialContractMonthlyHours: get(data, 'contract.versions[0]') ? getMonthlyHours(data.contract.versions[0]) : '',
   };
 };
 
 export const getCustomerDocumentTags = data => ({
-  customerFirstname: data.customer.identity.firstname,
-  customerLastname: data.customer.identity.lastname,
-  customerAddress: data.customer.contact.primaryAddress.fullAddress,
-  customerStreet: data.customer.contact.primaryAddress.street,
-  customerCity: data.customer.contact.primaryAddress.city,
-  customerZipCode: data.customer.contact.primaryAddress.zipCode,
-  ics: get(data, 'company.ics'),
-  companyName: data.company.name,
-  companyAddress: data.company.address.fullAddress,
-  companyStreet: data.company.address.street,
-  companyCity: data.company.address.city,
-  companyZipCode: data.company.address.zipCode,
+  customerFirstname: get(data, 'customer.identity.firstname') || '',
+  customerLastname: get(data, 'customer.identity.lastname') || '',
+  customerAddress: get(data, 'customer.contact.primaryAddress.fullAddress') || '',
+  customerStreet: get(data, 'customer.contact.primaryAddress.street') || '',
+  customerCity: get(data, 'customer.contact.primaryAddress.city') || '',
+  customerZipCode: get(data, 'customer.contact.primaryAddress.zipCode') || '',
+  ics: get(data, 'company.ics') || '',
+  companyName: get(data, 'company.name') || '',
+  companyAddress: get(data, 'company.address.fullAddress') || '',
+  companyStreet: get(data, 'company.address.street') || '',
+  companyCity: get(data, 'company.address.city') || '',
+  companyZipCode: get(data, 'company.address.zipCode') || '',
   downloadDate: formatDate(Date.now()),
-  rcs: get(data, 'company.rcs'),
+  rcs: get(data, 'company.rcs') || '',
 });
 
-export const getMandateTags = (data, doc) => {
-  const customerDocumentTags = getCustomerDocumentTags(data);
-
-  return {
-    ...customerDocumentTags,
-    bankAccountOwner: data.customer.payment.bankAccountOwner || '',
-    bic: data.customer.payment.bic || '',
-    iban: data.customer.payment.iban || '',
-    rum: doc.rum,
-  };
-};
-const formatNumber = number => parseFloat(Math.round(number * 100) / 100).toFixed(2);
+export const getMandateTags = (customer, company, mandate) => ({
+  ...getCustomerDocumentTags({ customer, company }),
+  bankAccountOwner: get(customer, 'payment.bankAccountOwner') || '',
+  bic: get(customer, 'payment.bic') || '',
+  iban: get(customer, 'payment.iban') || '',
+  rum: mandate.rum,
+});
 
 export const getSubscriptionQuoteTags = data => ({
-  serviceName: data.service.name,
+  serviceName: get(data, 'service.name') || '',
   unitTTCRate: data.unitTTCRate,
   estimatedWeeklyVolume: data.estimatedWeeklyVolume,
   sundays: data.sundays,
   evenings: data.evenings,
 });
 
-export const getQuoteTags = (data, doc) => {
-  const customerDocumentTags = getCustomerDocumentTags(data);
-  const subscriptions = doc.subscriptions.map(subscription => ({
+export const getQuoteTags = (customer, company, quote) => ({
+  ...getCustomerDocumentTags({ customer, company }),
+  quoteNumber: quote.quoteNumber,
+  subscriptions: quote.subscriptions.map(subscription => ({
     serviceName: subscription.serviceName,
     sundays: subscription.sundays ? subscription.sundays : '',
     evenings: subscription.evenings ? subscription.evenings : '',
     weeklyVolume: subscription.estimatedWeeklyVolume,
     serviceNature: subscription.nature ? NATURE_OPTIONS.find(nat => nat.value === subscription.nature).label : '',
-    weeklyRate: subscription.estimatedWeeklyRate ? `${formatNumber(subscription.estimatedWeeklyRate)}€` : '',
-    unitTTCRate: subscription.unitTTCRate ? `${formatNumber(subscription.unitTTCRate)}€` : '',
-  }));
-
-  return {
-    ...customerDocumentTags,
-    quoteNumber: doc.quoteNumber,
-    subscriptions,
-  };
-};
+    weeklyRate: subscription.estimatedWeeklyRate ? formatPrice(subscription.estimatedWeeklyRate) : '',
+    unitTTCRate: subscription.unitTTCRate ? formatPrice(subscription.unitTTCRate) : '',
+  })),
+});
