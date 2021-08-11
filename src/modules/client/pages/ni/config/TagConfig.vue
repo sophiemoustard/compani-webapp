@@ -27,6 +27,7 @@ export default {
         auxiliaryFirstname: 'Prénom',
         auxiliaryLastname: 'Nom',
         auxiliaryAddress: 'Adresse',
+        auxiliaryStreet: 'Rue',
         auxiliaryCity: 'Ville',
         auxiliaryZipCode: 'Code postal',
         auxiliaryBirthDate: 'Date de naissance',
@@ -45,6 +46,7 @@ export default {
         initialContractMonthlyHours: 'Volume d\'heures mensuel du contrat initial',
       },
       mandateTags: {
+        customerTitle: 'Civilité',
         customerFirstname: 'Prénom du/de la bénéficiaire',
         customerLastname: 'Nom du/de la bénéficiaire',
         customerAddress: 'Adresse du/de la bénéficiaire',
@@ -65,6 +67,7 @@ export default {
         bankAccountOwner: 'Nom associé au compte bancaire',
       },
       quoteTags: {
+        customerTitle: 'Civilité',
         customerFirstname: 'Prénom du/de la bénéficiaire',
         customerLastname: 'Nom du/de la bénéficiaire',
         customerAddress: 'Adresse du/de la bénéficiaire',

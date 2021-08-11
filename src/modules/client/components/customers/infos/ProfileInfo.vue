@@ -836,11 +836,7 @@ export default {
 
         const subscriptions = quote.subscriptions.map(subscription => ({
           ...subscription,
-          nature: this.subscriptions
-            .filter(s => s.service.name === subscription.serviceName)
-            .map(s => s.service.nature)[0],
-          estimatedWeeklyRate: this.computeWeeklyRate(this.subscriptions
-            .filter(s => s.service.name === subscription.serviceName)[0]),
+          estimatedWeeklyRate: this.computeWeeklyRate(subscription),
         }));
 
         const data = getQuoteTags(this.customer, this.company, { ...quote, subscriptions });

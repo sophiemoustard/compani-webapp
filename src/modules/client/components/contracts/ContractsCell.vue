@@ -221,14 +221,14 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
-    async dlTemplate (contractVersion, parentContract, contractIndex) {
+    async dlTemplate (version, contract, contractIndex) {
       try {
-        const data = getContractTags({ user: this.user, version: contractVersion, contract: parentContract });
-        if (!this.canDownload(contractVersion, contractIndex)) {
+        const data = getContractTags({ user: this.user, version, contract });
+        if (!this.canDownload(version, contractIndex)) {
           return NotifyNegative('Impossible de télécharger le contrat.');
         }
 
-        const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contractVersion);
+        const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, version);
         const params = {
           driveId: versionIndex === 0
             ? this.user.company.rhConfig.templates.contract.driveId

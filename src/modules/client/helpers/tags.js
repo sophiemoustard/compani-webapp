@@ -1,5 +1,4 @@
 import get from 'lodash/get';
-
 import { CIVILITY_OPTIONS, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import nationalities from '@data/nationalities';
 import { formatPrice } from '@helpers/utils';
@@ -9,13 +8,15 @@ const getMonthlyHours = contract => Number.parseFloat(contract.weeklyHours * WEE
 
 export const getContractTags = (data) => {
   const monthlyHours = getMonthlyHours(data.version);
-  const civility = CIVILITY_OPTIONS.find(opt => opt.value === data.user.identity.title);
+  const civility = CIVILITY_OPTIONS.find(opt => opt.value === get(data, 'user.identity.title'));
+
   return {
     auxiliaryTitle: civility ? civility.label : '',
     auxiliaryFirstname: get(data, 'user.identity.firstname') || '',
     auxiliaryLastname: get(data, 'user.identity.lastname') || '',
     auxiliaryAddress: get(data, 'user.contact.address.fullAddress') || '',
-    auxiliaryCity: get(data, 'user.contact.address.street') || '',
+    auxiliaryStreet: get(data, 'user.contact.address.street') || '',
+    auxiliaryCity: get(data, 'user.contact.address.city') || '',
     auxiliaryZipCode: get(data, 'user.contact.address.zipCode') || '',
     auxiliaryBirthCountry: get(data, 'user.identity.birthCountry') || '',
     auxiliaryBirthState: get(data, 'user.identity.birthState') || '',
@@ -34,22 +35,27 @@ export const getContractTags = (data) => {
   };
 };
 
-export const getCustomerDocumentTags = data => ({
-  customerFirstname: get(data, 'customer.identity.firstname') || '',
-  customerLastname: get(data, 'customer.identity.lastname') || '',
-  customerAddress: get(data, 'customer.contact.primaryAddress.fullAddress') || '',
-  customerStreet: get(data, 'customer.contact.primaryAddress.street') || '',
-  customerCity: get(data, 'customer.contact.primaryAddress.city') || '',
-  customerZipCode: get(data, 'customer.contact.primaryAddress.zipCode') || '',
-  ics: get(data, 'company.ics') || '',
-  companyName: get(data, 'company.name') || '',
-  companyAddress: get(data, 'company.address.fullAddress') || '',
-  companyStreet: get(data, 'company.address.street') || '',
-  companyCity: get(data, 'company.address.city') || '',
-  companyZipCode: get(data, 'company.address.zipCode') || '',
-  downloadDate: formatDate(Date.now()),
-  rcs: get(data, 'company.rcs') || '',
-});
+export const getCustomerDocumentTags = (data) => {
+  const civility = CIVILITY_OPTIONS.find(opt => opt.value === get(data, 'customer.identity.title'));
+
+  return {
+    customerTitle: civility ? civility.label : '',
+    customerFirstname: get(data, 'customer.identity.firstname') || '',
+    customerLastname: get(data, 'customer.identity.lastname') || '',
+    customerAddress: get(data, 'customer.contact.primaryAddress.fullAddress') || '',
+    customerStreet: get(data, 'customer.contact.primaryAddress.street') || '',
+    customerCity: get(data, 'customer.contact.primaryAddress.city') || '',
+    customerZipCode: get(data, 'customer.contact.primaryAddress.zipCode') || '',
+    ics: get(data, 'company.ics') || '',
+    companyName: get(data, 'company.name') || '',
+    companyAddress: get(data, 'company.address.fullAddress') || '',
+    companyStreet: get(data, 'company.address.street') || '',
+    companyCity: get(data, 'company.address.city') || '',
+    companyZipCode: get(data, 'company.address.zipCode') || '',
+    downloadDate: formatDate(Date.now()),
+    rcs: get(data, 'company.rcs') || '',
+  };
+};
 
 export const getMandateTags = (customer, company, mandate) => ({
   ...getCustomerDocumentTags({ customer, company }),
@@ -60,7 +66,14 @@ export const getMandateTags = (customer, company, mandate) => ({
 });
 
 export const getSubscriptionQuoteTags = data => ({
-  serviceName: get(data, 'service.name') || '',
+  service: {
+    name: get(data, 'service.name'),
+    nature: get(data, 'service.nature'),
+    surcharge: {
+      evening: get(data, 'service.surcharge.evening') || '',
+      sunday: get(data, 'service.surcharge.sunday') || '',
+    },
+  },
   unitTTCRate: data.unitTTCRate,
   estimatedWeeklyVolume: data.estimatedWeeklyVolume,
   sundays: data.sundays,
@@ -71,11 +84,13 @@ export const getQuoteTags = (customer, company, quote) => ({
   ...getCustomerDocumentTags({ customer, company }),
   quoteNumber: quote.quoteNumber,
   subscriptions: quote.subscriptions.map(subscription => ({
-    serviceName: subscription.serviceName,
+    serviceName: subscription.service.name,
     sundays: subscription.sundays ? subscription.sundays : '',
     evenings: subscription.evenings ? subscription.evenings : '',
     weeklyVolume: subscription.estimatedWeeklyVolume,
-    serviceNature: subscription.nature ? NATURE_OPTIONS.find(nat => nat.value === subscription.nature).label : '',
+    serviceNature: subscription.service.nature
+      ? NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature).label
+      : '',
     weeklyRate: subscription.estimatedWeeklyRate ? formatPrice(subscription.estimatedWeeklyRate) : '',
     unitTTCRate: subscription.unitTTCRate ? formatPrice(subscription.unitTTCRate) : '',
   })),
