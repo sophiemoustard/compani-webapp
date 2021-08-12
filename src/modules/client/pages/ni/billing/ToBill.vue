@@ -206,7 +206,6 @@ export default {
       try {
         this.tableLoading = true;
         const params = {
-          startDate: moment(this.billingDates.startDate).endOf('d').toISOString() || null,
           endDate: moment(this.billingDates.endDate).endOf('d').toISOString(),
           billingStartDate: moment(this.billingDates.startDate).startOf('d').toISOString(),
           billingPeriod: get(this.company, 'customersConfig.billingPeriod'),
