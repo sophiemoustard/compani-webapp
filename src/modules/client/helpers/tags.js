@@ -69,15 +69,17 @@ export const getSubscriptionQuoteTags = data => ({
   service: {
     name: get(data, 'service.name'),
     nature: get(data, 'service.nature'),
-    surcharge: {
-      evening: get(data, 'service.surcharge.evening') || '',
-      sunday: get(data, 'service.surcharge.sunday') || '',
+    ...(get(data, 'service.surcharge.evening') || get(data, 'service.surcharge.sunday')) && {
+      surcharge: {
+        ...get(data, 'service.surcharge.evening') && { evening: data.service.surcharge.evening },
+        ...get(data, 'service.surcharge.sunday') && { sunday: data.service.surcharge.sunday },
+      },
     },
   },
   unitTTCRate: data.unitTTCRate,
   estimatedWeeklyVolume: data.estimatedWeeklyVolume,
-  sundays: data.sundays,
-  evenings: data.evenings,
+  ...data.sundays && { sundays: data.sundays },
+  ...data.evenings && { evenings: data.evenings },
 });
 
 export const getQuoteTags = (customer, company, quote) => ({
