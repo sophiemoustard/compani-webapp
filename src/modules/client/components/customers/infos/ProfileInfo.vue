@@ -300,20 +300,12 @@ import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { days } from '@data/days';
-import {
-  NATURE_OPTIONS,
-  FIXED,
-  HOURLY,
-  MONTHLY,
-  REQUIRED_LABEL,
-  CIVILITY_OPTIONS,
-  DOC_EXTENSIONS,
-  ONCE,
-} from '@data/constants';
+import { FIXED, HOURLY, MONTHLY, REQUIRED_LABEL, CIVILITY_OPTIONS, DOC_EXTENSIONS, ONCE } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate } from '@helpers/date';
 import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
+import { getSubscriptionQuoteTags, getQuoteTags, getMandateTags } from 'src/modules/client/helpers/tags';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import HelperEditionModal from 'src/modules/client/components/customers/infos/HelperEditionModal';
@@ -812,24 +804,14 @@ export default {
         NotifyNegative('Erreur lors de la modification.');
       }
     },
-    async downloadMandate (doc) {
+    async downloadMandate (mandate) {
       try {
         const mandateDriveId = get(this.company, 'customersConfig.templates.debitMandate.driveId', null);
         if (!mandateDriveId) {
           return NotifyWarning('Template manquant');
         }
 
-        const data = {
-          bankAccountOwner: this.customer.payment.bankAccountOwner || '',
-          customerAddress: this.customer.contact.primaryAddress.fullAddress,
-          downloadDate: formatDate(Date.now()),
-          ics: this.company.ics,
-          rum: doc.rum,
-          bic: this.customer.payment.bic || '',
-          iban: this.customer.payment.iban || '',
-          companyName: this.company.name,
-          companyAddress: this.company.address.fullAddress,
-        };
+        const data = getMandateTags(this.customer, this.company, mandate);
         const params = { driveId: mandateDriveId };
 
         await downloadDriveDocx(params, data, 'mandat.docx');
@@ -847,38 +829,17 @@ export default {
     getQuoteLink (quote) {
       return get(quote, 'drive.link') || false;
     },
-    formatSubscriptionToDownloadQuote (subscription) {
-      const estimatedWeeklyRate = this.computeWeeklyRate(subscription);
-      const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
-
-      return {
-        serviceName: subscription.service.name,
-        serviceNature: nature ? nature.label : '',
-        unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
-        weeklyVolume: subscription.estimatedWeeklyVolume,
-        weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
-        sundays: subscription.sundays || '',
-        evenings: subscription.evenings || '',
-      };
-    },
-    async downloadQuote (doc) {
+    async downloadQuote (quote) {
       try {
         const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);
         if (!quoteDriveId) return NotifyWarning('Template manquant');
 
-        const subscriptions = this.subscriptions.map(this.formatSubscriptionToDownloadQuote);
+        const subscriptions = quote.subscriptions.map(subscription => ({
+          ...subscription,
+          estimatedWeeklyRate: this.computeWeeklyRate(subscription),
+        }));
 
-        const data = {
-          quoteNumber: doc.quoteNumber,
-          customerFirstname: this.customer.identity.firstname,
-          customerLastname: this.customer.identity.lastname,
-          customerAddress: this.customer.contact.primaryAddress.fullAddress,
-          companyName: this.company.name,
-          companyAddress: this.company.address.fullAddress,
-          rcs: this.company.rcs,
-          subscriptions,
-          downloadDate: formatDate(Date.now()),
-        };
+        const data = getQuoteTags(this.customer, this.company, { ...quote, subscriptions });
         const params = { driveId: quoteDriveId };
         await downloadDriveDocx(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
@@ -887,21 +848,9 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du devis.');
       }
     },
-    formatSubscriptionToGenerateQuote (subscription) {
-      const sub = {
-        serviceName: subscription.service.name,
-        unitTTCRate: subscription.unitTTCRate,
-        estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-      };
-      if (subscription.sundays) sub.sundays = subscription.sundays;
-      if (subscription.evenings) sub.evenings = subscription.evenings;
-
-      return sub;
-    },
     async generateQuote () {
       try {
-        const subscriptions = this.subscriptions.map(this.formatSubscriptionToGenerateQuote);
-        const payload = { subscriptions };
+        const payload = { subscriptions: this.subscriptions.map(getSubscriptionQuoteTags) };
         await Customers.addQuote(this.customer._id, payload);
 
         await this.refreshQuotes();
