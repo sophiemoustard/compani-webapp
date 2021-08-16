@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="row">
+      <div class="q-my-sm">Numéro de matricule : {{ auxiliary.serialNumber }}</div>
       <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
         :person-key="COACH" display-actions display-uploader @open-end-contract="openEndContractModal"
         @open-version-edition="openVersionEditionModal" @open-version-creation="openVersionCreationModal"
