@@ -27,6 +27,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
+import uniqBy from 'lodash/uniqBy';
 import pick from 'lodash/pick';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
@@ -172,20 +173,9 @@ export default {
       }
     },
     updateAuxiliariesList () {
-      const auxiliaries = [];
-      for (const sector of this.filteredSectors) {
-        auxiliaries.push(...this.getAuxBySector(sector).reduce(
-          (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
-          []
-        ));
-      }
-
-      auxiliaries.push(...this.filteredAuxiliaries.reduce(
-        (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
-        []
-      ));
-
-      this.auxiliaries = auxiliaries;
+      const auxFromSector = this.filteredSectors.map(this.getAuxBySector).flat();
+      this.auxiliaries = uniqBy([...this.filteredAuxiliaries, ...auxFromSector], '_id')
+        .map(this.formatAuxiliaryWithSector);
     },
     async refresh () {
       const params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
