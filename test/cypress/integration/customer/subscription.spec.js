@@ -71,14 +71,12 @@ describe('customers subscription tests', () => {
       cy.get('[data-cy=col-folderNumber]').should('contain', 'Numéro de dossier');
       cy.get('[data-cy=col-frequency]').should('contain', 'Fréquence');
       cy.get('[data-cy=col-amountTTC]').should('contain', 'Montant forfaitaire TTC');
-      cy.get('[data-cy=col-customerParticipationRate]').should('contain', 'Tx. participation bénéficiaire');
 
       cy.get('[data-cy=col-side-startDate]').should('contain', '02/02/2020');
       cy.get('[data-cy=col-side-thirdPartyPayer]').should('contain', 'Toto');
       cy.get('[data-cy=col-side-folderNumber]').should('contain', 'D123456');
       cy.get('[data-cy=col-side-frequency]').should('contain', 'Une seule fois');
-      cy.get('[data-cy=col-side-amountTTC]').should('contain', '1600€');
-      cy.get('[data-cy=col-side-customerParticipationRate]').should('contain', '66%');
+      cy.get('[data-cy=col-side-amountTTC]').should('contain', '160,00\u00A0€');
     });
   });
 

@@ -26,7 +26,7 @@ describe('ToBill', () => {
 
     cy.get('[data-cy=col-customer]').should('contain', 'ANDTHEQUEENS C.');
     cy.get('[data-cy=col-client]').should('contain', 'ANDTHEQUEENS C.');
-    cy.get('[data-cy=col-startDate]').should('contain', '19/01/19');
+    cy.get('[data-cy=col-startDate]').should('contain', '19/01/2019');
     cy.get('[data-cy=col-service]').should('contain', 'Service 2');
     cy.get('[data-cy=col-hours]').should('contain', '5.00h');
     cy.get('[data-cy=col-unitExclTaxes]').should('contain', '10,71');
@@ -36,7 +36,7 @@ describe('ToBill', () => {
 
     cy.get('[data-cy=bill-row]').should('have.length', 3);
 
-    // should interact correctly with dateInput and payerSelect '
+    // should interact correctly with date input and thirdPartyPayer select'
     cy.get('[data-cy=select-tpp]').eq(1).click();
     cy.get('[data-cy=select-tpp]').eq(1).type('{backspace}Avec{downarrow}{enter}');
     cy.get('[data-cy=bill-row]').should('have.length', 1);
@@ -53,10 +53,14 @@ describe('ToBill', () => {
     cy.get('[data-cy=bill-row]').should('have.length', 2);
 
     cy.get('[data-cy=date-input]  input').eq(0).clear().type('01/01/2019');
-    cy.get('[data-cy=date-input]  input').eq(1).clear().type('17/01/2019');
+    cy.get('[data-cy=date-input]  input')
+      .eq(1)
+      .clear()
+      .type('17/01/2019')
+      .blur();
     cy.get('[data-cy=bill-row]').should('have.length', 1);
     cy.get('[data-cy=col-customer]').should('contain', 'AUFRAY H.');
-    cy.get('[data-cy=col-endDate]').should('contain', '17/01/19');
+    cy.get('[data-cy=col-endDate]').should('contain', '17/01/2019');
     cy.get('[data-cy=col-selected-bill]').within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
       cy.get('.q-checkbox').click();
@@ -72,7 +76,11 @@ describe('ToBill', () => {
 
     cy.get('[data-cy=select-tpp]').eq(1).click();
     cy.get('[data-cy=select-tpp]').eq(1).type('{backspace}Tous{downarrow}{enter}');
-    cy.get('[data-cy=date-input]  input').eq(1).clear().type('01/01/2020');
+    cy.get('[data-cy=date-input]  input')
+      .eq(1)
+      .clear()
+      .type('01/01/2021')
+      .blur();
     cy.get('[data-cy=bill-row]').should('have.length', 3);
 
     // should bill correctly
