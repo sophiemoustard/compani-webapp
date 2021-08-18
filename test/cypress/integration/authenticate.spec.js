@@ -8,8 +8,9 @@ describe('Login page tests', () => {
     cy.get('[data-cy=email]').type('client-admin@alenvi.io');
     cy.get('[data-cy=password]').type('3236{enter}');
     cy.get('.q-notification__message')
+      .scrollIntoView()
       .should('be.visible')
-      .and('contain', 'Impossible de se connecter');
+      .and('contain', 'Identifiant ou mot de passe invalide');
     cy.url().should('include', '/login');
   });
 
@@ -54,7 +55,6 @@ describe('Login page tests', () => {
       cy.url().should('include', params.url);
       cy.getCookie('alenvi_token').should('exist');
       cy.getCookie('refresh_token').should('exist');
-      cy.getCookie('user_id').should('exist');
     });
   });
 });
