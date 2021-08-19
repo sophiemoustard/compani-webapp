@@ -314,6 +314,8 @@ export default {
       await this.updateDisplayedEventHistories();
     },
     async updateDisplayedEventHistories () {
+      if (!this.displayHistory) return;
+
       this.eventHistories = this.eventHistories
         .filter(history => this.auxiliaries.some(aux => history.auxiliaries.map(a => a._id).includes(aux._id)));
       if (this.auxiliaries.length) await this.getEventHistories();
