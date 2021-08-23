@@ -9,27 +9,33 @@ describe('customers agenda tests', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=customer-identity]').should('have.value', 'Romain BARDET');
 
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
-    cy.get('[data-cy=days-number]').eq(0).should(
-      'contain',
-      Cypress.moment().subtract(1, 'day').startOf('week').add(1, 'day')
-        .format('DD')
-    );
-    cy.get('[data-cy=days-number]').eq(6).should(
-      'contain',
-      Cypress.moment().subtract(1, 'day').endOf('week').add(1, 'day')
-        .format('DD')
-    );
+    cy.get('[data-cy=planning-date]').click();
+    cy.get('.q-date__navigation > .relative-position').eq(0).click();
+    cy.get('.q-date__months-item').eq(3).click();
+    cy.get('.q-date__navigation > .relative-position').eq(1).click();
+    cy.get('.q-date__years-item').eq(0).click();
+    cy.get('.q-date__calendar-item--in').eq(8).click();
+
+    cy.get('[data-cy=week-number]').should('contain', 15);
+    cy.get('[data-cy=days-number]').eq(0).should('contain', '06');
+    cy.get('[data-cy=days-number]').eq(6).should('contain', '12');
   });
 
   it('should go through agenda and display events', () => {
     cy.get('#q-app').click(500, 500);
+    cy.get('[data-cy=planning-date]').click();
+    cy.get('.q-date__navigation > .relative-position').eq(0).click();
+    cy.get('.q-date__months-item').eq(2).click();
+    cy.get('.q-date__navigation > .relative-position').eq(1).click();
+    cy.get('.q-date__years-item').eq(0).click();
+    cy.get('.q-date__calendar-item--in').eq(1).click();
+
     cy.get('.event-intervention').should('have.length', 1);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'Auxiliary T.');
     cy.get('[data-cy=event-hours]').eq(0).should('contain', '10:00 - 12:30');
 
-    cy.get('[data-cy=planning_before]').click();
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'week').subtract(1, 'day').week());
+    cy.get('[data-cy=planning-before]').click();
+    cy.get('[data-cy=week-number]').should('contain', 9);
     cy.get('.event-intervention').should('have.length', 3);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'Auxiliary T.');
     cy.get('[data-cy=event-hours]').eq(0).should('contain', '11:15 - 12:30');
@@ -38,12 +44,7 @@ describe('customers agenda tests', () => {
     cy.get('[data-cy=event-title]').eq(2).should('contain', 'Auxiliary T.');
     cy.get('[data-cy=event-hours]').eq(2).should('contain', '18:15 - 20:30');
 
-    cy.get('[data-cy=planning_after]').click();
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
-
-    cy.get('[data-cy=planning_before]').click();
-    cy.get('[data-cy=planning_before]').click();
-    cy.get('[data-cy=planning_today]').click();
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
+    cy.get('[data-cy=planning-after]').click();
+    cy.get('[data-cy=week-number]').should('contain', 10);
   });
 });
