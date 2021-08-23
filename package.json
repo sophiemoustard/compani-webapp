@@ -7,8 +7,8 @@
   "author": "Sophie MOUSTARD & Chloe MOLLE & Corentin MARTINOT-LAGARDE & Kenny CALLEGARI",
   "private": true,
   "scripts": {
-    "test:e2e:ci": "cross-env E2E_TEST=true start-test 'quasar dev' http-get://localhost:8080 'cypress run'",
-    "test:e2e": "cross-env E2E_TEST=true start-test 'quasar dev' http-get://localhost:8080 'cypress open'",
+    "test:e2e:ci": "cypress run",
+    "test:e2e": "cypress open",
     "postinstall": "holidays2json --pick FR --min && quasar build",
     "start": "node server.js",
     "lint": "eslint ./src --ext .js,.vue -c .eslintrc.js"

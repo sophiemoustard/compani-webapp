@@ -5,8 +5,8 @@ describe('Login page tests', () => {
   });
 
   it('should display an error if credentials are wrong', () => {
-    cy.get('[data-cy=email]').type('client-admin@alenvi.io');
-    cy.get('[data-cy=password]').type('3236{enter}');
+    cy.dataCy('email').type('client-admin@alenvi.io');
+    cy.dataCy('password').type('3236{enter}');
     cy.get('.q-notification__message')
       .scrollIntoView()
       .should('be.visible')
@@ -48,9 +48,9 @@ describe('Login page tests', () => {
 
   paramsArray.forEach((params) => {
     it(`should visits login page and connects ${params.person} user`, () => {
-      cy.get('[data-cy=email]').type(params.email);
-      cy.get('[data-cy=password]').type(params.password);
-      cy.get('[data-cy=login]').click();
+      cy.dataCy('email').type(params.email);
+      cy.dataCy('password').type(params.password);
+      cy.dataCy('login').click();
 
       cy.url().should('include', params.url);
       cy.getCookie('alenvi_token').should('exist');

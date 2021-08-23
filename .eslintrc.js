@@ -31,7 +31,6 @@ module.exports = {
     'vue/singleline-html-element-content-newline': 0,
     'vue/html-indent': 0,
     'vue/html-closing-bracket-newline': 0,
-    'vue/script-setup-uses-vars': 0,
     'arrow-parens': [2, 'as-needed', { requireForBlockBody: true }],
     // Un-used AirBnb rules
     'no-param-reassign': 0,

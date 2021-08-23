@@ -8,7 +8,7 @@ describe('ToBill', () => {
 
   it('should display, interact and bill correctly', () => {
     // should display correctly to-bill
-    cy.get('[data-cy=client-table]').within(() => {
+    cy.dataCy('client-table').within(() => {
       cy.get('th').should('have.length', 12).and(($th) => {
         expect($th.eq(0)).to.contain('Factu. externe');
         expect($th.eq(1)).to.contain('Bénéficiaire');
@@ -24,33 +24,33 @@ describe('ToBill', () => {
       });
     });
 
-    cy.get('[data-cy=col-customer]').should('contain', 'ANDTHEQUEENS C.');
-    cy.get('[data-cy=col-client]').should('contain', 'ANDTHEQUEENS C.');
-    cy.get('[data-cy=col-startDate]').should('contain', '19/01/2019');
-    cy.get('[data-cy=col-service]').should('contain', 'Service 2');
-    cy.get('[data-cy=col-hours]').should('contain', '5.00h');
-    cy.get('[data-cy=col-unitExclTaxes]').should('contain', '10,71');
-    cy.get('[data-cy=col-discount]').should('contain', '0,00');
-    cy.get('[data-cy=col-exclTaxes]').should('contain', '53,57');
-    cy.get('[data-cy=col-inclTaxes]').should('contain', '60,00');
+    cy.dataCy('col-customer').should('contain', 'ANDTHEQUEENS C.');
+    cy.dataCy('col-client').should('contain', 'ANDTHEQUEENS C.');
+    cy.dataCy('col-startDate').should('contain', '19/01/2019');
+    cy.dataCy('col-service').should('contain', 'Service 2');
+    cy.dataCy('col-hours').should('contain', '5.00h');
+    cy.dataCy('col-unitExclTaxes').should('contain', '10,71');
+    cy.dataCy('col-discount').should('contain', '0,00');
+    cy.dataCy('col-exclTaxes').should('contain', '53,57');
+    cy.dataCy('col-inclTaxes').should('contain', '60,00');
 
-    cy.get('[data-cy=bill-row]').should('have.length', 3);
+    cy.dataCy('bill-row').should('have.length', 3);
 
     // should interact correctly with date input and thirdPartyPayer select'
-    cy.get('[data-cy=select-tpp]').eq(1).click();
-    cy.get('[data-cy=select-tpp]').eq(1).type('{backspace}Avec{downarrow}{enter}');
-    cy.get('[data-cy=bill-row]').should('have.length', 1);
-    cy.get('[data-cy=col-customer]').should('contain', 'YAFFA E.');
-    cy.get('[data-cy=col-externalBilling]').within(() => {
+    cy.dataCy('select-tpp').eq(1).click();
+    cy.dataCy('select-tpp').eq(1).type('{backspace}Avec{downarrow}{enter}');
+    cy.dataCy('bill-row').should('have.length', 1);
+    cy.dataCy('col-customer').should('contain', 'YAFFA E.');
+    cy.dataCy('col-externalBilling').within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
       cy.get('.q-checkbox').click();
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
       cy.get('.q-checkbox').click();
     });
 
-    cy.get('[data-cy=select-tpp]').eq(1).click();
-    cy.get('[data-cy=select-tpp]').eq(1).type('{backspace}Sans{downarrow}{enter}');
-    cy.get('[data-cy=bill-row]').should('have.length', 2);
+    cy.dataCy('select-tpp').eq(1).click();
+    cy.dataCy('select-tpp').eq(1).type('{backspace}Sans{downarrow}{enter}');
+    cy.dataCy('bill-row').should('have.length', 2);
 
     cy.get('[data-cy=date-input]  input').eq(0).clear().type('01/01/2019');
     cy.get('[data-cy=date-input]  input')
@@ -58,74 +58,74 @@ describe('ToBill', () => {
       .clear()
       .type('17/01/2019')
       .blur();
-    cy.get('[data-cy=bill-row]').should('have.length', 1);
-    cy.get('[data-cy=col-customer]').should('contain', 'AUFRAY H.');
-    cy.get('[data-cy=col-endDate]').should('contain', '17/01/2019');
-    cy.get('[data-cy=col-selected-bill]').within(() => {
+    cy.dataCy('bill-row').should('have.length', 1);
+    cy.dataCy('col-customer').should('contain', 'AUFRAY H.');
+    cy.dataCy('col-endDate').should('contain', '17/01/2019');
+    cy.dataCy('col-selected-bill').within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
       cy.get('.q-checkbox').click();
     });
 
-    cy.get('[data-cy=to-bill-button]').click();
+    cy.dataCy('to-bill-button').click();
     cy.get('div.q-dialog__title').eq(0).should('contain', 'Confirmation');
     cy.get('div.q-checkbox__label').eq(0).should('contain', 'Envoyer par email');
     cy.get('div.q-card__actions').within(() => {
       cy.get('.q-btn__content').eq(0).click();
     });
-    cy.get('[data-cy=bill-row]').should('have.length', 1);
+    cy.dataCy('bill-row').should('have.length', 1);
 
-    cy.get('[data-cy=select-tpp]').eq(1).click();
-    cy.get('[data-cy=select-tpp]').eq(1).type('{backspace}Tous{downarrow}{enter}');
+    cy.dataCy('select-tpp').eq(1).click();
+    cy.dataCy('select-tpp').eq(1).type('{backspace}Tous{downarrow}{enter}');
     cy.get('[data-cy=date-input]  input')
       .eq(1)
       .clear()
       .type('01/01/2021')
       .blur();
-    cy.get('[data-cy=bill-row]').should('have.length', 3);
+    cy.dataCy('bill-row').should('have.length', 3);
 
     // should bill correctly
-    cy.get('[data-cy=client-table]').within(() => {
+    cy.dataCy('client-table').within(() => {
       cy.get('th').eq(11).within(() => {
         cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
         cy.get('.q-checkbox').click();
       });
     });
 
-    cy.get('[data-cy=col-selected-bill]').eq(0).within(() => {
+    cy.dataCy('col-selected-bill').eq(0).within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
       cy.get('.q-checkbox').click();
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
     });
-    cy.get('[data-cy=col-selected-bill]').eq(1)
+    cy.dataCy('col-selected-bill').eq(1)
       .get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
-    cy.get('[data-cy=col-selected-bill]').eq(2)
+    cy.dataCy('col-selected-bill').eq(2)
       .get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
 
-    cy.get('[data-cy=to-bill-button]').click();
+    cy.dataCy('to-bill-button').click();
     cy.get('div.q-card__actions').within(() => {
       cy.get('.q-btn__content').eq(1).click();
     });
 
-    cy.get('[data-cy=bill-row]').should('have.length', 1);
-    cy.get('[data-cy=col-customer]').should('contain', 'ANDTHEQUEENS C.');
+    cy.dataCy('bill-row').should('have.length', 1);
+    cy.dataCy('col-customer').should('contain', 'ANDTHEQUEENS C.');
   });
 
   it('should bill a ttp customer with external option', () => {
-    cy.get('[data-cy=bill-row]').should('have.length', 3);
-    cy.get('[data-cy=col-externalBilling]').within(() => {
+    cy.dataCy('bill-row').should('have.length', 3);
+    cy.dataCy('col-externalBilling').within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
       cy.get('.q-checkbox').click();
     });
-    cy.get('[data-cy=col-selected-bill]').eq(2).within(() => {
+    cy.dataCy('col-selected-bill').eq(2).within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
       cy.get('.q-checkbox').click();
     });
 
-    cy.get('[data-cy=to-bill-button]').click();
+    cy.dataCy('to-bill-button').click();
     cy.get('div.q-card__actions').within(() => {
       cy.get('.q-btn__content').eq(1).click();
     });
 
-    cy.get('[data-cy=bill-row]').should('have.length', 2);
+    cy.dataCy('bill-row').should('have.length', 2);
   });
 });

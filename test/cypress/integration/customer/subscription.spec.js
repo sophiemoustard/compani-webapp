@@ -9,7 +9,7 @@ describe('customers subscription tests', () => {
 
   it('should display correctly the subscriptions part of the page', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=subscriptions-table]').within(() => {
+    cy.dataCy('subscriptions-table').within(() => {
       cy.get('th').should('have.length', 6).and(($th) => {
         expect($th.eq(0)).to.have.text('Service');
         expect($th.eq(1)).to.have.text('Nature');
@@ -20,11 +20,11 @@ describe('customers subscription tests', () => {
       });
     });
 
-    cy.get('[data-cy=col-service]').should('contain', 'Service 1');
-    cy.get('[data-cy=col-nature]').should('contain', 'Horaire');
-    cy.get('[data-cy=col-unitTTCRate]').should('contain', '12.00€');
-    cy.get('[data-cy=col-estimatedWeeklyVolume]').should('contain', '12h');
-    cy.get('[data-cy=col-weeklyRate]').should('contain', '144.00€');
+    cy.dataCy('col-service').should('contain', 'Service 1');
+    cy.dataCy('col-nature').should('contain', 'Horaire');
+    cy.dataCy('col-unitTTCRate').should('contain', '12.00€');
+    cy.dataCy('col-estimatedWeeklyVolume').should('contain', '12h');
+    cy.dataCy('col-weeklyRate').should('contain', '144.00€');
   });
 
   it('should interact correctly with the subscriptions part of the page', () => {
@@ -34,13 +34,13 @@ describe('customers subscription tests', () => {
     cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
     cy.get('.q-checkbox').should('have.class', 'disabled');
 
-    cy.get('[data-cy=agreement]').should(
+    cy.dataCy('agreement').should(
       'contain',
       `(Accepté le ${moment().format('DD/MM/YYYY')} par Helper TEST)`
     );
 
-    cy.get('[data-cy=show-subscription-history]').click();
-    cy.get('[data-cy=subscriptions-history]').within(() => {
+    cy.dataCy('show-subscription-history').click();
+    cy.dataCy('subscriptions-history').within(() => {
       cy.get('th').should('have.length', 5).and(($th) => {
         expect($th.eq(0)).to.have.text('Date de modification');
         expect($th.eq(1)).to.have.text('Prix unitaire TTC');
@@ -49,45 +49,45 @@ describe('customers subscription tests', () => {
         expect($th.eq(4)).to.have.text('dont dimanche');
       });
 
-      cy.get('[data-cy=col-createdAt]').eq(0).should('contain', '01/01/2020');
-      cy.get('[data-cy=col-unitTTCRate]').eq(0).should('contain', '12.00€');
-      cy.get('[data-cy=col-estimatedWeeklyVolume]').eq(0).should('contain', '12h');
-      cy.get('[data-cy=col-evenings]').eq(0).should('contain', '2');
-      cy.get('[data-cy=col-sundays]').eq(0).should('contain', '1');
+      cy.dataCy('col-createdAt').eq(0).should('contain', '01/01/2020');
+      cy.dataCy('col-unitTTCRate').eq(0).should('contain', '12.00€');
+      cy.dataCy('col-estimatedWeeklyVolume').eq(0).should('contain', '12h');
+      cy.dataCy('col-evenings').eq(0).should('contain', '2');
+      cy.dataCy('col-sundays').eq(0).should('contain', '1');
 
-      cy.get('[data-cy=col-createdAt]').eq(1).should('contain', '01/06/2019');
-      cy.get('[data-cy=col-unitTTCRate]').eq(1).should('contain', '10.00€');
-      cy.get('[data-cy=col-estimatedWeeklyVolume]').eq(1).should('contain', '8h');
-      cy.get('[data-cy=col-evenings]').eq(1).should('contain', '');
-      cy.get('[data-cy=col-sundays]').eq(1).should('contain', '2');
+      cy.dataCy('col-createdAt').eq(1).should('contain', '01/06/2019');
+      cy.dataCy('col-unitTTCRate').eq(1).should('contain', '10.00€');
+      cy.dataCy('col-estimatedWeeklyVolume').eq(1).should('contain', '8h');
+      cy.dataCy('col-evenings').eq(1).should('contain', '');
+      cy.dataCy('col-sundays').eq(1).should('contain', '2');
     });
 
-    cy.get('[data-cy=close-modal]').click();
+    cy.dataCy('close-modal').click();
 
-    cy.get('[data-cy=show-fundings-history]').click();
-    cy.get('[data-cy=fundings-history]').within(() => {
-      cy.get('[data-cy=col-startDate]').should('contain', 'Date de début de prise en charge');
-      cy.get('[data-cy=col-thirdPartyPayer]').should('contain', 'Tiers payeur');
-      cy.get('[data-cy=col-folderNumber]').should('contain', 'Numéro de dossier');
-      cy.get('[data-cy=col-frequency]').should('contain', 'Fréquence');
-      cy.get('[data-cy=col-amountTTC]').should('contain', 'Montant forfaitaire TTC');
+    cy.dataCy('show-fundings-history').click();
+    cy.dataCy('fundings-history').within(() => {
+      cy.dataCy('col-startDate').should('contain', 'Date de début de prise en charge');
+      cy.dataCy('col-thirdPartyPayer').should('contain', 'Tiers payeur');
+      cy.dataCy('col-folderNumber').should('contain', 'Numéro de dossier');
+      cy.dataCy('col-frequency').should('contain', 'Fréquence');
+      cy.dataCy('col-amountTTC').should('contain', 'Montant forfaitaire TTC');
 
-      cy.get('[data-cy=col-side-startDate]').should('contain', '02/02/2020');
-      cy.get('[data-cy=col-side-thirdPartyPayer]').should('contain', 'Toto');
-      cy.get('[data-cy=col-side-folderNumber]').should('contain', 'D123456');
-      cy.get('[data-cy=col-side-frequency]').should('contain', 'Une seule fois');
-      cy.get('[data-cy=col-side-amountTTC]').should('contain', '160,00\u00A0€');
+      cy.dataCy('col-side-startDate').should('contain', '02/02/2020');
+      cy.dataCy('col-side-thirdPartyPayer').should('contain', 'Toto');
+      cy.dataCy('col-side-folderNumber').should('contain', 'D123456');
+      cy.dataCy('col-side-frequency').should('contain', 'Une seule fois');
+      cy.dataCy('col-side-amountTTC').should('contain', '160,00\u00A0€');
     });
   });
 
   it('should display correctly the payment part and open the modal for the mandate', () => {
     cy.get('#q-app').click(500, 500);
 
-    cy.get('[data-cy=bank-account-owner]').should('have.value', 'David gaudu');
-    cy.get('[data-cy=iban]').should('have.value', 'FR3617569000306699167186M11');
-    cy.get('[data-cy=bic]').should('have.value', 'ABNAFRPP');
+    cy.dataCy('bank-account-owner').should('have.value', 'David gaudu');
+    cy.dataCy('iban').should('have.value', 'FR3617569000306699167186M11');
+    cy.dataCy('bic').should('have.value', 'ABNAFRPP');
 
-    cy.get('[data-cy=mandate-table]').within(() => {
+    cy.dataCy('mandate-table').within(() => {
       cy.get('th').should('have.length', 2).and(($th) => {
         expect($th.eq(0)).to.have.text('RUM');
         expect($th.eq(1)).to.have.text('Signature');
@@ -97,7 +97,7 @@ describe('customers subscription tests', () => {
     cy.server();
     cy.route('POST', '/customers/*/mandates/*/esign').as('esign');
 
-    cy.get('[data-cy=open-mandate]').click();
+    cy.dataCy('open-mandate').click();
     cy.wait('@esign').should((xhr) => {
       expect(xhr.request.body.customer).to.deep.equal({
         name: 'Bardet',
@@ -117,6 +117,6 @@ describe('customers subscription tests', () => {
     });
 
     cy.get('iframe');
-    cy.get('[data-cy=esign-modal]').should('be.visible');
+    cy.dataCy('esign-modal').should('be.visible');
   });
 });
