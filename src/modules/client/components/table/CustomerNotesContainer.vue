@@ -13,7 +13,7 @@
         <q-separator v-if="notesList.length > 1" class="q-mx-sm q-mb-sm" />
       </div>
     </template>
-    <div v-else class="text-italic text-center q-py-sm">Aucune note de suivi pour ce bénéficiaire.</div>
+    <div v-else class="text-italic text-center q-py-sm">Aucune note de suivi.</div>
     <div v-if="notesList.length > 3" class="flex-row justify-center">
       <ni-button :label="displayAllNotes ? 'Afficher moins' : 'Afficher tout'" @click="update(!displayAllNotes)" />
     </div>

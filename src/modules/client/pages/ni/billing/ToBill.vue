@@ -2,14 +2,13 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="À facturer" padding>
       <template slot="content">
-        <div class="flex-row header-selects">
+        <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-4">
-              <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" separator
-                data-cy="select-tpp" />
+              <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
             <div class="col-xs-12 col-sm-8">
-              <ni-date-range v-model="billingDates" @input="getDraftBills" :error.sync="billingDatesHasError"
+              <ni-date-range v-model="billingDates" @blur="getDraftBills" :error.sync="billingDatesHasError"
                 borderless class="q-ma-sm" />
             </div>
           </div>
@@ -186,18 +185,18 @@ export default {
       const billingPeriod = get(this.company, 'customersConfig.billingPeriod');
       if (billingPeriod === MONTH) {
         this.billingDates = {
-          endDate: moment().subtract(1, 'M').endOf('month').toISOString(),
           startDate: moment().subtract(1, 'M').startOf('month').toISOString(),
+          endDate: moment().subtract(1, 'M').endOf('month').toISOString(),
         };
       } else {
         this.billingDates = {
-          endDate: moment().date() > 15
-            ? moment().date(15).endOf('d').toISOString()
-            : moment().subtract(1, 'M').endOf('month').toISOString(),
           startDate: moment().date() > 15
             ? moment().startOf('month').toISOString()
             : moment().subtract(1, 'M').date(16).startOf('d')
               .toISOString(),
+          endDate: moment().date() > 15
+            ? moment().date(15).endOf('d').toISOString()
+            : moment().subtract(1, 'M').endOf('month').toISOString(),
         };
       }
     },

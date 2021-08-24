@@ -127,18 +127,19 @@ export default {
       const usedInOtherStepMessage = this.isActivityUsedInOtherStep
         ? 'Cette activité est utilisée dans les étapes '
           + `${programsReusingActivity.length > 1 ? 'des programmes suivants' : 'du programme suivant'} : `
-          + `${programsReusingActivity.join(', ')}. <br />Si tu la modifies, elle sera modifiée dans toutes ces étapes.`
+          + `${programsReusingActivity.join(', ')}. <br />Si vous la modifiez, elle sera modifiée dans toutes
+          ces étapes.`
           + '<br /><br />'
         : '';
       const isPublishedMessage = this.isActivityPublished
-        ? 'Cette activité est publiée, tu ne pourras pas ajouter, supprimer ou changer l\'ordre des cartes'
+        ? 'Cette activité est publiée, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes'
           + '<br /><br />'
         : '';
 
       this.$q.dialog({
         title: 'Confirmation',
         message: `${usedInOtherStepMessage} ${isPublishedMessage}`
-          + 'Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
+          + 'Êtes-vous sûr(e) de vouloir déverrouiller cette activité ?',
         html: true,
         ok: true,
         cancel: 'Annuler',

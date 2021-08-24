@@ -340,7 +340,7 @@ export default {
     validateInternalHourDeletion (internalHour) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette heure interne ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteInternalHour(internalHour))
@@ -360,8 +360,8 @@ export default {
     },
     async createNewSector () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.newSector.name);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newSector.$touch();
+        if (this.$v.newSector.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Sectors.create(this.newSector);
@@ -388,8 +388,8 @@ export default {
     },
     async updateSector () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.editedSector.name);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.editedSector.$touch();
+        if (this.$v.editedSector.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
@@ -423,7 +423,7 @@ export default {
     validateSectorDeletion (sector) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette équipe ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteSector(sector))
@@ -431,7 +431,7 @@ export default {
     },
     // Administrative document
     getAdministrativeDocumentLink (doc) {
-      return get(doc, 'driveFile.link') || false;
+      return get(doc, 'driveFile.link') || '';
     },
     async getAdministrativeDocuments () {
       try {
@@ -489,7 +489,7 @@ export default {
     validateAdministrativeDocumentDeletion (doc) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteAdministrativeDocument(doc))

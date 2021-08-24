@@ -245,10 +245,9 @@ export default {
     },
     async createNewEstablishment () {
       try {
+        this.$v.newEstablishment.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.newEstablishment);
-        if (!formIsValid) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         if (this.newEstablishment.phone) {
@@ -286,6 +285,7 @@ export default {
     },
     async updateEstablishment () {
       try {
+        this.$v.editedEstablishment.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.editedEstablishment);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -321,7 +321,7 @@ export default {
     validateEstablishmentDeletion (sectorId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cet établissement ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet établissement ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteEstablishment(sectorId))

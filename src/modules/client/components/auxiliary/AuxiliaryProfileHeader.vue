@@ -11,17 +11,17 @@
       </div>
     </div>
     <div class="row profile-info">
-      <div class="col-6 q-pl-lg">
-        <div class="row items-center">
+      <div class="col-sm-6 col-xs-12 q-pl-lg">
+        <div class="flex-row items-center q-ml-sm">
           <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-error']" />
           <div :class="[userActivity.active ? 'text-green-800' : 'text-orange-700']">{{ userActivity.status }}</div>
         </div>
-        <div class="row items-center">
+        <div class="flex-row items-center q-ml-sm">
           <q-icon name="restore" class="q-mr-md" size="1rem" />
           <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
         </div>
       </div>
-      <div class="q-pl-lg col-6 row">
+      <div class="q-pl-lg col-sm-6 col-xs-12 flex-row q-mt-xs">
         <div class="relative-position">
           <q-icon size="36px" name="phone_iphone" color="copper-grey-300" />
           <q-icon v-if="!userProfile.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
@@ -130,9 +130,10 @@ export default {
     async updateMessage () {
       if (this.messageType === 'PM') {
         this.message = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et `
-        + 'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: '
+        + 'documents importants pour compléter votre dossier.\nCliquez ici pour compléter votre profil: '
         + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/auxiliaries/info`
-        + '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
+        + '\nSi vous rencontrez des difficultés, n’hésitez pas à vous adresser à votre coach ou votre '
+        + 'marraine/parrain.';
       } else if (this.messageType === 'LA') {
         if (!this.userProfile.passwordToken || moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
           this.userProfile.passwordToken = await Authentication.createPasswordToken(
@@ -141,10 +142,11 @@ export default {
           );
         }
         this.message = `${this.companyName}. Bienvenue ! :)\nPour pouvoir `
-          + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '
+          + 'commencer votre enregistrement sur Compani avant votre intégration, '
+          + 'créez votre mot de passe en suivant ce lien: '
           + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
           + `/reset-password/${this.userProfile.passwordToken.token} :-)\n`
-          + 'Par la suite pour te connecter suis ce lien: '
+          + 'Par la suite pour vous connecter suivez ce lien: '
           + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`;
       } else this.message = '';
     },
@@ -153,7 +155,7 @@ export default {
       this.smsModal = true;
     },
     goToPlanning () {
-      this.$router.push({ name: 'ni planning auxiliaries', params: { targetedAuxiliary: this.userProfile } });
+      this.$router.push({ name: 'ni planning auxiliaries', params: { targetedAuxiliaryId: this.userProfile._id } });
     },
     async sendMessage () {
       this.loading = true;

@@ -36,13 +36,13 @@
           @focus="saveTmp('identity.lastname')" />
         <ni-select caption="Nationalité" :error="$v.userProfile.identity.nationality.$error"
           :options="nationalitiesOptions" v-model="userProfile.identity.nationality"
-          @focus="saveTmp('identity.nationality')" in-form @blur="updateUser('identity.nationality')" />
+          @focus="saveTmp('identity.nationality')" @blur="updateUser('identity.nationality')" />
         <ni-date-input caption="Date de naissance" :error="$v.userProfile.identity.birthDate.$error"
           v-model="userProfile.identity.birthDate" @focus="saveTmp('identity.birthDate')"
           content-class="col-xs-12 col-md-6" @input="updateUser('identity.birthDate')" />
         <ni-select caption="Pays de naissance" :error="$v.userProfile.identity.birthCountry.$error"
           :options="countriesOptions" v-model="userProfile.identity.birthCountry"
-          @focus="saveTmp('identity.birthCountry')" in-form @blur="updateUser('identity.birthCountry')" />
+          @focus="saveTmp('identity.birthCountry')" @blur="updateUser('identity.birthCountry')" />
         <ni-input caption="Département de naissance" :error="$v.userProfile.identity.birthState.$error"
           :error-message="birthStateError" v-model="userProfile.identity.birthState"
           @blur="updateUser('identity.birthState')" @focus="saveTmp('identity.birthState')"
@@ -120,7 +120,7 @@
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary" v-model="userProfile.administrative.identityDocs"
             type="radio" :options="identityDocsOptions" :error="$v.userProfile.administrative.identityDocs.$error"
-            caption="Merci de nous indiquer le type de document d'identité que tu possèdes." required-field
+            caption="Merci de nous indiquer le type de document d'identité que vous possédez." required-field
             :error-message="requiredLabel" @input="updateUser('administrative.identityDocs')" />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
@@ -185,7 +185,7 @@
       <div class="row gutter-profile">
         <div class="col-xs-12">
           <div v-if="isAuxiliary" class="row justify-between">
-            <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
+            <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise ?</p>
             <q-icon v-if="$v.userProfile.administrative.mutualFund.has.$error" name="error_outline"
               color="secondary" />
           </div>
@@ -198,8 +198,8 @@
         </div>
         <div class="col-xs-12 col-md-6" v-if="hasMutual">
           <ni-file-uploader
-            caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
-            path="administrative.mutualFund" alt="justif mutuelle" :entity="userProfile" :url="docsUploadUrl"
+            caption="Merci de nous transmettre une attestation prouvant que vous êtes déjà affilié(e) à une autre
+            mutuelle" path="administrative.mutualFund" alt="justif mutuelle" :entity="userProfile" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.mutualFund')" :extensions="extensions" entity-url="users"
             name="mutualFund" @uploaded="documentUploaded" :additional-value="documentTitle('mutuelle')" drive-storage
             :error="$v.userProfile.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary" />
@@ -215,7 +215,7 @@
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary"
             v-model="userProfile.administrative.transportInvoice.transportType" :options="transportOptions"
-            caption="Par quel moyen comptes-tu te rendre au travail ?" type="radio" :error-message="requiredLabel"
+            caption="Par quel moyen comptez-vous vous rendre au travail ?" type="radio" :error-message="requiredLabel"
             :error="$v.userProfile.administrative.transportInvoice.transportType.$error" required-field
             @input="updateUser('administrative.transportInvoice.transportType')" />
         </div>
@@ -440,7 +440,7 @@ export default {
     ...mapGetters({ clientRole: 'main/getClientRole' }),
     captionTransportUploader () {
       const coachText = 'Justificatif d\'abonnement';
-      const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement';
+      const auxiliaryText = 'Merci de nous transmettre votre justificatif d\'abonnement';
 
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
@@ -573,7 +573,7 @@ export default {
     validateDocumentDeletion (path) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(path))
@@ -594,7 +594,7 @@ export default {
     validateCertificateDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteCertificate(driveId))

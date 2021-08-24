@@ -223,6 +223,7 @@ export default {
       this.newUser = cloneDeep(this.defaultNewUser);
       this.firstStep = true;
       this.fetchedUser = {};
+      this.sendWelcomeMsg = true;
     },
     async formatUserPayload () {
       const roles = await Roles.list({ name: AUXILIARY });
@@ -249,10 +250,10 @@ export default {
           tag: HR_SMS,
           recipient: `+33${user.contact.phone.substring(1)}`,
           content: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
-            + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce '
-            + `lien : ${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
+            + 'commencer votre enregistrement sur Compani avant votre intégration, crée votre mot de passe en suivant '
+            + `ce lien : ${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
             + `/reset-password/${passwordToken.token} :-)\n`
-            + 'Par la suite pour te connecter suis ce lien: '
+            + 'Par la suite pour vous connecter suivez ce lien: '
             + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`,
         });
 
@@ -305,7 +306,7 @@ export default {
         this.firstStep = false;
         this.$v.newUser.$reset();
       } catch (e) {
-        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+        NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;
       }
@@ -319,7 +320,7 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const folderId = get(this.company, 'auxiliariesFolderId');
-        if (!folderId) return NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+        if (!folderId) return NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
 
         const payload = await this.formatUserPayload();
 
@@ -331,7 +332,7 @@ export default {
         }
         await Users.createDriveFolder(editedUser._id);
         await this.getUserList();
-        NotifyPositive('Fiche auxiliaire créée');
+        NotifyPositive('Auxiliaire créé(e)');
 
         this.auxiliaryCreationModal = false;
 
@@ -339,7 +340,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative('Email déjà existant.');
-        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+        NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;
       }

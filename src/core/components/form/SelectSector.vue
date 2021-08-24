@@ -1,7 +1,7 @@
 <template>
   <ni-select :in-modal="inModal" :value="value" @input="updateSector" :options="sectors" :error-message="errorMessage"
     @blur="blurHandler" @focus="focusHandler" filter-placeholder="Rechercher" :error="error" ref="selectSector"
-    :caption="caption" :required-field="requiredField" />
+    caption="Équipe" :required-field="requiredField" />
 </template>
 
 <script>
@@ -20,7 +20,6 @@ export default {
     allowNullOption: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    caption: { type: String, default: 'Équipe' },
     requiredField: { type: Boolean, default: false },
   },
   components: {

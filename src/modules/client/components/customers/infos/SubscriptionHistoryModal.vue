@@ -2,9 +2,9 @@
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
       Historique de la souscription
-      <span v-if="selected.service" class="text-weight-bold">{{ selected.service.name }}</span>
+      <span v-if="subscription.service" class="text-weight-bold">{{ subscription.service.name }}</span>
     </template>
-    <ni-responsive-table class="q-mb-sm" :data="selected.versions" :columns="subscriptionHistoryColumns"
+    <ni-responsive-table class="q-mb-sm" :data="subscription.versions" :columns="subscriptionHistoryColumns"
       :pagination.sync="paginationHistory">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -26,7 +26,7 @@ export default {
   name: 'SubscriptionHistoryModal',
   props: {
     value: { type: Boolean, default: false },
-    selected: { type: Object, default: () => ({}) },
+    subscription: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,

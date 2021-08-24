@@ -28,14 +28,18 @@ export default {
       const filterPromises = await Promise.all(rawPromises);
       const sectors = filterPromises[0];
       for (let i = 0, l = sectors.length; i < l; i++) {
-        elems.push({ label: sectors[i].name, value: sectors[i].name, _id: sectors[i]._id, type: SECTOR });
+        elems.push({ label: sectors[i].name, value: sectors[i]._id, _id: sectors[i]._id, type: SECTOR });
       }
 
       if (roleToSearch) {
         const persons = filterPromises[1];
         for (let i = 0, l = persons.length; i < l; i++) {
-          const value = formatIdentity(persons[i].identity, 'FL');
-          elems.push({ label: value, value, ...persons[i], type: PERSON });
+          elems.push({
+            label: formatIdentity(persons[i].identity, 'FL'),
+            value: persons[i]._id,
+            ...persons[i],
+            type: PERSON,
+          });
         }
       }
 

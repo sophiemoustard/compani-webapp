@@ -51,7 +51,7 @@ export const courseFiltersMixin = {
 
       return [
         { label: 'Tous les intervenants', value: '' },
-        { label: 'Sans intervenant', value: 'without_trainer' },
+        { label: 'Sans intervenant(e)', value: 'without_trainer' },
         ...uniqBy(trainers, 'value'),
       ];
     },
@@ -68,7 +68,7 @@ export const courseFiltersMixin = {
 
       return [
         { label: 'Tous les référents Compani', value: '' },
-        { label: 'Sans référent Compani', value: 'without_sales_representative' },
+        { label: 'Sans référent(e) Compani', value: 'without_sales_representative' },
         ...uniqBy(salesRepresentatives, 'value'),
       ];
     },

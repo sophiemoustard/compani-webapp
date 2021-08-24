@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input" @show="show">
     <template slot="title">
-      Ajouter un <span class="text-weight-bold">utilisateur</span>
+      Ajouter une <span class="text-weight-bold">personne</span>
     </template>
     <ni-input :disable="!firstStep" in-modal :value="newCoach.local.email" :error="validations.local.email.$error"
       caption="Email" @blur="validations.local.email.$touch" :error-message="emailError" required-field
@@ -21,7 +21,7 @@
     <template slot="footer">
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" icon-right="add" color="primary"
         :loading="loading" @click="goToNextStep" />
-      <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter un utilisateur" icon-right="add"
+      <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add"
         color="primary" :loading="loading" @click="submit" />
     </template>
   </ni-modal>

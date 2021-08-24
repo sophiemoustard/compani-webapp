@@ -48,7 +48,7 @@ export default {
       return get(this.userProfile, 'role.client.name') || '';
     },
     headerInfo () {
-      const infos = [{ icon: 'apartment', label: this.userProfile.company.name }];
+      const infos = [{ icon: 'apartment', label: get(this.userProfile, 'company.name') || '' }];
       if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
 
       return infos;

@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
-        Ajouter un <span class="text-weight-bold">apprenant</span>
+        Ajouter une <span class="text-weight-bold">personne</span>
       </template>
       <ni-input in-modal :value="newUser.local.email" @input="update($event.trim(), 'local.email')"
         @blur="validations.local.email.$touch" caption="Email" :error-message="emailError(validations)"
@@ -22,7 +22,7 @@
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
           :loading="loading" icon-right="add" @click="nextStep" />
-        <q-btn v-else no-caps class="full-width modal-btn" color="primary" label="Ajouter l'apprenant"
+        <q-btn v-else no-caps class="full-width modal-btn" color="primary" label="Ajouter la personne"
           :loading="loading" icon-right="add" @click="submit" />
       </template>
     </ni-modal>

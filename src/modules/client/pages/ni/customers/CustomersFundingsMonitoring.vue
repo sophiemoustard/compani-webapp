@@ -5,13 +5,15 @@
         <ni-button icon="save_alt" @click="exportToCSV" class="q-ml-sm" :disable="!allCustomersFundings.length" />
       </template>
       <template slot="content">
-        <div class=" col-xs-12 row items-baseline justify-end fill-width">
-          <div class="col-xs-12 col-sm-6 col-md-4">
-            <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector" allow-null-option />
-          </div>
-          <div class="col-xs-12 col-sm-6 col-md-4">
-            <ni-select class="q-pl-sm" :options="thirdPartyPayerOptions" v-model="selectedThirdPartyPayer"
-              @input="onInputThirdPartyPayer" allow-null-option />
+        <div class="col-xs-12 header-selects">
+          <div class="row header-selects-container">
+            <div class="col-xs-12 col-sm-6">
+              <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector" allow-null-option />
+            </div>
+            <div class="col-xs-12 col-sm-6">
+              <ni-select class="q-pl-sm" :options="thirdPartyPayerOptions" v-model="selectedThirdPartyPayer"
+                @input="onInputThirdPartyPayer" allow-null-option caption="Financeur" />
+            </div>
           </div>
         </div>
       </template>
@@ -196,9 +198,9 @@ export default {
       const csvData = [[
         'Financeur',
         'Bénéficiaire',
-        'Référent',
+        'Référent(e)',
         'Equipe',
-        'Taux participation du bénéficiaire',
+        'Taux participation du/de la bénéficiaire',
         'Prix unitaire',
         'Nb d\'heures',
         'Mois précédent',

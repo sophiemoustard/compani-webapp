@@ -4,11 +4,11 @@
     <template #item="props">
       <q-card class="full-width q-mb-md" flat bordered>
         <q-list separator dense>
-          <q-item v-for="col in filterCols(props.cols)" :key="col.name">
-            <q-item-section>
+          <q-item v-for="col in filterCols(props.cols)" :key="col.name" class="row">
+            <q-item-section class="col-5">
               <q-item-label :data-cy="`col-${col.name}`">{{ col.label }}</q-item-label>
             </q-item-section>
-            <q-item-section side>
+            <q-item-section class="col-7" side>
               <q-item-label caption :data-cy="`col-side-${col.name}`">{{ col.value }}</q-item-label>
             </q-item-section>
           </q-item>
@@ -22,7 +22,7 @@
 import { NATURE_OPTIONS, FIXED } from '@data/constants';
 
 export default {
-  name: 'GridTable',
+  name: 'FundingGridTable',
   props: {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
@@ -30,15 +30,8 @@ export default {
   },
   data () {
     return {
-      fixedFundingColumns: [
-        'thirdPartyPayer',
-        'folderNumber',
-        'startDate',
-        'frequency',
-        'amountTTC',
-        'customerParticipationRate',
-      ],
-      otherFundingColumns: [
+      fixedFundingColumns: ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC', 'careDays'],
+      hourlyFundingColumns: [
         'thirdPartyPayer',
         'folderNumber',
         'startDate',
@@ -46,6 +39,7 @@ export default {
         'unitTTCRate',
         'careHours',
         'customerParticipationRate',
+        'careDays',
       ],
     };
   },
@@ -56,18 +50,13 @@ export default {
   },
   methods: {
     filterCols (cols) {
-      if (!this.visibleColumns) {
-        const isFixedFunding = cols.some((col) => {
-          const natureOption = NATURE_OPTIONS.find(opt => opt.label === col.value);
-          return natureOption && natureOption.value === FIXED;
-        });
+      if (this.visibleColumns.length) return cols;
 
-        return isFixedFunding
-          ? cols.filter(col => this.fixedFundingColumns.includes(col.name))
-          : cols.filter(col => this.otherFundingColumns.includes(col.name));
-      }
+      const isFixed = cols.some(col => NATURE_OPTIONS.some(o => o.label === col.value && o.value === FIXED));
 
-      return cols;
+      return isFixed
+        ? cols.filter(col => this.fixedFundingColumns.includes(col.name))
+        : cols.filter(col => this.hourlyFundingColumns.includes(col.name));
     },
   },
 };
@@ -77,4 +66,7 @@ export default {
   .q-item__section--main
     & > .q-item__label
       font-size: 0.80rem
+  .q-item__section--side
+    & > .q-item__label
+      text-align: right
 </style>

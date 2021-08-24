@@ -96,24 +96,24 @@ export default {
   methods: {
     goToPlanning () {
       if (this.customer.subscriptions.length) {
-        return this.$router.push({ name: 'ni planning customers', params: { targetedCustomer: this.customer } });
+        return this.$router.push({ name: 'ni planning customers', params: { targetedCustomerId: this.customer._id } });
       }
 
-      return NotifyWarning('Ce bénéficiaire n\'a pas de souscription.');
+      return NotifyWarning('Le/la bénéficiaire n\'a pas de souscription.');
     },
     async deleteCustomer () {
       try {
         await Customers.remove(this.customer._id);
-        NotifyPositive('Bénéficiaire supprimé.');
+        NotifyPositive('Bénéficiaire supprimé(e).');
         this.$router.push({ name: 'ni customers' });
       } catch (e) {
         console.error(e);
-        if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer ce bénéficiaire.');
-        if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire.');
+        if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer le/la bénéficiaire.');
+        if (e.msg) NotifyNegative('Erreur lors de la suppression du/de la bénéficiaire.');
       }
     },
     validateCustomerDeletion () {
-      if (this.customer.firstIntervention) return NotifyWarning('Ce bénéficiaire est lié à des interventions.');
+      if (this.customer.firstIntervention) return NotifyWarning('Le/la bénéficiaire est lié(e) à des interventions.');
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
@@ -163,11 +163,11 @@ export default {
         await Customers.updateById(this.customer._id, payload);
 
         this.stopSupportModal = false;
-        NotifyPositive('Bénéficiaire arrêté.');
+        NotifyPositive('Bénéficiaire arrêté(e).');
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'arrêt du bénéficiaire.');
+        NotifyNegative('Erreur lors de l\'arrêt du/de la bénéficiaire.');
       } finally {
         this.modalLoading = false;
       }
