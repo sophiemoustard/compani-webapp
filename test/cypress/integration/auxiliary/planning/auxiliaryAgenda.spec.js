@@ -1,3 +1,5 @@
+import { goToDisplayedEvents } from '../../utils';
+
 describe('Auxiliary agenda - display', () => {
   beforeEach(() => {
     cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
@@ -7,12 +9,7 @@ describe('Auxiliary agenda - display', () => {
 
   it('should display correctly auxiliary agenda', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-date]').click();
-    cy.get('.q-date__navigation > .relative-position').eq(0).click();
-    cy.get('.q-date__months-item').eq(2).click();
-    cy.get('.q-date__navigation > .relative-position').eq(1).click();
-    cy.get('.q-date__years-item').eq(0).click();
-    cy.get('.q-date__calendar-item--in').eq(1).click();
+    goToDisplayedEvents();
 
     cy.get('[data-cy=agenda-event]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
@@ -35,12 +32,7 @@ describe('Auxiliary agenda - display', () => {
 
   it('should create event', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-date]').click();
-    cy.get('.q-date__navigation > .relative-position').eq(0).click();
-    cy.get('.q-date__months-item').eq(2).click();
-    cy.get('.q-date__navigation > .relative-position').eq(1).click();
-    cy.get('.q-date__years-item').eq(0).click();
-    cy.get('.q-date__calendar-item--in').eq(1).click();
+    goToDisplayedEvents();
 
     cy.get('[data-cy=agenda-cell]').eq(1).click();
     cy.get('[data-cy=event-creation-customer]').eq(0).type('Romain{downarrow}{enter}');
@@ -51,12 +43,7 @@ describe('Auxiliary agenda - display', () => {
 
   it('should update event', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-date]').click();
-    cy.get('.q-date__navigation > .relative-position').eq(0).click();
-    cy.get('.q-date__months-item').eq(2).click();
-    cy.get('.q-date__navigation > .relative-position').eq(1).click();
-    cy.get('.q-date__years-item').eq(0).click();
-    cy.get('.q-date__calendar-item--in').eq(1).click();
+    goToDisplayedEvents();
 
     cy.get('[data-cy=agenda-event]').click();
     cy.get('[data-cy=time-input]').eq(0).clear().type('15:00');
@@ -68,12 +55,7 @@ describe('Auxiliary agenda - display', () => {
 
   it('should delete event', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-date]').click();
-    cy.get('.q-date__navigation > .relative-position').eq(0).click();
-    cy.get('.q-date__months-item').eq(2).click();
-    cy.get('.q-date__navigation > .relative-position').eq(1).click();
-    cy.get('.q-date__years-item').eq(0).click();
-    cy.get('.q-date__calendar-item--in').eq(1).click();
+    goToDisplayedEvents();
 
     cy.get('[data-cy=agenda-event]').click();
     cy.get('[data-cy=event-deletion-button]').click();

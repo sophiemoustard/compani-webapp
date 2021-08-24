@@ -1,3 +1,5 @@
+import { goToDisplayedEvents } from '../utils';
+
 describe('customers agenda tests', () => {
   beforeEach(() => {
     cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
@@ -9,12 +11,7 @@ describe('customers agenda tests', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=customer-identity]').should('have.value', 'Romain BARDET');
 
-    cy.get('[data-cy=planning-date]').click();
-    cy.get('.q-date__navigation > .relative-position').eq(0).click();
-    cy.get('.q-date__months-item').eq(3).click();
-    cy.get('.q-date__navigation > .relative-position').eq(1).click();
-    cy.get('.q-date__years-item').eq(0).click();
-    cy.get('.q-date__calendar-item--in').eq(8).click();
+    goToDisplayedEvents();
 
     cy.get('[data-cy=week-number]').should('contain', 15);
     cy.get('[data-cy=days-number]').eq(0).should('contain', '06');
@@ -23,12 +20,7 @@ describe('customers agenda tests', () => {
 
   it('should go through agenda and display events', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-date]').click();
-    cy.get('.q-date__navigation > .relative-position').eq(0).click();
-    cy.get('.q-date__months-item').eq(2).click();
-    cy.get('.q-date__navigation > .relative-position').eq(1).click();
-    cy.get('.q-date__years-item').eq(0).click();
-    cy.get('.q-date__calendar-item--in').eq(1).click();
+    goToDisplayedEvents();
 
     cy.get('.event-intervention').should('have.length', 1);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'Auxiliary T.');

@@ -1,4 +1,5 @@
 import { CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT } from '../../../../../src/core/data/constants';
+import { goToDisplayedEvents } from '../../utils';
 
 describe('Auxiliary planning - display', () => {
   beforeEach(() => {
@@ -9,12 +10,7 @@ describe('Auxiliary planning - display', () => {
 
   it('should display correctly auxiliary planning', () => {
     cy.get('#q-app').click(500, 500);
-    cy.dataCy('planning-date').click();
-    cy.get('.q-date__navigation > .relative-position').eq(0).click();
-    cy.get('.q-date__months-item').eq(2).click();
-    cy.get('.q-date__navigation > .relative-position').eq(1).click();
-    cy.get('.q-date__years-item').eq(0).click();
-    cy.get('.q-date__calendar-item--in').eq(1).click();
+    goToDisplayedEvents();
 
     cy.dataCy('planning-search').eq(1).click();
     cy.dataCy('planning-search').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
@@ -56,12 +52,7 @@ loggedUsers.forEach((user) => {
 
     it('should create event', () => {
       cy.get('#q-app').click(500, 500);
-      cy.dataCy('planning-date').click();
-      cy.get('.q-date__navigation > .relative-position').eq(0).click();
-      cy.get('.q-date__months-item').eq(2).click();
-      cy.get('.q-date__navigation > .relative-position').eq(1).click();
-      cy.get('.q-date__years-item').eq(0).click();
-      cy.get('.q-date__calendar-item--in').eq(1).click();
+      goToDisplayedEvents();
 
       cy.dataCy('planning-search').eq(1).click();
       cy.dataCy('planning-search').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
@@ -75,12 +66,7 @@ loggedUsers.forEach((user) => {
 
     it('should update event', () => {
       cy.get('#q-app').click(500, 500);
-      cy.dataCy('planning-date').click();
-      cy.get('.q-date__navigation > .relative-position').eq(0).click();
-      cy.get('.q-date__months-item').eq(2).click();
-      cy.get('.q-date__navigation > .relative-position').eq(1).click();
-      cy.get('.q-date__years-item').eq(0).click();
-      cy.get('.q-date__calendar-item--in').eq(1).click();
+      goToDisplayedEvents();
 
       cy.dataCy('planning-search').eq(1).click();
       cy.dataCy('planning-search').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
@@ -96,12 +82,7 @@ loggedUsers.forEach((user) => {
 
     it('should delete event', () => {
       cy.get('#q-app').click(500, 500);
-      cy.dataCy('planning-date').click();
-      cy.get('.q-date__navigation > .relative-position').eq(0).click();
-      cy.get('.q-date__months-item').eq(2).click();
-      cy.get('.q-date__navigation > .relative-position').eq(1).click();
-      cy.get('.q-date__years-item').eq(0).click();
-      cy.get('.q-date__calendar-item--in').eq(1).click();
+      goToDisplayedEvents();
 
       cy.dataCy('planning-search').eq(1).click();
       cy.dataCy('planning-search').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
