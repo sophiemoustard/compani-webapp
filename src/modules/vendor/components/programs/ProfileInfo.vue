@@ -165,7 +165,7 @@ export default {
     validateProgramImageDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer l\'image ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer l\'image ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteProgramImage())
@@ -223,7 +223,7 @@ export default {
     validateCategoryRemoval (category) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir retirer cette catégorie ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer cette catégorie ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.removeCategory(category._id))

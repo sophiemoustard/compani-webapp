@@ -113,14 +113,14 @@ export const helperMixin = {
 
         const payload = await this.formatHelper();
         await Users.create(pickBy(payload));
-        NotifyPositive('Aidant créé');
+        NotifyPositive('Aidant(e) créé(e)');
         await this.getUserHelpers();
         this.openNewHelperModal = false;
 
         await this.sendWelcome();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'aidant.');
+        NotifyNegative('Erreur lors de la création de l\'aidant(e).');
       } finally {
         this.loading = false;
       }
@@ -143,10 +143,11 @@ export const helperMixin = {
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
         const { user } = userInfo;
 
-        const sameOrNoCompany = !user.company || user.company === this.company._id;
-        if (userInfo.exists && (get(user, 'role.client') || !sameOrNoCompany)) {
-          NotifyNegative('Utilisateur déjà existant');
-        } else if (userInfo.exists) {
+        const sameOrNoCompany = (!user.company && user._id) || user.company === this.company._id;
+        if (!userInfo.exists) this.firstStep = false;
+        else if (get(user, 'role.client') || !sameOrNoCompany) {
+          NotifyNegative('Compte déjà existant.');
+        } else {
           const roles = await Roles.list({ name: HELPER });
           if (roles.length === 0) throw new Error('Role not found');
 
@@ -154,16 +155,14 @@ export const helperMixin = {
           if (!user.company) payload.company = this.customer.company;
 
           await Users.updateById(user._id, payload);
-          NotifyPositive('Aidant créé');
+          NotifyPositive('Aidant(e) créé(e)');
 
           this.getUserHelpers();
           this.openNewHelperModal = false;
-        } else {
-          this.firstStep = false;
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'aidant.');
+        NotifyNegative('Erreur lors de la création de l\'aidant(e).');
       } finally {
         this.loading = false;
       }
@@ -186,13 +185,13 @@ export const helperMixin = {
         const payload = { ...omit(this.editedHelper, ['_id']) };
         delete payload.local;
         await Users.updateById(this.editedHelper._id, payload);
-        NotifyPositive('Aidant modifié');
+        NotifyPositive('Aidant(e) modifié(e)');
 
         await this.getUserHelpers();
         this.openEditedHelperModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'aidant.');
+        NotifyNegative('Erreur lors de la modification de l\'aidant(e).');
       } finally {
         this.loading = false;
       }
@@ -212,7 +211,7 @@ export const helperMixin = {
         await this.getUserHelpers();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'aidant référent.');
+        NotifyNegative('Erreur lors de l\'édition de l\'aidant(e) référent(e).');
       }
     },
     // Deletion
@@ -221,16 +220,16 @@ export const helperMixin = {
         await Users.deleteById(helperId);
 
         await this.getUserHelpers();
-        NotifyPositive('Aidant supprimé.');
+        NotifyPositive('Aidant(e) supprimé(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'aidant.');
+        NotifyNegative('Erreur lors de la suppression de l\'aidant(e).');
       }
     },
     validateHelperDeletion (helperId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer l\'aidant(e) ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteHelper(helperId))

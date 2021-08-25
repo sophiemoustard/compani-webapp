@@ -32,7 +32,7 @@
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
               <div v-if="!props.row.customerPartners.length" class="q-px-lg text-italic text-center">
-                Aucun bénéficiaire prescrit.
+                Aucun(e) bénéficiaire prescrit(e).
               </div>
               <div v-else v-for="customerPartner in props.row.customerPartners" :key="customerPartner._id"
                 :props="props" class="q-px-lg q-my-sm row justify-between">
@@ -43,7 +43,7 @@
           </template>
       </ni-expanding-table>
       <q-card-actions align="right">
-        <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
+        <ni-button color="primary" icon="add" label="Ajouter un(e) partenaire" @click="partnerCreationModal = true" />
       </q-card-actions>
     </q-card>
 
@@ -215,7 +215,7 @@ export default {
         await this.refreshPartnerOrganization();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du partenaire.');
+        NotifyNegative('Erreur lors de la création du/de la partenaire.');
       } finally {
         this.modalLoading = false;
       }
@@ -235,7 +235,8 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id', 'customerPartners']));
+        const payload = omit(this.editedPartner, ['_id', 'customerPartners', 'partnerOrganization']);
+        await Partner.updateById(this.editedPartner._id, payload);
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');
@@ -243,7 +244,7 @@ export default {
         await this.refreshPartnerOrganization();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification du partenaire.');
+        NotifyNegative('Erreur lors de la modification du/de la partenaire.');
       } finally {
         this.modalLoading = false;
       }

@@ -56,10 +56,15 @@ export default {
       return this.error || this.$v.value.$error;
     },
     innerErrorMessage () {
-      if (!this.$v.value.startDate.required || !this.$v.value.startDate.required) return REQUIRED_LABEL;
+      if (!this.$v.value.startDate.required || !this.$v.value.endDate.required) return REQUIRED_LABEL;
       if (!this.$v.value.endDate.minDate) return 'La date de fin doit être postérieure à la date de début';
 
       return this.errorMessage;
+    },
+  },
+  watch: {
+    value () {
+      this.$emit('update:error', this.$v.value.$error);
     },
   },
   methods: {

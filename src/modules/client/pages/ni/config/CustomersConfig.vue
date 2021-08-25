@@ -123,7 +123,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Facturation</p>
         <div class="row gutter-profile">
-          <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod" in-form
+          <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod"
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
             :options="billingPeriodOptions" :error="$v.company.customersConfig.billingPeriod.$error"
             :error-message="REQUIRED_LABEL" />
@@ -820,7 +820,7 @@ export default {
     validateSurchargeDeletion (surchargeId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce plan de majoration ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteSurcharge(surchargeId, row))
@@ -949,7 +949,7 @@ export default {
     validateServiceDeletion (serviceId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer ce service ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce service ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteService(serviceId, row))
@@ -968,7 +968,7 @@ export default {
     validateServiceArchiving (serviceId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir archiver ce service ?',
+        message: 'Êtes-vous sûr(e) de vouloir archiver ce service ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.archiveService(serviceId))
@@ -1013,6 +1013,7 @@ export default {
     },
     async createNewThirdPartyPayer () {
       try {
+        this.$v.newThirdPartyPayer.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.newThirdPartyPayer);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -1034,6 +1035,7 @@ export default {
     },
     async updateThirdPartyPayer () {
       try {
+        this.$v.editedThirdPartyPayer.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.editedThirdPartyPayer);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -1066,7 +1068,7 @@ export default {
     validateTppDeletion (thirdPartyPayerId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce tiers payeur ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))

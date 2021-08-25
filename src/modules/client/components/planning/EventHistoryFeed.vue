@@ -3,7 +3,7 @@
     <div class="row history-container-title">
       <div class="col-11">Flux d'activité</div>
       <div class="col-1 cursor-pointer">
-        <ni-button icon="clear" size="sm" @click.native="close" />
+        <ni-button icon="close" size="sm" @click.native="close" />
       </div>
     </div>
     <div class="scroll-container" ref="scrollTargetRef">

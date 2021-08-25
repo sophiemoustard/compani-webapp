@@ -2,10 +2,10 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Fin de contrats" padding>
       <template slot="content">
-        <div class="flex-row header-selects">
+        <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12">
-              <ni-select :options="periodOptions" v-model="period" separator in-form />
+              <ni-select :options="periodOptions" v-model="period" caption="Période" />
             </div>
           </div>
         </div>

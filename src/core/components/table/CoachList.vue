@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Utilisateurs</p>
+      <p class="text-weight-bold">Coachs</p>
       <q-card>
         <ni-responsive-table :data="users" :columns="usersColumns" :pagination.sync="usersPagination"
           :loading="usersLoading">
@@ -24,7 +24,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter un utilisateur" @click="coachCreationModal = true"
+          <ni-button color="primary" icon="add" label="Ajouter une personne" @click="coachCreationModal = true"
             :disable="usersLoading" />
         </q-card-actions>
       </q-card>
@@ -165,22 +165,24 @@ export default {
         const sameOrNoCompany = !user.company || user.company === this.company._id;
         const noDataOnUser = !Object.keys(user).length;
         if (userInfo.exists && (!sameOrNoCompany || noDataOnUser)) {
-          return NotifyNegative('Cet utilisateur n\'est pas relié à cette structure');
+          return NotifyNegative('Ce compte n\'est pas relié à cette structure.');
         }
-        if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
+        if (userInfo.exists && get(userInfo, 'user.role.client')) {
+          return NotifyNegative('Compte déjà existant.');
+        }
         if (userInfo.exists) {
           const payload = { role: this.newCoach.role };
           if (!user.company) payload.company = this.company._id;
 
           await Users.updateById(userInfo.user._id, payload);
 
-          NotifyPositive('Coach créé');
+          NotifyPositive('Compte créé.');
           await this.getUsers();
           this.coachCreationModal = false;
         } else this.firstStep = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du coach');
+        NotifyNegative('Erreur lors de la création du compte.');
       } finally {
         this.loading = false;
       }
@@ -193,10 +195,10 @@ export default {
 
         await Users.create(this.formatUserPayload(this.newCoach));
 
-        NotifyPositive('Utilisateur enregistré.');
+        NotifyPositive('Compte enregistré.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'utilisateur.');
+        NotifyNegative('Erreur lors de la création du compte.');
       } finally {
         this.loading = false;
       }
@@ -204,7 +206,7 @@ export default {
       if (!get(this.company, 'subscriptions.erp')) {
         try {
           const userRole = this.roles.find(role => role._id === this.newCoach.role);
-          if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
+          if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail.');
 
           await Email.sendWelcome({ email: this.newCoach.local.email, type: get(userRole, 'name') });
           NotifyPositive('Email envoyé.');
@@ -268,10 +270,10 @@ export default {
         await Users.updateById(this.selectedCoach._id, this.formatUpdatedUserPayload(this.selectedCoach));
         this.coachEditionModal = false;
         this.getUsers();
-        NotifyPositive('Utilisateur modifié.');
+        NotifyPositive('Compte modifié.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'utilisateur.');
+        NotifyNegative('Erreur lors de la modification du compte.');
       } finally {
         this.loading = false;
       }
@@ -282,7 +284,7 @@ export default {
         this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des utilisateurs');
+        NotifyNegative('Erreur lors de la récupération des comptes.');
         this.users = [];
       } finally {
         this.usersLoading = false;

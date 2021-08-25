@@ -1,7 +1,7 @@
 <template>
-  <q-select dense borderless bg-color="white" multiple behavior="menu" use-chips use-input ref="refFilter" emit-value
+  <q-select dense borderless bg-color="white" multiple behavior="menu" use-chips use-input ref="refFilter"
     :value="value" :options="options" @filter="search" @input="input" @add="addEvent" @remove="removeEvent"
-    input-debounce="0" :style="disable && { width: '40px'}" :data-cy="dataCy">
+    input-debounce="0" :style="disable && { width: '40px'}" :data-cy="dataCy" map-options>
     <template #prepend>
       <q-icon name="search" size="xs" />
     </template>
@@ -30,30 +30,26 @@ export default {
   computed: {
     ...mapState('planning', ['elementToAdd']),
     noDiacriticFilters () {
-      return this.filters.map(el => ({ ...el, noDiacriticsValue: removeDiacritics(el.value) }));
+      return this.filters.map(el => ({ ...el, noDiacriticsLabel: removeDiacritics(el.label) }));
     },
   },
   methods: {
     addEvent (el) {
-      this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el.value));
+      this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el.value.value));
       this.$refs.refFilter.hidePopup();
       this.$refs.refFilter.inputValue = '';
     },
-    input (el) {
-      this.$emit('input', el);
+    input (list) {
+      this.$emit('input', list);
     },
     removeEvent (el) {
-      this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value));
+      this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value.value));
     },
-    async search (terms, done) {
-      try {
-        const formattedString = escapeRegExp(removeDiacritics(terms));
-        this.options = this.noDiacriticFilters
-          .filter(el => el.noDiacriticsValue.match(new RegExp(formattedString, 'i')));
-        done(this.options);
-      } catch (e) {
-        done([]);
-      }
+    search (terms, done) {
+      const formattedString = escapeRegExp(removeDiacritics(terms));
+      this.options = this.noDiacriticFilters
+        .filter(el => el.noDiacriticsLabel.match(new RegExp(formattedString, 'i')));
+      done(this.options);
     },
     add (el) {
       this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el));

@@ -16,7 +16,7 @@
       required-field @blur="validations.otherMisc.$touch" :error="validations.otherMisc.$error"
       @input="update($event, 'otherMisc')" />
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary"
+      <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="close" color="primary"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>

@@ -2,7 +2,7 @@
   <q-page padding class="client-background q-pb-xl">
     <ni-title-header title="Historique" class="q-mb-xl" />
     <div class="row q-col-gutter-sm">
-      <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />
+      <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" />
       <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :error="$v.dateRange.$error"
         @input="input" :error-message="dateRangeErrorMessage" @blur="$v.dateRange.$touch" />
     </div>

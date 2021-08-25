@@ -497,7 +497,7 @@ export default {
     validateStepDetachment (subProgramId, stepId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir retirer cette étape de ce sous-programme ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer cette étape de ce sous-programme ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.detachStep(subProgramId, stepId))
@@ -525,7 +525,7 @@ export default {
     validateActivityDeletion (stepId, activityId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir retirer cette activité de cette étape ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.detachActivity(stepId, activityId))
@@ -552,10 +552,10 @@ export default {
         sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
       );
       if (subProgram.isStrictlyELearning && eLearningSubProgramAlreadyPublished) {
-        return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
+        return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié.');
       }
 
-      if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
+      if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide.');
 
       return subProgram.isStrictlyELearning
         ? this.openSubProgramPublicationModal()
@@ -564,8 +564,8 @@ export default {
     validateSubProgramPublication (accessCompany = null) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
-          + 'Es-tu sûr(e) de vouloir publier ce sous-programme ?',
+        message: 'Une fois le sous-programme publié, vous ne pourrez plus le modifier.<br />'
+          + 'Êtes-vous sûr(e) de vouloir publier ce sous-programme ?',
         html: true,
         ok: true,
         cancel: 'Annuler',
@@ -582,10 +582,10 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
-          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
+          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié.');
         }
 
-        NotifyNegative('Erreur lors de la publication du sous-programme');
+        NotifyNegative('Erreur lors de la publication du sous-programme.');
       }
     },
     isPublished (element) {

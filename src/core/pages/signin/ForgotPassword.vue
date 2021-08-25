@@ -55,9 +55,9 @@ export default {
           if (e.response.status === 400) {
             content = 'Veuillez remplir le champ email.';
           } else if (e.response.status === 404) {
-            content = 'Aucun utilisateur ne correspond à l\'email indiqué';
+            content = 'Aucun compte ne correspond à l\'email indiqué.';
           } else {
-            content = 'Erreur. Si le problème persiste, contactez le support technique';
+            content = 'Erreur. Si le problème persiste, contactez le support technique.';
           }
         }
         NotifyNegative(content);

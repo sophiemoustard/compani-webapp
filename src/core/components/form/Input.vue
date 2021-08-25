@@ -6,7 +6,7 @@
       <q-icon v-if="error" name="error_outline" color="secondary" size="1rem" class="q-mb-xs" />
     </div>
     <template v-if="type === 'file'">
-      <div class="row input-file-container" :class="{'borders': inModal}">
+      <div class="row input-file-container" :class="{'borders-parent': inModal}">
         <div class="col full-width">
           <span class="input-file-empty" v-if="!value">Pas de document</span>
           <template v-else>{{ value.name }}</template>

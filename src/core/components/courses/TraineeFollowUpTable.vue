@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-weight-bold">Progression des participants</p>
+    <p class="text-weight-bold">Progression des stagiaires</p>
     <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
       :loading="loading" :visible-columns="visibleColumns">
       <template #row="{ props }">

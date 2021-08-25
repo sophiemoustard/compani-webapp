@@ -60,7 +60,7 @@
         <template v-if="displayActions && !contract.endDate">
           <ni-button icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" :disable="contractsLoading" />
-          <ni-button icon="clear" label="Mettre fin au contrat"
+          <ni-button icon="close" label="Mettre fin au contrat"
             @click="openEndContract(contract)" :disable="contractsLoading" />
         </template>
       </q-card-actions>
@@ -69,7 +69,7 @@
     <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-height full-width>
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end">
-          <ni-button icon="clear" size="sm" @click.native="esignModal = false" />
+          <ni-button icon="close" size="sm" @click.native="esignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
           <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />
@@ -92,7 +92,7 @@ import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
-import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
+import { getContractTags } from 'src/modules/client/helpers/tags';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
@@ -221,18 +221,14 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
-    async dlTemplate (contractVersion, parentContract, contractIndex) {
+    async dlTemplate (version, contract, contractIndex) {
       try {
-        const data = generateContractFields({
-          user: this.user,
-          contract: contractVersion,
-          initialContractStartDate: parentContract.startDate,
-        });
-        if (!this.canDownload(contractVersion, contractIndex)) {
+        const data = getContractTags({ user: this.user, version, contract });
+        if (!this.canDownload(version, contractIndex)) {
           return NotifyNegative('Impossible de télécharger le contrat.');
         }
 
-        const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contractVersion);
+        const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, version);
         const params = {
           driveId: versionIndex === 0
             ? this.user.company.rhConfig.templates.contract.driveId

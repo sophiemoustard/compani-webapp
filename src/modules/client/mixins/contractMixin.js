@@ -8,7 +8,7 @@ import nationalities from '@data/nationalities';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
-import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
+import { getContractTags } from 'src/modules/client/helpers/tags';
 
 export const contractMixin = {
   data () {
@@ -90,9 +90,7 @@ export const contractMixin = {
         ...this.esignRedirection,
         templateId: template.driveId,
         meta: { auxiliaryDriveId: this.auxiliary.administrative.driveFolder.driveId },
-        fields: generateContractFields(
-          { user: this.auxiliary, contract, initialContractStartDate: this.selectedContract.startDate }
-        ),
+        fields: getContractTags({ user: this.auxiliary, version: contract, contract: this.selectedContract }),
         signers: [
           { id: '1', name: this.userFullName, email: this.auxiliary.local.email },
           { id: '2', name: formatIdentity(this.loggedUser.identity, 'FL'), email: this.loggedUser.local.email },

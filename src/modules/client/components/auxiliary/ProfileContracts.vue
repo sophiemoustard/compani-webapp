@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="row">
+      <div class="q-my-sm">Numéro de matricule : {{ auxiliary.serialNumber }}</div>
       <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
         :person-key="COACH" display-actions display-uploader @open-end-contract="openEndContractModal"
         @open-version-edition="openVersionEditionModal" @open-version-creation="openVersionCreationModal"
@@ -354,7 +355,7 @@ export default {
     validateVersionDeletion ({ contractId, versionId }) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cet avenant ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet avenant ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteVersion(contractId, versionId))

@@ -9,7 +9,7 @@
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
-              <q-icon name="clear" v-close-popup data-cy="close-modal" size="sm" />
+              <q-icon name="close" v-close-popup data-cy="close-modal" size="sm" />
             </span>
           </div>
         </div>

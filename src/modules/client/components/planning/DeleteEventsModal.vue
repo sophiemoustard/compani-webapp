@@ -19,7 +19,7 @@
     </template>
     <template slot="footer">
       <q-btn class="modal-btn full-width" color="primary" no-caps :loading="loading" label="Supprimer les interventions"
-        @click="validateEventsDeletion" icon-right="clear" />
+        @click="validateEventsDeletion" icon-right="close" />
     </template>
   </ni-modal>
 </template>
@@ -31,7 +31,7 @@ import Events from '@api/Events';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import { validationMixin } from '@mixins/validationMixin';
 
@@ -78,7 +78,7 @@ export default {
     validateEventsDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr de vouloir supprimer ces évènements ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ces évènements ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteEvents)
@@ -87,11 +87,14 @@ export default {
     async deleteEvents () {
       try {
         this.loading = true;
+        this.$v.deletedEvents.$touch();
         const isValid = await this.waitForFormValidation(this.$v.deletedEvents);
-        if (!isValid) return NotifyNegative('Champ(s) invalide(s)');
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+
         await Events.deleteList(omit(this.deletedEvents, 'inRange'));
+
         this.hide();
-        NotifyPositive('Les évènements ont bien étés supprimés');
+        NotifyPositive('Les évènements ont bien étés supprimés.');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);

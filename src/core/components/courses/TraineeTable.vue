@@ -25,7 +25,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right" v-if="canEdit">
-          <ni-button color="primary" icon="add" label="Ajouter un stagiaire" :disable="loading"
+          <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
             @click="traineeCreationModal = true" />
         </q-card-actions>
       </q-card>
@@ -165,8 +165,8 @@ export default {
     },
     tableTitle () {
       return this.canEdit || this.isTrainer
-        ? `Participants (${this.traineesNumber})`
-        : `Participants de votre structure (${this.traineesNumber})`;
+        ? `Stagiaires (${this.traineesNumber})`
+        : `Stagiaires de votre structure (${this.traineesNumber})`;
     },
     traineesVisibleColumns () {
       const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
@@ -211,11 +211,11 @@ export default {
 
         if (userInfo.exists) {
           if (this.isIntraCourse) {
-            if (!userInfo.user.company) {
+            if (!userInfo.user.company && userInfo.user._id) {
               this.newTrainee.company = this.course.company._id;
               await this.addTrainee();
-            } else if (userInfo.user.company === this.course.company._id) await this.addTrainee();
-            else return NotifyNegative('Ce stagiaire n\'est pas relié à la structure de la formation.');
+            } else if (get(userInfo, 'user.company') === this.course.company._id) await this.addTrainee();
+            else return NotifyNegative('Ce compte n\'est pas relié à la structure de la formation.');
           } else if (userInfo.user.company) await this.addTrainee();
           else this.firstStep = false;
         } else {
@@ -225,7 +225,7 @@ export default {
         }
         this.$v.newTrainee.$reset();
       } catch (e) {
-        NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
+        NotifyNegative('Erreur lors de l\'ajout de la personne.');
       } finally {
         this.traineeCreationModalLoading = false;
       }
@@ -255,7 +255,7 @@ export default {
         this.traineeCreationModalLoading = true;
         const payload = this.formatAddTraineePayload();
         await Courses.addTrainee(this.course._id, payload);
-        NotifyPositive('Stagiaire ajouté.');
+        NotifyPositive('Stagiaire ajouté(e).');
         if (!this.firstStep) NotifyPositive('Email envoyé.');
         this.traineeCreationModal = false;
         this.$emit('refresh');
@@ -263,14 +263,14 @@ export default {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         if (e.status === 424) {
-          NotifyPositive('Stagiaire ajouté.');
+          NotifyPositive('Stagiaire ajouté(e).');
 
           this.traineeCreationModal = false;
           this.$emit('refresh');
 
           return NotifyNegative(e.data.message);
         }
-        NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
+        NotifyNegative('Erreur lors de l\'ajout du/de la stagiaire.');
       } finally {
         this.traineeCreationModalLoading = false;
       }
@@ -298,10 +298,10 @@ export default {
         await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
         this.traineeEditionModal = false;
         this.$emit('refresh');
-        NotifyPositive('Stagiaire modifié.');
+        NotifyPositive('Stagiaire modifié(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification du stagiaire.');
+        NotifyNegative('Erreur lors de la modification du/de la stagiaire.');
       } finally {
         this.traineeEditionModalLoading = false;
       }
@@ -309,7 +309,7 @@ export default {
     validateTraineeDeletion (traineeId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir retirer ce stagiaire de la formation ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer le/la stagiaire de la formation ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteTrainee(traineeId))
@@ -319,10 +319,10 @@ export default {
       try {
         await Courses.deleteTrainee(this.course._id, traineeId);
         this.$emit('refresh');
-        NotifyPositive('Stagiaire supprimé.');
+        NotifyPositive('Stagiaire supprimé(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du stagiaire.');
+        NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
     },
     handleCopySuccess () {
