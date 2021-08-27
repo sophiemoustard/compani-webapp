@@ -202,7 +202,7 @@ export default {
     initFilters () {
       if (AUXILIARY_ROLES.includes(this.clientRole)) {
         const userSector = this.filters.find(filter => filter._id === this.loggedUser.sector);
-        if (userSector) this.$refs.teamAutocomplete.add(userSector.label);
+        if (userSector) this.$refs.teamAutocomplete.add(userSector);
       }
     },
     formatHours,
