@@ -216,7 +216,7 @@ import {
   BILLING_ITEMS_TYPE_OPTIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
+import { roundFrenchPercentage, formatHoursWithMinutes, formatPrice } from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
@@ -323,18 +323,8 @@ export default {
       },
       surchargesColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        {
-          name: 'saturday',
-          label: 'Samedi',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.saturday, 0),
-        },
-        {
-          name: 'sunday',
-          label: 'Dimanche',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.sunday, 0),
-        },
+        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
+        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         {
           name: 'publicHoliday',
           label: 'Jour férié',
@@ -359,12 +349,7 @@ export default {
           align: 'center',
           field: row => roundFrenchPercentage(row.firstOfJanuary, 0),
         },
-        {
-          name: 'evening',
-          label: 'Soirée',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.evening, 0),
-        },
+        { name: 'evening', label: 'Soirée', align: 'center', field: row => roundFrenchPercentage(row.evening, 0) },
         {
           name: 'eveningStartTime',
           label: 'Début soirée',
@@ -377,12 +362,7 @@ export default {
           align: 'center',
           field: row => (row.eveningEndTime ? formatHoursWithMinutes(row.eveningEndTime) : ''),
         },
-        {
-          name: 'custom',
-          label: 'Perso',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.custom, 0),
-        },
+        { name: 'custom', label: 'Perso', align: 'center', field: row => roundFrenchPercentage(row.custom, 0) },
         {
           name: 'customStartTime',
           label: 'Début perso',
@@ -455,13 +435,13 @@ export default {
           label: 'Prix unitaire TTC par défaut',
           align: 'center',
           field: 'defaultUnitAmount',
-          format: value => `${value}€`,
+          format: formatPrice,
         },
         {
           name: 'vat',
           label: 'TVA',
           align: 'center',
-          field: row => row.vat && `${row.vat}%`,
+          field: row => roundFrenchPercentage(row.vat, 0),
         },
         {
           name: 'surcharge',
@@ -478,7 +458,7 @@ export default {
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       servicesLoading: false,
-      newBillingItem: { name: '', type: '', defaultUnitAmount: '', vat: '' },
+      newBillingItem: { name: '', type: '', defaultUnitAmount: 0, vat: 0 },
       billingItemsLoading: false,
       billingItemCreationModal: false,
       billingItemTypeOptions: BILLING_ITEMS_TYPE_OPTIONS,
@@ -500,14 +480,9 @@ export default {
           label: 'Prix unitaire TTC par défaut',
           align: 'center',
           field: 'defaultUnitAmount',
-          format: value => `${value}€`,
+          format: formatPrice,
         },
-        {
-          name: 'vat',
-          label: 'TVA',
-          align: 'center',
-          field: row => row.vat && `${row.vat}%`,
-        },
+        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 0) },
       ],
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
@@ -525,7 +500,7 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC par défaut',
           field: 'unitTTCRate',
-          format: val => (val ? `${val}€` : ''),
+          format: formatPrice,
           align: 'center',
         },
         {
@@ -1042,7 +1017,7 @@ export default {
     // Billing Items
     resetBillingItemCreation () {
       this.$v.newBillingItem.$reset();
-      this.newBillingItem = { name: '', type: '', defaultUnitAmount: '', vat: '' };
+      this.newBillingItem = { name: '', type: '', defaultUnitAmount: 0, vat: 0 };
     },
     async createNewBillingItem () {
       try {
@@ -1050,7 +1025,10 @@ export default {
         if (this.$v.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await BillingItems.create(pickBy(this.newBillingItem));
+
+        if (!this.newBillingItem.vat) this.newBillingItem.vat = 0;
+
+        await BillingItems.create(this.newBillingItem);
 
         NotifyPositive('Article de facturation créé.');
         this.billingItemCreationModal = false;

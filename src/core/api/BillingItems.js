@@ -6,6 +6,6 @@ export default {
   },
   async list () {
     const billingItems = await alenviAxios.get(`${process.env.API_HOSTNAME}/billingitems`);
-    return billingItems.data.data;
+    return billingItems.data.data.billingItems;
   },
 };
