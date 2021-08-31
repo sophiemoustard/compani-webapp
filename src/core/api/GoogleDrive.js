@@ -33,6 +33,7 @@ export default {
       ...(!getHtmlFile && { responseType: 'blob' }),
     });
 
-    downloadFile(file, `download-${Date.now()}`, file.headers['content-type']);
+    if (getHtmlFile) return file;
+    return downloadFile(file, `download-${Date.now()}`, file.headers['content-type']);
   },
 };
