@@ -439,7 +439,7 @@ export default {
         const gcsDriveId = get(this.helper, 'company.customersConfig.templates.gcs.driveId');
         if (!gcsDriveId) return;
 
-        const file = await Drive.downloadFileById(gcsDriveId);
+        const file = await Drive.downloadFileById(gcsDriveId, true);
 
         this.gcs = file.data;
       } catch (e) {
