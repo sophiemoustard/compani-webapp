@@ -9,8 +9,8 @@ export default {
     const companyRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies/first-intervention`);
     return companyRaw.data.data.firstIntervention;
   },
-  async list (params = {}) {
-    const companies = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies`, params);
+  async list () {
+    const companies = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies`);
     return companies.data.data.companies;
   },
   async create (payload) {
