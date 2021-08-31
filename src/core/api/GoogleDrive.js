@@ -1,4 +1,5 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
+import { downloadFile } from '@helpers/file';
 
 export default {
   async getFileById (params) {
@@ -32,6 +33,6 @@ export default {
       ...(!getHtmlFile && { responseType: 'blob' }),
     });
 
-    return file;
+    downloadFile(file, `download-${Date.now()}`, file.headers['content-type']);
   },
 };
