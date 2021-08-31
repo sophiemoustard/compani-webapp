@@ -165,9 +165,9 @@
       :validations="$v.editedService" />
 
     <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
-      :validations="$v.newBillingItem" :type-options="billingItemTypeOptions"
+      :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
       :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
-      :loading="loading" />
+      @submit="createNewBillingItem" />
 
     <!-- Service history modal -->
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
@@ -194,6 +194,7 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
+import BillingItems from '@api/BillingItems';
 import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -1040,6 +1041,24 @@ export default {
     resetBillingItemCreation () {
       this.$v.newBillingItem.$reset();
       this.newBillingItem = { name: '', type: '', defaultUnitAmount: '', vat: '' };
+    },
+    async createNewBillingItem () {
+      try {
+        this.$v.newBillingItem.$touch();
+        if (this.$v.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        await BillingItems.create(pickBy(this.newBillingItem));
+
+        NotifyPositive('Article de facturation créé.');
+        this.billingItemCreationModal = false;
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la création de l\'article de facturation.');
+      } finally {
+        this.loading = false;
+      }
     },
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
