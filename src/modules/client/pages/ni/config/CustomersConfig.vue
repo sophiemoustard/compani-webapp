@@ -62,7 +62,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Articles de facturation</p>
         <q-card>
-          <ni-responsive-table :data="[]" :columns="billingItemsColumns" :pagination.sync="pagination"
+          <ni-responsive-table :data="billingItems" :columns="billingItemsColumns" :pagination.sync="pagination"
             :loading="billingItemsLoading" />
           <q-card-actions align="right">
             <ni-button icon="add" label="Ajouter un article de facturation" :disable="billingItemsLoading"
@@ -482,6 +482,7 @@ export default {
       billingItemsLoading: false,
       billingItemCreationModal: false,
       billingItemTypeOptions: BILLING_ITEMS_TYPE_OPTIONS,
+      billingItems: [],
       billingItemsColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
@@ -684,6 +685,7 @@ export default {
       this.refreshSurcharges(),
       this.refreshServices(),
       this.refreshThirdPartyPayers(),
+      this.refreshBillingItems(),
     ]);
   },
   methods: {
@@ -1052,12 +1054,24 @@ export default {
 
         NotifyPositive('Article de facturation créé.');
         this.billingItemCreationModal = false;
+        await this.refreshBillingItems();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la création de l\'article de facturation.');
       } finally {
         this.loading = false;
+      }
+    },
+    async refreshBillingItems () {
+      try {
+        this.billingItemsLoading = true;
+        this.billingItems = await BillingItems.list();
+      } catch (e) {
+        this.billingItems = [];
+        console.error(e);
+      } finally {
+        this.billingItemsLoading = false;
       }
     },
     // Third party payers
