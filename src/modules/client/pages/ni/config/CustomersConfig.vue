@@ -60,6 +60,16 @@
         </q-card>
       </div>
       <div class="q-mb-xl">
+        <p class="text-weight-bold">Articles de facturation</p>
+        <q-card>
+          <ni-responsive-table :data="[]" :columns="billingItemsColumns" :pagination.sync="pagination"
+            :loading="billingItemsLoading" />
+          <q-card-actions align="right">
+            <ni-button icon="add" label="Ajouter un article de facturation" :disable="billingItemsLoading" />
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
@@ -196,6 +206,7 @@ import {
   COMPANY,
   REQUIRED_LABEL,
   HTML_EXTENSIONS,
+  BILLING_ITEMS_OPTIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
@@ -536,6 +547,33 @@ export default {
         descending: true,
       },
       HTML_EXTENSIONS,
+      billingItemsLoading: false,
+      billingItemsColumns: [
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
+        {
+          name: 'type',
+          label: 'Nature',
+          align: 'left',
+          format: (value) => {
+            const type = BILLING_ITEMS_OPTIONS.find(option => option.value === value);
+            return type ? capitalize(type.label) : '';
+          },
+          field: 'type',
+        },
+        {
+          name: 'defaultUnitAmount',
+          label: 'Prix unitaire TTC par défaut',
+          align: 'center',
+          field: 'defaultUnitAmount',
+          format: value => `${value}€`,
+        },
+        {
+          name: 'vat',
+          label: 'TVA',
+          align: 'center',
+          field: row => row.vat && `${row.vat}%`,
+        },
+      ],
     };
   },
   validations: {
