@@ -493,7 +493,7 @@ export const NOTE_UPDATE = 'note_update';
 // BILLING ITEMS
 export const MANUAL = 'manual';
 export const PER_INTERVENTION = 'per_intervention';
-export const BILLING_ITEMS_OPTIONS = [
+export const BILLING_ITEMS_TYPE_OPTIONS = [
   { label: 'Manuel', value: MANUAL },
   { label: 'Par intervention', value: PER_INTERVENTION },
 ];

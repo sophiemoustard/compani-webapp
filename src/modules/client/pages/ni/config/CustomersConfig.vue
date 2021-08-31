@@ -65,7 +65,8 @@
           <ni-responsive-table :data="[]" :columns="billingItemsColumns" :pagination.sync="pagination"
             :loading="billingItemsLoading" />
           <q-card-actions align="right">
-            <ni-button icon="add" label="Ajouter un article de facturation" :disable="billingItemsLoading" />
+            <ni-button icon="add" label="Ajouter un article de facturation" :disable="billingItemsLoading"
+              @click="billingItemCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -163,6 +164,11 @@
       :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
       :validations="$v.editedService" />
 
+    <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
+      :validations="$v.newBillingItem" :type-options="billingItemTypeOptions"
+      :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
+      :loading="loading" />
+
     <!-- Service history modal -->
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
       :selected-service="selectedService" :service-columns="serviceColumns" />
@@ -206,7 +212,7 @@ import {
   COMPANY,
   REQUIRED_LABEL,
   HTML_EXTENSIONS,
-  BILLING_ITEMS_OPTIONS,
+  BILLING_ITEMS_TYPE_OPTIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
@@ -214,6 +220,7 @@ import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
+import BillingItemCreationModal from 'src/modules/client/components/config/BillingItemCreationModal';
 import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
@@ -233,6 +240,7 @@ export default {
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
+    'billing-item-creation-modal': BillingItemCreationModal,
     'surcharge-creation-modal': SurchargeCreationModal,
     'surcharge-edition-modal': SurchargeEditionModal,
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
@@ -469,6 +477,36 @@ export default {
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       servicesLoading: false,
+      newBillingItem: { name: '', type: '', defaultUnitAmount: '', vat: '' },
+      billingItemsLoading: false,
+      billingItemCreationModal: false,
+      billingItemTypeOptions: BILLING_ITEMS_TYPE_OPTIONS,
+      billingItemsColumns: [
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
+        {
+          name: 'type',
+          label: 'Nature',
+          align: 'left',
+          format: (value) => {
+            const type = BILLING_ITEMS_TYPE_OPTIONS.find(option => option.value === value);
+            return type ? capitalize(type.label) : '';
+          },
+          field: 'type',
+        },
+        {
+          name: 'defaultUnitAmount',
+          label: 'Prix unitaire TTC par défaut',
+          align: 'center',
+          field: 'defaultUnitAmount',
+          format: value => `${value}€`,
+        },
+        {
+          name: 'vat',
+          label: 'TVA',
+          align: 'center',
+          field: row => row.vat && `${row.vat}%`,
+        },
+      ],
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
         {
@@ -547,33 +585,6 @@ export default {
         descending: true,
       },
       HTML_EXTENSIONS,
-      billingItemsLoading: false,
-      billingItemsColumns: [
-        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        {
-          name: 'type',
-          label: 'Nature',
-          align: 'left',
-          format: (value) => {
-            const type = BILLING_ITEMS_OPTIONS.find(option => option.value === value);
-            return type ? capitalize(type.label) : '';
-          },
-          field: 'type',
-        },
-        {
-          name: 'defaultUnitAmount',
-          label: 'Prix unitaire TTC par défaut',
-          align: 'center',
-          field: 'defaultUnitAmount',
-          format: value => `${value}€`,
-        },
-        {
-          name: 'vat',
-          label: 'TVA',
-          align: 'center',
-          field: row => row.vat && `${row.vat}%`,
-        },
-      ],
     };
   },
   validations: {
@@ -616,6 +627,12 @@ export default {
     editedService: {
       name: { required },
       startDate: { required },
+      defaultUnitAmount: { required, positiveNumber },
+      vat: { positiveNumber },
+    },
+    newBillingItem: {
+      name: { required },
+      type: { required },
       defaultUnitAmount: { required, positiveNumber },
       vat: { positiveNumber },
     },
@@ -1018,6 +1035,11 @@ export default {
     },
     resetServiceHistoryData () {
       this.selectedService = {};
+    },
+    // Billing Items
+    resetBillingItemCreation () {
+      this.$v.newBillingItem.$reset();
+      this.newBillingItem = { name: '', type: '', defaultUnitAmount: '', vat: '' };
     },
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
