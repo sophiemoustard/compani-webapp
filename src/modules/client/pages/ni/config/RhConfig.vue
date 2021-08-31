@@ -97,9 +97,9 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button @click="downloadDriveDoc(getAdministrativeDocumentId(props.row))"
-                        :disable="!getAdministrativeDocumentId(props.row)" icon="file_download" />
-                      <ni-button :disable="!getAdministrativeDocumentId(props.row)"
+                      <ni-button @click="downloadDriveDoc(getAdministrativeDocumentId(props.row))" icon="file_download"
+                        :disable="!getAdministrativeDocumentId(props.row) || disableAdministrativeDocument" />
+                      <ni-button :disable="!getAdministrativeDocumentId(props.row) || disableAdministrativeDocument"
                          icon="delete" @click="validateAdministrativeDocumentDeletion(props.row)" />
                     </div>
                   </template>
@@ -218,6 +218,7 @@ export default {
         { name: 'actions', label: '', align: 'center' },
       ],
       administrativeDocumentsLoading: false,
+      disableAdministrativeDocument: false,
       administrativeDocumentCreationModal: false,
       administrativeDocumentsPagination: { rowsPerPage: 0 },
       newAdministrativeDocument: { name: '', file: null },
@@ -436,9 +437,12 @@ export default {
     },
     async downloadDriveDoc (id) {
       try {
+        this.disableAdministrativeDocument = true;
         await GoogleDrive.downloadFileById(id);
       } catch (e) {
         console.error(e);
+      } finally {
+        this.disableAdministrativeDocument = false;
       }
     },
     async getAdministrativeDocuments () {
