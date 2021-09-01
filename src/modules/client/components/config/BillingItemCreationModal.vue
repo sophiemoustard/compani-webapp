@@ -11,8 +11,7 @@
       :value="newBillingItem.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
       @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError" suffix="€" type="number" />
     <ni-input in-modal caption="TVA" suffix="%" :value="newBillingItem.vat" type="number" @input="update($event, 'vat')"
-      :error="validations.vat.$error" @blur="validations.vat.$touch"
-      error-message="La TVA doit être positive ou nulle" />
+      :error="validations.vat.$error" @blur="validations.vat.$touch" required-field :error-message="vatError" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer un article" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -38,6 +37,7 @@ export default {
     newBillingItem: { type: Object, required: true },
     typeOptions: { type: Array, required: true },
     defaultUnitAmountError: { type: String, required: true },
+    vatError: { type: String, required: true },
     loading: { type: Boolean, default: false },
   },
   methods: {

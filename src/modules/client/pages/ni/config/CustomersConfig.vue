@@ -167,7 +167,7 @@
     <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
       :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
       :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
-      @submit="createNewBillingItem" />
+      :vat-error="nbrError('newBillingItem.vat')" @submit="createNewBillingItem" />
 
     <!-- Service history modal -->
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
@@ -611,7 +611,7 @@ export default {
       name: { required },
       type: { required },
       defaultUnitAmount: { required, positiveNumber },
-      vat: { positiveNumber },
+      vat: { required, positiveNumber },
     },
     company: {
       customersConfig: {
@@ -1025,8 +1025,6 @@ export default {
         if (this.$v.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-
-        if (!this.newBillingItem.vat) this.newBillingItem.vat = 0;
 
         await BillingItems.create(this.newBillingItem);
 
