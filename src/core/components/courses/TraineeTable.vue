@@ -118,6 +118,7 @@ export default {
         sortBy: 'lastname',
       },
       companyOptions: [],
+      potentialTrainees: [],
       traineeCreationModal: false,
       traineeCreationModalLoading: false,
       firstStep: true,
@@ -181,9 +182,24 @@ export default {
     },
   },
   async created () {
-    if (!this.isIntraCourse && this.canEdit) await this.refreshCompanies();
+    await this.getPotentialTrainees();
   },
   methods: {
+    async getPotentialTrainees () {
+      try {
+        let query;
+
+        if (this.course.type === INTRA) query = { company: this.selectedCompany };
+        if (this.course.type === INTER_B2B) {
+          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
+        }
+
+        this.potentialTrainees = Object.freeze(await Users.learnerList(query));
+      } catch (error) {
+        this.potentialTrainees = [];
+        console.error(error);
+      }
+    },
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
