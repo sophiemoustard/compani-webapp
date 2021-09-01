@@ -97,9 +97,9 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button :href="getAdministrativeDocumentLink(props.row)" type="a"
-                        :disable="!getAdministrativeDocumentLink(props.row)" icon="file_download" />
-                      <ni-button :disable="!getAdministrativeDocumentLink(props.row)"
+                      <ni-button @click="downloadDriveDoc(getAdministrativeDocumentId(props.row))" icon="file_download"
+                        :disable="!getAdministrativeDocumentId(props.row) || disableAdministrativeDocument" />
+                      <ni-button :disable="!getAdministrativeDocumentId(props.row) || disableAdministrativeDocument"
                          icon="delete" @click="validateAdministrativeDocumentDeletion(props.row)" />
                     </div>
                   </template>
@@ -166,6 +166,7 @@ import { required, maxValue } from 'vuelidate/lib/validators';
 import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
+import GoogleDrive from '@api/GoogleDrive';
 import InternalHours from '@api/InternalHours';
 import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
@@ -217,6 +218,7 @@ export default {
         { name: 'actions', label: '', align: 'center' },
       ],
       administrativeDocumentsLoading: false,
+      disableAdministrativeDocument: false,
       administrativeDocumentCreationModal: false,
       administrativeDocumentsPagination: { rowsPerPage: 0 },
       newAdministrativeDocument: { name: '', file: null },
@@ -430,8 +432,18 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Administrative document
-    getAdministrativeDocumentLink (doc) {
-      return get(doc, 'driveFile.link') || '';
+    getAdministrativeDocumentId (doc) {
+      return get(doc, 'driveFile.driveId') || '';
+    },
+    async downloadDriveDoc (id) {
+      try {
+        this.disableAdministrativeDocument = true;
+        await GoogleDrive.downloadFileById(id);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.disableAdministrativeDocument = false;
+      }
     },
     async getAdministrativeDocuments () {
       try {
