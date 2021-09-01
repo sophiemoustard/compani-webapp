@@ -485,6 +485,15 @@ export const MANUAL_TIME_STAMPING_REASONS = {
   [QRCODE_ERROR]: 'Le code barre ne fonctionne pas',
   [CAMERA_ERROR]: 'Mon appareil photo ne fonctionne pas',
 };
+
 // NOTE
 export const NOTE_CREATION = 'note_creation';
 export const NOTE_UPDATE = 'note_update';
+
+// BILLING ITEMS
+export const MANUAL = 'manual';
+export const PER_INTERVENTION = 'per_intervention';
+export const BILLING_ITEMS_TYPE_OPTIONS = [
+  { label: 'Manuel', value: MANUAL },
+  { label: 'Par intervention', value: PER_INTERVENTION },
+];

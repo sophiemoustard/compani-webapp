@@ -60,6 +60,17 @@
         </q-card>
       </div>
       <div class="q-mb-xl">
+        <p class="text-weight-bold">Articles de facturation</p>
+        <q-card>
+          <ni-responsive-table :data="billingItems" :columns="billingItemsColumns" :pagination.sync="pagination"
+            :loading="billingItemsLoading" />
+          <q-card-actions align="right">
+            <ni-button icon="add" label="Ajouter un article de facturation" :disable="billingItemsLoading"
+              @click="billingItemCreationModal = true" />
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
@@ -153,6 +164,11 @@
       :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
       :validations="$v.editedService" />
 
+    <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
+      :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
+      :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
+      :vat-error="nbrError('newBillingItem.vat')" @submit="createNewBillingItem" />
+
     <!-- Service history modal -->
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
       :selected-service="selectedService" :service-columns="serviceColumns" />
@@ -178,6 +194,7 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
+import BillingItems from '@api/BillingItems';
 import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -196,13 +213,15 @@ import {
   COMPANY,
   REQUIRED_LABEL,
   HTML_EXTENSIONS,
+  BILLING_ITEMS_TYPE_OPTIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
+import { roundFrenchPercentage, formatHoursWithMinutes, formatPrice } from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
+import BillingItemCreationModal from 'src/modules/client/components/config/BillingItemCreationModal';
 import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
@@ -222,6 +241,7 @@ export default {
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
+    'billing-item-creation-modal': BillingItemCreationModal,
     'surcharge-creation-modal': SurchargeCreationModal,
     'surcharge-edition-modal': SurchargeEditionModal,
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
@@ -303,18 +323,8 @@ export default {
       },
       surchargesColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        {
-          name: 'saturday',
-          label: 'Samedi',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.saturday, 0),
-        },
-        {
-          name: 'sunday',
-          label: 'Dimanche',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.sunday, 0),
-        },
+        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
+        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         {
           name: 'publicHoliday',
           label: 'Jour férié',
@@ -339,12 +349,7 @@ export default {
           align: 'center',
           field: row => roundFrenchPercentage(row.firstOfJanuary, 0),
         },
-        {
-          name: 'evening',
-          label: 'Soirée',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.evening, 0),
-        },
+        { name: 'evening', label: 'Soirée', align: 'center', field: row => roundFrenchPercentage(row.evening, 0) },
         {
           name: 'eveningStartTime',
           label: 'Début soirée',
@@ -357,12 +362,7 @@ export default {
           align: 'center',
           field: row => (row.eveningEndTime ? formatHoursWithMinutes(row.eveningEndTime) : ''),
         },
-        {
-          name: 'custom',
-          label: 'Perso',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.custom, 0),
-        },
+        { name: 'custom', label: 'Perso', align: 'center', field: row => roundFrenchPercentage(row.custom, 0) },
         {
           name: 'customStartTime',
           label: 'Début perso',
@@ -435,14 +435,9 @@ export default {
           label: 'Prix unitaire TTC par défaut',
           align: 'center',
           field: 'defaultUnitAmount',
-          format: value => `${value}€`,
+          format: formatPrice,
         },
-        {
-          name: 'vat',
-          label: 'TVA',
-          align: 'center',
-          field: row => row.vat && `${row.vat}%`,
-        },
+        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 0) },
         {
           name: 'surcharge',
           label: 'Plan de majoration',
@@ -458,6 +453,32 @@ export default {
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       servicesLoading: false,
+      newBillingItem: { name: '', type: '', defaultUnitAmount: 0, vat: 0 },
+      billingItemsLoading: false,
+      billingItemCreationModal: false,
+      billingItemTypeOptions: BILLING_ITEMS_TYPE_OPTIONS,
+      billingItems: [],
+      billingItemsColumns: [
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
+        {
+          name: 'type',
+          label: 'Nature',
+          align: 'left',
+          format: (value) => {
+            const type = BILLING_ITEMS_TYPE_OPTIONS.find(option => option.value === value);
+            return type ? capitalize(type.label) : '';
+          },
+          field: 'type',
+        },
+        {
+          name: 'defaultUnitAmount',
+          label: 'Prix unitaire TTC par défaut',
+          align: 'center',
+          field: 'defaultUnitAmount',
+          format: formatPrice,
+        },
+        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 0) },
+      ],
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
         {
@@ -474,7 +495,7 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC par défaut',
           field: 'unitTTCRate',
-          format: val => (val ? `${val}€` : ''),
+          format: formatPrice,
           align: 'center',
         },
         {
@@ -581,6 +602,12 @@ export default {
       defaultUnitAmount: { required, positiveNumber },
       vat: { positiveNumber },
     },
+    newBillingItem: {
+      name: { required },
+      type: { required },
+      defaultUnitAmount: { required, positiveNumber },
+      vat: { required, positiveNumber },
+    },
     company: {
       customersConfig: {
         billingPeriod: { required },
@@ -628,6 +655,7 @@ export default {
       this.refreshSurcharges(),
       this.refreshServices(),
       this.refreshThirdPartyPayers(),
+      this.refreshBillingItems(),
     ]);
   },
   methods: {
@@ -980,6 +1008,42 @@ export default {
     },
     resetServiceHistoryData () {
       this.selectedService = {};
+    },
+    // Billing Items
+    resetBillingItemCreation () {
+      this.$v.newBillingItem.$reset();
+      this.newBillingItem = { name: '', type: '', defaultUnitAmount: 0, vat: 0 };
+    },
+    async createNewBillingItem () {
+      try {
+        this.$v.newBillingItem.$touch();
+        if (this.$v.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+
+        await BillingItems.create(this.newBillingItem);
+
+        NotifyPositive('Article de facturation créé.');
+        this.billingItemCreationModal = false;
+        await this.refreshBillingItems();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la création de l\'article de facturation.');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async refreshBillingItems () {
+      try {
+        this.billingItemsLoading = true;
+        this.billingItems = await BillingItems.list();
+      } catch (e) {
+        this.billingItems = [];
+        console.error(e);
+      } finally {
+        this.billingItemsLoading = false;
+      }
     },
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
