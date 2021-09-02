@@ -16,20 +16,20 @@
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <div v-if="!props.row.number">Facture tiers</div>
-              <a v-else-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
-                data-cy="link">
+              <div v-else-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))" data-cy="link"
+                :class="['download', { 'disabled': docLoading }]">
                 Facture {{ props.row.number }}
-              </a>
+              </div>
               <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
                 Facture {{ props.row.number }}
               </div>
             </template>
             <template v-else-if="props.row.type === CREDIT_NOTE">
-              <a v-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
-                data-cy="link">
+              <div v-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))" target="_blank" data-cy="link"
+                :class="['download', { 'disabled': docLoading }]">
                 Avoir {{ props.row.number }}
-              </a>
+              </div>
               <div v-else @click="downloadCreditNotePdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
                 Avoir {{ props.row.number }}
@@ -72,6 +72,7 @@
 import get from 'lodash/get';
 import Bills from '@api/Bills';
 import CreditNotes from '@api/CreditNotes';
+import GoogleDrive from '@api/GoogleDrive';
 import SimpleTable from '@components/table/SimpleTable';
 import Button from '@components/Button';
 import { NotifyNegative } from '@components/popup/notify';
@@ -188,8 +189,19 @@ export default {
     openEditionModal (payment) {
       this.$emit('open-edition-modal', payment);
     },
-    getUrl (doc) {
-      return get(doc, 'driveFile.link');
+    getDriveId (doc) {
+      return get(doc, 'driveFile.driveId');
+    },
+    async downloadDriveDoc (id) {
+      if (this.docLoading) return;
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(id);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
+      }
     },
     canDownload (doc) {
       return doc.origin === COMPANI;
@@ -242,6 +254,9 @@ export default {
     cursor: pointer;
     color: $primary;
     text-decoration underline;
+
+  .disabled
+    cursor: not-allowed;
 
   /deep/ .q-item
     .q-item__section
