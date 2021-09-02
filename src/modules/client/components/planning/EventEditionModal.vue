@@ -35,8 +35,6 @@
             :value="editedEvent.subscription" :error="validations.subscription.$error" caption="Service"
             @blur="validations.subscription.$touch" required-field
             :disable="isBilledIntervention || historiesLoading" />
-          <ni-select in-modal caption="Mode de transport spécifique" :value="editedEvent.transportMode"
-            :options="eventTransportOptions" @input="update($event, 'transportMode')" />
         </template>
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :value="editedEvent.internalHour"
@@ -88,6 +86,9 @@
               :disable="historiesLoading" />
           </div>
         </template>
+        <ni-select in-modal v-if="!editedEvent.shouldUpdateRepetition" caption="Mode de transport spécifique"
+          :value="editedEvent.transportMode" :options="eventTransportOptions"
+          @input="update($event, 'transportMode')" />
         <div class="q-mb-lg">
           <div class="flex-row items-center justify-between">
             <div class="flex-row items-center">
