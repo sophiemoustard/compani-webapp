@@ -33,7 +33,7 @@
 
     <trainee-addition-modal v-model="traineeAdditionModal" :new-trainee.sync="newTrainee"
       :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
-      :trainees-options="traineesOptions" />
+      :trainees-options="traineesOptions" @submit="addTrainee" />
 
     <!-- Trainee edition modal -->
     <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee" @submit="updateTrainee"
@@ -182,6 +182,24 @@ export default {
     resetTraineeAdditionForm () {
       this.newTrainee = '';
       this.$v.newTrainee.$reset();
+    },
+    async addTrainee () {
+      try {
+        this.traineeModalLoading = true;
+        this.$v.newTrainee.$touch();
+        if (this.$v.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Courses.addTrainee(this.course._id, { trainee: this.newTrainee });
+        this.traineeAdditionModal = false;
+        this.$emit('refresh');
+        NotifyPositive('Stagiaire ajouté(e).');
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout du/de la stagiaire.');
+      } finally {
+        this.traineeModalLoading = false;
+      }
     },
     async openTraineeEditionModal (trainee) {
       this.editedTrainee = {

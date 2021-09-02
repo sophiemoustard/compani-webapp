@@ -3,7 +3,7 @@
     <template slot="title">
         Ajouter une <span class="text-weight-bold">personne</span>
       </template>
-      <ni-select in-modal :value="newTrainee" @input="update" caption="Personne" :error="validations.$error"
+      <ni-select in-modal :value="newTrainee" @input="update" caption="Stagiaire" :error="validations.$error"
         :options="traineesOptions" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add" color="primary"
