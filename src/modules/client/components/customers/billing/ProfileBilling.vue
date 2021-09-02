@@ -39,8 +39,8 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <ni-button v-if="!!getUrl(props.row)" data-cy="link" color="primary" type="a"
-                    :href="getUrl(props.row)" icon="file_download" target="_blank" />
+                  <ni-button v-if="get(props, 'row.driveFile.driveId')" data-cy="link" color="primary"
+                    @click="downloadTaxCertificateFromDrive(props.row)" icon="file_download" />
                   <ni-button v-else data-cy="link" color="primary" icon="file_download"
                     @click="downloadTaxCertificate(props.row)" :disable="pdfLoading" />
                   <ni-button v-if="isCoach" color="copper-grey-400" icon="delete"
@@ -80,7 +80,7 @@
       <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="$v.taxCertificate.file.$error"
         @blur="$v.taxCertificate.file.$touch" in-modal required-field last :error-message="taxCertificateFileError" />
       <template slot="footer">
-        <ni-button no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
           :loading="modalLoading" @click="createTaxCertificate" />
       </template>
     </ni-modal>
@@ -95,6 +95,7 @@ import snakeCase from 'lodash/snakeCase';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import TaxCertificates from '@api/TaxCertificates';
+import GoogleDrive from '@api/GoogleDrive';
 import DateRange from '@components/form/DateRange';
 import SimpleTable from '@components/table/SimpleTable';
 import DateInput from '@components/form/DateInput';
@@ -229,6 +230,7 @@ export default {
     await this.getTaxCertificates();
   },
   methods: {
+    get,
     // Billing dates
     setBillingDates () {
       this.billingDates.endDate = moment().endOf('d').toISOString();
@@ -449,8 +451,15 @@ export default {
         this.modalLoading = false;
       }
     },
-    getUrl (doc) {
-      return get(doc, 'driveFile.link');
+    async downloadTaxCertificateFromDrive (tc) {
+      try {
+        this.disableAdministrativeDocument = true;
+        await GoogleDrive.downloadFileById(get(tc, 'driveFile.driveId'));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.disableAdministrativeDocument = false;
+      }
     },
     async downloadTaxCertificate (tc) {
       if (this.pdfLoading) return;
