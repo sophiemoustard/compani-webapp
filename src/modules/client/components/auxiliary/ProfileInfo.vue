@@ -170,10 +170,10 @@
             :error="$v.userProfile.administrative.phoneInvoice.driveId.$error" drive-storage />
         </div>
         <div class="col-xs-12 col-md-6">
-          <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
-            alt="diplome" @delete="validateCertificateDeletion" name="certificates" drive-storage
-            collapsible-label="Ajouter un diplôme" :user-profile="userProfile" :url="docsUploadUrl"
-            additional-fields-name="diplomes" @uploaded="documentUploaded" :extensions="extensions" />
+          <ni-multiple-files-uploader caption="Diplôme(s) ou certificat(s)" path="administrative.certificates"
+            document-caption="Diplôme" @delete="validateCertificateDeletion" name="certificates" :url="docsUploadUrl"
+            collapsible-label="Ajouter un diplôme" :user-profile="userProfile" additional-fields-name="diplomes"
+            @uploaded="documentUploaded" :extensions="extensions" />
         </div>
       </div>
     </div>
