@@ -49,10 +49,8 @@
             </q-item>
           </template>
           <template v-else-if="col.name === 'actions' && displayActions">
-            <q-btn v-if="paymentTypes.includes(props.row.type)" flat dense color="primary" icon="edit"
-              @click="openEditionModal(props.row)" />
-            <q-btn v-if="REFUND === props.row.nature" flat dense color="primary" icon="delete"
-              @click="deleteRefund(props.row)" />
+            <ni-button v-if="paymentTypes.includes(props.row.type)" icon="edit" @click="openEditionModal(props.row)" />
+            <ni-button v-if="REFUND === props.row.nature" icon="delete" @click="deleteRefund(props.row)" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -75,6 +73,7 @@ import get from 'lodash/get';
 import Bills from '@api/Bills';
 import CreditNotes from '@api/CreditNotes';
 import SimpleTable from '@components/table/SimpleTable';
+import Button from '@components/Button';
 import { NotifyNegative } from '@components/popup/notify';
 import {
   CREDIT_NOTE,
@@ -107,6 +106,7 @@ export default {
   },
   components: {
     'ni-simple-table': SimpleTable,
+    'ni-button': Button,
   },
   data () {
     return {
