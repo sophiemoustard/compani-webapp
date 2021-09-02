@@ -18,7 +18,7 @@
 
       <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetAddLearnerForm"
-      :first-step="!identityStep" :identity-step="identityStep" @next-step="nextStepLearnerCreationModal"
+      :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
       :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" />
   </q-page>
 </template>
@@ -60,7 +60,7 @@ export default {
       searchStr: '',
       learnerCreationModal: false,
       learnerCreationModalLoading: false,
-      identityStep: false,
+      firstStep: true,
       newLearner: { identity: { firstname: '', lastname: '' }, contact: { phone: '' }, local: { email: '' } },
     };
   },
@@ -94,7 +94,7 @@ export default {
       return link || DEFAULT_AVATAR;
     },
     resetAddLearnerForm () {
-      this.identityStep = false;
+      this.firstStep = true;
       this.newLearner = { ...clear(this.newLearner) };
       this.$v.newLearner.$reset();
     },
@@ -120,7 +120,7 @@ export default {
       }
     },
     goToCreationStep () {
-      this.identityStep = true;
+      this.firstStep = false;
       this.$v.newLearner.$reset();
     },
     async updateLearner (userId) {
