@@ -16,7 +16,7 @@
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <div v-if="!props.row.number">Facture tiers</div>
-              <div v-else-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))" data-cy="link"
+              <div v-else-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))"
                 :class="['download', { 'disabled': docLoading }]">
                 Facture {{ props.row.number }}
               </div>
@@ -26,7 +26,7 @@
               </div>
             </template>
             <template v-else-if="props.row.type === CREDIT_NOTE">
-              <div v-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))" target="_blank" data-cy="link"
+              <div v-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))" target="_blank"
                 :class="['download', { 'disabled': docLoading }]">
                 Avoir {{ props.row.number }}
               </div>
