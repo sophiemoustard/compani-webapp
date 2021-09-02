@@ -1,6 +1,6 @@
 <template>
   <div class="dot-container">
-    <q-icon size="12px" name="check_circle" color="green-800" />
+    <q-icon size="12px" name="check_circle" color="green-600" />
     <span :class="'connected-text'">Connecté</span>
   </div>
 </template>
@@ -21,5 +21,5 @@ export default {
 
 .connected-text
   font-size: 12px
-  color: $green-800
+  color: $green-600
 </style>

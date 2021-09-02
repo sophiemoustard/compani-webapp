@@ -131,7 +131,7 @@ export default {
     },
     getDotTextClass (value) {
       return {
-        'text-green-800': value === ACTIVATED,
+        'text-green-600': value === ACTIVATED,
         'text-orange-700': value === STOPPED,
         'text-copper-grey-700': value === ARCHIVED,
       };
