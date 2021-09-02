@@ -25,14 +25,19 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right" v-if="canEdit">
-          <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading" />
+          <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
+            @click="traineeAdditionModal = true" />
         </q-card-actions>
       </q-card>
     </div>
 
+    <trainee-addition-modal v-model="traineeAdditionModal" :new-trainee.sync="newTrainee"
+      :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
+      :trainees-options="traineesOptions" />
+
     <!-- Trainee edition modal -->
     <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee" @submit="updateTrainee"
-      @hide="resetTraineeEditionForm" :loading="traineeEditionModalLoading" :validations="$v.editedTrainee" />
+      @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="$v.editedTrainee" />
   </div>
 </template>
 
@@ -45,11 +50,12 @@ import omit from 'lodash/omit';
 import Users from '@api/Users';
 import Courses from '@api/Courses';
 import { INTER_B2B, TRAINER, INTRA } from '@data/constants';
-import { formatPhone, formatPhoneForPayload } from '@helpers/utils';
+import { formatPhone, formatPhoneForPayload, formatAndSortIdentityOptions } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';
+import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -66,6 +72,7 @@ export default {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
     'trainee-edition-modal': TraineeEditionModal,
+    'trainee-addition-modal': TraineeAdditionModal,
     'ni-copy-button': CopyButton,
   },
   data () {
@@ -104,8 +111,10 @@ export default {
       ],
       traineesPagination: { rowsPerPage: 0, sortBy: 'lastname' },
       potentialTrainees: [],
+      traineeAdditionModal: false,
+      newTrainee: '',
       traineeEditionModal: false,
-      traineeEditionModalLoading: false,
+      traineeModalLoading: false,
       editedTrainee: {
         identity: {},
         contact: {},
@@ -115,6 +124,7 @@ export default {
   },
   validations () {
     return {
+      newTrainee: { required },
       editedTrainee: {
         identity: { lastname: { required } },
         contact: { phone: { required, frPhoneNumber } },
@@ -146,6 +156,9 @@ export default {
 
       return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc},${value}`, '');
     },
+    traineesOptions () {
+      return formatAndSortIdentityOptions(this.potentialTrainees);
+    },
   },
   async created () {
     await this.getPotentialTrainees();
@@ -155,7 +168,7 @@ export default {
       try {
         let query;
 
-        if (this.course.type === INTRA) query = { company: this.selectedCompany };
+        if (this.course.type === INTRA) query = { company: get(this.course, 'company._id') };
         if (this.course.type === INTER_B2B) {
           query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
         }
@@ -165,6 +178,10 @@ export default {
         this.potentialTrainees = [];
         console.error(error);
       }
+    },
+    resetTraineeAdditionForm () {
+      this.newTrainee = '';
+      this.$v.newTrainee.$reset();
     },
     async openTraineeEditionModal (trainee) {
       this.editedTrainee = {
@@ -179,7 +196,7 @@ export default {
     },
     async updateTrainee () {
       try {
-        this.traineeEditionModalLoading = true;
+        this.traineeModalLoading = true;
         this.$v.editedTrainee.$touch();
         if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (get(this.editedTrainee, 'contact.phone')) {
@@ -194,7 +211,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification du/de la stagiaire.');
       } finally {
-        this.traineeEditionModalLoading = false;
+        this.traineeModalLoading = false;
       }
     },
     validateTraineeDeletion (traineeId) {
