@@ -18,10 +18,8 @@
           <div v-if="certificate.driveId" class="row justify-between files-container" :key="index">
             <span class="document-caption">{{ documentCaption }}</span>
             <div class="doc-actions">
-              <ni-button color="primary" icon="save_alt" size="1rem" :disabled="loading"
-                @click.native="downloadDriveDoc(certificate.driveId)" />
-              <ni-button color="primary" icon="delete" size="1rem" :disabled="loading"
-                @click.native="deleteDocument(certificate.driveId)" />
+              <ni-button icon="save_alt" :disabled="loading" @click.native="downloadDriveDoc(certificate.driveId)" />
+              <ni-button icon="delete" :disabled="loading" @click.native="deleteDocument(certificate.driveId)" />
             </div>
           </div>
         </template>
@@ -53,7 +51,6 @@ export default {
   },
   props: {
     caption: { type: String, default: '' },
-    error: { type: Boolean, default: false },
     path: { type: String, default: '' },
     documentCaption: { type: String, default: '' },
     name: { type: String, default: '' },
@@ -116,6 +113,6 @@ export default {
     width: 100%
     background-color: white
     align-items: center
-    padding: 8px 16px
+    padding: 8px
     margin-bottom: 16px
 </style>
