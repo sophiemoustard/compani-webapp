@@ -12,16 +12,13 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" :disable="loading || !getLink(props.row)" class="q-mx-sm"
-                    type="a" :href="getLink(props.row)" target="_blank" icon="file_download" />
-                  <q-btn v-if="isCoach" flat round small color="primary" icon="delete" class="q-mx-sm"
-                    :disable="loading"
+                  <ni-button :disable="loading || !getDriveId(props.row)" class="q-mx-sm" icon="file_download"
+                    @click="downloadDriveDoc(props.row)" />
+                  <ni-button v-if="isCoach" icon="delete" class="q-mx-sm" :disable="loading"
                     @click="validatePayDocumentDeletion(payDocuments[getRowIndex(payDocuments, props.row)])" />
                 </div>
               </template>
-              <template v-else>
-                {{ col.value }}
-              </template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </template>
@@ -46,7 +43,9 @@ import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import PayDocuments from '@api/PayDocuments';
+import GoogleDrive from '@api/GoogleDrive';
 import SimpleTable from '@components/table/SimpleTable';
+import Button from '@components/Button';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
 import { formatDate } from '@helpers/date';
@@ -60,6 +59,7 @@ export default {
   components: {
     'pay-document-creation-modal': PayDocumentCreationModal,
     'ni-simple-table': SimpleTable,
+    'ni-button': Button,
   },
   data () {
     return {
@@ -121,8 +121,19 @@ export default {
     await this.getDocuments();
   },
   methods: {
-    getLink (doc) {
-      return get(doc, 'file.link') || false;
+    getDriveId (doc) {
+      return get(doc, 'file.driveId') || false;
+    },
+    async downloadDriveDoc (doc) {
+      if (this.loading) return;
+      try {
+        this.loading = true;
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.loading = false;
+      }
     },
     formatDocumentPayload () {
       const { file, nature, date } = this.newPayDocument;
