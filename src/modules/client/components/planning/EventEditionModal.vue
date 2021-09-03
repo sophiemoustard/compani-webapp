@@ -86,6 +86,9 @@
               :disable="historiesLoading" />
           </div>
         </template>
+        <ni-select in-modal v-if="!editedEvent.shouldUpdateRepetition && editedEvent.type === INTERVENTION "
+          :value="editedEvent.transportMode" :options="eventTransportOptions" caption="Mode de transport spécifique"
+          @input="update($event, 'transportMode')" />
         <div class="q-mb-lg">
           <div class="flex-row items-center justify-between">
             <div class="flex-row items-center">

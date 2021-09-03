@@ -195,7 +195,7 @@ export const planningActionMixin = {
     getPayload (event) {
       const payload = {
         ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
-        ...pick(event, ['isCancelled']), // pickBy removes isCancelled: false
+        ...pick(event, ['isCancelled', 'transportMode']), // pickBy removes isCancelled: false and transportMode: ''
         startDate: event.dates.startDate,
         endDate: event.dates.endDate,
       };
@@ -360,6 +360,7 @@ export const planningActionMixin = {
         customer,
         internalHour,
         sector,
+        transportMode,
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
@@ -378,6 +379,7 @@ export const planningActionMixin = {
             subscription: subscription._id,
             isBilled,
             address,
+            transportMode: transportMode || '',
           };
           break;
         }
@@ -416,7 +418,10 @@ export const planningActionMixin = {
 
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
-      if (event.shouldUpdateRepetition) delete payload.misc;
+      if (event.shouldUpdateRepetition) {
+        delete payload.misc;
+        delete payload.transportMode;
+      }
       if (event.auxiliary) delete payload.sector;
       if (event.address && !event.address.fullAddress) payload.address = {};
 

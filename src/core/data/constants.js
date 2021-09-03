@@ -224,13 +224,18 @@ export const MONTH_STATS = 'month_stat';
 // TRANSORT
 export const PUBLIC_TRANSPORT = 'public';
 export const PRIVATE_TRANSPORT = 'private';
+export const COMPANY_TRANSPORT = 'company_transport';
 export const TRANSPORT_OPTIONS = [
   { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT },
   { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT },
   { label: 'Aucun', value: 'none' },
 ];
-export const TRANSIT = 'transit';
-export const DRIVING = 'driving';
+export const EVENT_TRANSPORT_OPTIONS = [
+  { label: 'Pas de mode de transport spécifique', value: '' },
+  { label: 'Transports en commun / À pied', value: PUBLIC_TRANSPORT },
+  { label: 'Véhicule personnel', value: PRIVATE_TRANSPORT },
+  { label: 'Véhicule d\'entreprise', value: COMPANY_TRANSPORT },
+];
 
 export const REQUIRED_LABEL = 'Champ requis';
 
