@@ -14,7 +14,7 @@
       <div class="col-sm-6 col-xs-12 q-pl-lg">
         <div class="flex-row items-center q-ml-sm">
           <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-error']" />
-          <div :class="[userActivity.active ? 'text-green-800' : 'text-orange-700']">{{ userActivity.status }}</div>
+          <div :class="[userActivity.active ? 'text-green-600' : 'text-orange-700']">{{ userActivity.status }}</div>
         </div>
         <div class="flex-row items-center q-ml-sm">
           <q-icon name="restore" class="q-mr-md" size="1rem" />
@@ -25,7 +25,7 @@
         <div class="relative-position">
           <q-icon size="36px" name="phone_iphone" color="copper-grey-300" />
           <q-icon v-if="!userProfile.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
-          <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="green-800" size="16px" />
+          <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="green-600" size="16px" />
         </div>
         <div>
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
