@@ -15,7 +15,7 @@
         @open-edition-modal="openEditionModal" :start-balance="getStartBalance()" :loading="tableLoading"
         :end-balance="getEndBalance(customerDocuments)" :type="CUSTOMER" @delete="validateRefundDeletion" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
-        <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
+        <ni-button class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           color="white" icon="add" />
       </div>
     </div>
@@ -25,7 +25,7 @@
         @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
         :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" @delete="validateRefundDeletion" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
-        <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
+        <ni-button class="add-payment" label="Ajouter un réglement" color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
       </div>
     </div>
@@ -39,11 +39,11 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn v-if="!!getUrl(props.row)" data-cy="link" flat round small color="primary" type="a"
-                    :href="getUrl(props.row)" icon="file_download" target="_blank" />
-                  <q-btn v-else data-cy="link" flat round small color="primary" icon="file_download"
+                  <ni-button v-if="get(props, 'row.driveFile.driveId')" data-cy="link" color="primary"
+                    @click="downloadTaxCertificateFromDrive(props.row)" icon="file_download" />
+                  <ni-button v-else data-cy="link" color="primary" icon="file_download"
                     @click="downloadTaxCertificate(props.row)" :disable="pdfLoading" />
-                  <q-btn v-if="isCoach" flat round small dense color="copper-grey-400" icon="delete"
+                  <ni-button v-if="isCoach" color="copper-grey-400" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
               </template>
@@ -53,7 +53,7 @@
         </template>
       </ni-simple-table>
       <div v-if="isCoach" class="q-mt-md" align="right">
-        <q-btn class="add-payment" label="Ajouter une attestation" no-caps flat color="white" icon="add"
+        <ni-button class="add-payment" label="Ajouter une attestation" color="white" icon="add"
           @click="taxCertificateModal = true" />
       </div>
     </div>
@@ -95,12 +95,14 @@ import snakeCase from 'lodash/snakeCase';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import TaxCertificates from '@api/TaxCertificates';
+import GoogleDrive from '@api/GoogleDrive';
 import DateRange from '@components/form/DateRange';
 import SimpleTable from '@components/table/SimpleTable';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
+import Button from '@components/Button';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import {
   CREDIT_NOTE,
@@ -140,6 +142,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
+    'ni-button': Button,
   },
   mixins: [paymentMixin, tableMixin],
   data () {
@@ -227,6 +230,7 @@ export default {
     await this.getTaxCertificates();
   },
   methods: {
+    get,
     // Billing dates
     setBillingDates () {
       this.billingDates.endDate = moment().endOf('d').toISOString();
@@ -447,8 +451,15 @@ export default {
         this.modalLoading = false;
       }
     },
-    getUrl (doc) {
-      return get(doc, 'driveFile.link');
+    async downloadTaxCertificateFromDrive (tc) {
+      try {
+        this.disableAdministrativeDocument = true;
+        await GoogleDrive.downloadFileById(get(tc, 'driveFile.driveId'));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.disableAdministrativeDocument = false;
+      }
     },
     async downloadTaxCertificate (tc) {
       if (this.pdfLoading) return;
