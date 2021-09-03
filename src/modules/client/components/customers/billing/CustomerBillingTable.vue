@@ -111,6 +111,7 @@ export default {
   },
   data () {
     return {
+      docLoading: false,
       pdfLoading: false,
       CREDIT_NOTE,
       BILL,
