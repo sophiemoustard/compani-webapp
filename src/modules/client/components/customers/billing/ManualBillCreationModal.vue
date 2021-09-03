@@ -8,15 +8,17 @@
     <ni-select in-modal caption="Bénéficiaire" :value="newManualBill.customer"
       @input="update($event, 'customer')" :options="customersOptions" required-field
       @blur="validations.customer.$touch" :error="validations.customer.$error" />
-    <ni-select in-modal caption="Article" :value="newManualBill.billingItem"
-      @input="update($event, 'billingItem')" :options="billingItemsOptions" required-field
-      @blur="validations.billingItem.$touch" :error="validations.billingItem.$error" />
-    <ni-input in-modal caption="PU TTC" @blur="validations.unitInclTaxes.$touch" required-field
-      :value="newManualBill.unitInclTaxes" @input="update($event, 'unitInclTaxes')" type="number"
-      :error="validations.unitInclTaxes.$error" :error-message="nbrError('unitInclTaxes', validations)" />
-    <ni-input in-modal caption="Quantité" @blur="validations.count.$touch" required-field
-      :value="newManualBill.count" @input="update($event, 'count')" type="number"
-      :error="validations.count.$error" :error-message="nbrError('count', validations)" />
+    <ni-select in-modal caption="Article" :value="newManualBill.billingItem" @blur="validations.billingItem.$touch"
+      @input="updateBillingItem($event)" :options="billingItemsOptions" :error="validations.billingItem.$error"
+      required-field />
+    <div class="flex-row">
+      <ni-input class="inputUnitPrice" in-modal caption="PU TTC" @blur="validations.unitInclTaxes.$touch" required-field
+        :value="newManualBill.unitInclTaxes" @input="update($event, 'unitInclTaxes')" type="number"
+        :error="validations.unitInclTaxes.$error" :error-message="nbrError('unitInclTaxes', validations)" />
+      <ni-input class="inputCount" in-modal caption="Quantité" @blur="validations.count.$touch" required-field
+        :value="newManualBill.count" @input="update($event, 'count')" type="number"
+        :error="validations.count.$error" :error-message="nbrError('count', validations)" />
+    </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la facture" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -47,6 +49,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     customersOptions: { type: Array, default: () => ([]) },
     billingItemsOptions: { type: Array, default: () => ([]) },
+    billingItems: { type: Array, default: () => ([]) },
   },
   methods: {
     hide (partialReset, type) {
@@ -58,9 +61,23 @@ export default {
     submit (value) {
       this.$emit('submit', value);
     },
+    async updateBillingItem (event) {
+      const selectedBillingItem = this.billingItems.find(bi => bi._id === event);
+      const defaultUnitAmount = selectedBillingItem ? selectedBillingItem.defaultUnitAmount : 0;
+      await this.update(defaultUnitAmount, 'unitInclTaxes');
+      await this.update(event, 'billingItem');
+    },
     update (event, prop) {
       this.$emit('update:newManualBill', { ...this.newManualBill, [prop]: event });
     },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.inputUnitPrice
+  max-width: 120px
+  margin-right: 32px !important
+.inputCount
+  max-width: 120px
+</style>

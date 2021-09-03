@@ -6,7 +6,8 @@
 
     <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="$v.newManualBill"
       :loading="manualBillCreationLoading" :new-manual-bill.sync="newManualBill" :customers-options="customersOptions"
-      :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" />
+      :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="createManualBill"
+      :billing-items="billingItems" />
   </q-page>
 </template>
 
@@ -14,7 +15,9 @@
 import { required } from 'vuelidate/lib/validators';
 import Customers from '@api/Customers';
 import BillingItems from '@api/BillingItems';
+import Bills from '@api/Bills';
 import TitleHeader from '@components/TitleHeader';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import ManualBillCreationModal from 'src/modules/client/components/customers/billing/ManualBillCreationModal';
 import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
 import { strictPositiveNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -40,7 +43,7 @@ export default {
     newManualBill: {
       date: { required },
       customer: { required },
-      billingItem: {},
+      billingItem: { required },
       unitInclTaxes: { positiveNumber, required },
       count: { strictPositiveNumber, required },
     },
@@ -61,6 +64,36 @@ export default {
     resetManualBillCreationModal () {
       this.newManualBill = { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 };
       this.$v.newManualBill.$reset();
+    },
+    formatCreationPayload () {
+      const netInclTaxes = this.newManualBill.unitInclTaxes * this.newManualBill.count;
+      return {
+        customer: this.newManualBill.customer,
+        date: this.newManualBill.date,
+        billingItemList: [{
+          billingItem: this.newManualBill.billingItem,
+          unitInclTaxes: this.newManualBill.unitInclTaxes,
+          count: this.newManualBill.count,
+        }],
+        netInclTaxes,
+      };
+    },
+    async createManualBill () {
+      try {
+        this.$v.newManualBill.$touch();
+        if (this.$v.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.manualBillCreationLoading = true;
+
+        await Bills.create(this.formatCreationPayload());
+
+        this.manualBillCreationModal = false;
+        NotifyPositive('Facture créée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la facture.');
+      } finally {
+        this.manualBillCreationLoading = false;
+      }
     },
   },
 };
