@@ -19,6 +19,10 @@
         :value="newManualBill.count" @input="update($event, 'count')" type="number"
         :error="validations.count.$error" :error-message="nbrError('count', validations)" />
     </div>
+    <div class="q-mb-md">
+      <span class="q-mr-xl" style="font-size: 0.8rem">Total HT : {{ totalExclTaxes }}</span>
+      <span style="font-size: 0.8rem">Total TTC : {{ totalInclTaxes }}</span>
+    </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la facture" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -51,6 +55,25 @@ export default {
     billingItemsOptions: { type: Array, default: () => ([]) },
     billingItems: { type: Array, default: () => ([]) },
   },
+  data () {
+    return {
+      selectedBillingItem: null,
+    };
+  },
+  computed: {
+    totalExclTaxes () {
+      if (!this.selectedBillingItem) return '0 €';
+
+      return `${parseFloat(
+        this.newManualBill.unitInclTaxes / (1 - this.selectedBillingItem.vat * 0.01) * this.newManualBill.count
+      ).toFixed(2)} €`;
+    },
+    totalInclTaxes () {
+      if (!this.selectedBillingItem) return '0 €';
+
+      return `${parseFloat(this.newManualBill.unitInclTaxes * this.newManualBill.count).toFixed(2)} €`;
+    },
+  },
   methods: {
     hide (partialReset, type) {
       this.$emit('hide', { partialReset, type });
@@ -62,8 +85,8 @@ export default {
       this.$emit('submit', value);
     },
     async updateBillingItem (event) {
-      const selectedBillingItem = this.billingItems.find(bi => bi._id === event);
-      const defaultUnitAmount = selectedBillingItem ? selectedBillingItem.defaultUnitAmount : 0;
+      this.selectedBillingItem = this.billingItems.find(bi => bi._id === event);
+      const defaultUnitAmount = this.selectedBillingItem ? this.selectedBillingItem.defaultUnitAmount : 0;
       await this.update(defaultUnitAmount, 'unitInclTaxes');
       await this.update(event, 'billingItem');
     },
