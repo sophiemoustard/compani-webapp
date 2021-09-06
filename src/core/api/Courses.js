@@ -43,7 +43,7 @@ export default {
     return sms.data.data.sms;
   },
   async addTrainee (courseId, payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees`, payload);
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees`, payload);
   },
   async deleteTrainee (courseId, traineeId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees/${traineeId}`);

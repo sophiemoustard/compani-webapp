@@ -6,7 +6,7 @@
       <ni-input in-modal :value="newUser.local.email" @input="update($event.trim(), 'local.email')"
         @blur="validations.local.email.$touch" caption="Email" :error-message="emailError(validations)"
         :error="validations.local.email.$error" required-field :last="firstStep" :disable="!firstStep" />
-      <template v-if="!firstStep && identityStep">
+      <template v-if="!firstStep">
         <ni-input in-modal :value="newUser.identity.firstname" @input="update($event, 'identity.firstname')"
           caption="Prénom" />
         <ni-input in-modal :value="newUser.identity.lastname" @input="update($event, 'identity.lastname')"
@@ -14,11 +14,11 @@
           :error="validations.identity.lastname.$error" />
         <ni-input in-modal :value="newUser.contact.phone" @input="update($event.trim(), 'contact.phone')"
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
-          :error-message="phoneNbrError(validations)" :last="!companyStep" required-field />
-      </template>
-        <ni-select v-if="!firstStep && companyStep" in-modal :options="companyOptions" :value="newUser.company"
+          :error-message="phoneNbrError(validations)" :last="!displayCompany" required-field />
+        <ni-select v-if="displayCompany" in-modal :options="companyOptions" :value="newUser.company"
           @input="update($event.trim(), 'company')" required-field caption="Structure"
-          @blur="validations.company.$touch" :error="validations.company.$error" :last="companyStep" />
+          @blur="validations.company.$touch" :error="validations.company.$error" :last="displayCompany" />
+      </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
           :loading="loading" icon-right="add" @click="nextStep" />
@@ -41,8 +41,7 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
-    identityStep: { type: Boolean, default: false },
-    companyStep: { type: Boolean, default: false },
+    displayCompany: { type: Boolean, default: false },
     newUser: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
