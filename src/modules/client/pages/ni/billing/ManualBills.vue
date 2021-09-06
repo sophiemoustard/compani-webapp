@@ -5,7 +5,7 @@
       @click="manualBillCreationModal = true" />
 
     <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="$v.newManualBill"
-      :loading="manualBillCreationLoading" :new-manual-bill.sync="newManualBill" :customers-options="customersOptions"
+      :loading="modalLoading" :new-manual-bill.sync="newManualBill" :customers-options="customersOptions"
       :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="createManualBill"
       :billing-items="billingItems" />
   </q-page>
@@ -13,14 +13,16 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import pick from 'lodash/pick';
 import Customers from '@api/Customers';
 import BillingItems from '@api/BillingItems';
 import Bills from '@api/Bills';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import ManualBillCreationModal from 'src/modules/client/components/customers/billing/ManualBillCreationModal';
+import { MANUAL } from '@data/constants';
 import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
 import { strictPositiveNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
+import ManualBillCreationModal from 'src/modules/client/components/customers/billing/ManualBillCreationModal';
 
 export default {
   name: 'ManualBills',
@@ -32,7 +34,7 @@ export default {
   data () {
     return {
       manualBillCreationModal: false,
-      manualBillCreationLoading: false,
+      modalLoading: false,
       newManualBill: { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 },
       customers: [],
       billingItems: [],
@@ -57,32 +59,38 @@ export default {
     },
   },
   async created () {
-    this.customers = await Customers.list();
-    this.billingItems = await BillingItems.list();
+    await this.refreshData();
   },
   methods: {
+    async refreshData () {
+      try {
+        this.modalLoading = true;
+        this.customers = await Customers.list();
+        const billingItems = await BillingItems.list();
+        this.billingItems = billingItems.filter(bi => bi.type === MANUAL);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.modalLoading = false;
+      }
+    },
     resetManualBillCreationModal () {
       this.newManualBill = { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 };
       this.$v.newManualBill.$reset();
     },
     formatCreationPayload () {
-      const netInclTaxes = this.newManualBill.unitInclTaxes * this.newManualBill.count;
       return {
-        customer: this.newManualBill.customer,
-        date: this.newManualBill.date,
-        billingItemList: [{
-          billingItem: this.newManualBill.billingItem,
-          unitInclTaxes: this.newManualBill.unitInclTaxes,
-          count: this.newManualBill.count,
-        }],
-        netInclTaxes,
+        ...pick(this.newManualBill, ['customer', 'date']),
+        billingItemList: [pick(this.newManualBill, ['billingItem', 'unitInclTaxes', 'count'])],
+        netInclTaxes: this.newManualBill.unitInclTaxes * this.newManualBill.count,
       };
     },
     async createManualBill () {
       try {
         this.$v.newManualBill.$touch();
         if (this.$v.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
-        this.manualBillCreationLoading = true;
+
+        this.modalLoading = true;
 
         await Bills.create(this.formatCreationPayload());
 
@@ -92,7 +100,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la facture.');
       } finally {
-        this.manualBillCreationLoading = false;
+        this.modalLoading = false;
       }
     },
   },

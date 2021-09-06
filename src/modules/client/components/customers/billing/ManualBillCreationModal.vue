@@ -3,7 +3,7 @@
     <template slot="title">
       Créer une <span class="text-weight-bold">facture manuelle</span>
     </template>
-    <ni-date-input caption="Date de la facture" :value="newManualBill.date" in-modal required-field
+    <ni-date-input caption="Date" :value="newManualBill.date" in-modal required-field
       @input="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch" />
     <ni-select in-modal caption="Bénéficiaire" :value="newManualBill.customer"
       @input="update($event, 'customer')" :options="customersOptions" required-field
@@ -20,8 +20,8 @@
         :error="validations.count.$error" :error-message="nbrError('count', validations)" />
     </div>
     <div class="q-mb-md">
-      <span class="q-mr-xl" style="font-size: 0.8rem">Total HT : {{ totalExclTaxes }}</span>
-      <span style="font-size: 0.8rem">Total TTC : {{ totalInclTaxes }}</span>
+      <span class="q-mr-xl total-text">Total HT : {{ totalExclTaxes }}</span>
+      <span class="total-text">Total TTC : {{ totalInclTaxes }}</span>
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la facture" icon-right="add" color="primary"
@@ -35,6 +35,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import DateInput from '@components/form/DateInput';
+import { formatPrice } from '@helpers/utils';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 
 export default {
@@ -64,14 +65,17 @@ export default {
     totalExclTaxes () {
       if (!this.selectedBillingItem) return '0 €';
 
-      return `${parseFloat(
-        this.newManualBill.unitInclTaxes / (1 - this.selectedBillingItem.vat * 0.01) * this.newManualBill.count
-      ).toFixed(2)} €`;
+      const totalExclTaxes = (this.newManualBill.unitInclTaxes / (1 + this.selectedBillingItem.vat / 100))
+        * this.newManualBill.count;
+
+      return formatPrice(totalExclTaxes);
     },
     totalInclTaxes () {
       if (!this.selectedBillingItem) return '0 €';
 
-      return `${parseFloat(this.newManualBill.unitInclTaxes * this.newManualBill.count).toFixed(2)} €`;
+      const totalInclTaxes = this.newManualBill.unitInclTaxes * this.newManualBill.count;
+
+      return formatPrice(totalInclTaxes);
     },
   },
   methods: {
@@ -103,4 +107,6 @@ export default {
   margin-right: 32px !important
 .inputCount
   max-width: 120px
+.total-text
+  font-size: 14px
 </style>
