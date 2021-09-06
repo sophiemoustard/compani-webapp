@@ -12,9 +12,9 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <ni-button :disable="loading || !getDriveId(props.row)" class="q-mx-sm" icon="file_download"
+                  <ni-button :disable="loading || !getDriveId(props.row)" icon="file_download"
                     @click="downloadDriveDoc(props.row)" />
-                  <ni-button v-if="isCoach" icon="delete" class="q-mx-sm" :disable="loading"
+                  <ni-button v-if="isCoach" icon="delete" :disable="loading"
                     @click="validatePayDocumentDeletion(payDocuments[getRowIndex(payDocuments, props.row)])" />
                 </div>
               </template>
