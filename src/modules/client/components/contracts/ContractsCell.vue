@@ -23,6 +23,9 @@
                   <ni-button :flat="false" v-if="!props.row.endDate" label="Signer"
                     @click="openSignatureModal(props.row.signature.eversignId)" />
                 </div>
+                <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
+                  <p class="no-margin">En attente de signature</p>
+                </div>
                 <div v-else-if="!getContractDriveId(props.row.auxiliaryDoc) && displayUploader"
                   class="row justify-center table-actions">
                   <q-uploader flat :url="docsUploadUrl(contract._id)" with-credentials auto-upload @uploaded="refresh"
@@ -32,9 +35,6 @@
                 <div v-else-if="!!getContractDriveId(props.row.auxiliaryDoc)" class="row justify-center table-actions">
                   <ni-button @click="downloadDriveDoc(props.row.auxiliaryDoc)" icon="file_download"
                     :disable="docLoading" />
-                </div>
-                <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
-                  <p class="no-margin">En attente de signature</p>
                 </div>
               </template>
               <template v-else-if="col.name === 'archives'">
