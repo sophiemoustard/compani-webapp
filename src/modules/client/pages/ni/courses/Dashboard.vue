@@ -1,6 +1,14 @@
 <template>
   <q-page class="client-background" padding>
     <ni-title-header title="La formation Compani dans ma structure" />
+    <div v-if="linkRequests.length" class="bg-yellow-100 q-my-md q-pa-md">
+      <p class="text-orange-900 text-weight-bold">Demandes de rattachement à ma structure</p>
+      <div class="request-container">
+        <div v-for="request in linkRequests" :key="request._id">
+          <company-link-request-cell :user="request.user" @click="refreshCompanyLinkRequests" />
+        </div>
+      </div>
+    </div>
     <div class="flex justify-between q-mt-xl">
       <p class="text-weight-bold section-title">Chiffres généraux</p>
       <ni-date-range v-model="dates" class="dates" borders />
@@ -71,11 +79,13 @@ import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
+import CompanyLinkRequests from '@api/CompanyLinkRequests';
 import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import LineChart from '@components/charts/LineChart';
+import CompanyLinkRequestCell from '@components/CompanyLinkRequestCell';
 import { DEFAULT_AVATAR } from '@data/constants';
 import moment from '@helpers/moment';
 import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
@@ -90,6 +100,7 @@ export default {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
     'ni-line-chart': LineChart,
+    'company-link-request-cell': CompanyLinkRequestCell,
   },
   data () {
     return {
@@ -101,6 +112,7 @@ export default {
       formatIdentity,
       upperCaseFirstLetter,
       DEFAULT_AVATAR,
+      linkRequests: [],
     };
   },
   computed: {
@@ -134,6 +146,7 @@ export default {
   async created () {
     await this.getActivityHistories();
     await this.computeChartsData();
+    await this.refreshCompanyLinkRequests();
   },
   methods: {
     async getActivityHistories () {
@@ -165,6 +178,15 @@ export default {
         NotifyNegative('Erreur lors de la récupération des données.');
       }
     },
+    async refreshCompanyLinkRequests () {
+      try {
+        this.linkRequests = await CompanyLinkRequests.list();
+        NotifyPositive('Données mises à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des données.');
+      }
+    },
   },
 };
 </script>
@@ -189,4 +211,9 @@ export default {
 .section-title
   font-size: 24px;
   color: $copper-grey-900
+.request-container
+  flex-direction: row
+  grid-auto-flow: row
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr))
 </style>
