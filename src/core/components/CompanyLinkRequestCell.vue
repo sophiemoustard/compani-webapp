@@ -1,24 +1,21 @@
 <template>
   <div class="request-cell">
-    <q-card flat>
-      <div v-if="user.picture" class="avatar-container">
-        <img :src="user.picture.link" class="avatar-test">
-      </div>
-      <div v-else class="avatar-container">
-        <img :src="DEFAULT_AVATAR" class="default-avatar q-my-sm">
-      </div>
-      <p class="text-copper-grey-700 text-weight-bold q-my-md q-mx-md">
-        {{ user.identity.firstname }} {{ user.identity.lastname }}
-      </p>
-      <div class="column q-ma-sm">
-        <ni-button class="validation-button" label="Confirmer" @click="validateLinkRequestCreation" />
-        <ni-button class="delete-button" label="Supprimer" />
-      </div>
-    </q-card>
+    <div class="avatar-container">
+      <img v-if="user.picture" :src="user.picture.link" class="avatar">
+      <img v-else :src="DEFAULT_AVATAR" class="default-avatar q-my-sm">
+    </div>
+    <p class="text-copper-grey-700 text-weight-bold q-ma-md">
+      {{ formatIdentity(user.identity, 'FL') }}
+    </p>
+    <div class="column q-ma-sm">
+      <ni-button class="validation-button" label="Confirmer" @click="validateLinkRequestCreation" />
+      <ni-button class="delete-button" label="Supprimer" />
+    </div>
   </div>
 </template>
 
 <script>
+import get from 'lodash/get';
 import { mapState } from 'vuex';
 import Button from '@components/Button';
 import { NotifyPositive } from '@components/popup/notify';
@@ -28,9 +25,8 @@ import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'CompanyLinkRequestCell',
-  metadata: { title: 'Tableau de bord des formations' },
   props: {
-    user: { type: Object, default: () => {} },
+    user: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-button': Button,
@@ -46,11 +42,15 @@ export default {
   },
   methods: {
     getAvatar (picture) {
-      return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
+      return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
-    async createLinkRequest () {
-      await Users.updateById(this.user._id, { company: this.userProfile.company._id });
-      this.$emit('click');
+    async linkUserToCompany () {
+      try {
+        await Users.updateById(this.user._id, { company: this.userProfile.company._id });
+        this.$emit('click');
+      } catch (e) {
+        console.error(e);
+      }
     },
     validateLinkRequestCreation () {
       this.$q.dialog({
@@ -58,7 +58,7 @@ export default {
         message: `<div class="row q-my-md items-center">
             <img class="avatar q-mx-md" src="${this.getAvatar(this.user.picture)}"/>
             <div>
-              <div>${this.user.identity.firstname} ${this.user.identity.lastname}</div>
+              <div>${formatIdentity(this.user.identity, 'FL')}</div>
               <div style="font-size: 14px" class="text-copper-grey-500">${this.user.local.email}</div>
             </div>
           </div>
@@ -68,7 +68,7 @@ export default {
         ok: 'Rattacher ce compte',
         cancel: 'Annuler',
       })
-        .onOk(this.createLinkRequest)
+        .onOk(this.linkUserToCompany)
         .onCancel(() => NotifyPositive('Rattachement à la structure annulé.'));
     },
   },
@@ -77,38 +77,37 @@ export default {
 
 <style lang="stylus" scoped>
 .request-cell
-  border-radius: 10px
-  width: 170px
+  width: 176px
+  border-radius: 8px
+  box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
+  background-color: white
 .avatar-container
   height: 120px
   background-color : $copper-grey-50
   display: flex
   justify-content: center
+  border-radius: 8px 8px 0px 0px
 .default-avatar
-  border-radius: 50%
-  width: 95px
-  height: 95px
+  width: 96px
+  height: 96px
   border-radius: 50%
   box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12)
   vertical-align: middle
   @media screen and (max-width: $breakpoint-sm-max)
     height: 60px
     width: 60px
-.avatar-test
+.avatar
   height: 100%;
   width: 100%;
   object-fit: cover;
-  border-radius: 10px 10px 0px 0px
+  border-radius: 8px 8px 0px 0px
 .validation-button
   color: white
   background: $primary
-  margin: 5px
+  margin: 4px
 .delete-button
   color: $primary
   background: white
   border: 1px solid $primary
-  margin: 5px
-.email-test
-  font-size: 14px
-  color: white
+  margin: 4px
 </style>

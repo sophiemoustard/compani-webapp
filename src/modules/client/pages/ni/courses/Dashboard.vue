@@ -4,9 +4,8 @@
     <div v-if="linkRequests.length" class="bg-yellow-100 q-my-md q-pa-md">
       <p class="text-orange-900 text-weight-bold">Demandes de rattachement à ma structure</p>
       <div class="request-container">
-        <div v-for="request in linkRequests" :key="request._id">
-          <company-link-request-cell :user="request.user" @click="refreshCompanyLinkRequests" />
-        </div>
+        <company-link-request-cell v-for="request in linkRequests" :key="request._id" :user="request.user"
+          @click="refreshCompanyLinkRequests" />
       </div>
     </div>
     <div class="flex justify-between q-mt-xl">
@@ -183,6 +182,7 @@ export default {
         this.linkRequests = await CompanyLinkRequests.list();
         NotifyPositive('Données mises à jour.');
       } catch (e) {
+        this.linkRequests = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
       }
@@ -215,5 +215,5 @@ export default {
   flex-direction: row
   grid-auto-flow: row
   display: grid
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr))
+  grid-template-columns: repeat(auto-fill, minmax(184px, 1fr))
 </style>

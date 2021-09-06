@@ -197,7 +197,7 @@ export default {
   methods: {
     ...mapActions({ fillFilter: 'planning/fillFilter' }),
     getAvatar (picture) {
-      return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
+      return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
     initFilters () {
       if (AUXILIARY_ROLES.includes(this.clientRole)) {
