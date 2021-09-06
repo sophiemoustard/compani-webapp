@@ -1,16 +1,27 @@
 import escapeRegExp from 'lodash/escapeRegExp';
-import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
+import get from 'lodash/get';
+import {
+  formatIdentity,
+  sortStrings,
+  removeDiacritics,
+  clear,
+  removeEmptyProps,
+  formatPhoneForPayload,
+} from '@helpers/utils';
 import Users from '@api/Users';
 import Email from '@api/Email';
 import { dateDiff, formatDateDiff } from '@helpers/date';
 import { TRAINEE, DEFAULT_AVATAR } from '@data/constants';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { required, email } from 'vuelidate/lib/validators';
 
 export const learnerDirectoryMixin = {
   data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+
     return {
+      isClientInterface,
       firstStep: true,
       loading: false,
       searchStr: '',
@@ -72,6 +83,13 @@ export const learnerDirectoryMixin = {
       },
     };
   },
+  async created () {
+    const promises = this.isClientInterface
+      ? [this.getLearnerList(this.company._id)]
+      : [this.refreshCompanies(), this.getLearnerList()];
+
+    await Promise.all(promises);
+  },
   computed: {
     filteredLearners () {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
@@ -121,6 +139,69 @@ export const learnerDirectoryMixin = {
         this.learnerList = [];
       } finally {
         this.tableLoading = false;
+      }
+    },
+    resetAddLearnerForm () {
+      this.firstStep = true;
+      this.newLearner = { ...clear(this.newLearner) };
+      this.$v.newLearner.$reset();
+    },
+    formatUserPayload () {
+      const payload = removeEmptyProps(this.newLearner);
+      if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
+
+      if (this.isClientInterface) return { ...payload, company: this.company._id };
+      return payload;
+    },
+    async nextStepLearnerCreationModal () {
+      try {
+        this.$v.newLearner.$touch();
+        if (this.$v.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
+
+        this.learnerCreationModalLoading = true;
+        const userInfo = await Users.exists({ email: this.newLearner.local.email });
+
+        if (!userInfo.exists) return this.goToCreationStep();
+
+        if (this.isClientInterface) {
+          if (!get(userInfo, 'user.company') && userInfo.user._id) return this.updateLearner(userInfo.user._id);
+          if (get(userInfo, 'user.company') !== this.company._id) {
+            return NotifyNegative('L\'apprenant(e) n\'est pas relié(e) à cette structure.');
+          }
+        }
+
+        NotifyWarning('L\'apprenant(e) est déjà ajouté(e).');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
+      } finally {
+        this.learnerCreationModalLoading = false;
+      }
+    },
+    goToCreationStep () {
+      this.firstStep = false;
+      this.$v.newLearner.$reset();
+    },
+    async createLearner () {
+      try {
+        this.learnerCreationModalLoading = true;
+        this.$v.newLearner.$touch();
+        if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        const payload = await this.formatUserPayload();
+        await Users.create(payload);
+        NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
+
+        await this.sendWelcome();
+
+        this.learnerCreationModal = false;
+        await this.getLearnerList(this.isClientInterface ? this.company._id : null);
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
+      } finally {
+        this.learnerCreationModalLoading = false;
       }
     },
     async sendWelcome () {

@@ -25,15 +25,12 @@
 </template>
 
 <script>
-import get from 'lodash/get';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
-import Users from '@api/Users';
 import Companies from '@api/Companies';
-import { clear, removeEmptyProps, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 
 export default {
@@ -50,9 +47,6 @@ export default {
       companyOptions: [],
     };
   },
-  async created () {
-    await Promise.all([this.refreshCompanies(), this.getLearnerList()]);
-  },
   methods: {
     async refreshCompanies () {
       try {
@@ -61,61 +55,6 @@ export default {
       } catch (e) {
         console.error(e);
         this.companyOptions = [];
-      }
-    },
-    resetAddLearnerForm () {
-      this.firstStep = true;
-      this.newLearner = { ...clear(this.newLearner) };
-      this.$v.newLearner.$reset();
-    },
-    formatUserPayload () {
-      const payload = removeEmptyProps(this.newLearner);
-      if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
-
-      return payload;
-    },
-    async nextStepLearnerCreationModal () {
-      try {
-        this.$v.newLearner.$touch();
-        if (this.$v.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
-
-        this.learnerCreationModalLoading = true;
-        const userInfo = await Users.exists({ email: this.newLearner.local.email });
-
-        if (!userInfo.exists) return this.goToCreationStep();
-
-        return NotifyWarning('L\'apprenant(e) est déjà ajouté(e).');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
-      } finally {
-        this.learnerCreationModalLoading = false;
-      }
-    },
-    goToCreationStep () {
-      this.firstStep = false;
-      this.$v.newLearner.$reset();
-    },
-    async createLearner () {
-      try {
-        this.learnerCreationModalLoading = true;
-        this.$v.newLearner.$touch();
-        if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
-
-        const payload = await this.formatUserPayload();
-        await Users.create(payload);
-        NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
-
-        await this.sendWelcome();
-
-        this.learnerCreationModal = false;
-        await this.getLearnerList();
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
-      } finally {
-        this.learnerCreationModalLoading = false;
       }
     },
   },
