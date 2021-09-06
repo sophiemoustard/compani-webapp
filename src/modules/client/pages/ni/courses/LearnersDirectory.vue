@@ -27,23 +27,17 @@
 import get from 'lodash/get';
 import { mapGetters } from 'vuex';
 import Users from '@api/Users';
-import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { required, email } from 'vuelidate/lib/validators';
-import { DEFAULT_AVATAR, TRAINEE } from '@data/constants';
 import {
   formatPhoneForPayload,
-  removeDiacritics,
   removeEmptyProps,
   clear,
 } from '@helpers/utils';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
-import Email from '@api/Email';
 
 export default {
   metaInfo: { title: 'Répertoire apprenants' },
@@ -54,45 +48,13 @@ export default {
     'learner-creation-modal': LearnerCreationModal,
   },
   mixins: [userMixin, learnerDirectoryMixin],
-  data () {
-    return {
-      loading: false,
-      searchStr: '',
-      learnerCreationModal: false,
-      learnerCreationModalLoading: false,
-      firstStep: true,
-      newLearner: { identity: { firstname: '', lastname: '' }, contact: { phone: '' }, local: { email: '' } },
-    };
-  },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
-    filteredLearners () {
-      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.learnerList.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
-    },
   },
   async created () {
     await this.getLearnerList(this.company._id);
   },
-  validations () {
-    return {
-      newLearner: {
-        identity: { lastname: { required } },
-        local: { email: { required, email } },
-        contact: { phone: { required, frPhoneNumber } },
-      },
-    };
-  },
   methods: {
-    goToLearnerProfile (row) {
-      this.$router.push({ name: 'ni courses learners info', params: { learnerId: row.learner._id } });
-    },
-    updateSearch (value) {
-      this.searchStr = value;
-    },
-    getAvatar (link) {
-      return link || DEFAULT_AVATAR;
-    },
     resetAddLearnerForm () {
       this.firstStep = true;
       this.newLearner = { ...clear(this.newLearner) };
@@ -162,15 +124,6 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
       } finally {
         this.learnerCreationModalLoading = false;
-      }
-    },
-    async sendWelcome () {
-      try {
-        await Email.sendWelcome({ email: this.newLearner.local.email, type: TRAINEE });
-        NotifyPositive('Email envoyé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'envoi du mail.');
       }
     },
   },

@@ -26,15 +26,11 @@
 
 <script>
 import get from 'lodash/get';
-import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
-import { DEFAULT_AVATAR } from '@data/constants';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { required, email } from 'vuelidate/lib/validators';
-import { removeDiacritics, clear, removeEmptyProps, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
+import { clear, removeEmptyProps, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -51,29 +47,8 @@ export default {
   mixins: [userMixin, learnerDirectoryMixin],
   data () {
     return {
-      firstStep: true,
-      loading: false,
-      searchStr: '',
-      learnerCreationModal: false,
-      learnerCreationModalLoading: false,
-      newLearner: { identity: { firstname: '', lastname: '' }, contact: { phone: '' }, local: { email: '' } },
       companyOptions: [],
     };
-  },
-  validations () {
-    return {
-      newLearner: {
-        identity: { lastname: { required } },
-        local: { email: { required, email } },
-        contact: { phone: { required, frPhoneNumber } },
-      },
-    };
-  },
-  computed: {
-    filteredLearners () {
-      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.learnerList.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
-    },
   },
   async created () {
     await Promise.all([this.refreshCompanies(), this.getLearnerList()]);
@@ -87,15 +62,6 @@ export default {
         console.error(e);
         this.companyOptions = [];
       }
-    },
-    goToLearnerProfile (row) {
-      this.$router.push({ name: 'ni users learners info', params: { learnerId: row.learner._id } });
-    },
-    updateSearch (value) {
-      this.searchStr = value;
-    },
-    getAvatar (link) {
-      return link || DEFAULT_AVATAR;
     },
     resetAddLearnerForm () {
       this.firstStep = true;
@@ -150,15 +116,6 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
       } finally {
         this.learnerCreationModalLoading = false;
-      }
-    },
-    async sendWelcome () {
-      try {
-        await Email.sendWelcome({ email: this.newLearner.local.email, type: TRAINEE });
-        NotifyPositive('Email envoyé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'envoi du mail.');
       }
     },
   },
