@@ -15,11 +15,11 @@
       </div>
       <div class="row">
         <template v-for="(certificate, index) in documents">
-          <div v-if="certificate.driveId" class="row justify-between files-container" :key="index">
+          <div v-if="getDriveId(certificate)" class="row justify-between files-container" :key="index">
             <span class="document-caption">{{ documentCaption }}</span>
             <div class="doc-actions">
-              <ni-button icon="save_alt" :disabled="loading" @click.native="downloadDriveDoc(certificate.driveId)" />
-              <ni-button icon="delete" :disabled="loading" @click.native="deleteDocument(certificate.driveId)" />
+              <ni-button icon="save_alt" :disabled="loading" @click.native="downloadDriveDoc(certificate)" />
+              <ni-button icon="delete" :disabled="loading" @click.native="deleteDocument(certificate)" />
             </div>
           </div>
         </template>
@@ -75,8 +75,8 @@ export default {
     },
   },
   methods: {
-    deleteDocument (documentId) {
-      this.$emit('delete', documentId);
+    deleteDocument (doc) {
+      this.$emit('delete', this.getDriveId(doc));
     },
     documentUploaded (file) {
       this.$emit('uploaded');
@@ -84,10 +84,13 @@ export default {
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document.');
     },
-    async downloadDriveDoc (id) {
+    getDriveId (doc) {
+      return get(doc, 'driveId') || '';
+    },
+    async downloadDriveDoc (doc) {
       try {
         this.loading = true;
-        await GoogleDrive.downloadFileById(id);
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
       } catch (e) {
         console.error(e);
       } finally {

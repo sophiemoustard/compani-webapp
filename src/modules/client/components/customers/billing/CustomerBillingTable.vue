@@ -16,8 +16,8 @@
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <div v-if="!props.row.number">Facture tiers</div>
-              <div v-else-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))"
-                :class="['download', { 'disabled': docLoading }]">
+              <div v-else-if="getDriveId(props.row)" :class="['download', { 'disabled': docLoading }]"
+                @click="downloadDriveDoc(props.row)">
                 Facture {{ props.row.number }}
               </div>
               <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
@@ -26,8 +26,8 @@
               </div>
             </template>
             <template v-else-if="props.row.type === CREDIT_NOTE">
-              <div v-if="getDriveId(props.row)" @click="downloadDriveDoc(getDriveId(props.row))" target="_blank"
-                :class="['download', { 'disabled': docLoading }]">
+              <div v-if="getDriveId(props.row)" :class="['download', { 'disabled': docLoading }]"
+                @click="downloadDriveDoc(props.row)">
                 Avoir {{ props.row.number }}
               </div>
               <div v-else @click="downloadCreditNotePdf(props.row)" :class="{ 'download': canDownload(props.row) }"
@@ -191,13 +191,13 @@ export default {
       this.$emit('open-edition-modal', payment);
     },
     getDriveId (doc) {
-      return get(doc, 'driveFile.driveId');
+      return get(doc, 'driveFile.driveId') || '';
     },
-    async downloadDriveDoc (id) {
+    async downloadDriveDoc (doc) {
       if (this.docLoading) return;
       try {
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(id);
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
       } catch (e) {
         console.error(e);
       } finally {
