@@ -16,8 +16,7 @@
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" :last="!displayCompany" required-field />
         <ni-select v-if="displayCompany" in-modal :options="companyOptions" :value="newUser.company"
-          @input="update($event.trim(), 'company')" required-field caption="Structure"
-          @blur="validations.company.$touch" :error="validations.company.$error" :last="displayCompany" />
+          @input="update($event.trim(), 'company')" caption="Structure" last />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
