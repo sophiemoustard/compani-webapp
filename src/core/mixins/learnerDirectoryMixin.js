@@ -92,6 +92,7 @@ export const learnerDirectoryMixin = {
   computed: {
     filteredLearners () {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+
       return this.learnerList.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
@@ -147,6 +148,7 @@ export const learnerDirectoryMixin = {
       if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
 
       if (this.isClientInterface) return { ...payload, company: this.company._id };
+
       return payload;
     },
     async nextStepLearnerCreationModal () {
