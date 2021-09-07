@@ -43,10 +43,10 @@
         </div>
       </div>
       <div class="q-mb-md">
-        <p class="title">Justificatifs APA ou autres financements</p>
+        <p class="title">Financement APA ou autres financements</p>
         <div class="row gutter-profile items-center">
           <div class="col-xs-12 col-md-6">
-            <ni-multiple-files-uploader path="financialCertificates" document-caption="Justificatif financement"
+            <ni-multiple-files-uploader path="financialCertificates" caption="Justificatif financement"
               @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates" :url="docsUploadUrl"
               collapsible-label="Ajouter un justificatif" :user-profile="customer" :extensions="extensions" multiple
               @delete="validateFinancialCertifDeletion($event)" additional-fields-name="justificatif_financement" />

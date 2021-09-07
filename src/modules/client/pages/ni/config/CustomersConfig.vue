@@ -64,7 +64,7 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate"
-              :entity="company" alt="template mandat prelevement" name="debitMandate" :url="docsUploadUrl" drive-storage
+              :entity="company" name="debitMandate" :url="docsUploadUrl" drive-storage
               @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`"
               @delete="validateDocumentDeletion(
                 company.customersConfig.templates.debitMandate.driveId,
@@ -73,7 +73,7 @@
               )" />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" alt="template devis" name="quote"
+            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" name="quote"
               @uploaded="documentUploaded" :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl"
               drive-storage :entity="company" @delete="validateDocumentDeletion(
                 company.customersConfig.templates.quote.driveId,
@@ -83,10 +83,9 @@
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Conditions générales de services" path="customersConfig.templates.gcs"
-              alt="document conditions générales de services" name="gcs" @uploaded="documentUploaded"
-              :additional-value="`gcs_${company.name}`" :url="docsUploadUrl" drive-storage :entity="company"
+              name="gcs" @uploaded="documentUploaded" :extensions="HTML_EXTENSIONS" drive-storage :entity="company"
               @delete="validateDocumentDeletion(company.customersConfig.templates.gcs.driveId,'gcs','customersConfig')"
-              :extensions="HTML_EXTENSIONS" />
+              :additional-value="`gcs_${company.name}`" :url="docsUploadUrl" />
           </div>
         </div>
       </div>
