@@ -1,8 +1,7 @@
 <template>
   <div>
     <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" class="select" />
-    <q-card v-for="(card, cardIndex) of questionnaireAnswersFormattedAndFiltered.followUp" :key="cardIndex" flat
-      class="q-mb-sm">
+    <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
     </q-card>
   </div>
@@ -39,25 +38,10 @@ export default {
     await Promise.all([this.getQuestionnaireAnswers(), this.getTrainerList()]);
   },
   computed: {
-    questionnaireAnswersFormattedAndFiltered () {
-      let followUp = [];
+    filteredAnswers () {
       if (!get(this.questionnaireAnswers, 'followUp')) return {};
-      if (!this.selectedTrainer) {
-        followUp = this.questionnaireAnswers.followUp.map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) }));
-      } else {
-        followUp = this.questionnaireAnswers.followUp
-          .map(fu => ({
-            ...fu,
-            answers: fu.answers
-              .filter(a => (get(a, 'course.trainer._id') === this.selectedTrainer))
-              .map(a => a.answer),
-          }));
-      }
 
-      return {
-        ...this.questionnaireAnswers,
-        followUp,
-      };
+      return { ...this.questionnaireAnswers, followUp: this.questionnaireAnswers.followUp.map(this.formatFollowUp) };
     },
   },
   methods: {
@@ -86,6 +70,13 @@ export default {
     },
     updateSelectedTrainer (trainerId) {
       this.selectedTrainer = trainerId;
+    },
+    formatFollowUp (fu) {
+      const answers = this.selectedTrainer
+        ? fu.answers.filter(a => (get(a, 'course.trainer._id') === this.selectedTrainer))
+        : fu.answers;
+
+      return { ...fu, answers: answers.map(a => a.answer) };
     },
   },
 };
