@@ -10,7 +10,7 @@
       </div>
       <div v-else class="document-caption">{{ caption }}</div>
       <div class="self-end">
-        <ni-button icon="save_alt" :disabble="loading || !getDocument(document)" @click="downloadDoc(document)" />
+        <ni-button icon="save_alt" :disable="loading || !getDocument(document)" @click="downloadDoc(document)" />
         <ni-button icon="delete" :disable="disable" @click="deleteDocument" />
       </div>
     </div>

@@ -219,7 +219,7 @@
         </div>
         <div v-if="userProfile.administrative.transportInvoice.transportType === 'public'"
           class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Justificatif d\'abonnement" path="administrative.transportInvoice"
+          <ni-file-uploader caption="Justificatif d'abonnement" path="administrative.transportInvoice"
             :entity="userProfile" name="transportInvoice" @uploaded="documentUploaded"
             :error="$v.userProfile.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
             :extensions="extensions" :additional-value="documentTitle('justif_transport')"
