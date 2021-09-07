@@ -14,6 +14,9 @@
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
           @click="$refs['selectInput'].showPopup()" />
       </template>
+      <template v-if="optionSlot" #option="scope">
+        <slot name="option" :scope="scope" />
+      </template>
     </q-select>
   </div>
 </template>
@@ -40,6 +43,7 @@ export default {
     bgColor: { type: String, default: 'white' },
     optionDisable: { type: String, default: 'disable' },
     dataCy: { type: String, default: '' },
+    optionSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,

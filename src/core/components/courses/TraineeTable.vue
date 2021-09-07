@@ -31,6 +31,7 @@
       </q-card>
     </div>
 
+    <!-- Trainee addition modal -->
     <trainee-addition-modal v-model="traineeAdditionModal" :new-trainee.sync="newTrainee"
       :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
       :trainees-options="traineesOptions" @submit="addTrainee" />
@@ -49,8 +50,8 @@ import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Users from '@api/Users';
 import Courses from '@api/Courses';
-import { INTER_B2B, TRAINER, INTRA } from '@data/constants';
-import { formatPhone, formatPhoneForPayload, formatAndSortIdentityOptions } from '@helpers/utils';
+import { INTER_B2B, TRAINER, INTRA, DEFAULT_AVATAR } from '@data/constants';
+import { formatPhone, formatPhoneForPayload, formatIdentity } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -157,7 +158,13 @@ export default {
       return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc},${value}`, '');
     },
     traineesOptions () {
-      return formatAndSortIdentityOptions(this.potentialTrainees);
+      return this.potentialTrainees.map(pt => ({
+        value: pt._id,
+        label: formatIdentity(pt.identity, 'FL'),
+        email: pt.local.email || '',
+        company: pt.company.name || '',
+        picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
+      }));
     },
   },
   async created () {

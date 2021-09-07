@@ -4,7 +4,22 @@
         Ajouter une <span class="text-weight-bold">personne</span>
       </template>
       <ni-select in-modal :value="newTrainee" @input="update" caption="Stagiaire" :error="validations.$error"
-        :options="traineesOptions" required-field />
+        :options="traineesOptions" required-field option-slot>
+        <template #option="scope">
+          <q-item v-bind="scope.scope.itemProps" v-on="scope.scope.itemEvents">
+            <q-item-section avatar>
+              <img class="avatar" :src="scope.scope.opt.picture">
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ scope.scope.opt.label }}</q-item-label>
+              <q-item-label class="details">
+                <div class="q-mb-xs">{{ scope.scope.opt.email }}</div>
+                <div>{{ scope.scope.opt.company }}</div>
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
+      </ni-select>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -47,3 +62,9 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .details
+    font-size: 14px
+    color: $copper-grey-500
+</style>
