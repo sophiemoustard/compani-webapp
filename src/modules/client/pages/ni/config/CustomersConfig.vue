@@ -162,7 +162,8 @@
       :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
       :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
       :validations="$v.editedService" @add-billing-item="addBillingItemToService"
-      @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions" />
+      @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions"
+      @remove-billing-item="removeBillingItemInService" />
 
     <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
       :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
@@ -190,6 +191,7 @@ import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
+import compact from 'lodash/compact';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
@@ -945,6 +947,7 @@ export default {
     },
     formatEditedService () {
       const payload = pickBy(this.editedService);
+      payload.billingItems = compact(payload.billingItems); // remove empty billing items
       delete payload._id;
       delete payload.nature;
 
@@ -1020,6 +1023,9 @@ export default {
     },
     updateBillingItemInService (index, event) {
       this.$set(this.editedService.billingItems, index, event);
+    },
+    removeBillingItemInService (index) {
+      this.editedService.billingItems.splice(index, 1);
     },
     // Billing Items
     resetBillingItemCreation () {

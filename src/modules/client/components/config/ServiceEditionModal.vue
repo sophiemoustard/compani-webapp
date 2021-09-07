@@ -21,9 +21,12 @@
       <q-checkbox label="Exonération de charges" :value="editedService.exemptFromCharges" dense
         @input="update($event, 'exemptFromCharges')" />
     </div>
-    <ni-select in-modal v-for="(billingItem, index) in editedService.billingItems" :key="index" :value="billingItem"
-      :options="billingItemsOptions" @input="updateBillingItem(index, $event)" :caption="`Article ${index + 1}`" />
-    <ni-button class="button" icon="add" label="Ajouter un article de facturation" @click="addBillingItem" />
+    <div class="row" v-for="(billingItem, index) in editedService.billingItems" :key="index">
+      <ni-select in-modal :full-width="false" :close="false" :value="billingItem" :options="billingItemsOptions"
+        :caption="`Article ${index + 1}`" class="flex-1 q-mr-md" @input="updateBillingItem(index, $event)" />
+      <ni-button icon="close" @click="removeBillingItem(index)" />
+    </div>
+    <ni-button class="ni-button" icon="add" label="Ajouter un article de facturation" @click="addBillingItem" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
@@ -82,12 +85,17 @@ export default {
     updateBillingItem (index, event) {
       this.$emit('update-billing-item', index, event);
     },
+    removeBillingItem (index) {
+      this.$emit('remove-billing-item', index);
+    },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-  .button > .q-btn__wrapper
-    padding: 0 !important
+  .ni-button
+    margin-bottom: 8px
+  .ni-button > .q-btn__wrapper // je n'ai pas réussi
+        padding: 0 !important
 
 </style>

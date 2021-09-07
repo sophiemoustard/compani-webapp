@@ -1,16 +1,17 @@
 <template>
-  <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
+  <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input': inModal, last: last, 'full-width': fullWidth }">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
-      :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
+      :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error"
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
+      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" use-input
+      :error-message="errorMessage">
       <template #append>
-        <ni-button v-if="value && !disable" icon="close" @click.stop="resetValue" size="sm" />
+        <ni-button v-if="value && !disable && close" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
           @click="$refs['selectInput'].showPopup()" />
       </template>
@@ -38,6 +39,8 @@ export default {
     value: { type: [String, Number, Object, Date], default: '' },
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
+    fullWidth: { type: Boolean, default: true },
+    close: { type: Boolean, default: true },
     last: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
