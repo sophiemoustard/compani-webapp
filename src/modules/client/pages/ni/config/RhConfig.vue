@@ -97,10 +97,10 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button @click="downloadDriveDoc(getAdministrativeDocumentId(props.row))" icon="file_download"
-                        :disable="!getAdministrativeDocumentId(props.row) || disableAdministrativeDocument" />
-                      <ni-button :disable="!getAdministrativeDocumentId(props.row) || disableAdministrativeDocument"
-                         icon="delete" @click="validateAdministrativeDocumentDeletion(props.row)" />
+                      <ni-button @click="downloadDriveDoc(props.row)" icon="file_download"
+                        :disable="!getDriveId(props.row) || disableAdministrativeDocument" />
+                      <ni-button :disable="!getDriveId(props.row) || disableAdministrativeDocument" icon="delete"
+                        @click="validateAdministrativeDocumentDeletion(props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -432,13 +432,13 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Administrative document
-    getAdministrativeDocumentId (doc) {
+    getDriveId (doc) {
       return get(doc, 'driveFile.driveId') || '';
     },
-    async downloadDriveDoc (id) {
+    async downloadDriveDoc (doc) {
       try {
         this.disableAdministrativeDocument = true;
-        await GoogleDrive.downloadFileById(id);
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
       } catch (e) {
         console.error(e);
       } finally {

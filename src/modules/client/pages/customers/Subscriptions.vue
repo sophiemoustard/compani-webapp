@@ -136,7 +136,7 @@ import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Esign from '@api/Esign';
-import Drive from '@api/GoogleDrive';
+import GoogleDrive from '@api/GoogleDrive';
 import Customers from '@api/Customers';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
@@ -439,7 +439,7 @@ export default {
         const gcsDriveId = get(this.helper, 'company.customersConfig.templates.gcs.driveId');
         if (!gcsDriveId) return;
 
-        const file = await Drive.downloadFileById(gcsDriveId, true);
+        const file = await GoogleDrive.downloadFileById(gcsDriveId, true);
 
         this.gcs = file.data;
       } catch (e) {
