@@ -27,7 +27,7 @@ import { formatIdentity } from '@helpers/utils';
 export default {
   name: 'CompanyLinkRequestCell',
   props: {
-    user: { type: Object, default: () => ({}) },
+    request: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-button': Button,
@@ -40,6 +40,9 @@ export default {
   },
   computed: {
     ...mapState({ userProfile: state => state.main.loggedUser }),
+    user () {
+      return this.request.user;
+    },
   },
   methods: {
     getAvatar (picture) {
@@ -54,7 +57,7 @@ export default {
       }
     },
     async deleteLinkRequest () {
-      await CompanyLinkRequests.remove(this.user._id);
+      await CompanyLinkRequests.remove(this.request._id);
       this.$emit('click');
     },
     validateLinkRequestCreation () {

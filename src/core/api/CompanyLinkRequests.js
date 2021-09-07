@@ -5,7 +5,7 @@ export default {
     const companyLinkRequests = await alenviAxios.get(`${process.env.API_HOSTNAME}/companylinkrequests`);
     return companyLinkRequests.data.data.companyLinkRequests;
   },
-  async remove (userId) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/companylinkrequests/${userId}`);
+  async remove (_id) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/companylinkrequests/${_id}`);
   },
 };
