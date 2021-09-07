@@ -4,13 +4,14 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <div v-if="document && imageSource" class="row justify-between" style="background: white">
-      <div class="doc-thumbnail">
-        <ni-custom-img :image-source="imageSource" :alt="alt" :drive-storage="driveStorage" />
+    <div v-if="document && imageSource" class="row justify-between files-container">
+      <div v-if="!driveStorage" class="doc-thumbnail">
+        <ni-custom-img :image-source="imageSource" :alt="caption" />
       </div>
-      <div class="self-end doc-delete">
-        <q-btn color="primary" round flat icon="delete" size="1rem" :disable="disable" @click.native="deleteDocument" />
-        <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
+      <div v-else class="document-caption">{{ caption }}</div>
+      <div class="self-end">
+        <ni-button icon="save_alt" :disable="loading || !getDocument(document)" @click="downloadDoc(document)" />
+        <ni-button icon="delete" :disable="disable" @click="deleteDocument" />
       </div>
     </div>
     <q-field borderless v-else :error="error" :error-message="errorMessage">
@@ -25,14 +26,13 @@
 <script>
 import { openURL } from 'quasar';
 import get from 'lodash/get';
+import GoogleDrive from '@api/GoogleDrive';
+import Button from '@components/Button';
 import CustomImg from '@components/form/CustomImg';
 import { NotifyNegative } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
 
 export default {
-  components: {
-    'ni-custom-img': CustomImg,
-  },
   props: {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
@@ -52,6 +52,15 @@ export default {
     label: { type: String, default: 'Pas de document' },
     driveStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
+  },
+  components: {
+    'ni-button': Button,
+    'ni-custom-img': CustomImg,
+  },
+  data () {
+    return {
+      loading: false,
+    };
   },
   computed: {
     additionalFields () {
@@ -79,9 +88,22 @@ export default {
     documentUploaded ({ file, xhr }) {
       this.$emit('uploaded', { file, xhr });
     },
-    goToUrl (url) {
-      if (this.driveStorage) url = `${url}?usp=sharing`;
-      openURL(url);
+    getDocument (doc) {
+      if (!this.driveStorage) return get(doc, 'link') || '';
+
+      return get(doc, 'driveId') || '';
+    },
+    async downloadDoc (doc) {
+      if (!this.driveStorage) return openURL(this.getDocument(doc));
+
+      try {
+        this.loading = true;
+        await GoogleDrive.downloadFileById(this.getDocument(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.loading = false;
+      }
     },
     failMsg () {
       return NotifyNegative('Echec de l\'envoi du document.');
@@ -96,11 +118,16 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+  .files-container
+    width: 100%
+    background-color: white
+    align-items: center
+    padding: 8px
+    margin-bottom: 16px
+
   .doc-thumbnail
     padding: 13px 0px 40px 12px
-
-  .doc-delete
-    padding: 0px 14px 17px 0px
 
   /deep/ .q-field__control
     height: 40px
