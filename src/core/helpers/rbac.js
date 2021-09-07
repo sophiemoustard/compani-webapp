@@ -44,6 +44,7 @@ const clientAdminRoutes = [
   { name: 'ni config coach' },
   { name: 'ni config tags', subscription: ERP },
   { name: 'ni billing to bill', subscription: ERP },
+  { name: 'ni billing manual bills', subscription: ERP },
   { name: 'ni billing credit note', subscription: ERP },
   { name: 'ni billing clients balances', subscription: ERP },
   { name: 'ni billing tpp bill slips', subscription: ERP },

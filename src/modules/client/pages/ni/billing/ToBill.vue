@@ -241,7 +241,7 @@ export default {
         }));
 
         for (let i = 0, l = bills.length; i < l; i += BATCH_SIZE) {
-          await Bills.create({ bills: bills.slice(i, i + BATCH_SIZE) });
+          await Bills.createList({ bills: bills.slice(i, i + BATCH_SIZE) });
         }
 
         this.selected = [];
