@@ -38,7 +38,6 @@ export default {
       newManualBill: { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 },
       customers: [],
       billingItems: [],
-
     };
   },
   validations: {
@@ -59,15 +58,14 @@ export default {
     },
   },
   async created () {
-    await this.refreshData();
+    await this.refresh();
   },
   methods: {
-    async refreshData () {
+    async refresh () {
       try {
         this.modalLoading = true;
         this.customers = await Customers.list();
-        const billingItems = await BillingItems.list();
-        this.billingItems = billingItems.filter(bi => bi.type === MANUAL);
+        this.billingItems = await BillingItems.list({ type: MANUAL });
       } catch (e) {
         console.error(e);
       } finally {

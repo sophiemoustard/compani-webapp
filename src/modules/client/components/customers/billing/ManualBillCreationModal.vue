@@ -11,17 +11,19 @@
     <ni-select in-modal caption="Article" :value="newManualBill.billingItem" @blur="validations.billingItem.$touch"
       @input="updateBillingItem($event)" :options="billingItemsOptions" :error="validations.billingItem.$error"
       required-field />
-    <div class="flex-row">
-      <ni-input class="inputUnitPrice" in-modal caption="PU TTC" @blur="validations.unitInclTaxes.$touch" required-field
-        :value="newManualBill.unitInclTaxes" @input="update($event, 'unitInclTaxes')" type="number"
-        :error="validations.unitInclTaxes.$error" :error-message="nbrError('unitInclTaxes', validations)" />
-      <ni-input class="inputCount" in-modal caption="Quantité" @blur="validations.count.$touch" required-field
-        :value="newManualBill.count" @input="update($event, 'count')" type="number"
-        :error="validations.count.$error" :error-message="nbrError('count', validations)" />
-    </div>
-    <div class="q-mb-md">
-      <span class="q-mr-xl total-text">Total HT : {{ totalExclTaxes }}</span>
-      <span class="total-text">Total TTC : {{ totalInclTaxes }}</span>
+    <div class="flex-row q-mb-md">
+      <div class="q-mr-lg">
+        <ni-input in-modal caption="PU TTC" @blur="validations.unitInclTaxes.$touch" required-field
+          :value="newManualBill.unitInclTaxes" @input="update($event, 'unitInclTaxes')" type="number"
+          :error="validations.unitInclTaxes.$error" :error-message="nbrError('unitInclTaxes', validations)" />
+        <div class="total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
+      </div>
+      <div>
+        <ni-input in-modal caption="Quantité" @blur="validations.count.$touch" required-field
+          :value="newManualBill.count" @input="update($event, 'count')" type="number" :error="validations.count.$error"
+          :error-message="nbrError('count', validations)" />
+        <div class="total-text">Total TTC : {{ formatPrice(totalInclTaxes) }}</div>
+      </div>
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la facture" icon-right="add" color="primary"
@@ -31,15 +33,17 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import DateInput from '@components/form/DateInput';
+import { REQUIRED_LABEL } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 
 export default {
-  name: 'PaymentEditionModal',
+  name: 'ManualBillCreationModal',
   mixins: [configMixin],
   components: {
     'ni-select': Select,
@@ -58,27 +62,26 @@ export default {
   },
   data () {
     return {
+      formatPrice,
       selectedBillingItem: null,
     };
   },
   computed: {
     totalExclTaxes () {
-      if (!this.selectedBillingItem) return '0 €';
-
-      const totalExclTaxes = (this.newManualBill.unitInclTaxes / (1 + this.selectedBillingItem.vat / 100))
-        * this.newManualBill.count;
-
-      return formatPrice(totalExclTaxes);
+      return this.selectedBillingItem ? this.totalInclTaxes / (1 + this.selectedBillingItem.vat / 100) : 0;
     },
     totalInclTaxes () {
-      if (!this.selectedBillingItem) return '0 €';
-
-      const totalInclTaxes = this.newManualBill.unitInclTaxes * this.newManualBill.count;
-
-      return formatPrice(totalInclTaxes);
+      return this.selectedBillingItem ? this.newManualBill.unitInclTaxes * this.newManualBill.count : 0;
     },
   },
   methods: {
+    nbrError (path, validations = this.$v) {
+      const val = get(validations, path);
+      if (val.required === false) return REQUIRED_LABEL;
+      if (val.positiveNumber === false || val.strictPositiveNumber === false) return 'Nombre non valide';
+
+      return '';
+    },
     hide (partialReset, type) {
       this.$emit('hide', { partialReset, type });
     },
@@ -94,19 +97,14 @@ export default {
       await this.update(defaultUnitAmount, 'unitInclTaxes');
       await this.update(event, 'billingItem');
     },
-    update (event, prop) {
-      this.$emit('update:newManualBill', { ...this.newManualBill, [prop]: event });
+    async update (event, prop) {
+      await this.$emit('update:newManualBill', { ...this.newManualBill, [prop]: event });
     },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-.inputUnitPrice
-  max-width: 120px
-  margin-right: 32px !important
-.inputCount
-  max-width: 120px
 .total-text
   font-size: 14px
 </style>
