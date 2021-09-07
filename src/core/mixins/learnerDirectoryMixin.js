@@ -14,7 +14,7 @@ import { dateDiff, formatDateDiff } from '@helpers/date';
 import { TRAINEE, DEFAULT_AVATAR } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { required, email } from 'vuelidate/lib/validators';
+import { required, email, requiredIf } from 'vuelidate/lib/validators';
 
 export const learnerDirectoryMixin = {
   data () {
@@ -27,7 +27,12 @@ export const learnerDirectoryMixin = {
       searchStr: '',
       learnerCreationModal: false,
       learnerCreationModalLoading: false,
-      newLearner: { identity: { firstname: '', lastname: '' }, contact: { phone: '' }, local: { email: '' } },
+      newLearner: {
+        identity: { firstname: '', lastname: '' },
+        contact: { phone: '' },
+        local: { email: '' },
+        company: '',
+      },
       tableLoading: false,
       learnerList: [],
       pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
@@ -80,6 +85,7 @@ export const learnerDirectoryMixin = {
         identity: { lastname: { required } },
         local: { email: { required, email } },
         contact: { phone: { required, frPhoneNumber } },
+        company: { required: requiredIf(() => !this.isClientInterface) },
       },
     };
   },
