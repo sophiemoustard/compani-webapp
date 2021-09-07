@@ -83,13 +83,6 @@ export const learnerDirectoryMixin = {
       },
     };
   },
-  async created () {
-    const promises = this.isClientInterface
-      ? [this.getLearnerList(this.company._id)]
-      : [this.refreshCompanies(), this.getLearnerList()];
-
-    await Promise.all(promises);
-  },
   computed: {
     filteredLearners () {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
@@ -97,9 +90,6 @@ export const learnerDirectoryMixin = {
     },
   },
   methods: {
-    goToLearnerProfile (row) {
-      this.$router.push({ name: 'ni users learners info', params: { learnerId: row.learner._id } });
-    },
     updateSearch (value) {
       this.searchStr = value;
     },

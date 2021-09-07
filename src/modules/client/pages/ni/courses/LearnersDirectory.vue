@@ -42,10 +42,16 @@ export default {
     'learner-creation-modal': LearnerCreationModal,
   },
   mixins: [userMixin, learnerDirectoryMixin],
+  async created () {
+    await this.getLearnerList(this.company._id);
+  },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
   },
   methods: {
+    goToLearnerProfile (row) {
+      this.$router.push({ name: 'ni courses learners info', params: { learnerId: row.learner._id } });
+    },
     async updateLearner (userId) {
       try {
         await Users.updateById(userId, { company: this.company._id });

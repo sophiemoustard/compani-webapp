@@ -13,8 +13,8 @@
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
-      <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
-        @click="learnerCreationModal = true" :disable="tableLoading" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
+      @click="learnerCreationModal = true" :disable="tableLoading" />
 
     <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetAddLearnerForm"
@@ -47,7 +47,13 @@ export default {
       companyOptions: [],
     };
   },
+  async created () {
+    await Promise.all([this.refreshCompanies(), this.getLearnerList()]);
+  },
   methods: {
+    goToLearnerProfile (row) {
+      this.$router.push({ name: 'ni users learners info', params: { learnerId: row.learner._id } });
+    },
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
