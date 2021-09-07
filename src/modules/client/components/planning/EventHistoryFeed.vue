@@ -8,8 +8,7 @@
     </div>
     <div class="scroll-container" ref="scrollTargetRef">
       <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTargetRef">
-        <ni-event-history v-for="history in eventHistoriesExceptTimeStamping" :key="history._id" :history="history"
-          class="q-ma-xs" />
+        <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" class="q-ma-xs" />
         <div slot="loading" class="loading">
           <q-spinner />
         </div>
@@ -21,7 +20,6 @@
 <script>
 import Button from '@components/Button';
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
-import { TIME_STAMPING_ACTIONS } from 'src/core/data/constants';
 
 export default {
   name: 'EventHistoryFeed',
@@ -38,9 +36,6 @@ export default {
     },
     top () {
       return window.innerWidth >= 768 ? 60 : 100;
-    },
-    eventHistoriesExceptTimeStamping () {
-      return this.eventHistories.filter(eH => !TIME_STAMPING_ACTIONS.includes(eH.action));
     },
   },
   methods: {
