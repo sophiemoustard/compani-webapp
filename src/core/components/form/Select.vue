@@ -24,6 +24,8 @@
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
+import escapeRegExp from 'lodash/escapeRegExp';
+import { removeDiacritics } from '@helpers/utils';
 
 export default {
   name: 'NiSelect',
@@ -73,11 +75,17 @@ export default {
       this.$emit('input', val);
       this.$refs.selectInput.blur();
     },
+    formatStringForFiltering (str) {
+      return escapeRegExp(removeDiacritics(str.toLowerCase()));
+    },
     onFilter (val, update) {
       update(() => {
         if (val) {
-          const value = val.toLowerCase();
-          this.innerOptions = this.options.filter(opt => opt.label.toLowerCase().includes(value));
+          const formattedValue = this.formatStringForFiltering(val);
+          this.innerOptions = this.options.filter((opt) => {
+            const formattedOptionLabel = this.formatStringForFiltering(opt.label);
+            return formattedOptionLabel.match(new RegExp(formattedValue, 'i'));
+          });
         } else {
           this.innerOptions = this.options;
         }
