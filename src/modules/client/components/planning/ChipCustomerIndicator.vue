@@ -48,7 +48,7 @@ export default {
       return get(referentHistory[0], 'auxiliary.identity', {});
     },
     getAvatar (picture) {
-      return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
+      return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
   },
   filters: {
