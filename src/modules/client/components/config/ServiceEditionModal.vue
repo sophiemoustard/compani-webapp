@@ -21,6 +21,9 @@
       <q-checkbox label="Exonération de charges" :value="editedService.exemptFromCharges" dense
         @input="update($event, 'exemptFromCharges')" />
     </div>
+    <ni-select in-modal v-for="(billingItem, index) in editedService.billingItems" :key="index" :value="billingItem"
+      :options="billingItemsOptions" @input="updateBillingItem(index, $event)" :caption="`Article ${index + 1}`" />
+    <ni-button class="button" icon="add" label="Ajouter un article de facturation" @click="addBillingItem" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
@@ -32,6 +35,7 @@
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import { FIXED } from '@data/constants';
 
@@ -42,6 +46,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
     'ni-select': Select,
+    'ni-button': Button,
   },
   props: {
     validations: { type: Object, required: true },
@@ -51,6 +56,7 @@ export default {
     defaultUnitAmountError: { type: String, required: true },
     loading: { type: Boolean, default: false },
     minStartDate: { type: String, required: true },
+    billingItemsOptions: { type: Array, required: true },
   },
   data () {
     return {
@@ -70,6 +76,18 @@ export default {
     update (event, prop) {
       this.$emit('update:editedService', { ...this.editedService, [prop]: event });
     },
+    addBillingItem () {
+      this.$emit('add-billing-item');
+    },
+    updateBillingItem (index, event) {
+      this.$emit('update-billing-item', index, event);
+    },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .button > .q-btn__wrapper
+    padding: 0 !important
+
+</style>

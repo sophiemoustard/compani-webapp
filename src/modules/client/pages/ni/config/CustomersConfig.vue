@@ -161,7 +161,8 @@
     <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService"
       :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
       :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
-      :validations="$v.editedService" />
+      :validations="$v.editedService" @add-billing-item="addBillingItemToService"
+      @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions" />
 
     <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
       :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
@@ -213,9 +214,10 @@ import {
   REQUIRED_LABEL,
   HTML_EXTENSIONS,
   BILLING_ITEMS_TYPE_OPTIONS,
+  PER_INTERVENTION,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { roundFrenchPercentage, formatHoursWithMinutes, formatPrice } from '@helpers/utils';
+import { roundFrenchPercentage, formatHoursWithMinutes, formatPrice, formatAndSortOptions } from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
@@ -647,6 +649,9 @@ export default {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
       return selectedService ? moment(selectedService.startDate).add(1, 'd').toISOString() : '';
     },
+    billingItemsOptions () {
+      return formatAndSortOptions(this.billingItems, 'name');
+    },
   },
   async mounted () {
     await Promise.all([
@@ -910,7 +915,7 @@ export default {
     },
     openServiceEditionModal (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat, surcharge, nature, exemptFromCharges } = selectedService;
+      const { name, defaultUnitAmount, vat, surcharge, nature, exemptFromCharges, billingItems } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
@@ -920,6 +925,7 @@ export default {
         nature,
         surcharge: surcharge ? surcharge._id : null,
         exemptFromCharges,
+        billingItems,
       };
 
       this.serviceEditionModal = true;
@@ -933,6 +939,7 @@ export default {
         nature: '',
         surcharge: null,
         exemptFromCharges: false,
+        billingItems: [],
       };
       this.$v.editedService.$reset();
     },
@@ -1008,6 +1015,12 @@ export default {
     resetServiceHistoryData () {
       this.selectedService = {};
     },
+    addBillingItemToService () {
+      this.editedService.billingItems.push('');
+    },
+    updateBillingItemInService (index, event) {
+      this.$set(this.editedService.billingItems, index, event);
+    },
     // Billing Items
     resetBillingItemCreation () {
       this.$v.newBillingItem.$reset();
@@ -1036,7 +1049,7 @@ export default {
     async refreshBillingItems () {
       try {
         this.billingItemsLoading = true;
-        this.billingItems = await BillingItems.list();
+        this.billingItems = await BillingItems.list({ type: PER_INTERVENTION });
       } catch (e) {
         this.billingItems = [];
         console.error(e);
