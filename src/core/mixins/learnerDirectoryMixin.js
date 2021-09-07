@@ -138,7 +138,7 @@ export const learnerDirectoryMixin = {
         this.tableLoading = false;
       }
     },
-    resetAddLearnerForm () {
+    resetLearnerCreationModal () {
       this.firstStep = true;
       this.newLearner = { ...clear(this.newLearner) };
       this.$v.newLearner.$reset();
@@ -147,9 +147,7 @@ export const learnerDirectoryMixin = {
       const payload = removeEmptyProps(this.newLearner);
       if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
 
-      if (this.isClientInterface) return { ...payload, company: this.company._id };
-
-      return payload;
+      return this.isClientInterface ? { ...payload, company: this.company._id } : payload;
     },
     async nextStepLearnerCreationModal () {
       try {

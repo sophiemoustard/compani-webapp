@@ -17,10 +17,9 @@
       @click="learnerCreationModal = true" :disable="tableLoading" />
 
     <!-- New learner modal -->
-    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetAddLearnerForm"
-      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" display-company
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner"
-      :company-options="companyOptions" />
+    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
+      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" display-company />
   </q-page>
 </template>
 
