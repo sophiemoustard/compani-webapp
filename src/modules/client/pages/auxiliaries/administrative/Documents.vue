@@ -47,7 +47,7 @@ export default {
         { name: 'actions', align: 'center' },
       ],
       documents: [],
-      docLOading: false,
+      docLoading: false,
     };
   },
   async mounted () {
