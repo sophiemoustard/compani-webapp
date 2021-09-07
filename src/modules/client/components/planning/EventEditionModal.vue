@@ -62,7 +62,7 @@
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(editedEvent)" :disable="historiesLoading"
             :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" @input="update($event, 'dates')" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence" required-field
-            path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
+            path="attachment" :entity="editedEvent" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additional-value="additionalValue" :error="validations.attachment.$error"
             :disable="!selectedAuxiliary._id || historiesLoading" in-modal :extensions="extensions" drive-storage
             @delete="deleteDocument(editedEvent.attachment.driveId)" />

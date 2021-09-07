@@ -183,10 +183,9 @@
       </q-card>
     </div>
     <div class="q-mb-lg">
-      <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
-      <div class="row gutter-profile q-mb-lg">
+      <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-multiple-files-uploader path="financialCertificates" document-caption="Justificatif financement"
+          <ni-multiple-files-uploader path="financialCertificates" caption="Justificatif financement"
             @uploaded="documentUploaded" name="financialCertificates" collapsible-label="Ajouter un justificatif"
             :user-profile="customer" :url="docsUploadUrl" @delete="validateFinancialCertifDeletion($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />

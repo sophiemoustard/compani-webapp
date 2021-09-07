@@ -69,13 +69,13 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contract" drive-storage
-              :entity="company" alt="template contrat prestataire" name="contract" :url="docsUploadUrl"
+              :entity="company" name="contract" :url="docsUploadUrl"
               @delete="validateDocumentDeletion(company.rhConfig.templates.contract.driveId, 'contract', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat prestataire" drive-storage
-              path="rhConfig.templates.contractVersion" :entity="company" alt="template avenant prestataire"
+              path="rhConfig.templates.contractVersion" :entity="company"
               name="contractVersion" :url="docsUploadUrl"
               @delete="validateDocumentDeletion(
                 company.rhConfig.templates.contractVersion.driveId,

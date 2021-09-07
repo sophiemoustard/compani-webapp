@@ -6,7 +6,7 @@
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :disable="disableEdition" />
     <ni-option-group v-model="card.media.type" :options="extensionOptions" inline @input="updateCard('media.type')"
        type="radio" :disable="isUploading || !!card.media.publicId" :error="$v.card.media.type.$error" />
-    <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
+    <ni-file-uploader class="file-uploader" caption="Média" path="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
       :extensions="extensions" :additional-value="mediaFileName" required-field
       :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" :disable="disableEdition" />

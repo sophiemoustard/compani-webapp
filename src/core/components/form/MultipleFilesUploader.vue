@@ -16,7 +16,7 @@
       <div class="row">
         <template v-for="(certificate, index) in documents">
           <div v-if="getDriveId(certificate)" class="row justify-between files-container" :key="index">
-            <span class="document-caption">{{ documentCaption }}</span>
+            <span class="document-caption">{{ caption }}</span>
             <div class="doc-actions">
               <ni-button icon="save_alt" :disabled="loading" @click.native="downloadDriveDoc(certificate)" />
               <ni-button icon="delete" :disabled="loading" @click.native="deleteDocument(certificate)" />
@@ -52,7 +52,6 @@ export default {
   props: {
     caption: { type: String, default: '' },
     path: { type: String, default: '' },
-    documentCaption: { type: String, default: '' },
     name: { type: String, default: '' },
     url: { type: String, default: '' },
     additionalFieldsName: { type: String, default: '' },
@@ -105,7 +104,7 @@ export default {
   .doc-actions
     .q-btn
       @media screen and (max-width: 767px)
-        margin: 0px 5px
+        margin: 0px 4px
 
   /deep/ .q-item__section--side
     .q-icon

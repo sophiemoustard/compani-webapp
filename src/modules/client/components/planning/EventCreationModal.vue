@@ -45,10 +45,9 @@
             required-field in-modal caption="Absence" :options="extendedAbsenceOptions"
             @blur="validations.extension.$touch" :error="validations.extension.$error" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
-            :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
-            :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
-            :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)"
-            :extensions="extensions" drive-storage />
+            :entity="newEvent" name="file" :url="docsUploadUrl" @uploaded="documentUploaded" :extensions="extensions"
+            :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id" drive-storage
+            :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :value="newEvent.internalHour"
