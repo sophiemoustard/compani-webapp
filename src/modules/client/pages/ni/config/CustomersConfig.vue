@@ -192,6 +192,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import compact from 'lodash/compact';
+import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
@@ -927,7 +928,7 @@ export default {
         nature,
         surcharge: surcharge ? surcharge._id : null,
         exemptFromCharges,
-        billingItems,
+        billingItems: billingItems || [],
       };
 
       this.serviceEditionModal = true;
@@ -947,7 +948,7 @@ export default {
     },
     formatEditedService () {
       const payload = pickBy(this.editedService);
-      payload.billingItems = compact(payload.billingItems); // remove empty billing items
+      payload.billingItems = uniq(compact(payload.billingItems)); // remove duplicates and empty billing items
       delete payload._id;
       delete payload.nature;
 

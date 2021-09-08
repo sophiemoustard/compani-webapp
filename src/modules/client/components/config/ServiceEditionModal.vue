@@ -16,13 +16,13 @@
       type="number" @blur="validations.vat.$touch" error-message="La TVA doit être positive ou nulle"
       @input="update($event, 'vat')" />
     <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration"
-      :value="editedService.surcharge" :options="surchargesOptions" clearable @input="update($event, 'surcharge')" />
+      :value="editedService.surcharge" :options="surchargesOptions" @input="update($event, 'surcharge')" />
     <div class="row q-mb-md">
       <q-checkbox label="Exonération de charges" :value="editedService.exemptFromCharges" dense
         @input="update($event, 'exemptFromCharges')" />
     </div>
     <div class="row" v-for="(billingItem, index) in editedService.billingItems" :key="index">
-      <ni-select in-modal :full-width="false" :close="false" :value="billingItem" :options="billingItemsOptions"
+      <ni-select in-modal :full-width="false" :reset-button="false" :value="billingItem" :options="billingItemsOptions"
         :caption="`Article ${index + 1}`" class="flex-1 q-mr-md" @input="updateBillingItem(index, $event)" />
       <ni-button icon="close" @click="removeBillingItem(index)" />
     </div>

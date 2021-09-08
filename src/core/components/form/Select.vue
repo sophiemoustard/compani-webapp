@@ -6,12 +6,11 @@
     </div>
     <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
-      :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error"
+      :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" use-input
-      :error-message="errorMessage">
+      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
       <template #append>
-        <ni-button v-if="value && !disable && close" icon="close" @click.stop="resetValue" size="sm" />
+        <ni-button v-if="value && !disable && resetButton" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
           @click="$refs['selectInput'].showPopup()" />
       </template>
@@ -40,7 +39,7 @@ export default {
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     fullWidth: { type: Boolean, default: true },
-    close: { type: Boolean, default: true },
+    resetButton: { type: Boolean, default: true },
     last: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
