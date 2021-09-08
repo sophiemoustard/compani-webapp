@@ -1,15 +1,15 @@
 <template>
   <div class="request-cell">
     <div class="avatar-container">
-      <img v-if="user.picture" :src="user.picture.link" class="avatar">
+      <img v-if="request.user.picture" :src="request.user.picture.link" class="avatar">
       <img v-else :src="DEFAULT_AVATAR" class="default-avatar q-my-sm">
     </div>
     <p class="text-copper-grey-700 text-weight-bold q-ma-md">
-      {{ formatIdentity(user.identity, 'FL') }}
+      {{ formatIdentity(request.user.identity, 'FL') }}
     </p>
     <div class="column q-ma-sm">
       <ni-button class="validation-button" label="Confirmer" @click="validateLinkRequestCreation" />
-      <ni-button class="delete-button" label="Supprimer" />
+      <ni-button class="delete-button" label="Supprimer" @click="validateLinkRequestDeletion" />
     </div>
   </div>
 </template>
@@ -20,13 +20,14 @@ import { mapState } from 'vuex';
 import Button from '@components/Button';
 import { NotifyPositive } from '@components/popup/notify';
 import Users from '@api/Users';
+import CompanyLinkRequests from '@api/CompanyLinkRequests';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'CompanyLinkRequestCell',
   props: {
-    user: { type: Object, default: () => ({}) },
+    request: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-button': Button,
@@ -46,7 +47,15 @@ export default {
     },
     async linkUserToCompany () {
       try {
-        await Users.updateById(this.user._id, { company: this.userProfile.company._id });
+        await Users.updateById(this.request.user._id, { company: this.userProfile.company._id });
+        this.$emit('click');
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async deleteLinkRequest () {
+      try {
+        await CompanyLinkRequests.remove(this.request._id);
         this.$emit('click');
       } catch (e) {
         console.error(e);
@@ -56,10 +65,10 @@ export default {
       this.$q.dialog({
         title: 'Voulez-vous vraiment rattacher ce compte ?',
         message: `<div class="row q-my-md items-center">
-            <img class="avatar q-mx-md" src="${this.getAvatar(this.user.picture)}"/>
+            <img class="avatar q-mx-md" src="${this.getAvatar(this.request.user.picture)}"/>
             <div>
-              <div>${formatIdentity(this.user.identity, 'FL')}</div>
-              <div style="font-size: 14px" class="text-copper-grey-500">${this.user.local.email}</div>
+              <div>${formatIdentity(this.request.user.identity, 'FL')}</div>
+              <div style="font-size: 14px" class="text-copper-grey-500">${this.request.user.local.email}</div>
             </div>
           </div>
         En l’ajoutant, vous confirmez que vous êtes employeur de cette personne.<br />
@@ -70,6 +79,24 @@ export default {
       })
         .onOk(this.linkUserToCompany)
         .onCancel(() => NotifyPositive('Rattachement à la structure annulé.'));
+    },
+    validateLinkRequestDeletion () {
+      this.$q.dialog({
+        title: 'Voulez-vous vraiment supprimer cette demande de rattachement ?',
+        message: `<div class="row q-my-md items-center">
+            <img class="avatar q-mx-md" src="${this.getAvatar(this.request.user.picture)}"/>
+            <div>
+              <div>${formatIdentity(this.request.user.identity, 'FL')}</div>
+              <div style="font-size: 14px" class="text-copper-grey-500">${this.request.user.local.email}</div>
+            </div>
+          </div>
+        Vous ne pourrez pas avoir accès à son historique de formation sur Compani.`,
+        html: true,
+        ok: 'Supprimer la demande',
+        cancel: 'Annuler',
+      })
+        .onOk(this.deleteLinkRequest)
+        .onCancel(() => NotifyPositive('Suppression de la demande de rattachement annulée.'));
     },
   },
 };

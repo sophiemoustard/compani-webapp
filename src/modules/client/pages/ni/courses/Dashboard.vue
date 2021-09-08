@@ -4,7 +4,7 @@
     <div v-if="linkRequests.length" class="bg-yellow-100 q-my-md q-pa-md">
       <p class="text-orange-900 text-weight-bold">Demandes de rattachement à ma structure</p>
       <div class="request-container">
-        <company-link-request-cell v-for="request in linkRequests" :key="request._id" :user="request.user"
+        <company-link-request-cell v-for="request in linkRequests" :key="request._id" :request="request"
           @click="refreshCompanyLinkRequests" />
       </div>
     </div>
