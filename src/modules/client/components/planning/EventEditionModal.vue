@@ -86,9 +86,13 @@
               :disable="historiesLoading" />
           </div>
         </template>
-        <ni-select in-modal v-if="!editedEvent.shouldUpdateRepetition && editedEvent.type === INTERVENTION "
-          :value="editedEvent.transportMode" :options="eventTransportOptions" caption="Mode de transport spécifique"
-          @input="update($event, 'transportMode')" />
+        <div v-if="!editedEvent.shouldUpdateRepetition && editedEvent.type === INTERVENTION">
+          <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :value="editedEvent.kmDuringEvent"
+            suffix="km" type="number" :error="validations.kmDuringEvent.$error" @blur="validations.kmDuringEvent.$touch"
+            error-message="Le déplacement doit être positif ou nul" @input="update($event, 'kmDuringEvent')" />
+          <ni-select in-modal :value="editedEvent.transportMode" :options="eventTransportOptions"
+            caption="Mode de transport spécifique" @input="update($event, 'transportMode')" />
+        </div>
         <div class="q-mb-lg">
           <div class="flex-row items-center justify-between">
             <div class="flex-row items-center">
