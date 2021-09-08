@@ -19,22 +19,17 @@
                 </div>
               </template>
               <template v-if="col.name === 'contractSigned'">
-                <div v-if="hasToBeSignedOnline(props.row) && shouldSignContract(props.row.signature)">
-                  <ni-button :flat="false" v-if="!props.row.endDate" label="Signer"
-                    @click="openSignatureModal(props.row.signature.eversignId)" />
-                </div>
-                <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
-                  <p class="no-margin">En attente de signature</p>
-                </div>
-                <div v-else-if="!getContractDriveId(props.row.auxiliaryDoc) && displayUploader"
-                  class="row justify-center table-actions">
-                  <q-uploader flat :url="docsUploadUrl(contract._id)" with-credentials auto-upload @uploaded="refresh"
+                <div class="row justify-center table-actions">
+                  <ni-button v-if="!!getContractDriveId(props.row.auxiliaryDoc)" icon="file_download"
+                    :disable="docLoading" @click="downloadDriveDoc(props.row.auxiliaryDoc)" />
+                  <template v-else-if="shouldSignContract(props.row)">
+                    <ni-button :flat="false" v-if="!props.row.endDate" label="Signer"
+                      @click="openSignatureModal(props.row.signature.eversignId)" />
+                  </template>
+                  <p v-else-if="hasToBeSignedOnline(props.row)" class="no-margin">En attente de signature</p>
+                  <q-uploader v-else-if="displayUploader" flat :url="docsUploadUrl(contract._id)" with-credentials
                     :form-fields="getFormFields(contract, props.row)" field-name="file" :accept="extensions"
-                    @fail="failMsg" />
-                </div>
-                <div v-else-if="!!getContractDriveId(props.row.auxiliaryDoc)" class="row justify-center table-actions">
-                  <ni-button @click="downloadDriveDoc(props.row.auxiliaryDoc)" icon="file_download"
-                    :disable="docLoading" />
+                    @fail="failMsg" auto-upload @uploaded="refresh" />
                 </div>
               </template>
               <template v-else-if="col.name === 'archives'">
@@ -257,14 +252,16 @@ export default {
     hasToBeSignedOnline (contract) {
       return !!get(contract, 'signature.eversignId');
     },
-    shouldSignContract (signature) {
-      if (!signature.signedBy) return true;
+    shouldSignContract (contract) {
+      if (!this.hasToBeSignedOnline(contract)) return false;
+
+      if (!get(contract, 'signature.signedBy')) return true;
 
       switch (this.personKey) {
         case COACH:
-          return !signature.signedBy.other;
+          return !contract.signature.signedBy.other;
         case AUXILIARY:
-          return !signature.signedBy.auxiliary;
+          return !contract.signature.signedBy.auxiliary;
       }
     },
     getContractDriveId (doc) {
