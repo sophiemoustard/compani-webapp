@@ -10,7 +10,7 @@
             <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
                 <div class="row justify-center table-actions">
                   <ni-button @click="downloadDriveDoc(col.value)" icon="file_download"
-                    :disable="!getDriveId(col.value) || docLoading" />
+                    :disable="!col.value || docLoading" />
                 </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -82,16 +82,16 @@ export default {
         {
           name: 'idCardOrResidencePermitRecto',
           label: 'Titre de séjour/Identité (R)',
-          field: row => get(row, 'user.administrative.idCardRecto') ||
-            get(row, 'user.administrative.residencePermitRecto') || '',
+          field: row => get(row, 'user.administrative.idCardRecto.driveId') ||
+            get(row, 'user.administrative.residencePermitRecto.driveId') || '',
           align: 'left',
           style: 'width: 105px',
         },
         {
           name: 'idCardOrResidencePermitVerso',
           label: 'Titre de séjour/Identité (V)',
-          field: row => get(row, 'user.administrative.idCardVerso') ||
-            get(row, 'user.administrative.residencePermitVerso') || '',
+          field: row => get(row, 'user.administrative.idCardVerso.driveId') ||
+            get(row, 'user.administrative.residencePermitVerso.driveId') || '',
           align: 'left',
           style: 'width: 105px',
         },
@@ -114,14 +114,11 @@ export default {
         this.staffRegister = [];
       }
     },
-    getDriveId (doc) {
-      return get(doc, 'driveId') || '';
-    },
-    async downloadDriveDoc (doc) {
+    async downloadDriveDoc (driveId) {
       if (this.docLoading) return;
       try {
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+        await GoogleDrive.downloadFileById(driveId);
       } catch (e) {
         console.error(e);
       } finally {
