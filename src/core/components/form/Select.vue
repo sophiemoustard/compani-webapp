@@ -82,10 +82,8 @@ export default {
       update(() => {
         if (val) {
           const formattedValue = this.formatStringForFiltering(val);
-          this.innerOptions = this.options.filter((opt) => {
-            const formattedOptionLabel = this.formatStringForFiltering(opt.label);
-            return formattedOptionLabel.match(new RegExp(formattedValue, 'i'));
-          });
+          this.innerOptions = this.options
+            .filter(opt => this.formatStringForFiltering(opt.label).includes(formattedValue));
         } else {
           this.innerOptions = this.options;
         }
