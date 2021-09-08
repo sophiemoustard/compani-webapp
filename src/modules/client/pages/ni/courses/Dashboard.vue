@@ -143,9 +143,7 @@ export default {
     },
   },
   async created () {
-    await this.getActivityHistories();
-    await this.computeChartsData();
-    await this.refreshCompanyLinkRequests();
+    await Promise.all([this.getActivityHistories(), this.computeChartsData(), this.refreshCompanyLinkRequests()]);
   },
   methods: {
     async getActivityHistories () {
