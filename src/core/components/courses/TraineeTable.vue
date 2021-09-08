@@ -158,13 +158,15 @@ export default {
       return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc},${value}`, '');
     },
     traineesOptions () {
-      return this.potentialTrainees.map(pt => ({
-        value: pt._id,
-        label: formatIdentity(pt.identity, 'FL'),
-        email: pt.local.email || '',
-        company: pt.company.name || '',
-        picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
-      }));
+      return this.potentialTrainees
+        .map(pt => ({
+          value: pt._id,
+          label: formatIdentity(pt.identity, 'FL'),
+          email: pt.local.email || '',
+          company: pt.company.name || '',
+          picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
     },
   },
   async created () {
