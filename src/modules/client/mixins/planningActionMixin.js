@@ -195,7 +195,7 @@ export const planningActionMixin = {
     getPayload (event) {
       const payload = {
         ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
-        ...pick(event, ['isCancelled', 'transportMode']), // pickBy removes isCancelled: false and transportMode: ''
+        ...pick(event, ['isCancelled', 'transportMode', 'misc']), // pickBy removes false and '' value
         startDate: event.dates.startDate,
         endDate: event.dates.endDate,
       };
