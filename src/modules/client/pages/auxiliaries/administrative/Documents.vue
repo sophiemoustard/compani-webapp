@@ -10,13 +10,11 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" class="q-mx-sm" :disable="!getDriveFileLink(props)" type="a"
-                  :href="getDriveFileLink(props)" target="_blank" icon="file_download" />
+                <ni-button :disable="docLoading || !getDriveId(props.row)" @click="downloadDriveDoc(props.row)"
+                  icon="file_download" />
               </div>
             </template>
-            <template v-else>
-              {{ col.value }}
-            </template>
+            <template v-else>{{ col.value }}</template>
           </q-td>
         </q-tr>
       </template>
@@ -26,32 +24,20 @@
 
 <script>
 import get from 'lodash/get';
-import AdministrativeDocument from '@api/AdministrativeDocuments';
+import AdministrativeDocuments from '@api/AdministrativeDocuments';
+import GoogleDrive from '@api/GoogleDrive';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
+import Button from '@components/Button';
 
 export default {
   metaInfo: { title: 'Documents' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
+    'ni-button': Button,
   },
-  async mounted () {
-    try {
-      this.loading = true;
-      this.documents = await AdministrativeDocument.list();
-    } catch (e) {
-      console.error(e);
-      this.documents = [];
-    } finally {
-      this.loading = false;
-    }
-  },
-  methods: {
-    getDriveFileLink (doc) {
-      return get(doc, 'row.driveFile.link', '');
-    },
-  },
+
   data () {
     return {
       pagination: { sortBy: 'title', descending: false, rowsPerPage: 0 },
@@ -61,7 +47,35 @@ export default {
         { name: 'actions', align: 'center' },
       ],
       documents: [],
+      docLoading: false,
     };
+  },
+  async mounted () {
+    try {
+      this.loading = true;
+      this.documents = await AdministrativeDocuments.list();
+    } catch (e) {
+      console.error(e);
+      this.documents = [];
+    } finally {
+      this.loading = false;
+    }
+  },
+  methods: {
+    getDriveId (doc) {
+      return get(doc, 'driveFile.driveId') || '';
+    },
+    async downloadDriveDoc (doc) {
+      if (this.docLoading) return;
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
+      }
+    },
   },
 };
 </script>

@@ -9,8 +9,8 @@
             :style="col.style">
             <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" type="a" :href="col.value" target="_blank"
-                    icon="file_download" />
+                  <ni-button @click="downloadDriveDoc(col.value)" icon="file_download"
+                    :disable="!getDriveId(col.value) || docLoading" />
                 </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -24,8 +24,10 @@
 <script>
 import get from 'lodash/get';
 import Contracts from '@api/Contracts';
+import GoogleDrive from '@api/GoogleDrive';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
+import Button from '@components/Button';
 import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
 import { formatDate } from '@helpers/date';
@@ -36,17 +38,13 @@ export default {
   components: {
     'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
+    'ni-button': Button,
   },
   data () {
     return {
       staffRegister: [],
       tableLoading: false,
-      pagination: {
-        sortBy: 'startDate',
-        descending: true,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'startDate', descending: true, page: 1, rowsPerPage: 15 },
       columns: [
         {
           name: 'name',
@@ -84,20 +82,21 @@ export default {
         {
           name: 'idCardOrResidencePermitRecto',
           label: 'Titre de séjour/Identité (R)',
-          field: row => get(row, 'user.administrative.idCardRecto.link') ||
-            get(row, 'user.administrative.residencePermitRecto.link') || '',
+          field: row => get(row, 'user.administrative.idCardRecto') ||
+            get(row, 'user.administrative.residencePermitRecto') || '',
           align: 'left',
           style: 'width: 105px',
         },
         {
           name: 'idCardOrResidencePermitVerso',
           label: 'Titre de séjour/Identité (V)',
-          field: row => get(row, 'user.administrative.idCardVerso.link') ||
-            get(row, 'user.administrative.residencePermitVerso.link') || '',
+          field: row => get(row, 'user.administrative.idCardVerso') ||
+            get(row, 'user.administrative.residencePermitVerso') || '',
           align: 'left',
           style: 'width: 105px',
         },
       ],
+      docLoading: false,
     };
   },
   async mounted () {
@@ -113,6 +112,20 @@ export default {
         console.error(e);
         this.tableLoading = false;
         this.staffRegister = [];
+      }
+    },
+    getDriveId (doc) {
+      return get(doc, 'driveId') || '';
+    },
+    async downloadDriveDoc (doc) {
+      if (this.docLoading) return;
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
       }
     },
   },

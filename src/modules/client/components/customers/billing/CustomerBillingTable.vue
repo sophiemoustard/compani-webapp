@@ -16,20 +16,20 @@
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <div v-if="!props.row.number">Facture tiers</div>
-              <a v-else-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
-                data-cy="link">
+              <div v-else-if="getDriveId(props.row)" :class="['download', { 'disabled': docLoading }]"
+                @click="downloadDriveDoc(props.row)">
                 Facture {{ props.row.number }}
-              </a>
+              </div>
               <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
                 Facture {{ props.row.number }}
               </div>
             </template>
             <template v-else-if="props.row.type === CREDIT_NOTE">
-              <a v-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
-                data-cy="link">
+              <div v-if="getDriveId(props.row)" :class="['download', { 'disabled': docLoading }]"
+                @click="downloadDriveDoc(props.row)">
                 Avoir {{ props.row.number }}
-              </a>
+              </div>
               <div v-else @click="downloadCreditNotePdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
                 Avoir {{ props.row.number }}
@@ -49,10 +49,8 @@
             </q-item>
           </template>
           <template v-else-if="col.name === 'actions' && displayActions">
-            <q-btn v-if="paymentTypes.includes(props.row.type)" flat dense color="primary" icon="edit"
-              @click="openEditionModal(props.row)" />
-            <q-btn v-if="REFUND === props.row.nature" flat dense color="primary" icon="delete"
-              @click="deleteRefund(props.row)" />
+            <ni-button v-if="paymentTypes.includes(props.row.type)" icon="edit" @click="openEditionModal(props.row)" />
+            <ni-button v-if="REFUND === props.row.nature" icon="delete" @click="deleteRefund(props.row)" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -74,7 +72,9 @@
 import get from 'lodash/get';
 import Bills from '@api/Bills';
 import CreditNotes from '@api/CreditNotes';
+import GoogleDrive from '@api/GoogleDrive';
 import SimpleTable from '@components/table/SimpleTable';
+import Button from '@components/Button';
 import { NotifyNegative } from '@components/popup/notify';
 import {
   CREDIT_NOTE,
@@ -107,9 +107,11 @@ export default {
   },
   components: {
     'ni-simple-table': SimpleTable,
+    'ni-button': Button,
   },
   data () {
     return {
+      docLoading: false,
       pdfLoading: false,
       CREDIT_NOTE,
       BILL,
@@ -188,8 +190,19 @@ export default {
     openEditionModal (payment) {
       this.$emit('open-edition-modal', payment);
     },
-    getUrl (doc) {
-      return get(doc, 'driveFile.link');
+    getDriveId (doc) {
+      return get(doc, 'driveFile.driveId') || '';
+    },
+    async downloadDriveDoc (doc) {
+      if (this.docLoading) return;
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
+      }
     },
     canDownload (doc) {
       return doc.origin === COMPANI;
@@ -242,6 +255,9 @@ export default {
     cursor: pointer;
     color: $primary;
     text-decoration underline;
+
+  .disabled
+    cursor: not-allowed;
 
   /deep/ .q-item
     .q-item__section

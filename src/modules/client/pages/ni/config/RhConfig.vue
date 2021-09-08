@@ -69,13 +69,13 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contract" drive-storage
-              :entity="company" alt="template contrat prestataire" name="contract" :url="docsUploadUrl"
+              :entity="company" name="contract" :url="docsUploadUrl"
               @delete="validateDocumentDeletion(company.rhConfig.templates.contract.driveId, 'contract', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat prestataire" drive-storage
-              path="rhConfig.templates.contractVersion" :entity="company" alt="template avenant prestataire"
+              path="rhConfig.templates.contractVersion" :entity="company"
               name="contractVersion" :url="docsUploadUrl"
               @delete="validateDocumentDeletion(
                 company.rhConfig.templates.contractVersion.driveId,
@@ -97,10 +97,10 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button :href="getAdministrativeDocumentLink(props.row)" type="a"
-                        :disable="!getAdministrativeDocumentLink(props.row)" icon="file_download" />
-                      <ni-button :disable="!getAdministrativeDocumentLink(props.row)"
-                         icon="delete" @click="validateAdministrativeDocumentDeletion(props.row)" />
+                      <ni-button @click="downloadDriveDoc(props.row)" icon="file_download"
+                        :disable="!getDriveId(props.row) || disableAdministrativeDocument" />
+                      <ni-button :disable="!getDriveId(props.row) || disableAdministrativeDocument" icon="delete"
+                        @click="validateAdministrativeDocumentDeletion(props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -166,6 +166,7 @@ import { required, maxValue } from 'vuelidate/lib/validators';
 import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
+import GoogleDrive from '@api/GoogleDrive';
 import InternalHours from '@api/InternalHours';
 import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
@@ -217,6 +218,7 @@ export default {
         { name: 'actions', label: '', align: 'center' },
       ],
       administrativeDocumentsLoading: false,
+      disableAdministrativeDocument: false,
       administrativeDocumentCreationModal: false,
       administrativeDocumentsPagination: { rowsPerPage: 0 },
       newAdministrativeDocument: { name: '', file: null },
@@ -430,8 +432,18 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Administrative document
-    getAdministrativeDocumentLink (doc) {
-      return get(doc, 'driveFile.link') || '';
+    getDriveId (doc) {
+      return get(doc, 'driveFile.driveId') || '';
+    },
+    async downloadDriveDoc (doc) {
+      try {
+        this.disableAdministrativeDocument = true;
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.disableAdministrativeDocument = false;
+      }
     },
     async getAdministrativeDocuments () {
       try {

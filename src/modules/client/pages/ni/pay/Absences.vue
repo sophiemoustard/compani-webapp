@@ -18,8 +18,8 @@
               </div>
             </template>
             <template v-if="col.name === 'attachment'">
-              <div v-if="getAbsenceLink(props.row)" class="row no-wrap table-actions">
-                <ni-button type="a" :href="getAbsenceLink(props.row)" icon="file_download" />
+              <div v-if="getDriveId(props.row)" class="row no-wrap table-actions">
+                <ni-button @click="downloadDriveDoc(props.row)" icon="file_download" :disable="docLoading" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -40,6 +40,7 @@
 <script>
 import get from 'lodash/get';
 import Events from '@api/Events';
+import GoogleDrive from '@api/GoogleDrive';
 import Button from '@components/Button';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
@@ -71,11 +72,7 @@ export default {
       editedEvent: {},
       editionModal: false,
       selectedAuxiliary: { picture: {}, identity: { lastname: '' } },
-      pagination: {
-        rowsPerPage: 0,
-        sortBy: 'startDate',
-        descending: true,
-      },
+      pagination: { rowsPerPage: 0, sortBy: 'startDate', descending: true },
       columns: [
         {
           name: 'auxiliary',
@@ -129,7 +126,7 @@ export default {
           align: 'left',
           sortable: true,
         },
-        { name: 'attachment', label: 'Justificatif' },
+        { name: 'attachment', label: 'Justificatif', align: 'left' },
         { name: 'misc', label: 'Notes', field: 'misc', align: 'left' },
         { name: 'actions', label: '' },
       ],
@@ -138,6 +135,7 @@ export default {
         endDate: moment().endOf('M').toISOString(),
       },
       datesHasError: false,
+      docLoading: false,
     };
   },
   async mounted () {
@@ -149,8 +147,19 @@ export default {
     },
   },
   methods: {
-    getAbsenceLink (absence) {
-      return get(absence, 'attachment.link') || false;
+    getDriveId (absence) {
+      return get(absence, 'attachment.driveId') || '';
+    },
+    async downloadDriveDoc (doc) {
+      if (this.docLoading) return;
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
+      }
     },
     getAbsenceDuration (absence) {
       if (absence.absenceNature === DAILY) {
