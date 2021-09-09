@@ -7,13 +7,15 @@
     <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="$v.newManualBill"
       :loading="modalLoading" :new-manual-bill.sync="newManualBill" :customers-options="customersOptions"
       :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="createManualBill"
-      :billing-items="billingItems" @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem" />
+      :billing-items="billingItems" @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem"
+      @remove-billing-item="removeBillingItem" />
   </q-page>
 </template>
 
 <script>
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import Customers from '@api/Customers';
 import BillingItems from '@api/BillingItems';
 import Bills from '@api/Bills';
@@ -93,6 +95,9 @@ export default {
     addBillingItem () {
       this.newManualBill.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
     },
+    removeBillingItem (index) {
+      this.newManualBill.billingItemList.splice(index, 1);
+    },
     updateBillingItem (event, index, path) {
       this.$set(this.newManualBill.billingItemList[index], path, event);
       if (path === 'billingItem') {
@@ -111,7 +116,8 @@ export default {
     },
     formatCreationPayload () {
       return {
-        ...pick(this.newManualBill, ['customer', 'date', 'billingItemList', 'netInclTaxes']),
+        ...pick(this.newManualBill, ['customer', 'date', 'netInclTaxes']),
+        billingItemList: this.newManualBill.billingItemList.map(bi => omit(bi, 'vat')),
       };
     },
     async createManualBill () {

@@ -9,9 +9,14 @@
       @input="update($event, 'customer')" :options="customersOptions" required-field
       @blur="validations.customer.$touch" :error="validations.customer.$error" />
     <div v-for="(item, index) of newManualBill.billingItemList" :key="index">
-      <ni-select in-modal :caption="`Article ${index + 1}`" @input="updateBillingItem($event, index, 'billingItem')"
-        :error="validations.billingItemList.$each[index].billingItem.$error" :value="item.billingItem" required-field
-        @blur="validations.billingItemList.$each[index].billingItem.$touch" :options="billingItemsOptions" />
+      <div class="row">
+        <ni-select in-modal :caption="`Article ${index + 1}`" @input="updateBillingItem($event, index, 'billingItem')"
+          :error="validations.billingItemList.$each[index].billingItem.$error" :value="item.billingItem" required-field
+          @blur="validations.billingItemList.$each[index].billingItem.$touch" :options="billingItemsOptions"
+          class="flex-1" />
+        <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
+          :disable="newManualBill.billingItemList.length === 1" />
+      </div>
       <div class="flex-row gutter-profile">
         <ni-input caption="PU TTC" @input="updateBillingItem($event, index, 'unitInclTaxes')"
           :error-message="nbrError('unitInclTaxes', index, validations)" :value="item.unitInclTaxes" required-field
@@ -43,6 +48,7 @@ import get from 'lodash/get';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
+import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
@@ -56,6 +62,7 @@ export default {
     'ni-input': Input,
     'ni-date-input': DateInput,
     'ni-modal': Modal,
+    'ni-button': Button,
   },
   props: {
     newManualBill: { type: Object, default: () => ({}) },
@@ -103,7 +110,10 @@ export default {
       this.$emit('submit', value);
     },
     async updateBillingItem (event, index, path) {
-      this.$emit('update-billing-item', event, index, path);
+      await this.$emit('update-billing-item', event, index, path);
+    },
+    async removeBillingItem (index) {
+      await this.$emit('remove-billing-item', index);
     },
     async update (event, prop) {
       await this.$emit('update:newManualBill', { ...this.newManualBill, [prop]: event });
