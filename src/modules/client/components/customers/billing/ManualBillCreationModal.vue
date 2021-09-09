@@ -17,15 +17,19 @@
         <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
           :disable="newManualBill.billingItemList.length === 1" />
       </div>
-      <div class="flex-row gutter-profile">
-        <ni-input caption="PU TTC" @input="updateBillingItem($event, index, 'unitInclTaxes')"
-          :error-message="nbrError('unitInclTaxes', index, validations)" :value="item.unitInclTaxes" required-field
-          :error="validations.billingItemList.$each[index].unitInclTaxes.$error" type="number"
-          @blur="validations.billingItemList.$each[index].unitInclTaxes.$touch" />
-        <ni-input caption="Quantité" :value="item.count" @input="updateBillingItem($event, index, 'count')"
-          :error-message="nbrError('count', index, validations)" required-field
-          :error="validations.billingItemList.$each[index].count.$error" type="number"
-          @blur="validations.billingItemList.$each[index].count.$touch" />
+      <div class="flex-row">
+        <div class="q-mr-sm">
+          <ni-input caption="PU TTC" @input="updateBillingItem($event, index, 'unitInclTaxes')"
+            :error-message="nbrError('unitInclTaxes', index, validations)" :value="item.unitInclTaxes" required-field
+            :error="validations.billingItemList.$each[index].unitInclTaxes.$error" type="number"
+            @blur="validations.billingItemList.$each[index].unitInclTaxes.$touch" />
+          </div>
+        <div class="q-ml-sm">
+          <ni-input caption="Quantité" :value="item.count" @input="updateBillingItem($event, index, 'count')"
+            :error-message="nbrError('count', index, validations)" required-field
+            :error="validations.billingItemList.$each[index].count.$error" type="number"
+            @blur="validations.billingItemList.$each[index].count.$touch" />
+        </div>
       </div>
     </div>
     <div class="text-button flex-row items-center q-mb-md" @click="addBillingItem">
