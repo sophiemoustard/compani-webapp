@@ -163,8 +163,8 @@ export default {
           value: pt._id,
           label: formatIdentity(pt.identity, 'FL'),
           email: pt.local.email || '',
-          company: pt.company.name || '',
           picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
+          ...(!this.isIntraCourse && { company: pt.company.name || '' }),
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
     },
