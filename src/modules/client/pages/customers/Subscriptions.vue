@@ -43,11 +43,11 @@
         </div>
       </div>
       <div class="q-mb-md">
-        <p class="title">Justificatifs APA ou autres financements</p>
+        <p class="title">Financement APA ou autres financements</p>
         <div class="row gutter-profile items-center">
           <div class="col-xs-12 col-md-6">
-            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement" :url="docsUploadUrl"
-              @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates" drive-storage
+            <ni-multiple-files-uploader path="financialCertificates" caption="Justificatif financement"
+              @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates" :url="docsUploadUrl"
               collapsible-label="Ajouter un justificatif" :user-profile="customer" :extensions="extensions" multiple
               @delete="validateFinancialCertifDeletion($event)" additional-fields-name="justificatif_financement" />
           </div>
@@ -136,7 +136,7 @@ import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Esign from '@api/Esign';
-import Drive from '@api/GoogleDrive';
+import GoogleDrive from '@api/GoogleDrive';
 import Customers from '@api/Customers';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
@@ -439,7 +439,7 @@ export default {
         const gcsDriveId = get(this.helper, 'company.customersConfig.templates.gcs.driveId');
         if (!gcsDriveId) return;
 
-        const file = await Drive.downloadFileById(gcsDriveId);
+        const file = await GoogleDrive.downloadFileById(gcsDriveId, true);
 
         this.gcs = file.data;
       } catch (e) {

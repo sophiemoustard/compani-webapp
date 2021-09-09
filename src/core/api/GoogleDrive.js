@@ -1,4 +1,5 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
+import { downloadFile } from '@helpers/file';
 
 export default {
   async getFileById (params) {
@@ -25,8 +26,14 @@ export default {
   getUploadUrl (driveId) {
     return `${process.env.API_HOSTNAME}/gdrive/${driveId}/upload`;
   },
-  async downloadFileById (driveId) {
-    const file = await alenviAxios.get(`${process.env.API_HOSTNAME}/gdrive/file/${driveId}/download`);
-    return file;
+  async downloadFileById (driveId, getHtmlFile = false) {
+    const file = await alenviAxios({
+      url: `${process.env.API_HOSTNAME}/gdrive/file/${driveId}/download`,
+      method: 'GET',
+      ...(!getHtmlFile && { responseType: 'blob' }),
+    });
+
+    if (getHtmlFile) return file;
+    return downloadFile(file, `download-${Date.now()}`, file.headers['content-type']);
   },
 };

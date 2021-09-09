@@ -129,12 +129,13 @@
                     @click="downloadMandate(props.row)" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
-                  <div v-if="!props.row.drive || !getMandateLink(props.row)" class="row justify-center table-actions">
+                  <div v-if="!getDriveId(props.row)" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" with-credentials :form-fields="mandateFormFields(props.row)"
                       field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
-                  <ni-button v-else type="a" :href="getMandateLink(props.row)" icon="file_download" />
+                  <ni-button v-else @click="downloadDriveDoc(props.row)" icon="file_download"
+                    :disable="docLoading || !getDriveId(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
                   <ni-date-input
@@ -183,10 +184,9 @@
       </q-card>
     </div>
     <div class="q-mb-lg">
-      <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
-      <div class="row gutter-profile q-mb-lg">
+      <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" drive-storage
+          <ni-multiple-files-uploader path="financialCertificates" caption="Justificatif financement"
             @uploaded="documentUploaded" name="financialCertificates" collapsible-label="Ajouter un justificatif"
             :user-profile="customer" :url="docsUploadUrl" @delete="validateFinancialCertifDeletion($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />
@@ -208,12 +208,12 @@
                   <ni-button icon="file_download" color="primary" @click="downloadQuote(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signedQuote'">
-                  <div v-if="!props.row.drive || !getQuoteLink(props.row)" class="row justify-center table-actions">
+                  <div v-if="!getDriveId(props.row)" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" with-credentials :form-fields="quoteFormFields(props.row)"
-                      field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
-                      @failed="failMsg" />
+                      field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes" @failed="failMsg" />
                   </div>
-                  <ni-button v-else type="a" :href="getQuoteLink(props.row)" icon="file_download" />
+                  <ni-button v-else @click="downloadDriveDoc(props.row)" icon="file_download"
+                    :disable="docLoading || !getDriveId(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
                   <div :class="[{ 'dot dot-active': col.value, 'dot dot-error': !col.value }]" />
@@ -290,6 +290,7 @@ import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
+import GoogleDrive from '@api/GoogleDrive';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SearchAddress from '@components/form/SearchAddress';
 import Button from '@components/Button';
@@ -369,8 +370,8 @@ export default {
       services: [],
       quotesColumns: [
         { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
-        { name: 'emptyQuote', label: 'Devis', align: 'center', field: 'emptyQuote' },
-        { name: 'signedQuote', label: 'Devis signé', align: 'center', field: 'signedQuote' },
+        { name: 'emptyQuote', label: 'Devis', align: 'center' },
+        { name: 'signedQuote', label: 'Devis signé', align: 'center' },
         { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
       ],
       quotesLoading: false,
@@ -382,8 +383,8 @@ export default {
       editedSubscription: {},
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
-        { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },
-        { name: 'signedMandate', label: 'Mandat signé', align: 'center', field: 'signedMandate' },
+        { name: 'emptyMandate', label: 'Mandat', align: 'center' },
+        { name: 'signedMandate', label: 'Mandat signé', align: 'center' },
         { name: 'signed', label: 'Signé', align: 'center', field: 'signedAt' },
         { name: 'signedAt', label: 'Date de signature', align: 'left', field: 'signedAt' },
       ],
@@ -423,6 +424,7 @@ export default {
       },
       extensions: DOC_EXTENSIONS,
       firstStep: true,
+      docLoading: false,
     };
   },
   computed: {
@@ -788,9 +790,6 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Mandates
-    getMandateLink (mandate) {
-      return get(mandate, 'drive.link') || false;
-    },
     async updateSignedAt (mandate) {
       try {
         if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
@@ -825,10 +824,21 @@ export default {
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document.');
     },
-    // Quotes
-    getQuoteLink (quote) {
-      return get(quote, 'drive.link') || false;
+    getDriveId (doc) {
+      return get(doc, 'drive.driveId') || '';
     },
+    async downloadDriveDoc (doc) {
+      if (this.docLoading) return;
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
+      }
+    },
+    // Quotes
     async downloadQuote (quote) {
       try {
         const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);

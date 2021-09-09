@@ -19,29 +19,23 @@
                 </div>
               </template>
               <template v-if="col.name === 'contractSigned'">
-                <div v-if="hasToBeSignedOnline(props.row) && shouldSignContract(props.row.signature)">
-                  <ni-button :flat="false" v-if="!props.row.endDate" label="Signer"
-                  @click="openSignatureModal(props.row.signature.eversignId)" />
-                </div>
-                <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
-                  class="row justify-center table-actions">
-                  <q-uploader flat :url="docsUploadUrl(contract._id)" with-credentials auto-upload @uploaded="refresh"
+                <div class="row justify-center table-actions">
+                  <ni-button v-if="!!getContractDriveId(props.row.auxiliaryDoc)" icon="file_download"
+                    :disable="docLoading" @click="downloadDriveDoc(props.row.auxiliaryDoc)" />
+                  <template v-else-if="shouldSignContract(props.row)">
+                    <ni-button :flat="false" v-if="!props.row.endDate" label="Signer"
+                      @click="openSignatureModal(props.row.signature.eversignId)" />
+                  </template>
+                  <p v-else-if="hasToBeSignedOnline(props.row)" class="no-margin">En attente de signature</p>
+                  <q-uploader v-else-if="displayUploader" flat :url="docsUploadUrl(contract._id)" with-credentials
                     :form-fields="getFormFields(contract, props.row)" field-name="file" :accept="extensions"
-                    @fail="failMsg" />
-                </div>
-                <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
-                  <ni-button type="a" :href="getContractLink(props.row)" target="_blank" icon="file_download" />
-                </div>
-                <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
-                  <p class="no-margin">En attente de signature</p>
+                    @fail="failMsg" auto-upload @uploaded="refresh" />
                 </div>
               </template>
               <template v-else-if="col.name === 'archives'">
                 <div class="row archives justify-center">
-                  <div v-for="archive in col.value" :key="archive._id">
-                    <ni-button type="a" :href="getArchiveLink(archive)" target="_blank" icon="file_download"
-                      :disable="!getArchiveLink(archive)" />
-                  </div>
+                  <ni-button v-for="archive in col.value" :key="archive._id" @click="downloadDriveDoc(archive)"
+                    icon="file_download" :disable="!getContractDriveId(archive) || docLoading" />
                 </div>
               </template>
               <template v-else-if="col.name === 'actions'">
@@ -82,8 +76,9 @@
 <script>
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
-import esign from '@api/Esign';
 import Contracts from '@api/Contracts';
+import esign from '@api/Esign';
+import GoogleDrive from '@api/GoogleDrive';
 import Button from '@components/Button';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -133,6 +128,7 @@ export default {
         { name: 'actions', align: 'center', field: '_id' },
       ],
       extensions: DOC_EXTENSIONS,
+      docLoading: false,
     };
   },
   computed: {
@@ -191,9 +187,6 @@ export default {
     refreshWithTimeout () {
       this.$emit('refresh-with-timeout');
     },
-    getArchiveLink (archive) {
-      return archive.link || false;
-    },
     // Documents
     canDownload (version, contractIndex) {
       const templates = get(this.user, 'company.rhConfig.templates');
@@ -247,11 +240,8 @@ export default {
         const document = await esign.getDocument(eversignId);
         const id = this.personKey === AUXILIARY ? 1 : 2;
         this.embeddedUrl = document.signers.find(signer => signer.id === id).embedded_signing_url;
-        if (this.$q.platform.is.mobile) {
-          window.location.href = this.embeddedUrl;
-        } else {
-          this.esignModal = true;
-        }
+        if (this.$q.platform.is.mobile) window.location.href = this.embeddedUrl;
+        else this.esignModal = true;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la requête de signature en ligne du contrat.');
@@ -260,20 +250,33 @@ export default {
       }
     },
     hasToBeSignedOnline (contract) {
-      return !!(contract.signature && contract.signature.eversignId);
+      return !!get(contract, 'signature.eversignId');
     },
-    shouldSignContract (signature) {
-      if (!signature.signedBy) return true;
+    shouldSignContract (contract) {
+      if (!this.hasToBeSignedOnline(contract)) return false;
+
+      if (!get(contract, 'signature.signedBy')) return true;
 
       switch (this.personKey) {
         case COACH:
-          return !signature.signedBy.other;
+          return !contract.signature.signedBy.other;
         case AUXILIARY:
-          return !signature.signedBy.auxiliary;
+          return !contract.signature.signedBy.auxiliary;
       }
     },
-    getContractLink (contract) {
-      return contract.auxiliaryDoc ? contract.auxiliaryDoc.link : false;
+    getContractDriveId (doc) {
+      return get(doc, 'driveId');
+    },
+    async downloadDriveDoc (doc) {
+      if (this.docLoading) return;
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(this.getContractDriveId(doc));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
+      }
     },
   },
   filters: {
