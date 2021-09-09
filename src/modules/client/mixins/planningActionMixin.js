@@ -383,7 +383,7 @@ export const planningActionMixin = {
             isBilled,
             address,
             transportMode: transportMode || '',
-            kmDuringEvent: kmDuringEvent || '',
+            kmDuringEvent: kmDuringEvent || 0,
           };
           break;
         }
