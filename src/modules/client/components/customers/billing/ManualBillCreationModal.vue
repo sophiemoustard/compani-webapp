@@ -28,8 +28,8 @@
       <div>Ajouter un article</div>
     </div>
     <div class="row q-mb-md">
-      <div class="col-6 total-text">Total HT : {{ totalExclTaxes }}</div>
-      <div class="col-6 total-text">Total TTC : {{ newManualBill.netInclTaxes }}</div>
+      <div class="col-6 total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
+      <div class="col-6 total-text">Total TTC : {{ formatPrice(newManualBill.netInclTaxes) }}</div>
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la facture" icon-right="add" color="primary"
@@ -70,15 +70,22 @@ export default {
     return {
       formatPrice,
       selectedBillingItem: null,
+      totalExclTaxes: 0,
     };
   },
-  computed: {
-    totalExclTaxes () {
-      return this.newManualBill.billingItemList
-        .reduce((acc, bi) => acc + bi.unitInclTaxes * bi.count, 0);
+  watch: {
+    'newManualBill.billingItemList': {
+      deep: true,
+      handler () {
+        this.totalExclTaxes = this.newManualBill.billingItemList
+          .reduce((acc, bi) => acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count, 0);
+      },
     },
   },
   methods: {
+    getExclTaxes (inclTaxes, vat) {
+      return inclTaxes / (1 + vat / 100);
+    },
     nbrError (path, index, validations) {
       const val = get(validations, `billingItemList.$each.${index}.${path}`);
       if (val.required === false) return REQUIRED_LABEL;

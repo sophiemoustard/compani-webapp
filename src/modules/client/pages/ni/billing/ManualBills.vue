@@ -95,6 +95,11 @@ export default {
     },
     updateBillingItem (event, index, path) {
       this.$set(this.newManualBill.billingItemList[index], path, event);
+      if (path === 'billingItem') {
+        const billingItem = this.billingItems.find(bi => bi._id === event);
+        this.$set(this.newManualBill.billingItemList[index], 'vat', billingItem?.vat || 0);
+        this.$set(this.newManualBill.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+      }
     },
     resetManualBillCreationModal () {
       this.newManualBill = {
