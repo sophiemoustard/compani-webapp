@@ -8,22 +8,28 @@
     <ni-select in-modal caption="Bénéficiaire" :value="newManualBill.customer"
       @input="update($event, 'customer')" :options="customersOptions" required-field
       @blur="validations.customer.$touch" :error="validations.customer.$error" />
-    <ni-select in-modal caption="Article" :value="newManualBill.billingItem" @blur="validations.billingItem.$touch"
-      @input="updateBillingItem($event)" :options="billingItemsOptions" :error="validations.billingItem.$error"
-      required-field />
-    <div class="flex-row q-mb-md">
-      <div class="q-mr-lg">
-        <ni-input in-modal caption="PU TTC" @blur="validations.unitInclTaxes.$touch" required-field
-          :value="newManualBill.unitInclTaxes" @input="update($event, 'unitInclTaxes')" type="number"
-          :error="validations.unitInclTaxes.$error" :error-message="nbrError('unitInclTaxes', validations)" />
-        <div class="total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
+    <div v-for="(item, index) of newManualBill.billingItemList" :key="index">
+      <ni-select in-modal :caption="`Article ${index + 1}`" @input="updateBillingItem($event, index, 'billingItem')"
+        :error="validations.billingItemList.$each[index].billingItem.$error" :value="item.billingItem" required-field
+        @blur="validations.billingItemList.$each[index].billingItem.$touch" :options="billingItemsOptions" />
+      <div class="flex-row gutter-profile">
+        <ni-input caption="PU TTC" @input="updateBillingItem($event, index, 'unitInclTaxes')"
+          :error-message="nbrError('unitInclTaxes', index, validations)" :value="item.unitInclTaxes" required-field
+          :error="validations.billingItemList.$each[index].unitInclTaxes.$error" type="number"
+          @blur="validations.billingItemList.$each[index].unitInclTaxes.$touch" />
+        <ni-input caption="Quantité" :value="item.count" @input="updateBillingItem($event, index, 'count')"
+          :error-message="nbrError('count', index, validations)" required-field
+          :error="validations.billingItemList.$each[index].count.$error" type="number"
+          @blur="validations.billingItemList.$each[index].count.$touch" />
       </div>
-      <div>
-        <ni-input in-modal caption="Quantité" @blur="validations.count.$touch" required-field
-          :value="newManualBill.count" @input="update($event, 'count')" type="number" :error="validations.count.$error"
-          :error-message="nbrError('count', validations)" />
-        <div class="total-text">Total TTC : {{ formatPrice(totalInclTaxes) }}</div>
-      </div>
+    </div>
+    <div class="text-button flex-row items-center q-mb-md" @click="addBillingItem">
+      <q-icon color="primary" name="add" class="q-mr-md" />
+      <div>Ajouter un article</div>
+    </div>
+    <div class="row q-mb-md">
+      <div class="col-6 total-text">Total HT : {{ totalExclTaxes }}</div>
+      <div class="col-6 total-text">Total TTC : {{ newManualBill.netInclTaxes }}</div>
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la facture" icon-right="add" color="primary"
@@ -68,15 +74,13 @@ export default {
   },
   computed: {
     totalExclTaxes () {
-      return this.selectedBillingItem ? this.totalInclTaxes / (1 + this.selectedBillingItem.vat / 100) : 0;
-    },
-    totalInclTaxes () {
-      return this.selectedBillingItem ? this.newManualBill.unitInclTaxes * this.newManualBill.count : 0;
+      return this.newManualBill.billingItemList
+        .reduce((acc, bi) => acc + bi.unitInclTaxes * bi.count, 0);
     },
   },
   methods: {
-    nbrError (path, validations = this.$v) {
-      const val = get(validations, path);
+    nbrError (path, index, validations) {
+      const val = get(validations, `billingItemList.$each.${index}.${path}`);
       if (val.required === false) return REQUIRED_LABEL;
       if (val.positiveNumber === false || val.strictPositiveNumber === false) return 'Nombre non valide';
 
@@ -91,14 +95,14 @@ export default {
     submit (value) {
       this.$emit('submit', value);
     },
-    async updateBillingItem (event) {
-      this.selectedBillingItem = this.billingItems.find(bi => bi._id === event);
-      const defaultUnitAmount = this.selectedBillingItem ? this.selectedBillingItem.defaultUnitAmount : 0;
-      await this.update(defaultUnitAmount, 'unitInclTaxes');
-      await this.update(event, 'billingItem');
+    async updateBillingItem (event, index, path) {
+      this.$emit('update-billing-item', event, index, path);
     },
     async update (event, prop) {
       await this.$emit('update:newManualBill', { ...this.newManualBill, [prop]: event });
+    },
+    addBillingItem () {
+      this.$emit('add-billing-item');
     },
   },
 };
@@ -107,4 +111,7 @@ export default {
 <style lang="stylus" scoped>
 .total-text
   font-size: 14px
+.text-button
+  cursor: pointer;
+  color: $primary;
 </style>

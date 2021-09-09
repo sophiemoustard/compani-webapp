@@ -7,7 +7,7 @@
     <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="$v.newManualBill"
       :loading="modalLoading" :new-manual-bill.sync="newManualBill" :customers-options="customersOptions"
       :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="createManualBill"
-      :billing-items="billingItems" />
+      :billing-items="billingItems" @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem" />
   </q-page>
 </template>
 
@@ -35,7 +35,12 @@ export default {
     return {
       manualBillCreationModal: false,
       modalLoading: false,
-      newManualBill: { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 },
+      newManualBill: {
+        date: '',
+        customer: '',
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
+        netInclTaxes: 0,
+      },
       customers: [],
       billingItems: [],
     };
@@ -44,9 +49,13 @@ export default {
     newManualBill: {
       date: { required },
       customer: { required },
-      billingItem: { required },
-      unitInclTaxes: { positiveNumber, required },
-      count: { strictPositiveNumber, required },
+      billingItemList: {
+        $each: {
+          billingItem: { required },
+          unitInclTaxes: { positiveNumber, required },
+          count: { strictPositiveNumber, required },
+        },
+      },
     },
   },
   computed: {
@@ -55,6 +64,15 @@ export default {
     },
     billingItemsOptions () {
       return formatAndSortOptions(this.billingItems, 'name');
+    },
+  },
+  watch: {
+    'newManualBill.billingItemList': {
+      deep: true,
+      handler () {
+        this.newManualBill.netInclTaxes = this.newManualBill.billingItemList
+          .reduce((acc, bi) => acc + bi.unitInclTaxes * bi.count, 0);
+      },
     },
   },
   async created () {
@@ -72,15 +90,23 @@ export default {
         this.modalLoading = false;
       }
     },
+    addBillingItem () {
+      this.newManualBill.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+    },
+    updateBillingItem (event, index, path) {
+      this.$set(this.newManualBill.billingItemList[index], path, event);
+    },
     resetManualBillCreationModal () {
-      this.newManualBill = { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 };
+      this.newManualBill = {
+        date: '',
+        customer: '',
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
+      };
       this.$v.newManualBill.$reset();
     },
     formatCreationPayload () {
       return {
-        ...pick(this.newManualBill, ['customer', 'date']),
-        billingItemList: [pick(this.newManualBill, ['billingItem', 'unitInclTaxes', 'count'])],
-        netInclTaxes: this.newManualBill.unitInclTaxes * this.newManualBill.count,
+        ...pick(this.newManualBill, ['customer', 'date', 'billingItemList', 'netInclTaxes']),
       };
     },
     async createManualBill () {
