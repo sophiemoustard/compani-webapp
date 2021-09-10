@@ -20,15 +20,14 @@
       <div class="flex-row">
         <div class="q-mr-sm">
           <ni-input caption="PU TTC" @input="updateBillingItem($event, index, 'unitInclTaxes')"
-            :error-message="nbrError('unitInclTaxes', index, validations)" :value="item.unitInclTaxes" required-field
+            :error-message="nbrError('unitInclTaxes', index)" :value="item.unitInclTaxes" required-field
             :error="validations.billingItemList.$each[index].unitInclTaxes.$error" type="number"
             @blur="validations.billingItemList.$each[index].unitInclTaxes.$touch" />
           </div>
         <div class="q-ml-sm">
           <ni-input caption="Quantité" :value="item.count" @input="updateBillingItem($event, index, 'count')"
-            :error-message="nbrError('count', index, validations)" required-field
-            :error="validations.billingItemList.$each[index].count.$error" type="number"
-            @blur="validations.billingItemList.$each[index].count.$touch" />
+            :error="validations.billingItemList.$each[index].count.$error" type="number" required-field
+            @blur="validations.billingItemList.$each[index].count.$touch" :error-message="nbrError('count', index)" />
         </div>
       </div>
     </div>
@@ -97,8 +96,8 @@ export default {
     getExclTaxes (inclTaxes, vat) {
       return inclTaxes / (1 + vat / 100);
     },
-    nbrError (path, index, validations) {
-      const val = get(validations, `billingItemList.$each.${index}.${path}`);
+    nbrError (path, index) {
+      const val = get(this.validations, `billingItemList.$each.${index}.${path}`);
       if (val.required === false) return REQUIRED_LABEL;
       if (val.positiveNumber === false || val.strictPositiveNumber === false) return 'Nombre non valide';
 
