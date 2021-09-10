@@ -50,7 +50,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
-import TextButton from '@components/BiColorButton';
+import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
@@ -65,7 +65,7 @@ export default {
     'ni-date-input': DateInput,
     'ni-modal': Modal,
     'ni-button': Button,
-    'ni-bi-color-button': TextButton,
+    'ni-bi-color-button': BiColorButton,
   },
   props: {
     newManualBill: { type: Object, default: () => ({}) },

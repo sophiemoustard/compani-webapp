@@ -48,6 +48,11 @@
                       <div class="archived" v-else>archivé</div>
                     </div>
                   </template>
+                  <template v-else-if="col.name === 'billingItems'">
+                    <div v-for="billingItem in col.value" :key="billingItem._id" class="billing-item-tag q-ma-sm">
+                      {{ billingItem.name }}
+                    </div>
+                  </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
               </q-tr>
@@ -158,10 +163,11 @@
       :loading="loading" />
 
     <!-- Service edition modal -->
-    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService"
+    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
       :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
-      :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
-      :validations="$v.editedService" />
+      @hide="resetEditionServiceData" :min-start-date="minStartDate" @add-billing-item="addBillingItemToService"
+      @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions" :loading="loading"
+      :validations="$v.editedService" @remove-billing-item="removeBillingItemInService" />
 
     <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
       :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
@@ -189,6 +195,8 @@ import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
+import compact from 'lodash/compact';
+import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
@@ -213,9 +221,16 @@ import {
   REQUIRED_LABEL,
   HTML_EXTENSIONS,
   BILLING_ITEMS_TYPE_OPTIONS,
+  PER_INTERVENTION,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { roundFrenchPercentage, formatHoursWithMinutes, formatPrice } from '@helpers/utils';
+import {
+  roundFrenchPercentage,
+  formatHoursWithMinutes,
+  formatPrice,
+  formatAndSortOptions,
+  sortStrings,
+} from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
@@ -408,6 +423,7 @@ export default {
         'vat',
         'surcharge',
         'exemptFromCharges',
+        'billingItems',
         'actions',
       ],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
@@ -448,6 +464,16 @@ export default {
           label: 'Exonération de charges',
           align: 'center',
           field: row => (row.exemptFromCharges ? 'Oui' : 'Non'),
+        },
+        {
+          name: 'billingItems',
+          label: 'Articles',
+          field: (row) => {
+            const billingItems = cloneDeep(row.billingItems);
+            return billingItems.sort((a, b) => sortStrings(a.name, b.name));
+          },
+          align: 'center',
+          style: !this.$q.platform.is.mobile && 'width: 200px',
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -646,6 +672,9 @@ export default {
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
       return selectedService ? moment(selectedService.startDate).add(1, 'd').toISOString() : '';
+    },
+    billingItemsOptions () {
+      return formatAndSortOptions(this.billingItems.filter(bi => bi.type === PER_INTERVENTION), 'name');
     },
   },
   async mounted () {
@@ -910,7 +939,7 @@ export default {
     },
     openServiceEditionModal (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat, surcharge, nature, exemptFromCharges } = selectedService;
+      const { name, defaultUnitAmount, vat, surcharge, nature, exemptFromCharges, billingItems } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
@@ -920,6 +949,7 @@ export default {
         nature,
         surcharge: surcharge ? surcharge._id : null,
         exemptFromCharges,
+        billingItems: billingItems.map(bi => bi._id) || [],
       };
 
       this.serviceEditionModal = true;
@@ -933,15 +963,15 @@ export default {
         nature: '',
         surcharge: null,
         exemptFromCharges: false,
+        billingItems: [],
       };
       this.$v.editedService.$reset();
     },
     formatEditedService () {
-      const payload = pickBy(this.editedService);
-      delete payload._id;
-      delete payload.nature;
-
-      return payload;
+      return {
+        ...pickBy(omit(this.editedService, ['_id', 'nature'])),
+        billingItems: uniq(compact(this.editedService.billingItems)),
+      };
     },
     async updateService () {
       try {
@@ -1008,6 +1038,15 @@ export default {
     resetServiceHistoryData () {
       this.selectedService = {};
     },
+    addBillingItemToService () {
+      this.editedService.billingItems.push('');
+    },
+    updateBillingItemInService (index, event) {
+      this.$set(this.editedService.billingItems, index, event);
+    },
+    removeBillingItemInService (index) {
+      this.editedService.billingItems.splice(index, 1);
+    },
     // Billing Items
     resetBillingItemCreation () {
       this.$v.newBillingItem.$reset();
@@ -1036,7 +1075,7 @@ export default {
     async refreshBillingItems () {
       try {
         this.billingItemsLoading = true;
-        this.billingItems = await BillingItems.list();
+        this.billingItems = await BillingItems.list({ type: PER_INTERVENTION });
       } catch (e) {
         this.billingItems = [];
         console.error(e);
@@ -1149,4 +1188,8 @@ export default {
   .archived
     display: flex;
     align-self: center;
+  .billing-item-tag
+    background-color: $copper-100;
+    border-radius: 8px;
+    color: $copper-700;
 </style>

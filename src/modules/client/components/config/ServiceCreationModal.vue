@@ -14,7 +14,7 @@
       :error="validations.vat.$error" @blur="validations.vat.$touch"
       error-message="La TVA doit être positive ou nulle" />
     <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" :value="newService.surcharge"
-      :options="surchargesOptions" clearable @input="update($event, 'surcharge')" />
+      :options="surchargesOptions" @input="update($event, 'surcharge')" />
     <div class="row q-mb-md">
       <q-checkbox label="Exonération de charges" :value="newService.exemptFromCharges" dense
         @input="update($event, 'exemptFromCharges')" />

@@ -16,11 +16,21 @@
       type="number" @blur="validations.vat.$touch" error-message="La TVA doit être positive ou nulle"
       @input="update($event, 'vat')" />
     <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration"
-      :value="editedService.surcharge" :options="surchargesOptions" clearable @input="update($event, 'surcharge')" />
+      :value="editedService.surcharge" :options="surchargesOptions" @input="update($event, 'surcharge')" />
     <div class="row q-mb-md">
       <q-checkbox label="Exonération de charges" :value="editedService.exemptFromCharges" dense
         @input="update($event, 'exemptFromCharges')" />
     </div>
+    <p class="text-weight-bold q-mt-md billing-items-title" v-if="get(editedService, 'billingItems.length')">
+      Articles facturés par intervention
+    </p>
+    <div class="row" v-for="(billingItem, index) in editedService.billingItems" :key="index">
+      <ni-select :clearable="false" :value="billingItem" :options="billingItemsOptions"
+        :caption="`Article ${index + 1}`" class="flex-1 q-mr-sm" @input="updateBillingItem(index, $event)" />
+      <ni-button icon="close" @click="removeBillingItem(index)" size="sm" />
+    </div>
+    <ni-bi-color-button label="Ajouter un article de facturation" icon="add" class="q-mb-md" @click="addBillingItem"
+      label-color="primary" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
@@ -29,9 +39,12 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
+import BiColorButton from '@components/BiColorButton';
+import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import { FIXED } from '@data/constants';
 
@@ -42,6 +55,8 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
     'ni-select': Select,
+    'ni-button': Button,
+    'ni-bi-color-button': BiColorButton,
   },
   props: {
     validations: { type: Object, required: true },
@@ -51,6 +66,7 @@ export default {
     defaultUnitAmountError: { type: String, required: true },
     loading: { type: Boolean, default: false },
     minStartDate: { type: String, required: true },
+    billingItemsOptions: { type: Array, required: true },
   },
   data () {
     return {
@@ -58,6 +74,7 @@ export default {
     };
   },
   methods: {
+    get,
     hide () {
       this.$emit('hide');
     },
@@ -70,6 +87,20 @@ export default {
     update (event, prop) {
       this.$emit('update:editedService', { ...this.editedService, [prop]: event });
     },
+    addBillingItem () {
+      this.$emit('add-billing-item');
+    },
+    updateBillingItem (index, event) {
+      this.$emit('update-billing-item', index, event);
+    },
+    removeBillingItem (index) {
+      this.$emit('remove-billing-item', index);
+    },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .billing-items-title
+    font-size: 14px
+</style>
