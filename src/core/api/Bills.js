@@ -5,6 +5,10 @@ export default {
     const draftBills = await alenviAxios.get(`${process.env.API_HOSTNAME}/bills/drafts`, { params });
     return draftBills.data.data.draftBills;
   },
+  async list (params) {
+    const bills = alenviAxios.get(`${process.env.API_HOSTNAME}/bills/list`, { params });
+    return bills.data.data.bills;
+  },
   async create (data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/bills`, data);
   },

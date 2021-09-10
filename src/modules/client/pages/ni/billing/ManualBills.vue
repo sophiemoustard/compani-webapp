@@ -45,6 +45,7 @@ export default {
       },
       customers: [],
       billingItems: [],
+      manualBills: [],
     };
   },
   validations: {
@@ -78,9 +79,12 @@ export default {
     },
   },
   async created () {
-    await this.refresh();
+    await Promise.all([this.refresh(), this.getManualBills()]);
   },
   methods: {
+    async getManualBills () {
+      this.manualBills = await Bills.list({ type: MANUAL });
+    },
     async refresh () {
       try {
         this.modalLoading = true;
