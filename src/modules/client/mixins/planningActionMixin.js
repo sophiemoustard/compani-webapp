@@ -420,26 +420,25 @@ export const planningActionMixin = {
     getEditionPayload (event) {
       const payload = this.getPayload(event);
 
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
-      if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
-      if (event.shouldUpdateRepetition) ['misc', 'transportMode', 'kmDuringEvent'].forEach(key => delete payload[key]);
-      if (event.auxiliary) delete payload.sector;
+      const fieldsToOmit = [
+        'customer',
+        'repetition',
+        'staffingBeginning',
+        'staffingDuration',
+        'type',
+        'displayedStartDate',
+        'displayedEndDate',
+        'extension',
+        'histories',
+      ];
+
+      if (event.cancel && Object.keys(event.cancel).length === 0) fieldsToOmit.push('cancel');
+      if (event.attachment && Object.keys(event.attachment).length === 0) fieldsToOmit.push('attachment');
+      if (event.shouldUpdateRepetition) fieldsToOmit.push('misc', 'transportMode', 'kmDuringEvent');
+      if (event.auxiliary) fieldsToOmit.push('sector');
       if (event.address && !event.address.fullAddress) payload.address = {};
 
-      return omit(
-        payload,
-        [
-          'customer',
-          'repetition',
-          'staffingBeginning',
-          'staffingDuration',
-          'type',
-          'displayedStartDate',
-          'displayedEndDate',
-          'extension',
-          'histories',
-        ]
-      );
+      return omit(payload, fieldsToOmit);
     },
     async updateEvent () {
       try {
