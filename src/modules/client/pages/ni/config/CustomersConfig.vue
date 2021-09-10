@@ -48,6 +48,11 @@
                       <div class="archived" v-else>archivé</div>
                     </div>
                   </template>
+                  <template v-else-if="col.name === 'billingItems'">
+                    <div v-for="billingItem in col.value" :key="billingItem._id" class="billing-item-tag q-ma-sm">
+                      {{ billingItem.name }}
+                    </div>
+                  </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
               </q-tr>
@@ -412,6 +417,7 @@ export default {
         'vat',
         'surcharge',
         'exemptFromCharges',
+        'billingItems',
         'actions',
       ],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
@@ -452,6 +458,13 @@ export default {
           label: 'Exonération de charges',
           align: 'center',
           field: row => (row.exemptFromCharges ? 'Oui' : 'Non'),
+        },
+        {
+          name: 'billingItems',
+          label: 'Articles',
+          field: 'billingItems',
+          align: 'center',
+          style: !this.$q.platform.is.mobile && 'width: 200px',
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -927,7 +940,7 @@ export default {
         nature,
         surcharge: surcharge ? surcharge._id : null,
         exemptFromCharges,
-        billingItems: billingItems || [],
+        billingItems: billingItems.map(bi => bi._id) || [],
       };
 
       this.serviceEditionModal = true;
@@ -1166,4 +1179,8 @@ export default {
   .archived
     display: flex;
     align-self: center;
+  .billing-item-tag
+    background-color: $copper-100;
+    border-radius: 8px;
+    color: $copper-700;
 </style>
