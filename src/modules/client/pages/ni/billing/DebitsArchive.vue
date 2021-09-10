@@ -8,7 +8,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'download'">
                 <div class="row no-wrap table-actions">
-                  <q-btn flat round icon="file_download" color="primary" @click="goToUrl(col.value)" />
+                  <ni-button icon="file_download" @click="downloadDriveDoc(col.value)" :disable="docLoading" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -28,6 +28,7 @@ import GoogleDrive from '@api/GoogleDrive';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
+import Button from '@components/Button';
 import { formatDate } from '@helpers/date';
 
 export default {
@@ -36,15 +37,17 @@ export default {
   components: {
     'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
+    'ni-button': Button,
   },
   data () {
     return {
       directDebits: [],
       loading: false,
+      docLoading: false,
       columns: [
         { name: 'name', label: 'Nom du fichier', align: 'left', field: 'name' },
         { name: 'createdTime', label: 'Date de création', align: 'left', field: 'createdTime', format: formatDate },
-        { name: 'download', label: '', align: 'left', field: 'webViewLink' },
+        { name: 'download', label: '', align: 'left', field: 'id' },
       ],
       pagination: {
         rowsPerPage: 0,
@@ -62,6 +65,16 @@ export default {
   methods: {
     goToUrl (url) {
       openURL(url);
+    },
+    async downloadDriveDoc (docId) {
+      try {
+        this.docLoading = true;
+        await GoogleDrive.downloadFileById(docId);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.docLoading = false;
+      }
     },
     async getDirectDebits () {
       try {
