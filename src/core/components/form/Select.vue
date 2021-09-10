@@ -14,6 +14,9 @@
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
           @click="$refs['selectInput'].showPopup()" />
       </template>
+      <template v-if="optionSlot" #option="scope">
+        <slot name="option" :scope="scope" />
+      </template>
     </q-select>
   </div>
 </template>
@@ -21,6 +24,8 @@
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
+import escapeRegExp from 'lodash/escapeRegExp';
+import { removeDiacritics } from '@helpers/utils';
 
 export default {
   name: 'NiSelect',
@@ -40,6 +45,7 @@ export default {
     bgColor: { type: String, default: 'white' },
     optionDisable: { type: String, default: 'disable' },
     dataCy: { type: String, default: '' },
+    optionSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
@@ -69,11 +75,15 @@ export default {
       this.$emit('input', val);
       this.$refs.selectInput.blur();
     },
+    formatStringForFiltering (str) {
+      return escapeRegExp(removeDiacritics(str.toLowerCase()));
+    },
     onFilter (val, update) {
       update(() => {
         if (val) {
-          const value = val.toLowerCase();
-          this.innerOptions = this.options.filter(opt => opt.label.toLowerCase().includes(value));
+          const formattedValue = this.formatStringForFiltering(val);
+          this.innerOptions = this.options
+            .filter(opt => this.formatStringForFiltering(opt.label).includes(formattedValue));
         } else {
           this.innerOptions = this.options;
         }

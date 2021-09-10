@@ -20,6 +20,7 @@
                 @click="downloadDriveDoc(props.row)">
                 Facture {{ props.row.number }}
               </div>
+              <div v-else-if="props.row.billType === MANUAL">Facture {{ props.row.number }}</div>
               <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
                 Facture {{ props.row.number }}
@@ -89,6 +90,7 @@ import {
   CUSTOMER,
   PAYMENT,
   COMPANI,
+  MANUAL,
 } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
@@ -117,6 +119,7 @@ export default {
       BILL,
       COMPANI,
       REFUND,
+      MANUAL,
       columns: [
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         { name: 'document', label: '', align: 'left' },

@@ -321,6 +321,7 @@ export default {
       const tppDocuments = {};
 
       for (const bill of this.bills) {
+        bill.billType = bill.type;
         bill.type = BILL;
         if (!bill.thirdPartyPayer) this.customerDocuments.push(bill);
         else if (bill.thirdPartyPayer._id && !tppDocuments[bill.thirdPartyPayer._id]) {

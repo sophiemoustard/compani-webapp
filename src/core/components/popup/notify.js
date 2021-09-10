@@ -1,7 +1,7 @@
 import { Notify } from 'quasar';
 
 export const NotifyPositive = message => Notify.create({
-  color: 'positive',
+  color: 'green-600',
   icon: 'thumb_up',
   message,
   position: 'bottom-left',

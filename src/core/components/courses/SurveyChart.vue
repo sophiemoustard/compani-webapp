@@ -36,7 +36,7 @@ export default {
       return ['1', '2', '3', '4', '5'].map((pa) => {
         const total = this.card.answers.filter(a => a === pa).length;
 
-        return { title: pa, total, percentage: total / this.card.answers.length };
+        return { title: pa, total, percentage: total / this.card.answers.length || 0 };
       });
     },
   },

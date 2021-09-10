@@ -120,6 +120,7 @@ export default {
 
   /deep/ .q-field__control
     min-height: 40px
+    border: none !important
     .q-field__marginal.q-anchor--skip
       display: none
 

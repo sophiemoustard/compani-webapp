@@ -13,17 +13,24 @@
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
+      @click="learnerCreationModal = true" :disable="tableLoading" />
+
+    <!-- New learner modal -->
+    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
+      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" display-company />
   </q-page>
 </template>
 
 <script>
-import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
-import { DEFAULT_AVATAR } from '@data/constants';
-import { removeDiacritics } from '@helpers/utils';
+import Companies from '@api/Companies';
+import { formatAndSortOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 
 export default {
   metaInfo: { title: 'Répertoire apprenants' },
@@ -31,32 +38,29 @@ export default {
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
+    'learner-creation-modal': LearnerCreationModal,
   },
   mixins: [userMixin, learnerDirectoryMixin],
   data () {
     return {
-      loading: false,
-      searchStr: '',
+      companyOptions: [],
     };
   },
-  computed: {
-    filteredLearners () {
-      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.learnerList.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
-    },
-  },
   async created () {
-    await this.getLearnerList();
+    await Promise.all([this.refreshCompanies(), this.getLearnerList()]);
   },
   methods: {
     goToLearnerProfile (row) {
       this.$router.push({ name: 'ni users learners info', params: { learnerId: row.learner._id } });
     },
-    updateSearch (value) {
-      this.searchStr = value;
-    },
-    getAvatar (link) {
-      return link || DEFAULT_AVATAR;
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = formatAndSortOptions(companies, 'name');
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
+      }
     },
   },
 };
