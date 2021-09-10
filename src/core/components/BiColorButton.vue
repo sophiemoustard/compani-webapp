@@ -1,8 +1,8 @@
 <template>
-  <div>
-    <ni-button class="button" flat :icon="icon" color="primary" @click="click" :size="size" :href="href"
+  <div class="flex-row items-center">
+    <ni-button class="button" :icon="icon" :color="iconColor" @click="click" :size="size" :href="href"
       :disable="disable" :type="type" />
-    <ni-button class="button" flat :label="label" color="copper-grey-700" @click="click" :size="size" :href="href"
+    <ni-button class="button" :label="label" :color="labelColor" @click="click" :size="size" :href="href"
       :disable="disable" :type="type" />
   </div>
 </template>
@@ -19,6 +19,8 @@ export default {
     href: { type: String, default: '' },
     disable: { type: Boolean, default: false },
     type: { type: String, default: '' },
+    labelColor: { type: String, default: 'copper-grey-700' },
+    iconColor: { type: String, default: 'primary' },
   },
   components: {
     'ni-button': Button,

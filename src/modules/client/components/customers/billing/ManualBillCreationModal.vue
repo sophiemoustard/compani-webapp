@@ -31,10 +31,8 @@
         </div>
       </div>
     </div>
-    <div class="text-button flex-row items-center q-mb-md" @click="addBillingItem">
-      <q-icon color="primary" name="add" class="q-mr-md" />
-      <div>Ajouter un article</div>
-    </div>
+    <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
+      label-color="primary" />
     <div class="row q-mb-md">
       <div class="col-6 total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
       <div class="col-6 total-text">Total TTC : {{ formatPrice(newManualBill.netInclTaxes) }}</div>
@@ -52,6 +50,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
+import TextButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
@@ -66,6 +65,7 @@ export default {
     'ni-date-input': DateInput,
     'ni-modal': Modal,
     'ni-button': Button,
+    'ni-bi-color-button': TextButton,
   },
   props: {
     newManualBill: { type: Object, default: () => ({}) },
@@ -131,7 +131,4 @@ export default {
 <style lang="stylus" scoped>
 .total-text
   font-size: 14px
-.text-button
-  cursor: pointer;
-  color: $primary;
 </style>
