@@ -304,5 +304,4 @@ export default {
 
   .history-list-title
     font-size: 14px
-
 </style>

@@ -7,13 +7,15 @@
     <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="$v.newManualBill"
       :loading="modalLoading" :new-manual-bill.sync="newManualBill" :customers-options="customersOptions"
       :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="createManualBill"
-      :billing-items="billingItems" />
+      :billing-items="billingItems" @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem"
+      @remove-billing-item="removeBillingItem" />
   </q-page>
 </template>
 
 <script>
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import Customers from '@api/Customers';
 import BillingItems from '@api/BillingItems';
 import Bills from '@api/Bills';
@@ -35,7 +37,12 @@ export default {
     return {
       manualBillCreationModal: false,
       modalLoading: false,
-      newManualBill: { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 },
+      newManualBill: {
+        date: '',
+        customer: '',
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
+        netInclTaxes: 0,
+      },
       customers: [],
       billingItems: [],
     };
@@ -44,9 +51,13 @@ export default {
     newManualBill: {
       date: { required },
       customer: { required },
-      billingItem: { required },
-      unitInclTaxes: { positiveNumber, required },
-      count: { strictPositiveNumber, required },
+      billingItemList: {
+        $each: {
+          billingItem: { required },
+          unitInclTaxes: { positiveNumber, required },
+          count: { strictPositiveNumber, required },
+        },
+      },
     },
   },
   computed: {
@@ -55,6 +66,15 @@ export default {
     },
     billingItemsOptions () {
       return formatAndSortOptions(this.billingItems, 'name');
+    },
+  },
+  watch: {
+    'newManualBill.billingItemList': {
+      deep: true,
+      handler () {
+        this.newManualBill.netInclTaxes = this.newManualBill.billingItemList
+          .reduce((acc, bi) => acc + bi.unitInclTaxes * bi.count, 0);
+      },
     },
   },
   async created () {
@@ -72,15 +92,32 @@ export default {
         this.modalLoading = false;
       }
     },
+    addBillingItem () {
+      this.newManualBill.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+    },
+    removeBillingItem (index) {
+      this.newManualBill.billingItemList.splice(index, 1);
+    },
+    updateBillingItem (event, index, path) {
+      this.$set(this.newManualBill.billingItemList[index], path, event);
+      if (path === 'billingItem') {
+        const billingItem = this.billingItems.find(bi => bi._id === event);
+        this.$set(this.newManualBill.billingItemList[index], 'vat', billingItem?.vat || 0);
+        this.$set(this.newManualBill.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+      }
+    },
     resetManualBillCreationModal () {
-      this.newManualBill = { date: '', customer: {}, billingItem: {}, unitInclTaxes: 0, count: 1 };
+      this.newManualBill = {
+        date: '',
+        customer: '',
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
+      };
       this.$v.newManualBill.$reset();
     },
     formatCreationPayload () {
       return {
-        ...pick(this.newManualBill, ['customer', 'date']),
-        billingItemList: [pick(this.newManualBill, ['billingItem', 'unitInclTaxes', 'count'])],
-        netInclTaxes: this.newManualBill.unitInclTaxes * this.newManualBill.count,
+        ...pick(this.newManualBill, ['customer', 'date', 'netInclTaxes']),
+        billingItemList: this.newManualBill.billingItemList.map(bi => omit(bi, 'vat')),
       };
     },
     async createManualBill () {
