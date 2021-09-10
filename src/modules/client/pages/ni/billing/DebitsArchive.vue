@@ -8,8 +8,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'download'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="file_download" color="primary" @click="downloadDriveDoc(col.value)"
-                    :loading="docLoading" />
+                  <ni-button icon="file_download" @click="downloadDriveDoc(col.value)" :disable="docLoading" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
