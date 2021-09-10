@@ -21,12 +21,16 @@
       <q-checkbox label="Exonération de charges" :value="editedService.exemptFromCharges" dense
         @input="update($event, 'exemptFromCharges')" />
     </div>
+    <p class="text-weight-bold q-mt-md billing-items-title" v-if="get(editedService, 'billingItems.length')">
+      Articles facturés par intervention
+    </p>
     <div class="row" v-for="(billingItem, index) in editedService.billingItems" :key="index">
-      <ni-select in-modal :full-width="false" :reset-button="false" :value="billingItem" :options="billingItemsOptions"
-        :caption="`Article ${index + 1}`" class="flex-1 q-mr-md" @input="updateBillingItem(index, $event)" />
-      <ni-button icon="close" @click="removeBillingItem(index)" />
+      <ni-select in-modal :full-width="false" :clearable="false" :value="billingItem" :options="billingItemsOptions"
+        :caption="`Article ${index + 1}`" class="flex-1 q-mr-sm" @input="updateBillingItem(index, $event)" />
+      <ni-button icon="close" @click="removeBillingItem(index)" flat />
     </div>
-    <ni-button class="ni-button" icon="add" label="Ajouter un article de facturation" @click="addBillingItem" />
+    <q-btn icon="add" no-caps label="Ajouter un article de facturation" @click.stop.native="addBillingItem"
+      dense color="copper-500" flat class="ni-button" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
@@ -35,6 +39,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -67,6 +72,7 @@ export default {
     };
   },
   methods: {
+    get,
     hide () {
       this.$emit('hide');
     },
@@ -94,8 +100,9 @@ export default {
 
 <style lang="stylus" scoped>
   .ni-button
-    margin-bottom: 8px
-  .ni-button > .q-btn__wrapper // je n'ai pas réussi
-        padding: 0 !important
+    margin-left: -8px
+    margin-bottom: 12px
+  .billing-items-title
+    font-size: 14px
 
 </style>

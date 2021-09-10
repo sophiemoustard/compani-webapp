@@ -947,12 +947,10 @@ export default {
       this.$v.editedService.$reset();
     },
     formatEditedService () {
-      const payload = pickBy(this.editedService);
-      payload.billingItems = uniq(compact(payload.billingItems)); // remove duplicates and empty billing items
-      delete payload._id;
-      delete payload.nature;
-
-      return payload;
+      return {
+        ...pickBy(omit(this.editedService, ['_id', 'nature'])),
+        billingItems: uniq(compact(this.editedService.billingItems)), // remove duplicates and empty billing items
+      };
     },
     async updateService () {
       try {
