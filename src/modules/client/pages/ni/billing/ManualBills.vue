@@ -189,6 +189,7 @@ export default {
 
         await Bills.create(this.formatCreationPayload());
 
+        await this.getManualBills();
         this.manualBillCreationModal = false;
         NotifyPositive('Facture créée.');
       } catch (e) {
