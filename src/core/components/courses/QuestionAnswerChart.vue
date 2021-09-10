@@ -31,7 +31,7 @@ export default {
       return this.card.qcAnswers.map((pa) => {
         const total = this.card.answers.filter(a => a === pa._id).length;
 
-        return { title: pa.text, total, percentage: total / this.card.answers.length };
+        return { title: pa.text, total, percentage: total / this.card.answers.length || 0 };
       });
     },
   },

@@ -1,0 +1,140 @@
+<template>
+  <div class="request-cell">
+    <div class="avatar-container">
+      <img v-if="request.user.picture" :src="request.user.picture.link" class="avatar">
+      <img v-else :src="DEFAULT_AVATAR" class="default-avatar q-my-sm">
+    </div>
+    <p class="text-copper-grey-700 text-weight-bold q-ma-md">
+      {{ formatIdentity(request.user.identity, 'FL') }}
+    </p>
+    <div class="column q-ma-sm">
+      <ni-button class="validation-button" label="Confirmer" @click="validateLinkRequestCreation" />
+      <ni-button class="delete-button" label="Supprimer" @click="validateLinkRequestDeletion" />
+    </div>
+  </div>
+</template>
+
+<script>
+import get from 'lodash/get';
+import { mapState } from 'vuex';
+import Button from '@components/Button';
+import { NotifyPositive } from '@components/popup/notify';
+import Users from '@api/Users';
+import CompanyLinkRequests from '@api/CompanyLinkRequests';
+import { DEFAULT_AVATAR } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+
+export default {
+  name: 'CompanyLinkRequestCell',
+  props: {
+    request: { type: Object, default: () => ({}) },
+  },
+  components: {
+    'ni-button': Button,
+  },
+  data () {
+    return {
+      formatIdentity,
+      DEFAULT_AVATAR,
+    };
+  },
+  computed: {
+    ...mapState({ userProfile: state => state.main.loggedUser }),
+  },
+  methods: {
+    getAvatar (picture) {
+      return (get(picture, 'link')) || DEFAULT_AVATAR;
+    },
+    async linkUserToCompany () {
+      try {
+        await Users.updateById(this.request.user._id, { company: this.userProfile.company._id });
+        this.$emit('click');
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async deleteLinkRequest () {
+      try {
+        await CompanyLinkRequests.remove(this.request._id);
+        this.$emit('click');
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    validateLinkRequestCreation () {
+      this.$q.dialog({
+        title: 'Voulez-vous vraiment rattacher ce compte ?',
+        message: `<div class="row q-my-md items-center">
+            <img class="avatar q-mx-md" src="${this.getAvatar(this.request.user.picture)}"/>
+            <div>
+              <div>${formatIdentity(this.request.user.identity, 'FL')}</div>
+              <div style="font-size: 14px" class="text-copper-grey-500">${this.request.user.local.email}</div>
+            </div>
+          </div>
+        En l’ajoutant, vous confirmez que vous êtes employeur de cette personne.<br />
+        Vous aurez alors accès à son historique de formation sur Compani.`,
+        html: true,
+        ok: 'Rattacher ce compte',
+        cancel: 'Annuler',
+      })
+        .onOk(this.linkUserToCompany)
+        .onCancel(() => NotifyPositive('Rattachement à la structure annulé.'));
+    },
+    validateLinkRequestDeletion () {
+      this.$q.dialog({
+        title: 'Voulez-vous vraiment supprimer cette demande de rattachement ?',
+        message: `<div class="row q-my-md items-center">
+            <img class="avatar q-mx-md" src="${this.getAvatar(this.request.user.picture)}"/>
+            <div>
+              <div>${formatIdentity(this.request.user.identity, 'FL')}</div>
+              <div style="font-size: 14px" class="text-copper-grey-500">${this.request.user.local.email}</div>
+            </div>
+          </div>
+        Vous ne pourrez pas avoir accès à son historique de formation sur Compani.`,
+        html: true,
+        ok: 'Supprimer la demande',
+        cancel: 'Annuler',
+      })
+        .onOk(this.deleteLinkRequest)
+        .onCancel(() => NotifyPositive('Suppression de la demande de rattachement annulée.'));
+    },
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.request-cell
+  width: 176px
+  border-radius: 8px
+  box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
+  background-color: white
+.avatar-container
+  height: 120px
+  background-color : $copper-grey-50
+  display: flex
+  justify-content: center
+  border-radius: 8px 8px 0px 0px
+.default-avatar
+  width: 96px
+  height: 96px
+  border-radius: 50%
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12)
+  vertical-align: middle
+  @media screen and (max-width: $breakpoint-sm-max)
+    height: 60px
+    width: 60px
+.avatar
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px 8px 0px 0px
+.validation-button
+  color: white
+  background: $primary
+  margin: 4px
+.delete-button
+  color: $primary
+  background: white
+  border: 1px solid $primary
+  margin: 4px
+</style>

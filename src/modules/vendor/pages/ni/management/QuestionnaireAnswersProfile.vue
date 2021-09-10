@@ -27,7 +27,7 @@ export default {
   },
   data () {
     return {
-      questionnaireAnswers: [],
+      questionnaireAnswers: {},
       get,
     };
   },
@@ -56,12 +56,14 @@ export default {
   methods: {
     async getQuestionnaireAnswers () {
       try {
-        this.questionnaireAnswers = await Questionnaires.getQuestionnaireAnswers(
-          this.questionnaireId,
-          { course: this.courseId }
-        );
+        const qa = await Questionnaires.getQuestionnaireAnswers(this.questionnaireId, { course: this.courseId });
+
+        this.questionnaireAnswers = {
+          ...qa,
+          followUp: qa.followUp.map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })),
+        };
       } catch (e) {
-        this.questionnaireAnswers = [];
+        this.questionnaireAnswers = {};
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des réponses au questionnaire.');
       }

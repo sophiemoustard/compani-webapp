@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Pay from '@api/Pay';
 import Stats from '@api/Stats';
 import {
@@ -118,7 +119,7 @@ export default {
   },
   methods: {
     getAvatar (picture) {
-      return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
+      return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
     async openIndicatorsModal () {
       if (!this.hasContractOnEvent) return;

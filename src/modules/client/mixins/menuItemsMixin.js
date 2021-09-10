@@ -105,7 +105,8 @@ export const menuItemsMixin = {
             { name: 'ni auxiliaries staff register', icon: 'view_headline', label: 'Registre unique du personnel' },
             { name: 'ni auxiliaries dashboard', icon: 'dashboard', label: 'Tableau de bord' },
           ],
-        }, {
+        },
+        {
           ref: 'planning',
           label: 'Planning',
           children: [
@@ -120,7 +121,8 @@ export const menuItemsMixin = {
             { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },
             { name: 'ni customers partner organizations', icon: 'apartment', label: 'Structures partenaires' },
           ],
-        }, {
+        },
+        {
           ref: 'courses',
           label: 'Formations',
           children: [
@@ -129,17 +131,20 @@ export const menuItemsMixin = {
             { name: 'ni elearning courses', icon: 'stay_primary_portrait', label: 'Formations eLearning' },
             { name: 'ni courses learners', icon: 'contacts', label: 'Apprenants' },
           ],
-        }, {
+        },
+        {
           ref: 'billing',
           label: 'Facturation',
           children: [
             { name: 'ni billing to bill', icon: 'credit_card', label: 'À facturer' },
+            { name: 'ni billing manual bills', icon: 'receipt', label: 'Factures manuelles' },
             { name: 'ni billing credit note', icon: 'mdi-credit-card-refund', label: 'Avoirs' },
             { name: 'ni billing clients balances', icon: 'mdi-scale-balance', label: 'Balances clients' },
             { name: 'ni billing tpp bill slips', icon: 'view_headline', label: 'Bordereaux tiers payeurs' },
             { name: 'ni billing debits archive', icon: 'mdi-archive', label: 'Archive prélèvements' },
           ],
-        }, {
+        },
+        {
           ref: 'pay',
           label: 'Paie',
           children: [
@@ -148,14 +153,16 @@ export const menuItemsMixin = {
             { name: 'ni pay contract ends', icon: 'description', label: 'STC' },
             { name: 'ni pay to pay', icon: 'euro_symbol', label: 'Paie mensuelle' },
           ],
-        }, {
+        },
+        {
           ref: 'exports',
           label: 'Exports',
           children: [
             { name: 'ni exports data', icon: 'list_alt', label: 'Données' },
             { name: 'ni exports history', icon: 'history', label: 'Historique' },
           ],
-        }, {
+        },
+        {
           ref: 'configuration',
           label: 'Configuration',
           children: [

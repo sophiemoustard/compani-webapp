@@ -35,6 +35,7 @@ import {
   OTHER,
   SECTOR,
   DOC_EXTENSIONS,
+  EVENT_TRANSPORT_OPTIONS,
 } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -71,6 +72,7 @@ export const planningModalMixin = {
       addressError: 'Adresse non valide',
       selectedAddress: '',
       extensions: DOC_EXTENSIONS,
+      eventTransportOptions: EVENT_TRANSPORT_OPTIONS,
     };
   },
   computed: {

@@ -643,7 +643,7 @@ export default {
     color: $secondary
     &-ok
       font-size: 12px
-      color: $green-800
+      color: $green-600
   /deep/ .q-field--standard.q-field--focused
     .q-field__control:after
       display: none;

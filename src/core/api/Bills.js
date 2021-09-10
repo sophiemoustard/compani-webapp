@@ -8,6 +8,9 @@ export default {
   async create (data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/bills`, data);
   },
+  async createList (data) {
+    return alenviAxios.post(`${process.env.API_HOSTNAME}/bills/list`, data);
+  },
   async getPdf (id) {
     return alenviAxios.get(
       `${process.env.API_HOSTNAME}/bills/${id}/pdfs`,
