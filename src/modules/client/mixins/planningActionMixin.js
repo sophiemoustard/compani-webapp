@@ -196,8 +196,7 @@ export const planningActionMixin = {
     getPayload (event) {
       const payload = {
         ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
-        ...pick(event, ['isCancelled', 'transportMode', 'misc']), // pickBy removes false and '' value
-        kmDuringEvent: event.kmDuringEvent || 0,
+        ...pick(event, ['isCancelled', 'transportMode', 'misc', 'kmDuringEvent']), // pickBy removes false and '' value
         startDate: event.dates.startDate,
         endDate: event.dates.endDate,
       };
@@ -437,6 +436,7 @@ export const planningActionMixin = {
       if (event.shouldUpdateRepetition) fieldsToOmit.push('misc', 'transportMode', 'kmDuringEvent');
       if (event.auxiliary) fieldsToOmit.push('sector');
       if (event.address && !event.address.fullAddress) payload.address = {};
+      if (event.kmDuringEvent === '') payload.kmDuringEvent = 0;
 
       return omit(payload, fieldsToOmit);
     },
