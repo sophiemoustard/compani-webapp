@@ -158,12 +158,11 @@
       :loading="loading" />
 
     <!-- Service edition modal -->
-    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService"
+    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
       :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
-      :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
-      :validations="$v.editedService" @add-billing-item="addBillingItemToService"
-      @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions"
-      @remove-billing-item="removeBillingItemInService" />
+      @hide="resetEditionServiceData" :min-start-date="minStartDate" @add-billing-item="addBillingItemToService"
+      @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions" :loading="loading"
+      :validations="$v.editedService" @remove-billing-item="removeBillingItemInService" />
 
     <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
       :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
@@ -949,7 +948,7 @@ export default {
     formatEditedService () {
       return {
         ...pickBy(omit(this.editedService, ['_id', 'nature'])),
-        billingItems: uniq(compact(this.editedService.billingItems)), // remove duplicates and empty billing items
+        billingItems: uniq(compact(this.editedService.billingItems)),
       };
     },
     async updateService () {

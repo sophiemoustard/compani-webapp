@@ -29,8 +29,8 @@
         :caption="`Article ${index + 1}`" class="flex-1 q-mr-sm" @input="updateBillingItem(index, $event)" />
       <ni-button icon="close" @click="removeBillingItem(index)" flat />
     </div>
-    <q-btn icon="add" no-caps label="Ajouter un article de facturation" @click.stop.native="addBillingItem"
-      dense color="copper-500" flat class="ni-button" />
+    <ni-bi-color-button label="Ajouter un article de facturation" icon="add" class="q-mb-md" @click="addBillingItem"
+      label-color="primary" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
@@ -43,6 +43,7 @@ import get from 'lodash/get';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
+import TextButton from '@components/BiColorButton';
 import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import { FIXED } from '@data/constants';
@@ -55,6 +56,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-button': Button,
+    'ni-bi-color-button': TextButton,
   },
   props: {
     validations: { type: Object, required: true },
@@ -104,5 +106,4 @@ export default {
     margin-bottom: 12px
   .billing-items-title
     font-size: 14px
-
 </style>
