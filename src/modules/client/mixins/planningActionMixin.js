@@ -24,7 +24,7 @@ import {
   OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
-import { frAddress, maxDate } from '@helpers/vuelidateCustomVal';
+import { frAddress, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
@@ -135,6 +135,7 @@ export const planningActionMixin = {
         misc: {
           required: requiredIf(item => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
         },
+        kmDuringEvent: { positiveNumber },
       },
     };
   },
@@ -195,7 +196,7 @@ export const planningActionMixin = {
     getPayload (event) {
       const payload = {
         ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
-        ...pick(event, ['isCancelled', 'transportMode', 'misc']), // pickBy removes false and '' value
+        ...pick(event, ['isCancelled', 'transportMode', 'misc', 'kmDuringEvent']), // pickBy removes false and '' value
         startDate: event.dates.startDate,
         endDate: event.dates.endDate,
       };
@@ -361,6 +362,7 @@ export const planningActionMixin = {
         internalHour,
         sector,
         transportMode,
+        kmDuringEvent,
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
@@ -380,6 +382,7 @@ export const planningActionMixin = {
             isBilled,
             address,
             transportMode: transportMode || '',
+            kmDuringEvent: kmDuringEvent || 0,
           };
           break;
         }
@@ -416,29 +419,26 @@ export const planningActionMixin = {
     getEditionPayload (event) {
       const payload = this.getPayload(event);
 
-      if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
-      if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
-      if (event.shouldUpdateRepetition) {
-        delete payload.misc;
-        delete payload.transportMode;
-      }
-      if (event.auxiliary) delete payload.sector;
-      if (event.address && !event.address.fullAddress) payload.address = {};
+      const fieldsToOmit = [
+        'customer',
+        'repetition',
+        'staffingBeginning',
+        'staffingDuration',
+        'type',
+        'displayedStartDate',
+        'displayedEndDate',
+        'extension',
+        'histories',
+      ];
 
-      return omit(
-        payload,
-        [
-          'customer',
-          'repetition',
-          'staffingBeginning',
-          'staffingDuration',
-          'type',
-          'displayedStartDate',
-          'displayedEndDate',
-          'extension',
-          'histories',
-        ]
-      );
+      if (event.cancel && Object.keys(event.cancel).length === 0) fieldsToOmit.push('cancel');
+      if (event.attachment && Object.keys(event.attachment).length === 0) fieldsToOmit.push('attachment');
+      if (event.shouldUpdateRepetition) fieldsToOmit.push('misc', 'transportMode', 'kmDuringEvent');
+      if (event.auxiliary) fieldsToOmit.push('sector');
+      if (event.address && !event.address.fullAddress) payload.address = {};
+      if (event.kmDuringEvent === '') payload.kmDuringEvent = 0;
+
+      return omit(payload, fieldsToOmit);
     },
     async updateEvent () {
       try {
