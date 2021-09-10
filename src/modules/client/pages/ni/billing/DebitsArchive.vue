@@ -8,7 +8,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'download'">
                 <div class="row no-wrap table-actions">
-                  <q-btn flat round icon="file_download" color="primary" @click="goToUrl(col.value)" />
+                  <q-btn flat round icon="file_download" color="primary" @click="downloadDriveDoc(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -44,7 +44,7 @@ export default {
       columns: [
         { name: 'name', label: 'Nom du fichier', align: 'left', field: 'name' },
         { name: 'createdTime', label: 'Date de création', align: 'left', field: 'createdTime', format: formatDate },
-        { name: 'download', label: '', align: 'left', field: 'webViewLink' },
+        { name: 'download', label: '', align: 'left', field: 'id' },
       ],
       pagination: {
         rowsPerPage: 0,
@@ -62,6 +62,16 @@ export default {
   methods: {
     goToUrl (url) {
       openURL(url);
+    },
+    async downloadDriveDoc (docId) {
+      try {
+        this.loading = true;
+        await GoogleDrive.downloadFileById(docId);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.loading = false;
+      }
     },
     async getDirectDebits () {
       try {
