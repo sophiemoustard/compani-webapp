@@ -224,7 +224,13 @@ import {
   PER_INTERVENTION,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { roundFrenchPercentage, formatHoursWithMinutes, formatPrice, formatAndSortOptions } from '@helpers/utils';
+import {
+  roundFrenchPercentage,
+  formatHoursWithMinutes,
+  formatPrice,
+  formatAndSortOptions,
+  sortStrings,
+} from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
@@ -462,7 +468,10 @@ export default {
         {
           name: 'billingItems',
           label: 'Articles',
-          field: 'billingItems',
+          field: (row) => {
+            const billingItems = cloneDeep(row.billingItems);
+            return billingItems.sort((a, b) => sortStrings(a.name, b.name));
+          },
           align: 'center',
           style: !this.$q.platform.is.mobile && 'width: 200px',
         },
@@ -665,7 +674,7 @@ export default {
       return selectedService ? moment(selectedService.startDate).add(1, 'd').toISOString() : '';
     },
     billingItemsOptions () {
-      return formatAndSortOptions(this.billingItems, 'name');
+      return formatAndSortOptions(this.billingItems.filter(bi => bi.type === PER_INTERVENTION), 'name');
     },
   },
   async mounted () {

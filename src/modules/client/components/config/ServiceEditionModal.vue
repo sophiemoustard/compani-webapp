@@ -25,9 +25,9 @@
       Articles facturés par intervention
     </p>
     <div class="row" v-for="(billingItem, index) in editedService.billingItems" :key="index">
-      <ni-select in-modal :full-width="false" :clearable="false" :value="billingItem" :options="billingItemsOptions"
+      <ni-select :clearable="false" :value="billingItem" :options="billingItemsOptions"
         :caption="`Article ${index + 1}`" class="flex-1 q-mr-sm" @input="updateBillingItem(index, $event)" />
-      <ni-button icon="close" @click="removeBillingItem(index)" flat />
+      <ni-button icon="close" @click="removeBillingItem(index)" size="sm" />
     </div>
     <ni-bi-color-button label="Ajouter un article de facturation" icon="add" class="q-mb-md" @click="addBillingItem"
       label-color="primary" />
@@ -43,7 +43,7 @@ import get from 'lodash/get';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import TextButton from '@components/BiColorButton';
+import BiColorButton from '@components/BiColorButton';
 import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import { FIXED } from '@data/constants';
@@ -56,7 +56,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-button': Button,
-    'ni-bi-color-button': TextButton,
+    'ni-bi-color-button': BiColorButton,
   },
   props: {
     validations: { type: Object, required: true },
@@ -101,9 +101,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .ni-button
-    margin-left: -8px
-    margin-bottom: 12px
   .billing-items-title
     font-size: 14px
 </style>
