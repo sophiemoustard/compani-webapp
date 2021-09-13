@@ -4,10 +4,9 @@
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
     <ni-select in-modal caption="Bénéficiaire" :value="newCreditNote.customer" :options="customersOptions"
-      required-field @input="updateCustomer" @blur="validations.customer.$touch" clearable
-      :error="validations.customer.$error" />
+      required-field @input="updateCustomer" @blur="validations.customer.$touch" :error="validations.customer.$error" />
     <ni-select caption="Tiers payeur" @input="getEvents($event, 'thirdPartyPayer')" :options="thirdPartyPayerOptions"
-      clearable in-modal :disable="thirdPartyPayerOptions.length === 0" :value="newCreditNote.thirdPartyPayer" />
+      in-modal :disable="thirdPartyPayerOptions.length === 0" :value="newCreditNote.thirdPartyPayer" />
     <ni-date-input caption="Date de l'avoir" :value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @input="update($event, 'date')" />
     <div class="row q-mb-md light">

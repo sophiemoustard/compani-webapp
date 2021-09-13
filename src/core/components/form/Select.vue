@@ -10,7 +10,7 @@
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
       :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
       <template #append>
-        <ni-button v-if="value && !disable" icon="close" @click.stop="resetValue" size="sm" />
+        <ni-button v-if="value && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
           @click="$refs['selectInput'].showPopup()" />
       </template>
@@ -38,6 +38,7 @@ export default {
     value: { type: [String, Number, Object, Date], default: '' },
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: true },
     last: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
