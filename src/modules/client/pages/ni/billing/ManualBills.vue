@@ -1,11 +1,11 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Factures manuelles" padding />
-     <ni-simple-table :columns="columns" :pagination.sync="pagination" :data="manualBills"
-      :loading="tableLoading" data-cy="manual-bills-table">
+    <ni-simple-table :columns="columns" :pagination.sync="pagination" :data="manualBills"
+      :loading="tableLoading" :rows-per-page="rowsPerPage" separator="none">
       <template #body="{ props }">
         <template v-for="(billingItem, index) of props.row.billingItemList">
-          <q-tr :props="props" :key="`${props.row._id}-${index}`">
+          <q-tr :props="props" :key="`${props.row._id}-${index}`" :class="{ 'border-top': index === 0 }">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'billingItem'">{{ billingItem.name }}</template>
@@ -21,9 +21,8 @@
           <q-td colspan="7"><div class="text-right">Total :</div></q-td>
           <q-td colspan="1" align="center">{{ formatPrice(props.row.netInclTaxes) }}</q-td>
         </q-tr>
-        <q-separator />
       </template>
-     </ni-simple-table>
+    </ni-simple-table>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer une facture"
       @click="manualBillCreationModal = true" />
@@ -62,6 +61,7 @@ export default {
   },
   data () {
     return {
+      rowsPerPage: [1, 5, 15, 50, 100, 200, 300],
       manualBillCreationModal: false,
       modalLoading: false,
       newManualBill: {
@@ -202,3 +202,8 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.border-top td
+  border-width: 1px 0 0 0
+</style>
