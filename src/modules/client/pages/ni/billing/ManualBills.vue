@@ -123,8 +123,7 @@ export default {
     },
   },
   async created () {
-    await this.refresh();
-    await this.getManualBills();
+    await Promise.all([this.getManualBills(), this.refresh()]);
   },
   methods: {
     formatPrice,
