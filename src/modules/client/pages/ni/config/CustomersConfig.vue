@@ -1075,7 +1075,7 @@ export default {
     async refreshBillingItems () {
       try {
         this.billingItemsLoading = true;
-        this.billingItems = await BillingItems.list({ type: PER_INTERVENTION });
+        this.billingItems = await BillingItems.list();
       } catch (e) {
         this.billingItems = [];
         console.error(e);
