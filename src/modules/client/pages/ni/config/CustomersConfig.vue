@@ -49,7 +49,7 @@
                     </div>
                   </template>
                   <template v-else-if="col.name === 'billingItems'">
-                    <div v-for="billingItem in col.value" :key="billingItem._id" class="billing-item-tag q-ma-sm">
+                    <div v-for="billingItem in col.value" :key="billingItem._id" class="billing-item-tag q-my-sm">
                       {{ billingItem.name }}
                     </div>
                   </template>
@@ -230,6 +230,7 @@ import {
   formatPrice,
   formatAndSortOptions,
   sortStrings,
+  getLastVersion,
 } from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
@@ -426,13 +427,13 @@ export default {
         'billingItems',
         'actions',
       ],
-      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
       serviceColumns: [
         {
           name: 'startDate',
           label: 'Date d\'effet',
           align: 'left',
-          field: row => (row.startDate ? moment(row.startDate).format('DD/MM/YYYY') : ''),
+          field: 'startDate',
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
@@ -720,14 +721,13 @@ export default {
       try {
         this.servicesLoading = true;
         const services = await Services.list();
-        this.services = services.map(service => ({
-          ...this.getServiceLastVersion(service),
-          ...service,
-        })).sort((a, b) => {
-          if (a.isArchived && !b.isArchived) return 1;
-          if (!a.isArchived && b.isArchived) return -1;
-          return 0;
-        });
+        this.services = services
+          .map(service => ({ ...getLastVersion(service.versions, 'startDate'), ...service }))
+          .sort((a, b) => {
+            if (a.isArchived && !b.isArchived) return 1;
+            if (!a.isArchived && b.isArchived) return -1;
+            return 0;
+          });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du rafraîchissement des services.');
@@ -881,12 +881,6 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteSurcharge(surchargeId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
-    },
-    // Services
-    getServiceLastVersion (service) {
-      if (!service.versions || service.versions.length === 0) return {};
-
-      return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
     },
     formatCreatedService () {
       const { nature, name, defaultUnitAmount, exemptFromCharges } = this.newService;

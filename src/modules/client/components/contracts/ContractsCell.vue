@@ -85,7 +85,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, descendingSort } from '@helpers/date';
 import moment from '@helpers/moment';
 import { getContractTags } from 'src/modules/client/helpers/tags';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -134,7 +134,7 @@ export default {
   computed: {
     sortedContracts () {
       const { contracts } = this;
-      return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      return contracts.sort((a, b) => descendingSort(a.startDate, b.startDate));
     },
   },
   methods: {
