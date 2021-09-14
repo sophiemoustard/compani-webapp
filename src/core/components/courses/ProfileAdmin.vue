@@ -98,7 +98,7 @@ import CourseInfoLink from '@components/courses/CourseInfoLink';
 import BiColorButton from '@components/BiColorButton';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { formatQuantity, formatIdentity } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
 import { openPdf, downloadZip } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -231,7 +231,7 @@ export default {
       try {
         this.smsLoading = true;
         const smsSent = await Courses.getSMSHistory(this.course._id);
-        this.smsSent = smsSent.sort((a, b) => new Date(b.date) - new Date(a.date));
+        this.smsSent = smsSent.sort((a, b) => descendingSort(a.date, b.date));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
@@ -269,7 +269,9 @@ export default {
       else if (newMessageType === REMINDER) this.setReminderMessage();
     },
     setConvocationMessage () {
-      const slots = this.course.slots.filter(s => !!s.startDate).sort((a, b) => a.startDate - b.startDate);
+      const slots = this.course.slots
+        .filter(s => !!s.startDate)
+        .sort((a, b) => ascendingSort(a.startDate, b.startDate));
       const date = moment(slots[0].startDate).format('DD/MM');
       const hour = moment(slots[0].startDate).format('HH:mm');
 
@@ -283,7 +285,7 @@ export default {
       const slots = this.course.slots
         .filter(s => !!s.startDate)
         .filter(slot => moment().isBefore(slot.startDate))
-        .sort((a, b) => a.startDate - b.startDate);
+        .sort((a, b) => ascendingSort(a.startDate, b.startDate));
       const date = moment(slots[0].startDate).format('DD/MM');
       const hour = moment(slots[0].startDate).format('HH:mm');
 

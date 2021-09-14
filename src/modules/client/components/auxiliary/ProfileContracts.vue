@@ -47,6 +47,7 @@ import Contracts from '@api/Contracts';
 import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
+import { descendingSort } from '@helpers/date';
 import moment from '@helpers/moment';
 import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
@@ -172,7 +173,7 @@ export default {
     contractMinStartDate () {
       if (this.contracts.length === 0) return '';
       const endedContracts = this.contracts.filter(contract => contract.endDate)
-        .sort((a, b) => b.startDate - a.startDate);
+        .sort((a, b) => descendingSort(a.startDate, b.startDate));
 
       if (endedContracts.length === 0) return '';
 

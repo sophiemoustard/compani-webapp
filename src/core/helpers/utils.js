@@ -61,7 +61,7 @@ export const getLastVersion = (versions, dateKey) => {
 
 export const getLastDocument = (docs) => {
   if (!docs || !Array.isArray(docs) || docs.length === 0) return [];
-  const sortedDocs = docs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const sortedDocs = docs.sort((a, b) => descendingSort(a.createdAt, a.createdAt));
   return [sortedDocs[0]];
 };
 

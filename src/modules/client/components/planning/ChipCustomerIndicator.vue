@@ -16,6 +16,7 @@
 <script>
 import get from 'lodash/get';
 import { formatIdentity } from '@helpers/utils';
+import { ascendingSort } from '@helpers/date';
 import { DEFAULT_AVATAR } from '@data/constants';
 import moment from '@helpers/moment';
 
@@ -43,7 +44,7 @@ export default {
       const referentHistory = person.referentHistories
         .filter(rh => moment(this.startOfWeek).isSameOrAfter(rh.startDate) &&
           (!rh.endDate || moment(this.startOfWeek).isBefore(rh.endDate)))
-        .sort((a, b) => a.startDate - b.startDate);
+        .sort((a, b) => ascendingSort(a.startDate, b.startDate));
 
       return get(referentHistory[0], 'auxiliary.identity', {});
     },
