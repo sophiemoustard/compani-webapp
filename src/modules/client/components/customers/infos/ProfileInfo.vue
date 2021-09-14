@@ -304,6 +304,7 @@ import { days } from '@data/days';
 import { FIXED, HOURLY, MONTHLY, REQUIRED_LABEL, CIVILITY_OPTIONS, DOC_EXTENSIONS, ONCE } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate } from '@helpers/date';
+import { getLastVersion } from '@helpers/utils';
 import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getSubscriptionQuoteTags, getQuoteTags, getMandateTags } from 'src/modules/client/helpers/tags';
@@ -450,7 +451,7 @@ export default {
       const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
-        label: this.getServiceLastVersion(service).name,
+        label: getLastVersion(service.versions).name,
         value: { _id: service._id, nature: service.nature },
       }));
     },
@@ -633,11 +634,6 @@ export default {
         { name: 'fileName', value: `devis_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedQuote' },
       ];
-    },
-    getServiceLastVersion (service) {
-      if (!service.versions || service.versions.length === 0) return {};
-
-      return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
     },
     saveTmp (path) {
       this.tmpInput = get(this.customer, path);
