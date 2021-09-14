@@ -1,6 +1,6 @@
 import escapeRegExp from 'lodash/escapeRegExp';
 import { removeDiacritics } from '@helpers/utils';
-import { formatDate, descendingSort } from '@helpers/date';
+import { formatDate, ascendingSort } from '@helpers/date';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
@@ -23,7 +23,7 @@ export const eLearningCourseDirectoryMixin = {
           align: 'left',
           sortable: true,
           format: formatDate,
-          sort: descendingSort,
+          sort: ascendingSort,
         },
       ],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },

@@ -1,3 +1,4 @@
+import moment from '@helpers/moment';
 import { formatQuantity } from '@helpers/utils';
 
 export const dateDiff = (newerDate, olderDate) => new Date(newerDate) - new Date(olderDate);
@@ -32,9 +33,17 @@ export const getStartOfDay = date => new Date(date.getFullYear(), date.getMonth(
 
 export const getEndOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
 
-export const ascendingSort = (a, b) => new Date(a) - new Date(b);
+export const ascendingSort = (a, b) => {
+  if (moment(a).isAfter(b)) return 1;
+  if (moment(a).isBefore(b)) return -1;
+  return 0;
+};
 
-export const descendingSort = (a, b) => new Date(b) - new Date(a);
+export const descendingSort = (a, b) => {
+  if (moment(a).isAfter(b)) return -1;
+  if (moment(a).isBefore(b)) return 1;
+  return 0;
+};
 
 export const formatDate = (value) => {
   if (!value) return '';
