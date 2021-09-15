@@ -26,10 +26,12 @@
         </div>
       </template>
       <template v-else-if="col.name === 'endDate'">{{ formatDate(bill.endDate) }}</template>
-      <template v-else-if="col.name === 'service'">
+      <template v-else-if="col.name === 'service' && !!bill.subscription">
         {{ getLastVersion(bill.subscription.service.versions).name }}
       </template>
-      <template v-else-if="col.name === 'hours'">{{ formatHours(bill) }}</template>
+      <template v-else-if="col.name === 'service' && !bill.subscription">{{ bill.billingItem.name }}</template>
+      <template v-else-if="col.name === 'hours' && !!bill.subscription">{{ formatHours(bill) }}</template>
+      <template v-else-if="col.name === 'hours' && !bill.subscription">{{ bill.eventsList.length }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
         <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
