@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="filters-container">
-      <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" class="select" />
-      <ni-select :options="companyList" :value="selectedCompany" @input="updateSelectedCompany" class="select" />
+      <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" />
+      <ni-select :options="companyList" :value="selectedCompany" @input="updateSelectedCompany" />
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
@@ -78,7 +78,7 @@ export default {
         const companies = await Companies.list();
         this.companyList = [
           { label: 'Toutes les structures', value: '' },
-          ...uniqBy(formatAndSortOptions(companies, 'name'), 'value'),
+          ...formatAndSortOptions(companies, 'name'),
         ];
       } catch (e) {
         this.companyList = [];
