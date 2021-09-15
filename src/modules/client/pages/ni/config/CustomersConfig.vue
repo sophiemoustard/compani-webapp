@@ -48,6 +48,11 @@
                       <div class="archived" v-else>archivé</div>
                     </div>
                   </template>
+                  <template v-else-if="col.name === 'billingItems'">
+                    <div v-for="billingItem in col.value" :key="billingItem._id" class="billing-item-tag q-my-sm">
+                      {{ billingItem.name }}
+                    </div>
+                  </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
               </q-tr>
@@ -56,6 +61,17 @@
           <q-card-actions align="right">
             <ni-button icon="add" label="Ajouter un service" @click="serviceCreationModal = true"
               :disable="servicesLoading" />
+          </q-card-actions>
+        </q-card>
+      </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Articles de facturation</p>
+        <q-card>
+          <ni-responsive-table :data="billingItems" :columns="billingItemsColumns" :pagination.sync="pagination"
+            :loading="billingItemsLoading" />
+          <q-card-actions align="right">
+            <ni-button icon="add" label="Ajouter un article de facturation" :disable="billingItemsLoading"
+              @click="billingItemCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -147,10 +163,16 @@
       :loading="loading" />
 
     <!-- Service edition modal -->
-    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService"
+    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
       :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
-      :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
-      :validations="$v.editedService" />
+      @hide="resetEditionServiceData" :min-start-date="minStartDate" @add-billing-item="addBillingItemToService"
+      @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions" :loading="loading"
+      :validations="$v.editedService" @remove-billing-item="removeBillingItemInService" />
+
+    <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
+      :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
+      :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
+      :vat-error="nbrError('newBillingItem.vat')" @submit="createNewBillingItem" />
 
     <!-- Service history modal -->
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
@@ -173,10 +195,13 @@ import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
+import compact from 'lodash/compact';
+import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
+import BillingItems from '@api/BillingItems';
 import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -195,13 +220,23 @@ import {
   COMPANY,
   REQUIRED_LABEL,
   HTML_EXTENSIONS,
+  BILLING_ITEMS_TYPE_OPTIONS,
+  PER_INTERVENTION,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
+import {
+  roundFrenchPercentage,
+  formatHoursWithMinutes,
+  formatPrice,
+  formatAndSortOptions,
+  sortStrings,
+  getLastVersion,
+} from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
+import BillingItemCreationModal from 'src/modules/client/components/config/BillingItemCreationModal';
 import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
@@ -221,6 +256,7 @@ export default {
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
+    'billing-item-creation-modal': BillingItemCreationModal,
     'surcharge-creation-modal': SurchargeCreationModal,
     'surcharge-edition-modal': SurchargeEditionModal,
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
@@ -302,18 +338,8 @@ export default {
       },
       surchargesColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        {
-          name: 'saturday',
-          label: 'Samedi',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.saturday, 0),
-        },
-        {
-          name: 'sunday',
-          label: 'Dimanche',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.sunday, 0),
-        },
+        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
+        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         {
           name: 'publicHoliday',
           label: 'Jour férié',
@@ -338,12 +364,7 @@ export default {
           align: 'center',
           field: row => roundFrenchPercentage(row.firstOfJanuary, 0),
         },
-        {
-          name: 'evening',
-          label: 'Soirée',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.evening, 0),
-        },
+        { name: 'evening', label: 'Soirée', align: 'center', field: row => roundFrenchPercentage(row.evening, 0) },
         {
           name: 'eveningStartTime',
           label: 'Début soirée',
@@ -356,12 +377,7 @@ export default {
           align: 'center',
           field: row => (row.eveningEndTime ? formatHoursWithMinutes(row.eveningEndTime) : ''),
         },
-        {
-          name: 'custom',
-          label: 'Perso',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.custom, 0),
-        },
+        { name: 'custom', label: 'Perso', align: 'center', field: row => roundFrenchPercentage(row.custom, 0) },
         {
           name: 'customStartTime',
           label: 'Début perso',
@@ -408,15 +424,16 @@ export default {
         'vat',
         'surcharge',
         'exemptFromCharges',
+        'billingItems',
         'actions',
       ],
-      visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
       serviceColumns: [
         {
           name: 'startDate',
           label: 'Date d\'effet',
           align: 'left',
-          field: row => (row.startDate ? moment(row.startDate).format('DD/MM/YYYY') : ''),
+          field: 'startDate',
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
@@ -434,14 +451,9 @@ export default {
           label: 'Prix unitaire TTC par défaut',
           align: 'center',
           field: 'defaultUnitAmount',
-          format: value => `${value}€`,
+          format: formatPrice,
         },
-        {
-          name: 'vat',
-          label: 'TVA',
-          align: 'center',
-          field: row => row.vat && `${row.vat}%`,
-        },
+        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 0) },
         {
           name: 'surcharge',
           label: 'Plan de majoration',
@@ -454,9 +466,45 @@ export default {
           align: 'center',
           field: row => (row.exemptFromCharges ? 'Oui' : 'Non'),
         },
+        {
+          name: 'billingItems',
+          label: 'Articles',
+          field: (row) => {
+            const billingItems = cloneDeep(row.billingItems);
+            return billingItems.sort((a, b) => sortStrings(a.name, b.name));
+          },
+          align: 'center',
+          style: !this.$q.platform.is.mobile && 'width: 200px',
+        },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       servicesLoading: false,
+      newBillingItem: { name: '', type: '', defaultUnitAmount: 0, vat: 0 },
+      billingItemsLoading: false,
+      billingItemCreationModal: false,
+      billingItemTypeOptions: BILLING_ITEMS_TYPE_OPTIONS,
+      billingItems: [],
+      billingItemsColumns: [
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
+        {
+          name: 'type',
+          label: 'Nature',
+          align: 'left',
+          format: (value) => {
+            const type = BILLING_ITEMS_TYPE_OPTIONS.find(option => option.value === value);
+            return type ? capitalize(type.label) : '';
+          },
+          field: 'type',
+        },
+        {
+          name: 'defaultUnitAmount',
+          label: 'Prix unitaire TTC par défaut',
+          align: 'center',
+          field: 'defaultUnitAmount',
+          format: formatPrice,
+        },
+        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 0) },
+      ],
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
         {
@@ -473,7 +521,7 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC par défaut',
           field: 'unitTTCRate',
-          format: val => (val ? `${val}€` : ''),
+          format: formatPrice,
           align: 'center',
         },
         {
@@ -580,6 +628,12 @@ export default {
       defaultUnitAmount: { required, positiveNumber },
       vat: { positiveNumber },
     },
+    newBillingItem: {
+      name: { required },
+      type: { required },
+      defaultUnitAmount: { required, positiveNumber },
+      vat: { required, positiveNumber },
+    },
     company: {
       customersConfig: {
         billingPeriod: { required },
@@ -620,6 +674,9 @@ export default {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
       return selectedService ? moment(selectedService.startDate).add(1, 'd').toISOString() : '';
     },
+    billingItemsOptions () {
+      return formatAndSortOptions(this.billingItems.filter(bi => bi.type === PER_INTERVENTION), 'name');
+    },
   },
   async mounted () {
     await Promise.all([
@@ -627,6 +684,7 @@ export default {
       this.refreshSurcharges(),
       this.refreshServices(),
       this.refreshThirdPartyPayers(),
+      this.refreshBillingItems(),
     ]);
   },
   methods: {
@@ -663,14 +721,13 @@ export default {
       try {
         this.servicesLoading = true;
         const services = await Services.list();
-        this.services = services.map(service => ({
-          ...this.getServiceLastVersion(service),
-          ...service,
-        })).sort((a, b) => {
-          if (a.isArchived && !b.isArchived) return 1;
-          if (!a.isArchived && b.isArchived) return -1;
-          return 0;
-        });
+        this.services = services
+          .map(service => ({ ...getLastVersion(service.versions, 'startDate'), ...service }))
+          .sort((a, b) => {
+            if (a.isArchived && !b.isArchived) return 1;
+            if (!a.isArchived && b.isArchived) return -1;
+            return 0;
+          });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du rafraîchissement des services.');
@@ -825,12 +882,6 @@ export default {
       }).onOk(() => this.deleteSurcharge(surchargeId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
-    // Services
-    getServiceLastVersion (service) {
-      if (!service.versions || service.versions.length === 0) return {};
-
-      return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
-    },
     formatCreatedService () {
       const { nature, name, defaultUnitAmount, exemptFromCharges } = this.newService;
       const formattedService = {
@@ -882,7 +933,7 @@ export default {
     },
     openServiceEditionModal (id) {
       const selectedService = this.services.find(service => service._id === id);
-      const { name, defaultUnitAmount, vat, surcharge, nature, exemptFromCharges } = selectedService;
+      const { name, defaultUnitAmount, vat, surcharge, nature, exemptFromCharges, billingItems } = selectedService;
       this.editedService = {
         _id: selectedService._id,
         name: name || '',
@@ -892,6 +943,7 @@ export default {
         nature,
         surcharge: surcharge ? surcharge._id : null,
         exemptFromCharges,
+        billingItems: billingItems.map(bi => bi._id) || [],
       };
 
       this.serviceEditionModal = true;
@@ -905,15 +957,15 @@ export default {
         nature: '',
         surcharge: null,
         exemptFromCharges: false,
+        billingItems: [],
       };
       this.$v.editedService.$reset();
     },
     formatEditedService () {
-      const payload = pickBy(this.editedService);
-      delete payload._id;
-      delete payload.nature;
-
-      return payload;
+      return {
+        ...pickBy(omit(this.editedService, ['_id', 'nature'])),
+        billingItems: uniq(compact(this.editedService.billingItems)),
+      };
     },
     async updateService () {
       try {
@@ -979,6 +1031,51 @@ export default {
     },
     resetServiceHistoryData () {
       this.selectedService = {};
+    },
+    addBillingItemToService () {
+      this.editedService.billingItems.push('');
+    },
+    updateBillingItemInService (index, event) {
+      this.$set(this.editedService.billingItems, index, event);
+    },
+    removeBillingItemInService (index) {
+      this.editedService.billingItems.splice(index, 1);
+    },
+    // Billing Items
+    resetBillingItemCreation () {
+      this.$v.newBillingItem.$reset();
+      this.newBillingItem = { name: '', type: '', defaultUnitAmount: 0, vat: 0 };
+    },
+    async createNewBillingItem () {
+      try {
+        this.$v.newBillingItem.$touch();
+        if (this.$v.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+
+        await BillingItems.create(this.newBillingItem);
+
+        NotifyPositive('Article de facturation créé.');
+        this.billingItemCreationModal = false;
+        await this.refreshBillingItems();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la création de l\'article de facturation.');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async refreshBillingItems () {
+      try {
+        this.billingItemsLoading = true;
+        this.billingItems = await BillingItems.list();
+      } catch (e) {
+        this.billingItems = [];
+        console.error(e);
+      } finally {
+        this.billingItemsLoading = false;
+      }
     },
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
@@ -1085,4 +1182,8 @@ export default {
   .archived
     display: flex;
     align-self: center;
+  .billing-item-tag
+    background-color: $copper-100;
+    border-radius: 8px;
+    color: $copper-700;
 </style>

@@ -100,6 +100,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/billing/manual-bills',
+        name: 'ni billing manual bills',
+        component: () => import('src/modules/client/pages/ni/billing/ManualBills'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'billing',
+        },
+      },
+      {
         path: 'ni/billing/credit-notes',
         name: 'ni billing credit note',
         component: () => import('src/modules/client/pages/ni/billing/CreditNotes'),

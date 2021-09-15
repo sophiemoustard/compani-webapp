@@ -3,6 +3,7 @@ import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
 import moment from '@helpers/moment';
+import { descendingSort } from '@helpers/date';
 
 export const extend = (...sources) => {
   const extended = {};
@@ -55,12 +56,12 @@ export const getLastVersion = (versions, dateKey) => {
   if (versions.length === 0) return null;
   if (versions.length === 1) return { ...versions[0] };
 
-  return [...versions].sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
+  return [...versions].sort((a, b) => descendingSort(a[dateKey], b[dateKey]))[0];
 };
 
 export const getLastDocument = (docs) => {
   if (!docs || !Array.isArray(docs) || docs.length === 0) return [];
-  const sortedDocs = docs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const sortedDocs = docs.sort((a, b) => descendingSort(a.createdAt, a.createdAt));
   return [sortedDocs[0]];
 };
 

@@ -33,7 +33,18 @@ import Customers from '@api/Customers';
 import Events from '@api/Events';
 import EventHistories from '@api/EventHistories';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES, DAILY } from '@data/constants';
+import {
+  INTERVENTION,
+  NEVER,
+  PERSON,
+  AUXILIARY,
+  SECTOR,
+  COACH_ROLES,
+  DAILY,
+  EVENT_CREATION,
+  EVENT_UPDATE,
+  EVENT_DELETION,
+} from '@data/constants';
 import moment from '@helpers/moment';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
@@ -222,6 +233,7 @@ export default {
         const params = {
           sectors: this.filteredSectors.map(sector => sector._id),
           auxiliaries: this.auxiliaries.map(aux => aux._id),
+          action: [EVENT_CREATION, EVENT_UPDATE, EVENT_DELETION],
         };
 
         let oldEventHistories;

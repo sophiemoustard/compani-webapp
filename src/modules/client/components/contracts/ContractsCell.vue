@@ -1,7 +1,7 @@
 <template>
   <div class="cell-container">
     <q-card v-for="(contract, contractIndex) in sortedContracts" :key="contractIndex" class="contract-cell">
-      <q-card-section class="cell-title" :style="{ color: cellTitle(contract.endDate).color }">
+      <q-card-section :class="`cell-title text-${cellTitle(contract.endDate).color}`">
         <div>{{ cellTitle(contract.endDate).msg }}</div>
         <ni-button v-if="displayActions" label="DPAE" icon="file_download" color="primary"
           @click="exportDpae(contract._id)" />
@@ -85,7 +85,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, descendingSort } from '@helpers/date';
 import moment from '@helpers/moment';
 import { getContractTags } from 'src/modules/client/helpers/tags';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -134,22 +134,22 @@ export default {
   computed: {
     sortedContracts () {
       const { contracts } = this;
-      return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      return contracts.sort((a, b) => descendingSort(a.startDate, b.startDate));
     },
   },
   methods: {
     cellTitle (contractEndDate) {
-      if (!contractEndDate) return { msg: 'Contrat en cours', color: 'green' };
+      if (!contractEndDate) return { msg: 'Contrat en cours', color: 'green-600' };
 
       if (moment().isBefore(contractEndDate)) {
         return {
           msg: `Le contrat se termine le ${moment(contractEndDate).format('DD MMMM YYYY')}`,
-          color: 'orange',
+          color: 'orange-800',
         };
       }
       return {
         msg: `Contrat terminé le: ${moment(contractEndDate).format('DD MMMM YYYY')}`,
-        color: 'red',
+        color: 'red-800',
       };
     },
     failMsg () {
