@@ -3,6 +3,7 @@
     <div class="filters-container">
       <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" />
       <ni-select :options="companyList" :value="selectedCompany" @input="updateSelectedCompany" />
+      <ni-select :options="programList" :value="selectedProgram" @input="updateSelectedProgram" />
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
@@ -15,6 +16,7 @@ import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
+import Programs from '@api/Programs';
 import Select from '@components/form/Select';
 import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
 import { NotifyNegative } from '@components/popup/notify';
@@ -37,10 +39,17 @@ export default {
       trainerList: [],
       selectedCompany: '',
       companyList: [],
+      selectedProgram: '',
+      programList: [],
     };
   },
   async created () {
-    await Promise.all([this.getQuestionnaireAnswers(), this.getTrainerList(), this.getCompanyList()]);
+    await Promise.all([
+      this.getQuestionnaireAnswers(),
+      this.getTrainerList(),
+      this.getCompanyList(),
+      this.getProgramList(),
+    ]);
   },
   computed: {
     filteredAnswers () {
@@ -85,16 +94,33 @@ export default {
         NotifyNegative('Erreur lors de la récupération des structures.');
       }
     },
+    async getProgramList () {
+      try {
+        const programs = await Programs.list();
+        this.programList = [
+          { label: 'Tous les programmes', value: '' },
+          ...formatAndSortOptions(programs, 'name'),
+        ];
+      } catch (e) {
+        this.programList = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des programmes.');
+      }
+    },
     updateSelectedTrainer (trainerId) {
       this.selectedTrainer = trainerId;
     },
     updateSelectedCompany (companyId) {
       this.selectedCompany = companyId;
     },
+    updateSelectedProgram (programId) {
+      this.selectedProgram = programId;
+    },
     formatFollowUp (fu) {
       const answers = fu.answers
         .filter(a => !this.selectedTrainer || (get(a, 'course.trainer._id') === this.selectedTrainer))
-        .filter(a => !this.selectedCompany || (a.traineeCompany === this.selectedCompany));
+        .filter(a => !this.selectedCompany || (a.traineeCompany === this.selectedCompany))
+        .filter(a => !this.selectedProgram || (get(a, 'course.subProgram.program._id') === this.selectedProgram));
 
       return { ...fu, answers: answers.map(a => a.answer) };
     },
