@@ -11,7 +11,6 @@
 </template>
 
 <script>
-import uniqBy from 'lodash/uniqBy';
 import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
 import Users from '@api/Users';
@@ -65,7 +64,7 @@ export default {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         this.trainerList = [
           { label: 'Tous les intervenants', value: '' },
-          ...uniqBy(formatAndSortIdentityOptions(trainers), 'value'),
+          ...formatAndSortIdentityOptions(trainers),
         ];
       } catch (e) {
         this.trainerList = [];
