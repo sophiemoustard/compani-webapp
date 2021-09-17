@@ -4,6 +4,7 @@
       <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" />
       <ni-select :options="companyList" :value="selectedCompany" @input="updateSelectedCompany" />
       <ni-select :options="programList" :value="selectedProgram" @input="updateSelectedProgram" />
+      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
@@ -124,6 +125,18 @@ export default {
 
       return { ...fu, answers: answers.map(a => a.answer) };
     },
+    resetFilters () {
+      this.selectedTrainer = '';
+      this.selectedCompany = '';
+      this.selectedProgram = '';
+    },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.filters-container
+    grid-template-columns: repeat(3, 28%) 16%
+    @media screen and (max-width: 767px)
+      width: 95%;
+</style>
