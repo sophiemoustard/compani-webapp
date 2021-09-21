@@ -107,6 +107,7 @@ export default {
     },
     hide () {
       this.totalExclTaxes = 0;
+      this.selectedBillingItem = null;
       this.$emit('hide');
     },
     input (event) {
