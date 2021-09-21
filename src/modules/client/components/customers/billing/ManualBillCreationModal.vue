@@ -89,7 +89,8 @@ export default {
       handler () {
         this.totalExclTaxes = this.newManualBill.billingItemList
           .reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc), 0
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
           );
       },
     },
