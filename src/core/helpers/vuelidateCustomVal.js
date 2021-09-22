@@ -30,15 +30,12 @@ export const bic = (value) => {
 
 export const frAddress = async (value) => {
   if (!value) return true;
-  const res = await axios.get('https://api-adresse.data.gouv.fr/search', {
-    params: {
-      q: value,
-      limit: 1,
-    },
-  });
-  return new Promise((resolve) => {
-    resolve(res.data.features.length === 1 && res.data.features[0].properties.score > 0.9);
-  });
+
+  // interceptor avoids having an infinite loop for API calls although we don't understand how it works
+  axios.interceptors.request.use();
+  const res = await axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: value, limit: 1 } });
+
+  return (res.data.features.length === 1 && res.data.features[0].properties.score > 0.9);
 };
 
 export const positiveNumber = (value) => {
