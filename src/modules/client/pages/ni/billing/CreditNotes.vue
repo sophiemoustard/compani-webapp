@@ -553,6 +553,13 @@ export default {
       this.hasLinkedEvents = false;
       this.$v.editedCreditNote.$reset();
     },
+    formatEditionPayload () {
+      return {
+        ...this.formatPayload(this.editedCreditNote),
+        customer: this.editedCreditNote.customer._id,
+        ...(this.editedCreditNote.thirdPartyPayer && { thirdPartyPayer: this.editedCreditNote.thirdPartyPayer._id }),
+      };
+    },
     async updateCreditNote () {
       try {
         this.$v.editedCreditNote.$touch();
@@ -561,9 +568,7 @@ export default {
         }
 
         this.loading = true;
-        const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer._id };
-        if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
-        await CreditNotes.updateById(this.editedCreditNote._id, payload);
+        await CreditNotes.updateById(this.editedCreditNote._id, this.formatEditionPayload());
 
         NotifyPositive('Avoir modifié.');
         await this.refreshCreditNotes();
