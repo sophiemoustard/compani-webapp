@@ -474,13 +474,18 @@ export default {
     },
     formatPayloadWithLinkedEvents (creditNote, customer) {
       const payload = {
-        startDate: creditNote.startDate,
-        endDate: creditNote.endDate,
-        exclTaxesCustomer: creditNote.exclTaxesCustomer,
-        inclTaxesCustomer: creditNote.inclTaxesCustomer,
-        exclTaxesTpp: creditNote.exclTaxesTpp,
-        inclTaxesTpp: creditNote.inclTaxesTpp,
-        thirdPartyPayer: creditNote.thirdPartyPayer,
+        ...pick(
+          creditNote,
+          [
+            'startDate',
+            'endDate',
+            'exclTaxesCustomer',
+            'inclTaxesCustomer',
+            'exclTaxesTpp',
+            'inclTaxesTpp',
+            'thirdPartyPayer',
+          ]
+        ),
       };
 
       if (creditNote.events.length > 0) payload.events = this.formatCreditNoteEvents(creditNote.events, customer);
