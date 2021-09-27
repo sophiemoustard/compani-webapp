@@ -554,11 +554,7 @@ export default {
       this.$v.editedCreditNote.$reset();
     },
     formatEditionPayload () {
-      return {
-        ...this.formatPayload(this.editedCreditNote),
-        customer: this.editedCreditNote.customer._id,
-        ...(this.editedCreditNote.thirdPartyPayer && { thirdPartyPayer: this.editedCreditNote.thirdPartyPayer._id }),
-      };
+      return { ...omit(this.formatPayload(this.editedCreditNote), ['customer', 'thirdPartyPayer']) };
     },
     async updateCreditNote () {
       try {
