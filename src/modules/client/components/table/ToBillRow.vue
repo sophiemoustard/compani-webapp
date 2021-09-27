@@ -107,9 +107,9 @@ export default {
     update (event, prop) {
       this.$emit('update:bill', { ...this.bill, [prop]: event });
     },
-    updateDate (event, prop) {
-      this.update(event, prop);
-      this.$emit('datetime-input');
+    async updateDate (event, prop) {
+      await this.update(event, prop);
+      await this.$emit('datetime-input');
     },
   },
 };

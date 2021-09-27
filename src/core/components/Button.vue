@@ -24,11 +24,7 @@ export default {
       return this.type === 'a' ? '_blank' : '';
     },
     padding () {
-      if (this.type === 'a') return 'xs 0px';
-
-      if (this.$q.platform.is.mobile) return 'xs';
-
-      return 'xs md';
+      return this.type === 'a' ? 'xs 0px' : 'xs';
     },
   },
   methods: {
