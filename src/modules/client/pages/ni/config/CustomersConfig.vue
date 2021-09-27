@@ -453,7 +453,7 @@ export default {
           field: 'defaultUnitAmount',
           format: formatPrice,
         },
-        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 0) },
+        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 1) },
         {
           name: 'surcharge',
           label: 'Plan de majoration',
@@ -503,7 +503,7 @@ export default {
           field: 'defaultUnitAmount',
           format: formatPrice,
         },
-        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 0) },
+        { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 1) },
       ],
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
