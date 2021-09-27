@@ -31,8 +31,10 @@
           error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="$v.userProfile.contact.phone.$error" />
       </div>
-      <ni-button @click="newPasswordModal = true" color="white" class="bg-copper-500" icon="mdi-lock-reset"
-        label="Modifier mon mot de passe" />
+      <div class="account-button">
+        <ni-button @click="newPasswordModal = true" color="white" class="bg-copper-500" icon="mdi-lock-reset"
+          label="Modifier mon mot de passe" />
+      </div>
       <q-separator class="q-my-lg" />
       <div class="account-button">
         <ni-button color="white" class="bg-copper-500 q-mb-md" @click="logout" icon="logout" label="Déconnexion" />
@@ -175,8 +177,7 @@ export default {
   flex-direction: column
   align-items: flex-start
   @media screen and (max-width: 676px)
-    justify-content: center
-    margin-bottom: 48px
+    align-items: center
 .photo-caption
   font-size: 12px
   margin: 0 0 4px 0
