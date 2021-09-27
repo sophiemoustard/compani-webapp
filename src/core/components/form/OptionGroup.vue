@@ -47,4 +47,5 @@ export default {
 
   /deep/ .q-field__control
     min-height: 25px !important
+    border: 0
 </style>
