@@ -176,6 +176,7 @@ export default {
   align-items: flex-start
   @media screen and (max-width: 676px)
     justify-content: center
+    margin-bottom: 48px
 .photo-caption
   font-size: 12px
   margin: 0 0 4px 0
