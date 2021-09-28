@@ -25,7 +25,7 @@
       Articles facturés par intervention
     </p>
     <div class="row" v-for="(billingItem, index) in editedService.billingItems" :key="index">
-      <ni-select :clearable="false" :value="billingItem" :options="billingItemsOptions"
+      <ni-select :clearable="false" :value="billingItem" :options="billingItemsOptions" in-modal
         :caption="`Article ${index + 1}`" class="flex-1 q-mr-sm" @input="updateBillingItem(index, $event)" />
       <ni-button icon="close" @click="removeBillingItem(index)" size="sm" />
     </div>

@@ -24,7 +24,8 @@
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
-        :data-cy="dataCy" @click="onClick" :hide-bottom-space="readOnly" :input-class="inputClass">
+        :data-cy="dataCy" @click="onClick" :hide-bottom-space="readOnly" :input-class="inputClass"
+        :class="inModal && !readOnly && 'borders'">
         <template v-if="icon" #prepend>
           <q-icon size="xs" :name="icon" />
         </template>

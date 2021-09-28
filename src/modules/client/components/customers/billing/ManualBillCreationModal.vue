@@ -22,11 +22,11 @@
           <ni-input caption="PU TTC" @input="updateBillingItem($event, index, 'unitInclTaxes')"
             :error-message="nbrError('unitInclTaxes', index)" :value="item.unitInclTaxes" required-field
             :error="validations.billingItemList.$each[index].unitInclTaxes.$error" type="number"
-            @blur="validations.billingItemList.$each[index].unitInclTaxes.$touch" />
+            @blur="validations.billingItemList.$each[index].unitInclTaxes.$touch" in-modal />
           </div>
         <div class="q-ml-sm">
           <ni-input caption="Quantité" :value="item.count" @input="updateBillingItem($event, index, 'count')"
-            :error="validations.billingItemList.$each[index].count.$error" type="number" required-field
+            :error="validations.billingItemList.$each[index].count.$error" type="number" required-field in-modal
             @blur="validations.billingItemList.$each[index].count.$touch" :error-message="nbrError('count', index)" />
         </div>
       </div>
