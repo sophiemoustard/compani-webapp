@@ -432,11 +432,10 @@ export default {
       this.hasLinkedEvents = false;
       this.$v.newCreditNote.$reset();
     },
-    formatPayloadWithSubscription (creditNote, customer) {
+    formatPayloadWithSubscription (creditNote) {
+      const { customer } = creditNote;
       const payload = {};
-      const selectedCustomer = customer._id
-        ? customer
-        : this.customersOptions.find(cus => cus.value === customer) || customer;
+      const selectedCustomer = customer._id ? customer : this.customersOptions.find(cus => cus.value === customer);
       const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
       const { vat } = subscription.service;
 
@@ -491,7 +490,7 @@ export default {
         ),
       };
 
-      if (creditNote.events.length > 0) payload.events = this.formatCreditNoteEvents(creditNote.events);
+      if (creditNote.events.length) payload.events = this.formatCreditNoteEvents(creditNote.events);
 
       return payload;
     },
@@ -499,11 +498,8 @@ export default {
       const { date, customer } = creditNote;
       let payload = { date, customer };
 
-      if (!this.hasLinkedEvents) {
-        payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote, customer) };
-      } else {
-        payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote, customer) };
-      }
+      if (!this.hasLinkedEvents) payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
+      else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
 
       return pickBy(payload, prop => prop != null);
     },
