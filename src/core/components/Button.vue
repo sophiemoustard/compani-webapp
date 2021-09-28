@@ -24,7 +24,9 @@ export default {
       return this.type === 'a' ? '_blank' : '';
     },
     padding () {
-      return this.type === 'a' ? 'xs 0px' : 'xs';
+      if (this.type === 'a') return 'xs 0px';
+
+      return this.label ? 'xs md' : 'xs';
     },
   },
   methods: {
