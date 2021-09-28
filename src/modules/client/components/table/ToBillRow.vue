@@ -21,7 +21,7 @@
           {{ formatDate(bill.startDate) }}
           <q-menu>
             <q-date :value="bill.startDate" :options="startDateOptions" mask="YYYY-MM-DD" minimal
-              @input="updateDate($event, 'startDate')" />
+              @input="updateDate($event, 'startDate')" no-unset />
           </q-menu>
         </div>
       </template>
