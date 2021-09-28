@@ -1,6 +1,11 @@
 <template>
   <div>
-    <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" class="select" />
+    <div class="filters-container">
+      <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" />
+      <ni-select :options="companyList" :value="selectedCompany" @input="updateSelectedCompany" />
+      <ni-select :options="programList" :value="selectedProgram" @input="updateSelectedProgram" />
+      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
+    </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
     </q-card>
@@ -8,12 +13,13 @@
 </template>
 
 <script>
-import uniqBy from 'lodash/uniqBy';
 import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
 import Users from '@api/Users';
+import Companies from '@api/Companies';
+import Programs from '@api/Programs';
 import Select from '@components/form/Select';
-import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
 import { NotifyNegative } from '@components/popup/notify';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
 import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
@@ -32,10 +38,19 @@ export default {
       questionnaireAnswers: {},
       selectedTrainer: '',
       trainerList: [],
+      selectedCompany: '',
+      companyList: [],
+      selectedProgram: '',
+      programList: [],
     };
   },
   async created () {
-    await Promise.all([this.getQuestionnaireAnswers(), this.getTrainerList()]);
+    await Promise.all([
+      this.getQuestionnaireAnswers(),
+      this.getTrainerList(),
+      this.getCompanyList(),
+      this.getProgramList(),
+    ]);
   },
   computed: {
     filteredAnswers () {
@@ -59,8 +74,7 @@ export default {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         this.trainerList = [
           { label: 'Tous les intervenants', value: '' },
-          { label: 'Sans intervenant(e)', value: 'without_trainer' },
-          ...uniqBy(formatAndSortIdentityOptions(trainers), 'value'),
+          ...formatAndSortIdentityOptions(trainers),
         ];
       } catch (e) {
         this.trainerList = [];
@@ -68,21 +82,61 @@ export default {
         NotifyNegative('Erreur lors de la récupération des formateurs.');
       }
     },
+    async getCompanyList () {
+      try {
+        const companies = await Companies.list();
+        this.companyList = [
+          { label: 'Toutes les structures', value: '' },
+          ...formatAndSortOptions(companies, 'name'),
+        ];
+      } catch (e) {
+        this.companyList = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des structures.');
+      }
+    },
+    async getProgramList () {
+      try {
+        const programs = await Programs.list();
+        this.programList = [
+          { label: 'Tous les programmes', value: '' },
+          ...formatAndSortOptions(programs, 'name'),
+        ];
+      } catch (e) {
+        this.programList = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des programmes.');
+      }
+    },
     updateSelectedTrainer (trainerId) {
       this.selectedTrainer = trainerId;
     },
+    updateSelectedCompany (companyId) {
+      this.selectedCompany = companyId;
+    },
+    updateSelectedProgram (programId) {
+      this.selectedProgram = programId;
+    },
     formatFollowUp (fu) {
-      const answers = this.selectedTrainer
-        ? fu.answers.filter(a => (get(a, 'course.trainer._id') === this.selectedTrainer))
-        : fu.answers;
+      const answers = fu.answers
+        .filter(a => !this.selectedTrainer || (get(a, 'course.trainer._id') === this.selectedTrainer))
+        .filter(a => !this.selectedCompany || (a.traineeCompany === this.selectedCompany))
+        .filter(a => !this.selectedProgram || (get(a, 'course.subProgram.program._id') === this.selectedProgram));
 
       return { ...fu, answers: answers.map(a => a.answer) };
+    },
+    resetFilters () {
+      this.selectedTrainer = '';
+      this.selectedCompany = '';
+      this.selectedProgram = '';
     },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-  .select
-    width: 30%
+.filters-container
+    grid-template-columns: repeat(3, 28%) 16%
+    @media screen and (max-width: 767px)
+      width: 95%;
 </style>

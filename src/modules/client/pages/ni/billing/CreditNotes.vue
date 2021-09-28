@@ -432,9 +432,13 @@ export default {
       this.hasLinkedEvents = false;
       this.$v.newCreditNote.$reset();
     },
-    formatPayloadWithSubscription (creditNote, customer) {
+    formatPayloadWithSubscription (creditNote) {
+      const { customer } = creditNote;
       const payload = {};
-      const subscription = customer.subscriptions.find(sub => sub._id === creditNote.subscription);
+      const selectedCustomer = customer.subscriptions
+        ? customer
+        : this.customersOptions.find(cus => cus.value === customer);
+      const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
       const { vat } = subscription.service;
 
       if (creditNote.inclTaxesCustomer) {
@@ -465,40 +469,41 @@ export default {
       return creditNoteEvents.map((eventId) => {
         const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
 
-        const event = pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
-        event.bills = omit(event.bills, '_id');
-        if (cnEvent.bills.surcharges) event.bills.surcharges = cnEvent.bills.surcharges.map(sur => omit(sur, '_id'));
-
-        return event;
+        return {
+          ...pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'serviceName']),
+          bills: {
+            ...omit(cnEvent.bills, '_id'),
+            ...(cnEvent.bills.surcharges && { surcharges: cnEvent.bills.surcharges.map(sur => omit(sur, '_id')) }),
+          },
+        };
       });
     },
-    formatPayloadWithLinkedEvents (creditNote, customer) {
+    formatPayloadWithLinkedEvents (creditNote) {
       const payload = {
-        startDate: creditNote.startDate,
-        endDate: creditNote.endDate,
-        exclTaxesCustomer: creditNote.exclTaxesCustomer,
-        inclTaxesCustomer: creditNote.inclTaxesCustomer,
-        exclTaxesTpp: creditNote.exclTaxesTpp,
-        inclTaxesTpp: creditNote.inclTaxesTpp,
-        thirdPartyPayer: creditNote.thirdPartyPayer,
+        ...pick(
+          creditNote,
+          [
+            'startDate',
+            'endDate',
+            'exclTaxesCustomer',
+            'inclTaxesCustomer',
+            'exclTaxesTpp',
+            'inclTaxesTpp',
+            'thirdPartyPayer',
+          ]
+        ),
       };
 
-      if (creditNote.events.length > 0) payload.events = this.formatCreditNoteEvents(creditNote.events, customer);
+      if (creditNote.events.length) payload.events = this.formatCreditNoteEvents(creditNote.events);
 
       return payload;
     },
     formatPayload (creditNote) {
       const { date, customer } = creditNote;
       let payload = { date, customer };
-      const selectedCustomer = customer._id
-        ? customer
-        : this.customersOptions.find(cus => cus.value === customer) || customer;
 
-      if (!this.hasLinkedEvents) {
-        payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote, selectedCustomer) };
-      } else {
-        payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote, selectedCustomer) };
-      }
+      if (!this.hasLinkedEvents) payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
+      else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
 
       return pickBy(payload, prop => prop != null);
     },
@@ -548,6 +553,9 @@ export default {
       this.hasLinkedEvents = false;
       this.$v.editedCreditNote.$reset();
     },
+    formatEditionPayload () {
+      return { ...omit(this.formatPayload(this.editedCreditNote), ['customer', 'thirdPartyPayer']) };
+    },
     async updateCreditNote () {
       try {
         this.$v.editedCreditNote.$touch();
@@ -556,9 +564,7 @@ export default {
         }
 
         this.loading = true;
-        const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer._id };
-        if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
-        await CreditNotes.updateById(this.editedCreditNote._id, payload);
+        await CreditNotes.updateById(this.editedCreditNote._id, this.formatEditionPayload());
 
         NotifyPositive('Avoir modifié.');
         await this.refreshCreditNotes();

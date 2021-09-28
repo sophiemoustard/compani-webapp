@@ -61,6 +61,7 @@ export const configMixin = {
       const val = get(validations, path);
       if (val.required === false) return REQUIRED_LABEL;
       if (val.positiveNumber === false || val.numeric === false || val.maxValue === false) return 'Nombre non valide';
+      if (val.twoFractionDigits === false) return 'Décimales non valides';
 
       return '';
     },

@@ -20,7 +20,6 @@
                 @click="downloadDriveDoc(props.row)">
                 Facture {{ props.row.number }}
               </div>
-              <div v-else-if="props.row.billType === MANUAL">Facture {{ props.row.number }}</div>
               <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
                 Facture {{ props.row.number }}

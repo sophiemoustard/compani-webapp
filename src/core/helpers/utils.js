@@ -75,12 +75,7 @@ export const roundFrenchPercentage = (number, digits = 2) => (number
   : '0%'
 );
 
-export const formatPrice = (val) => {
-  if (!val) return roundFrenchPrice(0);
-  const result = roundFrenchPrice(val);
-  if (Number.parseFloat(result) === 0) return roundFrenchPrice(0);
-  return result;
-};
+export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPrice(0));
 
 export const formatIdentity = (identity, format) => {
   if (!identity) return '';
