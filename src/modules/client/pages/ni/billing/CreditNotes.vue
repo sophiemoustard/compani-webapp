@@ -435,7 +435,9 @@ export default {
     formatPayloadWithSubscription (creditNote) {
       const { customer } = creditNote;
       const payload = {};
-      const selectedCustomer = customer._id ? customer : this.customersOptions.find(cus => cus.value === customer);
+      const selectedCustomer = customer.subscriptions
+        ? customer
+        : this.customersOptions.find(cus => cus.value === customer);
       const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
       const { vat } = subscription.service;
 
@@ -469,8 +471,10 @@ export default {
 
         return {
           ...pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'serviceName']),
-          bills: omit(cnEvent.bills, '_id'),
-          ...(cnEvent.bills.surcharges && { surcharges: cnEvent.bills.surcharges.map(sur => omit(sur, '_id')) }),
+          bills: {
+            ...omit(cnEvent.bills, '_id'),
+            ...(cnEvent.bills.surcharges && { surcharges: cnEvent.bills.surcharges.map(sur => omit(sur, '_id')) }),
+          },
         };
       });
     },
