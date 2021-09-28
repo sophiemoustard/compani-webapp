@@ -164,10 +164,11 @@
 
     <!-- Service edition modal -->
     <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
-      :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
+      :default-unit-amount-error="nbrError('editedService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
       @hide="resetEditionServiceData" :min-start-date="minStartDate" @add-billing-item="addBillingItemToService"
       @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions" :loading="loading"
-      :validations="$v.editedService" @remove-billing-item="removeBillingItemInService" />
+      :validations="$v.editedService" @remove-billing-item="removeBillingItemInService"
+      :start-date-error="startDateError" />
 
     <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
       :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
@@ -232,7 +233,7 @@ import {
   sortStrings,
   getLastVersion,
 } from '@helpers/utils';
-import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { frAddress, positiveNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
@@ -585,86 +586,88 @@ export default {
       HTML_EXTENSIONS,
     };
   },
-  validations: {
-    newSurcharge: {
-      name: { required },
-      saturday: { positiveNumber },
-      sunday: { positiveNumber },
-      publicHoliday: { positiveNumber },
-      twentyFifthOfDecember: { positiveNumber },
-      firstOfMay: { positiveNumber },
-      firstOfJanuary: { positiveNumber },
-      evening: { positiveNumber },
-      eveningStartTime: { required: requiredIf(item => item.evening) },
-      eveningEndTime: { required: requiredIf(item => item.evening) },
-      custom: { numeric },
-      customStartTime: { required: requiredIf(item => item.custom) },
-      customEndTime: { required: requiredIf(item => item.custom) },
-    },
-    editedSurcharge: {
-      name: { required },
-      saturday: { positiveNumber },
-      sunday: { positiveNumber },
-      publicHoliday: { positiveNumber },
-      twentyFifthOfDecember: { positiveNumber },
-      firstOfMay: { positiveNumber },
-      firstOfJanuary: { positiveNumber },
-      evening: { positiveNumber },
-      eveningStartTime: { required: requiredIf(item => item.evening) },
-      eveningEndTime: { required: requiredIf(item => item.evening) },
-      custom: { numeric },
-      customStartTime: { required: requiredIf(item => item.custom) },
-      customEndTime: { required: requiredIf(item => item.custom) },
-    },
-    newService: {
-      name: { required },
-      nature: { required },
-      defaultUnitAmount: { required, positiveNumber },
-      vat: { positiveNumber },
-    },
-    editedService: {
-      name: { required },
-      startDate: { required },
-      defaultUnitAmount: { required, positiveNumber },
-      vat: { positiveNumber },
-    },
-    newBillingItem: {
-      name: { required },
-      type: { required },
-      defaultUnitAmount: { required, positiveNumber },
-      vat: { required, positiveNumber },
-    },
-    company: {
-      customersConfig: {
-        billingPeriod: { required },
+  validations () {
+    return {
+      newSurcharge: {
+        name: { required },
+        saturday: { positiveNumber },
+        sunday: { positiveNumber },
+        publicHoliday: { positiveNumber },
+        twentyFifthOfDecember: { positiveNumber },
+        firstOfMay: { positiveNumber },
+        firstOfJanuary: { positiveNumber },
+        evening: { positiveNumber },
+        eveningStartTime: { required: requiredIf(item => item.evening) },
+        eveningEndTime: { required: requiredIf(item => item.evening) },
+        custom: { numeric },
+        customStartTime: { required: requiredIf(item => item.custom) },
+        customEndTime: { required: requiredIf(item => item.custom) },
       },
-    },
-    newThirdPartyPayer: {
-      name: { required },
-      address: {
-        zipCode: { required: requiredIf(item => !!item.fullAddress) },
-        street: { required: requiredIf(item => !!item.fullAddress) },
-        city: { required: requiredIf(item => !!item.fullAddress) },
-        fullAddress: { frAddress },
+      editedSurcharge: {
+        name: { required },
+        saturday: { positiveNumber },
+        sunday: { positiveNumber },
+        publicHoliday: { positiveNumber },
+        twentyFifthOfDecember: { positiveNumber },
+        firstOfMay: { positiveNumber },
+        firstOfJanuary: { positiveNumber },
+        evening: { positiveNumber },
+        eveningStartTime: { required: requiredIf(item => item.evening) },
+        eveningEndTime: { required: requiredIf(item => item.evening) },
+        custom: { numeric },
+        customStartTime: { required: requiredIf(item => item.custom) },
+        customEndTime: { required: requiredIf(item => item.custom) },
       },
-      email: { email },
-      billingMode: { required },
-      unitTTCRate: { positiveNumber },
-      isApa: { required },
-    },
-    editedThirdPartyPayer: {
-      name: { required },
-      address: {
-        zipCode: { required: requiredIf(item => !!item.fullAddress) },
-        street: { required: requiredIf(item => !!item.fullAddress) },
-        city: { required: requiredIf(item => !!item.fullAddress) },
-        fullAddress: { frAddress },
+      newService: {
+        name: { required },
+        nature: { required },
+        defaultUnitAmount: { required, positiveNumber },
+        vat: { positiveNumber },
       },
-      email: { email },
-      billingMode: { required },
-      unitTTCRate: { positiveNumber },
-      isApa: { required },
-    },
+      editedService: {
+        name: { required },
+        startDate: { required, minDate: this.minStartDate ? minDate(this.minStartDate) : '' },
+        defaultUnitAmount: { required, positiveNumber },
+        vat: { positiveNumber },
+      },
+      newBillingItem: {
+        name: { required },
+        type: { required },
+        defaultUnitAmount: { required, positiveNumber },
+        vat: { required, positiveNumber },
+      },
+      company: {
+        customersConfig: {
+          billingPeriod: { required },
+        },
+      },
+      newThirdPartyPayer: {
+        name: { required },
+        address: {
+          zipCode: { required: requiredIf(item => !!item.fullAddress) },
+          street: { required: requiredIf(item => !!item.fullAddress) },
+          city: { required: requiredIf(item => !!item.fullAddress) },
+          fullAddress: { frAddress },
+        },
+        email: { email },
+        billingMode: { required },
+        unitTTCRate: { positiveNumber },
+        isApa: { required },
+      },
+      editedThirdPartyPayer: {
+        name: { required },
+        address: {
+          zipCode: { required: requiredIf(item => !!item.fullAddress) },
+          street: { required: requiredIf(item => !!item.fullAddress) },
+          city: { required: requiredIf(item => !!item.fullAddress) },
+          fullAddress: { frAddress },
+        },
+        email: { email },
+        billingMode: { required },
+        unitTTCRate: { positiveNumber },
+        isApa: { required },
+      },
+    };
   },
   computed: {
     docsUploadUrl () {
@@ -676,6 +679,13 @@ export default {
     },
     billingItemsOptions () {
       return formatAndSortOptions(this.billingItems.filter(bi => bi.type === PER_INTERVENTION), 'name');
+    },
+    startDateError () {
+      const val = get(this.$v, 'editedService.startDate');
+      if (val.required === false) return REQUIRED_LABEL;
+      if (val.minDate === false) return 'La date d\'effet doit être postérieure à la date de la version précédente.';
+
+      return '';
     },
   },
   async mounted () {

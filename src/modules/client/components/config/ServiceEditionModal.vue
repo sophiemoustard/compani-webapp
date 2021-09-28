@@ -7,7 +7,7 @@
       @blur="validations.name.$touch" required-field @input="update($event, 'name')" />
     <ni-date-input caption="Date d'effet" :value="editedService.startDate" :error="validations.startDate.$error"
       @blur="validations.startDate.$touch" :min="minStartDate" in-modal required-field
-      @input="update($event, 'startDate')" />
+      @input="update($event, 'startDate')" :error-message="startDateError" />
     <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
       :value="editedService.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
       @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError"
@@ -64,6 +64,7 @@ export default {
     editedService: { type: Object, required: true },
     surchargesOptions: { type: Array, required: true },
     defaultUnitAmountError: { type: String, required: true },
+    startDateError: { type: String, required: true },
     loading: { type: Boolean, default: false },
     minStartDate: { type: String, required: true },
     billingItemsOptions: { type: Array, required: true },
