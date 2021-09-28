@@ -25,7 +25,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 
 export default {
-  name: 'ServiceCreationModal',
+  name: 'BillingItemCreationModal',
   components: {
     'ni-input': Input,
     'ni-modal': Modal,

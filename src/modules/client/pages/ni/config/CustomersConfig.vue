@@ -233,7 +233,7 @@ import {
   sortStrings,
   getLastVersion,
 } from '@helpers/utils';
-import { frAddress, positiveNumber, minDate } from '@helpers/vuelidateCustomVal';
+import { frAddress, positiveNumber, minDate, twoFractionDigits } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
@@ -621,19 +621,19 @@ export default {
       newService: {
         name: { required },
         nature: { required },
-        defaultUnitAmount: { required, positiveNumber },
+        defaultUnitAmount: { required, positiveNumber, twoFractionDigits },
         vat: { positiveNumber },
       },
       editedService: {
         name: { required },
         startDate: { required, minDate: this.minStartDate ? minDate(this.minStartDate) : '' },
-        defaultUnitAmount: { required, positiveNumber },
+        defaultUnitAmount: { required, positiveNumber, twoFractionDigits },
         vat: { positiveNumber },
       },
       newBillingItem: {
         name: { required },
         type: { required },
-        defaultUnitAmount: { required, positiveNumber },
+        defaultUnitAmount: { required, positiveNumber, twoFractionDigits },
         vat: { required, positiveNumber },
       },
       company: {
@@ -651,7 +651,7 @@ export default {
         },
         email: { email },
         billingMode: { required },
-        unitTTCRate: { positiveNumber },
+        unitTTCRate: { positiveNumber, twoFractionDigits },
         isApa: { required },
       },
       editedThirdPartyPayer: {
@@ -664,7 +664,7 @@ export default {
         },
         email: { email },
         billingMode: { required },
-        unitTTCRate: { positiveNumber },
+        unitTTCRate: { positiveNumber, twoFractionDigits },
         isApa: { required },
       },
     };

@@ -52,6 +52,8 @@ export const strictPositiveNumber = (value) => {
   return value > 0;
 };
 
+export const twoFractionDigits = value => /^\d*(\.\d{0,2})?$/.test(value);
+
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
 export const minDate = min => value => !value || new Date(min) <= new Date(value);
