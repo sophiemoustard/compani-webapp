@@ -104,8 +104,8 @@ export default {
     disableDiscountEditing (bill) {
       bill.discountEdition = false;
     },
-    update (event, prop) {
-      this.$emit('update:bill', { ...this.bill, [prop]: event });
+    async update (event, prop) {
+      await this.$emit('update:bill', { ...this.bill, [prop]: event });
     },
     async updateDate (event, prop) {
       await this.update(event, prop);
