@@ -20,8 +20,8 @@
         <div class="cursor-pointer text-primary">
           {{ formatDate(bill.startDate) }}
           <q-menu>
-            <q-date :value="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal
-              @input="updateDate($event, 'startDate')" />
+            <q-date :value="bill.startDate" :options="startDateOptions" mask="YYYY-MM-DD" minimal
+              @input="updateDate($event, 'startDate')" no-unset />
           </q-menu>
         </div>
       </template>
@@ -54,7 +54,7 @@
 <script>
 import EditableTd from '@components/table/EditableTd';
 import { formatPrice, getLastVersion, formatIdentity, truncate } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
 
 export default {
@@ -104,12 +104,15 @@ export default {
     disableDiscountEditing (bill) {
       bill.discountEdition = false;
     },
-    update (event, prop) {
-      this.$emit('update:bill', { ...this.bill, [prop]: event });
+    async update (event, prop) {
+      await this.$emit('update:bill', { ...this.bill, [prop]: event });
     },
-    updateDate (event, prop) {
-      this.update(event, prop);
-      this.$emit('datetime-input');
+    async updateDate (event, prop) {
+      await this.update(event, prop);
+      await this.$emit('datetime-input');
+    },
+    startDateOptions (date) {
+      return isSameOrBefore(date, this.bill.endDate);
     },
   },
 };
