@@ -1,6 +1,6 @@
 <template>
   <q-btn :flat="flat" small no-caps :color="color" :icon="icon" :disable="disable" :type="type" :href="!disable && href"
-    :target="target" :label="label" :dense="!label" :loading="loading" :size="size" unelevated
+    :target="target" :label="label" :dense="!label" :loading="loading" :size="size" unelevated :padding="padding"
     @click.stop.native="click" />
 </template>
 
@@ -23,6 +23,11 @@ export default {
     target () {
       return this.type === 'a' ? '_blank' : '';
     },
+    padding () {
+      if (this.type === 'a') return 'xs 0px';
+
+      return this.label ? 'xs md' : 'xs';
+    },
   },
   methods: {
     click (event) {
@@ -31,3 +36,8 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+/deep/ .q-btn__wrapper
+  min-height: 2.572em !important
+</style>

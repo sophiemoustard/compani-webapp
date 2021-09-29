@@ -88,7 +88,10 @@ export default {
       deep: true,
       handler () {
         this.totalExclTaxes = this.newManualBill.billingItemList
-          .reduce((acc, bi) => acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count, 0);
+          .reduce(
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
+          );
       },
     },
   },
@@ -103,8 +106,10 @@ export default {
 
       return '';
     },
-    hide (partialReset, type) {
-      this.$emit('hide', { partialReset, type });
+    hide () {
+      this.totalExclTaxes = 0;
+      this.selectedBillingItem = null;
+      this.$emit('hide');
     },
     input (event) {
       this.$emit('input', event);

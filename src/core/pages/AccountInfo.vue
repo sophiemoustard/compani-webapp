@@ -31,19 +31,16 @@
           error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="$v.userProfile.contact.phone.$error" />
       </div>
-      <div class="row account-button">
-        <ni-button @click="newPasswordModal = true" color="white" icon="mdi-lock-reset"
+      <div class="account-button">
+        <ni-button @click="newPasswordModal = true" color="white" class="bg-copper-500" icon="mdi-lock-reset"
           label="Modifier mon mot de passe" />
       </div>
       <q-separator class="q-my-lg" />
-      <div class="row account-button">
-        <ni-button color="white" @click="logout" icon="logout" label="Déconnexion" />
-      </div>
-      <div class="q-mt-lg links">
-        <div class="cursor-pointer q-mb-sm">
-          <a @click.prevent="cguModal = true">Conditions générales d’utilisation</a>
-        </div>
-        <div class="cursor-pointer"><a @click.prevent="rgpdModal = true">Politique RGPD</a></div>
+      <div class="account-button">
+        <ni-button color="white" class="bg-copper-500 q-mb-md" @click="logout" icon="logout" label="Déconnexion" />
+        <ni-button size="16px" href="https://www.compani.fr/cgu-cgv" label="Conditions générales d’utilisation"
+          type="a" />
+        <ni-button size="16px" type="a" href="https://www.compani.fr/rgpd" label="Politique RGPD" />
       </div>
     </div>
 
@@ -51,12 +48,6 @@
       v-model="newPasswordModal" :user-profile="userProfile" @hide="resetForm" :new-password.sync="newPassword"
       :password-error-message="passwordError($v.newPassword.password)" @submit="submitPasswordChange"
       :loading="loading" />
-
-    <!-- RGPD modal -->
-    <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
-
-    <!-- CSU modal -->
-    <ni-html-modal title="Conditions générales d’utilisation" v-model="cguModal" :html="cguCompani" />
   </q-page>
 </template>
 
@@ -70,7 +61,6 @@ import Authentication from '@api/Authentication';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import HtmlModal from '@components/modal/HtmlModal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
@@ -78,8 +68,6 @@ import { passwordMixin } from '@mixins/passwordMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
-import rgpd from 'src/statics/rgpd.html';
-import cguCompani from 'src/statics/cguCompani.html';
 import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 
 export default {
@@ -90,7 +78,6 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-button': Button,
     'ni-input': Input,
-    'ni-html-modal': HtmlModal,
     'ni-picture-uploader': PictureUploader,
     'new-password-modal': NewPasswordModal,
   },
@@ -101,10 +88,6 @@ export default {
       newPasswordModal: false,
       newPassword: { password: '', confirm: '' },
       loading: false,
-      rgpd,
-      rgpdModal: false,
-      cguModal: false,
-      cguCompani,
       backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
     };
@@ -189,15 +172,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.links
+.account-button
   display: flex
   flex-direction: column
-.account-button
-  button
-    background-color: $primary
+  align-items: flex-start
   @media screen and (max-width: 676px)
-    display: flex
-    justify-content: center
+    align-items: center
 .photo-caption
   font-size: 12px
   margin: 0 0 4px 0
