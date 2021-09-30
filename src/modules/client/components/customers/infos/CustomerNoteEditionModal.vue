@@ -4,7 +4,7 @@
       <div class="flex-row">
         <ni-input in-modal :value="editedNote.title" @input="update($event, 'title')" :read-only="readOnly"
           @blur="validations.title.$touch" :error="validations.title.$error" @click="removeReadOnly"
-          :input-class="['bold-title', { 'cursor-pointer': readOnly }]" />
+          :input-class="['bold-title', { 'cursor-pointer': readOnly }]" :no-border="readOnly" />
         <div class="cursor-pointer edit-btn">
           <q-icon v-if="readOnly" @click="removeReadOnly" name="edit" data-cy="edit" size="sm" />
         </div>
@@ -13,7 +13,7 @@
     </template>
     <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
-      @click="removeReadOnly" :input-class="{ 'cursor-pointer': readOnly }" />
+      @click="removeReadOnly" :input-class="{ 'cursor-pointer': readOnly }" :no-border="readOnly" />
     <customer-note-history-container v-if="readOnly && get(this.editedNote, 'histories.length')"
       :histories="this.editedNote.histories" />
     <template v-if="!readOnly" slot="footer">
