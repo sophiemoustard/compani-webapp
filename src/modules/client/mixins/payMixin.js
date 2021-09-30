@@ -225,7 +225,7 @@ export const payMixin = {
         ...omit(
           payload,
           ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition',
-            'compensationEdition', 'paidKm']
+            'compensationEdition']
         ),
         hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
         auxiliary: payload.auxiliary._id,
