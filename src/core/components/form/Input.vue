@@ -142,7 +142,4 @@ export default {
 
   /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
     color: $copper-grey-900
-
-  /deep/ .no-border > .q-field__inner > .q-field__control
-    border: none !important
 </style>
