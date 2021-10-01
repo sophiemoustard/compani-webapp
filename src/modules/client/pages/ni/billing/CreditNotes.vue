@@ -502,13 +502,12 @@ export default {
       return payload;
     },
     formatPayload (creditNote) {
-      const { date, customer } = creditNote;
-      let payload = { date, customer };
+      let payload = pick(creditNote, ['date', 'customer']);
 
       if (!this.hasLinkedEvents) payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
       else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
 
-      return pickBy(payload, prop => prop != null);
+      return pickBy(payload);
     },
     async createNewCreditNote () {
       try {
