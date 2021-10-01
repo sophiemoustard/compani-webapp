@@ -5,10 +5,10 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
-      :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
-      :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
+      :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter" use-input
+      :class="{ 'no-border': noBorder, 'borders': inModal && !noBorder , 'no-bottom': noError }" :error="error"
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
+      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" :error-message="errorMessage">
       <template #append>
         <ni-button v-if="value && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
@@ -47,6 +47,7 @@ export default {
     optionDisable: { type: String, default: 'disable' },
     dataCy: { type: String, default: '' },
     optionSlot: { type: Boolean, default: false },
+    noBorder: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,

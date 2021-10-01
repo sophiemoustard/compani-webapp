@@ -336,10 +336,13 @@ export default {
     async getEditionEvents (field) {
       if (field && this.$v.editedCreditNote[field]) this.$v.editedCreditNote[field].$touch();
       else this.$v.editedCreditNote.$touch();
+
       await this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
     },
     async getCreationEvents (field) {
       if (this.$v.newCreditNote[field]) this.$v.newCreditNote[field].$touch();
+      this.$set(this.newCreditNote, 'events', []);
+
       await this.getEvents(this.newCreditNote, this.$v.newCreditNote);
     },
     setMinAndMaxDates (events) {
@@ -499,13 +502,12 @@ export default {
       return payload;
     },
     formatPayload (creditNote) {
-      const { date, customer } = creditNote;
-      let payload = { date, customer };
+      let payload = pick(creditNote, ['date', 'customer']);
 
       if (!this.hasLinkedEvents) payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
       else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
 
-      return pickBy(payload, prop => prop != null);
+      return pickBy(payload);
     },
     async createNewCreditNote () {
       try {

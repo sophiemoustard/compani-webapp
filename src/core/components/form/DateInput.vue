@@ -63,6 +63,8 @@ export default {
       this.$refs.dateInput.blur();
     },
     input (value) {
+      if (!value) return this.update(value);
+
       const momentValue = moment(value, 'DD/MM/YYYY', true);
       if (!momentValue.isValid()) return;
       this.update(momentValue.toISOString());

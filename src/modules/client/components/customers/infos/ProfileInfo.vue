@@ -976,15 +976,9 @@ export default {
     formatFundingEditionPayload (funding) {
       const pickedFields = ['folderNumber', 'careDays', 'startDate', 'subscription', 'fundingPlanId'];
       if (funding.nature === FIXED) pickedFields.push('amountTTC');
-      else if (funding.nature === HOURLY) {
-        pickedFields.push('unitTTCRate', 'careHours', 'customerParticipationRate');
-      }
-      const payload = {
-        ...pick(funding, pickedFields),
-        endDate: funding.endDate ? moment(funding.endDate).endOf('d') : '',
-      };
+      else if (funding.nature === HOURLY) pickedFields.push('unitTTCRate', 'careHours', 'customerParticipationRate');
 
-      return pickBy(payload);
+      return { ...pick(funding, pickedFields), endDate: funding.endDate ? moment(funding.endDate).endOf('d') : '' };
     },
     async editFunding () {
       try {
