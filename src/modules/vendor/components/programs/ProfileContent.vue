@@ -125,6 +125,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 import {
   E_LEARNING,
   ON_SITE,
+  REMOTE,
   ACTIVITY_TYPES,
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
@@ -183,6 +184,7 @@ export default {
       stepTypeOptions: [
         { label: 'eLearning', value: E_LEARNING },
         { label: 'Présentiel', value: ON_SITE },
+        { label: 'Distanciel', value: REMOTE },
       ],
       activityTypeOptions: ACTIVITY_TYPES,
       PUBLISHED,
@@ -256,7 +258,9 @@ export default {
       return type ? type.label : '';
     },
     getStepTypeIcon (type) {
-      return type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach';
+      if (type === E_LEARNING) return 'stay_current_portrait';
+      if (type === ON_SITE) return 'mdi-teach';
+      return 'videocam';
     },
     getActivityTypeLabel (value) {
       const type = this.activityTypeOptions.find(t => t.value === value);
