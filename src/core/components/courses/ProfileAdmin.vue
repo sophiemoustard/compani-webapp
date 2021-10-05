@@ -214,7 +214,9 @@ export default {
       return !!this.course.slotsToPlan.length && !futurSlots.length;
     },
     disableSms () {
-      return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned;
+      const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
+
+      return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned || noPhoneNumber;
     },
   },
   methods: {
