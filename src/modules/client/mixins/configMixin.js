@@ -12,7 +12,7 @@ export const configMixin = {
     const companyModel = {
       address: { fullAddress: '' },
       legalRepresentative: { firstname: '', lastname: '', position: '' },
-      customersConfig: { templates: {} },
+      customersConfig: { templates: {}, billFooter: '' },
       rhConfig: { templates: {} },
     };
 
