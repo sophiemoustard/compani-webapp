@@ -8,6 +8,8 @@
       </div>
       <ni-button :flat="false" v-if="!customer.stoppedAt" class="justify-end" label="Arrêter"
         @click="stopSupportModal=true" />
+      <ni-button :flat="false" v-else-if="customer.stoppedAt" class="justify-end" label="Archiver"
+        @click="validateCustomerArchive" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -170,6 +172,29 @@ export default {
         NotifyNegative('Erreur lors de l\'arrêt du/de la bénéficiaire.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    validateCustomerArchive () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir archiver l’accompagnement ? <br /><br /> Il n’apparaîtra plus dans les '
+        + 'balances clients et vous ne pourrez plus le facturer, ni le prélever.',
+        html: true,
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(this.archiveCustomer)
+        .onCancel(() => NotifyPositive('Archivage annulée'));
+    },
+    async archiveCustomer () {
+      try {
+        const payload = { archivedAt: new Date() };
+        await Customers.updateById(this.customer._id, payload);
+
+        NotifyPositive('Bénéficiaire archivé');
+        await this.refreshCustomer();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'archivage du/de la bénéficiaire.');
       }
     },
   },
