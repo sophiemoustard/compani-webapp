@@ -194,6 +194,7 @@ export default {
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
+        if (e.status === 403 && e.data.message !== 'Forbidden') return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'archivage du/de la bénéficiaire.');
       }
     },
