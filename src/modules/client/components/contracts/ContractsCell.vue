@@ -133,7 +133,7 @@ export default {
   },
   computed: {
     sortedContracts () {
-      const { contracts } = this;
+      const contracts = [...this.contracts];
       return contracts.sort((a, b) => descendingSort(a.startDate, b.startDate));
     },
   },
