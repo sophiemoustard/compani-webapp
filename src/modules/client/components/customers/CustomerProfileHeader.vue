@@ -8,8 +8,8 @@
       </div>
       <ni-button :flat="false" v-if="!customer.stoppedAt" class="justify-end" label="Arrêter"
         @click="stopSupportModal=true" />
-      <ni-button :flat="false" v-else-if="customer.stoppedAt" class="justify-end" label="Archiver"
-        @click="validateCustomerArchive" />
+      <ni-button :flat="false" v-else-if="customer.stoppedAt && !customer.archivedAt" class="justify-end"
+        label="Archiver" @click="validateCustomerArchive" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
