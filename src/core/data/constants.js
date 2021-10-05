@@ -348,6 +348,7 @@ export const PUBLISHED = 'published';
 // STEP
 export const E_LEARNING = 'e_learning';
 export const ON_SITE = 'on_site';
+export const REMOTE = 'remote';
 
 // ACTIVITY
 export const LESSON = 'lesson';
