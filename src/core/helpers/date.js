@@ -45,6 +45,8 @@ export const descendingSort = (a, b) => {
   return 0;
 };
 
+export const descendingSortArray = (array, key) => [...array].sort((a, b) => descendingSort(a[key], b[key]));
+
 export const formatDate = (value) => {
   if (!value) return '';
 
