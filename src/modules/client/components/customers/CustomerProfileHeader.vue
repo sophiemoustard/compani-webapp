@@ -177,20 +177,20 @@ export default {
     validateCustomerArchive () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir archiver le bénéficaire ? <br /><br /> Il n’apparaîtra plus dans les '
-        + 'balances clients et vous ne pourrez plus le facturer, ni le prélever.',
+        message: 'Êtes-vous sûr(e) de vouloir archiver le/la bénéficaire&nbsp;? <br /><br /> Il/elle n’apparaîtra plus'
+        + ' dans les balances clients et vous ne pourrez plus le/la facturer, ni le/la prélever.',
         html: true,
         ok: 'Oui',
         cancel: 'Non',
       }).onOk(this.archiveCustomer)
-        .onCancel(() => NotifyPositive('Archivage annulé'));
+        .onCancel(() => NotifyPositive('Archivage annulé.'));
     },
     async archiveCustomer () {
       try {
         const payload = { archivedAt: new Date() };
         await Customers.updateById(this.customer._id, payload);
 
-        NotifyPositive('Bénéficiaire archivé');
+        NotifyPositive('Bénéficiaire archivé(e).');
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
