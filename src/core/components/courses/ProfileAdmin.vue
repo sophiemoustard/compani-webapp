@@ -325,6 +325,13 @@ export default {
         openPdf(pdf);
       } catch (e) {
         console.error(e);
+        if (e.status === 404) {
+          const dataView = new DataView(e.data);
+          const decoder = new TextDecoder('utf8');
+          const ResponseData = JSON.parse(decoder.decode(dataView));
+
+          return NotifyNegative(ResponseData.message);
+        }
         NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
       } finally {
         this.pdfLoading = false;
