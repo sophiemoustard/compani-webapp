@@ -177,13 +177,13 @@ export default {
     validateCustomerArchive () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir archiver l’accompagnement ? <br /><br /> Il n’apparaîtra plus dans les '
+        message: 'Êtes-vous sûr(e) de vouloir archiver le bénéficaire ? <br /><br /> Il n’apparaîtra plus dans les '
         + 'balances clients et vous ne pourrez plus le facturer, ni le prélever.',
         html: true,
         ok: 'Oui',
         cancel: 'Non',
       }).onOk(this.archiveCustomer)
-        .onCancel(() => NotifyPositive('Archivage annulée'));
+        .onCancel(() => NotifyPositive('Archivage annulé'));
     },
     async archiveCustomer () {
       try {
