@@ -68,8 +68,8 @@
             :disable="!selectedAuxiliary._id || historiesLoading" in-modal :extensions="extensions" drive-storage
             @delete="deleteDocument(editedEvent.attachment.driveId)" />
         </template>
-        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" :value="editedEvent.misc" caption="Notes"
-          :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
+        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" type="textarea" :value="editedEvent.misc"
+          caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired" @input="updateEvent('misc', $event)" />
         <div v-if="canCancel" class="row q-mb-md light-checkbox">
           <q-checkbox :value="editedEvent.isCancelled" label="Annuler l'évènement" dense :disable="historiesLoading"
