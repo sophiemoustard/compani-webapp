@@ -9,8 +9,9 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
-                <ni-button icon="edit" @click="openCreditNoteEditionModal(props.row)" />
-                <ni-button icon="delete" :disable="!props.row.isEditable"
+                <ni-button icon="edit" :disable="!!props.row.customer.archivedAt"
+                  @click="openCreditNoteEditionModal(props.row)" />
+                <ni-button icon="delete" :disable="!props.row.isEditable || !!props.row.customer.archivedAt"
                   @click="validateCNDeletion(col.value, props.row)" />
               </div>
             </template>
