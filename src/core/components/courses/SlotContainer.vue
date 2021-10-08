@@ -268,9 +268,8 @@ export default {
 
       return {
         ...courseSlot.dates,
-        ...(stepType === 'on_site' &&
-        { address: get(courseSlot, 'address.fullAddress') ? { ...courseSlot.address } : {} }),
-        ...(stepType === 'remote' && { meetingLink: courseSlot.meetingLink || '' }),
+        ...(stepType === 'on_site' && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
+        ...(stepType === 'remote' && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
         step: courseSlot.step,
       };
     },

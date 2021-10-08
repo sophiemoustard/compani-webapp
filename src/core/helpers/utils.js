@@ -138,5 +138,3 @@ export const formatAndSortIdentityOptions = (array, field = null) => array
   .sort((a, b) => a.label.localeCompare(b.label));
 
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
-
-export const getType = (step, stepOptions) => (step ? stepOptions.find(option => option.value === step).type : false);
