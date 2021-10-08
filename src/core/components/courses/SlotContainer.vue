@@ -72,7 +72,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-import { frAddress } from '@helpers/vuelidateCustomVal';
+import { frAddress, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -116,31 +116,24 @@ export default {
         { name: 'address', label: 'Lieu', align: 'left' },
         { name: 'actions', label: '', align: 'center' },
       ],
-      courseSlotValidation: {
-        step: { required },
-        dates: {
-          startDate: { required },
-          endDate: {
-            required,
-            greaterThanStartDate (val, { startDate }) { return moment(startDate).isBefore(val); },
-            onSameDayAsStartDate (val, { startDate }) { return moment(startDate).isSame(val, 'day'); },
-          },
-        },
-        address: {
-          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-          street: { required: requiredIf(item => item && !!item.fullAddress) },
-          city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: { frAddress },
-        },
-      },
       isVendorInterface,
       ON_SITE,
     };
   },
   validations () {
+    const courseSlotValidation = {
+      step: { required },
+      address: {
+        zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+        street: { required: requiredIf(item => item && !!item.fullAddress) },
+        city: { required: requiredIf(item => item && !!item.fullAddress) },
+        fullAddress: { frAddress },
+      },
+    };
+
     return {
-      newCourseSlot: { ...this.courseSlotValidation },
-      editedCourseSlot: { ...this.courseSlotValidation },
+      newCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.newCourseSlot.dates) },
+      editedCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.editedCourseSlot.dates) },
     };
   },
   computed: {
@@ -359,6 +352,16 @@ export default {
         default:
           return '';
       }
+    },
+    datesValidations (dates) {
+      return {
+        startDate: { required },
+        endDate: {
+          required,
+          minDate: minDate(dates?.startDate),
+          maxDate: maxDate(moment(dates?.startDate).endOf('d')),
+        },
+      };
     },
   },
 
