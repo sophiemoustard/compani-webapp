@@ -69,7 +69,7 @@ import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
+import { E_LEARNING, ON_SITE, REMOTE, STEP_TYPES } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { frAddress, minDate, maxDate } from '@helpers/vuelidateCustomVal';
@@ -261,8 +261,8 @@ export default {
 
       return {
         ...courseSlot.dates,
-        ...(stepType === 'on_site' && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
-        ...(stepType === 'remote' && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
+        ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
+        ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
         step: courseSlot.step,
       };
     },
@@ -342,16 +342,8 @@ export default {
       return step ? step.label : '';
     },
     getStepType (type) {
-      switch (type) {
-        case E_LEARNING:
-          return ' (eLearning)';
-        case ON_SITE:
-          return ' (présentiel)';
-        case REMOTE:
-          return ' (distanciel)';
-        default:
-          return '';
-      }
+      const stepType = STEP_TYPES.find(step => step.value === type).label;
+      return stepType ? ` (${stepType})` : '';
     },
     datesValidations (dates) {
       return {

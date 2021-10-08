@@ -69,7 +69,7 @@ export default {
       this.$emit('update:newCourseSlot', { ...this.newCourseSlot, [prop]: event });
     },
     getType (step) {
-      return step ? this.stepOptions.find(option => option.value === step).type : false;
+      return step ? this.stepOptions.find(option => option.value === step).type : '';
     },
     updateStep (step) {
       const type = this.getType(step);
@@ -78,8 +78,8 @@ export default {
         {
           ...this.newCourseSlot,
           step,
-          ...(type !== 'remote' && { meetingLink: '' }),
-          ...(type !== 'on_site' && { address: {} }),
+          ...(type !== REMOTE && { meetingLink: '' }),
+          ...(type !== ON_SITE && { address: {} }),
         }
       );
     },
