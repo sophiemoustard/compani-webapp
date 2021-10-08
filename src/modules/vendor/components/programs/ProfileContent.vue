@@ -85,8 +85,8 @@
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
       :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program.sync="newSubProgram" />
 
-    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :step-type-options="stepTypeOptions"
-      :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
+    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :validations="$v.newStep"
+      @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
 
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
@@ -125,7 +125,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 import {
   E_LEARNING,
   ON_SITE,
-  REMOTE,
+  STEP_TYPES,
   ACTIVITY_TYPES,
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
@@ -181,11 +181,6 @@ export default {
       isActivitiesShown: {},
       currentSubProgramId: '',
       currentStepId: '',
-      stepTypeOptions: [
-        { label: 'eLearning', value: E_LEARNING },
-        { label: 'Présentiel', value: ON_SITE },
-        { label: 'Distanciel', value: REMOTE },
-      ],
       activityTypeOptions: ACTIVITY_TYPES,
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
@@ -254,7 +249,7 @@ export default {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
     },
     getStepTypeLabel (value) {
-      const type = this.stepTypeOptions.find(t => t.value === value);
+      const type = STEP_TYPES.find(t => t.value === value);
       return type ? type.label : '';
     },
     getStepTypeIcon (type) {
