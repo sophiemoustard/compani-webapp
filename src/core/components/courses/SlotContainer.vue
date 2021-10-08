@@ -21,10 +21,11 @@
               <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
               <q-item>{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</q-item>
               <q-item v-if="slot.step.type === ON_SITE">{{ getSlotAddress(slot) }}</q-item>
-              <q-item v-else-if="slot.meetingLink">
+              <q-item v-else>
                 <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
                   {{ slot.meetingLink }}
                 </a>
+                {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
               </q-item>
           </div>
         </q-card>
@@ -234,12 +235,13 @@ export default {
       this.$v.newCourseSlot.$reset();
     },
     formatCreationPayload (courseSlot) {
-      const payload = { ...courseSlot.dates, course: this.course._id };
-      if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
-      if (courseSlot.meetingLink) payload.meetingLink = courseSlot.meetingLink;
-      if (courseSlot.step) payload.step = courseSlot.step;
-
-      return payload;
+      return {
+        ...courseSlot.dates,
+        course: this.course._id,
+        ...(get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
+        ...(courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
+        ...(courseSlot.step && { step: courseSlot.step }),
+      };
     },
     openEditionModal (slot) {
       if (!this.canEdit) return;
@@ -263,14 +265,14 @@ export default {
     },
     formatEditionPayload (courseSlot) {
       const stepType = this.course.subProgram.steps.find(step => step._id === courseSlot.step).type;
-      const payload = {
+
+      return {
         ...courseSlot.dates,
         ...(stepType === 'on_site' &&
-        { address: courseSlot.address && courseSlot.address.fullAddress ? { ...courseSlot.address } : {} }),
+        { address: get(courseSlot, 'address.fullAddress') ? { ...courseSlot.address } : {} }),
         ...(stepType === 'remote' && { meetingLink: courseSlot.meetingLink || '' }),
         step: courseSlot.step,
       };
-      return payload;
     },
     async addCourseSlot () {
       try {

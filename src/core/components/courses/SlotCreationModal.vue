@@ -7,11 +7,11 @@
         @blur="validations.step.$touch" :error="validations.step.$error" @input="updateStep" />
       <ni-datetime-range caption="Dates et heures" :value="newCourseSlot.dates" required-field disable-end-date
         :error="validations.dates.$error" @blur="validations.dates.$touch" @input="update($event, 'dates')" />
-      <ni-search-address v-if="showField.address" :value="newCourseSlot.address" @input="update($event, 'address')"
-        :error-message="addressError" @blur="validations.address.$touch" :error="validations.address.$error" in-modal
-        last />
-      <ni-input v-if="showField.meetingLink" in-modal :value="newCourseSlot.meetingLink"
-        @input="update($event.trim(), 'meetingLink')" caption="Lien vers la visio" />
+      <ni-search-address v-if="getType(this.newCourseSlot.step, this.stepOptions) === ON_SITE"
+        :value="newCourseSlot.address" @input="update($event, 'address')" :error-message="addressError"
+        @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
+      <ni-input v-if="getType(this.newCourseSlot.step, this.stepOptions) === REMOTE" in-modal
+        :value="newCourseSlot.meetingLink" @input="update($event, 'meetingLink')" caption="Lien vers la visio" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -26,6 +26,7 @@ import Input from '@components/form/Input';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
 import { REQUIRED_LABEL, ON_SITE, REMOTE } from '@data/constants';
+import { getType } from '@helpers/utils';
 
 export default {
   name: 'SlotCreationModal',
@@ -43,18 +44,17 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
+  data () {
+    return {
+      ON_SITE,
+      REMOTE,
+      getType,
+    };
+  },
   computed: {
     addressError () {
       if (!this.validations.address.fullAddress.required) return REQUIRED_LABEL;
       return 'Adresse non valide';
-    },
-    showField () {
-      if (!this.newCourseSlot.step) return { address: false, meetingLink: false };
-
-      return {
-        address: this.getType(this.newCourseSlot.step) === ON_SITE,
-        meetingLink: this.getType(this.newCourseSlot.step) === REMOTE,
-      };
     },
   },
   methods: {
@@ -70,11 +70,8 @@ export default {
     update (event, prop) {
       this.$emit('update:newCourseSlot', { ...this.newCourseSlot, [prop]: event });
     },
-    getType (step) {
-      return this.stepOptions.find(option => option.value === step).type;
-    },
     updateStep (step) {
-      const type = this.getType(step);
+      const type = getType(step, this.stepOptions);
       this.$emit(
         'update:newCourseSlot',
         {
