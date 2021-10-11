@@ -16,6 +16,7 @@
         </div>
       </template>
     </ni-title-header>
+    <ni-button @click="openDeliveryDownloadModal" label="Télécharger un fichier de télétransmission" />
     <ni-simple-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
       :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected"
       data-cy="client-table" separator="none">
@@ -51,22 +52,31 @@
     </ni-simple-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="validateBillListCreation" data-cy="to-bill-button" />
+    <delivery-download-modal v-model="deliveryDownloadModal" :delivery-file="deliveryFile" :loading="modalLoading"
+      :validations="$v.deliveryFile" :tpp-options="thirdPartyPayerOptions" :month-options="monthOptions"
+      @submit="downloadDeliveryFile" @hide="resetDeliveryDownloadModal" />
   </q-page>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import capitalize from 'lodash/capitalize';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
+import { required } from 'vuelidate/lib/validators';
+import { mapGetters } from 'vuex';
 import Bills from '@api/Bills';
+import ThirdPartyPayers from '@api/ThirdPartyPayers';
+import Teletransmission from '@api/Teletransmission';
 import DateRange from '@components/form/DateRange';
 import SimpleTable from '@components/table/SimpleTable';
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 import TitleHeader from '@components/TitleHeader';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { MONTH } from '@data/constants';
-import { formatPrice, formatIdentity } from '@helpers/utils';
+import { formatPrice, formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
+import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -79,7 +89,9 @@ export default {
     'ni-date-range': DateRange,
     'ni-simple-table': SimpleTable,
     'ni-select': Select,
+    'ni-button': Button,
     'ni-title-header': TitleHeader,
+    'delivery-download-modal': DeliveryDownloadModal,
   },
   data () {
     return {
@@ -116,6 +128,22 @@ export default {
         { label: 'Avec tiers payeur', value: 2 },
       ],
       toBillOption: 0,
+      deliveryDownloadModal: false,
+      deliveryFile: { thirdPartyPayer: '', month: '' },
+      thirdPartyPayerOptions: [],
+      monthOptions: [
+        { label: capitalize(moment().format('MMMM YY')), value: moment().format('MM-YYYY') },
+        {
+          label: capitalize(moment().add(1, 'month').format('MMMM YY')),
+          value: moment().add(1, 'month').format('MM-YYYY'),
+        },
+      ],
+      modalLoading: false,
+    };
+  },
+  validations () {
+    return {
+      deliveryFile: { thirdPartyPayer: { required }, month: { required } },
     };
   },
   computed: {
@@ -160,11 +188,32 @@ export default {
       this.selected = [];
     },
   },
-  async mounted () {
+  async created () {
     this.setBillingDates();
-    await this.getDraftBills();
+    await Promise.all([this.getDraftBills(), this.getThirdPartyPayers()]);
   },
   methods: {
+    openDeliveryDownloadModal () {
+      this.deliveryFile = { thirdPartyPayer: '', month: moment().format('MM-YYYY') };
+      this.deliveryDownloadModal = true;
+    },
+    resetDeliveryDownloadModal () {
+      this.$v.deliveryFile.$reset();
+      this.deliveryFile = { thirdPartyPayer: '', month: '' };
+    },
+    async downloadDeliveryFile () {
+      try {
+        this.$v.deliveryFile.$touch();
+        if (this.$v.deliveryFile.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Teletransmission.downloadDeliveryFile(this.deliveryFile);
+
+        this.deliveryDownloadModal = false;
+      } catch (e) {
+        NotifyNegative('Erreur lors du téléchargement du fichier.');
+        console.error(e);
+      }
+    },
     formatPrice (value) {
       return formatPrice(value);
     },
@@ -230,6 +279,16 @@ export default {
         NotifyNegative('Erreur lors du chargement des données à facturer.');
       } finally {
         this.tableLoading = false;
+      }
+    },
+    async getThirdPartyPayers () {
+      try {
+        const tpps = await ThirdPartyPayers.list();
+        this.thirdPartyPayerOptions = formatAndSortOptions(tpps.filter(tpp => !!tpp.teletransmissionId), 'name');
+      } catch (e) {
+        this.thirdPartyPayerOptions = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des tiers-payeurs.');
       }
     },
     async createBillsBatch (shouldBeSent) {
