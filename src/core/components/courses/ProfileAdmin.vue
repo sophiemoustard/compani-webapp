@@ -97,7 +97,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import BiColorButton from '@components/BiColorButton';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
-import { formatQuantity, formatIdentity } from '@helpers/utils';
+import { formatQuantity, formatIdentity, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
 import { openPdf, downloadZip } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
@@ -326,11 +326,8 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 404) {
-          const dataView = new DataView(e.data);
-          const decoder = new TextDecoder('utf8');
-          const ResponseData = JSON.parse(decoder.decode(dataView));
-
-          return NotifyNegative(ResponseData.message);
+          const { message } = readAPIResponseWithTypeArrayBuffer(e);
+          return NotifyNegative(message);
         }
         NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
       } finally {
