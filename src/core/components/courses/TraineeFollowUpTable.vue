@@ -27,7 +27,7 @@
           <div v-for="(step, stepIndex) in props.row.steps" :key="step._id" :props="props"
             class="q-ma-sm expanding-table-expanded-row">
             <div>
-              <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
+              <q-icon :name="getStepTypeIcon(step.type)" />
               {{ stepIndex + 1 }} - {{ step.name }}
             </div>
             <div class="expanding-table-progress-container">
@@ -48,10 +48,12 @@ import Progress from '@components/CourseProgress';
 import { sortStrings } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
 import { defineAbilitiesFor } from '@helpers/ability';
+import { courseMixin } from '@mixins/courseMixin';
 import ConnectedDot from './ConnectedDot';
 
 export default {
   name: 'TraineeFollowUpTable',
+  mixins: [courseMixin],
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,

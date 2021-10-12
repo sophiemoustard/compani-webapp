@@ -124,7 +124,6 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
   E_LEARNING,
-  ON_SITE,
   STEP_TYPES,
   ACTIVITY_TYPES,
   PUBLISHED,
@@ -141,9 +140,11 @@ import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityR
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileContent',
+  mixins: [courseMixin],
   props: {
     profileId: { type: String, required: true },
   },
@@ -251,11 +252,6 @@ export default {
     getStepTypeLabel (value) {
       const type = STEP_TYPES.find(t => t.value === value);
       return type ? type.label : '';
-    },
-    getStepTypeIcon (type) {
-      if (type === E_LEARNING) return 'stay_current_portrait';
-      if (type === ON_SITE) return 'mdi-teach';
-      return 'videocam';
     },
     getActivityTypeLabel (value) {
       const type = this.activityTypeOptions.find(t => t.value === value);

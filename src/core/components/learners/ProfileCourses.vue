@@ -49,7 +49,7 @@
               <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
                 class="q-ma-sm expanding-table-expanded-row">
                 <div>
-                  <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
+                  <q-icon :name="getStepTypeIcon(step.type)" />
                   {{ stepIndex + 1 }} - {{ step.name }}
                 </div>
                 <div class="expanding-table-progress-container">
@@ -78,10 +78,11 @@ import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import { chartMixin } from '@mixins/chartMixin';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileCourses',
-  mixins: [chartMixin],
+  mixins: [chartMixin, courseMixin],
   components: {
     'ni-progress': Progress,
     'ni-expanding-table': ExpandingTable,
