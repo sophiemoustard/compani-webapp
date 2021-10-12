@@ -28,7 +28,7 @@
       <template v-else-if="col.name === 'endDate'">{{ formatDate(bill.endDate) }}</template>
       <template v-else-if="col.name === 'service'">
         <template v-if="!bill.subscription">{{ bill.billingItem.name }}</template>
-        <template v-else>{{ getLastVersion(bill.subscription.service.versions).name }}</template>
+        <template v-else>{{ getLastVersion(bill.subscription.service.versions, 'createdAt').name }}</template>
       </template>
       <template v-else-if="col.name === 'hours'">
         <template v-if="!bill.subscription">{{ bill.eventsList.length }}</template>

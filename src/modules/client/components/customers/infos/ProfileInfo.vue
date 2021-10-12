@@ -451,7 +451,7 @@ export default {
       const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
-        label: getLastVersion(service.versions).name,
+        label: getLastVersion(service.versions, 'createdAt').name,
         value: { _id: service._id, nature: service.nature },
       }));
     },
