@@ -403,11 +403,11 @@ export default {
         const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer']);
         await Payments.update(this.editedPayment._id, payload);
         this.paymentEditionModal = false;
-        NotifyPositive('Règlement créé');
+        NotifyPositive('Règlement modifié.');
         await this.refresh();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement.');
+        NotifyNegative('Erreur lors de l\'édition du règlement.');
       } finally {
         this.paymentEditionLoading = false;
       }
