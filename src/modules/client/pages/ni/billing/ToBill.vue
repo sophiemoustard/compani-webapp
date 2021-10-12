@@ -235,7 +235,7 @@ export default {
     async createBillsBatch (shouldBeSent) {
       try {
         if (!this.hasSelectedRows) return;
-        const BATCH_SIZE = 50;
+        const BATCH_SIZE = 25;
         const bills = this.selected.map(row => ({
           ...row,
           customerBills: { ...row.customerBills, shouldBeSent: !!shouldBeSent[0] },
