@@ -595,7 +595,7 @@ export const planningActionMixin = {
         NotifyPositive('Évènement supprimé.');
       } catch (e) {
         console.error(e);
-        if (e.status === 409) NotifyNegative(e.data.message);
+        if ([409, 422].includes(e.status)) NotifyNegative(e.data.message);
         else if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements.');
         else NotifyNegative('Erreur lors de la suppression de l\'évènement.');
       } finally {
