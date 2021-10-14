@@ -175,7 +175,7 @@ export default {
     },
     formatCreationPayload () {
       return {
-        ...pick(this.newManualBill, ['customer', 'date', 'netInclTaxes']),
+        ...pick(this.newManualBill, ['customer', 'date']),
         billingItemList: this.newManualBill.billingItemList.map(bi => omit(bi, 'vat')),
       };
     },
