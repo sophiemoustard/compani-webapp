@@ -177,8 +177,8 @@ export default {
     validateCustomerArchive () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir archiver le/la bénéficaire&nbsp;? <br /><br /> Il/elle n’apparaîtra plus'
-        + ' dans les balances clients et vous ne pourrez plus le/la facturer, ni le/la prélever.',
+        message: 'Êtes-vous sûr(e) de vouloir archiver cette personne&nbsp;? <br /><br /> Elle n’apparaîtra plus'
+        + ' dans les balances clients et vous ne pourrez plus la facturer, ni la prélever.',
         html: true,
         ok: 'Oui',
         cancel: 'Non',
