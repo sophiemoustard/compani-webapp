@@ -269,6 +269,7 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible de créer l\'évènement : '
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
+
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       } finally {
         this.loading = false;
@@ -523,6 +524,7 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible de créer l\'évènement :  '
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
+
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       }
     },

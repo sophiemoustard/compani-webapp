@@ -196,6 +196,7 @@ export default {
           date: new Date(),
           rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
         }));
+
         await Payments.createList(payload);
         NotifyPositive('Règlement(s) créé(s)');
         await this.refresh();

@@ -3,7 +3,7 @@
     <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">étape</span>
       </template>
-      <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options="stepTypeOptions"
+      <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options="STEP_TYPES"
         required-field @input="update($event, 'type')" />
       <ni-input in-modal :value="newStep.name" :error="validations.name.$error" @input="update($event.trim(), 'name')"
         @blur="validations.name.$touch" required-field caption="Nom" />
@@ -18,13 +18,13 @@
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import OptionGroup from '@components/form/OptionGroup';
+import { STEP_TYPES } from '@data/constants';
 
 export default {
   name: 'StepCreationModal',
   props: {
     value: { type: Boolean, default: false },
     newStep: { type: Object, default: () => ({}) },
-    stepTypeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
@@ -32,6 +32,11 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
     'ni-option-group': OptionGroup,
+  },
+  data () {
+    return {
+      STEP_TYPES,
+    };
   },
   methods: {
     hide () {
