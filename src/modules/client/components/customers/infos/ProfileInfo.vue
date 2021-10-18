@@ -46,7 +46,7 @@
                     <ni-button icon="history" @click="showHistory(col.value)" />
                     <ni-button @click="openSubscriptionEditionModal(col.value)" icon="edit"
                       :disable="get(props, 'row.service.isArchived') || false" />
-                    <ni-button icon="delete" :disable="props.row.eventCount > 0"
+                    <ni-button icon="delete" :disable="disableSubscriptionDeletion(props.row)"
                       @click="validateSubscriptionsDeletion(col.value)" />
                   </div>
                 </template>
@@ -574,6 +574,11 @@ export default {
   },
   methods: {
     get,
+    disableSubscriptionDeletion (sub) {
+      const hasFunding = this.fundings.some(f => f.subscription._id === sub._id);
+
+      return sub.eventCount > 0 || sub.repetitionCount > 0 || hasFunding;
+    },
     getFundingValidation (funding) {
       return {
         amountTTC: {
