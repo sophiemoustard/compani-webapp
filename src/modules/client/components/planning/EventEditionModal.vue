@@ -72,14 +72,14 @@
           :error="validations.misc.$error" :required-field="isMiscRequired" @input="update($event, 'misc')" />
         <div v-if="canCancel" class="row q-mb-md light-checkbox">
           <q-checkbox :value="editedEvent.isCancelled" label="Annuler l'évènement" dense :disable="historiesLoading"
-          @input="toggleCancellationForm($event)" />
+            @input="toggleCancellationForm($event)" />
         </div>
-        <div class="row justify-between">
-          <ni-select in-modal v-if="editedEvent.isCancelled" :value="editedEvent.cancel.condition" required-field
-            caption="Conditions" :options="cancellationConditions" @blur="validations.cancel.condition.$touch"
+        <div v-if="editedEvent.isCancelled" class="row justify-between">
+          <ni-select in-modal :value="editedEvent.cancel.condition" required-field caption="Conditions d'annulation"
+            :options="cancellationConditions" @blur="validations.cancel.condition.$touch"
             :error="validations.cancel.condition.$error" @input="update($event, 'cancel.condition')"
             :disable="!canCancel || historiesLoading" />
-          <ni-select in-modal v-if="editedEvent.isCancelled" :value="editedEvent.cancel.reason" caption="Motif"
+          <ni-select in-modal :value="editedEvent.cancel.reason" caption="Motif d'annulation"
             :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
             :error="validations.cancel.reason.$error" @input="update($event, 'cancel.reason')"
             :disable="!canCancel || historiesLoading" />
@@ -186,11 +186,11 @@ export default {
     },
     canCancel () {
       return this.editedEvent.type === INTERVENTION &&
-      !this.editedEvent.shouldUpdateRepetition &&
-      !this.isBilledIntervention &&
-      !this.startDateTimeStamped &&
-      !this.endDateTimeStamped &&
-      !this.isCustomerArchived;
+        !this.editedEvent.shouldUpdateRepetition &&
+        !this.isBilledIntervention &&
+        !this.startDateTimeStamped &&
+        !this.endDateTimeStamped &&
+        !this.isCustomerArchived;
     },
     auxiliaryFilterPlaceholder () {
       return this.selectedAuxiliary.identity
