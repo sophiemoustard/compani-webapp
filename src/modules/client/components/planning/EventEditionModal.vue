@@ -8,7 +8,7 @@
           :value="editedEvent.auxiliary" :selected-person="selectedAuxiliary" @close="close" />
         <ni-planning-modal-header v-else :value="editedEvent.auxiliary" @input="update($event, 'auxiliary')"
           :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close"
-          :disable="canUpdateAuxiliary" />
+          :disable="!canUpdateAuxiliary || historiesLoading" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap :value="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
@@ -26,7 +26,8 @@
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" :disable="canUpdateAuxiliary" />
+            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')"
+            :disable="!canUpdateAuxiliary || historiesLoading" />
           <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer"
             :options="getCustomersOptions(editedEvent.dates.startDate)" :error="validations.customer.$error"
             required-field disable />
@@ -218,13 +219,13 @@ export default {
       return !!this.startDateTimeStamped || !!this.endDateTimeStamped;
     },
     isCustomerArchived () {
-      return get(this.selectedCustomer, 'archivedAt') || '';
+      return !!get(this.selectedCustomer, 'archivedAt');
     },
     canUpdateIntervention () {
       return !this.isBilledIntervention && !this.isCustomerArchived;
     },
     canUpdateAuxiliary () {
-      return this.canUpdateIntervention && !this.isEventTimeStamped && !this.historiesLoading;
+      return this.canUpdateIntervention && !this.isEventTimeStamped;
     },
   },
   methods: {
