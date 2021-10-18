@@ -20,7 +20,13 @@
             @click="openEditionModal(slot)">
               <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
               <q-item>{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</q-item>
-              <q-item>{{ getSlotAddress(slot) }}</q-item>
+              <q-item v-if="slot.step.type === ON_SITE">{{ getSlotAddress(slot) }}</q-item>
+              <q-item v-else>
+                <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                  {{ slot.meetingLink }}
+                </a>
+                {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+              </q-item>
           </div>
         </q-card>
         <q-card :class="['slots-cells', { 'cursor-pointer' : canEdit }]" v-for="(value, index) in courseSlotsToPlan"
@@ -63,10 +69,10 @@ import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING } from '@data/constants';
+import { E_LEARNING, ON_SITE, REMOTE, STEP_TYPES } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-import { frAddress } from '@helpers/vuelidateCustomVal';
+import { frAddress, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -98,6 +104,7 @@ export default {
           endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
+        meetingLink: '',
         step: '',
       },
       editedCourseSlot: {},
@@ -109,30 +116,24 @@ export default {
         { name: 'address', label: 'Lieu', align: 'left' },
         { name: 'actions', label: '', align: 'center' },
       ],
-      courseSlotValidation: {
-        step: { required },
-        dates: {
-          startDate: { required },
-          endDate: {
-            required,
-            greaterThanStartDate (val, { startDate }) { return moment(startDate).isBefore(val); },
-            onSameDayAsStartDate (val, { startDate }) { return moment(startDate).isSame(val, 'day'); },
-          },
-        },
-        address: {
-          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-          street: { required: requiredIf(item => item && !!item.fullAddress) },
-          city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: { frAddress },
-        },
-      },
       isVendorInterface,
+      ON_SITE,
     };
   },
   validations () {
+    const courseSlotValidation = {
+      step: { required },
+      address: {
+        zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+        street: { required: requiredIf(item => item && !!item.fullAddress) },
+        city: { required: requiredIf(item => item && !!item.fullAddress) },
+        fullAddress: { frAddress },
+      },
+    };
+
     return {
-      newCourseSlot: { ...this.courseSlotValidation },
-      editedCourseSlot: { ...this.courseSlotValidation },
+      newCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.newCourseSlot.dates) },
+      editedCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.editedCourseSlot.dates) },
     };
   },
   computed: {
@@ -179,8 +180,9 @@ export default {
       return [
         { label: 'Pas d\'étape spécifiée', value: '' },
         ...this.course.subProgram.steps.map((step, index) => ({
-          label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
+          label: `${index + 1} - ${step.name}${this.getStepType(step.type)}`,
           value: step._id,
+          type: step.type,
           disable: step.type === E_LEARNING,
         })),
       ];
@@ -220,16 +222,19 @@ export default {
           endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
+        meetingLink: '',
         step: '',
       };
       this.$v.newCourseSlot.$reset();
     },
     formatCreationPayload (courseSlot) {
-      const payload = { ...courseSlot.dates, course: this.course._id };
-      if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
-      if (courseSlot.step) payload.step = courseSlot.step;
-
-      return payload;
+      return {
+        ...courseSlot.dates,
+        course: this.course._id,
+        ...(get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
+        ...(courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
+        ...(courseSlot.step && { step: courseSlot.step }),
+      };
     },
     openEditionModal (slot) {
       if (!this.canEdit) return;
@@ -241,6 +246,7 @@ export default {
         _id: slot._id,
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
+        meetingLink: get(slot, 'meetingLink') || '',
         step: get(slot, 'step._id') || '',
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
@@ -251,9 +257,14 @@ export default {
       this.$v.editedCourseSlot.$reset();
     },
     formatEditionPayload (courseSlot) {
-      const payload = { ...courseSlot.dates, address: {}, step: courseSlot.step };
-      if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
-      return payload;
+      const stepType = this.course.subProgram.steps.find(step => step._id === courseSlot.step).type;
+
+      return {
+        ...courseSlot.dates,
+        ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
+        ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
+        step: courseSlot.step,
+      };
     },
     async addCourseSlot () {
       try {
@@ -329,6 +340,20 @@ export default {
       if (!slot.step) return '';
       const step = this.stepOptions.find(option => option.value === slot.step._id);
       return step ? step.label : '';
+    },
+    getStepType (type) {
+      const stepType = STEP_TYPES.find(step => step.value === type).label;
+      return stepType ? ` (${stepType})` : '';
+    },
+    datesValidations (dates) {
+      return {
+        startDate: { required },
+        endDate: {
+          required,
+          minDate: minDate(dates?.startDate),
+          maxDate: maxDate(moment(dates?.startDate).endOf('d')),
+        },
+      };
     },
   },
 

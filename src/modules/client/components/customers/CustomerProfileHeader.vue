@@ -8,6 +8,8 @@
       </div>
       <ni-button :flat="false" v-if="!customer.stoppedAt" class="justify-end" label="Arrêter"
         @click="stopSupportModal=true" />
+      <ni-button :flat="false" v-else-if="customer.stoppedAt && !customer.archivedAt" class="justify-end"
+        label="Archiver" @click="validateCustomerArchive" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -170,6 +172,30 @@ export default {
         NotifyNegative('Erreur lors de l\'arrêt du/de la bénéficiaire.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    validateCustomerArchive () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir archiver cette personne&nbsp;? <br /><br /> Elle n’apparaîtra plus'
+        + ' dans les balances clients et vous ne pourrez plus la facturer, ni la prélever.',
+        html: true,
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(this.archiveCustomer)
+        .onCancel(() => NotifyPositive('Archivage annulé.'));
+    },
+    async archiveCustomer () {
+      try {
+        const payload = { archivedAt: new Date() };
+        await Customers.updateById(this.customer._id, payload);
+
+        NotifyPositive('Bénéficiaire archivé(e).');
+        await this.refreshCustomer();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 403 && e.data.message !== 'Forbidden') return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'archivage du/de la bénéficiaire.');
       }
     },
   },

@@ -137,6 +137,8 @@
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Facturation</p>
+          <ni-input caption="Pied de page sur la facture" v-model="company.customersConfig.billFooter" type="textarea"
+            @focus="saveTmp('customersConfig.billFooter')" @blur="updateCompany('customersConfig.billFooter')" />
         <div class="row gutter-profile">
           <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod"
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
@@ -210,6 +212,7 @@ import FileUploader from '@components/form/FileUploader';
 import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
+import Input from '@components/form/Input';
 import ReponsiveTable from '@components/table/ResponsiveTable';
 import {
   BILLING_DIRECT,
@@ -254,6 +257,7 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-select': Select,
     'ni-button': Button,
+    'ni-input': Input,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
