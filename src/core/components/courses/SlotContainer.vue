@@ -48,12 +48,13 @@
 
     <!-- Course slot creation modal -->
     <slot-creation-modal v-model="creationModal" :new-course-slot.sync="newCourseSlot" :validations="$v.newCourseSlot"
-      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
+      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
+      :link-error-message="linkErrorMessage" />
 
     <!-- Course slot edition modal -->
     <slot-edition-modal v-model="editionModal" :edited-course-slot.sync="editedCourseSlot" :step-options="stepOptions"
       :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
-      @submit="updateCourseSlot" />
+      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" />
 </div>
 </template>
 
@@ -72,7 +73,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 import { E_LEARNING, ON_SITE, REMOTE, STEP_TYPES } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-import { frAddress, minDate, maxDate } from '@helpers/vuelidateCustomVal';
+import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -118,6 +119,7 @@ export default {
       ],
       isVendorInterface,
       ON_SITE,
+      linkErrorMessage: 'Lien non valide',
     };
   },
   validations () {
@@ -129,6 +131,7 @@ export default {
         city: { required: requiredIf(item => item && !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      meetingLink: { urlAddress },
     };
 
     return {

@@ -10,8 +10,9 @@
       <ni-search-address v-if="getType(this.newCourseSlot.step) === ON_SITE"
         :value="newCourseSlot.address" @input="update($event, 'address')" :error-message="addressError"
         @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
-      <ni-input v-if="getType(this.newCourseSlot.step) === REMOTE" in-modal
-        :value="newCourseSlot.meetingLink" @input="update($event, 'meetingLink')" caption="Lien vers la visio" />
+      <ni-input v-if="getType(this.newCourseSlot.step) === REMOTE" in-modal :error="validations.meetingLink.$error"
+        :value="newCourseSlot.meetingLink" @input="update($event, 'meetingLink')" caption="Lien vers la visio"
+        :error-message="linkErrorMessage" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -35,6 +36,7 @@ export default {
     stepOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    linkErrorMessage: { type: String, default: '' },
   },
   components: {
     'ni-datetime-range': DateTimeRange,
