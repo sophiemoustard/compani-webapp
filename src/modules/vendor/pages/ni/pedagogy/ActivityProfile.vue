@@ -17,6 +17,7 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import uniqBy from 'lodash/uniqBy';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
@@ -120,9 +121,11 @@ export default {
       }
     },
     validateUnlockEdition () {
-      const programsReusingActivity = [...new Set(
-        this.activity.steps.filter(s => s._id !== this.stepId).map(s => get(s, 'subProgram.program.name'))
-      )];
+      const programsReusingActivityWithDuplicates = this.activity.steps
+        .filter(step => step._id !== this.stepId)
+        .map(step => step.subPrograms.map(sp => ({ id: get(sp, 'program._id'), name: get(sp, 'program.name') })))
+        .flat();
+      const programsReusingActivity = uniqBy(programsReusingActivityWithDuplicates, 'id').map(p => p.name);
 
       const usedInOtherStepMessage = this.isActivityUsedInOtherStep
         ? 'Cette activité est utilisée dans les étapes '

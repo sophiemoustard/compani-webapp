@@ -121,9 +121,16 @@ export default {
     courseList () {
       const groupedByCourses = Object.values(groupBy(this.activityHistories.map((aH) => {
         const res = [];
-        for (const step of aH.activity.steps) res.push({ ...aH, activity: { ...omit(aH.activity, 'steps'), step } });
+        for (const step of aH.activity.steps) {
+          for (const subProgram of step.subPrograms) {
+            res.push({
+              ...aH,
+              activity: { ...omit(aH.activity, 'steps'), step: { ...omit(step, 'subPrograms'), subProgram } },
+            });
+          }
+        }
         return res;
-      }).flat(), h => get(h, 'activity.step.subProgram.courses[0]._id')));
+      }).flat(), h => get(h, 'activity.step.subProgram._id')));
 
       return groupedByCourses.map(group => ({
         name: get(group[0], 'activity.step.subProgram.program.name'),
