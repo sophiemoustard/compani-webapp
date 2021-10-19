@@ -85,8 +85,8 @@
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
       :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program.sync="newSubProgram" />
 
-    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :step-type-options="stepTypeOptions"
-      :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
+    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :validations="$v.newStep"
+      @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
 
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
@@ -124,7 +124,7 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
   E_LEARNING,
-  ON_SITE,
+  STEP_TYPES,
   ACTIVITY_TYPES,
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
@@ -140,9 +140,11 @@ import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityR
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileContent',
+  mixins: [courseMixin],
   props: {
     profileId: { type: String, required: true },
   },
@@ -180,10 +182,6 @@ export default {
       isActivitiesShown: {},
       currentSubProgramId: '',
       currentStepId: '',
-      stepTypeOptions: [
-        { label: 'eLearning', value: E_LEARNING },
-        { label: 'Présentiel', value: ON_SITE },
-      ],
       activityTypeOptions: ACTIVITY_TYPES,
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
@@ -252,11 +250,8 @@ export default {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
     },
     getStepTypeLabel (value) {
-      const type = this.stepTypeOptions.find(t => t.value === value);
+      const type = STEP_TYPES.find(t => t.value === value);
       return type ? type.label : '';
-    },
-    getStepTypeIcon (type) {
-      return type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach';
     },
     getActivityTypeLabel (value) {
       const type = this.activityTypeOptions.find(t => t.value === value);

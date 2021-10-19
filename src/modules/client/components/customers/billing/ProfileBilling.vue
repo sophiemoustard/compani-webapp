@@ -11,21 +11,23 @@
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à
         <a :href="'mailto:' + company.billingAssistance"> {{ company.billingAssistance }}</a>.
       </div>
-      <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :display-actions="isAdmin"
+      <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates"
         @open-edition-modal="openEditionModal" :start-balance="getStartBalance()" :loading="tableLoading"
-        :end-balance="getEndBalance(customerDocuments)" :type="CUSTOMER" @delete="validateRefundDeletion" />
+        :end-balance="getEndBalance(customerDocuments)" :type="CUSTOMER" @delete="validateRefundDeletion"
+        :display-actions="isAdmin && !isArchived" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <ni-button class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
-          color="white" icon="add" />
+          color="white" icon="add" :disable="isArchived" />
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
       <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
-      <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates" :display-actions="isAdmin"
+      <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates"
         @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
-        :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" @delete="validateRefundDeletion" />
+        :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" @delete="validateRefundDeletion"
+        :display-actions="isAdmin && !isArchived" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
-        <ni-button class="add-payment" label="Ajouter un réglement" color="white" icon="add"
+        <ni-button class="add-payment" label="Ajouter un réglement" color="white" icon="add" :disable="isArchived"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
       </div>
     </div>
@@ -223,6 +225,9 @@ export default {
       const years = Array.from(range.by('years'));
       return years.map(year => ({ label: year.format('YYYY'), value: year.format('YYYY') }));
     },
+    isArchived () {
+      return !!this.customer.archivedAt;
+    },
   },
   async created () {
     this.setBillingDates();
@@ -398,11 +403,11 @@ export default {
         const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer']);
         await Payments.update(this.editedPayment._id, payload);
         this.paymentEditionModal = false;
-        NotifyPositive('Règlement créé');
+        NotifyPositive('Règlement modifié.');
         await this.refresh();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement.');
+        NotifyNegative('Erreur lors de l\'édition du règlement.');
       } finally {
         this.paymentEditionLoading = false;
       }

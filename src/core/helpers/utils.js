@@ -138,3 +138,11 @@ export const formatAndSortIdentityOptions = (array, field = null) => array
   .sort((a, b) => a.label.localeCompare(b.label));
 
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
+
+export const readAPIResponseWithTypeArrayBuffer = (response) => {
+  const dataView = new DataView(response.data);
+  const decoder = new TextDecoder('utf8');
+  const decodedResponse = JSON.parse(decoder.decode(dataView));
+
+  return decodedResponse;
+};

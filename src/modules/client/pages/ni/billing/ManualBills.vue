@@ -143,7 +143,7 @@ export default {
     async refresh () {
       try {
         this.modalLoading = true;
-        this.customers = Object.freeze(await Customers.list());
+        this.customers = Object.freeze(await Customers.list({ archived: false }));
         this.billingItems = Object.freeze(await BillingItems.list({ type: MANUAL }));
       } catch (e) {
         console.error(e);
@@ -175,7 +175,7 @@ export default {
     },
     formatCreationPayload () {
       return {
-        ...pick(this.newManualBill, ['customer', 'date', 'netInclTaxes']),
+        ...pick(this.newManualBill, ['customer', 'date']),
         billingItemList: this.newManualBill.billingItemList.map(bi => omit(bi, 'vat')),
       };
     },

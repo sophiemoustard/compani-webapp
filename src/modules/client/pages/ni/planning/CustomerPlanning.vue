@@ -177,8 +177,10 @@ export default {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
 
+      if (person.archivedAt) return NotifyNegative('La personne est archivée.');
+
       if (isAfter(selectedDay, person.stoppedAt)) {
-        return NotifyWarning('Le/la bénéficiare est arrêté(e) à cette date.');
+        return NotifyWarning('La personne est arrêtée à cette date.');
       }
 
       this.newEvent = {
