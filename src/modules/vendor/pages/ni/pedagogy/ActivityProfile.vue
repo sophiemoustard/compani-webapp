@@ -122,9 +122,9 @@ export default {
     },
     validateUnlockEdition () {
       const programsReusingActivityWithDuplicates = this.activity.steps
-        .filter(step => step._id !== this.stepId)
         .map(step => step.subPrograms.map(sp => ({ id: get(sp, 'program._id'), name: get(sp, 'program.name') })))
-        .flat();
+        .flat()
+        .filter(program => program.id !== this.program._id);
       const programsReusingActivity = uniqBy(programsReusingActivityWithDuplicates, 'id').map(p => p.name);
 
       const usedInOtherStepMessage = this.isActivityUsedInOtherStep
