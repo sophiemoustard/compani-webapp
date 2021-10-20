@@ -119,7 +119,7 @@ export default {
       ],
       isVendorInterface,
       ON_SITE,
-      linkErrorMessage: 'Lien non valide',
+      linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
     };
   },
   validations () {
