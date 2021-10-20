@@ -21,7 +21,9 @@
             :disable="!canUpdateIntervention || historiesLoading" :error="validations.dates.$error" disable-end-date
             @input="update($event, 'dates')" @blur="validations.dates.$touch" :disable-start-date="isEventTimeStamped"
             :max="customerStoppedDate" :disable-start-hour="!!startDateTimeStamped"
-            :disable-end-hour="!!endDateTimeStamped" />
+            :disable-end-hour="!!endDateTimeStamped" :start-locked="!!startDateTimeStamped"
+            @startLockClick="openTimeStampCancellationModal(true)" :end-locked="!!endDateTimeStamped"
+            @endLockClick="openTimeStampCancellationModal(false)" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
@@ -210,10 +212,14 @@ export default {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
     startDateTimeStamped () {
-      return this.eventHistories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour);
+      return this.eventHistories.some(
+        h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && h.isCancelled === false
+      );
     },
     endDateTimeStamped () {
-      return this.eventHistories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour);
+      return this.eventHistories.some(
+        h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && h.isCancelled === false
+      );
     },
     isEventTimeStamped () {
       return !!this.startDateTimeStamped || !!this.endDateTimeStamped;
@@ -294,6 +300,18 @@ export default {
     updateAddress (event) {
       this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
       this.deleteClassFocus();
+    },
+    openTimeStampCancellationModal (start) {
+      const historyToCancel = start
+        ? this.eventHistories.find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour)
+        : this.eventHistories.find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour);
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce créneau ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => console.log('ici', historyToCancel))
+        .onCancel(() => console.log('Suppression annulée.'));
     },
   },
 };
