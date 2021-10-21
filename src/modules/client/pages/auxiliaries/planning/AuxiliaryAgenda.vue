@@ -32,7 +32,8 @@
       :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
       @document-uploaded="documentUploaded" @submit="updateEvent" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @close="closeEditionModal"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading"
+      @refresh-histories="refreshHistories" />
   </q-page>
 </template>
 

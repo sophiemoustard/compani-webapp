@@ -112,7 +112,7 @@ export default {
       this.$emit('startLockClick');
     },
     endClick () {
-      this.$emit('startLockClick');
+      this.$emit('endLockClick');
     },
   },
 };

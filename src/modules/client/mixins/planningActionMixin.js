@@ -349,6 +349,17 @@ export const planningActionMixin = {
         this.historiesLoading = false;
       }
     },
+    async refreshHistories (eventId) {
+      try {
+        this.historiesLoading = true;
+        this.editedEventHistories = await EventHistories.list({ eventId });
+      } catch (e) {
+        console.error(e);
+        this.editedEventHistories = [];
+      } finally {
+        this.historiesLoading = false;
+      }
+    },
     async formatEditedEvent (event) {
       const {
         createdAt,
