@@ -12,6 +12,10 @@ export default {
     const program = await alenviAxios.get(`${process.env.API_HOSTNAME}/programs/${programId}`);
     return program.data.data.program;
   },
+  async getSteps (programId) {
+    const program = await alenviAxios.get(`${process.env.API_HOSTNAME}/programs/${programId}/steps`);
+    return program.data.data.steps;
+  },
   async update (programId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/programs/${programId}`, payload);
   },

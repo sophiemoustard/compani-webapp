@@ -354,6 +354,12 @@ export const STEP_TYPES = [
   { label: 'présentiel', value: ON_SITE },
   { label: 'distanciel', value: REMOTE },
 ];
+export const REUSE_STEP = 'reuse_step';
+export const CREATE_STEP = 'create_step';
+export const STEP_ATTACHEMENT_OPTIONS = [
+  { label: 'Créer', value: CREATE_STEP },
+  { label: 'Réutiliser', value: REUSE_STEP },
+];
 
 // ACTIVITY
 export const LESSON = 'lesson';
