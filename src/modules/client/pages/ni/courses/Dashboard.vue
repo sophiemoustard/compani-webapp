@@ -120,13 +120,11 @@ export default {
       const usersParticipationsToPrograms = this.activityHistories
         .map(aH => aH.activity.steps.map(s => s.subPrograms.map(sP => ({ userId: aH.user._id, program: sP.program }))))
         .flat(3);
-
       const participationsGroupedByProgram = Object.values(groupBy(usersParticipationsToPrograms, 'program._id'));
 
-      return participationsGroupedByProgram.map(group => ({
-        name: group[0].program.name,
-        activeTraineesCount: new Set(group.map(a => a.userId)).size,
-      })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
+      return participationsGroupedByProgram
+        .map(group => ({ name: group[0].program.name, activeTraineesCount: new Set(group.map(a => a.userId)).size }))
+        .sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
     },
     learnerList () {
       const groupedByLearners = Object.values(groupBy(this.activityHistories, h => h.user._id));
