@@ -240,7 +240,7 @@ export default {
           isCancelled: !this.editedEvent.isCancelled,
         });
       } else {
-        this.$emit('update:edited-event', { ...this.editedEvent, isCancelled: !this.editedEvent.isCancelled });
+        this.$emit('update:edited-event', set(this.editedEvent, 'isCancelled', !this.editedEvent.isCancelled));
         this.validations.misc.$touch();
         this.validations.cancel.$touch();
       }
@@ -285,14 +285,14 @@ export default {
       else this.update(addressList[0].value, 'address');
     },
     update (event, path) {
-      this.$emit('update:editedEvent', set({ ...this.editedEvent }, path, event));
+      this.$emit('update:editedEvent', set(this.editedEvent, path, event));
     },
     async updateAbsence (event) {
-      await this.$emit('update:editedEvent', { ...this.editedEvent, absence: event });
+      await this.$emit('update:editedEvent', set(this.editedEvent, 'absence', event));
       this.setDateHours(this.editedEvent, 'editedEvent');
     },
     updateAddress (event) {
-      this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
+      this.$emit('update:editedEvent', set(this.editedEvent, 'address', event));
       this.deleteClassFocus();
     },
   },
