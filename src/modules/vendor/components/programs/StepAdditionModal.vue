@@ -17,7 +17,7 @@
           @input="updateReusedStep($event, '_id')" :error="validations.reusedStep.$error" />
       </template>
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'étape" color="primary" :loading="loading"
+        <q-btn no-caps class="full-width modal-btn" :label="submitLabel" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
       </template>
     </ni-modal>
@@ -62,6 +62,11 @@ export default {
       selectedProgram: this.programId,
     };
   },
+  computed: {
+    submitLabel () {
+      return this.additionType === CREATE_STEP ? 'Créer l\'étape' : 'Réutiliser l\'étape';
+    },
+  },
   watch: {
     additionType () {
       if (this.additionType === REUSE_STEP) {
@@ -73,7 +78,7 @@ export default {
   methods: {
     async refreshProgramList () {
       try {
-        const programs = await Programs.list(this.programId);
+        const programs = await Programs.list();
 
         this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
       } catch (e) {
@@ -98,14 +103,14 @@ export default {
       this.$emit('hide');
       this.selectedProgram = this.programId;
     },
-    input (eventA) {
-      this.$emit('input', eventA);
+    input (event) {
+      this.$emit('input', event);
     },
     submit () {
       this.$emit('submit');
     },
-    updateNewStep (eventB, prop) {
-      this.$emit('update:newStep', { ...this.newStep, [prop]: eventB });
+    updateNewStep (event, prop) {
+      this.$emit('update:newStep', { ...this.newStep, [prop]: event });
     },
     updateReusedStep (value) {
       this.$emit('update:reusedStep', value);
