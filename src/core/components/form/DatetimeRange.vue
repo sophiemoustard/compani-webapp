@@ -99,7 +99,7 @@ export default {
       if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
       if (key === 'startHour') {
         dates.startDate = this.setDateHours(dates.startDate, value);
-        if (moment(value, 'HH:mm').isSameOrAfter(moment(this.endHour, 'HH:mm'))) {
+        if (!this.disableEndHour && moment(value, 'HH:mm').isSameOrAfter(moment(this.endHour, 'HH:mm'))) {
           const max = moment(dates.startDate).endOf('d');
           dates.endDate = moment.min(moment(dates.startDate).add(2, 'H'), max).toISOString();
         }
