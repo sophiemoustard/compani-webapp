@@ -29,9 +29,15 @@ export default {
   ],
   computed: {
     visibleColumns () {
-      return this.funding.nature === FIXED
+      const visibleColumns = this.funding.nature === FIXED
         ? ['startDate', 'endDate', 'amountTTC', 'careDays']
         : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
+
+      for (const version of this.funding.versions) {
+        if (version.fundingPlanId) visibleColumns.push('fundingPlanId');
+      }
+
+      return visibleColumns;
     },
   },
   methods: {

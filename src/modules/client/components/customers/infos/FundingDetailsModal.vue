@@ -33,7 +33,9 @@ export default {
         ? ['frequency', 'amountTTC', 'careDays', 'subscription']
         : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
 
-      if (this.funding.fundingPlanId) visibleColumns.push('fundingPlanId');
+      for (const version of this.funding.versions) {
+        if (version.fundingPlanId) visibleColumns.push('fundingPlanId');
+      }
 
       return visibleColumns;
     },
