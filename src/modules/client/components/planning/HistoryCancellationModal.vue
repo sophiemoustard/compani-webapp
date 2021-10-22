@@ -42,6 +42,6 @@ export default {
 
 <style lang="stylus" scoped>
 .banner
-  background-color: $orange-100
+  background-color: $orange-50
   color: $orange-900
 </style>
