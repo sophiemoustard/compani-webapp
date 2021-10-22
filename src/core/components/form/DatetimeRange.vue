@@ -83,15 +83,13 @@ export default {
     update (date, key) {
       const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
       const dateObject = pick(moment(this.value[key]).toObject(), hoursFields);
-      const dates = {
-        ...this.value,
-        [key]: moment(date).set({ ...dateObject }).toISOString(),
-      };
+      const dates = { ...this.value, [key]: moment(date).set({ ...dateObject }).toISOString() };
       if (key === 'startDate' && this.disableEndDate) {
         const endDateObject = pick(moment(this.value.endDate).toObject(), hoursFields);
         dates.endDate = moment(date).set({ ...endDateObject }).toISOString();
       }
       if (key === 'endDate') dates.endDate = moment(dates.endDate).endOf('d').toISOString();
+
       this.$emit('input', dates);
     },
     updateHours (value, key) {
@@ -104,6 +102,7 @@ export default {
           dates.endDate = moment.min(moment(dates.startDate).add(2, 'H'), max).toISOString();
         }
       }
+
       this.$emit('input', dates);
     },
   },
