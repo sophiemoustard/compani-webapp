@@ -173,16 +173,11 @@ export default {
   watch: {
     selectedAuxiliary (value) {
       if (!this.selectedAuxiliary.hasContractOnEvent && this.newEvent.type === INTERNAL_HOUR) {
-        this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
+        this.$emit('update:newEvent', set(this.newEvent, 'type', INTERVENTION));
       }
     },
     isRepetitionAllowed (value) {
-      if (!value) {
-        this.$emit('update:newEvent', {
-          ...this.newEvent,
-          repetition: { ...this.newEvent.repetition, frequency: NEVER },
-        });
-      }
+      if (!value) this.$emit('update:newEvent', set(this.newEvent.repetition, 'frequency', NEVER));
     },
     'newEvent.absence': function () {
       this.getAbsences();
@@ -236,7 +231,7 @@ export default {
       this.$emit('update:newEvent', set(this.newEvent, path, event));
     },
     async updateCustomer (event) {
-      await this.$emit('update:newEvent', this.newEvent, 'customer', event);
+      await this.$emit('update:newEvent', set(this.newEvent, 'customer', event));
       this.setEventAddressAndSubscription();
     },
     async updateType (event) {
