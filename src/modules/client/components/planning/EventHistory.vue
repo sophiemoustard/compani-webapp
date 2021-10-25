@@ -278,7 +278,9 @@ export default {
     },
     // TIME STAMP CANCELLATION
     getTimeStampCancellationTitle () {
-      return { pre: 'Horodatage annulé' };
+      return get(this.history, 'linkedEventHistory.update.startHour')
+        ? { pre: 'Horodatage de début d\'intervention annulé' }
+        : { pre: 'Horodatage de fin d\'intervention annulé' };
     },
     getTimeStampCancellationDetails () {
       if (!this.history.timeStampCancellationReason) return '';
