@@ -323,9 +323,12 @@ export default {
     async refreshHistories (eventId) {
       await this.$emit('refresh-histories', eventId);
     },
-    async cancelTimeStamping () {
+    async cancelTimeStamping (reason) {
       try {
-        await EventHistories.updateById(this.historyToCancel._id, { isCancelled: true });
+        await EventHistories.updateById(
+          this.historyToCancel._id,
+          { isCancelled: true, timestampCancellationReason: reason }
+        );
 
         await this.refreshHistories(this.editedEvent._id);
 
