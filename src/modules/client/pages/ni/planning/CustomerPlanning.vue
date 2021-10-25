@@ -15,7 +15,8 @@
       :edition-modal="editionModal" :active-auxiliaries="activeAuxiliaries" :customers="customers"
       @hide="resetEditionForm" @submit="updateEvent" @close="closeEditionModal" :person-key="personKey"
       @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading"
+      @refresh-histories="refreshHistories" />
   </q-page>
 </template>
 

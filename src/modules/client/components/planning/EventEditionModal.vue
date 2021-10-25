@@ -21,7 +21,9 @@
             :disable="!canUpdateIntervention || historiesLoading" :error="validations.dates.$error" disable-end-date
             @input="update($event, 'dates')" @blur="validations.dates.$touch" :disable-start-date="isEventTimeStamped"
             :max="customerStoppedDate" :disable-start-hour="!!startDateTimeStamped"
-            :disable-end-hour="!!endDateTimeStamped" />
+            :disable-end-hour="!!endDateTimeStamped" :start-locked="!!startDateTimeStamped"
+            @startLockClick="openTimeStampCancellationModal(true)" :end-locked="!!endDateTimeStamped"
+            @endLockClick="openTimeStampCancellationModal(false)" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
@@ -126,18 +128,23 @@
         label="Editer l'évènement" @click="submit" icon-right="check" data-cy="event-edition-button"
         :disable="historiesLoading" />
     </div>
+    <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
+      @cancelTimeStamping="cancelTimeStamping" :start="isStartCancellation" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
 import set from 'lodash/set';
+import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES, TIME_STAMPING_ACTIONS } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
+import NiHistoryCancellationModal from './HistoryCancellationModal';
 
 export default {
   name: 'EventEditionModal',
@@ -157,10 +164,14 @@ export default {
   components: {
     'ni-button': Button,
     'ni-event-history': NiEventHistory,
+    'ni-history-cancellation-modal': NiHistoryCancellationModal,
   },
   data () {
     return {
       displayHistory: false,
+      historyCancellationModal: false,
+      historyToCancel: {},
+      isStartCancellation: true,
     };
   },
   computed: {
@@ -210,10 +221,12 @@ export default {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
     startDateTimeStamped () {
-      return this.eventHistories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour);
+      return this.eventHistories
+        .some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && !h.isCancelled);
     },
     endDateTimeStamped () {
-      return this.eventHistories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour);
+      return this.eventHistories
+        .some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && !h.isCancelled);
     },
     isEventTimeStamped () {
       return !!this.startDateTimeStamped || !!this.endDateTimeStamped;
@@ -294,6 +307,34 @@ export default {
     updateAddress (event) {
       this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
       this.deleteClassFocus();
+    },
+    openTimeStampCancellationModal (isStartCancellation) {
+      this.isStartCancellation = isStartCancellation;
+      this.historyToCancel = isStartCancellation
+        ? this.eventHistories
+          .find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && !h.isCancelled)
+        : this.eventHistories.find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && !h.isCancelled);
+      this.historyCancellationModal = true;
+    },
+    resetHistoryCancellationModal () {
+      this.historyCancellationModal = false;
+      this.historyToCancel = {};
+    },
+    async refreshHistories (eventId) {
+      await this.$emit('refresh-histories', eventId);
+    },
+    async cancelTimeStamping () {
+      try {
+        await EventHistories.updateById(this.historyToCancel._id, { isCancelled: true });
+
+        await this.refreshHistories(this.editedEvent._id);
+
+        this.resetHistoryCancellationModal();
+        NotifyPositive('Horodatage supprimé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de l\'horodatage.');
+      }
     },
   },
 };
