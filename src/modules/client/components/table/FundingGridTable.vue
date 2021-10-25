@@ -1,6 +1,6 @@
 <template>
   <q-table class="q-mb-xl" :data="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
-    :visible-columns="formattedVisibleColumns">
+    :visible-columns="formattedVisibleColumns" :pagination.sync="paginationHistory">
     <template #item="props">
       <q-card class="full-width q-mb-md" flat bordered>
         <q-list separator dense>
@@ -20,6 +20,7 @@
 
 <script>
 import { NATURE_OPTIONS, FIXED } from '@data/constants';
+import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
 
 export default {
   name: 'FundingGridTable',
@@ -41,8 +42,16 @@ export default {
         'customerParticipationRate',
         'careDays',
       ],
+      paginationHistory: {
+        rowsPerPage: 0,
+        sortBy: 'createdAt',
+        descending: true,
+      },
     };
   },
+  mixins: [
+    fundingMixin,
+  ],
   computed: {
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
