@@ -1,7 +1,7 @@
 <template>
     <q-dialog :value="value" @hide="hide">
       <q-card>
-        <q-card-section>Confirmation</q-card-section>
+        <q-card-section class="title">Confirmation</q-card-section>
         <div class="banner row q-mx-md q-pa-sm">
           <q-icon size="sm" name="info_outline" color="orange-700" class="q-mr-sm" />
           <div>{{ start ? 'Début d\'intervention horodaté' : 'Fin d\'intervention horodatée' }}</div>
@@ -41,6 +41,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.title
+  font-size: 20px
 .banner
   background-color: $orange-50
   color: $orange-900

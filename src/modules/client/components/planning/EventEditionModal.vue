@@ -129,7 +129,7 @@
         :disable="historiesLoading" />
     </div>
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
-      @cancelTimeStamping="cancelTimeStamping" :start="start" />
+      @cancelTimeStamping="cancelTimeStamping" :start="isStartCancellation" />
   </q-dialog>
 </template>
 
@@ -171,7 +171,7 @@ export default {
       displayHistory: false,
       historyCancellationModal: false,
       historyToCancel: {},
-      start: true,
+      isStartCancellation: true,
     };
   },
   computed: {
@@ -221,14 +221,12 @@ export default {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
     startDateTimeStamped () {
-      return this.eventHistories.some(
-        h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && h.isCancelled === false
-      );
+      return this.eventHistories
+        .some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && !h.isCancelled);
     },
     endDateTimeStamped () {
-      return this.eventHistories.some(
-        h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && h.isCancelled === false
-      );
+      return this.eventHistories
+        .some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && !h.isCancelled);
     },
     isEventTimeStamped () {
       return !!this.startDateTimeStamped || !!this.endDateTimeStamped;
@@ -310,11 +308,12 @@ export default {
       this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
       this.deleteClassFocus();
     },
-    openTimeStampCancellationModal (start) {
-      this.start = start;
-      this.historyToCancel = start
-        ? this.eventHistories.find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour)
-        : this.eventHistories.find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour);
+    openTimeStampCancellationModal (isStartCancellation) {
+      this.isStartCancellation = isStartCancellation;
+      this.historyToCancel = isStartCancellation
+        ? this.eventHistories
+          .find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && !h.isCancelled)
+        : this.eventHistories.find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && !h.isCancelled);
       this.historyCancellationModal = true;
     },
     resetHistoryCancellationModal () {

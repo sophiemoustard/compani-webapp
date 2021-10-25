@@ -20,7 +20,7 @@
             </q-list>
           </q-menu>
         </q-icon>
-        <q-icon v-else name="fa fa-lock" class="cursor-pointer" @click.native="click" color="copper-500" />
+        <q-icon v-else name="lock" class="cursor-pointer" @click.native="click" color="copper-500" />
       </template>
     </q-input>
   </div>
