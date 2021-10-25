@@ -45,7 +45,6 @@ import {
   EVENT_CREATION,
   EVENT_UPDATE,
   EVENT_DELETION,
-  TIME_STAMP_CANCELLATION,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
@@ -235,7 +234,7 @@ export default {
         const params = {
           sectors: this.filteredSectors.map(sector => sector._id),
           auxiliaries: this.auxiliaries.map(aux => aux._id),
-          action: [EVENT_CREATION, EVENT_UPDATE, EVENT_DELETION, TIME_STAMP_CANCELLATION],
+          action: [EVENT_CREATION, EVENT_UPDATE, EVENT_DELETION],
         };
 
         let oldEventHistories;
