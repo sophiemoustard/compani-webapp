@@ -13,4 +13,8 @@ export default {
   async detachActivity (stepId, activityId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/steps/${stepId}/activities/${activityId}`);
   },
+  async list (params) {
+    const steps = await alenviAxios.get(`${process.env.API_HOSTNAME}/steps`, { params });
+    return steps.data.data.steps;
+  },
 };

@@ -33,6 +33,7 @@ import Select from '@components/form/Select';
 import { NotifyNegative } from '@components/popup/notify';
 import { STEP_TYPES, STEP_ATTACHEMENT_OPTIONS, CREATE_STEP, REUSE_STEP } from '@data/constants';
 import Programs from '@api/Programs';
+import Steps from '@api/Steps';
 
 export default {
   name: 'StepAdditionModal',
@@ -92,7 +93,7 @@ export default {
     async refreshSteps () {
       try {
         if (!this.selectedProgram) return;
-        const steps = await Programs.getSteps(this.selectedProgram);
+        const steps = await Steps.list({ program: this.selectedProgram });
 
         this.stepOptions = steps.map(s => ({ label: s.name, value: s._id }));
       } catch (e) {
