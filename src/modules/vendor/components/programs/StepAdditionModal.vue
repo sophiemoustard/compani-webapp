@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import ButtonToggle from '@components/ButtonToggle';
@@ -59,7 +60,7 @@ export default {
       REUSE_STEP,
       stepOptions: [],
       programOptions: [],
-      selectedProgram: this.programId,
+      selectedProgram: '',
     };
   },
   computed: {
@@ -70,13 +71,14 @@ export default {
   watch: {
     additionType () {
       if (this.additionType === REUSE_STEP) {
-        if (!this.programOptions.length) this.refreshProgramList();
+        if (!this.selectedProgram) this.selectedProgram = this.programId;
+        if (!this.programOptions.length) this.refreshPrograms();
         if (!this.stepOptions.length) this.refreshSteps();
       }
     },
   },
   methods: {
-    async refreshProgramList () {
+    async refreshPrograms () {
       try {
         const programs = await Programs.list();
 
@@ -101,7 +103,8 @@ export default {
     },
     hide () {
       this.$emit('hide');
-      this.selectedProgram = this.programId;
+      this.selectedProgram = '';
+      this.stepOptions = [];
     },
     input (event) {
       this.$emit('input', event);
@@ -110,7 +113,7 @@ export default {
       this.$emit('submit');
     },
     updateNewStep (event, prop) {
-      this.$emit('update:newStep', { ...this.newStep, [prop]: event });
+      this.$emit('update:newStep', set(this.newStep, prop, event));
     },
     updateReusedStep (value) {
       this.$emit('update:reusedStep', value);
