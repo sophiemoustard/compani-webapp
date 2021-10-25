@@ -20,7 +20,6 @@
 
 <script>
 import { NATURE_OPTIONS, FIXED } from '@data/constants';
-import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
 
 export default {
   name: 'FundingGridTable',
@@ -49,9 +48,6 @@ export default {
       },
     };
   },
-  mixins: [
-    fundingMixin,
-  ],
   computed: {
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
