@@ -3,8 +3,10 @@
     <div class="history-cell">
       <div class="history-title">
         <div class="history-title-text">
-          {{ historyInfo.title.pre }}<span class="history-type">{{ timeStampingType || eventType }}</span>
-          <template v-if="!isAuxiliaryUpdate && !isTimestamping">
+          {{ historyInfo.title.pre }}<span v-if="!isTimeStampingCancellation" class="history-type">{{
+            timeStampingType || eventType
+          }}</span>
+          <template v-if="!isAuxiliaryUpdate && !isTimestamping && !isTimeStampingCancellation">
             de <span class="history-info">{{ auxiliaryName }}</span>
           </template>
           {{ historyInfo.title.post }}
@@ -47,6 +49,7 @@ import {
   MANUAL_TIME_STAMPING_REASONS,
   TIME_STAMPING_ACTIONS,
   QR_CODE_TIME_STAMPING,
+  TIME_STAMP_CANCELLATION,
 } from '@data/constants';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -129,6 +132,9 @@ export default {
     isTimestamping () {
       return TIME_STAMPING_ACTIONS.includes(this.history.action);
     },
+    isTimeStampingCancellation () {
+      return this.history.action === TIME_STAMP_CANCELLATION;
+    },
     eventName () {
       const { type, internalHour, absence } = this.history.event;
       switch (type) {
@@ -163,6 +169,11 @@ export default {
           return {
             title: this.getEventTimeStampingTitle(),
             details: this.getEventTimeStampingDetails(),
+          };
+        case TIME_STAMP_CANCELLATION:
+          return {
+            title: this.getTimeStampCancellationTitle(),
+            details: this.getTimeStampCancellationDetails(),
           };
         case EVENT_CREATION:
         default:
@@ -264,6 +275,15 @@ export default {
       }
 
       return details;
+    },
+    // TIME STAMP CANCELLATION
+    getTimeStampCancellationTitle () {
+      return { pre: 'Horodatage annulé' };
+    },
+    getTimeStampCancellationDetails () {
+      if (!this.history.timeStampCancellationReason) return '';
+
+      return `Motif: ${this.history.timeStampCancellationReason}`;
     },
     // Update
     getEventUpdateTitle () {

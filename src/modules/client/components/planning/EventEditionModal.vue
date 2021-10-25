@@ -327,7 +327,7 @@ export default {
       try {
         await EventHistories.updateById(
           this.historyToCancel._id,
-          { isCancelled: true, timestampCancellationReason: reason }
+          { isCancelled: true, timeStampCancellationReason: reason }
         );
 
         await this.refreshHistories(this.editedEvent._id);
