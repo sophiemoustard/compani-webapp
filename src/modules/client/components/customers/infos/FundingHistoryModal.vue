@@ -3,8 +3,7 @@
     <template slot="title">
       Historique du financement <span class="text-weight-bold">{{ funding.thirdPartyPayer.name }}</span>
     </template>
-    <ni-funding-grid-table :data="funding.versions" :columns="fundingsColumns"
-      :visible-columns="visibleColumns" />
+    <ni-funding-grid-table :data="funding.versions" :columns="fundingsColumns" :visible-columns="visibleColumns" />
   </ni-modal>
 </template>
 
@@ -33,9 +32,7 @@ export default {
         ? ['startDate', 'endDate', 'amountTTC', 'careDays']
         : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
 
-      for (const version of this.funding.versions) {
-        if (version.fundingPlanId) visibleColumns.push('fundingPlanId');
-      }
+      if (this.funding.versions.some(version => version.fundingPlanId)) visibleColumns.push('fundingPlanId');
 
       return visibleColumns;
     },
