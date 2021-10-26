@@ -87,7 +87,7 @@
 
     <step-addition-modal v-model="stepAdditionModal" :new-step.sync="newStep" :reused-step.sync="reusedStep"
       @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" :addition-type.sync="additionType"
-      :program-id="program._id" :validations="$v" />
+      :program="program" :validations="$v" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />

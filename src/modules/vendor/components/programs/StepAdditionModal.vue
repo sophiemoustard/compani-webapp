@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
@@ -46,7 +47,8 @@ export default {
     value: { type: Boolean, default: false },
     newStep: { type: Object, default: () => ({}) },
     reusedStep: { type: String, default: '' },
-    programId: { type: String, default: '' },
+    program: { type: Object, default: () => ({}) },
+    subProgramId: { type: String, default: () => '' },
     additionType: { type: String, default: CREATE_STEP },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
@@ -78,7 +80,7 @@ export default {
   watch: {
     additionType () {
       if (this.additionType === REUSE_STEP) {
-        if (!this.selectedProgram) this.selectedProgram = this.programId;
+        if (!this.selectedProgram) this.selectedProgram = this.program._id;
         if (!this.programOptions.length) this.refreshPrograms();
         if (!this.stepOptions.length) this.refreshSteps();
       }
@@ -99,13 +101,28 @@ export default {
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
     },
+    formatAndSortStepOptions (array) {
+      const stepsInSubProgram = this.program.subPrograms
+        .find(subProgram => subProgram._id === this.subProgramId)
+        .steps.map(step => step._id);
+
+      return array
+        .map(element => ({
+          label: stepsInSubProgram.includes(element._id)
+            ? `${get(element, 'name')} (déjà utilisée)`
+            : get(element, 'name'),
+          value: element._id,
+          disable: stepsInSubProgram.includes(element._id),
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+    },
     async refreshSteps () {
       try {
         if (!this.selectedProgram) return;
         const steps = await Steps.list({ program: this.selectedProgram });
         const stepsGroupedByType = groupBy(steps, 'type');
         this.stepOptions = Object.keys(stepsGroupedByType)
-          .map(group => formatAndSortOptions(stepsGroupedByType[group], 'name'));
+          .map(group => this.formatAndSortStepOptions(stepsGroupedByType[group]));
         this.stepGroups = Object.keys(stepsGroupedByType)
           .map(group => ({ label: this.getStepTypeLabel(group), icon: this.getStepTypeIcon(group) }));
       } catch (e) {

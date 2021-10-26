@@ -7,7 +7,7 @@
       </div>
       <div v-for="(options, index) in optionsGroups" :key="index">
         <div v-if="groupTitles.length" class="group-title">
-          <q-icon :name="groupTitles[index].icon" size="sm" color="copper-grey-500" />
+          <q-icon :name="groupTitles[index].icon" size="sm" color="copper-grey-500" class="q-mr-xs" />
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
         <q-field dense borderless :error="error" :error-message="errorMessage" class="col-12">
