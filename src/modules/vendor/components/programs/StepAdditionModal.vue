@@ -34,6 +34,7 @@ import { NotifyNegative } from '@components/popup/notify';
 import { STEP_TYPES, STEP_ATTACHEMENT_OPTIONS, CREATE_STEP, REUSE_STEP } from '@data/constants';
 import Programs from '@api/Programs';
 import Steps from '@api/Steps';
+import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
   name: 'StepAdditionModal',
@@ -95,7 +96,7 @@ export default {
         if (!this.selectedProgram) return;
         const steps = await Steps.list({ program: this.selectedProgram });
 
-        this.stepOptions = steps.map(s => ({ label: s.name, value: s._id }));
+        this.stepOptions = formatAndSortOptions(steps, 'name');
       } catch (e) {
         this.stepOptions = [];
         console.error(e);

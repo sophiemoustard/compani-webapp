@@ -32,8 +32,8 @@ export default {
       flex-grow: 1
       flex-basis: 0
       border-radius: 20px
-      margin: 5px
-      padding: 0 5px
+      margin: 4px
+      padding: 0 4px
       background-color: $copper-grey-300
       > .q-btn__wrapper
         padding: 0
