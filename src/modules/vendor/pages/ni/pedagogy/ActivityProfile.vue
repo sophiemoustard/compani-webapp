@@ -49,7 +49,7 @@ export default {
       stepName: '',
       cardCreationModal: false,
       isEditionLocked: false,
-      isActivityUsedInOtherStep: false,
+      isActivityUsedInSeveralPlaces: false,
       PUBLISHED_DOT_WARNING,
       PUBLISHED_DOT_ACTIVE,
     };
@@ -89,7 +89,7 @@ export default {
     try {
       await this.refreshActivity();
 
-      if (!this.progam) await this.$store.dispatch('program/fetchProgram', { programId: this.programId });
+      if (!this.program) await this.$store.dispatch('program/fetchProgram', { programId: this.programId });
       this.programName = get(this.program, 'name') || '';
 
       const subProgram = this.program.subPrograms.find(sp => sp._id === this.subProgramId);
@@ -97,8 +97,11 @@ export default {
       const step = subProgram ? subProgram.steps.find(s => s._id === this.stepId) : '';
       this.stepName = get(step, 'name') || '';
 
-      this.isActivityUsedInOtherStep = this.activity.steps.length > 1;
-      this.isEditionLocked = this.isActivityUsedInOtherStep || this.isActivityPublished;
+      const isActivityUsedInOtherStep = this.activity.steps.length > 1;
+      const isActivityStepUsedInOtherSubProgram = this.activity.steps[0].subPrograms.length > 1;
+      this.isActivityUsedInSeveralPlaces = isActivityUsedInOtherStep || isActivityStepUsedInOtherSubProgram;
+
+      this.isEditionLocked = this.isActivityUsedInSeveralPlaces || this.isActivityPublished;
     } catch (e) {
       console.error(e);
     }
@@ -127,7 +130,7 @@ export default {
         .filter(program => program.id !== this.program._id);
       const programsReusingActivity = uniqBy(programsReusingActivityWithDuplicates, 'id').map(p => p.name);
 
-      const usedInOtherStepMessage = this.isActivityUsedInOtherStep
+      const usedInOtherStepMessage = this.isActivityUsedInSeveralPlaces
         ? 'Cette activité est utilisée dans les étapes '
           + `${programsReusingActivity.length > 1 ? 'des programmes suivants' : 'du programme suivant'} : `
           + `${programsReusingActivity.join(', ')}. <br />Si vous la modifiez, elle sera modifiée dans toutes
