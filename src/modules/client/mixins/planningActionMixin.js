@@ -20,6 +20,7 @@ import {
   ILLNESS,
   DAILY,
   SECTOR,
+  PERSON,
   CUSTOMER,
   OTHER,
   WORK_ACCIDENT,
@@ -552,8 +553,11 @@ export const planningActionMixin = {
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
-      else if (this.personKey === CUSTOMER) payload.auxiliary = draggedObject.auxiliary._id;
-      else payload.auxiliary = target._id;
+      else if (get(draggedObject, 'auxiliary._id') || target.type === PERSON) {
+        payload.auxiliary = this.personKey === CUSTOMER ? draggedObject.auxiliary._id : target._id;
+      } else {
+        payload.sector = draggedObject.sector;
+      }
 
       if (draggedObject.isCancelled) {
         payload.isCancelled = draggedObject.isCancelled;
@@ -593,7 +597,7 @@ export const planningActionMixin = {
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        NotifyNegative('Erreur lors de la création de l\'évènement.');
+        NotifyNegative('Erreur lors de la modification de l\'évènement.');
       }
     },
     // Event files
