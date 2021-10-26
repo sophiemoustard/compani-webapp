@@ -1111,18 +1111,19 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       })
-        .onOk(() => { this.deleteBillingItem(billingItemId); })
+        .onOk(() => this.deleteBillingItem(billingItemId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async deleteBillingItem (id) {
       try {
         await BillingItems.remove(id);
         NotifyPositive('Article de facturation supprimé.');
+
+        await this.refreshBillingItems();
       } catch (e) {
         console.error(e);
-        if (e.status === 403) NotifyNegative(e.data.message);
-      } finally {
-        this.refreshBillingItems();
+        if (e.status === 403) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la suppression de l\'article de facturation.');
       }
     },
     // Third party payers
