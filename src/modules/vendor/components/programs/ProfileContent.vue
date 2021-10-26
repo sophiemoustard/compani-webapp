@@ -74,7 +74,7 @@
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
           @click="checkPublicationAndOpenModal(subProgram)" :flat="false" />
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
-          @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
+          @click="openStepAdditionModal(subProgram._id)" label="Ajouter une étape" />
       </div>
       <q-separator v-if="index !== program.subPrograms.length-1" class="q-mt-lg" />
     </div>
@@ -85,8 +85,9 @@
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
       :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program.sync="newSubProgram" />
 
-    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :validations="$v.newStep"
-      @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
+    <step-addition-modal v-model="stepAdditionModal" :new-step.sync="newStep" :reused-step.sync="reusedStep"
+      @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" :addition-type.sync="additionType"
+      :program-id="program._id" :validations="$v" />
 
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
@@ -129,11 +130,12 @@ import {
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
   PUBLISHED_DOT_WARNING,
+  CREATE_STEP,
 } from '@data/constants';
 import { formatQuantity, formatAndSortOptions } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
-import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
+import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
 import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
@@ -152,7 +154,7 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
     'sub-program-creation-modal': SubProgramCreationModal,
-    'step-creation-modal': StepCreationModal,
+    'step-addition-modal': StepAdditionModal,
     'step-edition-modal': StepEditionModal,
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
@@ -167,8 +169,10 @@ export default {
       modalLoading: false,
       subProgramCreationModal: false,
       newSubProgram: { name: '' },
-      stepCreationModal: false,
+      additionType: CREATE_STEP,
+      stepAdditionModal: false,
       newStep: { name: '', type: E_LEARNING },
+      reusedStep: '',
       stepEditionModal: false,
       editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
@@ -196,6 +200,7 @@ export default {
       program: { subPrograms: { $each: { name: { required } } } },
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
+      reusedStep: { required },
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
       editedActivity: { name: { required }, type: { required } },
@@ -313,30 +318,43 @@ export default {
       this.$v.newSubProgram.$reset();
     },
     // STEP
-    async openStepCreationModal (subProgramId) {
-      this.stepCreationModal = true;
+    async openStepAdditionModal (subProgramId) {
+      this.stepAdditionModal = true;
       this.currentSubProgramId = subProgramId;
     },
-    async createStep () {
+    async addStep () {
       try {
         this.modalLoading = true;
-        this.$v.newStep.$touch();
-        if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
-        NotifyPositive('Étape créée.');
+
+        if (this.additionType === CREATE_STEP) {
+          this.$v.newStep.$touch();
+          if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+          await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
+          NotifyPositive('Étape créée.');
+        } else {
+          this.$v.reusedStep.$touch();
+          if (this.$v.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+          await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep });
+          NotifyPositive('Étape réutilisée.');
+        }
 
         await this.refreshProgram();
-        this.stepCreationModal = false;
+        this.stepAdditionModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'étape.');
+        NotifyNegative('Erreur lors de l\'ajout de l\'étape.');
       } finally {
         this.modalLoading = false;
       }
     },
-    resetStepCreationModal () {
+    resetStepAdditionModal () {
       this.newStep.name = '';
+      this.additionType = CREATE_STEP;
+      this.reusedStep = '';
       this.$v.newStep.$reset();
+      this.$v.reusedStep.$reset();
     },
     // step edition
     async openStepEditionModal (step) {

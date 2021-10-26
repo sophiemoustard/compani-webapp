@@ -10,8 +10,7 @@
           :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close"
           :disable="!canUpdateAuxiliary || historiesLoading" />
         <div class="modal-subtitle">
-          <q-btn-toggle no-wrap :value="editedEvent.type" toggle-color="primary" rounded unelevated
-            :options="eventType" />
+          <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
           <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
             color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
             :disable="historiesLoading" />
@@ -189,8 +188,8 @@ export default {
 
       return { ...aux, hasContractOnEvent };
     },
-    eventType () {
-      return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
+    eventTypeLabel () {
+      return this.eventTypeOptions.find(option => option.value === this.editedEvent.type)?.label || '';
     },
     isBilledIntervention () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
@@ -345,11 +344,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
-    /deep/ .q-btn-toggle
-      margin-bottom: 0;
-      width: 33%;
-      @media screen and (max-width: 767px)
-        width: 100%
 
   .light-checkbox
     color: $copper-grey-400

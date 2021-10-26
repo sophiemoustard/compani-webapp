@@ -7,10 +7,7 @@
         <ni-planning-modal-header v-else :value="newEvent.auxiliary" :options="auxiliariesOptions"
           :selected-person="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent"
           @input="update($event, 'auxiliary')" />
-        <div class="modal-subtitle">
-          <q-btn-toggle no-wrap :value="newEvent.type" unelevated toggle-color="primary" :options="eventTypeOptions"
-            @input="updateType($event)" text-color="copper-grey-700" />
-        </div>
+        <ni-btn-toggle :value="newEvent.type" :options="eventTypeOptions" @input="updateType($event)" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
             :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
@@ -90,6 +87,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Events from '@api/Events';
 import Button from '@components/Button';
+import ButtonToggle from '@components/ButtonToggle';
 import {
   ABSENCE,
   INTERNAL_HOUR,
@@ -122,6 +120,7 @@ export default {
   },
   components: {
     'ni-button': Button,
+    'ni-btn-toggle': ButtonToggle,
   },
   data () {
     return {
@@ -276,19 +275,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  /deep/ .q-btn-toggle
-    width: 100%
-    @media screen and (max-width: 767px)
-      display: inline-flex
-      flex-wrap: wrap
-    & .q-btn-item
-      width: 24%
-      border-radius: 20px
-      margin: 5px
-      background-color: $copper-grey-300
-      @media screen and (max-width: 767px)
-        width: 45%
-
-</style>
