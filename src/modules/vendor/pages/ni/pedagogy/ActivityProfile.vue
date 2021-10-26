@@ -127,7 +127,7 @@ export default {
       const activityReusagesInSubprogram = this.activity.steps
         .map(step => step.subPrograms.map(sp => ({ subProgramId: sp._id, programName: get(sp, 'program.name') })))
         .flat()
-        .filter(reusage => reusage.id !== this.subProgramId);
+        .filter(reusage => reusage.subProgramId !== this.subProgramId);
       const programsReusingActivity = uniqBy(activityReusagesInSubprogram, 'id').map(p => p.programName);
 
       const usedInOtherStepMessage = this.isActivityUsedInSeveralPlaces
