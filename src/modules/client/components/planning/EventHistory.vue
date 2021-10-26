@@ -3,9 +3,7 @@
     <div class="history-cell">
       <div class="history-title">
         <div class="history-title-text">
-          {{ historyInfo.title.pre }}<span v-if="!isTimeStampingCancellation" class="history-type">{{
-            timeStampingType || eventType
-          }}</span>
+          {{ historyInfo.title.pre }}<span v-if="!isTimeStampingCancellation" class="history-type">{{ type }}</span>
           <template v-if="!isAuxiliaryUpdate && !isTimestamping && !isTimeStampingCancellation">
             de <span class="history-info">{{ auxiliaryName }}</span>
           </template>
@@ -128,6 +126,9 @@ export default {
     timeStampingType () {
       if (!this.isTimestamping) return '';
       return this.history.action === MANUAL_TIME_STAMPING ? 'Manuel' : 'QR code';
+    },
+    type () {
+      return this.timeStampingType || this.eventType;
     },
     isTimestamping () {
       return TIME_STAMPING_ACTIONS.includes(this.history.action);
