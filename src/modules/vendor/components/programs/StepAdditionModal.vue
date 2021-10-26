@@ -78,6 +78,9 @@ export default {
         if (!this.stepOptions.length) this.refreshSteps();
       }
     },
+    selectedProgram () {
+      this.updateReusedStep('');
+    },
   },
   methods: {
     async refreshPrograms () {
