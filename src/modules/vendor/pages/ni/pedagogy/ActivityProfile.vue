@@ -97,9 +97,9 @@ export default {
       const step = subProgram ? subProgram.steps.find(s => s._id === this.stepId) : '';
       this.stepName = get(step, 'name') || '';
 
-      const isActivityUsedInOtherStep = this.activity.steps.length > 1;
-      const isActivityStepUsedInOtherSubProgram = this.activity.steps[0].subPrograms.length > 1;
-      this.isActivityUsedInSeveralPlaces = isActivityUsedInOtherStep || isActivityStepUsedInOtherSubProgram;
+      const isActivityUsedInOtherSteps = this.activity.steps.length > 1;
+      const isActivityUsedInOneStepButSeveralSubPrograms = this.activity.steps[0].subPrograms.length > 1;
+      this.isActivityUsedInSeveralPlaces = isActivityUsedInOtherSteps || isActivityUsedInOneStepButSeveralSubPrograms;
 
       this.isEditionLocked = this.isActivityUsedInSeveralPlaces || this.isActivityPublished;
     } catch (e) {
