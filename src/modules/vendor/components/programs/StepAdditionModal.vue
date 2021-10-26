@@ -87,7 +87,7 @@ export default {
       try {
         const programs = await Programs.list();
 
-        this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
+        this.programOptions = formatAndSortOptions(programs, 'name');
       } catch (e) {
         this.programOptions = [];
         console.error(e);
