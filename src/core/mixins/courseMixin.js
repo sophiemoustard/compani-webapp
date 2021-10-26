@@ -6,7 +6,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
-import { openPdf } from '@helpers/file';
+import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 
 export const courseMixin = {
@@ -109,7 +109,7 @@ export const courseMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        openPdf(pdf);
+        downloadFile(pdf, 'convocation.pdf');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la convocation.');
