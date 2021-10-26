@@ -43,15 +43,23 @@ export default {
   data () {
     return {
       selectedProgram: '',
-      programIsSelected: false,
       activityOptions: [],
       refreshingActivities: false,
     };
+  },
+  watch: {
+    value () {
+      if (!this.activityOptions.length) this.refreshActivities();
+    },
   },
   methods: {
     async refreshActivities () {
       try {
         this.refreshingActivities = true;
+        if (!this.selectedProgram) {
+          this.activityOptions = [];
+          return;
+        }
         const program = await Programs.getById(this.selectedProgram);
 
         const reuseableActivities = program.subPrograms
@@ -73,8 +81,8 @@ export default {
       this.$emit('update:reusedActivity', value);
     },
     hide () {
-      this.selectedProgram = '';
-      this.$emit('input', event);
+      this.activityOptions = [];
+      this.$emit('hide');
     },
     input (event) {
       this.$emit('input', event);

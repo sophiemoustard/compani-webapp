@@ -147,7 +147,7 @@ export default {
       this.$emit('update:newStep', set(this.newStep, prop, event));
     },
     async updateProgram (event) {
-      this.$emit('update:reusedStep', { step: '', program: event });
+      await this.$emit('update:reusedStep', { step: '', program: event });
       await this.refreshSteps();
     },
     updateReusedStep (value) {
