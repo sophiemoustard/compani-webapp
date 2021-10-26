@@ -7,8 +7,8 @@
       @input="update($event, 'trainee')" caption="Participant(e)" in-modal
       :error="validation.trainee.$error" :error-message="REQUIRED_LABEL" required-field />
     <div class="row q-pb-md">
-      <ni-option-group :value="newTraineeAttendance.attendances" @input="update($event, 'attendances')"
-        :options="slotsOptions" :error="validation.attendances.$error" :error-message="REQUIRED_LABEL" required-field
+      <ni-option-group :value="newTraineeAttendance.attendances" @input="update($event, 'attendances')" required-field
+        :options-groups="[slotsOptions]" :error="validation.attendances.$error" :error-message="REQUIRED_LABEL"
         type="checkbox" caption="Selectionner les créneaux auxquelles a été présent(e) le/la participant(e)" inline />
     </div>
     <template slot="footer">

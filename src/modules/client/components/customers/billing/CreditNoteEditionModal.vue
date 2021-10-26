@@ -21,8 +21,8 @@
           required-field :error="validations.endDate.$error" @blur="validations.$touch" :min="minAndMaxDates.minEndDate"
           :error-message="endDateErrorMessage" />
         <template v-if="creditNoteEvents.length > 0">
-          <ni-option-group :value="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-            type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
+          <ni-option-group :value="editedCreditNote.events" :options-groups="[creditNoteEventsOptions]"
+            caption="Évènements" type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
             :error="validations.events.$error" @input="update($event, 'events')" />
         </template>
         <div v-if="editedCreditNoteHasNoEvents" class="light text-orange-700">

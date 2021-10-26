@@ -5,7 +5,7 @@
       </template>
       <ni-btn-toggle :value="additionType" :options="STEP_ATTACHEMENT_OPTIONS" @input="updateAdditionType($event)" />
       <template v-if="additionType === CREATE_STEP">
-        <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options="STEP_TYPES"
+        <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options-groups="[STEP_TYPES]"
           required-field @input="updateNewStep($event, 'type')" />
         <ni-input in-modal :value="newStep.name" :error="validations.newStep.name.$error" required-field caption="Nom"
           @input="updateNewStep($event.trim(), 'name')" @blur="validations.newStep.name.$touch" />
@@ -13,8 +13,9 @@
       <template v-else-if="additionType === REUSE_STEP">
         <ni-select in-modal v-model.trim="selectedProgram" caption="Programme" required-field :options="programOptions"
         inline @input="refreshSteps" />
-        <ni-option-group inline required-field caption="Étapes" :value="reusedStep" type="radio" :options="stepOptions"
-          @input="updateReusedStep($event, '_id')" :error="validations.reusedStep.$error" />
+        <ni-option-group inline required-field caption="Étapes" :value="reusedStep" type="radio"
+          :options-groups="stepOptions" @input="updateReusedStep($event, '_id')" :group-titles="stepGroups"
+          :error="validations.reusedStep.$error" />
       </template>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" :label="submitLabel" color="primary" :loading="loading"
@@ -24,6 +25,7 @@
 </template>
 
 <script>
+import groupBy from 'lodash/groupBy';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
@@ -35,9 +37,11 @@ import { STEP_TYPES, STEP_ATTACHEMENT_OPTIONS, CREATE_STEP, REUSE_STEP } from '@
 import Programs from '@api/Programs';
 import Steps from '@api/Steps';
 import { formatAndSortOptions } from '@helpers/utils';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'StepAdditionModal',
+  mixins: [courseMixin],
   props: {
     value: { type: Boolean, default: false },
     newStep: { type: Object, default: () => ({}) },
@@ -63,6 +67,7 @@ export default {
       stepOptions: [],
       programOptions: [],
       selectedProgram: '',
+      stepGroups: [],
     };
   },
   computed: {
@@ -98,10 +103,14 @@ export default {
       try {
         if (!this.selectedProgram) return;
         const steps = await Steps.list({ program: this.selectedProgram });
-
-        this.stepOptions = formatAndSortOptions(steps, 'name');
+        const stepsGroupedByType = groupBy(steps, 'type');
+        this.stepOptions = Object.keys(stepsGroupedByType)
+          .map(group => formatAndSortOptions(stepsGroupedByType[group], 'name'));
+        this.stepGroups = Object.keys(stepsGroupedByType)
+          .map(group => ({ label: this.getStepTypeLabel(group), icon: this.getStepTypeIcon(group) }));
       } catch (e) {
         this.stepOptions = [];
+        this.stepGroups = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des étapes de ce programme.');
       }
@@ -110,6 +119,7 @@ export default {
       this.$emit('hide');
       this.selectedProgram = '';
       this.stepOptions = [];
+      this.stepGroups = [];
     },
     input (event) {
       this.$emit('input', event);
@@ -129,3 +139,9 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+/deep/.q-option-group
+  display: flex
+  flex-direction: column
+</style>

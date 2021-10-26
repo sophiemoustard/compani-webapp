@@ -3,7 +3,7 @@
     <template slot="title">
       Définir une <span class="text-weight-bold">règle d'accès</span>
     </template>
-    <ni-option-group v-model="access" :options="ACCESS_OPTIONS" inline type="radio" @input="resetAccess" />
+    <ni-option-group v-model="access" :options-groups="[ACCESS_OPTIONS]" inline type="radio" @input="resetAccess" />
     <template v-if="access === RESTRICTED_ACCESS">
       <span class="text-italic">
         Seuls les apprenants de la structure choisie auront accès à la formation.

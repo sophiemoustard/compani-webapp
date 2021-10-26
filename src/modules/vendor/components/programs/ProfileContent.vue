@@ -125,7 +125,6 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
   E_LEARNING,
-  STEP_TYPES,
   ACTIVITY_TYPES,
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
@@ -253,10 +252,6 @@ export default {
     formatQuantity,
     saveTmpName (index) {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
-    },
-    getStepTypeLabel (value) {
-      const type = STEP_TYPES.find(t => t.value === value);
-      return type ? type.label : '';
     },
     getActivityTypeLabel (value) {
       const type = this.activityTypeOptions.find(t => t.value === value);

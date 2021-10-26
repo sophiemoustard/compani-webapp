@@ -2,8 +2,8 @@
   <div>
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :disable="disableEdition" />
-    <ni-option-group v-model="card.media.type" :options="extensionOptions" inline @input="updateCard('media.type')"
-       type="radio" :disable="isUploading || !!card.media.publicId" :error="$v.card.media.type.$error" />
+    <ni-option-group v-model="card.media.type" :options-groups="[extensionOptions]" :error="$v.card.media.type.$error"
+      @input="updateCard('media.type')" type="radio" :disable="isUploading || !!card.media.publicId" inline />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
       :extensions="extensions" :additional-value="mediaFileName" required-field :disable="disableEdition"

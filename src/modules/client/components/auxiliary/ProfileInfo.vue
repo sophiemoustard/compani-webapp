@@ -212,7 +212,7 @@
       <div class="row gutter-profile">
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary"
-            v-model="userProfile.administrative.transportInvoice.transportType" :options="transportOptions"
+            v-model="userProfile.administrative.transportInvoice.transportType" :options-groups="[transportOptions]"
             caption="Par quel moyen comptez-vous vous rendre au travail ?" type="radio" :error-message="requiredLabel"
             :error="$v.userProfile.administrative.transportInvoice.transportType.$error" required-field
             @input="updateUser('administrative.transportInvoice.transportType')" />

@@ -5,7 +5,7 @@
       :options="getCustomersOptions(deletedEvents.startDate)" required-field @blur="$v.deletedEvents.customer.$touch"
       :error="$v.deletedEvents.customer.$error" />
     <ni-option-group :display-caption="false" v-model="deletedEvents.inRange" type="radio"
-      :options="deletetionOptions" inline />
+      :options-groups="[deletetionOptions]" inline />
     <template v-if="deletedEvents.inRange">
       <ni-date-input caption="Date de début" v-model="deletedEvents.startDate" type="date" required-field
         in-modal @blur="$v.deletedEvents.startDate.$touch" :error="$v.deletedEvents.startDate.$error" />
