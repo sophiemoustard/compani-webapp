@@ -475,6 +475,7 @@ export const planningActionMixin = {
         const isValid = await this.waitForFormValidation(this.$v.editedEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
+        const isRepetition = get(this.editedEvent, 'repetition.frequency') !== NEVER;
         if (this.editedEvent.type === ABSENCE) {
           this.$q.dialog({
             title: 'Confirmation',
@@ -486,7 +487,7 @@ export const planningActionMixin = {
           })
             .onOk(this.updateEvent)
             .onCancel(() => NotifyPositive('Modification annulée.'));
-        } else if (this.editedEvent.auxiliary && get(this.editedEvent, 'repetition.frequency', '') !== NEVER) {
+        } else if (this.editedEvent.auxiliary && isRepetition && this.editedEvent.shouldUpdateRepetition) {
           this.$q.dialog({
             title: 'Confirmation',
             message: this.getEditionConfirmationMessage(),
