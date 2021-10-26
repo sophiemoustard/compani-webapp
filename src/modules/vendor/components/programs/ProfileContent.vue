@@ -513,12 +513,6 @@ export default {
     },
     async detachStep (subProgramId, stepId) {
       try {
-        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
-        const step = subProgram.steps.find(s => s._id === stepId);
-        if (step.courseSlotsCount) {
-          return NotifyWarning('Certains créneaux de formation sont encore rattachés à cette étape.');
-        }
-
         await SubPrograms.detachStep(subProgramId, stepId);
         await this.refreshProgram();
         NotifyPositive('Étape retirée.');
