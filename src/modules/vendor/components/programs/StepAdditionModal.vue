@@ -11,11 +11,11 @@
           @input="updateNewStep($event.trim(), 'name')" @blur="validations.newStep.name.$touch" />
       </template>
       <template v-else-if="additionType === REUSE_STEP">
-        <ni-select in-modal v-model.trim="selectedProgram" caption="Programme" required-field :options="programOptions"
-        inline @input="refreshSteps" />
-        <ni-option-group inline required-field caption="Étapes" :value="reusedStep" type="radio"
-          :options-groups="stepOptions" @input="updateReusedStep($event, '_id')" :group-titles="stepGroups"
-          :error="validations.reusedStep.$error" />
+        <ni-select in-modal :value="reusedStep.program" caption="Programme" required-field :options="programOptions"
+        inline @input="updateProgram($event)" :error="validations.reusedStep.program.$error" />
+        <ni-option-group inline required-field caption="Étapes" :value="reusedStep.step" type="radio"
+          :options-groups="stepOptions" @input="updateReusedStep($event)" :group-titles="stepGroups"
+          :error="validations.reusedStep.step.$error" />
       </template>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" :label="submitLabel" color="primary" :loading="loading"
@@ -46,7 +46,7 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     newStep: { type: Object, default: () => ({}) },
-    reusedStep: { type: String, default: '' },
+    reusedStep: { type: Object, default: () => ({}) },
     program: { type: Object, default: () => ({}) },
     subProgramId: { type: String, default: () => '' },
     additionType: { type: String, default: CREATE_STEP },
@@ -68,7 +68,6 @@ export default {
       REUSE_STEP,
       stepOptions: [],
       programOptions: [],
-      selectedProgram: '',
       stepGroups: [],
     };
   },
@@ -80,13 +79,10 @@ export default {
   watch: {
     additionType () {
       if (this.additionType === REUSE_STEP) {
-        if (!this.selectedProgram) this.selectedProgram = this.program._id;
+        if (!this.reusedStep.program) this.updateProgram(this.program._id);
         if (!this.programOptions.length) this.refreshPrograms();
         if (!this.stepOptions.length) this.refreshSteps();
       }
-    },
-    selectedProgram () {
-      this.updateReusedStep('');
     },
   },
   methods: {
@@ -118,8 +114,12 @@ export default {
     },
     async refreshSteps () {
       try {
-        if (!this.selectedProgram) return;
-        const steps = await Steps.list({ program: this.selectedProgram });
+        if (!this.reusedStep.program) {
+          this.stepOptions = [];
+          this.stepGroups = [];
+          return;
+        }
+        const steps = await Steps.list({ program: this.reusedStep.program });
         const stepsGroupedByType = groupBy(steps, 'type');
         this.stepOptions = Object.keys(stepsGroupedByType)
           .map(group => this.formatAndSortStepOptions(stepsGroupedByType[group]));
@@ -134,7 +134,6 @@ export default {
     },
     hide () {
       this.$emit('hide');
-      this.selectedProgram = '';
       this.stepOptions = [];
       this.stepGroups = [];
     },
@@ -147,8 +146,12 @@ export default {
     updateNewStep (event, prop) {
       this.$emit('update:newStep', set(this.newStep, prop, event));
     },
+    async updateProgram (event) {
+      this.$emit('update:reusedStep', { step: '', program: event });
+      await this.refreshSteps();
+    },
     updateReusedStep (value) {
-      this.$emit('update:reusedStep', value);
+      this.$emit('update:reusedStep', set(this.reusedStep, 'step', value));
     },
     updateAdditionType (value) {
       this.$emit('update:additionType', value);

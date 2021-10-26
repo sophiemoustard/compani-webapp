@@ -10,11 +10,12 @@
           <q-icon :name="groupTitles[index].icon" size="sm" color="copper-grey-500" class="q-mr-xs" />
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
-        <q-field dense borderless :error="error" :error-message="errorMessage" class="col-12">
+        <q-field dense borderless class="col-12">
           <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
             :disable="disable" v-on="$listeners" />
         </q-field>
       </div>
+      <q-field :error="error" :error-message="errorMessage" dense borderless class="error-field" />
     </div>
   </div>
 </template>
@@ -43,6 +44,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .error-field
+    height: 0px
   .group-title
     display: flex
     flex: 1

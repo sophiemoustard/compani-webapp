@@ -171,7 +171,7 @@ export default {
       additionType: CREATE_STEP,
       stepAdditionModal: false,
       newStep: { name: '', type: E_LEARNING },
-      reusedStep: '',
+      reusedStep: { step: '', program: '' },
       stepEditionModal: false,
       editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
@@ -199,7 +199,7 @@ export default {
       program: { subPrograms: { $each: { name: { required } } } },
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
-      reusedStep: { required },
+      reusedStep: { step: { required }, program: { required } },
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
       editedActivity: { name: { required }, type: { required } },
@@ -331,7 +331,7 @@ export default {
           this.$v.reusedStep.$touch();
           if (this.$v.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-          await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep });
+          await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep.step });
           NotifyPositive('Étape réutilisée.');
         }
 
@@ -347,7 +347,7 @@ export default {
     resetStepAdditionModal () {
       this.newStep.name = '';
       this.additionType = CREATE_STEP;
-      this.reusedStep = '';
+      this.reusedStep = { step: '', program: '' };
       this.$v.newStep.$reset();
       this.$v.reusedStep.$reset();
     },
