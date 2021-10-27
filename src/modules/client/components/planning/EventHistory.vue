@@ -291,7 +291,8 @@ export default {
     formatDatesUpdateTitle () {
       const { endDate, startDate } = this.history.update;
 
-      const pre = 'Changement de dates pour l\'';
+      const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
+      const pre = `Changement de dates pour ${pronom}`;
       let post = this.customerName ? ` chez ${this.customerName}` : '';
       post += startDate && endDate
         ? `\xa0: du ${moment(startDate.to).format('DD/MM')} au ${moment(endDate.to).format('DD/MM')}.`

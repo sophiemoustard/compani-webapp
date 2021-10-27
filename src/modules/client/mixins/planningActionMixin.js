@@ -20,6 +20,7 @@ import {
   ILLNESS,
   DAILY,
   SECTOR,
+  PERSON,
   CUSTOMER,
   OTHER,
   WORK_ACCIDENT,
@@ -275,19 +276,19 @@ export const planningActionMixin = {
         this.loading = false;
       }
     },
-    getMessageForInternalOrUnavailability (type) {
+    getCreationMessageForInternalOrUnavailability (type) {
       return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. `
         + '<br /><br />Êtes-vous sûr(e) de vouloir créer cette répétition ?';
     },
-    getConfirmationMessage () {
+    getCreationConfirmationMessage () {
       switch (this.newEvent.type) {
         case INTERVENTION:
           return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en '
           + 'à affecter. <br /><br />Êtes-vous sûr(e) de vouloir créer cette répétition ?';
         case INTERNAL_HOUR:
-          return this.getMessageForInternalOrUnavailability('heures internes');
+          return this.getCreationMessageForInternalOrUnavailability('heures internes');
         case UNAVAILABILITY:
-          return this.getMessageForInternalOrUnavailability('indisponibilités');
+          return this.getCreationMessageForInternalOrUnavailability('indisponibilités');
         default:
           return 'Êtes-vous sûr(e) de vouloir créer cette répétition ?';
       }
@@ -312,7 +313,7 @@ export const planningActionMixin = {
         } else if (this.newEvent.auxiliary && get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
           this.$q.dialog({
             title: 'Confirmation',
-            message: this.getConfirmationMessage(),
+            message: this.getCreationConfirmationMessage(),
             html: true,
             ok: 'OK',
             cancel: 'Annuler',
@@ -452,6 +453,63 @@ export const planningActionMixin = {
 
       return omit(payload, fieldsToOmit);
     },
+    getEditionMessageForInternalOrUnavailability (type) {
+      return `Les ${type} de la répétition en conflit avec les évènements existants seront supprimées. `
+        + '<br /><br />Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
+    },
+    getEditionConfirmationMessage () {
+      switch (this.editedEvent.type) {
+        case INTERVENTION:
+          return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en '
+          + 'à affecter. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
+        case INTERNAL_HOUR:
+          return this.getEditionMessageForInternalOrUnavailability('heures internes');
+        case UNAVAILABILITY:
+          return this.getEditionMessageForInternalOrUnavailability('indisponibilités');
+        default:
+          return 'Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
+      }
+    },
+    async validateEventEdition () {
+      try {
+        this.$v.editedEvent.$touch();
+        const isValid = await this.waitForFormValidation(this.$v.editedEvent);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+
+        const isRepetition = get(this.editedEvent, 'repetition.frequency') !== NEVER;
+        if (this.editedEvent.type === ABSENCE) {
+          this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes '
+            + 'et indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette absence ?',
+            html: true,
+            ok: 'OK',
+            cancel: 'Annuler',
+          })
+            .onOk(this.updateEvent)
+            .onCancel(() => NotifyPositive('Modification annulée.'));
+        } else if (this.editedEvent.auxiliary && isRepetition && this.editedEvent.shouldUpdateRepetition) {
+          this.$q.dialog({
+            title: 'Confirmation',
+            message: this.getEditionConfirmationMessage(),
+            html: true,
+            ok: 'OK',
+            cancel: 'Annuler',
+          })
+            .onOk(this.updateEvent)
+            .onCancel(() => NotifyPositive('Modification annulée.'));
+        } else {
+          await this.updateEvent();
+        }
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) {
+          return NotifyNegative('Impossible de modifier l\'évènement : '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+        }
+        NotifyNegative('Erreur lors de la modification de l\'évènement.');
+      }
+    },
     async updateEvent () {
       try {
         this.$v.editedEvent.$touch();
@@ -495,8 +553,11 @@ export const planningActionMixin = {
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
-      else if (this.personKey === CUSTOMER) payload.auxiliary = draggedObject.auxiliary._id;
-      else payload.auxiliary = target._id;
+      else if (get(draggedObject, 'auxiliary._id') || target.type === PERSON) {
+        payload.auxiliary = this.personKey === CUSTOMER ? draggedObject.auxiliary._id : target._id;
+      } else {
+        payload.sector = draggedObject.sector;
+      }
 
       if (draggedObject.isCancelled) {
         payload.isCancelled = draggedObject.isCancelled;
@@ -536,7 +597,7 @@ export const planningActionMixin = {
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        NotifyNegative('Erreur lors de la création de l\'évènement.');
+        NotifyNegative('Erreur lors de la modification de l\'évènement.');
       }
     },
     // Event files
