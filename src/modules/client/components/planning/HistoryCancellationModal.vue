@@ -9,7 +9,8 @@
         <div class="q-mb-md">
           Êtes-vous sûr(e) de vouloir annuler l'horodatage ? Vous pourrez ensuite modifier l'évènement.
         </div>
-        <ni-input v-model="reason" caption="Motif" type="textarea" last class="q-mb-md" />
+        <ni-input :value="reason" @input="update" caption="Motif" type="textarea" last class="q-mb-md"
+          :error="validations.$error" required-field />
         <div class="row justify-end q-mb-md">
           <ni-button label="RETOUR" @click.native="hide" />
           <ni-button label="ANNULER L'HORODATAGE" @click.native="cancelTimeStamping" />
@@ -31,18 +32,18 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     start: { type: Boolean, default: true },
-  },
-  data () {
-    return {
-      reason: '',
-    };
+    reason: { type: String, default: '' },
+    validations: { type: Object, default: () => ({}) },
   },
   methods: {
     hide () {
       this.$emit('hide');
     },
+    update (event) {
+      this.$emit('update:reason', event);
+    },
     cancelTimeStamping () {
-      this.$emit('cancelTimeStamping', this.reason);
+      this.$emit('cancelTimeStamping');
     },
   },
 };
