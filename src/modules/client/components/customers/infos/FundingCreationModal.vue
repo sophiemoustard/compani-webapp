@@ -39,7 +39,7 @@
         caption="Taux de participation du/de la bénéficiaire" type="number" suffix="%" required-field
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
         @input="update($event, 'customerParticipationRate')" :error-message="customerParticipationRateErrorMessage" />
-      <ni-option-group :value="newFunding.careDays" :options-groups="[daysOptions]" caption="Jours pris en charge"
+      <ni-option-group :value="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
         required-field @input="update($event, 'careDays')" />
       <template slot="footer">

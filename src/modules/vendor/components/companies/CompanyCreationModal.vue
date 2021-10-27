@@ -5,7 +5,7 @@
     </template>
     <ni-input in-modal :value="newCompany.name" @input="update($event.trim(), 'name')" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Raison sociale" />
-    <ni-option-group :value="newCompany.type" type="radio" :options-groups="[companyTypeOptions]" inline caption="Type"
+    <ni-option-group :value="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
       :error="validations.type.$error" required-field @input="update($event, 'type')" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"

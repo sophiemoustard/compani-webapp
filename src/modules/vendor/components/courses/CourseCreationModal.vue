@@ -3,7 +3,7 @@
     <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
-      <ni-option-group :value="newCourse.type" @input="updateType($event)" type="radio" :options-groups="[courseTypes]"
+      <ni-option-group :value="newCourse.type" @input="updateType($event)" type="radio" :options="courseTypes"
         caption="Type" required-field inline :error="validations.type.$error" />
       <ni-select in-modal :value="newCourse.salesRepresentative" @input="update($event, 'salesRepresentative')"
         @blur="validations.salesRepresentative.$touch" :error="validations.salesRepresentative.$error" required-field

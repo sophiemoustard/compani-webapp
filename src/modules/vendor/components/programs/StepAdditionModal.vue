@@ -5,7 +5,7 @@
       </template>
       <ni-btn-toggle :value="additionType" :options="STEP_ATTACHEMENT_OPTIONS" @input="updateAdditionType($event)" />
       <template v-if="additionType === CREATE_STEP">
-        <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options-groups="[STEP_TYPES]"
+        <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options="STEP_TYPES"
           required-field @input="updateNewStep($event, 'type')" />
         <ni-input in-modal :value="newStep.name" :error="validations.newStep.name.$error" required-field caption="Nom"
           @input="updateNewStep($event.trim(), 'name')" @blur="validations.newStep.name.$touch" />
@@ -13,7 +13,7 @@
       <template v-else-if="additionType === REUSE_STEP">
         <ni-select in-modal :value="reusedStep.program" caption="Programme" required-field :options="programOptions"
         inline @input="updateProgram($event)" :error="validations.reusedStep.program.$error" />
-        <ni-option-group inline required-field caption="Étapes" :value="reusedStep._id" type="radio"
+        <ni-multiple-option-group inline required-field caption="Étapes" :value="reusedStep._id" type="radio"
           :options-groups="stepOptions" @input="updateReusedStep($event)" :group-titles="stepGroups"
           :error="validations.reusedStep._id.$error" />
       </template>
@@ -32,6 +32,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import ButtonToggle from '@components/ButtonToggle';
 import OptionGroup from '@components/form/OptionGroup';
+import MultipleOptionGroup from '@components/form/MultipleOptionGroup';
 import Select from '@components/form/Select';
 import { NotifyNegative } from '@components/popup/notify';
 import { STEP_TYPES, STEP_ATTACHEMENT_OPTIONS, CREATE_STEP, REUSE_STEP } from '@data/constants';
@@ -57,6 +58,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
     'ni-option-group': OptionGroup,
+    'ni-multiple-option-group': MultipleOptionGroup,
     'ni-btn-toggle': ButtonToggle,
     'ni-select': Select,
   },
@@ -159,9 +161,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-/deep/.q-option-group
-  display: flex
-  flex-direction: column
-</style>
