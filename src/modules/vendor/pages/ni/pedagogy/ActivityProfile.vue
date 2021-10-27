@@ -124,11 +124,17 @@ export default {
       }
     },
     validateUnlockEdition () {
-      const activityReusagesInSubprogram = this.activity.steps
-        .map(step => step.subPrograms.map(sp => ({ subProgramId: sp._id, programName: get(sp, 'program.name') })))
+      const activityReusagesExceptCurrentUsage = this.activity.steps
+        .map(step => step.subPrograms
+          .map(sp => ({
+            stepId: step._id,
+            subProgramId: sp._id,
+            programId: get(sp, 'program._id'),
+            programName: get(sp, 'program.name'),
+          })))
         .flat()
-        .filter(reusage => reusage.subProgramId !== this.subProgramId);
-      const programsReusingActivity = uniqBy(activityReusagesInSubprogram, 'id').map(p => p.programName);
+        .filter(reusage => reusage.subProgramId !== this.subProgramId || reusage.stepId !== this.stepId);
+      const programsReusingActivity = uniqBy(activityReusagesExceptCurrentUsage, 'programId').map(p => p.programName);
 
       const usedInOtherStepMessage = this.isActivityUsedInSeveralPlaces
         ? 'Cette activité est utilisée dans les étapes '
