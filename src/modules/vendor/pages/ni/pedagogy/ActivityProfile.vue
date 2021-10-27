@@ -133,7 +133,7 @@ export default {
             programName: get(sp, 'program.name'),
           })))
         .flat()
-        .filter(reusage => reusage.subProgramId !== this.subProgramId || reusage.stepId !== this.stepId);
+        .filter(activity => activity.subProgramId !== this.subProgramId || activity.stepId !== this.stepId);
       const programsReusingActivity = uniqBy(activityReusagesExceptCurrentUsage, 'programId').map(p => p.programName);
 
       const usedInOtherStepMessage = this.isActivityUsedInSeveralPlaces
