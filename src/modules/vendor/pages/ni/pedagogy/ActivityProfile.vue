@@ -49,7 +49,7 @@ export default {
       stepName: '',
       cardCreationModal: false,
       isEditionLocked: false,
-      isActivityUsedInOtherStep: false,
+      isActivityUsedInSeveralPlaces: false,
       PUBLISHED_DOT_WARNING,
       PUBLISHED_DOT_ACTIVE,
     };
@@ -89,7 +89,7 @@ export default {
     try {
       await this.refreshActivity();
 
-      if (!this.progam) await this.$store.dispatch('program/fetchProgram', { programId: this.programId });
+      if (!this.program) await this.$store.dispatch('program/fetchProgram', { programId: this.programId });
       this.programName = get(this.program, 'name') || '';
 
       const subProgram = this.program.subPrograms.find(sp => sp._id === this.subProgramId);
@@ -97,8 +97,11 @@ export default {
       const step = subProgram ? subProgram.steps.find(s => s._id === this.stepId) : '';
       this.stepName = get(step, 'name') || '';
 
-      this.isActivityUsedInOtherStep = this.activity.steps.length > 1;
-      this.isEditionLocked = this.isActivityUsedInOtherStep || this.isActivityPublished;
+      const isActivityUsedInOtherSteps = this.activity.steps.length > 1;
+      const isActivityUsedInOneStepButSeveralSubPrograms = this.activity.steps[0].subPrograms.length > 1;
+      this.isActivityUsedInSeveralPlaces = isActivityUsedInOtherSteps || isActivityUsedInOneStepButSeveralSubPrograms;
+
+      this.isEditionLocked = this.isActivityUsedInSeveralPlaces || this.isActivityPublished;
     } catch (e) {
       console.error(e);
     }
@@ -121,13 +124,19 @@ export default {
       }
     },
     validateUnlockEdition () {
-      const programsReusingActivityWithDuplicates = this.activity.steps
-        .map(step => step.subPrograms.map(sp => ({ id: get(sp, 'program._id'), name: get(sp, 'program.name') })))
+      const activityReusagesExceptCurrentUsage = this.activity.steps
+        .map(step => step.subPrograms
+          .map(sp => ({
+            stepId: step._id,
+            subProgramId: sp._id,
+            programId: get(sp, 'program._id'),
+            programName: get(sp, 'program.name'),
+          })))
         .flat()
-        .filter(program => program.id !== this.program._id);
-      const programsReusingActivity = uniqBy(programsReusingActivityWithDuplicates, 'id').map(p => p.name);
+        .filter(activity => activity.subProgramId !== this.subProgramId || activity.stepId !== this.stepId);
+      const programsReusingActivity = uniqBy(activityReusagesExceptCurrentUsage, 'programId').map(p => p.programName);
 
-      const usedInOtherStepMessage = this.isActivityUsedInOtherStep
+      const usedInOtherStepMessage = this.isActivityUsedInSeveralPlaces
         ? 'Cette activité est utilisée dans les étapes '
           + `${programsReusingActivity.length > 1 ? 'des programmes suivants' : 'du programme suivant'} : `
           + `${programsReusingActivity.join(', ')}. <br />Si vous la modifiez, elle sera modifiée dans toutes
