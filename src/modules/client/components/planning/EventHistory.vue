@@ -284,9 +284,7 @@ export default {
         : { pre: 'Horodatage de fin d\'intervention annulé' };
     },
     getTimeStampCancellationDetails () {
-      if (!this.history.timeStampCancellationReason) return '';
-
-      return `Motif: ${this.history.timeStampCancellationReason}`;
+      return this.history.timeStampCancellationReason ? `Motif : ${this.history.timeStampCancellationReason}` : '';
     },
     // Update
     getEventUpdateTitle () {
