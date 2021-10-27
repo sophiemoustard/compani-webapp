@@ -13,9 +13,9 @@
       <template v-else-if="additionType === REUSE_STEP">
         <ni-select in-modal :value="reusedStep.program" caption="Programme" required-field :options="programOptions"
         inline @input="updateProgram($event)" :error="validations.reusedStep.program.$error" />
-        <ni-option-group inline required-field caption="Étapes" :value="reusedStep.step" type="radio"
+        <ni-option-group inline required-field caption="Étapes" :value="reusedStep._id" type="radio"
           :options-groups="stepOptions" @input="updateReusedStep($event)" :group-titles="stepGroups"
-          :error="validations.reusedStep.step.$error" />
+          :error="validations.reusedStep._id.$error" />
       </template>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" :label="submitLabel" color="primary" :loading="loading"
@@ -147,11 +147,11 @@ export default {
       this.$emit('update:newStep', set(this.newStep, prop, event));
     },
     async updateProgram (event) {
-      await this.$emit('update:reusedStep', { step: '', program: event });
+      await this.$emit('update:reusedStep', { _id: '', program: event });
       await this.refreshSteps();
     },
     updateReusedStep (value) {
-      this.$emit('update:reusedStep', set(this.reusedStep, 'step', value));
+      this.$emit('update:reusedStep', set(this.reusedStep, '_id', value));
     },
     updateAdditionType (value) {
       this.$emit('update:additionType', value);

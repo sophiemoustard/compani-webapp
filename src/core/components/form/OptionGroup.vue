@@ -49,7 +49,7 @@ export default {
   .group-title
     display: flex
     flex: 1
-    margin: 2px -4px
+    margin: 16px 0px 2px -4px
   .required::after
     content: ' *'
   /deep/.q-option-group

@@ -47,11 +47,6 @@ export default {
       refreshingActivities: false,
     };
   },
-  watch: {
-    value () {
-      if (!this.activityOptions.length) this.refreshActivities();
-    },
-  },
   methods: {
     async refreshActivities () {
       try {
@@ -81,6 +76,7 @@ export default {
       this.$emit('update:reusedActivity', value);
     },
     hide () {
+      this.selectedProgram = '';
       this.activityOptions = [];
       this.$emit('hide');
     },
