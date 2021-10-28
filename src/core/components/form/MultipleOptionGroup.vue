@@ -1,8 +1,8 @@
 <template>
-  <div :class="['row', 'margin-input', { last: last }]">
+  <div :class="'row margin-input'">
     <div class="col-12">
       <div class="row justify-between">
-        <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+        <p :class="'input-caption required'">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <div v-for="(options, index) in optionsGroups" :key="index">
@@ -11,8 +11,8 @@
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
         <q-field dense borderless class="col-12">
-          <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
-            :disable="disable" v-on="$listeners" />
+          <q-option-group :value="value" :options="options" :type="type" inline dense
+            v-on="$listeners" />
         </q-field>
       </div>
       <q-field :error="error" :error-message="errorMessage" dense borderless class="error-field" />
@@ -30,14 +30,9 @@ export default {
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
     value: { type: String, default: '' },
-    last: { type: Boolean, default: false },
-    readOnly: { type: Boolean, default: false },
-    requiredField: { type: Boolean, default: false },
     optionsGroups: { type: Array, default: () => [] },
     groupTitles: { type: Array, default: () => [] },
     type: { type: String, default: '' },
-    inline: { type: Boolean, default: false },
-    disable: { type: Boolean, default: false },
   },
 };
 </script>

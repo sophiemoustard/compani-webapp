@@ -13,7 +13,7 @@
       <template v-else-if="additionType === REUSE_STEP">
         <ni-select in-modal :value="reusedStep.program" caption="Programme" required-field :options="programOptions"
         inline @input="updateProgram($event)" :error="validations.reusedStep.program.$error" />
-        <ni-multiple-option-group inline required-field caption="Étapes" :value="reusedStep._id" type="radio"
+        <ni-multiple-option-group required-field caption="Étapes" :value="reusedStep._id" type="radio"
           :options-groups="stepOptions" @input="updateReusedStep($event)" :group-titles="stepGroups"
           :error="validations.reusedStep._id.$error" />
       </template>
