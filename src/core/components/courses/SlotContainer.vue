@@ -70,7 +70,7 @@ import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, REMOTE, STEP_TYPES } from '@data/constants';
+import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
@@ -183,7 +183,7 @@ export default {
       return [
         { label: 'Pas d\'étape spécifiée', value: '' },
         ...this.course.subProgram.steps.map((step, index) => ({
-          label: `${index + 1} - ${step.name}${this.getStepType(step.type)}`,
+          label: `${index + 1} - ${step.name} (${this.getStepTypeLabel(step.type)})`,
           value: step._id,
           type: step.type,
           disable: step.type === E_LEARNING,
@@ -343,10 +343,6 @@ export default {
       if (!slot.step) return '';
       const step = this.stepOptions.find(option => option.value === slot.step._id);
       return step ? step.label : '';
-    },
-    getStepType (type) {
-      const stepType = STEP_TYPES.find(step => step.value === type).label;
-      return stepType ? ` (${stepType})` : '';
     },
     datesValidations (dates) {
       return {

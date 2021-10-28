@@ -87,7 +87,7 @@
 
     <step-addition-modal v-model="stepAdditionModal" :new-step.sync="newStep" :reused-step.sync="reusedStep"
       @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" :addition-type.sync="additionType"
-      :program-id="program._id" :validations="$v" />
+      :program="program" :validations="$v" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
@@ -125,7 +125,6 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
   E_LEARNING,
-  STEP_TYPES,
   ACTIVITY_TYPES,
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
@@ -172,7 +171,7 @@ export default {
       additionType: CREATE_STEP,
       stepAdditionModal: false,
       newStep: { name: '', type: E_LEARNING },
-      reusedStep: '',
+      reusedStep: { _id: '', program: '' },
       stepEditionModal: false,
       editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
@@ -200,7 +199,7 @@ export default {
       program: { subPrograms: { $each: { name: { required } } } },
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
-      reusedStep: { required },
+      reusedStep: { _id: { required }, program: { required } },
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
       editedActivity: { name: { required }, type: { required } },
@@ -253,10 +252,6 @@ export default {
     formatQuantity,
     saveTmpName (index) {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
-    },
-    getStepTypeLabel (value) {
-      const type = STEP_TYPES.find(t => t.value === value);
-      return type ? type.label : '';
     },
     getActivityTypeLabel (value) {
       const type = this.activityTypeOptions.find(t => t.value === value);
@@ -336,7 +331,7 @@ export default {
           this.$v.reusedStep.$touch();
           if (this.$v.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-          await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep });
+          await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep._id });
           NotifyPositive('Étape réutilisée.');
         }
 
@@ -352,7 +347,7 @@ export default {
     resetStepAdditionModal () {
       this.newStep.name = '';
       this.additionType = CREATE_STEP;
-      this.reusedStep = '';
+      this.reusedStep = { _id: '', program: '' };
       this.$v.newStep.$reset();
       this.$v.reusedStep.$reset();
     },
@@ -518,12 +513,6 @@ export default {
     },
     async detachStep (subProgramId, stepId) {
       try {
-        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
-        const step = subProgram.steps.find(s => s._id === stepId);
-        if (step.courseSlotsCount) {
-          return NotifyWarning('Certains créneaux de formation sont encore rattachés à cette étape.');
-        }
-
         await SubPrograms.detachStep(subProgramId, stepId);
         await this.refreshProgram();
         NotifyPositive('Étape retirée.');
