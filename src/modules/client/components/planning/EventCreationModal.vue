@@ -172,11 +172,16 @@ export default {
   watch: {
     selectedAuxiliary (value) {
       if (!this.selectedAuxiliary.hasContractOnEvent && this.newEvent.type === INTERNAL_HOUR) {
-        this.$emit('update:newEvent', set(this.newEvent, 'type', INTERVENTION));
+        this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
       }
     },
     isRepetitionAllowed (value) {
-      if (!value) this.$emit('update:newEvent', set(this.newEvent.repetition, 'frequency', NEVER));
+      if (!value) {
+        this.$emit(
+          'update:newEvent',
+          { ...this.newEvent, repetition: { ...this.newEvent.repetition, frequency: NEVER } }
+        );
+      }
     },
     'newEvent.absence': function () {
       this.getAbsences();
@@ -204,12 +209,12 @@ export default {
     },
     resetAbsenceType () {
       if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY) {
-        this.$emit('update:newEvent', set(this.newEvent, 'absence', UNJUSTIFIED));
+        this.$emit('update:newEvent', { ...this.newEvent, absence: UNJUSTIFIED });
       }
     },
     updateSectorEvent (auxId) {
       const auxiliary = this.activeAuxiliaries.find(aux => aux._id === auxId);
-      this.$emit('update:newEvent', set(this.newEvent, 'sector', auxiliary ? auxiliary.sector._id : ''));
+      this.$emit('update:newEvent', { ...this.newEvent, sector: auxiliary ? auxiliary.sector._id : '' });
     },
     setEventAddressAndSubscription () {
       const payload = {
@@ -227,14 +232,14 @@ export default {
       else this.update(addressList[0].value, 'address');
     },
     update (event, path) {
-      this.$emit('update:newEvent', set(this.newEvent, path, event));
+      this.$emit('update:newEvent', set({ ...this.newEvent }, path, event));
     },
     async updateCustomer (event) {
-      await this.$emit('update:newEvent', set(this.newEvent, 'customer', event));
+      await this.$emit('update:newEvent', { ...this.newEvent, customer: event });
       this.setEventAddressAndSubscription();
     },
     async updateType (event) {
-      await this.$emit('update:newEvent', set(this.newEvent, 'type', event));
+      await this.$emit('update:newEvent', { ...this.newEvent, type: event });
       this.reset(true, event);
     },
     async updateAbsenceNature (event) {
@@ -249,18 +254,18 @@ export default {
       this.setDateHours(this.newEvent, 'newEvent');
     },
     async updateCustomerAddress (event) {
-      await this.$emit('update:newEvent', set(this.newEvent, 'address', event));
+      await this.$emit('update:newEvent', { ...this.newEvent, address: event });
       this.deleteClassFocus();
     },
     async updateDates (event) {
-      await this.$emit('update:newEvent', set(this.newEvent, 'dates', event));
+      await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
     },
     async updateCheckBox (event) {
       if (!this.newEvent.isExtendedAbsence) await this.getAbsences();
-      await this.$emit('update:newEvent', set(this.newEvent, 'isExtendedAbsence', !this.newEvent.isExtendedAbsence));
+      await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });
     },
     async getAbsences () {
-      await this.$emit('update:newEvent', set(this.newEvent, 'extension', ''));
+      await this.$emit('update:newEvent', { ...this.newEvent, extension: '' });
       const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
 
       this.extendedAbsenceOptions = auxiliaryEvents
