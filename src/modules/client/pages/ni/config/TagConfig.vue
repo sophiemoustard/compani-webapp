@@ -44,6 +44,8 @@ export default {
         uploadDate: 'Date de mise en ligne du contrat',
         initialContractStartDate: 'Date d’effet du contrat initial',
         initialContractMonthlyHours: 'Volume d\'heures mensuel du contrat initial',
+        companySIRET: 'SIRET de l\'établissement',
+        auxiliaryBirthCity: 'Ville de naissance',
       },
       mandateTags: {
         customerTitle: 'Civilité',
