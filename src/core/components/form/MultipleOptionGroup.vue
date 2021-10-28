@@ -11,7 +11,7 @@
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
         <q-field dense borderless class="col-12">
-          <q-option-group :value="value" :options="options" :type="type" inline dense
+          <q-option-group :value="value" :options="options" type="radio" inline dense
             v-on="$listeners" />
         </q-field>
       </div>
@@ -32,7 +32,6 @@ export default {
     value: { type: String, default: '' },
     optionsGroups: { type: Array, default: () => [] },
     groupTitles: { type: Array, default: () => [] },
-    type: { type: String, default: '' },
   },
 };
 </script>
