@@ -128,16 +128,18 @@
         :disable="historiesLoading" />
     </div>
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
-      @cancelTimeStamping="cancelTimeStamping" :start="isStartCancellation" />
+      @cancelTimeStamping="cancelTimeStamping" :start="isStartCancellation" :reason.sync="timeStampCancellationReason"
+      :validations="$v.timeStampCancellationReason" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
 import set from 'lodash/set';
+import { required } from 'vuelidate/lib/validators';
 import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES, TIME_STAMPING_ACTIONS } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -171,6 +173,12 @@ export default {
       historyCancellationModal: false,
       historyToCancel: {},
       isStartCancellation: true,
+      timeStampCancellationReason: '',
+    };
+  },
+  validations () {
+    return {
+      timeStampCancellationReason: { required },
     };
   },
   computed: {
@@ -316,15 +324,23 @@ export default {
       this.historyCancellationModal = true;
     },
     resetHistoryCancellationModal () {
+      this.timeStampCancellationReason = '';
       this.historyCancellationModal = false;
       this.historyToCancel = {};
+      this.$v.timeStampCancellationReason.$reset();
     },
     async refreshHistories (eventId) {
       await this.$emit('refresh-histories', eventId);
     },
     async cancelTimeStamping () {
       try {
-        await EventHistories.updateById(this.historyToCancel._id, { isCancelled: true });
+        this.$v.timeStampCancellationReason.$touch();
+        if (this.$v.timeStampCancellationReason.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await EventHistories.updateById(
+          this.historyToCancel._id,
+          { isCancelled: true, timeStampCancellationReason: this.timeStampCancellationReason }
+        );
 
         await this.refreshHistories(this.editedEvent._id);
 
