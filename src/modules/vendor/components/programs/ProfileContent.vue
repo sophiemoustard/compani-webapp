@@ -21,8 +21,8 @@
                 <div class="flex-direction row">
                   <div class="text-weight-bold">
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
-                    <ni-button v-if="areStepsLocked[step._id]" icon="lock" @click="validateUnlockEdition(step)"
-                      class="step-icon-lock" size="sm" />
+                    <ni-button v-if="isLocked(step)" icon="lock" class="step-icon-lock" size="sm"
+                      @click="openValidateUnlockEditionModal(subProgram, step)" />
                   </div>
                   <published-dot :is-published="isPublished(step)"
                     :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
@@ -103,6 +103,10 @@
 
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
       :company-options="companyOptions" @hide="resetPublication" />
+
+    <validate-unlock-edition-modal :value="validateUnlockEditionModal" @confirm="confirmUnlocking(stepToBeUnlocked)"
+      :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" :step-status="stepToBeUnlocked.status"
+      @hide="resetValidateUnlockEditionModal" @cancel="cancelUnlocking()" />
   </div>
 </template>
 
@@ -112,6 +116,7 @@ import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import groupBy from 'lodash/groupBy';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
@@ -126,7 +131,7 @@ import {
   PUBLISHED_DOT_WARNING,
   CREATE_STEP,
 } from '@data/constants';
-import { formatQuantity, formatAndSortOptions } from '@helpers/utils';
+import { formatQuantity, formatAndSortOptions, sortStrings } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
@@ -134,6 +139,7 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
+import ValidateUnlockEditionModal from 'src/modules/vendor/components/programs/ValidateUnlockEditionModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -152,6 +158,7 @@ export default {
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
     'sub-program-publication-modal': SubProgramPublicationModal,
+    'validate-unlock-edition-modal': ValidateUnlockEditionModal,
     draggable,
     'published-dot': PublishedDot,
   },
@@ -183,6 +190,9 @@ export default {
       companyOptions: [],
       subProgramToPublish: null,
       areStepsLocked: {},
+      validateUnlockEditionModal: false,
+      subProgramsReusingStepToBeUnlocked: [],
+      stepToBeUnlocked: { _id: '', status: '' },
     };
   },
   validations () {
@@ -555,6 +565,12 @@ export default {
     isPublished (element) {
       return element.status === PUBLISHED;
     },
+    isLocked (step) {
+      return this.areStepsLocked[step._id];
+    },
+    isPublishedOrLocked (step) {
+      return this.isPublished(step) || this.isLocked(step);
+    },
     isReused (step) {
       return step.subPrograms && step.subPrograms.length > 1;
     },
@@ -564,15 +580,6 @@ export default {
         .forEach(sp => sp.steps.forEach(step => Object.assign(acc, { [step._id]: this.isReused(step) })));
 
       this.areStepsLocked = acc;
-    },
-    isLocked (step) {
-      return this.areStepsLocked[step._id];
-    },
-    unlock (stepId) {
-      this.$set(this.areStepsLocked, stepId, false);
-    },
-    isPublishedOrLocked (step) {
-      return this.isPublished(step) || this.isLocked(step);
     },
     async openSubProgramPublicationModal () {
       try {
@@ -588,23 +595,33 @@ export default {
     resetPublication () {
       this.subProgramToPublish = null;
     },
-    validateUnlockEdition (step) {
-      if (!this.areStepsLocked[step._id]) return;
+    resetValidateUnlockEditionModal () {
+      this.stepToBeUnlocked = { _id: '', status: '' };
+      this.subProgramsReusingStepToBeUnlocked = [];
+    },
+    initSubProgramsReusingStepToBeUnlocked (subProgram, step) {
+      this.subProgramsReusingStepToBeUnlocked = Object.values(groupBy(step.subPrograms, 'program._id'))
+        .map(groupSp => ({
+          programName: groupSp[0].program.name,
+          subProgramsName: groupSp.filter(sp => sp._id !== subProgram._id).map(sP => sP.name).sort(sortStrings),
+        }))
+        .sort((a, b) => sortStrings(a.programName, b.programName));
+    },
+    openValidateUnlockEditionModal (subProgram, step) {
+      if (!this.isLocked(step)) return;
 
-      const isPublishedMessage = this.isPublished(step)
-        ? 'Cette étape est publiée, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes'
-          + '<br /><br />'
-        : '';
-
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: `${isPublishedMessage}`
-          + 'Êtes-vous sûr(e) de vouloir déverrouiller cette étape ?',
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => { this.unlock(step._id); NotifyPositive('Étape déverouillée.'); })
-        .onCancel(() => NotifyPositive('Déverouillage annulé.'));
+      this.stepToBeUnlocked = pick(step, ['_id', 'status']);
+      this.initSubProgramsReusingStepToBeUnlocked(subProgram, step);
+      this.validateUnlockEditionModal = true;
+    },
+    confirmUnlocking (step) {
+      this.$set(this.areStepsLocked, step._id, false);
+      this.validateUnlockEditionModal = false;
+      NotifyPositive('Étape déverouillée.');
+    },
+    cancelUnlocking () {
+      this.validateUnlockEditionModal = false;
+      NotifyPositive('Déverouillage annulé.');
     },
   },
 };
