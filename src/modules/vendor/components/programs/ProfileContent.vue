@@ -12,7 +12,7 @@
         :disabled="$q.platform.is.mobile || isPublished(subProgram)">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step q-mb-sm">
           <q-card-section class="step-head cursor-pointer row" :id="step._id"
-            :class="{ 'step-lock': isReused(step) }">
+            :class="{ 'step-lock': isLocked(step) }">
             <div class="step-info" @click="showActivities(step._id)">
               <q-item-section side>
                 <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="copper-grey-500" />
@@ -21,7 +21,8 @@
                 <div class="flex-direction row">
                   <div class="text-weight-bold">
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
-                    <q-icon v-if="isReused(step)" name="lock" color="copper-grey-500" class="step-icon-lock" />
+                    <ni-button v-if="areStepsLocked[step._id]" icon="lock" @click="validateUnlockEdition(step)"
+                      class="step-icon-lock" size="sm" />
                   </div>
                   <published-dot :is-published="isPublished(step)"
                     :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
@@ -32,16 +33,16 @@
               </q-item-section>
             </div>
             <div class="flex align-center">
-              <ni-button icon="edit" @click="openStepEditionModal(step)" :disable="isReused(step)" />
+              <ni-button icon="edit" @click="openStepEditionModal(step)" :disable="isLocked(step)" />
               <ni-button icon="close" @click="validateStepDetachment(subProgram._id, step._id)"
-                :disable="isPublishedOrReused(step)" />
+                :disable="isPublished(subProgram) || isLocked(step)" />
             </div>
           </q-card-section>
           <div class="bg-peach-200 activity-container" v-if="isActivitiesShown[step._id]">
-            <draggable v-model="step.activities" :disabled="$q.platform.is.mobile || isPublishedOrReused(step)"
+            <draggable v-model="step.activities" :disabled="$q.platform.is.mobile || isPublishedOrLocked(step)"
               class="activity-draggable" ghost-class="ghost" @change="dropActivity(subProgram._id, step._id)">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-                <q-card-section :class="{ 'step-lock': isReused(step) }">
+                <q-card-section :class="{ 'step-lock': isLocked(step) }">
                   <div class="cursor-pointer row activity-info"
                     @click="goToActivityProfile(subProgram, step, activity)">
                     <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
@@ -53,16 +54,16 @@
                       :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
-                    <ni-button class="q-px-sm" icon="close" :disable="isPublishedOrReused(step)"
+                    <ni-button class="q-px-sm" icon="close" :disable="isPublishedOrLocked(step)"
                       @click="validateActivityDeletion(step._id, activity._id)" />
                   </div>
                 </q-card-section>
               </q-card>
             </draggable>
             <div v-if="!isPublished(step)" class="q-mt-md" align="right">
-              <ni-button color="primary" icon="add" label="Réutiliser une activité" :disable="isReused(step)"
+              <ni-button color="primary" icon="add" label="Réutiliser une activité" :disable="isLocked(step)"
                 @click="openActivityReuseModal(step)" />
-              <ni-button color="primary" icon="add" label="Créer une activité" :disable="isReused(step)"
+              <ni-button color="primary" icon="add" label="Créer une activité" :disable="isLocked(step)"
                 @click="openActivityCreationModal(step._id)" />
             </div>
             <div class="no-activity" v-if="isPublished(step) && !step.activities.length">
@@ -181,6 +182,7 @@ export default {
       subProgramPublicationModal: false,
       companyOptions: [],
       subProgramToPublish: null,
+      areStepsLocked: {},
     };
   },
   validations () {
@@ -200,6 +202,7 @@ export default {
   async created () {
     if (!this.program) await this.refreshProgram();
     await this.refreshProgramList();
+    await this.initAreStepsLocked();
 
     if (this.openedStep) {
       this.showActivities(this.openedStep);
@@ -367,7 +370,7 @@ export default {
     },
     // ACTIVITY
     goToActivityProfile (subProgram, step, activity) {
-      if (this.isReused(step)) return;
+      if (this.isLocked(step)) return;
       this.$router.push({
         name: 'ni pedagogy activity info',
         params: {
@@ -555,8 +558,21 @@ export default {
     isReused (step) {
       return step.subPrograms && step.subPrograms.length > 1;
     },
-    isPublishedOrReused (step) {
-      return this.isPublished(step) || this.isReused(step);
+    async initAreStepsLocked () {
+      const acc = {};
+      this.program.subPrograms
+        .forEach(sp => sp.steps.forEach(step => Object.assign(acc, { [step._id]: this.isReused(step) })));
+
+      this.areStepsLocked = acc;
+    },
+    isLocked (step) {
+      return this.areStepsLocked[step._id];
+    },
+    unlock (stepId) {
+      this.$set(this.areStepsLocked, stepId, false);
+    },
+    isPublishedOrLocked (step) {
+      return this.isPublished(step) || this.isLocked(step);
     },
     async openSubProgramPublicationModal () {
       try {
@@ -571,6 +587,24 @@ export default {
     },
     resetPublication () {
       this.subProgramToPublish = null;
+    },
+    validateUnlockEdition (step) {
+      if (!this.areStepsLocked[step._id]) return;
+
+      const isPublishedMessage = this.isPublished(step)
+        ? 'Cette étape est publiée, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes'
+          + '<br /><br />'
+        : '';
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: `${isPublishedMessage}`
+          + 'Êtes-vous sûr(e) de vouloir déverrouiller cette étape ?',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => { this.unlock(step._id); NotifyPositive('Étape déverouillée.'); })
+        .onCancel(() => NotifyPositive('Déverouillage annulé.'));
     },
   },
 };
@@ -605,7 +639,7 @@ export default {
     background-color: $copper-grey-100
 
 .step-icon-lock
-  margin: 0 0 2px 12px
+  margin: 0 0 4px 12px
 
 .add-step-button
   align-self: flex-end
