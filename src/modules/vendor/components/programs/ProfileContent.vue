@@ -581,7 +581,7 @@ export default {
     async initAreStepsLocked () {
       const acc = {};
       this.program.subPrograms
-        .forEach(sp => sp.steps.forEach(step => this.setStepLocking(step, this.isReused(step))));
+        .forEach(sp => sp.steps.forEach(step => Object.assign(acc, { [step._id]: this.isReused(step) })));
 
       this.areStepsLocked = acc;
     },
