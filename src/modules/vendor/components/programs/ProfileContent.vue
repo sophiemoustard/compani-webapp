@@ -579,8 +579,8 @@ export default {
       return step.subPrograms && step.subPrograms.length > 1;
     },
     initAreStepsLocked () {
-      this.areStepsLocked = Object.fromEntries(this.program.subPrograms
-        .map(sp => sp.steps.map(step => ([step._id, this.isReused(step)])))
+      this.areStepsLocked = Object.assign(...this.program.subPrograms
+        .map(sp => sp.steps.map(step => ({ [step._id]: this.isReused(step) })))
         .flat());
     },
     async openSubProgramPublicationModal () {
