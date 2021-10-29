@@ -33,7 +33,7 @@
               </q-item-section>
             </div>
             <div class="flex align-center">
-              <ni-button icon="edit" @click="openStepEditionModal(step)" :disable="isLocked(step)" />
+              <ni-button icon="edit" @click="openStepEditionModal(step)" />
               <ni-button icon="close" @click="validateStepDetachment(subProgram._id, step._id)"
                 :disable="isPublished(subProgram)" />
             </div>
@@ -54,8 +54,8 @@
                       :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
-                    <ni-button class="q-px-sm" icon="close" :disable="isPublishedOrLocked(step)"
-                      @click="validateActivityDeletion(step._id, activity._id)" />
+                    <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
+                      @click="validateActivityDeletion(step, activity._id)" />
                   </div>
                 </q-card-section>
               </q-card>
@@ -193,6 +193,7 @@ export default {
       validateUnlockingEditionModal: false,
       subProgramsReusingStepToBeUnlocked: [],
       stepToBeUnlocked: { _id: '', status: '' },
+      openNextModalAfterUnlocking: () => null,
     };
   },
   validations () {
@@ -358,8 +359,13 @@ export default {
     },
     // step edition
     async openStepEditionModal (step) {
-      this.editedStep = pick(step, ['_id', 'name', 'type']);
-      this.stepEditionModal = true;
+      if (this.isLocked(step)) {
+        this.openNextModalAfterUnlocking = () => this.openStepEditionModal(step);
+        this.openValidateUnlockingEditionModal(step);
+      } else {
+        this.editedStep = pick(step, ['_id', 'name', 'type']);
+        this.stepEditionModal = true;
+      }
     },
     async editStep () {
       try {
@@ -384,7 +390,6 @@ export default {
     },
     // ACTIVITY
     goToActivityProfile (subProgram, step, activity) {
-      if (this.isLocked(step)) return;
       this.$router.push({
         name: 'ni pedagogy activity info',
         params: {
@@ -500,14 +505,19 @@ export default {
         return NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
     },
-    validateActivityDeletion (stepId, activityId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.detachActivity(stepId, activityId))
-        .onCancel(() => NotifyPositive('Retrait annulé.'));
+    validateActivityDeletion (step, activityId) {
+      if (this.isLocked(step)) {
+        this.openNextModalAfterUnlocking = () => this.validateActivityDeletion(step, activityId);
+        this.openValidateUnlockingEditionModal(step);
+      } else {
+        this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape ?',
+          ok: true,
+          cancel: 'Annuler',
+        }).onOk(() => this.detachActivity(step._id, activityId))
+          .onCancel(() => NotifyPositive('Retrait annulé.'));
+      }
     },
     async detachActivity (stepId, activityId) {
       try {
@@ -598,6 +608,7 @@ export default {
       this.subProgramToPublish = null;
     },
     resetValidateUnlockingEditionModal () {
+      this.openNextModalAfterUnlocking = () => null;
       this.stepToBeUnlocked = { _id: '', status: '' };
       this.subProgramsReusingStepToBeUnlocked = [];
     },
@@ -618,6 +629,7 @@ export default {
     },
     confirmUnlocking () {
       this.setStepLocking(this.stepToBeUnlocked, false);
+      this.openNextModalAfterUnlocking();
       this.validateUnlockingEditionModal = false;
       NotifyPositive('Étape déverrouillée.');
     },
