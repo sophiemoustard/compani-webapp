@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
-      Téléchargement le <span class="text-weight-bold">fichier de télétransmission</span>
+      Téléchargement du <span class="text-weight-bold">fichier de télétransmission</span>
     </template>
     <ni-select in-modal caption="Tiers payeur" :value="deliveryFile.thirdPartyPayer" :options="tppOptions"
       @input="update($event, 'thirdPartyPayer')" @blur="validations.thirdPartyPayer.$touch" required-field

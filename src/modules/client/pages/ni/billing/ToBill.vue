@@ -52,6 +52,7 @@
     </ni-simple-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="validateBillListCreation" data-cy="to-bill-button" />
+
     <delivery-download-modal v-model="deliveryDownloadModal" :delivery-file="deliveryFile" :loading="modalLoading"
       :validations="$v.deliveryFile" :tpp-options="thirdPartyPayerOptions" :month-options="monthOptions"
       @submit="downloadDeliveryFile" @hide="resetDeliveryDownloadModal" />
@@ -74,8 +75,9 @@ import Button from '@components/Button';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { MONTH } from '@data/constants';
-import { formatPrice, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
+import { formatPrice, formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -129,13 +131,14 @@ export default {
       ],
       toBillOption: 0,
       deliveryDownloadModal: false,
-      deliveryFile: { thirdPartyPayer: '', month: '' },
+      deliveryFile: { thirdPartyPayer: '', month: moment().format('MM-YYYY') },
       thirdPartyPayerOptions: [],
+      thirdPartyPayers: [],
       monthOptions: [
         { label: capitalize(moment().format('MMMM YY')), value: moment().format('MM-YYYY') },
         {
-          label: capitalize(moment().add(1, 'month').format('MMMM YY')),
-          value: moment().add(1, 'month').format('MM-YYYY'),
+          label: capitalize(moment().subtract(1, 'month').format('MMMM YY')),
+          value: moment().subtract(1, 'month').format('MM-YYYY'),
         },
       ],
       modalLoading: false,
@@ -194,19 +197,27 @@ export default {
   },
   methods: {
     openDeliveryDownloadModal () {
-      this.deliveryFile = { thirdPartyPayer: '', month: moment().format('MM-YYYY') };
       this.deliveryDownloadModal = true;
     },
     resetDeliveryDownloadModal () {
       this.$v.deliveryFile.$reset();
-      this.deliveryFile = { thirdPartyPayer: '', month: '' };
+      this.deliveryFile = { thirdPartyPayer: '', month: moment().format('MM-YYYY') };
+    },
+    getFileName (query) {
+      const tpp = this.thirdPartyPayers.find(t => t._id === this.deliveryFile.thirdPartyPayer);
+
+      const month = moment(this.deliveryFile.month, 'MM-YYYY').format('YYYYMM');
+      const date = moment().format('YYMMDDHHmm');
+
+      return `${tpp.companyCode}-${month}-${tpp.teletransmissionType}-${date}.xml`;
     },
     async downloadDeliveryFile () {
       try {
         this.$v.deliveryFile.$touch();
         if (this.$v.deliveryFile.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Teletransmission.downloadDeliveryFile(this.deliveryFile);
+        const file = await Teletransmission.downloadDeliveryFile(this.deliveryFile);
+        await downloadFile(file, this.getFileName());
 
         this.deliveryDownloadModal = false;
       } catch (e) {
@@ -283,8 +294,11 @@ export default {
     },
     async getThirdPartyPayers () {
       try {
-        const tpps = await ThirdPartyPayers.list();
-        this.thirdPartyPayerOptions = formatAndSortOptions(tpps.filter(tpp => !!tpp.teletransmissionId), 'name');
+        this.thirdPartyPayers = await ThirdPartyPayers.list();
+        this.thirdPartyPayerOptions = formatAndSortOptions(
+          this.thirdPartyPayers.filter(tpp => !!tpp.teletransmissionId),
+          'name'
+        );
       } catch (e) {
         this.thirdPartyPayerOptions = [];
         console.error(e);
