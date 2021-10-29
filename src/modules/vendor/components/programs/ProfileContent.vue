@@ -18,11 +18,11 @@
                 <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="copper-grey-500" />
               </q-item-section>
               <q-item-section>
-                <div class="flex-direction row">
+                <div class="flex-direction row step-title">
                   <div class="text-weight-bold">
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
-                    <ni-button v-if="isLocked(step)" icon="lock" class="step-icon-lock" size="sm"
-                      @click="openValidateUnlockEditionModal(subProgram, step)" />
+                    <ni-button v-if="isLocked(step)" icon="lock" class="q-ml-sm q-px-xs" size="sm"
+                      @click="openValidateUnlockingEditionModal(step)" />
                   </div>
                   <published-dot :is-published="isPublished(step)"
                     :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
@@ -35,7 +35,7 @@
             <div class="flex align-center">
               <ni-button icon="edit" @click="openStepEditionModal(step)" :disable="isLocked(step)" />
               <ni-button icon="close" @click="validateStepDetachment(subProgram._id, step._id)"
-                :disable="isPublished(subProgram) || isLocked(step)" />
+                :disable="isPublished(subProgram)" />
             </div>
           </q-card-section>
           <div class="bg-peach-200 activity-container" v-if="isActivitiesShown[step._id]">
@@ -104,9 +104,9 @@
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
       :company-options="companyOptions" @hide="resetPublication" />
 
-    <validate-unlock-edition-modal :value="validateUnlockEditionModal" @confirm="confirmUnlocking(stepToBeUnlocked)"
+    <validate-unlocking-edition-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking()"
       :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" :step-status="stepToBeUnlocked.status"
-      @hide="resetValidateUnlockEditionModal" @cancel="cancelUnlocking()" />
+      @hide="resetValidateUnlockingEditionModal" @confirm="confirmUnlocking(stepToBeUnlocked)" />
   </div>
 </template>
 
@@ -139,7 +139,7 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
-import ValidateUnlockEditionModal from 'src/modules/vendor/components/programs/ValidateUnlockEditionModal';
+import ValidateUnlockingEditionModal from 'src/modules/vendor/components/programs/ValidateUnlockingEditionModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -158,7 +158,7 @@ export default {
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
     'sub-program-publication-modal': SubProgramPublicationModal,
-    'validate-unlock-edition-modal': ValidateUnlockEditionModal,
+    'validate-unlocking-edition-modal': ValidateUnlockingEditionModal,
     draggable,
     'published-dot': PublishedDot,
   },
@@ -190,7 +190,7 @@ export default {
       companyOptions: [],
       subProgramToPublish: null,
       areStepsLocked: {},
-      validateUnlockEditionModal: false,
+      validateUnlockingEditionModal: false,
       subProgramsReusingStepToBeUnlocked: [],
       stepToBeUnlocked: { _id: '', status: '' },
     };
@@ -318,6 +318,9 @@ export default {
       this.stepAdditionModal = true;
       this.currentSubProgramId = subProgramId;
     },
+    lockReusedStep (step) {
+      Object.assign(this.areStepsLocked, { [step._id]: true });
+    },
     async addStep () {
       try {
         this.modalLoading = true;
@@ -333,6 +336,7 @@ export default {
           if (this.$v.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep._id });
+          this.lockReusedStep(this.reusedStep);
           NotifyPositive('Étape réutilisée.');
         }
 
@@ -595,33 +599,33 @@ export default {
     resetPublication () {
       this.subProgramToPublish = null;
     },
-    resetValidateUnlockEditionModal () {
+    resetValidateUnlockingEditionModal () {
       this.stepToBeUnlocked = { _id: '', status: '' };
       this.subProgramsReusingStepToBeUnlocked = [];
     },
-    initSubProgramsReusingStepToBeUnlocked (subProgram, step) {
+    initSubProgramsReusingStepToBeUnlocked (step) {
       this.subProgramsReusingStepToBeUnlocked = Object.values(groupBy(step.subPrograms, 'program._id'))
         .map(groupSp => ({
           programName: groupSp[0].program.name,
-          subProgramsName: groupSp.filter(sp => sp._id !== subProgram._id).map(sP => sP.name).sort(sortStrings),
+          subProgramsName: groupSp.map(sP => sP.name).sort(sortStrings),
         }))
         .sort((a, b) => sortStrings(a.programName, b.programName));
     },
-    openValidateUnlockEditionModal (subProgram, step) {
+    openValidateUnlockingEditionModal (step) {
       if (!this.isLocked(step)) return;
 
       this.stepToBeUnlocked = pick(step, ['_id', 'status']);
-      this.initSubProgramsReusingStepToBeUnlocked(subProgram, step);
-      this.validateUnlockEditionModal = true;
+      this.initSubProgramsReusingStepToBeUnlocked(step);
+      this.validateUnlockingEditionModal = true;
     },
     confirmUnlocking (step) {
       this.$set(this.areStepsLocked, step._id, false);
-      this.validateUnlockEditionModal = false;
-      NotifyPositive('Étape déverouillée.');
+      this.validateUnlockingEditionModal = false;
+      NotifyPositive('Étape déverrouillée.');
     },
     cancelUnlocking () {
-      this.validateUnlockEditionModal = false;
-      NotifyPositive('Déverouillage annulé.');
+      this.validateUnlockingEditionModal = false;
+      NotifyPositive('Déverrouillage annulé.');
     },
   },
 };
@@ -654,9 +658,8 @@ export default {
     font-size: 13px
   &-lock
     background-color: $copper-grey-100
-
-.step-icon-lock
-  margin: 0 0 4px 12px
+  &-title
+    min-height: 28px
 
 .add-step-button
   align-self: flex-end

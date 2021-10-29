@@ -36,7 +36,7 @@
 import { PUBLISHED } from '@data/constants';
 
 export default {
-  name: 'ValidateUnlockEditionModal',
+  name: 'ValidateUnlockingEditionModal',
   props: {
     value: { type: Boolean, default: false },
     subProgramsGroupedByProgram: { type: Array, default: () => [] },
