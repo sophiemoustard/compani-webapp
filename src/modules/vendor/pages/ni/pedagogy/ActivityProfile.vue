@@ -1,17 +1,17 @@
 <template>
   <q-page padding class="vendor-background">
     <template v-if="activity">
-      <ni-profile-header :title="activityName" :header-info="headerInfo" />
+      <ni-profile-header :title="activity.name" :header-info="headerInfo" />
       <div>
         <ni-button v-if="isEditionLocked" label="Déverrouiller" color="primary" icon="mdi-lock"
           @click="validateUnlockEdition" />
         <div class="filters-container q-mt-md">
-          <ni-input v-model.trim="activity.name" required-field caption="Nom" @focus="saveTmp('name')"
-            @blur="updateActivity(null, 'name')" :disable="isEditionLocked"
-            :error="$v.activity.name.$error" />
-          <ni-select v-model.trim="activity.type" @input="updateActivity(null, 'type')"
+          <ni-input v-model.trim="editedActivity.name" required-field caption="Nom"
+            @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked"
+            :error="$v.editedActivity.name.$error" />
+          <ni-select v-model.trim="editedActivity.type" @input="updateActivity(editedActivity.type, 'type')"
             :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" required-field
-            :error="$v.activity.type.$error" />
+            :error="$v.editedActivity.type.$error" />
         </div>
       </div>
       <div class="row body">
@@ -29,7 +29,6 @@
 <script>
 import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
-import set from 'lodash/set';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import Activities from '@api/Activities';
@@ -72,13 +71,13 @@ export default {
       isActivityUsedInSeveralPlaces: false,
       PUBLISHED_DOT_WARNING,
       PUBLISHED_DOT_ACTIVE,
+      editedActivity: { name: '', type: '' },
       ACTIVITY_TYPES,
-      activityName: '',
     };
   },
   validations () {
     return {
-      activity: {
+      editedActivity: {
         name: { required },
         type: { required },
       },
@@ -91,7 +90,7 @@ export default {
       card: state => state.card.card,
     }),
     activityType () {
-      return get(ACTIVITY_TYPES.find(type => type.value === this.activity.type), 'label') || '';
+      return ACTIVITY_TYPES.find(type => type.value === this.activity.type).label || '';
     },
     isActivityPublished () {
       return this.activity.status === PUBLISHED;
@@ -115,11 +114,6 @@ export default {
       return infos;
     },
   },
-  watch: {
-    activity () {
-      this.activityName = get(this.activity, 'name') || '';
-    },
-  },
   async created () {
     try {
       await this.refreshActivity();
@@ -137,7 +131,7 @@ export default {
       this.isActivityUsedInSeveralPlaces = isActivityUsedInOtherSteps || isActivityUsedInOneStepButSeveralSubPrograms;
 
       this.isEditionLocked = this.isActivityUsedInSeveralPlaces || this.isActivityPublished;
-      this.activityName = get(this.activity, 'name') || '';
+      this.editedActivity = { name: this.activity.name, type: this.activity.type };
     } catch (e) {
       console.error(e);
     }
@@ -225,20 +219,11 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
-    saveTmp (path) {
-      this.tmpInput = get(this.activity, path);
-    },
     async updateActivity (event, path) {
       try {
-        if (event) await await Activities.updateById(this.activity._id, { [path]: event });
-        else {
-          const value = get(this.activity, path);
-          if (this.tmpInput === value) return;
-          this.$v.activity.$touch();
-          if (this.$v.activity.$error) return NotifyWarning('Champ(s) invalide(s)');
-          const payload = set({}, path, value);
-          await Activities.updateById(this.activity._id, payload);
-        }
+        this.$v.editedActivity.$touch();
+        if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+        await Activities.updateById(this.activity._id, { [path]: event });
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
