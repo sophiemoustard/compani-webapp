@@ -2,10 +2,20 @@
   <q-page padding class="vendor-background">
     <template v-if="activity">
       <ni-profile-header :title="activity.name" :header-info="headerInfo" />
+      <div>
+        <ni-button v-if="isEditionLocked" label="Déverouiller" color="primary" icon="mdi-lock"
+          @click="validateUnlockEdition" />
+        <div class="filters-container q-mt-md">
+          <ni-input v-model.trim="editedActivity.name" required-field caption="Nom"
+            @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked" />
+          <ni-select v-model.trim="editedActivity.type" @input="updateActivity(editedActivity.type, 'type')"
+            :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" />
+        </div>
+      </div>
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked" :card-parent="activity"
-          @unlock-edition="validateUnlockEdition" @update="updateActivity" />
+          @update="updateActivity($event, 'cards')" />
         <card-edition :disable-edition="isEditionLocked" :card-parent="activity" @refresh="refreshCard" />
       </div>
     </template>
@@ -22,6 +32,9 @@ import Activities from '@api/Activities';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 import ProfileHeader from '@components/ProfileHeader';
+import Button from '@components/Button';
+import Input from '@components/form/Input';
+import Select from '@components/form/Select';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
@@ -41,6 +54,9 @@ export default {
     'card-container': CardContainer,
     'card-edition': CardEdition,
     'card-creation-modal': CardCreationModal,
+    'ni-button': Button,
+    'ni-input': Input,
+    'ni-select': Select,
   },
   mixins: [cardMixin],
   data () {
@@ -52,6 +68,8 @@ export default {
       isActivityUsedInSeveralPlaces: false,
       PUBLISHED_DOT_WARNING,
       PUBLISHED_DOT_ACTIVE,
+      editedActivity: { name: '', type: '' },
+      ACTIVITY_TYPES,
     };
   },
   computed: {
@@ -102,6 +120,7 @@ export default {
       this.isActivityUsedInSeveralPlaces = isActivityUsedInOtherSteps || isActivityUsedInOneStepButSeveralSubPrograms;
 
       this.isEditionLocked = this.isActivityUsedInSeveralPlaces || this.isActivityPublished;
+      this.editedActivity = { name: this.activity.name, type: this.activity.type };
     } catch (e) {
       console.error(e);
     }
@@ -189,9 +208,9 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
-    async updateActivity (event) {
+    async updateActivity (event, field) {
       try {
-        await Activities.updateById(this.activity._id, { cards: event });
+        await Activities.updateById(this.activity._id, { [field]: event });
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
@@ -225,4 +244,6 @@ export default {
 .q-item
   padding: 0
   min-height: 0
+/deep/ .q-btn__wrapper
+  padding: 0px !important
 </style>
