@@ -7,9 +7,10 @@
       width: 45vw;
   &-container-sm
     background-color: white
-    min-width: 30vw
+    @media screen and (max-width: 767px)
+      min-width: 65vw;
     @media screen and (min-width: 768px)
-      max-width: 50vw
+      width: 35vw;
   &-padding
     @media screen and (min-width: 768px)
       padding: 24px 25px 0px 25px

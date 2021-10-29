@@ -1,6 +1,6 @@
 <template>
     <q-dialog :value="value" @hide="hide">
-      <div class="modal-container-md modal-padding modal">
+      <div class="modal-container-sm modal-padding">
         <div class="title q-mb-md">Confirmation</div>
         <div class="banner row q-pa-sm q-mb-md">
           <q-icon size="sm" name="info_outline" color="orange-700" class="q-mr-sm" />
@@ -50,13 +50,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.modal
-  @media screen and (min-width: 768px)
-    width: 40vw
-    max-width: 510px
-  @media screen and (max-width: 767px)
-    width: 80vw
-    max-width: 510px
 .title
   font-size: 20px
 .banner
