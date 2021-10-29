@@ -318,8 +318,8 @@ export default {
       this.stepAdditionModal = true;
       this.currentSubProgramId = subProgramId;
     },
-    lockReusedStep (step) {
-      Object.assign(this.areStepsLocked, { [step._id]: true });
+    setStepLocking (step, value) {
+      Object.assign(this.areStepsLocked, { [step._id]: value });
     },
     async addStep () {
       try {
@@ -336,7 +336,7 @@ export default {
           if (this.$v.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep._id });
-          this.lockReusedStep(this.reusedStep);
+          this.setStepLocking(this.reusedStep, true);
           NotifyPositive('Étape réutilisée.');
         }
 
@@ -581,7 +581,7 @@ export default {
     async initAreStepsLocked () {
       const acc = {};
       this.program.subPrograms
-        .forEach(sp => sp.steps.forEach(step => Object.assign(acc, { [step._id]: this.isReused(step) })));
+        .forEach(sp => sp.steps.forEach(step => this.setStepLocking(step, this.isReused(step))));
 
       this.areStepsLocked = acc;
     },
@@ -619,7 +619,7 @@ export default {
       this.validateUnlockingEditionModal = true;
     },
     confirmUnlocking (step) {
-      this.$set(this.areStepsLocked, step._id, false);
+      this.setStepLocking(step, false);
       this.validateUnlockingEditionModal = false;
       NotifyPositive('Étape déverrouillée.');
     },
