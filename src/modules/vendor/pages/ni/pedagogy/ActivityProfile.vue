@@ -3,13 +3,15 @@
     <template v-if="activity">
       <ni-profile-header :title="activity.name" :header-info="headerInfo" />
       <div>
-        <ni-button v-if="isEditionLocked" label="Déverouiller" color="primary" icon="mdi-lock"
+        <ni-button v-if="isEditionLocked" label="Déverrouiller" color="primary" icon="mdi-lock"
           @click="validateUnlockEdition" />
         <div class="filters-container q-mt-md">
           <ni-input v-model.trim="editedActivity.name" required-field caption="Nom"
-            @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked" />
+            @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked"
+            :error="$v.editedActivity.name.$error" />
           <ni-select v-model.trim="editedActivity.type" @input="updateActivity(editedActivity.type, 'type')"
-            :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" />
+            :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" required-field
+            :error="$v.editedActivity.type.$error" />
         </div>
       </div>
       <div class="row body">
@@ -26,10 +28,11 @@
 
 <script>
 import { mapState } from 'vuex';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import Activities from '@api/Activities';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
@@ -70,6 +73,14 @@ export default {
       PUBLISHED_DOT_ACTIVE,
       editedActivity: { name: '', type: '' },
       ACTIVITY_TYPES,
+    };
+  },
+  validations () {
+    return {
+      editedActivity: {
+        name: { required },
+        type: { required },
+      },
     };
   },
   computed: {
@@ -174,8 +185,8 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
-        .onCancel(() => NotifyPositive('Déverouillage annulé.'));
+      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverrouillée.'); })
+        .onCancel(() => NotifyPositive('Déverrouillage annulé.'));
     },
     async createCard (template) {
       this.$q.loading.show();
@@ -208,9 +219,11 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
-    async updateActivity (event, field) {
+    async updateActivity (event, path) {
       try {
-        await Activities.updateById(this.activity._id, { [field]: event });
+        this.$v.editedActivity.$touch();
+        if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+        await Activities.updateById(this.activity._id, { [path]: event });
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
