@@ -106,7 +106,7 @@
 
     <validate-unlocking-step-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking()"
       :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" @hide="resetValidateUnlockingEditionModal"
-      @confirm="confirmUnlocking(stepToBeUnlocked)" :is-step-published="stepToBeUnlocked.status === PUBLISHED" />
+      @confirm="confirmUnlocking()" :is-step-published="stepToBeUnlocked.status === PUBLISHED" />
   </div>
 </template>
 
@@ -578,7 +578,7 @@ export default {
     isReused (step) {
       return step.subPrograms && step.subPrograms.length > 1;
     },
-    async initAreStepsLocked () {
+    initAreStepsLocked () {
       this.areStepsLocked = Object.fromEntries(this.program.subPrograms
         .map(sp => sp.steps.map(step => ([step._id, this.isReused(step)])))
         .flat());
@@ -616,8 +616,8 @@ export default {
       this.subProgramsReusingStepToBeUnlocked = this.getSubProgramsReusingStep(step);
       this.validateUnlockingEditionModal = true;
     },
-    confirmUnlocking (step) {
-      this.setStepLocking(step, false);
+    confirmUnlocking () {
+      this.setStepLocking(this.stepToBeUnlocked, false);
       this.validateUnlockingEditionModal = false;
       NotifyPositive('Étape déverrouillée.');
     },
