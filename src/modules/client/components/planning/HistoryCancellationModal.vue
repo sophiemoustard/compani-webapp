@@ -54,7 +54,7 @@ export default {
   @media screen and (min-width: 768px)
     width: 40vw
     max-width: 510px
-  @media screen and (max-width: 768px)
+  @media screen and (max-width: 767px)
     width: 80vw
     max-width: 510px
 .title
