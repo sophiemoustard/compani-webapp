@@ -33,23 +33,12 @@
 </template>
 
 <script>
-import { PUBLISHED } from '@data/constants';
-
 export default {
-  name: 'ValidateUnlockingEditionModal',
+  name: 'ValidateUnlockingStepModal',
   props: {
     value: { type: Boolean, default: false },
     subProgramsGroupedByProgram: { type: Array, default: () => [] },
-    stepStatus: { type: String, default: '' },
-  },
-  data () {
-    return {
-    };
-  },
-  computed: {
-    isStepPublished () {
-      return this.stepStatus === PUBLISHED;
-    },
+    isStepPublished: { type: Boolean, default: false },
   },
   methods: {
     cancel () {

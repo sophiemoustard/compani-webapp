@@ -104,9 +104,9 @@
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
       :company-options="companyOptions" @hide="resetPublication" />
 
-    <validate-unlocking-edition-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking()"
-      :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" :step-status="stepToBeUnlocked.status"
-      @hide="resetValidateUnlockingEditionModal" @confirm="confirmUnlocking(stepToBeUnlocked)" />
+    <validate-unlocking-step-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking()"
+      :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" @hide="resetValidateUnlockingEditionModal"
+      @confirm="confirmUnlocking(stepToBeUnlocked)" :is-step-published="stepToBeUnlocked.status === PUBLISHED" />
   </div>
 </template>
 
@@ -139,7 +139,7 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
-import ValidateUnlockingEditionModal from 'src/modules/vendor/components/programs/ValidateUnlockingEditionModal';
+import ValidateUnlockingStepModal from 'src/modules/vendor/components/programs/ValidateUnlockingStepModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -158,7 +158,7 @@ export default {
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
     'sub-program-publication-modal': SubProgramPublicationModal,
-    'validate-unlocking-edition-modal': ValidateUnlockingEditionModal,
+    'validate-unlocking-step-modal': ValidateUnlockingStepModal,
     draggable,
     'published-dot': PublishedDot,
   },
@@ -579,11 +579,9 @@ export default {
       return step.subPrograms && step.subPrograms.length > 1;
     },
     async initAreStepsLocked () {
-      const acc = {};
-      this.program.subPrograms
-        .forEach(sp => sp.steps.forEach(step => Object.assign(acc, { [step._id]: this.isReused(step) })));
-
-      this.areStepsLocked = acc;
+      this.areStepsLocked = Object.fromEntries(this.program.subPrograms
+        .map(sp => sp.steps.map(step => ([step._id, this.isReused(step)])))
+        .flat());
     },
     async openSubProgramPublicationModal () {
       try {
@@ -603,8 +601,8 @@ export default {
       this.stepToBeUnlocked = { _id: '', status: '' };
       this.subProgramsReusingStepToBeUnlocked = [];
     },
-    initSubProgramsReusingStepToBeUnlocked (step) {
-      this.subProgramsReusingStepToBeUnlocked = Object.values(groupBy(step.subPrograms, 'program._id'))
+    getSubProgramsReusingStep (step) {
+      return Object.values(groupBy(step.subPrograms, 'program._id'))
         .map(groupSp => ({
           programName: groupSp[0].program.name,
           subProgramsName: groupSp.map(sP => sP.name).sort(sortStrings),
@@ -615,7 +613,7 @@ export default {
       if (!this.isLocked(step)) return;
 
       this.stepToBeUnlocked = pick(step, ['_id', 'status']);
-      this.initSubProgramsReusingStepToBeUnlocked(step);
+      this.subProgramsReusingStepToBeUnlocked = this.getSubProgramsReusingStep(step);
       this.validateUnlockingEditionModal = true;
     },
     confirmUnlocking (step) {
