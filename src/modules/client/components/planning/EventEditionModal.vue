@@ -10,8 +10,7 @@
           :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close"
           :disable="!canUpdateAuxiliary || historiesLoading" />
         <div class="modal-subtitle">
-          <q-btn-toggle no-wrap :value="editedEvent.type" toggle-color="primary" rounded unelevated
-            :options="eventType" />
+          <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
           <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
             color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
             :disable="historiesLoading" />
@@ -21,7 +20,9 @@
             :disable="!canUpdateIntervention || historiesLoading" :error="validations.dates.$error" disable-end-date
             @input="update($event, 'dates')" @blur="validations.dates.$touch" :disable-start-date="isEventTimeStamped"
             :max="customerStoppedDate" :disable-start-hour="!!startDateTimeStamped"
-            :disable-end-hour="!!endDateTimeStamped" />
+            :disable-end-hour="!!endDateTimeStamped" :start-locked="!!startDateTimeStamped"
+            @startLockClick="openTimeStampCancellationModal(true)" :end-locked="!!endDateTimeStamped"
+            @endLockClick="openTimeStampCancellationModal(false)" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
@@ -126,18 +127,25 @@
         label="Editer l'évènement" @click="submit" icon-right="check" data-cy="event-edition-button"
         :disable="historiesLoading" />
     </div>
+    <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
+      @cancelTimeStamping="cancelTimeStamping" :start="isStartCancellation" :reason.sync="timeStampCancellationReason"
+      :validations="$v.timeStampCancellationReason" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
 import set from 'lodash/set';
+import { required } from 'vuelidate/lib/validators';
+import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES, TIME_STAMPING_ACTIONS } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
+import NiHistoryCancellationModal from './HistoryCancellationModal';
 
 export default {
   name: 'EventEditionModal',
@@ -157,10 +165,20 @@ export default {
   components: {
     'ni-button': Button,
     'ni-event-history': NiEventHistory,
+    'ni-history-cancellation-modal': NiHistoryCancellationModal,
   },
   data () {
     return {
       displayHistory: false,
+      historyCancellationModal: false,
+      historyToCancel: {},
+      isStartCancellation: true,
+      timeStampCancellationReason: '',
+    };
+  },
+  validations () {
+    return {
+      timeStampCancellationReason: { required },
     };
   },
   computed: {
@@ -178,8 +196,8 @@ export default {
 
       return { ...aux, hasContractOnEvent };
     },
-    eventType () {
-      return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);
+    eventTypeLabel () {
+      return this.eventTypeOptions.find(option => option.value === this.editedEvent.type)?.label || '';
     },
     isBilledIntervention () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
@@ -210,10 +228,12 @@ export default {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
     startDateTimeStamped () {
-      return this.eventHistories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour);
+      return this.eventHistories
+        .some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && !h.isCancelled);
     },
     endDateTimeStamped () {
-      return this.eventHistories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour);
+      return this.eventHistories
+        .some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && !h.isCancelled);
     },
     isEventTimeStamped () {
       return !!this.startDateTimeStamped || !!this.endDateTimeStamped;
@@ -295,6 +315,42 @@ export default {
       this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
       this.deleteClassFocus();
     },
+    openTimeStampCancellationModal (isStartCancellation) {
+      this.isStartCancellation = isStartCancellation;
+      this.historyToCancel = isStartCancellation
+        ? this.eventHistories
+          .find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && !h.isCancelled)
+        : this.eventHistories.find(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour && !h.isCancelled);
+      this.historyCancellationModal = true;
+    },
+    resetHistoryCancellationModal () {
+      this.timeStampCancellationReason = '';
+      this.historyCancellationModal = false;
+      this.historyToCancel = {};
+      this.$v.timeStampCancellationReason.$reset();
+    },
+    async refreshHistories (eventId) {
+      await this.$emit('refresh-histories', eventId);
+    },
+    async cancelTimeStamping () {
+      try {
+        this.$v.timeStampCancellationReason.$touch();
+        if (this.$v.timeStampCancellationReason.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await EventHistories.updateById(
+          this.historyToCancel._id,
+          { isCancelled: true, timeStampCancellationReason: this.timeStampCancellationReason }
+        );
+
+        await this.refreshHistories(this.editedEvent._id);
+
+        this.resetHistoryCancellationModal();
+        NotifyPositive('Horodatage supprimé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de l\'horodatage.');
+      }
+    },
   },
 };
 </script>
@@ -304,11 +360,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
-    /deep/ .q-btn-toggle
-      margin-bottom: 0;
-      width: 33%;
-      @media screen and (max-width: 767px)
-        width: 100%
 
   .light-checkbox
     color: $copper-grey-400

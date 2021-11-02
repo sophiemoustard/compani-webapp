@@ -9,10 +9,10 @@
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
           @blur="blurHandler" :disable="disable || disableStartDate" :max="max" />
         <ni-time-input :value="startHour" @input="updateHours($event, 'startHour')" class="time-item"
-          @blur="blurHandler" :disable="disable || disableStartHour" />
+          @blur="blurHandler" :disable="disable || disableStartHour" @lockClick="startClick" :locked="startLocked" />
         <p class="delimiter">-</p>
-        <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item"
-          @blur="blurHandler" :disable="disable || disableEndHour" :min="startHour" />
+        <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item" @blur="blurHandler"
+          :disable="disable || disableEndHour" :min="startHour" @lockClick="endClick" :locked="endLocked" />
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" :max="max" />
       </div>
@@ -44,6 +44,8 @@ export default {
     disableEndHour: { type: Boolean, default: false },
     disableStartHour: { type: Boolean, default: false },
     max: { type: String, default: '' },
+    startLocked: { type: Boolean, default: false },
+    endLocked: { type: Boolean, default: false },
   },
   validations () {
     return {
@@ -83,15 +85,13 @@ export default {
     update (date, key) {
       const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
       const dateObject = pick(moment(this.value[key]).toObject(), hoursFields);
-      const dates = {
-        ...this.value,
-        [key]: moment(date).set({ ...dateObject }).toISOString(),
-      };
+      const dates = { ...this.value, [key]: moment(date).set({ ...dateObject }).toISOString() };
       if (key === 'startDate' && this.disableEndDate) {
         const endDateObject = pick(moment(this.value.endDate).toObject(), hoursFields);
         dates.endDate = moment(date).set({ ...endDateObject }).toISOString();
       }
       if (key === 'endDate') dates.endDate = moment(dates.endDate).endOf('d').toISOString();
+
       this.$emit('input', dates);
     },
     updateHours (value, key) {
@@ -99,12 +99,19 @@ export default {
       if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
       if (key === 'startHour') {
         dates.startDate = this.setDateHours(dates.startDate, value);
-        if (moment(value, 'HH:mm').isSameOrAfter(moment(this.endHour, 'HH:mm'))) {
+        if (!this.disableEndHour && moment(value, 'HH:mm').isSameOrAfter(moment(this.endHour, 'HH:mm'))) {
           const max = moment(dates.startDate).endOf('d');
           dates.endDate = moment.min(moment(dates.startDate).add(2, 'H'), max).toISOString();
         }
       }
+
       this.$emit('input', dates);
+    },
+    startClick () {
+      this.$emit('startLockClick');
+    },
+    endClick () {
+      this.$emit('endLockClick');
     },
   },
 };
