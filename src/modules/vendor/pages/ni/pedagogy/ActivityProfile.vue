@@ -2,17 +2,17 @@
   <q-page padding class="vendor-background">
     <template v-if="activity">
       <ni-profile-header :title="activity.name" :header-info="headerInfo" />
-      <div>
+      <div class="q-mb-lg">
         <ni-button v-if="isEditionLocked" label="Déverrouiller" color="primary" icon="mdi-lock"
           @click="validateUnlockEdition" />
-        <div class="filters-container q-mt-md">
-          <ni-input v-model.trim="editedActivity.name" required-field caption="Nom"
-            @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked"
-            :error="$v.editedActivity.name.$error" />
-          <ni-select v-model.trim="editedActivity.type" @input="updateActivity(editedActivity.type, 'type')"
-            :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" required-field
-            :error="$v.editedActivity.type.$error" />
-        </div>
+      </div>
+      <div class="row gutter-profile">
+        <ni-input v-model.trim="editedActivity.name" required-field caption="Nom"
+          @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked"
+          :error="$v.editedActivity.name.$error" />
+        <ni-select v-model.trim="editedActivity.type" @input="updateActivity(editedActivity.type, 'type')"
+          :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" required-field
+          :error="$v.editedActivity.type.$error" />
       </div>
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"

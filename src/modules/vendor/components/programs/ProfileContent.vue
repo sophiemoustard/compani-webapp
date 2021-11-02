@@ -93,9 +93,8 @@
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
-    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity"
-      :type-options="ACTIVITY_TYPES" @hide="resetActivityCreationModal" @submit="createActivity"
-      :loading="modalLoading" :validations="$v.newActivity" />
+    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity" :loading="modalLoading"
+      @hide="resetActivityCreationModal" @submit="createActivity" :validations="$v.newActivity" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
@@ -176,7 +175,6 @@ export default {
       isActivitiesShown: {},
       currentSubProgramId: '',
       currentStepId: '',
-      ACTIVITY_TYPES,
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
