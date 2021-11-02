@@ -66,5 +66,4 @@ export default {
   .sub-program
     border-radius: 0
     background-color: $copper-grey-300
-
 </style>
