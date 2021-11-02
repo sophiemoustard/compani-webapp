@@ -345,10 +345,10 @@ export default {
         await this.refreshHistories(this.editedEvent._id);
 
         this.resetHistoryCancellationModal();
-        NotifyPositive('Horodatage supprimé');
+        NotifyPositive('Horodatage annulé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'horodatage.');
+        NotifyNegative('Erreur lors de l\'annulation de l\'horodatage.');
       }
     },
   },
