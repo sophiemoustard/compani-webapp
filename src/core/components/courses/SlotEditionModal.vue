@@ -14,8 +14,7 @@
         :error-message="addressError" in-modal last @blur="validations.address.$touch"
         :error="validations.address.$error" @input="update($event, 'address')" />
       <ni-input v-if="getType(this.editedCourseSlot.step) === REMOTE" in-modal :value="editedCourseSlot.meetingLink"
-        @input="update($event, 'meetingLink')" caption="Lien vers la visio" :error="validations.meetingLink.$error"
-        :error-message="linkErrorMessage" />
+        @input="update($event, 'meetingLink')" caption="Lien vers la visio" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -41,7 +40,6 @@ export default {
     stepOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    linkErrorMessage: { type: String, default: '' },
   },
   components: {
     'ni-button': Button,

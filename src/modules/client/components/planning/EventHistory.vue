@@ -3,8 +3,8 @@
     <div class="history-cell">
       <div class="history-title">
         <div class="history-title-text">
-          {{ historyInfo.title.pre }}<span v-if="!isTimeStampingCancellation" class="history-type">{{ type }}</span>
-          <template v-if="!isAuxiliaryUpdate && !isTimestamping && !isTimeStampingCancellation">
+          {{ historyInfo.title.pre }}<span class="history-type">{{ timeStampingType || eventType }}</span>
+          <template v-if="!isAuxiliaryUpdate && !isTimestamping">
             de <span class="history-info">{{ auxiliaryName }}</span>
           </template>
           {{ historyInfo.title.post }}
@@ -47,7 +47,6 @@ import {
   MANUAL_TIME_STAMPING_REASONS,
   TIME_STAMPING_ACTIONS,
   QR_CODE_TIME_STAMPING,
-  TIME_STAMP_CANCELLATION,
 } from '@data/constants';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -127,14 +126,8 @@ export default {
       if (!this.isTimestamping) return '';
       return this.history.action === MANUAL_TIME_STAMPING ? 'Manuel' : 'QR code';
     },
-    type () {
-      return this.timeStampingType || this.eventType;
-    },
     isTimestamping () {
       return TIME_STAMPING_ACTIONS.includes(this.history.action);
-    },
-    isTimeStampingCancellation () {
-      return this.history.action === TIME_STAMP_CANCELLATION;
     },
     eventName () {
       const { type, internalHour, absence } = this.history.event;
@@ -170,11 +163,6 @@ export default {
           return {
             title: this.getEventTimeStampingTitle(),
             details: this.getEventTimeStampingDetails(),
-          };
-        case TIME_STAMP_CANCELLATION:
-          return {
-            title: this.getTimeStampCancellationTitle(),
-            details: this.getTimeStampCancellationDetails(),
           };
         case EVENT_CREATION:
         default:
@@ -277,15 +265,6 @@ export default {
 
       return details;
     },
-    // TIME STAMP CANCELLATION
-    getTimeStampCancellationTitle () {
-      return get(this.history, 'linkedEventHistory.update.startHour')
-        ? { pre: 'Horodatage de début d\'intervention annulé' }
-        : { pre: 'Horodatage de fin d\'intervention annulé' };
-    },
-    getTimeStampCancellationDetails () {
-      return `Motif : ${this.history.timeStampCancellationReason}`;
-    },
     // Update
     getEventUpdateTitle () {
       const { auxiliary, startDate, cancel, startHour } = this.history.update;
@@ -312,8 +291,7 @@ export default {
     formatDatesUpdateTitle () {
       const { endDate, startDate } = this.history.update;
 
-      const pronom = this.isRepetition && this.history.event.type === INTERVENTION ? 'la ' : 'l\'';
-      const pre = `Changement de dates pour ${pronom}`;
+      const pre = 'Changement de dates pour l\'';
       let post = this.customerName ? ` chez ${this.customerName}` : '';
       post += startDate && endDate
         ? `\xa0: du ${moment(startDate.to).format('DD/MM')} au ${moment(endDate.to).format('DD/MM')}.`

@@ -68,19 +68,7 @@
         <p class="text-weight-bold">Articles de facturation</p>
         <q-card>
           <ni-responsive-table :data="billingItems" :columns="billingItemsColumns" :pagination.sync="pagination"
-            :loading="billingItemsLoading">
-            <template #body="{ props }">
-              <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
-                  <template v-if="col.name === 'actions'">
-                    <ni-button icon="delete" @click="validateBillingItemDeletion(col.value)" />
-                  </template>
-                  <template v-else>{{ col.value }}</template>
-                </q-td>
-              </q-tr>
-            </template>
-          </ni-responsive-table>
+            :loading="billingItemsLoading" />
           <q-card-actions align="right">
             <ni-button icon="add" label="Ajouter un article de facturation" :disable="billingItemsLoading"
               @click="billingItemCreationModal = true" />
@@ -521,7 +509,6 @@ export default {
           format: formatPrice,
         },
         { name: 'vat', label: 'TVA', align: 'center', field: row => roundFrenchPercentage(row.vat, 1) },
-        { name: 'actions', label: '', align: 'right', field: '_id' },
       ],
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
@@ -1102,28 +1089,6 @@ export default {
         console.error(e);
       } finally {
         this.billingItemsLoading = false;
-      }
-    },
-    validateBillingItemDeletion (billingItemId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet article de facturation ?',
-        ok: 'OK',
-        cancel: 'Annuler',
-      })
-        .onOk(() => this.deleteBillingItem(billingItemId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async deleteBillingItem (id) {
-      try {
-        await BillingItems.remove(id);
-        NotifyPositive('Article de facturation supprimé.');
-
-        await this.refreshBillingItems();
-      } catch (e) {
-        console.error(e);
-        if (e.status === 403) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de la suppression de l\'article de facturation.');
       }
     },
     // Third party payers

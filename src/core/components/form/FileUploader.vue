@@ -132,10 +132,6 @@ export default {
   /deep/ .q-field__control
     height: 40px
     min-height: 40px
-    border: 0
-
-  /deep/ .q-uploader__header
-    border-radius: 4px
 
   /deep/ .q-field__append
     display: none

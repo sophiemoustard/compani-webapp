@@ -179,7 +179,8 @@ import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import InternalHourCreationModal from 'src/modules/client/components/config/InternalHourCreationModal';
-import AdministrativeDocCreationModal from 'src/modules/client/components/config/AdministrativeDocumentCreationModal';
+import AdministrativeDocumentCreationModal
+  from 'src/modules/client/components/config/AdministrativeDocumentCreationModal';
 import SectorCreationModal from 'src/modules/client/components/config/SectorCreationModal';
 import SectorEditionModal from 'src/modules/client/components/config/SectorEditionModal';
 
@@ -193,7 +194,7 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-responsive-table': ResponsiveTable,
     'internal-hour-creation-modal': InternalHourCreationModal,
-    'administrative-document-creation-modal': AdministrativeDocCreationModal,
+    'administrative-document-creation-modal': AdministrativeDocumentCreationModal,
     'sector-creation-modal': SectorCreationModal,
     'sector-edition-modal': SectorEditionModal,
   },

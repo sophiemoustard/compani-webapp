@@ -5,7 +5,7 @@
     </template>
     <ni-input in-modal :value="newActivity.name" :error="validations.name.$error" @input="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Nom" />
-    <ni-select in-modal caption="Type" :options="ACTIVITY_TYPES" :value="newActivity.type" required-field
+    <ni-select in-modal caption="Type" :options="typeOptions" :value="newActivity.type" required-field
       :error="validations.type.$error" @input="update($event, 'type')" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="loading"
@@ -18,20 +18,15 @@
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import { ACTIVITY_TYPES } from '@data/constants';
 
 export default {
   name: 'ActivityCreationModal',
   props: {
     value: { type: Boolean, default: false },
     newActivity: { type: Object, default: () => ({}) },
+    typeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-  },
-  data () {
-    return {
-      ACTIVITY_TYPES,
-    };
   },
   components: {
     'ni-input': Input,

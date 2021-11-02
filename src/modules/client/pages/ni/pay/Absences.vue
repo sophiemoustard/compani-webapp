@@ -32,7 +32,7 @@
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
       :edition-modal="editionModal" :person-key="personKey" :active-auxiliaries="activeAuxiliaries"
       @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
-      @submit="validateEventEdition" @close="closeEditionModal" @delete-event="validateEventDeletion"
+      @submit="updateEvent" @close="closeEditionModal" @delete-event="validateEventDeletion"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
   </q-page>
 </template>

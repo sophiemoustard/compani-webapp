@@ -138,9 +138,3 @@ export const maxArrayLength = maxLength => value => value.filter(a => !!a).lengt
 export const minTextArrayLength = minLength => value => value.filter(a => !!a.text).length >= minLength;
 
 export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;
-
-export const urlAddress = (value) => {
-  if (!value) return true;
-
-  return value.match(/^(?:http(s)?:\/\/)[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/) || false;
-};

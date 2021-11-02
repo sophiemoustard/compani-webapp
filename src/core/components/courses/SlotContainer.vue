@@ -48,13 +48,12 @@
 
     <!-- Course slot creation modal -->
     <slot-creation-modal v-model="creationModal" :new-course-slot.sync="newCourseSlot" :validations="$v.newCourseSlot"
-      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
-      :link-error-message="linkErrorMessage" />
+      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
 
     <!-- Course slot edition modal -->
     <slot-edition-modal v-model="editionModal" :edited-course-slot.sync="editedCourseSlot" :step-options="stepOptions"
       :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
-      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" />
+      @submit="updateCourseSlot" />
 </div>
 </template>
 
@@ -70,10 +69,10 @@ import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
+import { E_LEARNING, ON_SITE, REMOTE, STEP_TYPES } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
+import { frAddress, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -119,7 +118,6 @@ export default {
       ],
       isVendorInterface,
       ON_SITE,
-      linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
     };
   },
   validations () {
@@ -131,7 +129,6 @@ export default {
         city: { required: requiredIf(item => item && !!item.fullAddress) },
         fullAddress: { frAddress },
       },
-      meetingLink: { urlAddress },
     };
 
     return {
@@ -183,7 +180,7 @@ export default {
       return [
         { label: 'Pas d\'étape spécifiée', value: '' },
         ...this.course.subProgram.steps.map((step, index) => ({
-          label: `${index + 1} - ${step.name} (${this.getStepTypeLabel(step.type)})`,
+          label: `${index + 1} - ${step.name}${this.getStepType(step.type)}`,
           value: step._id,
           type: step.type,
           disable: step.type === E_LEARNING,
@@ -343,6 +340,10 @@ export default {
       if (!slot.step) return '';
       const step = this.stepOptions.find(option => option.value === slot.step._id);
       return step ? step.label : '';
+    },
+    getStepType (type) {
+      const stepType = STEP_TYPES.find(step => step.value === type).label;
+      return stepType ? ` (${stepType})` : '';
     },
     datesValidations (dates) {
       return {

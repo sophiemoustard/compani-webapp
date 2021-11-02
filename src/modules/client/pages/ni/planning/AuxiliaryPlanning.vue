@@ -17,10 +17,10 @@
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
-      @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @refresh-histories="refreshHistories"
+      :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
       @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
-      @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" :customers="customers"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading" @submit="validateEventEdition" />
+      @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @submit="updateEvent"
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
   </q-page>
 </template>
 

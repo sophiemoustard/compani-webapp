@@ -216,7 +216,6 @@ export const EXTREME = 'extreme';
 export const EVENT_CREATION = 'event_creation';
 export const EVENT_DELETION = 'event_deletion';
 export const EVENT_UPDATE = 'event_update';
-export const TIME_STAMP_CANCELLATION = 'time_stamp_cancellation';
 
 // INDICATORS
 export const PREV_MONTH_STATS = 'prev_month_stat';
@@ -354,12 +353,6 @@ export const STEP_TYPES = [
   { label: 'eLearning', value: E_LEARNING },
   { label: 'présentiel', value: ON_SITE },
   { label: 'distanciel', value: REMOTE },
-];
-export const REUSE_STEP = 'reuse_step';
-export const CREATE_STEP = 'create_step';
-export const STEP_ATTACHEMENT_OPTIONS = [
-  { label: 'Créer', value: CREATE_STEP },
-  { label: 'Réutiliser', value: REUSE_STEP },
 ];
 
 // ACTIVITY

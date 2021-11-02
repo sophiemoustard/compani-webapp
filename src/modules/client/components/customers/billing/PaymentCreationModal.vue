@@ -3,7 +3,10 @@
     <template slot="title">
       Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
     </template>
-    <ni-btn-toggle :value="newPayment.nature" :options="paymentNatureOptions" @input="update($event, 'nature')" />
+    <div class="modal-subtitle">
+      <q-btn-toggle no-wrap :value="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary"
+        @input="update($event, 'nature')" />
+    </div>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
     <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number" required-field
@@ -26,7 +29,6 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import DateInput from '@components/form/DateInput';
 import Modal from '@components/modal/Modal';
-import ButtonToggle from '@components/ButtonToggle';
 import { formatIdentity } from '@helpers/utils';
 import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '@data/constants';
 
@@ -37,7 +39,6 @@ export default {
     'ni-input': Input,
     'ni-date-input': DateInput,
     'ni-modal': Modal,
-    'ni-btn-toggle': ButtonToggle,
   },
   props: {
     newPayment: { type: Object, default: () => ({}) },
@@ -88,3 +89,22 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .modal-subtitle
+    display: flex
+    justify-content: space-between
+    margin-bottom: 16px
+    .q-btn-toggle
+      margin-bottom: 0
+      cursor: default
+      width: 100%
+    & /deep/ .q-btn-toggle
+      border: none
+      box-shadow: none
+      & .q-btn-item
+        width: 50%
+        border-radius: 20px
+        margin: 5px
+        background-color: $copper-grey-300
+</style>

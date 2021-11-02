@@ -918,10 +918,10 @@ export default {
       if (this.newFunding.nature === HOURLY && !this.newFunding.customerParticipationRate) {
         cleanPayload.customerParticipationRate = 0;
       }
-      const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
+      const { nature, thirdPartyPayer, subscription, frequency, fundingPlanId, ...version } = cleanPayload;
       if (version.endDate) version.endDate = moment(version.endDate).endOf('d').toDate();
 
-      return { nature, thirdPartyPayer, subscription, frequency, versions: [{ ...version }] };
+      return { nature, thirdPartyPayer, subscription, frequency, fundingPlanId, versions: [{ ...version }] };
     },
     async createFunding () {
       try {

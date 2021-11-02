@@ -113,8 +113,8 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Questionnaire déverrouillé.'); })
-        .onCancel(() => NotifyPositive('Déverrouillage annulé.'));
+      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Questionnaire déverouillé.'); })
+        .onCancel(() => NotifyPositive('Déverouillage annulé.'));
     },
     saveTmpName () {
       this.tmpInput = get(this.questionnaire, 'name') || '';
