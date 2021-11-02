@@ -2,10 +2,22 @@
   <q-page padding class="vendor-background">
     <template v-if="activity">
       <ni-profile-header :title="activity.name" :header-info="headerInfo" />
+      <div class="q-mb-lg">
+        <ni-button v-if="isEditionLocked" label="Déverrouiller" color="primary" icon="mdi-lock"
+          @click="validateUnlockEdition" />
+      </div>
+      <div class="row gutter-profile">
+        <ni-input v-model.trim="editedActivity.name" required-field caption="Nom"
+          @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked"
+          :error="$v.editedActivity.name.$error" />
+        <ni-select v-model.trim="editedActivity.type" @input="updateActivity(editedActivity.type, 'type')"
+          :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" required-field
+          :error="$v.editedActivity.type.$error" />
+      </div>
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked" :card-parent="activity"
-          @unlock-edition="validateUnlockEdition" @update="updateActivity" />
+          @update="updateActivity($event, 'cards')" />
         <card-edition :disable-edition="isEditionLocked" :card-parent="activity" @refresh="refreshCard" />
       </div>
     </template>
@@ -16,12 +28,16 @@
 
 <script>
 import { mapState } from 'vuex';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import Activities from '@api/Activities';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 import ProfileHeader from '@components/ProfileHeader';
+import Button from '@components/Button';
+import Input from '@components/form/Input';
+import Select from '@components/form/Select';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
@@ -41,6 +57,9 @@ export default {
     'card-container': CardContainer,
     'card-edition': CardEdition,
     'card-creation-modal': CardCreationModal,
+    'ni-button': Button,
+    'ni-input': Input,
+    'ni-select': Select,
   },
   mixins: [cardMixin],
   data () {
@@ -52,6 +71,16 @@ export default {
       isActivityUsedInSeveralPlaces: false,
       PUBLISHED_DOT_WARNING,
       PUBLISHED_DOT_ACTIVE,
+      editedActivity: { name: '', type: '' },
+      ACTIVITY_TYPES,
+    };
+  },
+  validations () {
+    return {
+      editedActivity: {
+        name: { required },
+        type: { required },
+      },
     };
   },
   computed: {
@@ -102,6 +131,7 @@ export default {
       this.isActivityUsedInSeveralPlaces = isActivityUsedInOtherSteps || isActivityUsedInOneStepButSeveralSubPrograms;
 
       this.isEditionLocked = this.isActivityUsedInSeveralPlaces || this.isActivityPublished;
+      this.editedActivity = { name: this.activity.name, type: this.activity.type };
     } catch (e) {
       console.error(e);
     }
@@ -155,8 +185,8 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
-        .onCancel(() => NotifyPositive('Déverouillage annulé.'));
+      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverrouillée.'); })
+        .onCancel(() => NotifyPositive('Déverrouillage annulé.'));
     },
     async createCard (template) {
       this.$q.loading.show();
@@ -189,9 +219,11 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
-    async updateActivity (event) {
+    async updateActivity (event, path) {
       try {
-        await Activities.updateById(this.activity._id, { cards: event });
+        this.$v.editedActivity.$touch();
+        if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+        await Activities.updateById(this.activity._id, { [path]: event });
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
@@ -225,4 +257,6 @@ export default {
 .q-item
   padding: 0
   min-height: 0
+/deep/ .q-btn__wrapper
+  padding: 0px !important
 </style>

@@ -53,8 +53,6 @@
                       :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
-                    <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
-                      :disable="isReused(step)" />
                     <ni-button class="q-px-sm" icon="close" :disable="isPublishedOrReused(step)"
                       @click="validateActivityDeletion(step._id, activity._id)" />
                   </div>
@@ -95,17 +93,12 @@
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
-    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity"
-      :type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
-      :loading="modalLoading" :validations="$v.newActivity" />
+    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity" :loading="modalLoading"
+      @hide="resetActivityCreationModal" @submit="createActivity" :validations="$v.newActivity" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
       :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
-
-    <activity-edition-modal v-model="activityEditionModal" :edited-activity.sync="editedActivity"
-      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" :loading="modalLoading"
-      :type-options="activityTypeOptions" />
 
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
       :company-options="companyOptions" @hide="resetPublication" />
@@ -117,12 +110,10 @@ import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
-import omit from 'lodash/omit';
 import get from 'lodash/get';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
-import Activities from '@api/Activities';
 import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -141,7 +132,6 @@ import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditi
 import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
-import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 import { courseMixin } from '@mixins/courseMixin';
@@ -160,7 +150,6 @@ export default {
     'step-edition-modal': StepEditionModal,
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
-    'activity-edition-modal': ActivityEditionModal,
     'sub-program-publication-modal': SubProgramPublicationModal,
     draggable,
     'published-dot': PublishedDot,
@@ -183,12 +172,9 @@ export default {
       sameStepActivities: [],
       reusedActivity: '',
       programOptions: [],
-      activityEditionModal: false,
-      editedActivity: { name: '', type: '' },
       isActivitiesShown: {},
       currentSubProgramId: '',
       currentStepId: '',
-      activityTypeOptions: ACTIVITY_TYPES,
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
@@ -205,7 +191,6 @@ export default {
       reusedStep: { _id: { required }, program: { required } },
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
-      editedActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     };
   },
@@ -257,7 +242,7 @@ export default {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
     },
     getActivityTypeLabel (value) {
-      const type = this.activityTypeOptions.find(t => t.value === value);
+      const type = ACTIVITY_TYPES.find(t => t.value === value);
       return type ? type.label : '';
     },
     showActivities (stepId) {
@@ -475,36 +460,6 @@ export default {
     resetActivityReuseModal () {
       this.reusedActivity = '';
       this.$v.reusedActivity.$reset();
-    },
-    // activity edition
-    async openActivityEditionModal (activity) {
-      this.editedActivity = pick(activity, ['_id', 'name', 'type', 'status']);
-      this.activityEditionModal = true;
-    },
-    async editActivity () {
-      try {
-        this.modalLoading = true;
-        this.$v.editedActivity.$touch();
-        if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = this.isPublished(this.editedActivity)
-          ? omit(this.editedActivity, ['_id', 'status', 'type'])
-          : omit(this.editedActivity, ['_id', 'status']);
-
-        await Activities.updateById(this.editedActivity._id, payload);
-        this.activityEditionModal = false;
-        await this.refreshProgram();
-        NotifyPositive('Activité modifiée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'activité.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    resetActivityEditionModal () {
-      this.editedActivity = { name: '', type: '' };
-      this.$v.editedActivity.$reset();
     },
     validateStepDetachment (subProgramId, stepId) {
       this.$q.dialog({
