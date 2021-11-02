@@ -38,7 +38,7 @@
                 :disable="isPublished(subProgram)" />
             </div>
           </q-card-section>
-          <div class="bg-peach-200 activity-container" v-if="isActivitiesShown[step._id]">
+          <div class="bg-peach-200 activity-container" v-if="areActivitiesVisible[step._id]">
             <draggable v-model="step.activities" :disabled="$q.platform.is.mobile || isPublishedOrLocked(step)"
               class="activity-draggable" ghost-class="ghost" @change="dropActivity(subProgram._id, step._id)">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
@@ -180,7 +180,7 @@ export default {
       sameStepActivities: [],
       reusedActivity: '',
       programOptions: [],
-      isActivitiesShown: {},
+      areActivitiesVisible: {},
       currentSubProgramId: '',
       currentStepId: '',
       PUBLISHED,
@@ -260,7 +260,7 @@ export default {
       return type ? type.label : '';
     },
     showActivities (stepId) {
-      this.$set(this.isActivitiesShown, stepId, !this.isActivitiesShown[stepId]);
+      this.$set(this.areActivitiesVisible, stepId, !this.areActivitiesVisible[stepId]);
     },
     async refreshProgram () {
       try {
