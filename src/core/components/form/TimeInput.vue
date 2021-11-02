@@ -6,10 +6,10 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
-      :error-message="errorMessage" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time"
-      data-cy="time-input">
+      :error-message="errorMessage" :error="error" @blur="onBlur" :rules="['time']" mask="time" data-cy="time-input"
+      :disable="disable && !locked" :readonly="locked">
       <template #append>
-        <q-icon name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime"
+        <q-icon v-if="!locked" name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime"
           color="copper-grey-500">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-list dense padding>
@@ -20,6 +20,7 @@
             </q-list>
           </q-menu>
         </q-icon>
+        <q-icon v-else name="lock" class="cursor-pointer" @click.native="click" color="copper-500" />
       </template>
     </q-input>
   </div>
@@ -45,6 +46,7 @@ export default {
     errorMessage: { type: String, default: '' },
     disable: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
+    locked: { type: Boolean, default: false },
   },
   computed: {
     hoursOptions () {
@@ -83,6 +85,9 @@ export default {
     },
     onBlur () {
       this.$emit('blur');
+    },
+    click () {
+      this.$emit('lockClick');
     },
   },
 };

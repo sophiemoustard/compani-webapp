@@ -99,7 +99,7 @@ import BiColorButton from '@components/BiColorButton';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { formatQuantity, formatIdentity, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
-import { openPdf, downloadZip } from '@helpers/file';
+import { downloadFile, downloadZip } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
@@ -322,7 +322,7 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        openPdf(pdf);
+        downloadFile(pdf, 'emargement.pdf');
       } catch (e) {
         console.error(e);
         if (e.status === 404) {

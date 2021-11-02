@@ -69,7 +69,7 @@ export default {
   getConvocationUrl (courseId) {
     return `${process.env.API_HOSTNAME}/courses/${courseId}/convocations`;
   },
-  downloadConvocation (courseId) {
+  async downloadConvocation (courseId) {
     return alenviAxios.get(
       this.getConvocationUrl(courseId),
       { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }

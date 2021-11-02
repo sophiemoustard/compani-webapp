@@ -30,9 +30,10 @@
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
-      @document-uploaded="documentUploaded" @submit="updateEvent" @delete-event="validateEventDeletion"
+      @document-uploaded="documentUploaded" @submit="validateEventEdition" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @close="closeEditionModal"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading"
+      @refresh-histories="refreshHistories" />
   </q-page>
 </template>
 

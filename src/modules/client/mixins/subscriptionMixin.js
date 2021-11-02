@@ -91,7 +91,7 @@ export const subscriptionMixin = {
       ],
       paginationHistory: {
         rowsPerPage: 0,
-        sortBy: 'startDate',
+        sortBy: 'createdAt',
         descending: true,
       },
       subscriptionsLoading: false,

@@ -3,10 +3,10 @@ import set from 'lodash/set';
 import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE } from '@data/constants';
+import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
-import { openPdf } from '@helpers/file';
+import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 
 export const courseMixin = {
@@ -109,7 +109,7 @@ export const courseMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        openPdf(pdf);
+        downloadFile(pdf, 'convocation.pdf');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la convocation.');
@@ -121,6 +121,10 @@ export const courseMixin = {
       if (type === E_LEARNING) return 'stay_current_portrait';
       if (type === ON_SITE) return 'mdi-teach';
       return 'videocam';
+    },
+    getStepTypeLabel (value) {
+      const type = STEP_TYPES.find(t => t.value === value);
+      return type ? type.label : '';
     },
   },
 };
