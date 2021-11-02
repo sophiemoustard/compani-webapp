@@ -43,7 +43,6 @@ export default {
   data () {
     return {
       selectedProgram: '',
-      programIsSelected: false,
       activityOptions: [],
       refreshingActivities: false,
     };
@@ -52,6 +51,10 @@ export default {
     async refreshActivities () {
       try {
         this.refreshingActivities = true;
+        if (!this.selectedProgram) {
+          this.activityOptions = [];
+          return;
+        }
         const program = await Programs.getById(this.selectedProgram);
 
         const reuseableActivities = program.subPrograms
@@ -74,7 +77,8 @@ export default {
     },
     hide () {
       this.selectedProgram = '';
-      this.$emit('input', event);
+      this.activityOptions = [];
+      this.$emit('hide');
     },
     input (event) {
       this.$emit('input', event);

@@ -21,9 +21,7 @@
         </div>
       </draggable>
     </q-scroll-area>
-    <ni-button v-if="disableEdition" label="Déverouiller" color="primary" icon="mdi-lock-outline"
-      @click="unlockEdition" />
-    <ni-button v-else-if="!isParentPublished" label="Ajouter une carte" color="primary" icon="add"
+    <ni-button v-if="!isParentPublished && !disableEdition" label="Ajouter une carte" color="primary" icon="add"
       @click="openCreationModal" />
   </div>
 </template>
@@ -132,9 +130,6 @@ export default {
     },
     deleteCard (card) {
       this.$emit('delete-card', card._id);
-    },
-    unlockEdition () {
-      this.$emit('unlock-edition');
     },
     update (event) {
       const cards = event.map(c => c._id);

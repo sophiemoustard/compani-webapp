@@ -11,15 +11,18 @@
       <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
         :disabled="$q.platform.is.mobile || isPublished(subProgram)">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step q-mb-sm">
-          <q-card-section class="step-head cursor-pointer row" :id="step._id">
+          <q-card-section class="step-head cursor-pointer row" :id="step._id"
+            :class="{ 'step-lock': isLocked(step) }">
             <div class="step-info" @click="showActivities(step._id)">
               <q-item-section side>
                 <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="copper-grey-500" />
               </q-item-section>
               <q-item-section>
-                <div class="flex-direction row">
+                <div class="flex-direction row step-title">
                   <div class="text-weight-bold">
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
+                    <ni-button v-if="isLocked(step)" icon="lock" class="q-ml-sm q-px-xs" size="sm"
+                      @click="openValidateUnlockingEditionModal(step)" />
                   </div>
                   <published-dot :is-published="isPublished(step)"
                     :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
@@ -35,11 +38,11 @@
                 :disable="isPublished(subProgram)" />
             </div>
           </q-card-section>
-          <div class="bg-peach-200 activity-container" v-if="isActivitiesShown[step._id]">
-            <draggable v-model="step.activities" @change="dropActivity(subProgram._id, step._id)"
-              class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile || isPublished(step)">
+          <div class="bg-peach-200 activity-container" v-if="areActivitiesVisible[step._id]">
+            <draggable v-model="step.activities" :disabled="$q.platform.is.mobile || isPublishedOrLocked(step)"
+              class="activity-draggable" ghost-class="ghost" @change="dropActivity(subProgram._id, step._id)">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-                <q-card-section>
+                <q-card-section :class="{ 'step-lock': isLocked(step) }">
                   <div class="cursor-pointer row activity-info"
                     @click="goToActivityProfile(subProgram, step, activity)">
                     <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
@@ -51,17 +54,16 @@
                       :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
-                    <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)" />
                     <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
-                      @click="validateActivityDeletion(step._id, activity._id)" />
+                      @click="validateActivityDeletion(step, activity._id)" />
                   </div>
                 </q-card-section>
               </q-card>
             </draggable>
             <div v-if="!isPublished(step)" class="q-mt-md" align="right">
-              <ni-button color="primary" icon="add" label="Réutiliser une activité"
+              <ni-button color="primary" icon="add" label="Réutiliser une activité" :disable="isLocked(step)"
                 @click="openActivityReuseModal(step)" />
-              <ni-button color="primary" icon="add" label="Créer une activité"
+              <ni-button color="primary" icon="add" label="Créer une activité" :disable="isLocked(step)"
                 @click="openActivityCreationModal(step._id)" />
             </div>
             <div class="no-activity" v-if="isPublished(step) && !step.activities.length">
@@ -74,7 +76,7 @@
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
           @click="checkPublicationAndOpenModal(subProgram)" :flat="false" />
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
-          @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
+          @click="openStepAdditionModal(subProgram._id)" label="Ajouter une étape" />
       </div>
       <q-separator v-if="index !== program.subPrograms.length-1" class="q-mt-lg" />
     </div>
@@ -85,26 +87,26 @@
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
       :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program.sync="newSubProgram" />
 
-    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :validations="$v.newStep"
-      @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
+    <step-addition-modal v-model="stepAdditionModal" :new-step.sync="newStep" :reused-step.sync="reusedStep"
+      @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" :addition-type.sync="additionType"
+      :program="program" :validations="$v" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
-    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity"
-      :type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
-      :loading="modalLoading" :validations="$v.newActivity" />
+    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity" :loading="modalLoading"
+      @hide="resetActivityCreationModal" @submit="createActivity" :validations="$v.newActivity" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
       :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
-    <activity-edition-modal v-model="activityEditionModal" :edited-activity.sync="editedActivity"
-      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" :loading="modalLoading"
-      :type-options="activityTypeOptions" />
-
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
       :company-options="companyOptions" @hide="resetPublication" />
+
+    <validate-unlocking-step-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking"
+      :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" @hide="resetValidateUnlockingEditionModal"
+      @confirm="confirmUnlocking" :is-step-published="stepToBeUnlocked.status === PUBLISHED" />
   </div>
 </template>
 
@@ -113,32 +115,31 @@ import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
-import omit from 'lodash/omit';
 import get from 'lodash/get';
+import groupBy from 'lodash/groupBy';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
-import Activities from '@api/Activities';
 import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
   E_LEARNING,
-  STEP_TYPES,
   ACTIVITY_TYPES,
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
   PUBLISHED_DOT_WARNING,
+  CREATE_STEP,
 } from '@data/constants';
-import { formatQuantity, formatAndSortOptions } from '@helpers/utils';
+import { formatQuantity, formatAndSortOptions, sortStrings } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
-import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
+import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
 import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
-import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
+import ValidateUnlockingStepModal from 'src/modules/vendor/components/programs/ValidateUnlockingStepModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -152,12 +153,12 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
     'sub-program-creation-modal': SubProgramCreationModal,
-    'step-creation-modal': StepCreationModal,
+    'step-addition-modal': StepAdditionModal,
     'step-edition-modal': StepEditionModal,
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
-    'activity-edition-modal': ActivityEditionModal,
     'sub-program-publication-modal': SubProgramPublicationModal,
+    'validate-unlocking-step-modal': ValidateUnlockingStepModal,
     draggable,
     'published-dot': PublishedDot,
   },
@@ -167,8 +168,10 @@ export default {
       modalLoading: false,
       subProgramCreationModal: false,
       newSubProgram: { name: '' },
-      stepCreationModal: false,
+      additionType: CREATE_STEP,
+      stepAdditionModal: false,
       newStep: { name: '', type: E_LEARNING },
+      reusedStep: { _id: '', program: '' },
       stepEditionModal: false,
       editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
@@ -177,18 +180,20 @@ export default {
       sameStepActivities: [],
       reusedActivity: '',
       programOptions: [],
-      activityEditionModal: false,
-      editedActivity: { name: '', type: '' },
-      isActivitiesShown: {},
+      areActivitiesVisible: {},
       currentSubProgramId: '',
       currentStepId: '',
-      activityTypeOptions: ACTIVITY_TYPES,
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
       subProgramPublicationModal: false,
       companyOptions: [],
       subProgramToPublish: null,
+      areStepsLocked: {},
+      validateUnlockingEditionModal: false,
+      subProgramsReusingStepToBeUnlocked: [],
+      stepToBeUnlocked: { _id: '', status: '' },
+      openNextModalAfterUnlocking: () => null,
     };
   },
   validations () {
@@ -196,9 +201,9 @@ export default {
       program: { subPrograms: { $each: { name: { required } } } },
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
+      reusedStep: { _id: { required }, program: { required } },
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
-      editedActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     };
   },
@@ -208,6 +213,7 @@ export default {
   async created () {
     if (!this.program) await this.refreshProgram();
     await this.refreshProgramList();
+    await this.initAreStepsLocked();
 
     if (this.openedStep) {
       this.showActivities(this.openedStep);
@@ -249,16 +255,12 @@ export default {
     saveTmpName (index) {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
     },
-    getStepTypeLabel (value) {
-      const type = STEP_TYPES.find(t => t.value === value);
-      return type ? type.label : '';
-    },
     getActivityTypeLabel (value) {
-      const type = this.activityTypeOptions.find(t => t.value === value);
+      const type = ACTIVITY_TYPES.find(t => t.value === value);
       return type ? type.label : '';
     },
     showActivities (stepId) {
-      this.$set(this.isActivitiesShown, stepId, !this.isActivitiesShown[stepId]);
+      this.$set(this.areActivitiesVisible, stepId, !this.areActivitiesVisible[stepId]);
     },
     async refreshProgram () {
       try {
@@ -313,35 +315,57 @@ export default {
       this.$v.newSubProgram.$reset();
     },
     // STEP
-    async openStepCreationModal (subProgramId) {
-      this.stepCreationModal = true;
+    async openStepAdditionModal (subProgramId) {
+      this.stepAdditionModal = true;
       this.currentSubProgramId = subProgramId;
     },
-    async createStep () {
+    setStepLocking (step, value) {
+      Object.assign(this.areStepsLocked, { [step._id]: value });
+    },
+    async addStep () {
       try {
         this.modalLoading = true;
-        this.$v.newStep.$touch();
-        if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
-        NotifyPositive('Étape créée.');
+
+        if (this.additionType === CREATE_STEP) {
+          this.$v.newStep.$touch();
+          if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+          await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
+          NotifyPositive('Étape créée.');
+        } else {
+          this.$v.reusedStep.$touch();
+          if (this.$v.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+          await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep._id });
+          this.setStepLocking(this.reusedStep, true);
+          NotifyPositive('Étape réutilisée.');
+        }
 
         await this.refreshProgram();
-        this.stepCreationModal = false;
+        this.stepAdditionModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'étape.');
+        NotifyNegative('Erreur lors de l\'ajout de l\'étape.');
       } finally {
         this.modalLoading = false;
       }
     },
-    resetStepCreationModal () {
+    resetStepAdditionModal () {
       this.newStep.name = '';
+      this.additionType = CREATE_STEP;
+      this.reusedStep = { _id: '', program: '' };
       this.$v.newStep.$reset();
+      this.$v.reusedStep.$reset();
     },
     // step edition
     async openStepEditionModal (step) {
-      this.editedStep = pick(step, ['_id', 'name', 'type']);
-      this.stepEditionModal = true;
+      if (this.isLocked(step)) {
+        this.openNextModalAfterUnlocking = () => this.openStepEditionModal(step);
+        this.openValidateUnlockingEditionModal(step);
+      } else {
+        this.editedStep = pick(step, ['_id', 'name', 'type']);
+        this.stepEditionModal = true;
+      }
     },
     async editStep () {
       try {
@@ -459,36 +483,6 @@ export default {
       this.reusedActivity = '';
       this.$v.reusedActivity.$reset();
     },
-    // activity edition
-    async openActivityEditionModal (activity) {
-      this.editedActivity = pick(activity, ['_id', 'name', 'type', 'status']);
-      this.activityEditionModal = true;
-    },
-    async editActivity () {
-      try {
-        this.modalLoading = true;
-        this.$v.editedActivity.$touch();
-        if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = this.isPublished(this.editedActivity)
-          ? omit(this.editedActivity, ['_id', 'status', 'type'])
-          : omit(this.editedActivity, ['_id', 'status']);
-
-        await Activities.updateById(this.editedActivity._id, payload);
-        this.activityEditionModal = false;
-        await this.refreshProgram();
-        NotifyPositive('Activité modifiée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'activité.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    resetActivityEditionModal () {
-      this.editedActivity = { name: '', type: '' };
-      this.$v.editedActivity.$reset();
-    },
     validateStepDetachment (subProgramId, stepId) {
       this.$q.dialog({
         title: 'Confirmation',
@@ -500,12 +494,6 @@ export default {
     },
     async detachStep (subProgramId, stepId) {
       try {
-        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
-        const step = subProgram.steps.find(s => s._id === stepId);
-        if (step.courseSlotsCount) {
-          return NotifyWarning('Certains créneaux de formation sont encore rattachés à cette étape.');
-        }
-
         await SubPrograms.detachStep(subProgramId, stepId);
         await this.refreshProgram();
         NotifyPositive('Étape retirée.');
@@ -517,14 +505,19 @@ export default {
         return NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
     },
-    validateActivityDeletion (stepId, activityId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.detachActivity(stepId, activityId))
-        .onCancel(() => NotifyPositive('Retrait annulé.'));
+    validateActivityDeletion (step, activityId) {
+      if (this.isLocked(step)) {
+        this.openNextModalAfterUnlocking = () => this.validateActivityDeletion(step, activityId);
+        this.openValidateUnlockingEditionModal(step);
+      } else {
+        this.$q.dialog({
+          title: 'Confirmation',
+          message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape ?',
+          ok: true,
+          cancel: 'Annuler',
+        }).onOk(() => this.detachActivity(step._id, activityId))
+          .onCancel(() => NotifyPositive('Retrait annulé.'));
+      }
     },
     async detachActivity (stepId, activityId) {
       try {
@@ -586,6 +579,20 @@ export default {
     isPublished (element) {
       return element.status === PUBLISHED;
     },
+    isLocked (step) {
+      return this.areStepsLocked[step._id];
+    },
+    isPublishedOrLocked (step) {
+      return this.isPublished(step) || this.isLocked(step);
+    },
+    isReused (step) {
+      return step.subPrograms && step.subPrograms.length > 1;
+    },
+    initAreStepsLocked () {
+      this.areStepsLocked = Object.assign(...this.program.subPrograms
+        .map(sp => sp.steps.map(step => ({ [step._id]: this.isReused(step) })))
+        .flat());
+    },
     async openSubProgramPublicationModal () {
       try {
         const companies = await Companies.list();
@@ -599,6 +606,36 @@ export default {
     },
     resetPublication () {
       this.subProgramToPublish = null;
+    },
+    resetValidateUnlockingEditionModal () {
+      this.openNextModalAfterUnlocking = () => null;
+      this.stepToBeUnlocked = { _id: '', status: '' };
+      this.subProgramsReusingStepToBeUnlocked = [];
+    },
+    getSubProgramsReusingStep (step) {
+      return Object.values(groupBy(step.subPrograms, 'program._id'))
+        .map(groupSp => ({
+          programName: groupSp[0].program.name,
+          subProgramsName: groupSp.map(sP => sP.name).sort(sortStrings),
+        }))
+        .sort((a, b) => sortStrings(a.programName, b.programName));
+    },
+    openValidateUnlockingEditionModal (step) {
+      if (!this.isLocked(step)) return;
+
+      this.stepToBeUnlocked = pick(step, ['_id', 'status']);
+      this.subProgramsReusingStepToBeUnlocked = this.getSubProgramsReusingStep(step);
+      this.validateUnlockingEditionModal = true;
+    },
+    confirmUnlocking () {
+      this.setStepLocking(this.stepToBeUnlocked, false);
+      this.openNextModalAfterUnlocking();
+      this.validateUnlockingEditionModal = false;
+      NotifyPositive('Étape déverrouillée.');
+    },
+    cancelUnlocking () {
+      this.validateUnlockingEditionModal = false;
+      NotifyPositive('Déverrouillage annulé.');
     },
   },
 };
@@ -629,6 +666,10 @@ export default {
       flex: 1
   &-subtitle
     font-size: 13px
+  &-lock
+    background-color: $copper-grey-100
+  &-title
+    min-height: 28px
 
 .add-step-button
   align-self: flex-end

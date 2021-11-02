@@ -10,4 +10,7 @@ export default {
   async detachStep (subProgramId, stepId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/subprograms/${subProgramId}/steps/${stepId}`);
   },
+  async reuseStep (subProgramId, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/subprograms/${subProgramId}/steps`, payload);
+  },
 };
