@@ -104,9 +104,9 @@
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
       :company-options="companyOptions" @hide="resetPublication" />
 
-    <validate-unlocking-step-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking()"
+    <validate-unlocking-step-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking"
       :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" @hide="resetValidateUnlockingEditionModal"
-      @confirm="confirmUnlocking()" :is-step-published="stepToBeUnlocked.status === PUBLISHED" />
+      @confirm="confirmUnlocking" :is-step-published="stepToBeUnlocked.status === PUBLISHED" />
   </div>
 </template>
 
