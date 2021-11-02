@@ -1,6 +1,6 @@
 <template>
     <q-dialog :value="value" @hide="hide">
-      <div class="modal-container-sm modal-padding">
+      <div class="modal-container-md modal-padding">
         <div class="title q-mb-md">Confirmation</div>
         <div class="banner row q-pa-sm q-mb-md">
           <q-icon size="sm" name="info_outline" color="orange-700" class="q-mr-sm" />
