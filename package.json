@@ -17,7 +17,7 @@
     "@casl/ability": "^5.3.0",
     "@casl/vue": "^1.2.3",
     "@quasar/extras": "^1.11.2",
-    "axios": "^0.23.0",
+    "axios": "^0.24.0",
     "chart.js": "^2.9.4",
     "connect-history-api-fallback": "^1.6.0",
     "date-holidays": "^2.0.3",
