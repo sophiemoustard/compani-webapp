@@ -73,8 +73,6 @@
 </template>
 
 <script>
-import omit from 'lodash/omit';
-import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
@@ -119,16 +117,14 @@ export default {
       return uniqBy(this.activityHistories, 'user._id').length;
     },
     courseList () {
-      const groupedByCourses = Object.values(groupBy(this.activityHistories.map((aH) => {
-        const res = [];
-        for (const step of aH.activity.steps) res.push({ ...aH, activity: { ...omit(aH.activity, 'steps'), step } });
-        return res;
-      }).flat(), h => get(h, 'activity.step.subProgram.courses[0]._id')));
+      const usersParticipationsToPrograms = this.activityHistories
+        .map(aH => aH.activity.steps.map(s => s.subPrograms.map(sP => ({ userId: aH.user._id, program: sP.program }))))
+        .flat(3);
+      const participationsGroupedByProgram = Object.values(groupBy(usersParticipationsToPrograms, 'program._id'));
 
-      return groupedByCourses.map(group => ({
-        name: get(group[0], 'activity.step.subProgram.program.name'),
-        activeTraineesCount: new Set(group.map(a => a.user._id)).size,
-      })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
+      return participationsGroupedByProgram
+        .map(group => ({ name: group[0].program.name, activeTraineesCount: new Set(group.map(a => a.userId)).size }))
+        .sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
     },
     learnerList () {
       const groupedByLearners = Object.values(groupBy(this.activityHistories, h => h.user._id));

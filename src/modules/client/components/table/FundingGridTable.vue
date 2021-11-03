@@ -1,6 +1,6 @@
 <template>
   <q-table class="q-mb-xl" :data="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
-    :visible-columns="formattedVisibleColumns">
+    :visible-columns="formattedVisibleColumns" :pagination.sync="paginationHistory">
     <template #item="props">
       <q-card class="full-width q-mb-md" flat bordered>
         <q-list separator dense>
@@ -41,6 +41,11 @@ export default {
         'customerParticipationRate',
         'careDays',
       ],
+      paginationHistory: {
+        rowsPerPage: 0,
+        sortBy: 'createdAt',
+        descending: true,
+      },
     };
   },
   computed: {
