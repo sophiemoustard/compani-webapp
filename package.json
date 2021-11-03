@@ -54,7 +54,7 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^5.1.1",
-    "eslint-plugin-vue": "^7.19.1",
+    "eslint-plugin-vue": "^7.20.0",
     "eslint-webpack-plugin": "^2.5.4",
     "html-loader": "^1.3.2"
   },
