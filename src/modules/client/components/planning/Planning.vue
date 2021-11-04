@@ -10,7 +10,7 @@
       <div class="col-xs-12 col-md-7">
         <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :type="PLANNING"
           @go-to-next-week="goToNextWeek" @go-to-previous-week="goToPreviousWeek" @go-to-today="goToToday"
-          @go-to-week="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
+          @go-to-week="goToWeek" :is-coach-or-planning-referent-or-auxiliary="isCoach || isPlanningReferentOrAuxiliary"
           :is-customer-planning="isCustomerPlanning" @open-delete-events-modal="openDeleteEventsModal"
           @toggle-history="toggleHistory" :display-history="displayHistory" />
       </div>
@@ -104,6 +104,7 @@ import Customers from '@api/Customers';
 import Button from '@components/Button';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
+  AUXILIARY,
   PLANNING,
   INVOICED_AND_PAID,
   SECTOR,
@@ -187,8 +188,8 @@ export default {
     isCoach () {
       return COACH_ROLES.includes(this.clientRole);
     },
-    isPlanningReferent () {
-      return this.clientRole === PLANNING_REFERENT;
+    isPlanningReferentOrAuxiliary () {
+      return this.clientRole === PLANNING_REFERENT || this.clientRole === AUXILIARY;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.uniqPersons } : groupBy(this.uniqPersons, 'sector._id');
