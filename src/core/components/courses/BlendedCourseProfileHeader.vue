@@ -1,7 +1,9 @@
 <template>
-  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
+  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfoWithArchivedIcon">
     <template #title v-if="!isClientInterface">
       <ni-button icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
+      <ni-button :flat="false" v-if="displayArchiveButton" class="q-ml-sm"
+        label="Archiver" @click="validateCourseArchive" />
     </template>
   </ni-profile-header>
 </template>
@@ -9,6 +11,11 @@
 <script>
 import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
+import moment from '@helpers/moment';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import Courses from '@api/Courses';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { mapState } from 'vuex';
 
 export default {
   name: 'BlendedCourseProfileHeader',
@@ -28,19 +35,61 @@ export default {
       isClientInterface,
     };
   },
+  computed: {
+    ...mapState('course', ['course']),
+    courseId () {
+      return this.course._id;
+    },
+    headerInfoWithArchivedIcon () {
+      return [
+        ...this.headerInfo,
+        ...(this.course.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
+      ];
+    },
+    displayArchiveButton () {
+      const vendorRole = this.$store.getters['main/getVendorRole'];
+      const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
+      const areAllCourseSlotsEnded = this.course.slots.every(slot => moment().isAfter(slot.endDate)) &&
+        !this.course.slotsToPlan.length;
+
+      return !this.course.archivedAt && areAllCourseSlotsEnded && isAdmin;
+    },
+  },
   methods: {
     deleteCourse () {
       this.$emit('delete');
+    },
+    refreshCourse () {
+      this.$emit('refresh');
+    },
+    validateCourseArchive () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir archiver cette formation&nbsp;? <br /><br /> Vous ne pourrez plus'
+        + ' modifier des informations, ajouter des émargements ni envoyer des sms.',
+        html: true,
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(this.archiveCourse)
+        .onCancel(() => NotifyPositive('Archivage annulé.'));
+    },
+    async archiveCourse () {
+      try {
+        const payload = { archivedAt: new Date() };
+        await Courses.update(this.course._id, payload);
+
+        NotifyPositive('Formation archivée.');
+        await this.refreshCourse();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'archivage de la formation.');
+      }
     },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-.q-item
-  padding: 0
-  min-height: 0
-
 .delete-container
   position: relative
 </style>
