@@ -48,7 +48,7 @@ export default {
     headerInfoWithArchived () {
       return [
         ...this.headerInfo,
-        ...(this.course?.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
+        ...(get(this, 'course.archivedAt') ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
       ];
     },
     isAdmin () {
