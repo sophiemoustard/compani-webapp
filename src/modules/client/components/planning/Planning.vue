@@ -10,7 +10,7 @@
       <div class="col-xs-12 col-md-7">
         <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :type="PLANNING"
           @go-to-next-week="goToNextWeek" @go-to-previous-week="goToPreviousWeek" @go-to-today="goToToday"
-          @go-to-week="goToWeek" :is-coach-or-planning-referent-or-auxiliary="isCoach || isPlanningReferentOrAuxiliary"
+          @go-to-week="goToWeek" :is-coach-or-auxiliary="isCoach || isAuxiliary"
           :is-customer-planning="isCustomerPlanning" @open-delete-events-modal="openDeleteEventsModal"
           @toggle-history="toggleHistory" :display-history="displayHistory" />
       </div>
@@ -188,7 +188,7 @@ export default {
     isCoach () {
       return COACH_ROLES.includes(this.clientRole);
     },
-    isPlanningReferentOrAuxiliary () {
+    isAuxiliary () {
       return this.clientRole === PLANNING_REFERENT || this.clientRole === AUXILIARY;
     },
     personsGroupedBySector () {
