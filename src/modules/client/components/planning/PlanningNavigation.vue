@@ -19,7 +19,7 @@
           @click="updateViewMode(THREE_DAYS_VIEW)" />
         <q-btn class="planning-view" sizs="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
       </template>
-      <q-btn v-if="isCoachOrAuxiliary" icon="highlight_off" flat round dense @click="openDeleteEventsModal" />
+      <q-btn v-if="isEventsDeletionAllowed" icon="highlight_off" flat round dense @click="openDeleteEventsModal" />
       <q-btn v-if="!isAgenda && !isCustomerPlanning" icon="playlist_play" flat round dense
         @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
     </div>
@@ -37,7 +37,7 @@ export default {
     targetDate: { type: String, default: '' },
     viewMode: { type: String, default: 'week' },
     type: { type: String, default: PLANNING },
-    isCoachOrAuxiliary: { type: Boolean, default: false },
+    isEventsDeletionAllowed: { type: Boolean, default: false },
     isCustomerPlanning: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
   },
