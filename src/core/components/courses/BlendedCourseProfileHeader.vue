@@ -1,5 +1,5 @@
 <template>
-  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfoWithArchived">
+  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
     <template #title v-if="!isClientInterface">
       <ni-button icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
       <ni-button :flat="false" v-if="displayArchiveButton" class="q-ml-sm"
@@ -37,25 +37,16 @@ export default {
     };
   },
   computed: {
-    areAllCourseSlotsEnded () {
-      return get(this, 'course') &&
-        this.course.slots.every(slot => moment().isAfter(slot.endDate)) && !this.course.slotsToPlan.length;
-    },
     courseId () {
       return get(this, 'course._id');
     },
-    headerInfoWithArchived () {
-      return [
-        ...this.headerInfo,
-        ...(get(this, 'course.archivedAt') ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
-      ];
-    },
-    isAdmin () {
-      const vendorRole = this.$store.getters['main/getVendorRole'];
-      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
-    },
     displayArchiveButton () {
-      return !this.course.archivedAt && this.areAllCourseSlotsEnded && this.isAdmin;
+      const vendorRole = this.$store.getters['main/getVendorRole'];
+      const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
+      const areAllCourseSlotsEnded = get(this, 'course') &&
+        this.course.slots.every(slot => moment().isAfter(slot.endDate)) && !this.course.slotsToPlan.length;
+
+      return !this.course.archivedAt && areAllCourseSlotsEnded && isAdmin;
     },
   },
   methods: {
