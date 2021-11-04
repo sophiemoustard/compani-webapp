@@ -2,7 +2,7 @@
   <ni-profile-header :title="title" class="delete-container" :header-info="headerInfoWithArchived">
     <template #title v-if="!isClientInterface">
       <ni-button icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
-      <ni-button :flat="false" v-if="!course.archivedAt && areAllCourseSlotsEnded && isAdmin" class="q-ml-sm"
+      <ni-button :flat="false" v-if="displayArchiveButton" class="q-ml-sm"
         label="Archiver" @click="validateCourseArchive" />
     </template>
   </ni-profile-header>
@@ -15,16 +15,15 @@ import moment from '@helpers/moment';
 import get from 'lodash/get';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Courses from '@api/Courses';
-import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 
 export default {
   name: 'BlendedCourseProfileHeader',
-  mixins: [blendedCourseProfileMixin],
   props: {
     title: { type: String, required: true },
     disableCourseDeletion: { type: Boolean, default: true },
     headerInfo: { type: Array, required: true },
+    course: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-profile-header': ProfileHeader,
@@ -55,10 +54,16 @@ export default {
       const vendorRole = this.$store.getters['main/getVendorRole'];
       return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
     },
+    displayArchiveButton () {
+      return !this.course.archivedAt && this.areAllCourseSlotsEnded && this.isAdmin;
+    },
   },
   methods: {
     deleteCourse () {
       this.$emit('delete');
+    },
+    refreshCourse () {
+      this.$emit('refresh');
     },
     validateCourseArchive () {
       this.$q.dialog({
@@ -88,10 +93,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.q-item
-  padding: 0
-  min-height: 0
-
 .delete-container
   position: relative
 </style>
