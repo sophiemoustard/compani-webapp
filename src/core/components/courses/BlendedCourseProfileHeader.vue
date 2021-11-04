@@ -12,9 +12,11 @@
 import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
 import moment from '@helpers/moment';
+import get from 'lodash/get';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Courses from '@api/Courses';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 
 export default {
   name: 'BlendedCourseProfileHeader',
@@ -23,7 +25,6 @@ export default {
     title: { type: String, required: true },
     disableCourseDeletion: { type: Boolean, default: true },
     headerInfo: { type: Array, required: true },
-    isAdmin: { type: Boolean, default: false },
   },
   components: {
     'ni-profile-header': ProfileHeader,
@@ -38,16 +39,21 @@ export default {
   },
   computed: {
     areAllCourseSlotsEnded () {
-      return this.course?.slots.every(slot => moment().isAfter(slot.endDate)) && !this.course.slotsToPlan.length;
+      return get(this, 'course') &&
+        this.course.slots.every(slot => moment().isAfter(slot.endDate)) && !this.course.slotsToPlan.length;
     },
     courseId () {
-      return this.course?._id;
+      return get(this, 'course._id');
     },
     headerInfoWithArchived () {
       return [
         ...this.headerInfo,
         ...(this.course?.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
       ];
+    },
+    isAdmin () {
+      const vendorRole = this.$store.getters['main/getVendorRole'];
+      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
     },
   },
   methods: {

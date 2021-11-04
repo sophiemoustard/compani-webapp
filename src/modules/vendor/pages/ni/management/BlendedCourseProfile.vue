@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background">
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" @delete="validateCourseDeletion" :header-info="headerInfo"
-        :disable-course-deletion="disableCourseDeletion" :is-admin="isAdmin" />
+        :disable-course-deletion="disableCourseDeletion" />
       <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>
@@ -19,7 +19,6 @@ import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 
 export default {
   name: 'BlendedCourseProfile',
@@ -54,10 +53,6 @@ export default {
           component: ProfileTraineeFollowUp,
         },
       ];
-    },
-    isAdmin () {
-      const vendorRole = this.$store.getters['main/getVendorRole'];
-      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
     },
   },
   async created () {
