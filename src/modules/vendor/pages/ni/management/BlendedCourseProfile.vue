@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background">
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" @delete="validateCourseDeletion" @refresh="refreshCourse"
-        :disable-course-deletion="disableCourseDeletion" :course="course" :header-info="headerInfoWithArchivedIcon" />
+        :disable-course-deletion="disableCourseDeletion" :header-info="headerInfo" />
       <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>

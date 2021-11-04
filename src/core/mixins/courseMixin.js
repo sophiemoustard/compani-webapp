@@ -45,12 +45,6 @@ export const courseMixin = {
         { icon: 'emoji_people', label: this.trainerName },
       ];
     },
-    headerInfoWithArchivedIcon () {
-      return [
-        ...this.headerInfo,
-        ...(get(this, 'course.archivedAt') ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
-      ];
-    },
     disableDocDownload () {
       return this.followUpDisabled || this.pdfLoading;
     },

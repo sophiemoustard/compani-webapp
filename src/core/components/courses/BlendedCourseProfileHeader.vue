@@ -1,5 +1,5 @@
 <template>
-  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
+  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfoWithArchivedIcon">
     <template #title v-if="!isClientInterface">
       <ni-button icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
       <ni-button :flat="false" v-if="displayArchiveButton" class="q-ml-sm"
@@ -12,10 +12,10 @@
 import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
 import moment from '@helpers/moment';
-import get from 'lodash/get';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Courses from '@api/Courses';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { mapState } from 'vuex';
 
 export default {
   name: 'BlendedCourseProfileHeader',
@@ -23,7 +23,6 @@ export default {
     title: { type: String, required: true },
     disableCourseDeletion: { type: Boolean, default: true },
     headerInfo: { type: Array, required: true },
-    course: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-profile-header': ProfileHeader,
@@ -37,14 +36,21 @@ export default {
     };
   },
   computed: {
+    ...mapState('course', ['course']),
     courseId () {
-      return get(this, 'course._id');
+      return this.course._id;
+    },
+    headerInfoWithArchivedIcon () {
+      return [
+        ...this.headerInfo,
+        ...(this.course.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
+      ];
     },
     displayArchiveButton () {
       const vendorRole = this.$store.getters['main/getVendorRole'];
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
-      const areAllCourseSlotsEnded = get(this, 'course') &&
-        this.course.slots.every(slot => moment().isAfter(slot.endDate)) && !this.course.slotsToPlan.length;
+      const areAllCourseSlotsEnded = this.course.slots.every(slot => moment().isAfter(slot.endDate)) &&
+        !this.course.slotsToPlan.length;
 
       return !this.course.archivedAt && areAllCourseSlotsEnded && isAdmin;
     },

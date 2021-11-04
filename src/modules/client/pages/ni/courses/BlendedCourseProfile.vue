@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <template v-if="course">
-      <ni-blended-course-profile-header :title="courseName" :header-info="headerInfoWithArchivedIcon" />
+      <ni-blended-course-profile-header :title="courseName" :header-info="headerInfo" />
       <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>
