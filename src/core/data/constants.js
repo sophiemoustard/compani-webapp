@@ -58,6 +58,10 @@ export const SITUATION_OPTIONS = [
   { label: 'Décédé', value: DECEASED },
 ];
 
+// CUSTOMER ABSENCE
+export const LEAVE = 'leave';
+export const HOSPITALIZATION = 'hospitalization';
+
 // CONTRACTS
 export const CONTRACT = 'contract';
 export const CONTRACT_VERSION = 'contract_version';

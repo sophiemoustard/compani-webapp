@@ -6,6 +6,11 @@
       :error="$v.deletedEvents.customer.$error" />
     <ni-option-group :display-caption="false" v-model="deletedEvents.inRange" type="radio"
       :options="deletetionOptions" inline />
+    <q-checkbox :value="isCustomerAbsence" label="Créer une absence bénéficiaire" dense class="q-mb-md"
+      @input="isCustomerAbsence=!isCustomerAbsence" />
+    <ni-select in-modal v-if="isCustomerAbsence" v-model="deletedEvents.absenceType" caption="Motif de l'absence"
+      :options="customerAbsenceOptions" required-field @blur="$v.deletedEvents.absenceType.$touch"
+      :error="$v.deletedEvents.absenceType.$error" />
     <template v-if="deletedEvents.inRange">
       <ni-date-input caption="Date de début" v-model="deletedEvents.startDate" type="date" required-field
         in-modal @blur="$v.deletedEvents.startDate.$touch" :error="$v.deletedEvents.startDate.$error" />
@@ -27,6 +32,8 @@
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import omit from 'lodash/omit';
+import set from 'lodash/set';
+import pick from 'lodash/pick';
 import Events from '@api/Events';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
@@ -34,6 +41,7 @@ import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import { validationMixin } from '@mixins/validationMixin';
+import { LEAVE, HOSPITALIZATION, OTHER } from '@data/constants';
 
 export default {
   name: 'DeleteEventsModal',
@@ -53,6 +61,7 @@ export default {
         customer: { required },
         startDate: { required },
         endDate: { required: requiredIf(item => item.inRange) },
+        absenceType: { required: requiredIf(this.isCustomerAbsence) },
       },
     };
   },
@@ -64,6 +73,12 @@ export default {
         { label: 'A partir d\'une date', value: false },
       ],
       loading: false,
+      isCustomerAbsence: true,
+      customerAbsenceOptions: [
+        { label: 'Congés', value: LEAVE },
+        { label: 'Hospitalisation', value: HOSPITALIZATION },
+        { label: 'Autre', value: OTHER },
+      ],
     };
   },
   methods: {
@@ -74,6 +89,9 @@ export default {
     },
     input (event) {
       this.$emit('input', event);
+    },
+    updateAbsenceType (event) {
+      set(this.deletedEvents, 'absenceType', event);
     },
     validateEventsDeletion () {
       this.$q.dialog({
@@ -95,9 +113,11 @@ export default {
 
         this.hide();
         NotifyPositive('Les évènements ont bien étés supprimés.');
+        if (this.isCustomerAbsence) NotifyPositive('L\'absence a bien été créée.');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
+        if (e.status === 403) return NotifyNegative(e.data.message);
         NotifyNegative('Problème lors de la suppression.');
       } finally {
         this.loading = false;
