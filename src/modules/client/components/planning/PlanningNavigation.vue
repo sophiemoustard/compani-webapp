@@ -10,18 +10,19 @@
     </div>
     <div class="planning-navigation-actions col-6">
       <div class="text-copper-grey-800">
-        <ni-button data-cy="planning_before" icon="chevron_left" @click="goToPreviousWeek()" />
-        <ni-button data-cy="planning_after" icon="chevron_right" @click="goToNextWeek()" />
-        <ni-button data-cy="planning_today" icon="today" @click="goToToday" />
+        <ni-button data-cy="planning_before" icon="chevron_left" @click="goToPreviousWeek()" color="copper-grey-800" />
+        <ni-button data-cy="planning_after" icon="chevron_right" @click="goToNextWeek()" color="copper-grey-800" />
+        <ni-button data-cy="planning_today" icon="today" @click="goToToday" color="copper-grey-800" />
       </div>
       <template v-if="$q.platform.is.mobile && isAgenda">
         <ni-button class="planning-view" size="sm" flat v-if="!isThreeDaysView" label="3J"
           @click="updateViewMode(THREE_DAYS_VIEW)" />
         <ni-button class="planning-view" size="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
       </template>
-      <ni-button v-if="isEventsDeletionAllowed" icon="highlight_off" @click="openDeleteEventsModal" />
+      <ni-button v-if="isEventsDeletionAllowed" icon="highlight_off" @click="openDeleteEventsModal"
+        color="copper-grey-800" />
       <ni-button v-if="!isAgenda && !isCustomerPlanning" icon="playlist_play" @click="toggleHistory"
-        :color="displayHistory ? 'primary' : ''" />
+        :color="displayHistory ? 'primary' : 'copper-grey-800'" />
     </div>
   </div>
 </template>
