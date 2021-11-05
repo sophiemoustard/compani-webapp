@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import capitalize from 'lodash/capitalize';
 import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
-import { getLastVersion } from '@helpers/utils';
+import { getLastVersion, formatPrice, formatHoursWithMinutes } from '@helpers/utils';
 import moment from '@helpers/moment';
 
 export const subscriptionMixin = {
@@ -11,12 +11,7 @@ export const subscriptionMixin = {
       selectedSubscription: {},
       subscriptionHistoryModal: false,
       subscriptionsColumns: [
-        {
-          name: 'service',
-          label: 'Service',
-          align: 'left',
-          field: row => get(row, 'service.name'),
-        },
+        { name: 'service', label: 'Service', align: 'left', field: row => get(row, 'service.name') },
         {
           name: 'nature',
           label: 'Nature',
@@ -27,12 +22,7 @@ export const subscriptionMixin = {
           },
           field: row => get(row, 'service.nature'),
         },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
-        },
+        { name: 'unitTTCRate', label: 'Prix unitaire TTC', align: 'center', field: 'unitTTCRate', format: formatPrice },
         {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
@@ -45,14 +35,15 @@ export const subscriptionMixin = {
           name: 'weeklyRate',
           label: 'Coût hebdomadaire TTC *',
           align: 'center',
-          field: row => `${this.formatNumber(this.computeWeeklyRate(row, this.getMatchingFunding(row)))}€`,
+          field: row => formatPrice(this.computeWeeklyRate(row, this.getMatchingFunding(row))),
         },
         {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
+          name: 'billingItems',
+          label: 'Frais supplémentaires par intervention',
+          align: 'center',
+          field: this.formatBillingItems,
         },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       subscriptionHistoryColumns: [
         {
@@ -62,12 +53,7 @@ export const subscriptionMixin = {
           field: 'createdAt',
           format: value => moment(value).format('DD/MM/YYYY'),
         },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
-        },
+        { name: 'unitTTCRate', label: 'Prix unitaire TTC', align: 'center', field: 'unitTTCRate', format: formatPrice },
         {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
@@ -76,18 +62,8 @@ export const subscriptionMixin = {
             ? `${row.estimatedWeeklyVolume}h`
             : row.estimatedWeeklyVolume),
         },
-        {
-          name: 'evenings',
-          label: 'dont soirées',
-          align: 'center',
-          field: row => (row.evenings ? `${row.evenings}h` : ''),
-        },
-        {
-          name: 'sundays',
-          label: 'dont dimanche',
-          align: 'center',
-          field: row => (row.sundays ? `${row.sundays}h` : ''),
-        },
+        { name: 'evenings', label: 'dont soirées', align: 'center', field: 'evenings', format: formatHoursWithMinutes },
+        { name: 'sundays', label: 'dont dimanche', align: 'center', field: 'sundays', format: formatHoursWithMinutes },
       ],
       paginationHistory: {
         rowsPerPage: 0,
@@ -97,7 +73,21 @@ export const subscriptionMixin = {
       subscriptionsLoading: false,
     };
   },
+  computed: {
+    visibleSubscriptionsColumns () {
+      const subHasBillingItems = this.subscriptions.some(sub => !!(get(sub, 'service.billingItems') || []).length);
+
+      return subHasBillingItems
+        ? this.subscriptionsColumns
+        : this.subscriptionsColumns.filter(col => col.name !== 'billingItems');
+    },
+  },
   methods: {
+    formatBillingItems (subscription) {
+      if (!get(subscription, 'service.billingItems')) return '';
+
+      return subscription.service.billingItems.map(bi => `${bi.name} : ${formatPrice(bi.defaultUnitAmount)}`);
+    },
     formatNumber (number) {
       return parseFloat(Math.round(number * 100) / 100).toFixed(2);
     },
@@ -111,6 +101,7 @@ export const subscriptionMixin = {
           weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening / 100;
         }
       }
+
       let fundingReduction = 0;
       if (this.isCompleteFunding(funding)) {
         if (funding.frequency !== ONCE) {

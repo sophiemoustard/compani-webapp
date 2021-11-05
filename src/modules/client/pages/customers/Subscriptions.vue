@@ -6,13 +6,16 @@
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-cell">
-          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading"
-            data-cy="subscriptions-table">
+          <ni-responsive-table :data="subscriptions" :columns="visibleSubscriptionsColumns"
+            data-cy="subscriptions-table" :loading="subscriptionsLoading">
             <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style" :data-cy="`col-${col.name}`">
-                  <template v-if="col.name === 'actions'">
+                  <template v-if="col.name === 'billingItems'">
+                    <div v-for="(item, index) in col.value" :key="`bi${index}`">{{ item }}</div>
+                  </template>
+                  <template v-else-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <ni-button icon="history" @click="showHistory(col.value)" data-cy="show-subscription-history" />
                       <ni-button :disable="!getSubscriptionFundings(col.value).length" icon="mdi-calculator"
@@ -26,7 +29,7 @@
           </ni-responsive-table>
         </q-card>
         <p v-if="subscriptions.length > 0" class="nota-bene">
-          * intègre les éventuelles majorations soir / dimanche
+          * intègre les éventuelles majorations soir / dimanche et financements
         </p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
@@ -191,11 +194,7 @@ export default {
       mandatesVisibleColumns: ['rum', 'sign'],
       fundingModal: false,
       fundingData: [],
-      pagination: {
-        sortBy: 'createdAt',
-        ascending: true,
-        rowsPerPage: 0,
-      },
+      pagination: { sortBy: 'createdAt', ascending: true, rowsPerPage: 0 },
       extensions: DOC_EXTENSIONS,
     };
   },
@@ -479,4 +478,16 @@ export default {
   .q-dialog__inner
     &--minimized > div
       max-width: none
+  .nature
+    @media screen and (min-width: 768px)
+      width: 96px
+  .unitTTCRate
+    @media screen and (min-width: 768px)
+      width: 104px
+  .weeklyRate
+    @media screen and (min-width: 768px)
+      width: 160px
+  .actions
+    @media screen and (min-width: 768px)
+      width: 96px
 </style>

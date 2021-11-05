@@ -36,12 +36,16 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Souscriptions</p>
       <q-card>
-        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
+        <ni-responsive-table :data="subscriptions" :columns="visibleSubscriptionsColumns"
+          :loading="subscriptionsLoading">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template v-if="col.name === 'actions'">
+                <template v-if="col.name === 'billingItems'">
+                  <div v-for="(item, index) in col.value" :key="`bi${index}`">{{ item }}</div>
+                </template>
+                <template v-else-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <ni-button icon="history" @click="showHistory(col.value)" />
                     <ni-button @click="openSubscriptionEditionModal(col.value)" icon="edit"
