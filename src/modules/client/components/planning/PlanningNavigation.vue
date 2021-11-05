@@ -10,18 +10,19 @@
     </div>
     <div class="planning-navigation-actions col-6">
       <div class="text-copper-grey-800">
-        <q-btn data-cy="planning_before" icon="chevron_left" dense flat round @click="goToPreviousWeek()" />
-        <q-btn data-cy="planning_after" icon="chevron_right" dense flat round @click="goToNextWeek()" />
-        <q-btn data-cy="planning_today" icon="today" dense flat round @click="goToToday" />
+        <ni-button data-cy="planning_before" icon="chevron_left" @click="goToPreviousWeek()" color="copper-grey-800" />
+        <ni-button data-cy="planning_after" icon="chevron_right" @click="goToNextWeek()" color="copper-grey-800" />
+        <ni-button data-cy="planning_today" icon="today" @click="goToToday" color="copper-grey-800" />
       </div>
       <template v-if="$q.platform.is.mobile && isAgenda">
-        <q-btn class="planning-view" sizs="sm" flat v-if="!isThreeDaysView" label="3J"
+        <ni-button class="planning-view" size="sm" flat v-if="!isThreeDaysView" label="3J"
           @click="updateViewMode(THREE_DAYS_VIEW)" />
-        <q-btn class="planning-view" sizs="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
+        <ni-button class="planning-view" size="sm" flat v-else label="7J" @click="updateViewMode(WEEK_VIEW)" />
       </template>
-      <q-btn v-if="isCoachOrPlanningReferent" icon="highlight_off" flat round dense @click="openDeleteEventsModal" />
-      <q-btn v-if="!isAgenda && !isCustomerPlanning" icon="playlist_play" flat round dense
-        @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
+      <ni-button v-if="isEventsDeletionAllowed" icon="highlight_off" @click="openDeleteEventsModal"
+        color="copper-grey-800" />
+      <ni-button v-if="!isAgenda && !isCustomerPlanning" icon="playlist_play" @click="toggleHistory"
+        :color="displayHistory ? 'primary' : 'copper-grey-800'" />
     </div>
   </div>
 </template>
@@ -29,6 +30,7 @@
 <script>
 import { AGENDA, PLANNING, THREE_DAYS_VIEW, WEEK_VIEW } from '@data/constants';
 import moment from '@helpers/moment';
+import Button from '@components/Button';
 
 export default {
   name: 'PlanningNavigation',
@@ -37,9 +39,12 @@ export default {
     targetDate: { type: String, default: '' },
     viewMode: { type: String, default: 'week' },
     type: { type: String, default: PLANNING },
-    isCoachOrPlanningReferent: { type: Boolean, default: false },
+    isEventsDeletionAllowed: { type: Boolean, default: false },
     isCustomerPlanning: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
+  },
+  components: {
+    'ni-button': Button,
   },
   data () {
     return {

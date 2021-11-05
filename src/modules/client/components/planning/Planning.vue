@@ -10,9 +10,9 @@
       <div class="col-xs-12 col-md-7">
         <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :type="PLANNING"
           @go-to-next-week="goToNextWeek" @go-to-previous-week="goToPreviousWeek" @go-to-today="goToToday"
-          @go-to-week="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
-          :is-customer-planning="isCustomerPlanning" @open-delete-events-modal="openDeleteEventsModal"
-          @toggle-history="toggleHistory" :display-history="displayHistory" />
+          @go-to-week="goToWeek" is-events-deletion-allowed @open-delete-events-modal="openDeleteEventsModal"
+          :is-customer-planning="isCustomerPlanning" :display-history="displayHistory"
+          @toggle-history="toggleHistory" />
       </div>
     </div>
     <div class="planning-container full-width">
@@ -110,7 +110,6 @@ import {
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
-  PLANNING_REFERENT,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
 } from '@data/constants';
@@ -186,9 +185,6 @@ export default {
     ...mapGetters({ clientRole: 'main/getClientRole' }),
     isCoach () {
       return COACH_ROLES.includes(this.clientRole);
-    },
-    isPlanningReferent () {
-      return this.clientRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.uniqPersons } : groupBy(this.uniqPersons, 'sector._id');
