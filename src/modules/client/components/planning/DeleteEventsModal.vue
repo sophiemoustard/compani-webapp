@@ -32,8 +32,6 @@
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import omit from 'lodash/omit';
-import set from 'lodash/set';
-import pick from 'lodash/pick';
 import Events from '@api/Events';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
@@ -90,9 +88,6 @@ export default {
     input (event) {
       this.$emit('input', event);
     },
-    updateAbsenceType (event) {
-      set(this.deletedEvents, 'absenceType', event);
-    },
     validateEventsDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
@@ -112,12 +107,12 @@ export default {
         await Events.deleteList(omit(this.deletedEvents, 'inRange'));
 
         this.hide();
+
+        if (this.isCustomerAbsence) return NotifyPositive('L\'absence a bien été créée.');
         NotifyPositive('Les évènements ont bien étés supprimés.');
-        if (this.isCustomerAbsence) NotifyPositive('L\'absence a bien été créée.');
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        if (e.status === 403) return NotifyNegative(e.data.message);
+        if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
         NotifyNegative('Problème lors de la suppression.');
       } finally {
         this.loading = false;
