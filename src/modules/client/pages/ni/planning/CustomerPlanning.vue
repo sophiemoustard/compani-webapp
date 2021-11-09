@@ -24,6 +24,7 @@
 import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
 import Events from '@api/Events';
+import CustomerAbsences from '@api/CustomerAbsences';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -62,6 +63,7 @@ export default {
       days: [],
       events: {},
       customers: [],
+      customerAbsences: {},
       auxiliaries: [],
       startOfWeek: '',
       filteredSectors: [],
@@ -163,8 +165,14 @@ export default {
           customer: this.customers.map(cus => cus._id),
           groupBy: CUSTOMER,
         });
+        this.customerAbsences = await CustomerAbsences.list({
+          startDate: new Date(this.startOfWeek),
+          endDate: new Date(this.endOfWeek),
+          customer: this.customers.map(cus => cus._id),
+        });
       } catch (e) {
         this.events = {};
+        this.customerAbsences = {};
       }
     },
     async getAuxiliaries () {
