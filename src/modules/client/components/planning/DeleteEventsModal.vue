@@ -7,7 +7,7 @@
     <ni-option-group :display-caption="false" v-model="deletedEvents.inRange" type="radio"
       :options="deletetionOptions" inline />
     <q-checkbox :value="isCustomerAbsence" label="Créer une absence bénéficiaire" dense class="q-mb-md"
-      @input="isCustomerAbsence=!isCustomerAbsence" />
+      @input="allowCustomerAbsenceCreation" />
     <ni-select in-modal v-if="isCustomerAbsence" v-model="deletedEvents.absenceType" caption="Motif de l'absence"
       :options="customerAbsenceOptions" required-field @blur="$v.deletedEvents.absenceType.$touch"
       :error="$v.deletedEvents.absenceType.$error" />
@@ -96,6 +96,10 @@ export default {
         cancel: 'Annuler',
       }).onOk(this.deleteEvents)
         .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
+    allowCustomerAbsenceCreation () {
+      this.isCustomerAbsence = !this.isCustomerAbsence;
+      if (!this.isCustomerAbsence) this.deletedEvents = { ...omit(this.deletedEvents, 'absenceType') };
     },
     async deleteEvents () {
       try {
