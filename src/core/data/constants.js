@@ -59,6 +59,7 @@ export const SITUATION_OPTIONS = [
 ];
 
 // CUSTOMER ABSENCE
+export const CUSTOMER_ABSENCE = 'customer_absence';
 export const LEAVE = 'leave';
 export const HOSPITALIZATION = 'hospitalization';
 

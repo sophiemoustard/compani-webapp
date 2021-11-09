@@ -37,6 +37,7 @@ import {
   CUSTOMER,
   SECTOR,
   COACH_ROLES,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { isAfter } from '@helpers/date';
@@ -170,6 +171,7 @@ export default {
           endDate: new Date(this.endOfWeek),
           customer: this.customers.map(cus => cus._id),
         });
+        this.customerAbsences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE }));
       } catch (e) {
         this.events = {};
         this.customerAbsences = {};
