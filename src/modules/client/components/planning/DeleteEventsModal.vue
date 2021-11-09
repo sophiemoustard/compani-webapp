@@ -6,12 +6,12 @@
       :error="$v.deletedEvents.customer.$error" />
     <ni-option-group :display-caption="false" v-model="deletedEvents.inRange" type="radio"
       :options="deletetionOptions" inline />
-    <q-checkbox :value="isCustomerAbsence" label="Créer une absence bénéficiaire" dense class="q-mb-md"
-      @input="allowCustomerAbsenceCreation" />
-    <ni-select in-modal v-if="isCustomerAbsence" v-model="deletedEvents.absenceType" caption="Motif de l'absence"
-      :options="customerAbsenceOptions" required-field @blur="$v.deletedEvents.absenceType.$touch"
-      :error="$v.deletedEvents.absenceType.$error" />
     <template v-if="deletedEvents.inRange">
+      <q-checkbox :value="isCustomerAbsence" label="Créer une absence bénéficiaire" dense class="q-mb-md"
+        @input="allowCustomerAbsenceCreation" />
+      <ni-select in-modal v-if="isCustomerAbsence" v-model="deletedEvents.absenceType" caption="Motif de l'absence"
+        :options="customerAbsenceOptions" required-field @blur="$v.deletedEvents.absenceType.$touch"
+        :error="$v.deletedEvents.absenceType.$error" />
       <ni-date-input caption="Date de début" v-model="deletedEvents.startDate" type="date" required-field
         in-modal @blur="$v.deletedEvents.startDate.$touch" :error="$v.deletedEvents.startDate.$error" />
       <ni-date-input caption="Date de fin" v-model="deletedEvents.endDate" type="date" required-field in-modal
@@ -59,7 +59,7 @@ export default {
         customer: { required },
         startDate: { required },
         endDate: { required: requiredIf(item => item.inRange) },
-        absenceType: { required: requiredIf(this.isCustomerAbsence) },
+        absenceType: { required: requiredIf(() => this.isCustomerAbsence) },
       },
     };
   },
@@ -112,8 +112,8 @@ export default {
 
         this.hide();
 
-        if (this.isCustomerAbsence) return NotifyPositive('L\'absence a bien été créée.');
-        NotifyPositive('Les évènements ont bien étés supprimés.');
+        if (this.isCustomerAbsence) return NotifyPositive('Absence bénéficiaire ajoutée.');
+        NotifyPositive('Les évènements ont été supprimés.');
       } catch (e) {
         console.error(e);
         if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
