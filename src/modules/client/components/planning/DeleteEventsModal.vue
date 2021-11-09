@@ -59,7 +59,7 @@ export default {
         customer: { required },
         startDate: { required },
         endDate: { required: requiredIf(item => item.inRange) },
-        absenceType: { required: requiredIf(() => this.isCustomerAbsence) },
+        absenceType: { required: requiredIf(() => this.isCustomerAbsence && this.deletedEvents.inRange) },
       },
     };
   },
