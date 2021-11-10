@@ -79,6 +79,18 @@ export default {
       ],
     };
   },
+  watch: {
+    'deletedEvents.inRange': {
+      handler () {
+        if (!this.deletedEvents.inRange) this.isCustomerAbsence = false;
+        this.deletedEvents = {
+          inRange: this.deletedEvents.inRange,
+          customer: this.deletedEvents.customer,
+          startDate: this.deletedEvents.startDate,
+        };
+      },
+    },
+  },
   methods: {
     hide () {
       this.deletedEvents = { inRange: true };
