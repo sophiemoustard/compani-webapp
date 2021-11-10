@@ -31,6 +31,7 @@
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
+import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Events from '@api/Events';
 import Modal from '@components/modal/Modal';
@@ -80,15 +81,9 @@ export default {
     };
   },
   watch: {
-    'deletedEvents.inRange': {
-      handler () {
-        if (!this.deletedEvents.inRange) this.isCustomerAbsence = false;
-        this.deletedEvents = {
-          inRange: this.deletedEvents.inRange,
-          customer: this.deletedEvents.customer,
-          startDate: this.deletedEvents.startDate,
-        };
-      },
+    'deletedEvents.inRange': function () {
+      this.isCustomerAbsence = this.deletedEvents.inRange;
+      this.deletedEvents = pick(this.deletedEvents, ['inRange', 'customer', 'startDate']);
     },
   },
   methods: {
