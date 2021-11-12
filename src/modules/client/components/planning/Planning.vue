@@ -114,7 +114,7 @@ import {
   NOT_INVOICED_AND_NOT_PAID,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEventCell';
+import PlanningEventCell from 'src/modules/client/components/planning/PlanningEventCell';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
 import ChipCustomerIndicator from 'src/modules/client/components/planning/ChipCustomerIndicator';
 import NiEventHistoryFeed from 'src/modules/client/components/planning/EventHistoryFeed';
@@ -129,7 +129,7 @@ export default {
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
     'ni-button': Button,
-    'ni-planning-event-cell': NiPlanningEvent,
+    'ni-planning-event-cell': PlanningEventCell,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
     'ni-event-history-feed': NiEventHistoryFeed,
