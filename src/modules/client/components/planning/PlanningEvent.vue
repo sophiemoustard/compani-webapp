@@ -22,6 +22,9 @@
         <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
           {{ displayAbsenceType(event.absence) }}
         </p>
+        <p v-if="event.type === CUSTOMER_ABSENCE" class="no-margin overflow-hidden-nowrap">
+          {{ displayCustomerAbsenceType(event.absenceType) }}
+        </p>
         <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">Indispo.</p>
         <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">
           {{ event.internalHour.name }}
@@ -43,6 +46,7 @@ import {
   AUXILIARY,
   STAFFING_PERCENTAGE_BY_MINUTES,
   CUSTOMER,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
 
@@ -63,6 +67,7 @@ export default {
       INTERVENTION,
       ABSENCE,
       UNAVAILABILITY,
+      CUSTOMER_ABSENCE,
     };
   },
   computed: {

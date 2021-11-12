@@ -4,9 +4,10 @@ import {
   DAILY,
   ABSENCE,
   STAFFING_VIEW_START_HOUR,
-  STAFFING_VIEW_END_HOUR,
   ILLNESS,
   WORK_ACCIDENT,
+  CUSTOMER_ABSENCE_TYPES,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -45,6 +46,10 @@ export const planningEventMixin = {
       const absence = ABSENCE_TYPES.find(abs => abs.value === value);
       return !absence ? '' : absence.label;
     },
+    displayCustomerAbsenceType (value) {
+      const customerAbsence = CUSTOMER_ABSENCE_TYPES.find(abs => abs.value === value);
+      return !customerAbsence ? '' : customerAbsence.label;
+    },
     eventTitle (event) {
       if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
@@ -67,9 +72,16 @@ export const planningEventMixin = {
           displayedStartHour = eventStartDate.startOf('d').hours();
           staffingStartHour = STAFFING_VIEW_START_HOUR;
         }
-        displayedEndHour = STAFFING_VIEW_END_HOUR;
+        displayedEndHour = eventEndDate.endOf('d').hours();
         displayedStartMinutes = 0;
-        displayedEndMinutes = 0;
+        displayedEndMinutes = eventEndDate.endOf('d').minutes();
+      }
+
+      if (event.type === CUSTOMER_ABSENCE) {
+        displayedStartHour = eventStartDate.startOf('d').hours();
+        displayedStartMinutes = eventStartDate.startOf('d').minutes();
+        displayedEndHour = eventEndDate.endOf('d').hours();
+        displayedEndMinutes = eventEndDate.endOf('d').minutes();
       }
 
       const staffingBeginning = Math.max((staffingStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
@@ -81,7 +93,10 @@ export const planningEventMixin = {
         .hour(displayedStartHour)
         .minutes(displayedStartMinutes)
         .toISOString();
-      dayEvent.displayedEndDate = eventEndDate.toISOString();
+      dayEvent.displayedEndDate = moment(day)
+        .hour(displayedEndHour)
+        .minutes(displayedEndMinutes)
+        .toISOString();
       dayEvent.staffingBeginning = staffingBeginning;
       dayEvent.staffingDuration = staffingEnd - staffingBeginning;
 

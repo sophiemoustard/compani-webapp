@@ -23,6 +23,7 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
+import groupBy from 'lodash/groupBy';
 import Events from '@api/Events';
 import CustomerAbsences from '@api/CustomerAbsences';
 import Customers from '@api/Customers';
@@ -63,8 +64,8 @@ export default {
       loading: false,
       days: [],
       events: {},
+      display: {},
       customers: [],
-      customerAbsences: {},
       auxiliaries: [],
       startOfWeek: '',
       filteredSectors: [],
@@ -160,21 +161,19 @@ export default {
     },
     async refresh () {
       try {
-        this.events = await Events.list({
+        const query = {
           startDate: this.startOfWeek,
           endDate: this.endOfWeek,
           customer: this.customers.map(cus => cus._id),
-          groupBy: CUSTOMER,
-        });
-        this.customerAbsences = await CustomerAbsences.list({
-          startDate: new Date(this.startOfWeek),
-          endDate: new Date(this.endOfWeek),
-          customer: this.customers.map(cus => cus._id),
-        });
-        this.customerAbsences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE }));
+        };
+
+        const interventions = await Events.list(query);
+        const absences = await CustomerAbsences.list(query);
+
+        const customerAbsences = absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE }));
+        this.events = groupBy([...interventions, ...customerAbsences], 'customer._id');
       } catch (e) {
         this.events = {};
-        this.customerAbsences = {};
       }
     },
     async getAuxiliaries () {
