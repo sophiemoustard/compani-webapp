@@ -64,7 +64,6 @@ export default {
       loading: false,
       days: [],
       events: {},
-      display: {},
       customers: [],
       auxiliaries: [],
       startOfWeek: '',
@@ -81,7 +80,7 @@ export default {
       sectorCustomers: [],
     };
   },
-  async mounted () {
+  async created () {
     try {
       await this.fillFilter({ company: this.company, roleToSearch: CUSTOMER });
       await this.getAuxiliaries();

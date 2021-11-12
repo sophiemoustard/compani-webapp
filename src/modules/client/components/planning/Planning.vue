@@ -79,7 +79,7 @@
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
                   :key="eventIndex" @drag="drag" @click="openEventEditionModal" :can-drag="canDrag"
-                  data-cy="planning-event" />
+                  data-cy="planning-event-cell" />
               </td>
             </tr>
           </template>
@@ -114,7 +114,7 @@ import {
   NOT_INVOICED_AND_NOT_PAID,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
+import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEventCell';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
 import ChipCustomerIndicator from 'src/modules/client/components/planning/ChipCustomerIndicator';
 import NiEventHistoryFeed from 'src/modules/client/components/planning/EventHistoryFeed';
