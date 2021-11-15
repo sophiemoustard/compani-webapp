@@ -1,6 +1,11 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Formations mixtes" class="q-mb-xl" />
+    <ni-title-header title="Formations" class="q-mb-xl">
+      <template slot="title">
+       <q-toggle dense :value="displayArchived" color="primary" label="Archivées"
+          @input="displayArchived=!displayArchived" class="q-ml-sm q-mb-sm" />
+      </template>
+    </ni-title-header>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
       <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
@@ -63,6 +68,7 @@ export default {
       coursesWithGroupedSlot: [],
       courseTypes: COURSE_TYPES,
       salesRepresentativeOptions: [],
+      displayArchived: false,
     };
   },
   validations () {

@@ -1,6 +1,11 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Formations" class="q-mb-xl" />
+    <ni-title-header title="Formations" class="q-mb-xl">
+      <template slot="title">
+       <q-toggle dense :value="displayArchived" color="primary" label="Archivées"
+          @input="displayArchived=!displayArchived" class="q-ml-sm q-mb-sm" />
+      </template>
+    </ni-title-header>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
       <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
@@ -33,6 +38,7 @@ export default {
   data () {
     return {
       coursesWithGroupedSlot: [],
+      displayArchived: false,
     };
   },
   computed: {
