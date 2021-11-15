@@ -112,6 +112,7 @@ import {
   UNKNOWN_AVATAR,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import PlanningEventCell from 'src/modules/client/components/planning/PlanningEventCell';
@@ -304,7 +305,9 @@ export default {
       this.$emit('open-creation-modal', event);
     },
     openEventEditionModal (event) {
-      this.$emit('open-edition-modal', event);
+      if (event.type !== CUSTOMER_ABSENCE) {
+        this.$emit('open-edition-modal', event);
+      }
     },
     canDrag (event) {
       return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
