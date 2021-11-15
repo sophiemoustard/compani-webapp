@@ -8,6 +8,7 @@ import {
   WORK_ACCIDENT,
   CUSTOMER_ABSENCE_TYPES,
   CUSTOMER_ABSENCE,
+  STAFFING_VIEW_END_HOUR,
 } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -72,8 +73,8 @@ export const planningEventMixin = {
           displayedStartHour = eventStartDate.startOf('d').hours();
           staffingStartHour = STAFFING_VIEW_START_HOUR;
         }
-        displayedEndHour = eventEndDate.endOf('d').hours();
-        displayedStartMinutes = 0;
+        displayedEndHour = STAFFING_VIEW_END_HOUR;
+        displayedStartMinutes = eventStartDate.startOf('d').minutes();
         displayedEndMinutes = eventEndDate.endOf('d').minutes();
       }
 
@@ -85,18 +86,16 @@ export const planningEventMixin = {
       }
 
       const staffingBeginning = Math.max((staffingStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
-      const staffingEnd = Math.min((displayedEndHour - startDisplay) * 60
-        + displayedEndMinutes, (endDisplay - startDisplay) * 60
-        + displayedEndMinutes);
+      const staffingEnd = Math.min(
+        (displayedEndHour - startDisplay) * 60 + displayedEndMinutes,
+        (endDisplay - startDisplay) * 60 + displayedEndMinutes
+      );
 
       dayEvent.displayedStartDate = moment(day)
         .hour(displayedStartHour)
         .minutes(displayedStartMinutes)
         .toISOString();
-      dayEvent.displayedEndDate = moment(day)
-        .hour(displayedEndHour)
-        .minutes(displayedEndMinutes)
-        .toISOString();
+      dayEvent.displayedEndDate = eventEndDate.toISOString();
       dayEvent.staffingBeginning = staffingBeginning;
       dayEvent.staffingDuration = staffingEnd - staffingBeginning;
 
