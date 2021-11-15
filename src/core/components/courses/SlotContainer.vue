@@ -16,8 +16,8 @@
             <div class="slots-cells-number">{{ index + 1 }}</div>
             <div class="slots-cells-date text-weight-bold">{{ key }}</div>
           </div>
-          <div :class="['slots-cells-content', { 'cursor-pointer': canEdit }]" v-for="slot in value" :key="slot._id"
-            @click="openEditionModal(slot)">
+          <div :class="['slots-cells-content', { 'cursor-pointer': canEdit && !course.archivedAt }]"
+            v-for="slot in value" :key="slot._id" @click="openEditionModal(slot)">
               <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
               <q-item>{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</q-item>
               <q-item v-if="slot.step.type === ON_SITE">{{ getSlotAddress(slot) }}</q-item>
@@ -29,8 +29,9 @@
               </q-item>
           </div>
         </q-card>
-        <q-card :class="['slots-cells', { 'cursor-pointer' : canEdit }]" v-for="(value, index) in courseSlotsToPlan"
-          :key="Object.keys(courseSlots).length + index + 1" flat @click="openEditionModal(value)">
+        <q-card :class="['slots-cells', { 'cursor-pointer': canEdit && !course.archivedAt }]"
+          v-for="(value, index) in courseSlotsToPlan" :key="Object.keys(courseSlots).length + index + 1" flat
+          @click="openEditionModal(value)">
           <div class="slots-cells-title">
             <div class="slots-cells-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
             <div class="slots-cells-date text-weight-bold">Date à planifier</div>
@@ -40,7 +41,7 @@
       </div>
       <div class="q-mt-md" v-if="canEdit" align="right">
         <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
-          :disable="loading || addDateToPlanloading" @click="creationModal = true" />
+          :disable="loading || addDateToPlanloading" @click="openSlotCreationModal" />
         <ni-button v-if="isVendorInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
           icon="add" @click="addDateToPlan" :disable="addDateToPlanloading" />
       </div>
@@ -241,6 +242,10 @@ export default {
     },
     openEditionModal (slot) {
       if (!this.canEdit) return;
+      if (this.course.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas éditer un créneau d\'une formation archivée.');
+      }
+
       const defaultDate = {
         startDate: moment().startOf('d').hours(9).toISOString(),
         endDate: moment().startOf('d').hours(12).toISOString(),
@@ -289,8 +294,19 @@ export default {
         this.modalLoading = false;
       }
     },
+    openSlotCreationModal () {
+      if (this.course.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
+      }
+
+      this.creationModal = true;
+    },
     async addDateToPlan () {
       try {
+        if (this.course.archivedAt) {
+          return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
+        }
+
         this.addDateToPlanloading = true;
         await CourseSlots.create(this.formatCreationPayload({}));
         NotifyPositive('Date à planifier ajoutée.');
