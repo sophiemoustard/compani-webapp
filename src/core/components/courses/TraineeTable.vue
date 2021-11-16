@@ -15,8 +15,10 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <ni-button icon="edit" @click.native="openTraineeEditionModal(props.row)" />
-                    <ni-button icon="close" @click.native="validateTraineeDeletion(col.value)" />
+                    <ni-button icon="edit" @click.native="openTraineeEditionModal(props.row)"
+                      :disable="!!course.archivedAt" />
+                    <ni-button icon="close" @click.native="validateTraineeDeletion(col.value)"
+                      :disable="!!course.archivedAt" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -26,7 +28,7 @@
         </ni-responsive-table>
         <q-card-actions align="right" v-if="canEdit">
           <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
-            @click="traineeAdditionModal = true" />
+            @click="openTraineeCreationModal" />
         </q-card-actions>
       </q-card>
     </div>
@@ -262,6 +264,13 @@ export default {
     },
     handleCopySuccess () {
       NotifyPositive('Adresses mail copiées !');
+    },
+    openTraineeCreationModal () {
+      if (this.course.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de stagiaire à une formation archivée.');
+      }
+
+      this.traineeAdditionModal = true;
     },
   },
 };
