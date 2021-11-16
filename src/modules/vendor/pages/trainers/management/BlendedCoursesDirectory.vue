@@ -1,11 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Formations" class="q-mb-xl">
-      <template slot="title">
-       <q-toggle dense :value="displayArchived" color="primary" label="Archivées"
-          @input="displayArchived=!displayArchived" class="q-ml-sm q-mb-sm" />
-      </template>
-    </ni-title-header>
+    <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
+      display-toggle @toggle="displayArchived=!displayArchived" :display-search-bar="false" />
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
       <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
@@ -20,7 +16,7 @@
 <script>
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
-import TitleHeader from '@components/TitleHeader';
+import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
 import Select from '@components/form/Select';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
@@ -31,7 +27,7 @@ export default {
   name: 'BlendedCoursesDirectory',
   mixins: [courseFiltersMixin],
   components: {
-    'ni-title-header': TitleHeader,
+    'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
     'ni-select': Select,
   },

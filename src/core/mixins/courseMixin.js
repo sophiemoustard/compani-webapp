@@ -43,6 +43,7 @@ export const courseMixin = {
       return [
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
+        ...(this.course.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
       ];
     },
     disableDocDownload () {

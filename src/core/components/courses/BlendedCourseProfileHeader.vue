@@ -43,7 +43,6 @@ export default {
     headerInfoWithArchivedIcon () {
       return [
         ...this.headerInfo,
-        ...(this.course.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
       ];
     },
     displayArchiveButton () {
