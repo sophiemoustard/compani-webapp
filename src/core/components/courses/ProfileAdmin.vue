@@ -4,11 +4,11 @@
       <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
         <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
-          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error" />
-        <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
+          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error" :disable="isArchived" />
+        <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')" :disable="isArchived"
           @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
           :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
-        <ni-input caption="Email" v-model.trim="course.contact.email"
+        <ni-input caption="Email" v-model.trim="course.contact.email" :disable="isArchived"
           @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
           :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
       </div>
