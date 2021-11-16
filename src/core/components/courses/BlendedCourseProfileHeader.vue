@@ -1,5 +1,5 @@
 <template>
-  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfoWithArchivedIcon">
+  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
     <template #title v-if="!isClientInterface">
       <ni-button icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
       <ni-button :flat="false" v-if="displayArchiveButton" class="q-ml-sm"
@@ -39,12 +39,6 @@ export default {
     ...mapState('course', ['course']),
     courseId () {
       return this.course._id;
-    },
-    headerInfoWithArchivedIcon () {
-      return [
-        ...this.headerInfo,
-        ...(this.course.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
-      ];
     },
     displayArchiveButton () {
       const vendorRole = this.$store.getters['main/getVendorRole'];
