@@ -255,8 +255,7 @@ export const planningActionMixin = {
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
         if (!this.isCreationAllowed(payload)) {
-          return NotifyNegative('Impossible de créer l\'évènement : '
-            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await Events.create(payload);
@@ -266,7 +265,7 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative(`Impossible de créer l'évènement : ${e.data.message}`);
+        if (e.status === 409) return NotifyNegative(`Impossible : ${e.data.message}`);
 
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       } finally {
@@ -323,8 +322,7 @@ export const planningActionMixin = {
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
-          return NotifyNegative('Impossible de créer l\'évènement : '
-            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       }
@@ -501,8 +499,7 @@ export const planningActionMixin = {
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
-          return NotifyNegative('Impossible de modifier l\'évènement : '
-            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       }
@@ -518,8 +515,7 @@ export const planningActionMixin = {
 
         if (!this.isEditionAllowed(payload, this.editedEvent.type)) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : '
-            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
         await Events.updateById(this.editedEvent._id, payload);
@@ -531,7 +527,7 @@ export const planningActionMixin = {
         console.error(e);
         if (e.status === 409) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative(`Impossible de modifier l'évènement : ${e.data.message}`);
+          return NotifyNegative(`Impossible : ${e.data.message}`);
         }
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       } finally {
@@ -579,8 +575,7 @@ export const planningActionMixin = {
 
         const payload = this.getDragAndDropPayload(toDay, target, draggedObject);
         if (!this.isEditionAllowed(payload, draggedObject.type)) {
-          return NotifyNegative('Impossible de modifier l\'évènement : '
-            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await Events.updateById(draggedObject._id, payload);
@@ -588,7 +583,7 @@ export const planningActionMixin = {
 
         NotifyPositive('Évènement modifié.');
       } catch (e) {
-        if (e.status === 409) return NotifyNegative(`Impossible de modifier l'évènement : ${e.data.message}`);
+        if (e.status === 409) return NotifyNegative(`Impossible : ${e.data.message}`);
 
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       }
