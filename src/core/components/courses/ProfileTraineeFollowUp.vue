@@ -11,7 +11,8 @@
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
     </div>
-    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-mb-xl" is-blended />
+    <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="loading" class="q-mb-xl"
+      is-blended />
   </div>
 </template>
 
@@ -20,9 +21,9 @@ import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import AttendanceTable from '@components/table/AttendanceTable';
-import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
+import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER } from '@data/constants';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
 import { upperCaseFirstLetter } from '@helpers/utils';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
@@ -30,7 +31,7 @@ export default {
   name: 'ProfileTraineeFollowUp',
   mixins: [traineeFollowUpTableMixin],
   components: {
-    'trainee-follow-up-table': TraineeFollowUpTable,
+    'elearning-follow-up-table': ElearningFollowUpTable,
     'attendance-table': AttendanceTable,
     'questionnaire-answers-cell': QuestionnaireAnswersCell,
   },
@@ -57,6 +58,9 @@ export default {
     ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),
     areQuestionnaireAnswersVisible () {
       return !this.isClientInterface && this.questionnaires.length;
+    },
+    courseHasElearningStep () {
+      return this.course.subProgram.steps.some(step => step.type === E_LEARNING);
     },
   },
   methods: {
