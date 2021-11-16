@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="displayArchived=!displayArchived" :display-search-bar="false" />
+      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
       <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
