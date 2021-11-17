@@ -426,7 +426,7 @@ export default {
     },
     openTraineeAttendanceAdditionModal () {
       if (this.course.archivedAt) {
-        return NotifyWarning('Vous ne pouvez pas ajouter un(e) participant(e) à une formation archivée');
+        return NotifyWarning('Vous ne pouvez pas ajouter un(e) participant(e) à une formation archivée.');
       }
 
       this.traineeAdditionModal = true;
