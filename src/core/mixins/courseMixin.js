@@ -49,6 +49,9 @@ export const courseMixin = {
     disableDocDownload () {
       return this.followUpDisabled || this.pdfLoading;
     },
+    isArchived () {
+      return !!this.course.archivedAt;
+    },
   },
   methods: {
     happened (sameDaySlots) {
