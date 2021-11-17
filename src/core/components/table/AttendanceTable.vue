@@ -80,7 +80,7 @@
   </div>
 
   <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
-     :loading="modalLoading" :validation="$v.newTraineeAttendance" :trainee-filter-options="traineeFilterOptions"
+    :loading="modalLoading" :validation="$v.newTraineeAttendance" :trainee-filter-options="traineeFilterOptions"
     :new-trainee-attendance.sync="newTraineeAttendance" :trainees="traineesWithAttendance" @submit="addTrainee" />
 
   <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
