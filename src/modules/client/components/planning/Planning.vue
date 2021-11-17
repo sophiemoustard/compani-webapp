@@ -79,7 +79,7 @@
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
                   :key="eventIndex" @drag="drag" @click="openEventEditionModal" :can-drag="canDrag"
-                  data-cy="planning-event" />
+                  data-cy="planning-event-cell" />
               </td>
             </tr>
           </template>
@@ -112,9 +112,10 @@ import {
   UNKNOWN_AVATAR,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
+import PlanningEventCell from 'src/modules/client/components/planning/PlanningEventCell';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
 import ChipCustomerIndicator from 'src/modules/client/components/planning/ChipCustomerIndicator';
 import NiEventHistoryFeed from 'src/modules/client/components/planning/EventHistoryFeed';
@@ -129,7 +130,7 @@ export default {
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
     'ni-button': Button,
-    'ni-planning-event-cell': NiPlanningEvent,
+    'ni-planning-event-cell': PlanningEventCell,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
     'ni-event-history-feed': NiEventHistoryFeed,
@@ -304,7 +305,9 @@ export default {
       this.$emit('open-creation-modal', event);
     },
     openEventEditionModal (event) {
-      this.$emit('open-edition-modal', event);
+      if (event.type !== CUSTOMER_ABSENCE) {
+        this.$emit('open-edition-modal', event);
+      }
     },
     canDrag (event) {
       return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });

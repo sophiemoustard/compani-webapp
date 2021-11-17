@@ -59,13 +59,19 @@ export const SITUATION_OPTIONS = [
 ];
 
 // CUSTOMER ABSENCE
+export const CUSTOMER_ABSENCE = 'customer_absence';
 export const LEAVE = 'leave';
 export const HOSPITALIZATION = 'hospitalization';
+export const OTHER = 'other';
+export const CUSTOMER_ABSENCE_TYPES = [
+  { label: 'Congés', value: LEAVE },
+  { label: 'Hospitalisation', value: HOSPITALIZATION },
+  { label: 'Autre', value: OTHER },
+];
 
 // CONTRACTS
 export const CONTRACT = 'contract';
 export const CONTRACT_VERSION = 'contract_version';
-export const OTHER = 'other';
 export const END_CONTRACT_REASONS = [
   { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
   { label: 'Rupture période d’essai salarié(e)', value: 'employee_trial_period_termination' },
