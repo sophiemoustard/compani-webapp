@@ -37,7 +37,7 @@
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
-              @input="updateCheckbox(col.value, col.slot)" :disable="loading || !canUpdate" />
+              @input="updateCheckbox(col.value, col.slot)" :disable="disableCheckBox" />
           </q-td>
         </q-tr>
       </template>
@@ -49,7 +49,7 @@
       Aucun créneau n'a été ajouté à cette formation
     </div>
     <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm"
-      label="Ajouter un(e) participant(e)" :disable="loading" @click="traineeAdditionModal = true" />
+      label="Ajouter un(e) participant(e)" :disable="loading" @click="openTraineeAttendanceAdditionModal" />
   </q-card>
 
   <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" :pagination.sync="pagination"
@@ -249,6 +249,9 @@ export default {
 
       return ability.can('update', 'course_trainee_follow_up');
     },
+    disableCheckBox () {
+      return this.loading || !this.canUpdate || !!this.course.archivedAt;
+    },
   },
   methods: {
     get,
@@ -420,6 +423,13 @@ export default {
     resetNewTraineeAttendance () {
       this.$v.newTraineeAttendance.$reset();
       this.newTraineeAttendance = { trainee: '', attendances: [] };
+    },
+    openTraineeAttendanceAdditionModal () {
+      if (this.course.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas ajouter un(e) participant(e) à une formation archivée.');
+      }
+
+      this.traineeAdditionModal = true;
     },
   },
 };
