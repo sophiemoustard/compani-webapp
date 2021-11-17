@@ -7,7 +7,6 @@ import {
   ILLNESS,
   WORK_ACCIDENT,
   CUSTOMER_ABSENCE_TYPES,
-  STAFFING_VIEW_END_HOUR,
 } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -62,9 +61,9 @@ export const planningEventMixin = {
       const eventStartDate = moment(event.startDate);
       const eventEndDate = moment(event.endDate);
       let displayedStartHour = eventStartDate.hours();
-      let displayedEndHour = eventEndDate.hours();
+      const displayedEndHour = eventEndDate.hours();
       let displayedStartMinutes = eventStartDate.minutes();
-      let displayedEndMinutes = eventEndDate.minutes();
+      const displayedEndMinutes = eventEndDate.minutes();
       let staffingStartHour = displayedStartHour;
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
@@ -73,8 +72,6 @@ export const planningEventMixin = {
           displayedStartMinutes = 0;
           staffingStartHour = STAFFING_VIEW_START_HOUR;
         }
-        displayedEndHour = STAFFING_VIEW_END_HOUR;
-        displayedEndMinutes = eventEndDate.endOf('d').minutes();
       }
 
       const staffingBeginning = Math.max((staffingStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
