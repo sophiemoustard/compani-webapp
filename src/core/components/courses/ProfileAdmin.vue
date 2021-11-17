@@ -52,12 +52,7 @@
           </q-tr>
         </template>
       </ni-responsive-table>
-      <ni-banner v-if="!followUpDisabled && isFinished">
-        <template #message>
-          Vous ne pouvez pas envoyer de sms car la formation est terminée.
-        </template>
-      </ni-banner>
-      <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
+      <ni-banner v-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
         <template #message>
           Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
         </template>
@@ -216,7 +211,7 @@ export default {
     disableSms () {
       const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
 
-      return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned || noPhoneNumber;
+      return this.followUpDisabled || this.allFuturSlotsAreNotPlanned || noPhoneNumber;
     },
   },
   methods: {
@@ -243,6 +238,9 @@ export default {
       }
     },
     openSmsModal () {
+      if (this.course.archivedAt) return NotifyWarning('Impossible: la formation est archivée.');
+      if (this.isFinished) return NotifyWarning('Impossible: la formation est terminée.');
+
       this.updateMessage(this.newSms.type);
       this.smsModal = true;
     },
