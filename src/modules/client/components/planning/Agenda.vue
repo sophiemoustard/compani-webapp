@@ -37,6 +37,9 @@
                     <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
                       {{ displayAbsenceType(event.absence) }}
                     </p>
+                    <p v-if="event.type === CUSTOMER_ABSENCE" class="no-margin overflow-hidden-nowrap">
+                      {{ displayCustomerAbsenceType(event.absenceType) }}
+                    </p>
                     <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">
                       Indispo.
                     </p>
@@ -49,7 +52,7 @@
                   </p>
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
-                <div v-if="isCustomerPlanning && event.inConflictEvents.length !== 1"
+                <div v-if="event.type !== CUSTOMER_ABSENCE && isCustomerPlanning && event.inConflictEvents.length !== 1"
                   class="event-number">
                   <p class="event-number-label">{{ event.inConflictEvents.length }}</p>
                 </div>
@@ -71,6 +74,7 @@ import {
   PLANNING_PERCENTAGE_BY_MINUTES,
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
@@ -89,6 +93,7 @@ export default {
       INTERVENTION,
       INTERNAL_HOUR,
       UNAVAILABILITY,
+      CUSTOMER_ABSENCE,
       PLANNING_PERCENTAGE_BY_MINUTES,
       halfHourHeight: 100 / 30, // (100 => % total height - 30: number of half hours)
     };
@@ -99,7 +104,9 @@ export default {
   methods: {
     getEventClass (event) {
       return [
-        this.isCustomerPlanning && event.inConflictEvents.length === 1 ? '' : 'cursor-pointer',
+        event.type !== CUSTOMER_ABSENCE && this.isCustomerPlanning && event.inConflictEvents.length === 1
+          ? ''
+          : 'cursor-pointer',
         event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
       ];
     },

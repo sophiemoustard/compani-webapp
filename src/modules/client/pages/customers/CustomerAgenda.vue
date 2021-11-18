@@ -25,7 +25,8 @@
 import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
-import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '@data/constants';
+import CustomerAbsences from '@api/CustomerAbsences';
+import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW, CUSTOMER_ABSENCE } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
@@ -87,12 +88,15 @@ export default {
     },
     async getEvents () {
       try {
-        this.events = await Events.list({
-          startDate: this.startOfWeek,
-          endDate: this.endOfWeek,
-          customer: this.customer._id,
-        });
-        this.events.map(event => (event.inConflictEvents = this.getInConflictEvents(event)));
+        const query = { startDate: this.startOfWeek, endDate: this.endOfWeek, customer: this.customer._id };
+
+        const interventions = await Events.list(query);
+        const absences = await CustomerAbsences.list(query);
+
+        const customerAbsences = absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE }));
+        this.events = interventions.concat(customerAbsences);
+        this.events.filter(ev => ev.type !== CUSTOMER_ABSENCE)
+          .map(event => (event.inConflictEvents = this.getInConflictEvents(event)));
       } catch (e) {
         this.events = [];
       }
