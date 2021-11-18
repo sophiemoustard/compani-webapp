@@ -63,7 +63,7 @@
               <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
                 :disable="!props.row.file.link" />
               <ni-button v-if="canUpdate" icon="delete" color="primary"
-                @click="validateAttendanceSheetDeletion(props.row)" :disable="!props.row.file.link" />
+                @click="validateAttendanceSheetDeletion(props.row)" :disable="disableSheetDeletion(props.row)" />
             </div>
           </template>
           <template v-else>
@@ -76,7 +76,7 @@
   </ni-simple-table>
   <div class="flex justify-end">
     <ni-button v-if="canUpdate" class="bg-primary" color="white" icon="add"
-      label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
+      label="Ajouter une feuille d'émargement" @click="openAttendanceSheetAdditionModal" />
   </div>
 
   <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
@@ -261,6 +261,9 @@ export default {
       }
       return false;
     },
+    disableSheetDeletion (attendanceSheet) {
+      return !attendanceSheet.file.link || !!this.course.archivedAt;
+    },
     traineesCount (slotId) {
       return this.attendances.filter(a => a.courseSlot === slotId).length;
     },
@@ -295,6 +298,11 @@ export default {
       } finally {
         this.attendanceSheetTableLoading = false;
       }
+    },
+    openAttendanceSheetAdditionModal () {
+      if (this.course.archivedAt) return NotifyWarning('Impossible: la formation est archivée.');
+
+      this.attendanceSheetAdditionModal = true;
     },
     resetAttendanceSheetAdditionModal () {
       this.$v.newAttendanceSheet.$reset();
