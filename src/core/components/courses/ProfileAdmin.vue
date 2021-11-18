@@ -238,8 +238,8 @@ export default {
       }
     },
     openSmsModal () {
-      if (this.course.archivedAt) return NotifyWarning('Impossible: la formation est archivée.');
-      if (this.isFinished) return NotifyWarning('Impossible: la formation est terminée.');
+      if (this.course.archivedAt) return NotifyWarning('Impossible : la formation est archivée.');
+      if (this.isFinished) return NotifyWarning('Impossible : la formation est terminée.');
 
       this.updateMessage(this.newSms.type);
       this.smsModal = true;
