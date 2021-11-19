@@ -52,17 +52,7 @@
           </q-tr>
         </template>
       </ni-responsive-table>
-      <ni-banner v-if="!followUpDisabled && isFinished">
-        <template #message>
-          Vous ne pouvez pas envoyer de sms car la formation est terminée.
-        </template>
-      </ni-banner>
-      <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
-        <template #message>
-          Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
-        </template>
-      </ni-banner>
-      <ni-banner v-else-if="missingTraineesPhone.length" icon="info_outline">
+      <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
         <template #message>
           Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
           {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
@@ -216,7 +206,7 @@ export default {
     disableSms () {
       const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
 
-      return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned || noPhoneNumber;
+      return this.followUpDisabled || noPhoneNumber;
     },
   },
   methods: {
@@ -243,6 +233,12 @@ export default {
       }
     },
     openSmsModal () {
+      if (this.course.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation archivée.');
+      } if (this.allFuturSlotsAreNotPlanned) {
+        return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
+      } if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
+
       this.updateMessage(this.newSms.type);
       this.smsModal = true;
     },
