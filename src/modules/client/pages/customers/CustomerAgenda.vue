@@ -16,7 +16,6 @@
       <agenda :events="events" :days="days" :person-key="personKey"
         @open-info-modal="openConflictModal($event)" />
     </div>
-
     <event-conflict-modal v-model="conflictModal" :events="conflictingEvents" @hide="closeConflictModal" />
   </q-page>
 </template>

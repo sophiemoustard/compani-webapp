@@ -52,7 +52,7 @@
                   </p>
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
-                <div v-if="event.type !== CUSTOMER_ABSENCE && isCustomerPlanning && event.inConflictEvents.length !== 1"
+                <div v-if="event.inConflictEvents && isCustomerPlanning && event.inConflictEvents.length !== 1"
                   class="event-number">
                   <p class="event-number-label">{{ event.inConflictEvents.length }}</p>
                 </div>
@@ -103,12 +103,15 @@ export default {
   },
   methods: {
     getEventClass (event) {
-      return [
-        event.type !== CUSTOMER_ABSENCE && this.isCustomerPlanning && event.inConflictEvents.length === 1
-          ? ''
-          : 'cursor-pointer',
-        event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
-      ];
+      if (event.type !== CUSTOMER_ABSENCE) {
+        return [
+          this.isCustomerPlanning && event?.inConflictEvents?.length === 1
+            ? ''
+            : 'cursor-pointer',
+          event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
+        ];
+      }
+      return ['', event.isCancelled ? 'event-cancelled' : `event-${event.type}`];
     },
     getEventStyle (event) {
       return {
