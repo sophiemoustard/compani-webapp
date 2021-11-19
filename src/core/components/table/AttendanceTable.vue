@@ -300,7 +300,9 @@ export default {
       }
     },
     openAttendanceSheetAdditionModal () {
-      if (this.course.archivedAt) return NotifyWarning('Impossible: la formation est archivée.');
+      if (this.course.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
+      }
 
       this.attendanceSheetAdditionModal = true;
     },
