@@ -3,9 +3,11 @@
     <template slot="title">
       Téléchargement du <span class="text-weight-bold">fichier de télétransmission</span>
     </template>
-    <ni-select in-modal caption="Tiers payeur" :value="deliveryFile.thirdPartyPayer" :options="tppOptions"
-      @input="update($event, 'thirdPartyPayer')" @blur="validations.thirdPartyPayer.$touch" required-field
-      :error="validations.thirdPartyPayer.$error" />
+    <div class="row q-pb-md">
+      <ni-option-group caption="Tiers payeur" :value="deliveryFile.thirdPartyPayers" required-field type="checkbox"
+        :options="tppOptions" @input="update($event, 'thirdPartyPayers')" :error="validations.thirdPartyPayers.$error"
+        inline />
+    </div>
     <ni-select in-modal caption="Mois" :value="deliveryFile.month" required-field :options="monthOptions"
       @blur="validations.month.$touch" :error="validations.month.$error" @input="update($event, 'month')" />
     <template slot="footer">
@@ -18,12 +20,14 @@
 <script>
 import set from 'lodash/set';
 import Select from '@components/form/Select';
+import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 
 export default {
   name: 'DeliveryDownloadModal',
   components: {
     'ni-select': Select,
+    'ni-option-group': OptionGroup,
     'ni-modal': Modal,
   },
   props: {
