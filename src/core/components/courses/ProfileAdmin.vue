@@ -233,9 +233,7 @@ export default {
       }
     },
     openSmsModal () {
-      if (this.course.archivedAt) {
-        return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation archivée.');
-      } if (this.allFuturSlotsAreNotPlanned) {
+      if (this.allFuturSlotsAreNotPlanned) {
         return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
       } if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
 
