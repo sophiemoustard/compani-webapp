@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-weight-bold">Progression des stagiaires</p>
+    <p class="text-weight-bold">Progression eLearning</p>
     <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
       :loading="loading" :visible-columns="visibleColumns">
       <template #row="{ props }">
@@ -24,11 +24,11 @@
       </template>
       <template #expanding-row="{ props }">
         <q-td colspan="100%">
-          <div v-for="(step, stepIndex) in props.row.steps" :key="step._id" :props="props"
+          <div v-for="step in props.row.steps" :key="step._id" :props="props"
             class="q-ma-sm expanding-table-expanded-row">
             <div>
               <q-icon :name="getStepTypeIcon(step.type)" />
-              {{ stepIndex + 1 }} - {{ step.name }}
+              {{ step.name }}
             </div>
             <div class="expanding-table-progress-container">
               <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
@@ -52,7 +52,7 @@ import { courseMixin } from '@mixins/courseMixin';
 import ConnectedDot from './ConnectedDot';
 
 export default {
-  name: 'TraineeFollowUpTable',
+  name: 'ElearningFollowUpTable',
   mixins: [courseMixin],
   components: {
     'ni-expanding-table': ExpandingTable,

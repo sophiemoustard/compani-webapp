@@ -1,6 +1,7 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-title-header title="Formations" class="q-mb-xl" />
+    <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
+      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
       <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
@@ -15,7 +16,7 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import Select from '@components/form/Select';
-import TitleHeader from '@components/TitleHeader';
+import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED } from '@data/constants';
@@ -26,12 +27,13 @@ export default {
   mixins: [courseFiltersMixin],
   components: {
     'ni-select': Select,
-    'ni-title-header': TitleHeader,
+    'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
   },
   data () {
     return {
       coursesWithGroupedSlot: [],
+      displayArchived: false,
     };
   },
   computed: {

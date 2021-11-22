@@ -1,7 +1,7 @@
 <template>
-  <div class="row q-mb-md">
+  <div class="row q-mb-md justify-between">
     <div :class="[titleContainerClass, 'page-title']">{{ title }}</div>
-    <div :class="searchBarContainerClass">
+    <div v-if="displaySearchBar" :class="searchBarContainerClass">
       <q-input class="no-border" :value="search" :placeholder="searchPlaceholder" dense borderless
         @input="input" debounce="0" type="search" bg-color="white">
         <template #prepend>
@@ -24,6 +24,7 @@ export default {
     toggleLabel: { type: String, default: '' },
     toggleValue: { type: Boolean, default: false },
     displayToggle: { type: Boolean, default: false },
+    displaySearchBar: { type: Boolean, default: true },
     search: { type: String, default: '' },
   },
   computed: {

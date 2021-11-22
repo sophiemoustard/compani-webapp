@@ -24,6 +24,8 @@ export const courseFiltersMixin = {
 
       if (this.selectedSalesRepresentative) courses = this.filterCoursesBySalesRepresentative(courses);
 
+      if (!this.displayArchived) courses = this.filterArchivedCourses(courses);
+
       return courses;
     },
     companyFilterOptions () {
@@ -105,6 +107,9 @@ export const courseFiltersMixin = {
       return courses.filter(course => (course.salesRepresentative
         ? course.salesRepresentative._id === this.selectedSalesRepresentative
         : this.selectedSalesRepresentative === 'without_sales_representative'));
+    },
+    filterArchivedCourses (courses) {
+      return courses.filter(course => !course.archivedAt);
     },
     groupByCourses (courses) {
       return courses.map(course => ({
