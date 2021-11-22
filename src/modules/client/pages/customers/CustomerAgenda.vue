@@ -92,10 +92,9 @@ export default {
         const interventions = await Events.list(query);
         const absences = await CustomerAbsences.list(query);
 
-        const customerAbsences = absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE }));
-        this.events = interventions.concat(customerAbsences);
-        this.events.filter(ev => ev.type !== CUSTOMER_ABSENCE)
-          .map(event => (event.inConflictEvents = this.getInConflictEvents(event)));
+        this.events = Object.freeze(interventions
+          .concat(absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE })))
+          .map(event => ({ ...event, inConflictEvents: this.getInConflictEvents(event, interventions) })));
       } catch (e) {
         this.events = [];
       }
@@ -111,8 +110,8 @@ export default {
       this.conflictModal = false;
       this.conflictingEvents = [];
     },
-    getInConflictEvents (event) {
-      return this.events.filter(
+    getInConflictEvents (event, interventions) {
+      return interventions.filter(
         ev => moment(event.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
           moment(ev.endDate).isBetween(event.startDate, event.endDate, 'minutes', '[]')
       ).map(ev => ({ ...ev, displayedStartDate: ev.startDate, displayedEndDate: ev.endDate }));

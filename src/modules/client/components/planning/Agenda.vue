@@ -103,15 +103,13 @@ export default {
   },
   methods: {
     getEventClass (event) {
-      if (event.type !== CUSTOMER_ABSENCE) {
-        return [
-          this.isCustomerPlanning && event?.inConflictEvents?.length === 1
-            ? ''
-            : 'cursor-pointer',
-          event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
-        ];
-      }
-      return ['', event.isCancelled ? 'event-cancelled' : `event-${event.type}`];
+      if (event.type === CUSTOMER_ABSENCE) return ['', event.isCancelled ? 'event-cancelled' : `event-${event.type}`];
+      return [
+        this.isCustomerPlanning && event?.inConflictEvents?.length === 1
+          ? ''
+          : 'cursor-pointer',
+        event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
+      ];
     },
     getEventStyle (event) {
       return {
