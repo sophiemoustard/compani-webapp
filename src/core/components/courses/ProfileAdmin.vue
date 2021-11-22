@@ -235,7 +235,8 @@ export default {
     openSmsModal () {
       if (this.allFuturSlotsAreNotPlanned) {
         return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
-      } if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
+      }
+      if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
 
       this.updateMessage(this.newSms.type);
       this.smsModal = true;
