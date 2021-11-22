@@ -92,16 +92,17 @@ export default {
         const interventions = await Events.list(query);
         const absences = await CustomerAbsences.list(query);
 
-        this.events = Object.freeze(interventions
-          .concat(absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE })))
-          .map(event => ({ ...event, inConflictEvents: this.getInConflictEvents(event, interventions) })));
+        this.events = interventions.concat(absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE })));
+        this.events = Object.freeze(
+          this.events.map(event => ({ ...event, inConflictEvents: this.getInConflictEvents(event) }))
+        );
       } catch (e) {
         this.events = [];
       }
     },
     formatIdentity,
     openConflictModal (event) {
-      if (event.inConflictEvents.length !== 1) {
+      if (event.inConflictEvents.length > 1) {
         this.conflictingEvents = event.inConflictEvents;
         this.conflictModal = true;
       }
@@ -110,8 +111,8 @@ export default {
       this.conflictModal = false;
       this.conflictingEvents = [];
     },
-    getInConflictEvents (event, interventions) {
-      return interventions.filter(
+    getInConflictEvents (event) {
+      return this.events.filter(
         ev => moment(event.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
           moment(ev.endDate).isBetween(event.startDate, event.endDate, 'minutes', '[]')
       ).map(ev => ({ ...ev, displayedStartDate: ev.startDate, displayedEndDate: ev.endDate }));
