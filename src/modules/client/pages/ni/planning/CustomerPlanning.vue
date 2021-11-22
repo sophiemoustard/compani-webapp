@@ -23,7 +23,9 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
+import groupBy from 'lodash/groupBy';
 import Events from '@api/Events';
+import CustomerAbsences from '@api/CustomerAbsences';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -36,6 +38,7 @@ import {
   CUSTOMER,
   SECTOR,
   COACH_ROLES,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { isAfter } from '@helpers/date';
@@ -77,7 +80,7 @@ export default {
       sectorCustomers: [],
     };
   },
-  async mounted () {
+  async created () {
     try {
       await this.fillFilter({ company: this.company, roleToSearch: CUSTOMER });
       await this.getAuxiliaries();
@@ -157,12 +160,17 @@ export default {
     },
     async refresh () {
       try {
-        this.events = await Events.list({
+        const query = {
           startDate: this.startOfWeek,
           endDate: this.endOfWeek,
           customer: this.customers.map(cus => cus._id),
-          groupBy: CUSTOMER,
-        });
+        };
+
+        const interventions = await Events.list(query);
+        const absences = await CustomerAbsences.list(query);
+
+        const customerAbsences = absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE }));
+        this.events = groupBy([...interventions, ...customerAbsences], 'customer._id');
       } catch (e) {
         this.events = {};
       }

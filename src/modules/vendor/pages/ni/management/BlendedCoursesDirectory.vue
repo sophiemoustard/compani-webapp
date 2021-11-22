@@ -1,6 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Formations mixtes" class="q-mb-xl" />
+    <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
+      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
       <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
@@ -28,7 +29,7 @@ import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Users from '@api/Users';
-import TitleHeader from '@components/TitleHeader';
+import DirectoryHeader from '@components/DirectoryHeader';
 import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
@@ -42,7 +43,7 @@ export default {
   name: 'BlendedCoursesDirectory',
   mixins: [courseFiltersMixin],
   components: {
-    'ni-title-header': TitleHeader,
+    'ni-directory-header': DirectoryHeader,
     'ni-select': Select,
     'course-creation-modal': CourseCreationModal,
     'ni-trello': Trello,
@@ -63,6 +64,7 @@ export default {
       coursesWithGroupedSlot: [],
       courseTypes: COURSE_TYPES,
       salesRepresentativeOptions: [],
+      displayArchived: false,
     };
   },
   validations () {

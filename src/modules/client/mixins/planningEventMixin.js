@@ -4,9 +4,9 @@ import {
   DAILY,
   ABSENCE,
   STAFFING_VIEW_START_HOUR,
-  STAFFING_VIEW_END_HOUR,
   ILLNESS,
   WORK_ACCIDENT,
+  CUSTOMER_ABSENCE_TYPES,
 } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -45,6 +45,10 @@ export const planningEventMixin = {
       const absence = ABSENCE_TYPES.find(abs => abs.value === value);
       return !absence ? '' : absence.label;
     },
+    displayCustomerAbsenceType (value) {
+      const customerAbsence = CUSTOMER_ABSENCE_TYPES.find(abs => abs.value === value);
+      return !customerAbsence ? '' : customerAbsence.label;
+    },
     eventTitle (event) {
       if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
@@ -57,25 +61,24 @@ export const planningEventMixin = {
       const eventStartDate = moment(event.startDate);
       const eventEndDate = moment(event.endDate);
       let displayedStartHour = eventStartDate.hours();
-      let displayedEndHour = eventEndDate.hours();
+      const displayedEndHour = eventEndDate.hours();
       let displayedStartMinutes = eventStartDate.minutes();
-      let displayedEndMinutes = eventEndDate.minutes();
+      const displayedEndMinutes = eventEndDate.minutes();
       let staffingStartHour = displayedStartHour;
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
         if ([ILLNESS, WORK_ACCIDENT].includes(event.absence) && !moment(event.startDate).isSame(day, 'day')) {
           displayedStartHour = eventStartDate.startOf('d').hours();
+          displayedStartMinutes = 0;
           staffingStartHour = STAFFING_VIEW_START_HOUR;
         }
-        displayedEndHour = STAFFING_VIEW_END_HOUR;
-        displayedStartMinutes = 0;
-        displayedEndMinutes = 0;
       }
 
       const staffingBeginning = Math.max((staffingStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
-      const staffingEnd = Math.min((displayedEndHour - startDisplay) * 60
-        + displayedEndMinutes, (endDisplay - startDisplay) * 60
-        + displayedEndMinutes);
+      const staffingEnd = Math.min(
+        (displayedEndHour - startDisplay) * 60 + displayedEndMinutes,
+        (endDisplay - startDisplay) * 60 + displayedEndMinutes
+      );
 
       dayEvent.displayedStartDate = moment(day)
         .hour(displayedStartHour)

@@ -12,14 +12,14 @@
         <ni-bi-color-button class="button-history" icon="history" label="Historique" @click="toggleHistory" />
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
-            @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
-          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id" :disable="!isAdmin"
-            @blur="updateCourse('salesRepresentative')" caption="Référent(e) Compani"
+            @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
+          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id"
+            @blur="updateCourse('salesRepresentative')" caption="Référent(e) Compani" :disable="!isAdmin || isArchived"
             :options="salesRepresentativeOptions" @focus="saveTmp('salesRepresentative')"
             :error="$v.course.salesRepresentative._id.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
             caption="Intervenant(e)" :options="trainerOptions" :error="$v.course.trainer._id.$error"
-            @blur="updateCourse('trainer')" />
+            @blur="updateCourse('trainer')" :disable="isArchived" />
         </div>
       </div>
     </div>

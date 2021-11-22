@@ -10,9 +10,9 @@
       <div class="col-xs-12 col-md-7">
         <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :type="PLANNING"
           @go-to-next-week="goToNextWeek" @go-to-previous-week="goToPreviousWeek" @go-to-today="goToToday"
-          @go-to-week="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
-          :is-customer-planning="isCustomerPlanning" @open-delete-events-modal="openDeleteEventsModal"
-          @toggle-history="toggleHistory" :display-history="displayHistory" />
+          @go-to-week="goToWeek" is-events-deletion-allowed @open-delete-events-modal="openDeleteEventsModal"
+          :is-customer-planning="isCustomerPlanning" :display-history="displayHistory"
+          @toggle-history="toggleHistory" />
       </div>
     </div>
     <div class="planning-container full-width">
@@ -79,7 +79,7 @@
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
                   :key="eventIndex" @drag="drag" @click="openEventEditionModal" :can-drag="canDrag"
-                  data-cy="planning-event" />
+                  data-cy="planning-event-cell" />
               </td>
             </tr>
           </template>
@@ -110,12 +110,12 @@ import {
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
-  PLANNING_REFERENT,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
+  CUSTOMER_ABSENCE,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
+import PlanningEventCell from 'src/modules/client/components/planning/PlanningEventCell';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
 import ChipCustomerIndicator from 'src/modules/client/components/planning/ChipCustomerIndicator';
 import NiEventHistoryFeed from 'src/modules/client/components/planning/EventHistoryFeed';
@@ -130,7 +130,7 @@ export default {
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
     'ni-button': Button,
-    'ni-planning-event-cell': NiPlanningEvent,
+    'ni-planning-event-cell': PlanningEventCell,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
     'ni-event-history-feed': NiEventHistoryFeed,
@@ -186,9 +186,6 @@ export default {
     ...mapGetters({ clientRole: 'main/getClientRole' }),
     isCoach () {
       return COACH_ROLES.includes(this.clientRole);
-    },
-    isPlanningReferent () {
-      return this.clientRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.uniqPersons } : groupBy(this.uniqPersons, 'sector._id');
@@ -308,7 +305,9 @@ export default {
       this.$emit('open-creation-modal', event);
     },
     openEventEditionModal (event) {
-      this.$emit('open-edition-modal', event);
+      if (event.type !== CUSTOMER_ABSENCE) {
+        this.$emit('open-edition-modal', event);
+      }
     },
     canDrag (event) {
       return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });

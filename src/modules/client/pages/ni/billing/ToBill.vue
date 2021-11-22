@@ -78,6 +78,7 @@ import { MONTH } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { formatPrice, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -131,7 +132,7 @@ export default {
       ],
       toBillOption: 0,
       deliveryDownloadModal: false,
-      deliveryFile: { thirdPartyPayer: '', month: moment().format('MM-YYYY') },
+      deliveryFile: { thirdPartyPayers: [], month: moment().format('MM-YYYY') },
       thirdPartyPayerOptions: [],
       thirdPartyPayers: [],
       monthOptions: [
@@ -146,7 +147,7 @@ export default {
   },
   validations () {
     return {
-      deliveryFile: { thirdPartyPayer: { required }, month: { required } },
+      deliveryFile: { thirdPartyPayers: { minArrayLength: minArrayLength(1) }, month: { required } },
     };
   },
   computed: {
@@ -201,10 +202,10 @@ export default {
     },
     resetDeliveryDownloadModal () {
       this.$v.deliveryFile.$reset();
-      this.deliveryFile = { thirdPartyPayer: '', month: moment().format('MM-YYYY') };
+      this.deliveryFile = { thirdPartyPayers: [], month: moment().format('MM-YYYY') };
     },
-    getFileName (query) {
-      const tpp = this.thirdPartyPayers.find(t => t._id === this.deliveryFile.thirdPartyPayer);
+    getFileName () {
+      const tpp = this.thirdPartyPayers.find(t => this.deliveryFile.thirdPartyPayers.includes(t._id));
 
       const month = moment(this.deliveryFile.month, 'MM-YYYY').format('YYYYMM');
       const date = moment().format('YYMMDDHHmm');
