@@ -17,7 +17,7 @@
 import get from 'lodash/get';
 import { formatIdentity } from '@helpers/utils';
 import { ascendingSort } from '@helpers/date';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, INTERVENTION } from '@data/constants';
 import moment from '@helpers/moment';
 
 export default {
@@ -34,7 +34,7 @@ export default {
       let weeklyHours = 0;
       this.events.forEach((event) => {
         if (event.auxiliary && !auxiliaries.includes(event.auxiliary._id)) auxiliaries.push(event.auxiliary._id);
-        weeklyHours += moment(event.endDate).diff(event.startDate, 'h', true);
+        if (event.type === INTERVENTION) weeklyHours += moment(event.endDate).diff(event.startDate, 'h', true);
       });
       return { auxiliariesNumber: auxiliaries.length, weeklyHours: Math.round(weeklyHours) };
     },

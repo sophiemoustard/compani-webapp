@@ -16,7 +16,6 @@
       <agenda :events="events" :days="days" :person-key="personKey"
         @open-info-modal="openConflictModal($event)" />
     </div>
-
     <event-conflict-modal v-model="conflictModal" :events="conflictingEvents" @hide="closeConflictModal" />
   </q-page>
 </template>
@@ -25,7 +24,8 @@
 import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
-import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '@data/constants';
+import CustomerAbsences from '@api/CustomerAbsences';
+import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW, CUSTOMER_ABSENCE } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
@@ -87,19 +87,22 @@ export default {
     },
     async getEvents () {
       try {
-        this.events = await Events.list({
-          startDate: this.startOfWeek,
-          endDate: this.endOfWeek,
-          customer: this.customer._id,
-        });
-        this.events.map(event => (event.inConflictEvents = this.getInConflictEvents(event)));
+        const query = { startDate: this.startOfWeek, endDate: this.endOfWeek, customer: this.customer._id };
+
+        const interventions = await Events.list(query);
+        const absences = await CustomerAbsences.list(query);
+
+        this.events = interventions.concat(absences.map(abs => ({ ...abs, type: CUSTOMER_ABSENCE })));
+        this.events = Object.freeze(
+          this.events.map(event => ({ ...event, inConflictEvents: this.getInConflictEvents(event) }))
+        );
       } catch (e) {
         this.events = [];
       }
     },
     formatIdentity,
     openConflictModal (event) {
-      if (event.inConflictEvents.length !== 1) {
+      if (event.inConflictEvents.length > 1) {
         this.conflictingEvents = event.inConflictEvents;
         this.conflictModal = true;
       }
