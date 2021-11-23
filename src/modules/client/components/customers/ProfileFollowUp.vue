@@ -67,7 +67,7 @@
                 <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{ col.value }}</a>
                 <div v-else>{{ col.value }}</div>
               </template>
-             <template :class="col.name" v-else>{{ col.value }}</template>
+             <template v-else>{{ col.value }}</template>
            </q-td>
           </q-tr>
         </template>
@@ -97,7 +97,7 @@
                 <template v-if="col.name === 'actions'">
                   <ni-button icon="close" @click="validatePartnerDeletion(col.value)" />
                 </template>
-                <template v-else :class="col.name">{{ col.value }}</template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </template>
