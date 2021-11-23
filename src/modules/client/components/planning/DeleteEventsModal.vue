@@ -7,6 +7,11 @@
     <ni-option-group :display-caption="false" v-model="deletedEvents.inRange" type="radio"
       :options="deletetionOptions" inline />
     <template v-if="deletedEvents.inRange">
+      <q-checkbox :value="isCustomerAbsence" label="Créer une absence bénéficiaire" dense class="q-mb-md"
+        @input="allowCustomerAbsenceCreation" />
+      <ni-select in-modal v-if="isCustomerAbsence" v-model="deletedEvents.absenceType" caption="Motif de l'absence"
+        :options="customerAbsenceOptions" required-field @blur="$v.deletedEvents.absenceType.$touch"
+        :error="$v.deletedEvents.absenceType.$error" />
       <ni-date-input caption="Date de début" v-model="deletedEvents.startDate" type="date" required-field
         in-modal @blur="$v.deletedEvents.startDate.$touch" :error="$v.deletedEvents.startDate.$error" />
       <ni-date-input caption="Date de fin" v-model="deletedEvents.endDate" type="date" required-field in-modal
@@ -26,6 +31,7 @@
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
+import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Events from '@api/Events';
 import Modal from '@components/modal/Modal';
@@ -34,6 +40,7 @@ import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import { validationMixin } from '@mixins/validationMixin';
+import { LEAVE, HOSPITALIZATION, OTHER } from '@data/constants';
 
 export default {
   name: 'DeleteEventsModal',
@@ -53,6 +60,7 @@ export default {
         customer: { required },
         startDate: { required },
         endDate: { required: requiredIf(item => item.inRange) },
+        absenceType: { required: requiredIf(() => this.isCustomerAbsence && this.deletedEvents.inRange) },
       },
     };
   },
@@ -64,7 +72,19 @@ export default {
         { label: 'A partir d\'une date', value: false },
       ],
       loading: false,
+      isCustomerAbsence: true,
+      customerAbsenceOptions: [
+        { label: 'Congés', value: LEAVE },
+        { label: 'Hospitalisation', value: HOSPITALIZATION },
+        { label: 'Autre', value: OTHER },
+      ],
     };
+  },
+  watch: {
+    'deletedEvents.inRange': function () {
+      this.isCustomerAbsence = this.deletedEvents.inRange;
+      this.deletedEvents = pick(this.deletedEvents, ['inRange', 'customer', 'startDate']);
+    },
   },
   methods: {
     hide () {
@@ -84,6 +104,10 @@ export default {
       }).onOk(this.deleteEvents)
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
+    allowCustomerAbsenceCreation () {
+      this.isCustomerAbsence = !this.isCustomerAbsence;
+      if (!this.isCustomerAbsence) this.deletedEvents = { ...omit(this.deletedEvents, 'absenceType') };
+    },
     async deleteEvents () {
       try {
         this.loading = true;
@@ -94,10 +118,12 @@ export default {
         await Events.deleteList(omit(this.deletedEvents, 'inRange'));
 
         this.hide();
-        NotifyPositive('Les évènements ont bien étés supprimés.');
+
+        if (this.isCustomerAbsence) return NotifyPositive('Absence bénéficiaire ajoutée.');
+        NotifyPositive('Les évènements ont été supprimés.');
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
+        if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
         NotifyNegative('Problème lors de la suppression.');
       } finally {
         this.loading = false;

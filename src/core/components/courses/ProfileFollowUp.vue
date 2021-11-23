@@ -20,13 +20,13 @@
       <ni-line-chart title="Nombre d'apprenants dans le temps" :chart-data="chartData(this.traineesByMonth)"
         class="col-md-6 col-xs-12 line-chart-container" />
     </div>
-    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
+    <elearning-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
   </div>
 </template>
 
 <script>
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
+import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import LineChart from '@components/charts/LineChart';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 import { chartMixin } from '@mixins/chartMixin';
@@ -36,7 +36,7 @@ export default {
   mixins: [traineeFollowUpTableMixin, chartMixin],
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
-    'trainee-follow-up-table': TraineeFollowUpTable,
+    'elearning-follow-up-table': ElearningFollowUpTable,
     'ni-line-chart': LineChart,
   },
   props: {

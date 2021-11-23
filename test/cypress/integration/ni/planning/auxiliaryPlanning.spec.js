@@ -12,7 +12,7 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=planning-search]').eq(1).click();
     cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 1);
-    cy.get('[data-cy=planning-event]').should('have.length', 1);
+    cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
 
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R. BARDET');
@@ -50,20 +50,20 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=planning-search]').eq(1).click();
     cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
-    cy.get('[data-cy=planning-event]').should('have.length', 1);
+    cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
 
     cy.get('[data-cy=planning-cell]').eq(0).click('bottom');
     cy.get('[data-cy=event-creation-customer]').eq(0).type('Romain{downarrow}{enter}');
     cy.get('[data-cy=event-creation-button]').click();
-    cy.get('[data-cy=planning-event]').should('have.length', 2);
+    cy.get('[data-cy=planning-event-cell]').should('have.length', 2);
   });
 
   it('should update event', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=planning-search]').eq(1).click();
     cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
-    cy.get('[data-cy=planning-event]').should('have.length', 1);
-    cy.get('[data-cy=planning-event]').click();
+    cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
+    cy.get('[data-cy=planning-event-cell]').click();
 
     cy.get('[data-cy=time-input]').eq(0).clear().type('15:00');
     cy.get('[data-cy=time-input]').eq(1).clear().type('17:15');
@@ -76,12 +76,12 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=planning-search]').eq(1).click();
     cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
-    cy.get('[data-cy=planning-event]').should('have.length', 1);
+    cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
 
-    cy.get('[data-cy=planning-event]').click();
+    cy.get('[data-cy=planning-event-cell]').click();
     cy.get('[data-cy=event-deletion-button]').click();
     cy.get('.q-dialog-plugin > .q-card__actions > .q-btn').eq(1).click();
 
-    cy.get('[data-cy=planning-event]').should('have.length', 0);
+    cy.get('[data-cy=planning-event-cell]').should('have.length', 0);
   });
 }));

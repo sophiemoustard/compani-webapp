@@ -4,11 +4,11 @@
       <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
         <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
-          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error" />
-        <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
+          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error" :disable="isArchived" />
+        <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')" :disable="isArchived"
           @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
           :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
-        <ni-input caption="Email" v-model.trim="course.contact.email"
+        <ni-input caption="Email" v-model.trim="course.contact.email" :disable="isArchived"
           @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
           :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
       </div>
@@ -52,17 +52,7 @@
           </q-tr>
         </template>
       </ni-responsive-table>
-      <ni-banner v-if="!followUpDisabled && isFinished">
-        <template #message>
-          Vous ne pouvez pas envoyer de sms car la formation est terminée.
-        </template>
-      </ni-banner>
-      <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
-        <template #message>
-          Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
-        </template>
-      </ni-banner>
-      <ni-banner v-else-if="missingTraineesPhone.length" icon="info_outline">
+      <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
         <template #message>
           Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
           {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
@@ -216,7 +206,7 @@ export default {
     disableSms () {
       const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
 
-      return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned || noPhoneNumber;
+      return this.followUpDisabled || noPhoneNumber;
     },
   },
   methods: {
@@ -243,6 +233,11 @@ export default {
       }
     },
     openSmsModal () {
+      if (this.allFuturSlotsAreNotPlanned) {
+        return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
+      }
+      if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
+
       this.updateMessage(this.newSms.type);
       this.smsModal = true;
     },

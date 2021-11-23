@@ -6,7 +6,7 @@
       <div class="items-container">
         <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container">
           <q-item-section side>
-            <q-icon size="12px" :name="info.icon" />
+            <q-icon size="12px" :name="info.icon" :class="info.iconClass" />
           </q-item-section>
           <q-item-section>{{ info.label }}</q-item-section>
         </q-item>
