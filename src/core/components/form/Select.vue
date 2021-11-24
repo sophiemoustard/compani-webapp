@@ -65,6 +65,18 @@ export default {
     model () {
       return this.options.find(opt => opt.value === this.value) || null;
     },
+    formattedOptions () {
+      return this.options.map(opt => ({
+        ...opt,
+        filters: [
+          this.formatStringForFiltering(opt.label),
+          ...(opt.additionalFilters
+            ? opt.additionalFilters.map(additionalFilter => this.formatStringForFiltering(additionalFilter))
+            : []
+          ),
+        ],
+      }));
+    },
   },
   methods: {
     onFocus () {
@@ -84,8 +96,8 @@ export default {
       update(() => {
         if (val) {
           const formattedValue = this.formatStringForFiltering(val);
-          this.innerOptions = this.options
-            .filter(opt => this.formatStringForFiltering(opt.label).includes(formattedValue));
+          this.innerOptions = this.formattedOptions
+            .filter(opt => opt.filters.some(word => word.includes(formattedValue)));
         } else {
           this.innerOptions = this.options;
         }
