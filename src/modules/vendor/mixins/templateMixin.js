@@ -107,7 +107,8 @@ export const templateMixin = {
         if (get(this.$v, `card.${key}.$each[${index}].text.$error`)) return NotifyWarning('Champ(s) invalide(s).');
 
         await Cards.updateAnswer(
-          { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
+          { cardId: this.card._id, answerId: editedAnswer._id },
+          { text: editedAnswer.text.trim() }
         );
 
         await this.refreshCard();
