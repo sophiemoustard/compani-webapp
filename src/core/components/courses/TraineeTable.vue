@@ -167,6 +167,7 @@ export default {
           email: pt.local.email || '',
           picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
           ...(!this.isIntraCourse && { company: pt.company.name || '' }),
+          additionalFilters: [pt.local.email],
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
     },
