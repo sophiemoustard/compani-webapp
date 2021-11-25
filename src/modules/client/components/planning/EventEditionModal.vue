@@ -252,7 +252,7 @@ export default {
       this.displayHistory = !this.displayHistory;
     },
     update (event, path) {
-      this.$emit('update-event', { event, path });
+      this.$emit('update-edited-event', { event, path });
     },
     toggleCancellationForm (value) {
       if (!value) {

@@ -35,7 +35,7 @@
             :disable-end-date="isHourlyAbsence(newEvent)" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
-            @input="updateDates($event)" />
+            @input="update($event, 'dates')" />
           <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="newEvent.isExtendedAbsence"
             @input="updateCheckBox" label="Prolongation" dense />
           <ni-select v-if="newEvent.isExtendedAbsence" :value="newEvent.extension" @input="update($event, 'extension')"
@@ -84,7 +84,6 @@
 
 <script>
 import get from 'lodash/get';
-import set from 'lodash/set';
 import Events from '@api/Events';
 import Button from '@components/Button';
 import ButtonToggle from '@components/ButtonToggle';
@@ -172,15 +171,12 @@ export default {
   watch: {
     selectedAuxiliary (value) {
       if (!this.selectedAuxiliary.hasContractOnEvent && this.newEvent.type === INTERNAL_HOUR) {
-        this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
+        this.update(INTERVENTION, 'type');
       }
     },
     isRepetitionAllowed (value) {
       if (!value) {
-        this.$emit(
-          'update:newEvent',
-          { ...this.newEvent, repetition: { ...this.newEvent.repetition, frequency: NEVER } }
-        );
+        this.update(NEVER, 'repetition.frequency');
       }
     },
     'newEvent.absence': function () {
@@ -191,6 +187,9 @@ export default {
     },
   },
   methods: {
+    update (event, path) {
+      this.$emit('update-event', { event, path });
+    },
     close () {
       this.$emit('close');
     },
@@ -208,13 +207,11 @@ export default {
       this.$emit('submit', value);
     },
     resetAbsenceType () {
-      if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY) {
-        this.$emit('update:newEvent', { ...this.newEvent, absence: UNJUSTIFIED });
-      }
+      if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY) this.update(UNJUSTIFIED, 'absence');
     },
     updateSectorEvent (auxId) {
       const auxiliary = this.activeAuxiliaries.find(aux => aux._id === auxId);
-      this.$emit('update:newEvent', { ...this.newEvent, sector: auxiliary ? auxiliary.sector._id : '' });
+      this.update(auxiliary ? auxiliary.sector._id : '', 'sector');
     },
     setEventAddressAndSubscription () {
       const payload = {
@@ -223,7 +220,7 @@ export default {
       };
       const cusSubNotArchived = this.customerSubscriptionsOptions.filter(sub => !sub.disable);
       if (cusSubNotArchived.length === 1) payload.subscription = cusSubNotArchived[0].value;
-      this.$emit('update:newEvent', payload);
+      this.update(get(this.selectedCustomer, 'contact.primaryAddress', {}), 'address');
     },
     toggleAddressSelect () {
       const addressList = this.customerAddressList(this.newEvent);
@@ -231,41 +228,35 @@ export default {
       if (addressIndex === 0) this.update(addressList[1].value, 'address');
       else this.update(addressList[0].value, 'address');
     },
-    update (event, path) {
-      this.$emit('update:newEvent', set({ ...this.newEvent }, path, event));
-    },
-    async updateCustomer (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, customer: event });
+    updateCustomer (event) {
+      this.update(event, 'customer');
       this.setEventAddressAndSubscription();
     },
-    async updateType (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, type: event });
+    updateType (event) {
+      this.update(event, 'type');
       this.reset(true, event);
     },
-    async updateAbsenceNature (event) {
-      await this.$emit(
-        'update:newEvent',
-        { ...this.newEvent, absenceNature: event, extension: '', isExtendedAbsence: false }
-      );
+    updateAbsenceNature (event) {
+      this.update(event, 'absenceNature');
+      this.update('', 'extension');
+      this.update(false, 'isExtendedAbsence');
       this.resetAbsenceType();
     },
-    async updateAbsence (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, absence: event, isExtendedAbsence: false });
+    updateAbsence (event) {
+      this.update(event, 'absence');
+      this.update(false, 'isExtendedAbsence');
       this.setDateHours(this.newEvent, 'newEvent');
     },
-    async updateCustomerAddress (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, address: event });
+    updateCustomerAddress (event) {
+      this.update(event, 'address');
       this.deleteClassFocus();
-    },
-    async updateDates (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
     },
     async updateCheckBox (event) {
       if (!this.newEvent.isExtendedAbsence) await this.getAbsences();
-      await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });
+      this.update(!this.newEvent.isExtendedAbsence, 'isExtendedAbsence');
     },
     async getAbsences () {
-      await this.$emit('update:newEvent', { ...this.newEvent, extension: '' });
+      this.update('', 'extension');
       const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
 
       this.extendedAbsenceOptions = auxiliaryEvents

@@ -8,11 +8,11 @@
       @update-feeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event.sync="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creation-modal="creationModal" :internal-hours="internalHours" @close="closeCreationModal" :customers="customers"
       :person-key="personKey" :active-auxiliaries="activeAuxiliaries" @reset="resetCreationForm"
       @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
-      @submit="validateCreationEvent" />
+      @submit="validateCreationEvent" @update-event="setNewEvent" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
@@ -21,7 +21,7 @@
       @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" :customers="customers"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading" @submit="validateEventEdition"
-      @update-event="updateEditedEvent" />
+      @update-edited-event="setEditedEvent" />
   </q-page>
 </template>
 
@@ -185,10 +185,13 @@ export default {
         await this.refresh();
       }
     },
-    updateEditedEvent (payload) {
-      const path = payload.path;
-      const event = payload.event;
-      set( this.editedEvent, `${path}`, event);
+    setNewEvent (payload) {
+      const { path, event } = payload;
+      set(this.newEvent, `${path}`, event);
+    },
+    setEditedEvent (payload) {
+      const { path, event } = payload;
+      set(this.editedEvent, `${path}`, event);
     },
     updateAuxiliariesList () {
       const auxFromSector = this.filteredSectors.map(this.getAuxBySector).flat();
