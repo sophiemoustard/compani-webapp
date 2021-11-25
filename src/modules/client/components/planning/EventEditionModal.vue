@@ -135,7 +135,6 @@
 
 <script>
 import get from 'lodash/get';
-import set from 'lodash/set';
 import { required } from 'vuelidate/lib/validators';
 import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
@@ -252,26 +251,23 @@ export default {
     toggleHistory () {
       this.displayHistory = !this.displayHistory;
     },
+    update (event, path) {
+      this.$emit('update-event', { event, path });
+    },
     toggleCancellationForm (value) {
       if (!value) {
-        this.$emit('update:edited-event', {
-          ...this.editedEvent,
-          cancel: {},
-          isCancelled: !this.editedEvent.isCancelled,
-        });
+        this.update({}, 'cancel');
+        this.update(!this.editedEvent.isCancelled, 'isCancelled');
       } else {
-        this.$emit('update:edited-event', { ...this.editedEvent, isCancelled: !this.editedEvent.isCancelled });
+        this.update(!this.editedEvent.isCancelled, 'isCancelled');
         this.validations.misc.$touch();
         this.validations.cancel.$touch();
       }
     },
     toggleRepetition () {
-      this.$emit('update:edited-event', {
-        ...this.editedEvent,
-        cancel: {},
-        isCancelled: false,
-        shouldUpdateRepetition: !this.editedEvent.shouldUpdateRepetition,
-      });
+      this.update({}, 'cancel');
+      this.update(false, 'isCancelled');
+      this.update(!this.editedEvent.shouldUpdateRepetition, 'shouldUpdateRepetition');
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
@@ -304,15 +300,12 @@ export default {
       if (addressIndex === 0) this.update(addressList[1].value, 'address');
       else this.update(addressList[0].value, 'address');
     },
-    update (event, path) {
-      this.$emit('update:editedEvent', set({ ...this.editedEvent }, path, event));
-    },
-    async updateAbsence (event) {
-      await this.$emit('update:editedEvent', { ...this.editedEvent, absence: event });
+    updateAbsence (event) {
+      this.update(event, 'absence');
       this.setDateHours(this.editedEvent, 'editedEvent');
     },
     updateAddress (event) {
-      this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
+      this.update(event, 'address');
       this.deleteClassFocus();
     },
     openTimeStampCancellationModal (isStartCancellation) {

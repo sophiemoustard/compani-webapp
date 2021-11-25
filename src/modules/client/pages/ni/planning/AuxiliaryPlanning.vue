@@ -15,12 +15,13 @@
       @submit="validateCreationEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @refresh-histories="refreshHistories"
       @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" :customers="customers"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading" @submit="validateEventEdition" />
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading" @submit="validateEventEdition"
+      @update-event="updateEditedEvent" />
   </q-page>
 </template>
 
@@ -29,6 +30,7 @@ import { mapGetters, mapActions, mapState } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqBy from 'lodash/uniqBy';
 import pick from 'lodash/pick';
+import set from 'lodash/set';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
 import EventHistories from '@api/EventHistories';
@@ -182,6 +184,11 @@ export default {
         this.filteredSectors = this.filters.filter(fil => fil.type === SECTOR);
         await this.refresh();
       }
+    },
+    updateEditedEvent (payload) {
+      const path = payload.path;
+      const event = payload.event;
+      set( this.editedEvent, `${path}`, event);
     },
     updateAuxiliariesList () {
       const auxFromSector = this.filteredSectors.map(this.getAuxBySector).flat();
