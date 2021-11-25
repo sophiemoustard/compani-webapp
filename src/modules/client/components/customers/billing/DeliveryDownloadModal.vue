@@ -4,7 +4,7 @@
       Téléchargement du <span class="text-weight-bold">fichier de télétransmission</span>
     </template>
     <div class="row q-pb-md">
-      <ni-option-group caption="Tiers payeur" :value="deliveryFile.thirdPartyPayers" required-field type="checkbox"
+      <ni-option-group caption="Tiers payeur(s)" :value="deliveryFile.thirdPartyPayers" required-field type="checkbox"
         :options="tppOptions" @input="update($event, 'thirdPartyPayers')" :error="validations.thirdPartyPayers.$error"
         inline />
     </div>
