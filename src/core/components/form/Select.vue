@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
+    <q-select dense borderless :value="model" :bg-color="bgColor" :options="selectableOptions" :multiple="multiple"
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter" use-input
       :class="{ 'no-border': noBorder, 'borders': inModal && !noBorder , 'no-bottom': noError }" :error="error"
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
@@ -54,7 +54,7 @@ export default {
   },
   data () {
     return {
-      innerOptions: [],
+      selectableOptions: [],
     };
   },
   computed: {
@@ -96,10 +96,10 @@ export default {
       update(() => {
         if (val) {
           const formattedValue = this.formatStringForFiltering(val);
-          this.innerOptions = this.formattedOptions
+          this.selectableOptions = this.formattedOptions
             .filter(opt => opt.filters.some(word => word.includes(formattedValue)));
         } else {
-          this.innerOptions = this.options;
+          this.selectableOptions = this.options;
         }
       });
     },
