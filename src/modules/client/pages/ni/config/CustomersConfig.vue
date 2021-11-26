@@ -174,7 +174,8 @@
     <service-creation-modal v-model="serviceCreationModal" :new-service.sync="newService" :validations="$v.newService"
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
-      :loading="loading" />
+      :loading="loading" @add-billing-item="addBillingItemToService" @update-billing-item="updateBillingItemInService"
+       @remove-billing-item="removeBillingItemInService" :billing-items-options="billingItemsOptions" />
 
     <!-- Service edition modal -->
     <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
@@ -423,6 +424,7 @@ export default {
         vat: '',
         surcharge: '',
         exemptFromCharges: false,
+        billingItems: [],
       },
       editedService: {
         name: '',
@@ -910,7 +912,7 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, exemptFromCharges } = this.newService;
+      const { nature, name, defaultUnitAmount, exemptFromCharges, billingItems } = this.newService;
       const formattedService = {
         nature,
         versions: [{
@@ -919,6 +921,7 @@ export default {
           exemptFromCharges,
           // first version does not have actual start date
           startDate: moment('1970-01-01').startOf('d').toISOString(),
+          billingItems,
         }],
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') {
@@ -936,6 +939,7 @@ export default {
         vat: '',
         surcharge: null,
         exemptFromCharges: false,
+        billingItems: [],
       };
       this.$v.newService.$reset();
     },
@@ -1060,13 +1064,16 @@ export default {
       this.selectedService = {};
     },
     addBillingItemToService () {
-      this.editedService.billingItems.push('');
+      if (this.serviceCreationModal) this.newService.billingItems.push('');
+      else if (this.serviceEditionModal) this.editedService.billingItems.push('');
     },
     updateBillingItemInService (index, event) {
-      this.$set(this.editedService.billingItems, index, event);
+      if (this.serviceCreationModal) this.$set(this.newService.billingItems, index, event);
+      else if (this.serviceEditionModal) this.$set(this.editedService.billingItems, index, event);
     },
     removeBillingItemInService (index) {
-      this.editedService.billingItems.splice(index, 1);
+      if (this.serviceCreationModal) this.newService.billingItems.splice(index, 1);
+      else if (this.serviceEditionModal) this.editedService.billingItems.splice(index, 1);
     },
     // Billing Items
     resetBillingItemCreation () {

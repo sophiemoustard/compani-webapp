@@ -19,6 +19,16 @@
       <q-checkbox label="Exonération de charges" :value="newService.exemptFromCharges" dense
         @input="update($event, 'exemptFromCharges')" />
     </div>
+    <p class="text-weight-bold q-mt-md billing-items-title" v-if="get(newService, 'billingItems.length')">
+      Articles facturés par intervention
+    </p>
+    <div class="row" v-for="(billingItem, index) in newService.billingItems" :key="index">
+      <ni-select :clearable="false" :value="billingItem" :options="billingItemsOptions"
+        :caption="`Article ${index + 1}`" class="flex-1 q-mr-sm" @input="updateBillingItem(index, $event)" />
+      <ni-button icon="close" @click="removeBillingItem(index)" size="sm" />
+    </div>
+    <ni-bi-color-button label="Ajouter un article de facturation" icon="add" class="q-mb-md" @click="addBillingItem"
+      label-color="primary" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -27,8 +37,11 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
+import BiColorButton from '@components/BiColorButton';
+import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import { FIXED } from '@data/constants';
 
@@ -37,7 +50,10 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'ni-button': Button,
     'ni-select': Select,
+    'ni-bi-color-button': BiColorButton,
+
   },
   props: {
     validations: { type: Object, required: true },
@@ -47,6 +63,7 @@ export default {
     surchargesOptions: { type: Array, required: true },
     defaultUnitAmountError: { type: String, required: true },
     loading: { type: Boolean, default: false },
+    billingItemsOptions: { type: Array, required: true },
   },
   data () {
     return {
@@ -54,6 +71,7 @@ export default {
     };
   },
   methods: {
+    get,
     hide () {
       this.$emit('hide');
     },
@@ -65,6 +83,15 @@ export default {
     },
     update (event, prop) {
       this.$emit('update:newService', { ...this.newService, [prop]: event });
+    },
+    addBillingItem () {
+      this.$emit('add-billing-item');
+    },
+    updateBillingItem (index, event) {
+      this.$emit('update-billing-item', index, event);
+    },
+    removeBillingItem (index) {
+      this.$emit('remove-billing-item', index);
     },
   },
 };
