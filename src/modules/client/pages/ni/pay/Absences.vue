@@ -29,16 +29,17 @@
     </ni-simple-table>
 
     <!-- Absence edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :person-key="personKey" :active-auxiliaries="activeAuxiliaries"
       @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
       @submit="validateEventEdition" @close="closeEditionModal" @delete-event="validateEventDeletion"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading" @update-edited-event="setEvent" />
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
 import Events from '@api/Events';
 import GoogleDrive from '@api/GoogleDrive';
 import Button from '@components/Button';
@@ -147,6 +148,10 @@ export default {
     },
   },
   methods: {
+    setEvent (payload) {
+      const { path, event } = payload;
+      set(this.editedEvent, `${path}`, event);
+    },
     getDriveId (absence) {
       return get(absence, 'attachment.driveId') || '';
     },

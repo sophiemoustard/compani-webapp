@@ -20,25 +20,26 @@
     </div>
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event.sync="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event="newEvent"
       :person-key="personKey" :creation-modal="creationModal" :internal-hours="internalHours"
       :active-auxiliaries="activeAuxiliaries" :customers="customers" @reset="resetCreationForm"
       @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
-      @submit="validateCreationEvent" @close="closeCreationModal" />
+      @submit="validateCreationEvent" @close="closeCreationModal" @update-event="setEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
       @document-uploaded="documentUploaded" @submit="validateEventEdition" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @close="closeEditionModal"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading"
-      @refresh-histories="refreshHistories" />
+      @refresh-histories="refreshHistories" @update-edited-event="setEvent" />
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
 import Users from '@api/Users';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
@@ -112,6 +113,11 @@ export default {
     await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh(), this.setInternalHours()]);
   },
   methods: {
+    setEvent (payload) {
+      const { path, event } = payload;
+      if (this.creationModal) set(this.newEvent, `${path}`, event);
+      else if (this.editionModal) set(this.editedEvent, `${path}`, event);
+    },
     getAvatar (aux) {
       if (!aux || !aux._id) return UNKNOWN_AVATAR;
 
