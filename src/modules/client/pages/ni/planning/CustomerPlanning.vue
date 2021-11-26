@@ -8,7 +8,8 @@
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :new-event.sync="newEvent" :person-key="personKey"
       :creation-modal="creationModal" :active-auxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
-      @reset="resetCreationForm" @submit="validateCreationEvent" @close="closeCreationModal" />
+      @reset="resetCreationForm" @submit="validateCreationEvent" @close="closeCreationModal"
+      @update-event="setEvent" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
@@ -16,13 +17,14 @@
       @hide="resetEditionForm" @submit="validateEventEdition" @close="closeEditionModal" :person-key="personKey"
       @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading"
-      @refresh-histories="refreshHistories" />
+      @refresh-histories="refreshHistories" @update-edited-event="setEvent" />
   </q-page>
 </template>
 
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import groupBy from 'lodash/groupBy';
 import Events from '@api/Events';
 import CustomerAbsences from '@api/CustomerAbsences';
@@ -218,6 +220,11 @@ export default {
           endDate: this.endOfWeek,
           sector: sectors,
         });
+    },
+    setEvent (payload) {
+      const { path, event } = payload;
+      if (this.creationModal) set(this.newEvent, `${path}`, event);
+      else if (this.editionModal) set(this.editedEvent, `${path}`, event);
     },
     // Filter
     async addElementToFilter (el) {

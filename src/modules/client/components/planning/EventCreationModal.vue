@@ -211,7 +211,7 @@ export default {
     },
     updateSectorEvent (auxId) {
       const auxiliary = this.activeAuxiliaries.find(aux => aux._id === auxId);
-      this.update(auxiliary ? auxiliary.sector._id : '', 'sector');
+      this.update(get(auxiliary, 'sector._id', ''), 'sector');
     },
     setEventAddressAndSubscription () {
       const payload = {

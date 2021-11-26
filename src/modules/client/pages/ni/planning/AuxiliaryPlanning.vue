@@ -8,20 +8,20 @@
       @update-feeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event="newEvent"
       :creation-modal="creationModal" :internal-hours="internalHours" @close="closeCreationModal" :customers="customers"
       :person-key="personKey" :active-auxiliaries="activeAuxiliaries" @reset="resetCreationForm"
       @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
-      @submit="validateCreationEvent" @update-event="setNewEvent" />
+      @submit="validateCreationEvent" @update-event="setEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @refresh-histories="refreshHistories"
       @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" :customers="customers"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading" @submit="validateEventEdition"
-      @update-edited-event="setEditedEvent" />
+      @update-edited-event="setEvent" />
   </q-page>
 </template>
 
@@ -185,13 +185,10 @@ export default {
         await this.refresh();
       }
     },
-    setNewEvent (payload) {
+    setEvent (payload) {
       const { path, event } = payload;
-      set(this.newEvent, `${path}`, event);
-    },
-    setEditedEvent (payload) {
-      const { path, event } = payload;
-      set(this.editedEvent, `${path}`, event);
+      if (this.creationModal) set(this.newEvent, `${path}`, event);
+      else if (this.editionModal) set(this.editedEvent, `${path}`, event);
     },
     updateAuxiliariesList () {
       const auxFromSector = this.filteredSectors.map(this.getAuxBySector).flat();
