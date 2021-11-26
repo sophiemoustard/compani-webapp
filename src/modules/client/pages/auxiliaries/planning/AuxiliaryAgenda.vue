@@ -33,7 +33,7 @@
       @document-uploaded="documentUploaded" @submit="validateEventEdition" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @close="closeEditionModal"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading"
-      @refresh-histories="refreshHistories" @update-edited-event="setEvent" />
+      @refresh-histories="refreshHistories" @update-event="setEvent" />
   </q-page>
 </template>
 
@@ -114,9 +114,9 @@ export default {
   },
   methods: {
     setEvent (payload) {
-      const { path, event } = payload;
-      if (this.creationModal) set(this.newEvent, `${path}`, event);
-      else if (this.editionModal) set(this.editedEvent, `${path}`, event);
+      const { path, value } = payload;
+      if (this.creationModal) set(this.newEvent, `${path}`, value);
+      else if (this.editionModal) set(this.editedEvent, `${path}`, value);
     },
     getAvatar (aux) {
       if (!aux || !aux._id) return UNKNOWN_AVATAR;

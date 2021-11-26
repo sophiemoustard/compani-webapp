@@ -21,7 +21,7 @@
       @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" :customers="customers"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading" @submit="validateEventEdition"
-      @update-edited-event="setEvent" />
+      @update-event="setEvent" />
   </q-page>
 </template>
 
@@ -186,9 +186,9 @@ export default {
       }
     },
     setEvent (payload) {
-      const { path, event } = payload;
-      if (this.creationModal) set(this.newEvent, `${path}`, event);
-      else if (this.editionModal) set(this.editedEvent, `${path}`, event);
+      const { path, value } = payload;
+      if (this.creationModal) set(this.newEvent, `${path}`, value);
+      else if (this.editionModal) set(this.editedEvent, `${path}`, value);
     },
     updateAuxiliariesList () {
       const auxFromSector = this.filteredSectors.map(this.getAuxBySector).flat();

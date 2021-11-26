@@ -33,7 +33,7 @@
       :edition-modal="editionModal" :person-key="personKey" :active-auxiliaries="activeAuxiliaries"
       @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
       @submit="validateEventEdition" @close="closeEditionModal" @delete-event="validateEventDeletion"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading" @update-edited-event="setEvent" />
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading" @update-event="setEvent" />
   </q-page>
 </template>
 
@@ -149,8 +149,8 @@ export default {
   },
   methods: {
     setEvent (payload) {
-      const { path, event } = payload;
-      set(this.editedEvent, `${path}`, event);
+      const { path, value } = payload;
+      set(this.editedEvent, `${path}`, value);
     },
     getDriveId (absence) {
       return get(absence, 'attachment.driveId') || '';

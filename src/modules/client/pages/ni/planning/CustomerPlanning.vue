@@ -17,7 +17,7 @@
       @hide="resetEditionForm" @submit="validateEventEdition" @close="closeEditionModal" :person-key="personKey"
       @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading"
-      @refresh-histories="refreshHistories" @update-edited-event="setEvent" />
+      @refresh-histories="refreshHistories" @update-event="setEvent" />
   </q-page>
 </template>
 
@@ -222,9 +222,9 @@ export default {
         });
     },
     setEvent (payload) {
-      const { path, event } = payload;
-      if (this.creationModal) set(this.newEvent, `${path}`, event);
-      else if (this.editionModal) set(this.editedEvent, `${path}`, event);
+      const { path, value } = payload;
+      if (this.creationModal) set(this.newEvent, `${path}`, value);
+      else if (this.editionModal) set(this.editedEvent, `${path}`, value);
     },
     // Filter
     async addElementToFilter (el) {
