@@ -217,12 +217,8 @@ export default {
       this.updateEvent('sector', get(auxiliary, 'sector._id', ''));
     },
     setEventAddressAndSubscription () {
-      const payload = {
-        ...this.newEvent,
-        address: get(this.selectedCustomer, 'contact.primaryAddress', {}),
-      };
       const cusSubNotArchived = this.customerSubscriptionsOptions.filter(sub => !sub.disable);
-      if (cusSubNotArchived.length === 1) payload.subscription = cusSubNotArchived[0].value;
+      if (cusSubNotArchived.length === 1) this.updateEvent('subscription', get(cusSubNotArchived[0], 'value'));
       this.updateEvent('address', get(this.selectedCustomer, 'contact.primaryAddress', {}));
     },
     toggleAddressSelect () {

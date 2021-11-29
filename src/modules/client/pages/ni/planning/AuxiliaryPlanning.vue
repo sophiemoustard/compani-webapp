@@ -187,8 +187,8 @@ export default {
     },
     setEvent (payload) {
       const { path, value } = payload;
-      if (this.creationModal) set(this.newEvent, `${path}`, value);
-      else if (this.editionModal) set(this.editedEvent, `${path}`, value);
+      if (this.creationModal) set(this.newEvent, path, value);
+      else if (this.editionModal) set(this.editedEvent, path, value);
     },
     updateAuxiliariesList () {
       const auxFromSector = this.filteredSectors.map(this.getAuxBySector).flat();
