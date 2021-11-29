@@ -380,7 +380,7 @@ export const planningActionMixin = {
         case INTERVENTION: {
           this.editedEvent = {
             isCancelled: false,
-            cancel: {},
+            cancel: { condition: '', reason: '' },
             shouldUpdateRepetition: false,
             ...eventData,
             dates,
