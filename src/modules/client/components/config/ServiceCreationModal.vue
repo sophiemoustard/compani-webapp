@@ -96,3 +96,8 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .billing-items-title
+    font-size: 14px
+</style>

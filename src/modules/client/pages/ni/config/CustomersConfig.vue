@@ -175,7 +175,7 @@
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
       :loading="loading" @add-billing-item="addBillingItemToService" @update-billing-item="updateBillingItemInService"
-       @remove-billing-item="removeBillingItemInService" :billing-items-options="billingItemsOptions" />
+      @remove-billing-item="removeBillingItemInService" :billing-items-options="billingItemsOptions" />
 
     <!-- Service edition modal -->
     <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
@@ -921,7 +921,7 @@ export default {
           exemptFromCharges,
           // first version does not have actual start date
           startDate: moment('1970-01-01').startOf('d').toISOString(),
-          billingItems,
+          billingItems: uniq(compact(billingItems)),
         }],
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') {
