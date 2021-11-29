@@ -285,6 +285,7 @@ export default {
           endDate: moment(selectedDay).hours(10).toISOString(),
         },
         extension: '',
+        misc: '',
         isExtendedAbsence: false,
       };
       this.creationModal = true;

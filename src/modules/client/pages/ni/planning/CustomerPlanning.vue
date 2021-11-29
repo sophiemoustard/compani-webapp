@@ -209,6 +209,7 @@ export default {
           startDate: moment(selectedDay).hours(8).toISOString(),
           endDate: moment(selectedDay).hours(10).toISOString(),
         },
+        misc: '',
       };
       this.creationModal = true;
     },
