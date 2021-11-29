@@ -53,7 +53,6 @@ export default {
     'ni-button': Button,
     'ni-select': Select,
     'ni-bi-color-button': BiColorButton,
-
   },
   props: {
     validations: { type: Object, required: true },
