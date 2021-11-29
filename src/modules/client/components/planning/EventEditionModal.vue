@@ -6,7 +6,7 @@
           :selected-person="selectedCustomer" @close="close" />
         <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)"
           :value="editedEvent.auxiliary" :selected-person="selectedAuxiliary" @close="close" />
-        <ni-planning-modal-header v-else :value="editedEvent.auxiliary" @input="update($event, 'auxiliary')"
+        <ni-planning-modal-header v-else :value="editedEvent.auxiliary" @input="updateEvent('auxiliary', $event)"
           :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close"
           :disable="!canUpdateAuxiliary || historiesLoading" />
         <div class="modal-subtitle">
@@ -18,21 +18,21 @@
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable="!canUpdateIntervention || historiesLoading" :error="validations.dates.$error" disable-end-date
-            @input="update($event, 'dates')" @blur="validations.dates.$touch" :disable-start-date="isEventTimeStamped"
-            :max="customerStoppedDate" :disable-start-hour="!!startDateTimeStamped"
-            :disable-end-hour="!!endDateTimeStamped" :start-locked="!!startDateTimeStamped"
-            @startLockClick="openTimeStampCancellationModal(true)" :end-locked="!!endDateTimeStamped"
-            @endLockClick="openTimeStampCancellationModal(false)" />
+            @input="updateEvent('dates', $event)" @blur="validations.dates.$touch"
+            :disable-start-date="isEventTimeStamped" :max="customerStoppedDate"
+            :disable-start-hour="!!startDateTimeStamped" :disable-end-hour="!!endDateTimeStamped"
+            :start-locked="!!startDateTimeStamped" @startLockClick="openTimeStampCancellationModal(true)"
+            :end-locked="!!endDateTimeStamped" @endLockClick="openTimeStampCancellationModal(false)" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')"
+            @blur="validations.auxiliary.$touch" @input="updateEvent('auxiliary', $event)"
             :disable="!canUpdateAuxiliary || historiesLoading" />
           <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer"
             :options="getCustomersOptions(editedEvent.dates.startDate)" :error="validations.customer.$error"
             required-field disable />
-          <ni-select in-modal :options="customerSubscriptionsOptions" @input="update($event, 'subscription')"
+          <ni-select in-modal :options="customerSubscriptionsOptions" @input="updateEvent('subscription', $event)"
             :value="editedEvent.subscription" :error="validations.subscription.$error" caption="Service"
             @blur="validations.subscription.$touch" required-field
             :disable="!canUpdateIntervention || historiesLoading" />
@@ -40,9 +40,9 @@
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :value="editedEvent.internalHour"
             :options="internalHourOptions" :error="validations.internalHour.$error" :disable="historiesLoading"
-            @blur="validations.internalHour.$touch" @input="update($event, 'internalHour')" />
+            @blur="validations.internalHour.$touch" @input="updateEvent('internalHour', $event)" />
           <ni-search-address :value="editedEvent.address" in-modal @blur="validations.address.$touch"
-            :error="validations.address.$error" :error-message="addressError" @input="update($event, 'address')"
+            :error="validations.address.$error" :error-message="addressError" @input="updateEvent('address', $event)"
             :disable="historiesLoading" />
         </template>
         <template v-if="isRepetition(editedEvent) && canUpdateIntervention && !editedEvent.isCancelled">
@@ -61,7 +61,7 @@
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable-end-date="isHourlyAbsence(editedEvent)" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(editedEvent)" :disable="historiesLoading"
-            :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" @input="update($event, 'dates')" />
+            :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" @input="updateEvent('dates', $event)" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence" required-field
             path="attachment" :entity="editedEvent" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additional-value="additionalValue" :error="validations.attachment.$error"
@@ -70,7 +70,7 @@
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" :value="editedEvent.misc" caption="Notes"
           :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
-          :error="validations.misc.$error" :required-field="isMiscRequired" @input="update($event, 'misc')" />
+          :error="validations.misc.$error" :required-field="isMiscRequired" @input="updateEvent('misc', $event)" />
         <div v-if="canCancel" class="row q-mb-md light-checkbox">
           <q-checkbox :value="editedEvent.isCancelled" label="Annuler l'évènement" dense :disable="historiesLoading"
             @input="toggleCancellationForm($event)" />
@@ -78,20 +78,20 @@
         <div v-if="editedEvent.isCancelled" class="row justify-between">
           <ni-select in-modal :value="editedEvent.cancel.condition" required-field caption="Conditions d'annulation"
             :options="cancellationConditions" @blur="validations.cancel.condition.$touch"
-            :error="validations.cancel.condition.$error" @input="update($event, 'cancel.condition')"
+            :error="validations.cancel.condition.$error" @input="updateEvent('cancel.condition', $event)"
             :disable="!canCancel || historiesLoading" />
           <ni-select in-modal :value="editedEvent.cancel.reason" caption="Motif d'annulation"
             :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
-            :error="validations.cancel.reason.$error" @input="update($event, 'cancel.reason')"
+            :error="validations.cancel.reason.$error" @input="updateEvent('cancel.reason', $event)"
             :disable="!canCancel || historiesLoading" />
         </div>
         <template v-if="!editedEvent.shouldUpdateRepetition && editedEvent.type === INTERVENTION">
           <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :value="editedEvent.kmDuringEvent"
             suffix="km" type="number" :error="validations.kmDuringEvent.$error" @blur="validations.kmDuringEvent.$touch"
-            error-message="Le déplacement doit être positif ou nul" @input="update($event, 'kmDuringEvent')"
+            error-message="Le déplacement doit être positif ou nul" @input="updateEvent('kmDuringEvent', $event)"
             :disable="!canUpdateIntervention" />
           <ni-select in-modal :value="editedEvent.transportMode" :options="eventTransportOptions"
-            caption="Transport spécifique pour aller à l'intervention" @input="update($event, 'transportMode')"
+            caption="Transport spécifique pour aller à l'intervention" @input="updateEvent('transportMode', $event)"
             :disable="!canUpdateIntervention" />
         </template>
         <div class="q-mb-lg">
@@ -135,7 +135,6 @@
 
 <script>
 import get from 'lodash/get';
-import set from 'lodash/set';
 import { required } from 'vuelidate/lib/validators';
 import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
@@ -252,26 +251,23 @@ export default {
     toggleHistory () {
       this.displayHistory = !this.displayHistory;
     },
+    updateEvent (path, value) {
+      this.$emit('update-event', { path, value });
+    },
     toggleCancellationForm (value) {
       if (!value) {
-        this.$emit('update:edited-event', {
-          ...this.editedEvent,
-          cancel: {},
-          isCancelled: !this.editedEvent.isCancelled,
-        });
+        this.updateEvent('cancel', {});
+        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
       } else {
-        this.$emit('update:edited-event', { ...this.editedEvent, isCancelled: !this.editedEvent.isCancelled });
+        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
         this.validations.misc.$touch();
         this.validations.cancel.$touch();
       }
     },
     toggleRepetition () {
-      this.$emit('update:edited-event', {
-        ...this.editedEvent,
-        cancel: {},
-        isCancelled: false,
-        shouldUpdateRepetition: !this.editedEvent.shouldUpdateRepetition,
-      });
+      this.updateEvent('cancel', {});
+      this.updateEvent('isCancelled', false);
+      this.updateEvent('shouldUpdateRepetition', !this.editedEvent.shouldUpdateRepetition);
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
@@ -301,18 +297,15 @@ export default {
     toggleAddressSelect () {
       const addressList = this.customerAddressList(this.editedEvent);
       const addressIndex = addressList.findIndex(ev => this.editedEvent.address.fullAddress === ev.label);
-      if (addressIndex === 0) this.update(addressList[1].value, 'address');
-      else this.update(addressList[0].value, 'address');
+      if (addressIndex === 0) this.updateEvent('address', addressList[1].value);
+      else this.updateEvent('address', addressList[0].value);
     },
-    update (event, path) {
-      this.$emit('update:editedEvent', set({ ...this.editedEvent }, path, event));
-    },
-    async updateAbsence (event) {
-      await this.$emit('update:editedEvent', { ...this.editedEvent, absence: event });
-      this.setDateHours(this.editedEvent, 'editedEvent');
+    updateAbsence (event) {
+      this.updateEvent('absence', event);
+      this.setDateHours('editedEvent', this.editedEvent);
     },
     updateAddress (event) {
-      this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
+      this.updateEvent('address', event);
       this.deleteClassFocus();
     },
     openTimeStampCancellationModal (isStartCancellation) {
