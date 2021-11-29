@@ -6,13 +6,13 @@
       @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :new-event.sync="newEvent" :person-key="personKey"
+    <ni-event-creation-modal :validations="$v.newEvent" :new-event="newEvent" :person-key="personKey"
       :creation-modal="creationModal" :active-auxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
       @reset="resetCreationForm" @submit="validateCreationEvent" @close="closeCreationModal"
       @update-event="setEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :active-auxiliaries="activeAuxiliaries" :customers="customers"
       @hide="resetEditionForm" @submit="validateEventEdition" @close="closeEditionModal" :person-key="personKey"
       @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion"

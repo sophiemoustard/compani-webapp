@@ -371,6 +371,7 @@ export const planningActionMixin = {
         sector,
         transportMode,
         kmDuringEvent,
+        misc,
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
@@ -391,6 +392,7 @@ export const planningActionMixin = {
             address,
             transportMode: transportMode || '',
             kmDuringEvent: kmDuringEvent || 0,
+            misc,
           };
           break;
         }
@@ -402,13 +404,14 @@ export const planningActionMixin = {
             auxiliary: auxiliary._id,
             internalHour: internalHour._id,
             dates,
+            misc,
           };
           break;
         case ABSENCE:
-          this.editedEvent = { address: {}, attachment: {}, ...eventData, auxiliary: auxiliary._id, dates };
+          this.editedEvent = { address: {}, attachment: {}, ...eventData, auxiliary: auxiliary._id, dates, misc };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, dates };
+          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, dates, misc };
           break;
       }
     },
