@@ -150,7 +150,7 @@ export default {
   methods: {
     setEvent (payload) {
       const { path, value } = payload;
-      set(this.editedEvent, `${path}`, value);
+      set(this.editedEvent, path, value);
     },
     getDriveId (absence) {
       return get(absence, 'attachment.driveId') || '';

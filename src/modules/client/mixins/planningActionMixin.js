@@ -187,7 +187,13 @@ export const planningActionMixin = {
           extension: '',
           address: {},
           attachment: {},
-          ...(type === ABSENCE && { absenceNature: DAILY }),
+          ...(type === ABSENCE && {
+            absenceNature: DAILY,
+            dates: {
+              startDate: moment(this.newEvent.dates.startDate).startOf('d').toISOString(),
+              endDate: moment(this.newEvent.dates.endDate).endOf('d').toISOString(),
+            },
+          }),
         };
       }
     },
