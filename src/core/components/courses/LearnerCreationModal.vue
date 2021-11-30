@@ -17,7 +17,7 @@
           :error-message="phoneNbrError(validations)" :last="!displayCompany" required-field />
         <ni-select v-if="displayCompany" in-modal :options="companyOptions" :value="newUser.company"
           @input="update($event.trim(), 'company')" caption="Structure" last @blur="validations.company.$touch"
-          :error="validations.company.$error" required-field />
+          :error="validations.company.$error" required-field :disable="disableCompany" />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
@@ -42,6 +42,7 @@ export default {
     value: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
     displayCompany: { type: Boolean, default: false },
+    disableCompany: { type: Boolean, default: false },
     newUser: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },

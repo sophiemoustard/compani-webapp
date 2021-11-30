@@ -35,38 +35,50 @@
 
     <!-- Trainee addition modal -->
     <trainee-addition-modal v-model="traineeAdditionModal" :new-trainee.sync="newTrainee"
-      :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
-      :trainees-options="traineesOptions" @submit="addTrainee" />
+      :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" @submit="addTrainee"
+      :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
 
     <!-- Trainee edition modal -->
     <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee" @submit="updateTrainee"
       @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="$v.editedTrainee" />
+
+    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
+      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" display-company
+      :company-options="companyOptions" :disable-company="disableCompany"
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </div>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Users from '@api/Users';
+import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import { INTER_B2B, TRAINER, INTRA, DEFAULT_AVATAR } from '@data/constants';
-import { formatPhone, formatPhoneForPayload, formatIdentity } from '@helpers/utils';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import {
+  formatPhone,
+  formatPhoneForPayload,
+  formatIdentity,
+  formatAndSortOptions,
+  removeEmptyProps,
+} from '@helpers/utils';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
+import { learnerCreationMixin } from '@mixins/learnerCreationMixin';
 import CopyButton from '@components/CopyButton';
 
 export default {
   name: 'TraineeTable',
-  mixins: [userMixin, courseMixin],
+  mixins: [userMixin, courseMixin, learnerCreationMixin],
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -77,6 +89,7 @@ export default {
     'trainee-edition-modal': TraineeEditionModal,
     'trainee-addition-modal': TraineeAdditionModal,
     'ni-copy-button': CopyButton,
+    'learner-creation-modal': LearnerCreationModal,
   },
   data () {
     return {
@@ -123,20 +136,13 @@ export default {
         contact: {},
         local: {},
       },
-    };
-  },
-  validations () {
-    return {
-      newTrainee: { required },
-      editedTrainee: {
-        identity: { lastname: { required } },
-        contact: { phone: { required, frPhoneNumber } },
-      },
+      companyOptions: [],
+      userAlreadyHasCompany: false,
     };
   },
   computed: {
     ...mapState('course', ['course']),
-    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
+    ...mapGetters({ vendorRole: 'main/getVendorRole', company: 'main/getCompany' }),
     isTrainer () {
       return this.vendorRole === TRAINER;
     },
@@ -166,10 +172,13 @@ export default {
           label: formatIdentity(pt.identity, 'FL'),
           email: pt.local.email || '',
           picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
-          ...(!this.isIntraCourse && { company: pt.company.name || '' }),
+          ...(!this.isIntraCourse && { company: get(pt, 'company.name') || '' }),
           additionalFilters: [pt.local.email],
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
+    },
+    disableCompany () {
+      return this.course.type === INTRA || this.userAlreadyHasCompany;
     },
   },
   async created () {
@@ -272,6 +281,40 @@ export default {
       }
 
       this.traineeAdditionModal = true;
+    },
+    async openLearnerCreationModal () {
+      this.traineeAdditionModal = false;
+      this.learnerCreationModal = true;
+      await this.refreshCompanies();
+    },
+    async submitLearnerCreationModal () {
+      this.$v.newLearner.$touch();
+      if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
+      try {
+        if (this.learnerAlreadyExists) {
+          const payload = removeEmptyProps(omit(this.newLearner, '_id'));
+          if (get(payload, 'contact.phone')) {
+            payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
+          }
+          await Users.updateById(this.newLearner._id, payload);
+          NotifyPositive('Apprenant(e) modifié(e).');
+        } else await this.createLearner();
+        this.learnerCreationModal = false;
+        this.traineeAdditionModal = true;
+        this.newTrainee = this.newLearner._id;
+        await this.getPotentialTrainees();
+      } catch (error) {
+        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
+      }
+    },
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = formatAndSortOptions(companies, 'name');
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
+      }
     },
   },
 };
