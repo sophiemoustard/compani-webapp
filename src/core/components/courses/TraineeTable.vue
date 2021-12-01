@@ -288,6 +288,7 @@ export default {
       await this.refreshCompanies();
     },
     async submitLearnerCreationModal () {
+      this.learnerCreationModalLoading = true;
       this.$v.newLearner.$touch();
       if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
       try {
@@ -305,6 +306,8 @@ export default {
         await this.getPotentialTrainees();
       } catch (error) {
         NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
+      } finally {
+        this.learnerCreationModalLoading = false;
       }
     },
     async refreshCompanies () {

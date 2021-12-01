@@ -1,6 +1,7 @@
 import escapeRegExp from 'lodash/escapeRegExp';
-import { sortStrings, removeDiacritics } from '@helpers/utils';
-import { formatDateDiff } from '@helpers/date';
+import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
+import Users from '@api/Users';
+import { dateDiff, formatDateDiff } from '@helpers/date';
 import { DEFAULT_AVATAR } from '@data/constants';
 
 export const learnerDirectoryMixin = {
@@ -66,6 +67,41 @@ export const learnerDirectoryMixin = {
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
+    },
+    getDaysSinceLastActivityHistory (lastActivityHistory) {
+      if (!lastActivityHistory) return null;
+
+      return dateDiff(Date.now(), lastActivityHistory.updatedAt);
+    },
+    formatRow (user) {
+      const formattedName = formatIdentity(user.identity, 'FL');
+
+      return {
+        learner: {
+          _id: user._id,
+          fullName: formattedName,
+          lastname: user.identity.lastname,
+          picture: user.picture ? user.picture.link : null,
+          noDiacriticsName: removeDiacritics(formattedName),
+        },
+        company: user.company ? user.company.name : 'N/A',
+        blendedCoursesCount: user.blendedCoursesCount,
+        eLearningCoursesCount: user.eLearningCoursesCount,
+        activityHistoryCount: user.activityHistoryCount,
+        daysSinceLastActivityHistory: this.getDaysSinceLastActivityHistory(user.lastActivityHistory),
+      };
+    },
+    async getLearnerList (companyId = null) {
+      try {
+        this.tableLoading = true;
+        const learners = await Users.learnerList(companyId ? { company: companyId } : {});
+        this.learnerList = Object.freeze(learners.map(this.formatRow));
+      } catch (e) {
+        console.error(e);
+        this.learnerList = [];
+      } finally {
+        this.tableLoading = false;
+      }
     },
   },
 };

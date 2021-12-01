@@ -19,7 +19,7 @@
       <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
       :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" />
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </q-page>
 </template>
 
@@ -65,6 +65,13 @@ export default {
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
       }
+    },
+    async submitLearnerCreationModal () {
+      this.learnerCreationModalLoading = true;
+      await this.createLearner();
+      await this.getLearnerList(this.isClientInterface ? this.company._id : null);
+      this.learnerCreationModal = false;
+      this.learnerCreationModalLoading = false;
     },
   },
 };

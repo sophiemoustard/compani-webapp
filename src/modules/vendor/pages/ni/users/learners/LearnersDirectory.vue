@@ -19,7 +19,8 @@
     <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
       :first-step="firstStep" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" display-company />
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal"
+      display-company />
   </q-page>
 </template>
 
@@ -62,6 +63,13 @@ export default {
         console.error(e);
         this.companyOptions = [];
       }
+    },
+    async submitLearnerCreationModal () {
+      this.learnerCreationModalLoading = true;
+      await this.createLearner();
+      await this.getLearnerList(this.isClientInterface ? this.company._id : null);
+      this.learnerCreationModal = false;
+      this.learnerCreationModalLoading = false;
     },
   },
 };
