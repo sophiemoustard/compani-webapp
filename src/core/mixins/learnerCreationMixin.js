@@ -57,6 +57,11 @@ export const learnerCreationMixin = {
       return this.isClientInterface ? { ...payload, company: this.company._id } : payload;
     },
     setNewLearner (user) {
+      if (get(user, 'company._id')) this.newLearner.company = get(user, 'company._id');
+      if (this.course.type === INTRA && !this.newLearner.company) this.newLearner.company = this.course.company._id;
+      if (this.course.type === INTRA && this.newLearner.company !== this.course.company._id) {
+        return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+      }
       this.newLearner._id = user._id;
       this.newLearner.identity = {
         firstname: get(user, 'identity.firstname'),
@@ -82,14 +87,11 @@ export const learnerCreationMixin = {
 
         if (this.isBlendedCourseProfile) {
           const user = await Users.getById(userInfo.user._id);
-          if (['helper', 'auxiliary_without_company'].includes(get(user, 'role.client.name')) &&
-            this.course.type === INTRA) {
+
+          const isHelperOrAuxiliaryWithoutCompany = ['helper', 'auxiliary_without_company']
+            .includes(get(user, 'role.client.name'));
+          if (isHelperOrAuxiliaryWithoutCompany && this.course.type === INTRA) {
             return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
-          }
-          if (get(user, 'company._id')) this.newLearner.company = get(user, 'company._id');
-          if (this.course.type === INTRA && !this.newLearner.company) this.newLearner.company = this.course.company._id;
-          if (this.course.type === INTRA && this.newLearner.company !== this.course.company._id) {
-            return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
           }
 
           this.setNewLearner(user);
