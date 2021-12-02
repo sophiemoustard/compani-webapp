@@ -288,9 +288,10 @@ export default {
       await this.refreshCompanies();
     },
     async submitLearnerCreationModal () {
-      this.learnerCreationModalLoading = true;
       this.$v.newLearner.$touch();
       if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+      this.learnerCreationModalLoading = true;
       try {
         if (this.learnerAlreadyExists) {
           const payload = removeEmptyProps(omit(this.newLearner, '_id'));

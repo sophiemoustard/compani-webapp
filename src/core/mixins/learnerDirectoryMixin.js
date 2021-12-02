@@ -3,6 +3,7 @@ import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
 import Users from '@api/Users';
 import { dateDiff, formatDateDiff } from '@helpers/date';
 import { DEFAULT_AVATAR } from '@data/constants';
+import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 export const learnerDirectoryMixin = {
   data () {
@@ -104,11 +105,19 @@ export const learnerDirectoryMixin = {
       }
     },
     async submitLearnerCreationModal () {
-      this.learnerCreationModalLoading = true;
-      await this.createLearner();
-      await this.getLearnerList(this.isClientInterface ? this.company._id : null);
-      this.learnerCreationModal = false;
-      this.learnerCreationModalLoading = false;
+      this.$v.newLearner.$touch();
+      if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+      try {
+        this.learnerCreationModalLoading = true;
+        await this.createLearner();
+        await this.getLearnerList(this.isClientInterface ? this.company._id : null);
+        this.learnerCreationModal = false;
+      } catch (e) {
+        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
+      } finally {
+        this.learnerCreationModalLoading = false;
+      }
     },
   },
 };

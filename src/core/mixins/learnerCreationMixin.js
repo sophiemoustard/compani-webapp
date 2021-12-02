@@ -122,9 +122,6 @@ export const learnerCreationMixin = {
     },
     async createLearner () {
       try {
-        this.$v.newLearner.$touch();
-        if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
-
         const payload = await this.formatUserPayload();
         await Users.create(payload);
         NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
@@ -132,8 +129,8 @@ export const learnerCreationMixin = {
         await this.sendWelcome();
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
+        if (e.status === 409) NotifyNegative(e.data.message);
+        throw e;
       }
     },
     async sendWelcome () {
