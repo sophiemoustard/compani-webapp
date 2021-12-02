@@ -73,13 +73,12 @@ export const learnerCreationMixin = {
 
         this.learnerCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newLearner.local.email });
-        this.learnerAlreadyExists = userInfo.exists;
 
         if (this.isBlendedCourseProfile) {
           if (!userInfo.exists) {
             if (this.course.type === INTRA) this.newLearner.company = this.course.company._id;
 
-            return this.goToCreationStep();
+            return this.goToNextStep();
           }
 
           const user = await Users.getById(userInfo.user._id);
@@ -95,11 +94,12 @@ export const learnerCreationMixin = {
 
           this.setNewLearner(user);
           this.userAlreadyHasCompany = !!get(user, 'company._id');
+          this.learnerAlreadyExists = true;
 
-          return this.goToCreationStep();
+          return this.goToNextStep();
         }
 
-        if (!userInfo.exists) return this.goToCreationStep();
+        if (!userInfo.exists) return this.goToNextStep();
 
         if (this.isClientInterface) {
           if (!get(userInfo, 'user.company') && userInfo.user._id) return this.updateLearner(userInfo.user._id);
@@ -116,17 +116,18 @@ export const learnerCreationMixin = {
         this.learnerCreationModalLoading = false;
       }
     },
-    goToCreationStep () {
+    goToNextStep () {
       this.firstStep = false;
       this.$v.newLearner.$reset();
     },
     async createLearner () {
       try {
         const payload = await this.formatUserPayload();
-        await Users.create(payload);
+        const user = await Users.create(payload);
         NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
 
         await this.sendWelcome();
+        return user._id;
       } catch (e) {
         console.error(e);
         if (e.status === 409) NotifyNegative(e.data.message);

@@ -44,7 +44,7 @@
 
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
       :first-step="firstStep" @next-step="nextStepLearnerCreationModal" display-company
-      :company-options="companyOptions" :disable-company="disableCompany"
+      :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
       :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </div>
 </template>
@@ -293,18 +293,21 @@ export default {
 
       this.learnerCreationModalLoading = true;
       try {
+        let learnerId;
         if (this.learnerAlreadyExists) {
           const payload = removeEmptyProps(omit(this.newLearner, '_id'));
           if (get(payload, 'contact.phone')) {
             payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
           }
           await Users.updateById(this.newLearner._id, payload);
+          learnerId = this.newLearner._id;
           NotifyPositive('Apprenant(e) modifié(e).');
-        } else await this.createLearner();
+        } else learnerId = await this.createLearner();
+
+        await this.getPotentialTrainees();
+        this.newTrainee = learnerId;
         this.learnerCreationModal = false;
         this.traineeAdditionModal = true;
-        this.newTrainee = this.newLearner._id;
-        await this.getPotentialTrainees();
       } catch (error) {
         NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
       } finally {
