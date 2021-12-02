@@ -49,6 +49,7 @@ export const learnerCreationMixin = {
       this.newLearner = { ...clear(this.newLearner) };
       this.$v.newLearner.$reset();
       this.userAlreadyHasCompany = false;
+      this.learnerAlreadyExists = false;
     },
     formatUserPayload () {
       const payload = removeEmptyProps(this.newLearner);
