@@ -33,19 +33,17 @@
       </q-card>
     </div>
 
-    <!-- Trainee addition modal -->
     <trainee-addition-modal v-model="traineeAdditionModal" :new-trainee.sync="newTrainee"
       :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" @submit="addTrainee"
       :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
 
-    <!-- Trainee edition modal -->
     <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee" @submit="updateTrainee"
       @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="$v.editedTrainee" />
 
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
-      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" display-company
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal"
+      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" display-company />
   </div>
 </template>
 
@@ -299,10 +297,13 @@ export default {
           if (get(payload, 'contact.phone')) {
             payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
           }
+
           await Users.updateById(this.newLearner._id, payload);
           learnerId = this.newLearner._id;
           NotifyPositive('Apprenant(e) modifié(e).');
-        } else learnerId = await this.createLearner();
+        } else {
+          learnerId = await this.createLearner();
+        }
 
         await this.getPotentialTrainees();
         this.newTrainee = learnerId;

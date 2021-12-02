@@ -57,14 +57,15 @@ export const learnerCreationMixin = {
       return this.isClientInterface ? { ...payload, company: this.company._id } : payload;
     },
     setNewLearner (user) {
-      if (get(user, 'company._id')) this.newLearner.company = get(user, 'company._id');
-      if (this.course.type === INTRA && !this.newLearner.company) this.newLearner.company = this.course.company._id;
       this.newLearner._id = user._id;
       this.newLearner.identity = {
         firstname: get(user, 'identity.firstname'),
         lastname: get(user, 'identity.lastname'),
       };
       this.newLearner.contact = { phone: get(user, 'contact.phone') };
+
+      if (get(user, 'company._id')) this.newLearner.company = get(user, 'company._id');
+      else if (this.course.type === INTRA) this.newLearner.company = this.course.company._id;
     },
     async nextStepLearnerCreationModal () {
       try {
