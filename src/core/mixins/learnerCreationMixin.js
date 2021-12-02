@@ -59,9 +59,6 @@ export const learnerCreationMixin = {
     setNewLearner (user) {
       if (get(user, 'company._id')) this.newLearner.company = get(user, 'company._id');
       if (this.course.type === INTRA && !this.newLearner.company) this.newLearner.company = this.course.company._id;
-      if (this.course.type === INTRA && this.newLearner.company !== this.course.company._id) {
-        return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
-      }
       this.newLearner._id = user._id;
       this.newLearner.identity = {
         firstname: get(user, 'identity.firstname'),
@@ -77,15 +74,14 @@ export const learnerCreationMixin = {
         this.learnerCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newLearner.local.email });
         this.learnerAlreadyExists = userInfo.exists;
-        if (!userInfo.exists) {
-          if (this.isBlendedCourseProfile) {
-            if (this.course.type === INTRA) this.newLearner.company = this.course.company._id;
-          }
-
-          return this.goToCreationStep();
-        }
 
         if (this.isBlendedCourseProfile) {
+          if (!userInfo.exists) {
+            if (this.course.type === INTRA) this.newLearner.company = this.course.company._id;
+
+            return this.goToCreationStep();
+          }
+
           const user = await Users.getById(userInfo.user._id);
 
           const isHelperOrAuxiliaryWithoutCompany = ['helper', 'auxiliary_without_company']
@@ -93,12 +89,17 @@ export const learnerCreationMixin = {
           if (isHelperOrAuxiliaryWithoutCompany && this.course.type === INTRA) {
             return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
           }
+          if (this.course.type === INTRA && get(user, 'company._id') && user.company._id !== this.course.company._id) {
+            return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+          }
 
           this.setNewLearner(user);
           this.userAlreadyHasCompany = !!get(user, 'company._id');
 
           return this.goToCreationStep();
         }
+
+        if (!userInfo.exists) return this.goToCreationStep();
 
         if (this.isClientInterface) {
           if (!get(userInfo, 'user.company') && userInfo.user._id) return this.updateLearner(userInfo.user._id);

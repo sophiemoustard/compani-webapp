@@ -66,13 +66,6 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
       }
     },
-    async submitLearnerCreationModal () {
-      this.learnerCreationModalLoading = true;
-      await this.createLearner();
-      await this.getLearnerList(this.isClientInterface ? this.company._id : null);
-      this.learnerCreationModal = false;
-      this.learnerCreationModalLoading = false;
-    },
   },
 };
 </script>
