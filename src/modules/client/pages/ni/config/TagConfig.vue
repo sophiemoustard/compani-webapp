@@ -34,6 +34,7 @@ export default {
         auxiliaryNationality: 'Nationalité',
         auxiliaryBirthCountry: 'Pays de naissance',
         auxiliaryBirthState: 'Département de naissance',
+        auxiliaryBirthCity: 'Ville de naissance',
         auxiliarySSN: 'Numéro de sécurité sociale',
         grossHourlyRate: 'Taux horaire brut',
         monthlyHours: 'Volume d\'heures mensuel (Volume d\'heures hebdomadaire * 4,33)',
@@ -45,7 +46,6 @@ export default {
         initialContractStartDate: 'Date d’effet du contrat initial',
         initialContractMonthlyHours: 'Volume d\'heures mensuel du contrat initial',
         companySIRET: 'SIRET de l\'établissement',
-        auxiliaryBirthCity: 'Ville de naissance',
       },
       mandateTags: {
         customerTitle: 'Civilité',
