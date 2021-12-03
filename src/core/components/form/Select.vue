@@ -14,6 +14,9 @@
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
           @click="$refs['selectInput'].showPopup()" />
       </template>
+    <template #no-option>
+      <slot name="no-option" />
+    </template>
       <template v-if="optionSlot" #option="scope">
         <slot name="option" :scope="scope" />
       </template>

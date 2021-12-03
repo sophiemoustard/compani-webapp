@@ -1,38 +1,14 @@
 import escapeRegExp from 'lodash/escapeRegExp';
-import get from 'lodash/get';
-import {
-  formatIdentity,
-  sortStrings,
-  removeDiacritics,
-  clear,
-  removeEmptyProps,
-  formatPhoneForPayload,
-} from '@helpers/utils';
+import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
 import Users from '@api/Users';
-import Email from '@api/Email';
 import { dateDiff, formatDateDiff } from '@helpers/date';
-import { TRAINEE, DEFAULT_AVATAR } from '@data/constants';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { required, email, requiredIf } from 'vuelidate/lib/validators';
+import { DEFAULT_AVATAR } from '@data/constants';
+import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 export const learnerDirectoryMixin = {
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
-
     return {
-      isClientInterface,
-      firstStep: true,
-      loading: false,
       searchStr: '',
-      learnerCreationModal: false,
-      learnerCreationModalLoading: false,
-      newLearner: {
-        identity: { firstname: '', lastname: '' },
-        contact: { phone: '' },
-        local: { email: '' },
-        company: '',
-      },
       tableLoading: false,
       learnerList: [],
       pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
@@ -77,16 +53,6 @@ export const learnerDirectoryMixin = {
           sort: (a, b) => b - a,
         },
       ],
-    };
-  },
-  validations () {
-    return {
-      newLearner: {
-        identity: { lastname: { required } },
-        local: { email: { required, email } },
-        contact: { phone: { required, frPhoneNumber } },
-        company: { required: requiredIf(() => !this.isClientInterface) },
-      },
     };
   },
   computed: {
@@ -138,75 +104,19 @@ export const learnerDirectoryMixin = {
         this.tableLoading = false;
       }
     },
-    resetLearnerCreationModal () {
-      this.firstStep = true;
-      this.newLearner = { ...clear(this.newLearner) };
-      this.$v.newLearner.$reset();
-    },
-    formatUserPayload () {
-      const payload = removeEmptyProps(this.newLearner);
-      if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
+    async submitLearnerCreationModal () {
+      this.$v.newLearner.$touch();
+      if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-      return this.isClientInterface ? { ...payload, company: this.company._id } : payload;
-    },
-    async nextStepLearnerCreationModal () {
-      try {
-        this.$v.newLearner.$touch();
-        if (this.$v.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
-
-        this.learnerCreationModalLoading = true;
-        const userInfo = await Users.exists({ email: this.newLearner.local.email });
-
-        if (!userInfo.exists) return this.goToCreationStep();
-
-        if (this.isClientInterface) {
-          if (!get(userInfo, 'user.company') && userInfo.user._id) return this.updateLearner(userInfo.user._id);
-          if (get(userInfo, 'user.company') !== this.company._id) {
-            return NotifyNegative('L\'apprenant(e) n\'est pas relié(e) à cette structure.');
-          }
-        }
-
-        NotifyWarning('L\'apprenant(e) est déjà ajouté(e).');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
-      } finally {
-        this.learnerCreationModalLoading = false;
-      }
-    },
-    goToCreationStep () {
-      this.firstStep = false;
-      this.$v.newLearner.$reset();
-    },
-    async createLearner () {
       try {
         this.learnerCreationModalLoading = true;
-        this.$v.newLearner.$touch();
-        if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
-
-        const payload = await this.formatUserPayload();
-        await Users.create(payload);
-        NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
-
-        await this.sendWelcome();
-
-        this.learnerCreationModal = false;
+        await this.createLearner();
         await this.getLearnerList(this.isClientInterface ? this.company._id : null);
+        this.learnerCreationModal = false;
       } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
       } finally {
         this.learnerCreationModalLoading = false;
-      }
-    },
-    async sendWelcome () {
-      try {
-        await Email.sendWelcome({ email: this.newLearner.local.email, type: TRAINEE });
-        NotifyPositive('Email envoyé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'envoi du mail.');
       }
     },
   },
