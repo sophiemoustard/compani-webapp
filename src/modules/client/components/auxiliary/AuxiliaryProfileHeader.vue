@@ -186,29 +186,29 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .avatar
-    width: 59px
-    height: 59px
-    border: 1px solid $copper-grey-400
+<style lang="sass" scoped>
+.avatar
+  width: 59px
+  height: 59px
+  border: 1px solid $copper-grey-400
 
-  .send-message-link
-    color: $primary
-    cursor: pointer
-    &:hover
-      text-decoration: underline
+.send-message-link
+  color: $primary
+  cursor: pointer
+  &:hover
+    text-decoration: underline
 
-  .chip-icon
-    height: 14px
-    position: absolute
-    right: 5px
-    top: -4px
-    width: 14px
-    border-radius: 50%
-    background: white
+.chip-icon
+  height: 14px
+  position: absolute
+  right: 5px
+  top: -4px
+  width: 14px
+  border-radius: 50%
+  background: white
 
-  .custom-justify-end
-    justify-content: flex-end
-    @media screen and (max-width: 767px)
-      justify-content: center
+.custom-justify-end
+  justify-content: flex-end
+  @media screen and (max-width: 767px)
+    justify-content: center
 </style>
