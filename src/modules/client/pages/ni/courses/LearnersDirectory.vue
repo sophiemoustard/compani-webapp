@@ -19,7 +19,7 @@
       <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
       :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" />
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </q-page>
 </template>
 
@@ -32,6 +32,7 @@ import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
+import { learnerCreationMixin } from '@mixins/learnerCreationMixin';
 
 export default {
   metaInfo: { title: 'Répertoire apprenants' },
@@ -41,7 +42,7 @@ export default {
     'ni-table-list': TableList,
     'learner-creation-modal': LearnerCreationModal,
   },
-  mixins: [userMixin, learnerDirectoryMixin],
+  mixins: [userMixin, learnerDirectoryMixin, learnerCreationMixin],
   async created () {
     await this.getLearnerList(this.company._id);
   },

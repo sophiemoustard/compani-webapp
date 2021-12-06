@@ -51,7 +51,7 @@ export default {
       return formatAndSortIdentityOptions(this.course.trainees);
     },
     dateOptions () {
-      const dateOptionsSet = new Set([...this.course.slots.map(date => moment(date.startDate).startOf('d').toDate())]);
+      const dateOptionsSet = new Set(this.course.slots.map(date => moment(date.startDate).startOf('d').toISOString()));
 
       return [...dateOptionsSet].map(date => ({ value: new Date(date), label: formatDate(date) }));
     },

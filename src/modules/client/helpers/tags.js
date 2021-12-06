@@ -32,6 +32,8 @@ export const getContractTags = (data) => {
     uploadDate: formatDate(Date.now()),
     initialContractStartDate: get(data, 'contract.startDate') ? formatDate(data.contract.startDate) : '',
     initialContractMonthlyHours: get(data, 'contract.versions[0]') ? getMonthlyHours(data.contract.versions[0]) : '',
+    companySIRET: get(data, 'user.establishment.siret') || '',
+    auxiliaryBirthCity: get(data, 'user.identity.birthCity') || '',
   };
 };
 

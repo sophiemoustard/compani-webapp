@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: '@babel/eslint-parser',
     sourceType: 'module',
   },
   env: { browser: true },
@@ -32,6 +32,8 @@ module.exports = {
     'vue/html-indent': 0,
     'vue/html-closing-bracket-newline': 0,
     'arrow-parens': [2, 'as-needed', { requireForBlockBody: true }],
+    'vue/first-attribute-linebreak': 0,
+    'vue/multi-word-component-names': 0,
     // Un-used AirBnb rules
     'no-param-reassign': 0,
     'import/no-extraneous-dependencies': 0,

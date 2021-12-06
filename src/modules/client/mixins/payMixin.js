@@ -210,6 +210,7 @@ export const payMixin = {
       periodOptions: [
         { label: 'Mois en cours', value: 0 },
         { label: 'Mois précédent', value: 1 },
+        { label: 'Mois M - 2', value: 2 },
       ],
       dates: {
         startDate: moment().startOf('M').toISOString(),
@@ -320,7 +321,7 @@ export const payMixin = {
         ]);
       }
 
-      return downloadCsv(csvData, `Paie_${moment().format('MM_YYYY')}.csv`);
+      return downloadCsv(csvData, `Paie_${moment(this.dates.startDate).format('MM_YYYY')}.csv`);
     },
     async exportTxt (type) {
       try {

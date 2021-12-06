@@ -19,7 +19,8 @@
     <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
       :first-step="firstStep" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" display-company />
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal"
+      display-company />
   </q-page>
 </template>
 
@@ -30,6 +31,7 @@ import Companies from '@api/Companies';
 import { formatAndSortOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
+import { learnerCreationMixin } from '@mixins/learnerCreationMixin';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 
 export default {
@@ -40,7 +42,7 @@ export default {
     'ni-table-list': TableList,
     'learner-creation-modal': LearnerCreationModal,
   },
-  mixins: [userMixin, learnerDirectoryMixin],
+  mixins: [userMixin, learnerDirectoryMixin, learnerCreationMixin],
   data () {
     return {
       companyOptions: [],
