@@ -25,7 +25,7 @@ import {
   OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
-import { frAddress, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { frAddress, maxDate, positiveNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
@@ -137,6 +137,13 @@ export const planningActionMixin = {
           required: requiredIf(item => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
         },
         kmDuringEvent: { positiveNumber },
+      },
+      editedCustomerAbsence: {
+        absenceType: { required },
+        dates: {
+          startDate: { required },
+          endDate: { required, minDate: minDate(this.editedCustomerAbsence?.dates?.startDate) },
+        },
       },
     };
   },

@@ -20,21 +20,24 @@
       @refresh-histories="refreshHistories" @update-event="setEvent" />
 
     <!-- Customer Absence Modal -->
-    <ni-customer-absence-edition-modal :edited-customer-absence="editedCustomerAbsence"
-      :customer-absence-edition-modal="customerAbsenceModal" />
+    <ni-customer-absence-edition-modal :edited-customer-absence.sync="editedCustomerAbsence"
+      :customer-absence-edition-modal="customerAbsenceModal" :validations="$v.editedCustomerAbsence"
+      @close="closeCustomerAbsenceModal" @hide="resetCustomerAbsenceEditionForm"
+      @submit="updateCustomerAbsence" />
   </q-page>
 </template>
 
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import set from 'lodash/set';
 import groupBy from 'lodash/groupBy';
 import Events from '@api/Events';
 import CustomerAbsences from '@api/CustomerAbsences';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
-import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
   INTERVENTION,
   DEFAULT_AVATAR,
@@ -238,7 +241,40 @@ export default {
     },
     // Customer Absence edition
     openCustomerAbsenceModal (event) {
+      const { startDate, endDate } = event;
+      this.editedCustomerAbsence = {
+        ...pick(event, ['_id', 'customer', 'absenceType']),
+        dates: { startDate, endDate },
+      };
       this.customerAbsenceModal = true;
+    },
+    closeCustomerAbsenceModal () {
+      this.customerAbsenceModal = false;
+    },
+    resetCustomerAbsenceEditionForm () {
+      this.$v.editedCustomerAbsence.$reset();
+      this.customerAbsenceModal = false;
+    },
+    formatEditedCustomerAbsence () {
+      const { absenceType, dates } = this.editedCustomerAbsence;
+      return { absenceType, startDate: dates.startDate, endDate: dates.endDate };
+    },
+    async updateCustomerAbsence (value) {
+      try {
+        this.$v.editedCustomerAbsence.$touch();
+        if (this.$v.editedCustomerAbsence.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const payload = this.formatEditedCustomerAbsence();
+        await CustomerAbsences.updateById(this.editedCustomerAbsence._id, payload);
+        NotifyPositive('Absence modifiée');
+
+        this.customerAbsenceModal = false;
+        await this.refresh();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 403) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la modification de l\'absence.');
+      }
     },
     // Filter
     async addElementToFilter (el) {
