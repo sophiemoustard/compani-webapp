@@ -3,7 +3,7 @@
     <ni-planning-manager :events="events" :persons="customers" :person-key="personKey" :can-edit="canEditEvent"
       @update-start-of-week="updateStartOfWeek" @open-edition-modal="openEditionModal" ref="planningManager"
       @open-creation-modal="openCreationModal" @on-drop="updateEventOnDrop" :filters="filters"
-      @refresh="refresh" />
+      @refresh="refresh" @open-customer-absence-edition-modal="openCustomerAbsenceModal" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :new-event="newEvent" :person-key="personKey"
@@ -18,6 +18,10 @@
       @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion"
       :event-histories="editedEventHistories" :histories-loading="historiesLoading"
       @refresh-histories="refreshHistories" @update-event="setEvent" />
+
+    <!-- Customer Absence Modal -->
+    <ni-customer-absence-edition-modal :edited-customer-absence="editedCustomerAbsence"
+      :customer-absence-edition-modal="customerAbsenceModal" />
   </q-page>
 </template>
 
@@ -48,6 +52,7 @@ import { planningActionMixin } from 'src/modules/client/mixins/planningActionMix
 import Planning from 'src/modules/client/components/planning/Planning';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
+import CustomerAbsenceEditionModal from 'src/modules/client/components/planning/CustomerAbsenceEditionModal';
 
 export default {
   name: 'CustomerPlanning',
@@ -57,6 +62,7 @@ export default {
     'ni-event-creation-modal': EventCreationModal,
     'ni-event-edition-modal': EventEditionModal,
     'ni-planning-manager': Planning,
+    'ni-customer-absence-edition-modal': CustomerAbsenceEditionModal,
   },
   props: {
     targetedCustomerId: { type: String, default: '' },
@@ -78,6 +84,9 @@ export default {
       // Event edition
       editedEvent: {},
       editionModal: false,
+      // Customer Absence edition
+      editedCustomerAbsence: {},
+      customerAbsenceModal: false,
       personKey: CUSTOMER,
       sectorCustomers: [],
     };
@@ -226,6 +235,10 @@ export default {
       const { path, value } = payload;
       if (this.creationModal) set(this.newEvent, path, value);
       else if (this.editionModal) set(this.editedEvent, path, value);
+    },
+    // Customer Absence edition
+    openCustomerAbsenceModal (event) {
+      this.customerAbsenceModal = true;
     },
     // Filter
     async addElementToFilter (el) {
