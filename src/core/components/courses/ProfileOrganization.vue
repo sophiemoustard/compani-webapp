@@ -190,7 +190,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .profile-container
     display: flex
     flex-direction: column

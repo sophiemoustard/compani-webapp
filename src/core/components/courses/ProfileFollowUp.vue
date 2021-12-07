@@ -71,17 +71,17 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .global-view
-  height: 100%;
+  height: 100%
   &-container
     @media screen and (min-width: $breakpoint-sm-max)
-      padding-right: 16px;
+      padding-right: 16px
 
 .line-chart-container
   @media screen and (max-width: $breakpoint-sm-max)
-    margin-top: 16px;
+    margin-top: 16px
 
 .learners-data
-  flex: 1;
+  flex: 1
 </style>

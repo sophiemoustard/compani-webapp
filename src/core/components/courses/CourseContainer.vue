@@ -46,14 +46,14 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .course-container
   padding: 10px
   border-radius: 3px
   &:not(:first-child)
-    margin-left: 10px;
+    margin-left: 10px
   &:not(:last-child)
-    margin-right: 10px;
+    margin-right: 10px
   @media screen and (min-width: 768px)
     width: 33%
   @media screen and (max-width: 767px)

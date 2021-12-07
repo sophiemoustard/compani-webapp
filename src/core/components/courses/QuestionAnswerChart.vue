@@ -43,7 +43,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .card
   padding: 16px 32px
 
@@ -59,7 +59,7 @@ export default {
   display: flex
   align-items: center
 
-/deep/ .q-linear-progress__track
+::v-deep .q-linear-progress__track
   opacity: 0
 
 .bar-label

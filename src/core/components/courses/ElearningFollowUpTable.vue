@@ -126,11 +126,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .progress
     width: 100%
   .name
-    width: fit-content;
+    width: fit-content
   .cliquable-name
     text-decoration: underline
     color: $primary
