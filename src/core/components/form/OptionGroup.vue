@@ -35,17 +35,17 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .required::after
     content: ' *'
-  /deep/.q-option-group
+  ::v-deep .q-option-group
     color: $copper-grey-700 !important
     .q-radio
       padding: 10px 0 !important
       .q-radio__label
         font-size: 15px
 
-  /deep/ .q-field__control
+  ::v-deep .q-field__control
     min-height: 25px !important
     border: 0
 </style>

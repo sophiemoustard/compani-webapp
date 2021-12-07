@@ -123,7 +123,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .input-file-container
     padding: 6px 10px
     .input-file-empty
@@ -140,6 +140,6 @@ export default {
     font-size: 11px
     padding-top: 3px
 
-  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
     color: $copper-grey-900
 </style>

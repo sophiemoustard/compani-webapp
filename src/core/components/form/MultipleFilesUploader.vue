@@ -100,13 +100,13 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .doc-actions
     .q-btn
       @media screen and (max-width: 767px)
         margin: 0px 4px
 
-  /deep/ .q-item__section--side
+  ::v-deep .q-item__section--side
     .q-icon
       size: 1em
       color: $primary

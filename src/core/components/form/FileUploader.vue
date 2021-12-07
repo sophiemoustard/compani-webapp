@@ -117,8 +117,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-
+<style lang="sass" scoped>
   .files-container
     width: 100%
     background-color: white
@@ -129,21 +128,21 @@ export default {
   .doc-thumbnail
     padding: 13px 0px 40px 12px
 
-  /deep/ .q-field__control
+  ::v-deep .q-field__control
     height: 40px
     min-height: 40px
     border: 0
 
-  /deep/ .q-uploader__header
+  ::v-deep .q-uploader__header
     border-radius: 4px
 
-  /deep/ .q-field__append
+  ::v-deep .q-field__append
     display: none
-  /deep/ .q-field__bottom
+  ::v-deep .q-field__bottom
       color: $secondary
       padding-top: 3px
 
-  /deep/ .q-uploader
+  ::v-deep .q-uploader
     width: 100%
     &--bordered
       border: 1px solid $copper-grey-300
