@@ -19,6 +19,9 @@
             </q-item-section>
           </q-item>
         </template>
+        <template slot="no-option">
+           <ni-button color="primary" icon="add" label="Créer un nouveau compte" @click="openLearnerCreationModal" />
+        </template>
       </ni-select>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add" color="primary"
@@ -30,6 +33,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 import { userMixin } from '@mixins/userMixin';
 
 export default {
@@ -45,6 +49,7 @@ export default {
   components: {
     'ni-modal': Modal,
     'ni-select': Select,
+    'ni-button': Button,
   },
   methods: {
     hide () {
@@ -58,6 +63,9 @@ export default {
     },
     update (event) {
       this.$emit('update:newTrainee', event);
+    },
+    openLearnerCreationModal () {
+      this.$emit('open-learner-creation-modal');
     },
   },
 };

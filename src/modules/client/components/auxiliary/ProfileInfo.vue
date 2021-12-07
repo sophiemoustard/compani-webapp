@@ -7,8 +7,8 @@
         @blur="updateUser('mentor')" />
       <ni-select v-model="userProfile.role.client._id" caption="Rôle" :options="auxiliaryRolesOptions"
         @focus="saveTmp('role.client._id')" @blur="updateUser('role.client._id')" />
-      <ni-select v-model="userProfile.establishment" caption="Établissement" :options="establishmentsOptions"
-        @focus="saveTmp('establishment')" @blur="updateUser('establishment')"
+      <ni-select v-model="userProfile.establishment._id" caption="Établissement" :options="establishmentsOptions"
+        @focus="saveTmp('establishment')" @blur="updateUser('establishment._id')"
         :error="$v.userProfile.establishment.$error" :error-message="REQUIRED_LABEL" option-disable="inactive" />
     </div>
     <div class="q-mb-xl">
@@ -380,7 +380,7 @@ export default {
             fullAddress: { required, frAddress },
           },
         },
-        establishment: { required },
+        establishment: { _id: { required } },
         administrative: {
           identityDocs: { required },
           emergencyContact: {
@@ -537,6 +537,7 @@ export default {
 
         const payload = set({}, path, value);
         if (path === 'role.client._id') payload.role = value;
+        if (path === 'establishment._id') payload.establishment = value;
         if (path.match(/birthCountry/i) && value !== 'FR') payload.identity.birthState = '99';
 
         await Users.updateById(this.userProfile._id, payload);

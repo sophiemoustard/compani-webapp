@@ -115,7 +115,7 @@
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
-      <template slot="title" data-cy="service-name">
+      <template slot="title">
         Historique de la souscription <span class="text-weight-bold">{{ selectedSubscription.service &&
           selectedSubscription.service.name }}</span>
       </template>

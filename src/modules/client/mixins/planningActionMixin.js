@@ -187,7 +187,13 @@ export const planningActionMixin = {
           extension: '',
           address: {},
           attachment: {},
-          ...(type === ABSENCE && { absenceNature: DAILY }),
+          ...(type === ABSENCE && {
+            absenceNature: DAILY,
+            dates: {
+              startDate: moment(this.newEvent.dates.startDate).startOf('d').toISOString(),
+              endDate: moment(this.newEvent.dates.endDate).endOf('d').toISOString(),
+            },
+          }),
         };
       }
     },
@@ -371,6 +377,7 @@ export const planningActionMixin = {
         sector,
         transportMode,
         kmDuringEvent,
+        misc,
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
@@ -379,7 +386,7 @@ export const planningActionMixin = {
         case INTERVENTION: {
           this.editedEvent = {
             isCancelled: false,
-            cancel: {},
+            cancel: { condition: '', reason: '' },
             shouldUpdateRepetition: false,
             ...eventData,
             dates,
@@ -391,6 +398,7 @@ export const planningActionMixin = {
             address,
             transportMode: transportMode || '',
             kmDuringEvent: kmDuringEvent || 0,
+            misc,
           };
           break;
         }
@@ -402,13 +410,14 @@ export const planningActionMixin = {
             auxiliary: auxiliary._id,
             internalHour: internalHour._id,
             dates,
+            misc,
           };
           break;
         case ABSENCE:
-          this.editedEvent = { address: {}, attachment: {}, ...eventData, auxiliary: auxiliary._id, dates };
+          this.editedEvent = { address: {}, attachment: {}, ...eventData, auxiliary: auxiliary._id, dates, misc };
           break;
         case UNAVAILABILITY:
-          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, dates };
+          this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, dates, misc };
           break;
       }
     },
