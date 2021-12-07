@@ -156,23 +156,23 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .q-chip
-    cursor: pointer
-  .q-tab-panel
-    padding: 0;
-  .q-tabs
-    margin: 0px 24px;
-  .q-tab
-    text-transform: none
-    padding: 3px 0
-    display: flex
-    justify-content: flex-start
-  /deep/ .q-hoverable:hover > .q-focus-helper
-    background: none !important
-  /deep/ .q-ripple
-    display: none
+<style lang="sass" scoped>
+.q-chip
+  cursor: pointer
+.q-tab-panel
+  padding: 0
+.q-tabs
+  margin: 0px 24px
+.q-tab
+  text-transform: none
+  padding: 3px 0
+  display: flex
+  justify-content: flex-start
+::v-deep .q-hoverable:hover > .q-focus-helper
+  background: none !important
+::v-deep .q-ripple
+  display: none
 
-  .person-name.modal
-    font-size: 14px !important
+.person-name.modal
+  font-size: 14px !important
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="planning-container full-width full-height">
-    <table class="agenda-table full-height">
+    <table class="planning-table full-height">
       <thead>
         <th class="capitalize bottom-border" v-for="(day, index) in daysHeader" :key="index">
           <div class="row justify-center items-baseline days-header">
@@ -141,63 +141,57 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .agenda-table
-    th
-      @media screen and (min-width: 768px)
-        top: 85px
-      @media screen and (max-width: 767px)
-        top: 100px
-    td
-      padding: 0px
+<style lang="sass" scoped>
+.planning-table
+  th
+    @media screen and (min-width: 768px)
+      top: 85px
+    @media screen and (max-width: 767px)
+      top: 100px
+  td
+    padding: 0px
+    height: 100%
+
+    .planning-background
+      background-image: repeating-linear-gradient(180deg, white, white 13.1%, $copper-grey-100, $copper-grey-100 13.3%)
       height: 100%
+      position: relative
+      margin-top: 2px
+      display: list-item
+      list-style: none
 
-      .planning-background
-        background: repeating-linear-gradient(
-          180deg,
-          white,
-          white 13.1%,
-          $copper-grey-100,
-          $copper-grey-100 13.3%
-        )
-        height: 100%
-        position: relative
-        margin-top: 2px
-        display: list-item
-        list-style: none
+    .event
+      position: absolute
+      left: 3px
+      right: 3px
+      margin: 0
+      border: 1px solid white
+      overflow: hidden
+      padding-top: 0
+      padding-bottom: 0
+      &-container
+        height: auto
 
-      .event
-        position: absolute
-        left: 3px
-        right: 3px
-        margin: 0
-        border: 1px solid white
-        overflow: hidden
-        padding-top: 0
-        padding-bottom: 0
-        &-container
-          height: auto
+    .planning-hour
+      position: absolute
+      color: $copper-grey-300
+      font-size: 12px
+      padding: 0 5px
 
-      .planning-hour
-        position: absolute
-        color: $copper-grey-300
-        font-size: 12px
-        padding: 0 5px
-
-      .event-number
-        border-radius: 50%
-        width: 16px
-        height: 16px
-        border: 1px solid $primary
-        text-align: center
-        background-color: white
-        position: absolute
-        bottom: 0
-        right: 0
-        &-label
-          line-height: 1
-          color: $primary
-          font-size: 14px
+    .event-number
+      border-radius: 50%
+      width: 16px
+      height: 16px
+      border: 1px solid $primary
+      text-align: center
+      background-color: white
+      position: absolute
+      bottom: 0
+      right: 0
+      &-label
+        line-height: 1
+        color: $primary
+        font-size: 14px
 
 thead
   vertical-align: baseline

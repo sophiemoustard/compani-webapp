@@ -95,21 +95,21 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .planning-history-button
-    display: flex;
-    align-items: center;
+<style lang="sass" scoped>
+.planning-history-button
+  display: flex
+  align-items: center
 
-  .planning-month
-    align-items: center
+.planning-month
+  align-items: center
 
-  .week-number
-    font-size: 12px
-    border: solid 1px
-    display: flex
-    height: 20px
-    width: 20px
-    border-radius: 50%
-    align-content: center
-    justify-content: center
+.week-number
+  font-size: 12px
+  border: solid 1px
+  display: flex
+  height: 20px
+  width: 20px
+  border-radius: 50%
+  align-content: center
+  justify-content: center
 </style>

@@ -1,5 +1,5 @@
 .event
-  z-index: 1;
+  z-index: 1
   user-select: none
   border-radius: 2px
   padding: 6px 4px
@@ -20,10 +20,10 @@
     font-size: 0.6875rem
     color: $copper-grey-800
   &-billed
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: fit-content;
+    position: absolute
+    right: 0
+    bottom: 0
+    width: fit-content
   &-intervention
     background: $copper-100
   &-internal_hour
@@ -33,38 +33,25 @@
   &-customer_absence
     background: $copper-grey-100
   &-unavailability
-    background: repeating-linear-gradient(
-      45deg,
-      $copper-grey-100,
-      $copper-grey-100 3px,
-      white 3px,
-      white 7px
-    )
+    background: repeating-linear-gradient(45deg, $copper-grey-100, $copper-grey-100 3px, white 3px, white 7px)
   &-cancelled
-    background: repeating-linear-gradient(
-      45deg,
-      $copper-100,
-      $copper-100 3px,
-      white 3px,
-      white 7px
-    )
+    background: repeating-linear-gradient(45deg, $copper-100, $copper-100 3px, white 3px, white 7px)
 
 .planning-table
-.agenda-table
   width: 100%
-  border-collapse: collapse;
-  table-layout: fixed;
-  border-style: hidden;
+  border-collapse: collapse
+  table-layout: fixed
+  border-style: hidden
 
   td
     border-left: 1px solid $copper-grey-300
     border-right: 1px solid $copper-grey-300
-    padding: 0px 5px 5px 5px;
+    padding: 0px 5px 5px 5px
   tr:not(:first-child)
     td:before
-      content: '';
-      display: block;
-      width: 98%;
+      content: ''
+      display: block
+      width: 98%
       border-bottom: 1px solid $copper-grey-300
 
   .days
@@ -72,8 +59,8 @@
       padding: 8px 0px 8px 0px
       width: 100%
       @media screen and (max-width: 767px)
-        flex-direction: column;
-        align-items: center;
+        flex-direction: column
+        align-items: center
     &-name
       font-size: 1.125rem
       color: $copper-grey-500
@@ -87,12 +74,12 @@
     color: white
 
 .planning
-  padding-left: 30px;
+  padding-left: 30px
   @media screen and (max-width: $breakpoint-sm-max)
-    padding-left: 0px;
+    padding-left: 0px
   &-container
-    background: white;
-    padding: 0 5px;
+    background: white
+    padding: 0 5px
     th
       background-color: white
       position: -webkit-sticky
@@ -101,10 +88,10 @@
       &:not(:first-child):before
         content: ''
         position: absolute
-        left: 0;
-        bottom: 0;
-        top: 6px;
-        border-right: 1px solid $copper-grey-300;
+        left: 0
+        bottom: 0
+        top: 6px
+        border-right: 1px solid $copper-grey-300
     .bottom-border
       &:after
         content: ''
@@ -112,7 +99,7 @@
         left: 6px
         right: 6px
         bottom: 0
-        border-bottom: 1px solid $copper-grey-300;
+        border-bottom: 1px solid $copper-grey-300
   &-header
     font-size: 1.2em
     position: -webkit-sticky

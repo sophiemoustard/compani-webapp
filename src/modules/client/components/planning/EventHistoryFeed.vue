@@ -49,15 +49,15 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .loading
-    width: 100%
-    height: 30px
-    display: flex
-    justify-content: center
-    margin: 10px 0
+<style lang="sass" scoped>
+.loading
+  width: 100%
+  height: 30px
+  display: flex
+  justify-content: center
+  margin: 10px 0
 
-  .scroll-container
-    height: 95%
-    overflow: auto
+.scroll-container
+  height: 95%
+  overflow: auto
 </style>

@@ -11,17 +11,8 @@ module.exports = function (ctx) {
       'vueclipboard',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
-    css: [
-      'app.styl',
-      'colors.styl',
-      'colors.sass',
-    ],
-    extras: [
-      'material-icons',
-      'mdi-v3',
-      'ionicons-v4',
-      'fontawesome-v5',
-    ],
+    css: ['app.sass', 'colors.styl', 'colors.sass'],
+    extras: ['material-icons', 'mdi-v3', 'ionicons-v4', 'fontawesome-v5'],
     framework: {
       all: false,
       lang: 'fr',
@@ -83,22 +74,10 @@ module.exports = function (ctx) {
         'QToggle',
         'QUploader',
       ],
-      directives: [
-        'Ripple',
-        'ClosePopup',
-      ],
-      plugins: [
-        'Notify',
-        'Cookies',
-        'Loading',
-        'Dialog',
-        'LocalStorage',
-      ],
+      directives: ['Ripple', 'ClosePopup'],
+      plugins: ['Notify', 'Cookies', 'Loading', 'Dialog', 'LocalStorage'],
     },
-    animations: [
-      'fadeIn',
-      'fadeOut',
-    ],
+    animations: ['fadeIn', 'fadeOut'],
     supportIE: true,
     build: {
       scopeHoisting: true,

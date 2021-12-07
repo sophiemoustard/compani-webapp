@@ -348,20 +348,20 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .modal-subtitle
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
+<style lang="sass" scoped>
+.modal-subtitle
+  display: flex
+  justify-content: space-between
+  margin-bottom: 16px
 
-  .light-checkbox
-    color: $copper-grey-400
-    font-size: 14px
+.light-checkbox
+  color: $copper-grey-400
+  font-size: 14px
 
-  .infos
-    font-style: italic;
-    color: $copper-grey-400;
+.infos
+  font-style: italic
+  color: $copper-grey-400
 
-  .history-list-title
-    font-size: 14px
+.history-list-title
+  font-size: 14px
 </style>
