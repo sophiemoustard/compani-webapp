@@ -74,6 +74,7 @@ export const courseMixin = {
     getValue (path) {
       if (path === 'trainer') return get(this.course, 'trainer._id', '');
       if (path === 'salesRepresentative') return get(this.course, 'salesRepresentative._id', '');
+      if (path === 'contact') return get(this.course, 'contact._id', '');
 
       return get(this.course, path);
     },

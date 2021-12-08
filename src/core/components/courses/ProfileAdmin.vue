@@ -3,14 +3,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
-          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error" :disable="isArchived" />
-        <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')" :disable="isArchived"
-          @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
-          :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
-        <ni-input caption="Email" v-model.trim="course.contact.email" :disable="isArchived"
-          @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
-          :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
+        <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" caption="Contact"
+          :options="contactOptions" @focus="saveTmp('contact')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -74,30 +68,44 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required, email } from 'vuelidate/lib/validators';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import Input from '@components/form/Input';
+import Users from '@api/Users';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
 import Button from '@components/Button';
+import Select from '@components/form/Select';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import BiColorButton from '@components/BiColorButton';
-import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
-import { formatQuantity, formatIdentity, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import {
+  CONVOCATION,
+  REMINDER,
+  REQUIRED_LABEL,
+  COACH,
+  CLIENT_ADMIN,
+  TRAINER,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
+  INTRA,
+} from '@data/constants';
+import {
+  formatQuantity,
+  formatIdentity,
+  readAPIResponseWithTypeArrayBuffer,
+  formatAndSortIdentityOptions,
+} from '@helpers/utils';
 import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
 import { downloadFile, downloadZip } from '@helpers/file';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileAdmin',
   components: {
-    'ni-input': Input,
     'ni-button': Button,
     'sms-sending-modal': SmsSendingModal,
     'sms-details-modal': SmsDetailsModal,
@@ -105,6 +113,7 @@ export default {
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
     'ni-bi-color-button': BiColorButton,
+    'ni-select': Select,
   },
   mixins: [courseMixin],
   props: {
@@ -139,21 +148,15 @@ export default {
       smsHistory: { missingPhones: [] },
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
+      contactOptions: [],
     };
   },
   async created () {
-    await Promise.all([this.refreshCourse(), this.refreshSms()]);
+    await Promise.all([this.refreshCourse(), this.refreshSms(), this.refreshContacts()]);
     this.setDefaultMessageType();
   },
   validations () {
     return {
-      course: {
-        contact: {
-          name: { required },
-          phone: { required, frPhoneNumber },
-          email: { email },
-        },
-      },
       newSms: { content: { required }, type: { required } },
     };
   },
@@ -252,6 +255,20 @@ export default {
         console.error(e);
       } finally {
         this.courseLoading = false;
+      }
+    },
+    async refreshContacts () {
+      try {
+        const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+
+        let clientUsersFromCompany = [];
+        if (this.course.type === INTRA) {
+          clientUsersFromCompany = await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id });
+        }
+
+        this.contactOptions = Object.freeze(formatAndSortIdentityOptions([...vendorUsers, ...clientUsersFromCompany]));
+      } catch (e) {
+        console.error(e);
       }
     },
     openSmsHistoriesModal (smsId) {
