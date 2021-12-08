@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
@@ -68,22 +69,17 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newCourseSlot', { ...this.newCourseSlot, [prop]: event });
+      this.$emit('update:newCourseSlot', set(this.newCourseSlot, prop, event));
     },
     getType (step) {
       return step ? this.stepOptions.find(option => option.value === step).type : '';
     },
     updateStep (step) {
       const type = this.getType(step);
-      this.$emit(
-        'update:newCourseSlot',
-        {
-          ...this.newCourseSlot,
-          step,
-          ...(type !== REMOTE && { meetingLink: '' }),
-          ...(type !== ON_SITE && { address: {} }),
-        }
-      );
+      let courseSlot = set(this.newCourseSlot, 'step', step);
+      if (type !== REMOTE) courseSlot = set(courseSlot, 'meetingLink', '');
+      if (type !== ON_SITE) courseSlot = set(courseSlot, 'address', {});
+      this.$emit('update:newCourseSlot', set(courseSlot, 'step', step));
     },
   },
 };

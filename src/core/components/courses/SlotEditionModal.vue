@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
@@ -86,22 +87,17 @@ export default {
       this.$emit('delete', slotId);
     },
     update (event, prop) {
-      this.$emit('update:editedCourseSlot', { ...this.editedCourseSlot, [prop]: event });
+      this.$emit('update:editedCourseSlot', set(this.editedCourseSlot, prop, event));
     },
     getType (step) {
       return step ? this.stepOptions.find(option => option.value === step).type : '';
     },
     updateStep (step) {
       const type = this.getType(step);
-      this.$emit(
-        'update:editedCourseSlot',
-        {
-          ...this.editedCourseSlot,
-          step,
-          ...(type !== REMOTE && { meetingLink: '' }),
-          ...(type !== ON_SITE && { address: {} }),
-        }
-      );
+      let courseSlot = set(this.editedCourseSlot, 'step', step);
+      if (type !== REMOTE) courseSlot = set(courseSlot, 'meetingLink', '');
+      if (type !== ON_SITE) courseSlot = set(courseSlot, 'address', {});
+      this.$emit('update:editedCourseSlot', set(courseSlot, 'step', step));
     },
   },
 };
