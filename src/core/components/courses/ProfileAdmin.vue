@@ -3,8 +3,9 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
-        <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" caption="Contact"
-          :options="contactOptions" @focus="saveTmp('contact')" />
+        <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
+          caption="Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation"
+           @focus="saveTmp('contact')" />
       </div>
     </div>
     <div class="q-mb-xl">

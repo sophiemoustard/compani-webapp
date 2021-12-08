@@ -33,9 +33,12 @@ export const courseMixin = {
       if (!this.course.trainer) missingInfo.push('l\'intervenant(e)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
-      if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
-      const phone = get(this.course, 'contact.phone');
-      if (!phone || !frPhoneNumber(phone)) missingInfo.push('le numéro du contact pour la formation');
+
+      if (!get(this.course, 'contact._id')) missingInfo.push('le contact pour la formation');
+      else {
+        const phone = get(this.course, 'contact.contact.phone');
+        if (!phone || !frPhoneNumber(phone)) missingInfo.push('le numéro du contact pour la formation');
+      }
 
       return missingInfo;
     },
