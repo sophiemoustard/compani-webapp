@@ -2,10 +2,10 @@
   <div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact pour la formation</p>
+      <p class="text-italic">Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation</p>
       <div class="row gutter-profile">
         <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
-          caption="Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation"
-           @focus="saveTmp('contact')" />
+          @focus="saveTmp('contact')" :error="IsMissingContactPhone" error-message="numéro de téléphone manquant" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -85,7 +85,6 @@ import BiColorButton from '@components/BiColorButton';
 import {
   CONVOCATION,
   REMINDER,
-  REQUIRED_LABEL,
   COACH,
   CLIENT_ADMIN,
   TRAINER,
@@ -158,8 +157,15 @@ export default {
   },
   validations () {
     return {
+      course: { contact: { contact: { phone: { required } } } },
       newSms: { content: { required }, type: { required } },
     };
+  },
+  watch: {
+    course () {
+      const phoneValidation = get(this.$v, 'course.contact.contact.phone', '');
+      if (phoneValidation) phoneValidation.$touch();
+    },
   },
   computed: {
     ...mapState('course', ['course']),
@@ -179,11 +185,6 @@ export default {
     },
     emailErrorcontact () {
       if (!this.$v.course.contact.email.email) return 'Email non valide';
-      return '';
-    },
-    phoneNbrErrorcontact () {
-      if (this.$v.course.contact.phone.required === false) return REQUIRED_LABEL;
-      if (!this.$v.course.contact.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
       return '';
     },
     filteredMessageTypeOptions () {
@@ -211,6 +212,9 @@ export default {
       const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
 
       return this.followUpDisabled || noPhoneNumber;
+    },
+    IsMissingContactPhone () {
+      return !!get(this.course, 'contact._id') && get(this.$v, 'course.contact.contact.phone.$error');
     },
   },
   methods: {
