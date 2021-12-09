@@ -5,7 +5,8 @@
       <p class="text-italic">Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation</p>
       <div class="row gutter-profile">
         <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
-          @focus="saveTmp('contact')" :error="IsMissingContactPhone" error-message="numéro de téléphone manquant" />
+          @focus="saveTmp('contact')" :error="isMissingContactPhone" error-message="numéro de téléphone manquant"
+          :disable="isArchived" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -183,10 +184,6 @@ export default {
     courseLink () {
       return Courses.getConvocationUrl(this.course._id);
     },
-    emailErrorcontact () {
-      if (!this.$v.course.contact.email.email) return 'Email non valide';
-      return '';
-    },
     filteredMessageTypeOptions () {
       return this.courseNotStartedYet
         ? this.messageTypeOptions
@@ -213,7 +210,7 @@ export default {
 
       return this.followUpDisabled || noPhoneNumber;
     },
-    IsMissingContactPhone () {
+    isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.$v, 'course.contact.contact.phone.$error');
     },
   },

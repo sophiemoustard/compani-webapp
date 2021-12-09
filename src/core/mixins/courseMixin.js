@@ -4,7 +4,6 @@ import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
@@ -35,10 +34,7 @@ export const courseMixin = {
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
 
       if (!get(this.course, 'contact._id')) missingInfo.push('le contact pour la formation');
-      else {
-        const phone = get(this.course, 'contact.contact.phone');
-        if (!phone || !frPhoneNumber(phone)) missingInfo.push('le numéro du contact pour la formation');
-      }
+      else if (!get(this.course, 'contact.contact.phone')) missingInfo.push('le numéro du contact pour la formation');
 
       return missingInfo;
     },
