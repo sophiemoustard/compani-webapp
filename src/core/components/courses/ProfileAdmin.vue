@@ -6,7 +6,7 @@
       <div class="row gutter-profile">
         <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
           @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived"
-          error-message="numéro de téléphone manquant, veuillez le renseigner" />
+          error-message="Numéro de téléphone manquant, veuillez le renseigner" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -263,10 +263,9 @@ export default {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
 
-        let clientUsersFromCompany = [];
-        if (this.course.type === INTRA) {
-          clientUsersFromCompany = await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id });
-        }
+        const clientUsersFromCompany = this.course.type === INTRA
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
+          : [];
 
         this.contactOptions = Object.freeze(formatAndSortIdentityOptions([...vendorUsers, ...clientUsersFromCompany]));
       } catch (e) {
