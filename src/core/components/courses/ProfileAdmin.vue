@@ -5,8 +5,8 @@
       <p class="text-italic">Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation</p>
       <div class="row gutter-profile">
         <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
-          @focus="saveTmp('contact')" :error="isMissingContactPhone" error-message="numéro de téléphone manquant"
-          :disable="isArchived" />
+          @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived"
+          error-message="numéro de téléphone manquant, veuillez le renseigner" />
       </div>
     </div>
     <div class="q-mb-xl">
