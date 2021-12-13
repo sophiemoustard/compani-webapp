@@ -50,7 +50,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .history-list-title
     font-size: 14px
 </style>

@@ -368,11 +368,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .selects
   @media screen and (min-width: 768px) and (max-width: $breakpoint-sm-max)
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 10px
+    padding-right: 10px
   @media screen and (max-width: $breakpoint-sm-max)
-    margin: 0px !important;
+    margin: 0px !important
 </style>

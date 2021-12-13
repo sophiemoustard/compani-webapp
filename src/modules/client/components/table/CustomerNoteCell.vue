@@ -36,8 +36,8 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .lastHistory
-    color: $copper-grey-500
-    font-size: 12px
+<style lang="sass" scoped>
+.lastHistory
+  color: $copper-grey-500
+  font-size: 12px
 </style>

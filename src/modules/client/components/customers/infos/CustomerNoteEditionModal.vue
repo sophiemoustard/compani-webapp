@@ -83,11 +83,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  ::v-deep .bold-title
-    color: $copper-grey-900
-    font-weight: bold
-    font-size: 24px
+<style lang="sass" scoped>
+::v-deep .bold-title
+  color: $copper-grey-900
+  font-weight: bold
+  font-size: 24px
 
 .edit-btn
   display: flex

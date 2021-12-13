@@ -108,7 +108,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   th
     text-align: left
 </style>

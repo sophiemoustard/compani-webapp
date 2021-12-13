@@ -202,7 +202,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .column
     flex-direction: column
 </style>

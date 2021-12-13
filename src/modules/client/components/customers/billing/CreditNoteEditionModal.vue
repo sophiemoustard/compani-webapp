@@ -132,7 +132,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .light
     font-size: 14px
 </style>

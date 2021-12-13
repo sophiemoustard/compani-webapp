@@ -1230,12 +1230,12 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .archived
-    display: flex;
-    align-self: center;
+    display: flex
+    align-self: center
   .billing-item-tag
-    background-color: $copper-100;
-    border-radius: 8px;
-    color: $copper-700;
+    background-color: $copper-100
+    border-radius: 8px
+    color: $copper-700
 </style>

@@ -185,7 +185,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .selects
   justify-content: end
   &-container

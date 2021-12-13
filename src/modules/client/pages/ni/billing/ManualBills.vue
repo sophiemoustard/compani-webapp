@@ -202,7 +202,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .border-top td
   border-width: 1px 0 0 0
 </style>

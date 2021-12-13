@@ -121,7 +121,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .identity
     background-color: inherit
     border: none
@@ -130,5 +130,5 @@ export default {
     outline: none
 
 .person-name
-  font-size: 14px;
+  font-size: 14px
 </style>

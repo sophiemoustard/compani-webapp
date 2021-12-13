@@ -1009,7 +1009,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .table-actions > .q-btn__wrapper
     padding: 0
 
@@ -1026,8 +1026,8 @@ export default {
       margin: 0px
 
   .signedAt
-    /deep/ .q-field--with-bottom
+    ::v-deep .q-field--with-bottom
       padding: 0
-    /deep/ .q-field__bottom
+    ::v-deep .q-field__bottom
       display: none
 </style>

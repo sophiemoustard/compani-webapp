@@ -246,23 +246,23 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .bold
-    font-weight bold;
+    font-weight: bold
 
   .q-table tbody tr:hover
-    background: none;
+    background: none
 
   .download
-    cursor: pointer;
-    color: $primary;
-    text-decoration underline;
+    cursor: pointer
+    color: $primary
+    text-decoration: underline
 
   .disabled
-    cursor: not-allowed;
+    cursor: not-allowed
 
-  /deep/ .q-item
+  ::v-deep .q-item
     .q-item__section
-      padding: 0px;
+      padding: 0px
 
 </style>

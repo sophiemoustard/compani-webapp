@@ -284,7 +284,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .cell-container
     width: 100%
 
@@ -303,7 +303,7 @@ export default {
     margin:  0 10px 10px
     font-size: 14px
 
-  /deep/ .q-layout-header
+  ::v-deep .q-layout-header
     box-shadow: none
 
   .iframe-normal

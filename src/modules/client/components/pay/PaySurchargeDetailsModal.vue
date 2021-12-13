@@ -72,11 +72,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .surcharge-line
     display: flex
     flex-direction: row
-    width: 100%;
+    width: 100%
     border: 1px solid $copper-grey-300
     &:not(:nth-child(2)) // first-child is title
       border-top: none

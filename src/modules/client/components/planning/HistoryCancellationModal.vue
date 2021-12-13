@@ -49,7 +49,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .title
   font-size: 20px
 .banner

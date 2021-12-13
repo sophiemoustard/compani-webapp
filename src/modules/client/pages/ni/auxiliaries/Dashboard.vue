@@ -374,7 +374,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .stats-header
   display: flex
   justify-content: space-between
@@ -424,7 +424,7 @@ export default {
 .customer
   display: flex
   flex-direction: column
-  justify-content: center;
+  justify-content: center
   @media screen and (max-width: 767px)
     margin-top: 8px
   .col-4
@@ -465,5 +465,4 @@ export default {
 
 .person-name
   font-size: 14px !important
-
 </style>

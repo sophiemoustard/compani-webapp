@@ -80,16 +80,16 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .referent-container
-  margin-bottom: 20px;
+  margin-bottom: 20px
 
 .referent-container > div
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 10px
+  margin-top: 10px
 
 .referent-info
-  padding-left: 10px;
+  padding-left: 10px
   display: flex
-  flex-direction: column;
+  flex-direction: column
 </style>

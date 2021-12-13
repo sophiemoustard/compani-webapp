@@ -185,7 +185,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .left-card
   @media screen and (min-width: $breakpoint-md-min)
     padding-right: 16px
@@ -200,10 +200,10 @@ export default {
 
 .line-chart-container
   @media screen and (min-width: $breakpoint-sm-max)
-    padding-right: 16px;
+    padding-right: 16px
 
 .section-title
-  font-size: 24px;
+  font-size: 24px
   color: $copper-grey-900
 .request-container
   flex-direction: row

@@ -118,7 +118,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .sector-label
   color: $copper-grey-400
   font-size: 14px

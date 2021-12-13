@@ -531,18 +531,18 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .add-payment
-    background-color: $primary;
+    background-color: $primary
 
   .title
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: center
+    flex-wrap: wrap
 
   .message
-    font-style: italic;
-    margin: 5px 0;
+    font-style: italic
+    margin: 4px 0
 </style>

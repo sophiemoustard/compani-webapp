@@ -127,11 +127,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .gauge
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+    display: flex
+    align-items: center
+    flex-direction: column
     &-container
       position: relative
     &-limit
@@ -143,11 +143,11 @@ export default {
     overflow: visible
 
   #meter_needle
-    position: absolute;
-    transform-origin: bottom center;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: absolute
+    transform-origin: bottom center
+    bottom: 0
+    left: 0
+    right: 0
     margin: auto
     height: 100%
 </style>
