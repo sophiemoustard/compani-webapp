@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12 margin-input last">
+  <div class="col-12 margin-input">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="hasError" name="error_outline" color="secondary" />

@@ -8,8 +8,9 @@
         </div>
         <ni-select caption="Motif" :value="editedCustomerAbsence.absenceType" :options="customerAbsenceOptions"
           required-field @input="update($event, 'absenceType')" />
-        <ni-datetime-range caption="Dates et heures de l'absence" :value="editedCustomerAbsence.dates" required-field
-          @input="update($event, 'dates')" @blur="validations.dates.$touch" disable-start-hour disable-end-hour />
+        <ni-datetime-range class="last" caption="Dates et heures de l'absence" :value="editedCustomerAbsence.dates"
+          @input="update($event, 'dates')" @blur="validations.dates.$touch" disable-start-hour disable-end-hour
+          required-field />
       </div>
       <q-btn class="modal-btn full-width" no-caps color="primary" :loading="loading" label="Editer l'absence"
         icon-right="check" @click="submit" />
