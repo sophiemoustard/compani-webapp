@@ -359,16 +359,10 @@ export default {
         { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
         { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         {
-          name: 'publicHoliday',
-          label: 'Jour férié',
+          name: 'firstOfJanuary',
+          label: '1er janvier',
           align: 'center',
-          field: row => roundFrenchPercentage(row.publicHoliday, 0),
-        },
-        {
-          name: 'twentyFifthOfDecember',
-          label: '25 décembre',
-          align: 'center',
-          field: row => roundFrenchPercentage(row.twentyFifthOfDecember, 0),
+          field: row => roundFrenchPercentage(row.firstOfJanuary, 0),
         },
         {
           name: 'firstOfMay',
@@ -377,10 +371,16 @@ export default {
           field: row => roundFrenchPercentage(row.firstOfMay, 0),
         },
         {
-          name: 'firstOfJanuary',
-          label: '1er janvier',
+          name: 'twentyFifthOfDecember',
+          label: '25 décembre',
           align: 'center',
-          field: row => roundFrenchPercentage(row.firstOfJanuary, 0),
+          field: row => roundFrenchPercentage(row.twentyFifthOfDecember, 0),
+        },
+        {
+          name: 'publicHoliday',
+          label: 'Jour férié',
+          align: 'center',
+          field: row => roundFrenchPercentage(row.publicHoliday, 0),
         },
         { name: 'evening', label: 'Soirée', align: 'center', field: row => roundFrenchPercentage(row.evening, 0) },
         {
