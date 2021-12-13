@@ -11,7 +11,7 @@ module.exports = function (ctx) {
       'vueclipboard',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
-    css: ['app.sass', 'colors.styl', 'colors.sass'],
+    css: ['app.sass', 'colors.sass'],
     extras: ['material-icons', 'mdi-v3', 'ionicons-v4', 'fontawesome-v5'],
     framework: {
       all: false,

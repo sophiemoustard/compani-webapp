@@ -444,6 +444,7 @@ export default {
   },
 };
 </script>
+
 <style lang="sass" scoped>
 .number
   font-size: 24px
@@ -478,8 +479,7 @@ export default {
         border-bottom: 1px solid $copper-grey-200
         padding-bottom: 8px
         margin-right: 16px
-  th:first-child
-  td:first-child
+  td:first-child, th:first-child
     position: sticky
     left: 0
     z-index: 1

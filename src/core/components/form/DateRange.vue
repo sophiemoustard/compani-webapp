@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12">
+  <div class="col-12 date-range">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -82,6 +82,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+  .date-range
+    max-width: 100%
+
   .date-container-borders
     border: solid 1px $copper-grey-300
     border-radius: 3px
@@ -101,7 +104,7 @@ export default {
     & .delimiter
       margin: 0
       color: $copper-grey-700
-    /deep/ .q-field__control
+    ::v-deep .q-field__control
       border: none !important
 
   .date-item
