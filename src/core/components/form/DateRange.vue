@@ -103,7 +103,8 @@ export default {
       color: $copper-grey-700
 
   .date-item
-    max-width: 150px
+    /deep/ .q-field__native
+      text-align: center
     /deep/ .q-field--with-bottom
       padding-bottom: 0px
     /deep/ .q-field__bottom
