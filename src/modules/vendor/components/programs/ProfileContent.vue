@@ -642,7 +642,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .sub-program-container
   display: flex
   flex-direction: column

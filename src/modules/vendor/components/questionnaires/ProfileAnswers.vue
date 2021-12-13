@@ -134,9 +134,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .filters-container
     grid-template-columns: repeat(3, 28%) 16%
     @media screen and (max-width: 767px)
-      width: 95%;
+      width: 95%
 </style>

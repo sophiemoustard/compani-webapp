@@ -148,7 +148,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 h6
   margin-bottom: 3px
 
@@ -180,7 +180,7 @@ h6
 
   .flashcard
     justify-content: center
-    & > div
+    div
       width: 40%
       height: 35px
       margin: 5px 2px

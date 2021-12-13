@@ -246,7 +246,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-page
   display: flex
   flex-direction: column
@@ -257,6 +257,6 @@ export default {
 .q-item
   padding: 0
   min-height: 0
-/deep/ .q-btn__wrapper
+::v-deep .q-btn__wrapper
   padding: 0px !important
 </style>

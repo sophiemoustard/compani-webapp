@@ -90,7 +90,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .container
     display: flex
     flex-direction: column

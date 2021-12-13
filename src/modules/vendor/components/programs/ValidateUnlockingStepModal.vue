@@ -54,7 +54,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .footer
     display: flex
     justify-content: flex-end

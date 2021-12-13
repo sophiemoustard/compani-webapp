@@ -64,7 +64,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-item
   padding: 0
   min-height: 0

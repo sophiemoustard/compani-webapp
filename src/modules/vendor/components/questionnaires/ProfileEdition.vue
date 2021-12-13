@@ -207,7 +207,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .body
   flex: 1
 .publish-button

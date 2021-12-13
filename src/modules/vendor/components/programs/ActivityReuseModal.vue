@@ -93,17 +93,16 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-
-/deep/.q-option-group
+<style lang="sass" scoped>
+::v-deep .q-option-group
   column-count: 2
   width: 100%
   margin-left: 0
 
-/deep/.q-radio
+::v-deep .q-radio
   width: 100%
 
-/deep/.q-radio__label
+::v-deep .q-radio__label
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
@@ -111,7 +110,6 @@ export default {
 .buttons
   display: flex
   justify-content: space-around
-  > .q-btn
-    background-color: $primary;
-
+  .q-btn
+    background-color: $primary
 </style>
