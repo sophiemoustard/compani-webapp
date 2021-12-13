@@ -8,9 +8,10 @@
         </div>
         <ni-select caption="Motif" :value="editedCustomerAbsence.absenceType" :options="customerAbsenceOptions"
           required-field @input="update($event, 'absenceType')" />
-        <ni-datetime-range class="last" caption="Dates et heures de l'absence" :value="editedCustomerAbsence.dates"
-          @input="update($event, 'dates')" @blur="validations.dates.$touch" disable-start-hour disable-end-hour
-          required-field />
+      </div>
+      <div class="q-mx-lg">
+        <ni-date-range borders class="last" caption="Dates de l'absence" required-field
+          :value="editedCustomerAbsence.dates" @input="update($event, 'dates')" @blur="validations.dates.$touch" />
       </div>
       <q-btn class="modal-btn full-width" no-caps color="primary" :loading="loading" label="Editer l'absence"
         icon-right="check" @click="submit" />
@@ -20,7 +21,7 @@
 
 <script>
 import Select from '@components/form/Select';
-import DatetimeRange from '@components/form/DatetimeRange';
+import DateRange from '@components/form/DateRange';
 import { CUSTOMER_ABSENCE_TYPES } from '@data/constants';
 import PlanningModalHeader from './PlanningModalHeader';
 
@@ -29,7 +30,7 @@ export default {
   components: {
     'ni-select': Select,
     'ni-planning-modal-header': PlanningModalHeader,
-    'ni-datetime-range': DatetimeRange,
+    'ni-date-range': DateRange,
   },
   data () {
     return {
@@ -65,4 +66,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
+  /deep/ .date-container
+    justify-content: flex-start;
 </style>

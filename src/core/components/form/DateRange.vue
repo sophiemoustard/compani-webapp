@@ -70,6 +70,8 @@ export default {
   methods: {
     update (value, key) {
       this.$v.value.$touch();
+      if (key === 'endDate') value = moment(value).endOf('d').toISOString();
+
       this.$emit('input', { ...this.value, [key]: value });
     },
     blur () {
