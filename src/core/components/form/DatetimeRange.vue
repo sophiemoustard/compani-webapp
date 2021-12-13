@@ -12,7 +12,7 @@
           @blur="blurHandler" :disable="disable || disableStartHour" @lockClick="startClick" :locked="startLocked" />
         <p class="delimiter">-</p>
         <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item" @blur="blurHandler"
-          :disable="disable || disableEndHour" :min="startHour" @lockClick="endClick" :locked="endLocked" />
+          :disable="disable || disableEndHour" :min="min" @lockClick="endClick" :locked="endLocked" />
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" :max="max" />
       </div>
@@ -66,6 +66,12 @@ export default {
     },
     endHour () {
       return moment(this.value.endDate).format('HH:mm');
+    },
+    min () {
+      if (moment(this.value.startDate).format('YYYY/MM/DD') === moment(this.value.endDate).format('YYYY/MM/DD')) {
+        return this.startHour;
+      }
+      return null;
     },
   },
   methods: {
