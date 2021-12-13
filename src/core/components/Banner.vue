@@ -22,11 +22,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-banner
-  /deep/ .q-banner__content
-    display: flex;
+  ::v-deep .q-banner__content
+    display: flex
     align-items: center
     .q-icon
-      margin-right: 5px
+      margin-right: 4px
 </style>

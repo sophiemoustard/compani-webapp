@@ -46,10 +46,10 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .q-option
-    font-size: 14px;
+    font-size: 14px
   .q-input
-    /deep/ .q-field__control
+    ::v-deep .q-field__control
       font-size: 14px
 </style>

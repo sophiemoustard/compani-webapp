@@ -27,10 +27,10 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .title-modal
-  position: sticky;
-  top: 0px;
-  z-index: 1;
-  background-color: white;
+  position: sticky
+  top: 0px
+  z-index: 1
+  background-color: white
 </style>

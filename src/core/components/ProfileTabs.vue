@@ -38,12 +38,12 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .profile-tabs
-    /deep/ .q-tab--active
+    ::v-deep .q-tab--active
       & > .q-tab__indicator
         color: $primary
-    /deep/.q-tab__indicator
+    ::v-deep .q-tab__indicator
       color: $copper-grey-300
       opacity: 1
     .q-tab-panels
@@ -53,7 +53,7 @@ export default {
       flex-direction: column
       .scroll
         overflow: initial
-      /deep/ .q-panel
+      ::v-deep .q-panel
         flex: 1
         display: flex
         flex-direction: column
@@ -63,7 +63,7 @@ export default {
           flex-direction: column
           > div
             flex: 1
-    & /deep/ .q-tabs
+    & ::v-deep .q-tabs
       & .q-tabs__content
         & .q-tab
           flex: 1 1 0

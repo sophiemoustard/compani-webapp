@@ -31,7 +31,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .line-chart
-  max-height: 200px;
+  max-height: 200px
 </style>

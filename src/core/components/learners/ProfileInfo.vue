@@ -100,10 +100,8 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-
+<style lang="sass" scoped>
 .photo-caption
   font-size: 12px
   margin: 0 0 4px 0
-
 </style>

@@ -33,9 +33,8 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .button
-    margin: -4px
-    align-self: center
-
+<style lang="sass" scoped>
+.button
+  margin: -4px
+  align-self: center
 </style>

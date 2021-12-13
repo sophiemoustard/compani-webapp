@@ -102,7 +102,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .request-cell
   width: 176px
   border-radius: 8px
@@ -110,7 +110,7 @@ export default {
   background-color: white
 .avatar-container
   height: 120px
-  background-color : $copper-grey-50
+  background-color: $copper-grey-50
   display: flex
   justify-content: center
   border-radius: 8px 8px 0px 0px
@@ -124,9 +124,9 @@ export default {
     height: 60px
     width: 60px
 .avatar
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
+  height: 100%
+  width: 100%
+  object-fit: cover
   border-radius: 8px 8px 0px 0px
 .validation-button
   color: white

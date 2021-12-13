@@ -101,7 +101,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .message
     font-size: 14px
 </style>
