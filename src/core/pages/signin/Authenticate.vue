@@ -9,9 +9,8 @@
           </div>
           <div class="col-10 signup-bloctext-padding">
             <p class="no-margin" style="font-size: 0.8rem">
-              Les services d’Alenvi sont maintenant disponibles via le site Compani. <br> Pour vous connecter à votre
-              compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span
-                class="text-weight-bold">mot de passe</span>
+              Pour vous connecter à votre compte, merci de <span class="text-weight-bold">saisir votre
+                identifiant</span> et votre <span class="text-weight-bold">mot de passe</span>
             </p>
           </div>
         </div>
@@ -50,7 +49,7 @@ export default {
     meta: [{
       name: 'description',
       content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées '
-        + 'par Alenvi.',
+        + 'par Compani.',
     }],
   },
   name: 'Authentication',
