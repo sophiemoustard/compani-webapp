@@ -267,8 +267,8 @@ export default {
           ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
           : [];
 
-        const formattedContacts = formatAndSortIdentityOptions([...new Set(vendorUsers, clientUsersFromCompany)]);
-        this.contactOptions = Object.freeze(formattedContacts);
+        const contacts = [...new Set([...clientUsersFromCompany, ...vendorUsers])];
+        this.contactOptions = Object.freeze(formatAndSortIdentityOptions(contacts));
       } catch (e) {
         console.error(e);
       }
