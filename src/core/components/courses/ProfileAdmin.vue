@@ -72,6 +72,7 @@
 import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
+import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Users from '@api/Users';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
@@ -267,8 +268,8 @@ export default {
           ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
           : [];
 
-        const formattedContacts = formatAndSortIdentityOptions([...new Set(vendorUsers, clientUsersFromCompany)]);
-        this.contactOptions = Object.freeze(formattedContacts);
+        const contacts = uniqBy([...clientUsersFromCompany, ...vendorUsers], '_id');
+        this.contactOptions = Object.freeze(formatAndSortIdentityOptions(contacts));
       } catch (e) {
         console.error(e);
       }
