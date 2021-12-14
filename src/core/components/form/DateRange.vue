@@ -70,7 +70,7 @@ export default {
   methods: {
     update (value, key) {
       this.$v.value.$touch();
-      if (key === 'endDate') value = moment(value).endOf('d').toISOString();
+      if (key === 'endDate') value = moment(value).endOf('d').milliseconds(0).toISOString();
 
       this.$emit('input', { ...this.value, [key]: value });
     },
