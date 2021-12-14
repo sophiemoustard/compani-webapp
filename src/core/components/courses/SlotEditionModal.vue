@@ -85,23 +85,17 @@ export default {
     delete (slotId) {
       this.$emit('delete', slotId);
     },
-    update (event, prop) {
-      this.$emit('update:editedCourseSlot', { ...this.editedCourseSlot, [prop]: event });
+    update (value, path) {
+      this.$emit('update', { path, value });
     },
     getType (step) {
       return step ? this.stepOptions.find(option => option.value === step).type : '';
     },
     updateStep (step) {
       const type = this.getType(step);
-      this.$emit(
-        'update:editedCourseSlot',
-        {
-          ...this.editedCourseSlot,
-          step,
-          ...(type !== REMOTE && { meetingLink: '' }),
-          ...(type !== ON_SITE && { address: {} }),
-        }
-      );
+      if (type !== REMOTE) this.update('', 'meetingLink');
+      if (type !== ON_SITE) this.update({}, 'address');
+      this.update(step, 'step');
     },
   },
 };

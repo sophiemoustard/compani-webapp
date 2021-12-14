@@ -67,23 +67,17 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event, prop) {
-      this.$emit('update:newCourseSlot', { ...this.newCourseSlot, [prop]: event });
+    update (value, path) {
+      this.$emit('update', { path, value });
     },
     getType (step) {
       return step ? this.stepOptions.find(option => option.value === step).type : '';
     },
     updateStep (step) {
       const type = this.getType(step);
-      this.$emit(
-        'update:newCourseSlot',
-        {
-          ...this.newCourseSlot,
-          step,
-          ...(type !== REMOTE && { meetingLink: '' }),
-          ...(type !== ON_SITE && { address: {} }),
-        }
-      );
+      if (type !== REMOTE) this.update('', 'meetingLink');
+      if (type !== ON_SITE) this.update({}, 'address');
+      this.update(step, 'step');
     },
   },
 };
