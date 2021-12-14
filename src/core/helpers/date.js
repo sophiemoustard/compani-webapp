@@ -31,7 +31,7 @@ export const isBetween = (date, min, max) => new Date(date) < new Date(max) && n
 
 export const getStartOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-export const getEndOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+export const getEndOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
 
 export const ascendingSort = (a, b) => {
   if (moment(a).isAfter(b)) return 1;
