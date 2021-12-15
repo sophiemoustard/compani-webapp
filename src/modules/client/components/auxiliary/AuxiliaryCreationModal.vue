@@ -99,7 +99,7 @@ export default {
       this.$emit('update:send-welcome-msg', event);
     },
     updateUser (event, path) {
-      this.$emit('update:newUser', set({ ...this.newUser }, path, event));
+      this.$emit('update:newUser', set(this.newUser, path, event));
     },
   },
 };
