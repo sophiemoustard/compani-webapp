@@ -5,6 +5,7 @@
         <ni-planning-modal-header :selected-person="editedCustomerAbsence.customer" @close="close" />
         <div class="modal-subtitle">
           <q-btn rounded unelevated color="primary" label="Absence" />
+          <ni-button icon="delete" color="copper-grey-400" @click="validateCustomerAbsenceDeletion" />
         </div>
         <ni-select caption="Motif" :value="editedCustomerAbsence.absenceType" :options="customerAbsenceOptions"
           required-field @input="update($event, 'absenceType')" />
@@ -22,6 +23,9 @@
 <script>
 import Select from '@components/form/Select';
 import DateRange from '@components/form/DateRange';
+import NiButton from '@components/Button';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import CustomerAbsences from '@api/CustomerAbsences';
 import { CUSTOMER_ABSENCE_TYPES } from '@data/constants';
 import PlanningModalHeader from './PlanningModalHeader';
 
@@ -31,6 +35,7 @@ export default {
     'ni-select': Select,
     'ni-planning-modal-header': PlanningModalHeader,
     'ni-date-range': DateRange,
+    'ni-button': NiButton,
   },
   data () {
     return {
@@ -55,6 +60,26 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    validateCustomerAbsenceDeletion () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette absence ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(this.deleteCustomerAbsence)
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteCustomerAbsence () {
+      try {
+        await CustomerAbsences.remove(this.editedCustomerAbsence._id);
+        this.close();
+
+        NotifyPositive('Absence supprimée.');
+      } catch (e) {
+        console.error(e);
+        if (e.msg) NotifyNegative('Erreur lors de la suppression de l\'absence bénéficiaire.');
+      }
     },
   },
 };
