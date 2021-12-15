@@ -5,7 +5,7 @@
         <ni-planning-modal-header :selected-person="editedCustomerAbsence.customer" @close="close" />
         <div class="modal-subtitle">
           <q-btn rounded unelevated color="primary" label="Absence" />
-          <ni-button icon="delete" color="copper-grey-400" @click="validateCustomerAbsenceDeletion" />
+          <ni-button class="q-mx-sm" icon="delete" color="copper-grey-400" @click="validateCustomerAbsenceDeletion" />
         </div>
         <ni-select caption="Motif" :value="editedCustomerAbsence.absenceType" :options="customerAbsenceOptions"
           required-field @input="update($event, 'absenceType')" />
