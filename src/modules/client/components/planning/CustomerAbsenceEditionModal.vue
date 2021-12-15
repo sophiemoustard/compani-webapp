@@ -23,7 +23,7 @@
 <script>
 import Select from '@components/form/Select';
 import DateRange from '@components/form/DateRange';
-import NiButton from '@components/Button';
+import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import CustomerAbsences from '@api/CustomerAbsences';
 import { CUSTOMER_ABSENCE_TYPES } from '@data/constants';
@@ -35,7 +35,7 @@ export default {
     'ni-select': Select,
     'ni-planning-modal-header': PlanningModalHeader,
     'ni-date-range': DateRange,
-    'ni-button': NiButton,
+    'ni-button': Button,
   },
   data () {
     return {
@@ -78,7 +78,7 @@ export default {
         NotifyPositive('Absence supprimée.');
       } catch (e) {
         console.error(e);
-        if (e.msg) NotifyNegative('Erreur lors de la suppression de l\'absence bénéficiaire.');
+        NotifyNegative('Erreur lors de la suppression de l\'absence bénéficiaire.');
       }
     },
   },
