@@ -189,12 +189,12 @@
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
       :selected-service="selectedService" :service-columns="serviceColumns" />
 
-    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal"
+    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal" @update="setThirdPartyPayer"
       :validations="$v.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
-      :loading="loading" :billing-mode-options="billingModeOptions" :new-third-party-payer.sync="newThirdPartyPayer" />
+      :loading="loading" :billing-mode-options="billingModeOptions" :new-third-party-payer="newThirdPartyPayer" />
 
-    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" @submit="updateThirdPartyPayer"
-      :edited-third-party-payer.sync="editedThirdPartyPayer" :validations="$v.editedThirdPartyPayer"
+    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" :validations="$v.editedThirdPartyPayer"
+      :edited-third-party-payer="editedThirdPartyPayer" @submit="updateThirdPartyPayer" @update="setThirdPartyPayer"
       @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions" />
   </q-page>
 </template>
@@ -204,6 +204,7 @@ import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
+import set from 'lodash/set';
 import compact from 'lodash/compact';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
@@ -1152,6 +1153,11 @@ export default {
       if (payload.address && !payload.address.fullAddress) delete payload.address;
 
       return { isApa: false, ...pickBy(payload) };
+    },
+    setThirdPartyPayer (payload) {
+      const { path, value } = payload;
+      if (this.thirdPartyPayerCreationModal) set(this.newThirdPartyPayer, path, value);
+      else if (this.thirdPartyPayerEditionModal) set(this.editedThirdPartyPayer, path, value);
     },
     async createNewThirdPartyPayer () {
       try {

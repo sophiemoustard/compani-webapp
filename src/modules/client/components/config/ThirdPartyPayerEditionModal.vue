@@ -62,8 +62,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event, prop) {
-      this.$emit('update:editedThirdPartyPayer', set(this.editedThirdPartyPayer, prop, event));
+    update (value, path) {
+      this.$emit('update', { path, value });
     },
   },
 };
