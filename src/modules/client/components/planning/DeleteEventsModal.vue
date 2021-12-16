@@ -1,6 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input"
-    title="Suppression d'interventions sur une période">
+  <ni-modal :value="value" @hide="hide" @input="input" title="Suppression d'interventions sur une période">
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer"
       :options="getCustomersOptions(deletedEvents.startDate)" required-field @blur="$v.deletedEvents.customer.$touch"
       :error="$v.deletedEvents.customer.$error" />
@@ -12,11 +11,8 @@
       <ni-select in-modal v-if="isCustomerAbsence" v-model="deletedEvents.absenceType" caption="Motif de l'absence"
         :options="customerAbsenceOptions" required-field @blur="$v.deletedEvents.absenceType.$touch"
         :error="$v.deletedEvents.absenceType.$error" />
-      <ni-date-input caption="Date de début" v-model="deletedEvents.startDate" type="date" required-field
-        in-modal @blur="$v.deletedEvents.startDate.$touch" :error="$v.deletedEvents.startDate.$error" />
-      <ni-date-input caption="Date de fin" v-model="deletedEvents.endDate" type="date" required-field in-modal
-        :min="deletedEvents.startDate" @blur="$v.deletedEvents.endDate.$touch"
-        :error="$v.deletedEvents.endDate.$error" />
+      <ni-date-range caption="Dates de début et de fin" required-field v-model="deletedEvents" @blur="validateDates"
+        :error="$v.deletedEvents.startDate.$error || $v.deletedEvents.endDate.$error" />
     </template>
     <template v-else>
       <ni-date-input caption="Date d'arrêt des interventions" v-model="deletedEvents.startDate" type="date"
@@ -35,6 +31,7 @@ import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Events from '@api/Events';
 import Modal from '@components/modal/Modal';
+import DateRange from '@components/form/DateRange';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -49,6 +46,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-option-group': OptionGroup,
+    'ni-date-range': DateRange,
   },
   props: {
     value: { type: Boolean, default: false },
@@ -107,6 +105,10 @@ export default {
     allowCustomerAbsenceCreation () {
       this.isCustomerAbsence = !this.isCustomerAbsence;
       if (!this.isCustomerAbsence) this.deletedEvents = { ...omit(this.deletedEvents, 'absenceType') };
+    },
+    validateDates () {
+      this.$v.deletedEvents.startDate.$touch();
+      this.$v.deletedEvents.endDate.$touch();
     },
     async deleteEvents () {
       try {
