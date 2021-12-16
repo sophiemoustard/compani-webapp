@@ -248,8 +248,9 @@ export default {
       };
       this.customerAbsenceModal = true;
     },
-    closeCustomerAbsenceModal () {
+    async closeCustomerAbsenceModal () {
       this.customerAbsenceModal = false;
+      await this.refresh();
     },
     resetCustomerAbsenceEditionForm () {
       this.$v.editedCustomerAbsence.$reset();

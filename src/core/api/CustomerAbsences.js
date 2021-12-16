@@ -8,4 +8,7 @@ export default {
   async updateById (id, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/customerabsences/${id}`, payload);
   },
+  async remove (id) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/customerabsences/${id}`);
+  },
 };
