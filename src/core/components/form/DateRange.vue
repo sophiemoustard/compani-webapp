@@ -101,6 +101,8 @@ export default {
     & .delimiter
       margin: 0
       color: $copper-grey-700
+    /deep/ .q-field__control
+      border: none !important
 
   .date-item
     /deep/ .q-field__native
