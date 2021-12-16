@@ -160,24 +160,20 @@
       </div>
     </div>
 
-    <!-- Surcharge creation modal -->
     <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge.sync="newSurcharge"
       :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
       :loading="loading" />
 
-    <!-- Surcharge edition modal -->
     <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge.sync="editedSurcharge"
       :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
       :loading="loading" />
 
-    <!-- Service creation modal -->
     <service-creation-modal v-model="serviceCreationModal" :new-service.sync="newService" :validations="$v.newService"
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
       :loading="loading" @add-billing-item="addBillingItemToService" @update-billing-item="updateBillingItemInService"
       @remove-billing-item="removeBillingItemInService" :billing-items-options="billingItemsOptions" />
 
-    <!-- Service edition modal -->
     <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
       :default-unit-amount-error="nbrError('editedService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
       @hide="resetEditionServiceData" :min-start-date="minStartDate" @add-billing-item="addBillingItemToService"
@@ -190,16 +186,13 @@
       :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
       :vat-error="nbrError('newBillingItem.vat')" @submit="createNewBillingItem" />
 
-    <!-- Service history modal -->
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
       :selected-service="selectedService" :service-columns="serviceColumns" />
 
-    <!-- Third party payers creation modal -->
     <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal"
       :validations="$v.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
       :loading="loading" :billing-mode-options="billingModeOptions" :new-third-party-payer.sync="newThirdPartyPayer" />
 
-    <!-- Third party payers edition modal -->
     <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" @submit="updateThirdPartyPayer"
       :edited-third-party-payer.sync="editedThirdPartyPayer" :validations="$v.editedThirdPartyPayer"
       @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions" />

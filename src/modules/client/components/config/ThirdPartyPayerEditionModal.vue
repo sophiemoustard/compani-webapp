@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
@@ -62,7 +63,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:editedThirdPartyPayer', { ...this.editedThirdPartyPayer, [prop]: event });
+      this.$emit('update:editedThirdPartyPayer', set(this.editedThirdPartyPayer, prop, event));
     },
   },
 };
