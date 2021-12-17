@@ -1127,13 +1127,18 @@ export default {
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
-      const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const selectedTpp = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const { name, address, email: tppEmail, unitTTCRate, billingMode, isApa, teletransmissionId } = selectedTpp;
+
       this.editedThirdPartyPayer = {
-        address: {},
-        ...pick(
-          currentThirdPartyPayer,
-          ['_id', 'name', 'address', 'email', 'unitTTCRate', 'billingMode', 'isApa', 'teletransmissionId']
-        ),
+        _id: selectedTpp._id,
+        name: name || '',
+        email: tppEmail || '',
+        address: address || {},
+        unitTTCRate: unitTTCRate || 0,
+        billingMode: billingMode || '',
+        isApa: isApa || false,
+        teletransmissionId: teletransmissionId || '',
       };
     },
     resetThirdPartyPayerCreation () {
