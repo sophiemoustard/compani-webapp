@@ -350,8 +350,6 @@ export default {
       },
       surchargesColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
-        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         {
           name: 'firstOfJanuary',
           label: '1er janvier',
@@ -376,6 +374,8 @@ export default {
           align: 'center',
           field: row => roundFrenchPercentage(row.publicHoliday, 0),
         },
+        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
+        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         { name: 'evening', label: 'Soirée', align: 'center', field: row => roundFrenchPercentage(row.evening, 0) },
         {
           name: 'eveningStartTime',
