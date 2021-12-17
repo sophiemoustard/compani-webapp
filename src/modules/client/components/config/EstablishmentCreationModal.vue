@@ -64,8 +64,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event, prop) {
-      this.$emit('update:newEstablishment', { ...this.newEstablishment, [prop]: event });
+    update (value, path) {
+      this.$emit('update', { path, value });
     },
   },
 };

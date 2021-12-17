@@ -82,15 +82,15 @@
       </div>
     </div>
 
-    <!-- Establishment creation modal -->
-    <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment.sync="newEstablishment"
+    <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment="newEstablishment"
       :validations="$v.newEstablishment" @hide="resetEstablishmentCreationModal" @submit="createNewEstablishment"
-      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
+      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes"
+      @update="setEstablishment" />
 
-    <!-- Establishment edition modal -->
-    <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment.sync="editedEstablishment"
+    <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment="editedEstablishment"
       :validations="$v.editedEstablishment" @hide="resetEstablishmentEditionModal" @submit="updateEstablishment"
-      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
+      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes"
+      @update="setEstablishment" />
   </q-page>
 </template>
 
@@ -99,6 +99,7 @@ import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
+import set from 'lodash/set';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Establishments from '@api/Establishments';
 import TitleHeader from '@components/TitleHeader';
@@ -282,6 +283,11 @@ export default {
         urssafCode: '',
       };
       this.$v.editedEstablishment.$reset();
+    },
+    setEstablishment (payload) {
+      const { path, value } = payload;
+      if (this.establishmentCreationModal) set(this.newEstablishment, path, value);
+      else if (this.establishmentEditionModal) set(this.editedEstablishment, path, value);
     },
     async updateEstablishment () {
       try {
