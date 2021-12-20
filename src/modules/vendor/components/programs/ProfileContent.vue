@@ -589,9 +589,10 @@ export default {
       return step.subPrograms && step.subPrograms.length > 1;
     },
     initAreStepsLocked () {
-      this.areStepsLocked = Object.assign(...this.program.subPrograms
+      const steps = this.program.subPrograms
         .map(sp => sp.steps.map(step => ({ [step._id]: this.isReused(step) })))
-        .flat());
+        .flat();
+      this.areStepsLocked = steps.length ? Object.assign(...steps) : {};
     },
     async openSubProgramPublicationModal () {
       try {

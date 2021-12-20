@@ -160,24 +160,20 @@
       </div>
     </div>
 
-    <!-- Surcharge creation modal -->
     <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge.sync="newSurcharge"
       :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
       :loading="loading" />
 
-    <!-- Surcharge edition modal -->
     <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge.sync="editedSurcharge"
       :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
       :loading="loading" />
 
-    <!-- Service creation modal -->
     <service-creation-modal v-model="serviceCreationModal" :new-service.sync="newService" :validations="$v.newService"
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
       :loading="loading" @add-billing-item="addBillingItemToService" @update-billing-item="updateBillingItemInService"
       @remove-billing-item="removeBillingItemInService" :billing-items-options="billingItemsOptions" />
 
-    <!-- Service edition modal -->
     <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
       :default-unit-amount-error="nbrError('editedService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
       @hide="resetEditionServiceData" :min-start-date="minStartDate" @add-billing-item="addBillingItemToService"
@@ -190,18 +186,15 @@
       :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
       :vat-error="nbrError('newBillingItem.vat')" @submit="createNewBillingItem" />
 
-    <!-- Service history modal -->
     <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
       :selected-service="selectedService" :service-columns="serviceColumns" />
 
-    <!-- Third party payers creation modal -->
-    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal"
+    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal" @update="setThirdPartyPayer"
       :validations="$v.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
-      :loading="loading" :billing-mode-options="billingModeOptions" :new-third-party-payer.sync="newThirdPartyPayer" />
+      :loading="loading" :billing-mode-options="billingModeOptions" :new-third-party-payer="newThirdPartyPayer" />
 
-    <!-- Third party payers edition modal -->
-    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" @submit="updateThirdPartyPayer"
-      :edited-third-party-payer.sync="editedThirdPartyPayer" :validations="$v.editedThirdPartyPayer"
+    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" :validations="$v.editedThirdPartyPayer"
+      :edited-third-party-payer="editedThirdPartyPayer" @submit="updateThirdPartyPayer" @update="setThirdPartyPayer"
       @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions" />
   </q-page>
 </template>
@@ -211,6 +204,7 @@ import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
+import set from 'lodash/set';
 import compact from 'lodash/compact';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
@@ -356,8 +350,6 @@ export default {
       },
       surchargesColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
-        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         {
           name: 'firstOfJanuary',
           label: '1er janvier',
@@ -382,6 +374,8 @@ export default {
           align: 'center',
           field: row => roundFrenchPercentage(row.publicHoliday, 0),
         },
+        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
+        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         { name: 'evening', label: 'Soirée', align: 'center', field: row => roundFrenchPercentage(row.evening, 0) },
         {
           name: 'eveningStartTime',
@@ -1133,13 +1127,18 @@ export default {
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
-      const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const selectedTpp = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const { _id, name, address, email: tppEmail, unitTTCRate, billingMode, isApa, teletransmissionId } = selectedTpp;
+
       this.editedThirdPartyPayer = {
-        address: {},
-        ...pick(
-          currentThirdPartyPayer,
-          ['_id', 'name', 'address', 'email', 'unitTTCRate', 'billingMode', 'isApa', 'teletransmissionId']
-        ),
+        _id,
+        name: name || '',
+        email: tppEmail || '',
+        address: address || {},
+        unitTTCRate: unitTTCRate || 0,
+        billingMode: billingMode || '',
+        isApa: isApa || false,
+        teletransmissionId: teletransmissionId || '',
       };
     },
     resetThirdPartyPayerCreation () {
@@ -1159,6 +1158,11 @@ export default {
       if (payload.address && !payload.address.fullAddress) delete payload.address;
 
       return { isApa: false, ...pickBy(payload) };
+    },
+    setThirdPartyPayer (payload) {
+      const { path, value } = payload;
+      if (this.thirdPartyPayerCreationModal) set(this.newThirdPartyPayer, path, value);
+      else if (this.thirdPartyPayerEditionModal) set(this.editedThirdPartyPayer, path, value);
     },
     async createNewThirdPartyPayer () {
       try {
