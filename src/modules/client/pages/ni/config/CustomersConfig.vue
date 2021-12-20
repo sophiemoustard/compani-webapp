@@ -1128,10 +1128,10 @@ export default {
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
       const selectedTpp = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
-      const { name, address, email: tppEmail, unitTTCRate, billingMode, isApa, teletransmissionId } = selectedTpp;
+      const { _id, name, address, email: tppEmail, unitTTCRate, billingMode, isApa, teletransmissionId } = selectedTpp;
 
       this.editedThirdPartyPayer = {
-        _id: selectedTpp._id,
+        _id,
         name: name || '',
         email: tppEmail || '',
         address: address || {},
