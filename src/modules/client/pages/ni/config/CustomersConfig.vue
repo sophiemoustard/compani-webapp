@@ -350,8 +350,6 @@ export default {
       },
       surchargesColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
-        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         {
           name: 'firstOfJanuary',
           label: '1er janvier',
@@ -376,6 +374,8 @@ export default {
           align: 'center',
           field: row => roundFrenchPercentage(row.publicHoliday, 0),
         },
+        { name: 'saturday', label: 'Samedi', align: 'center', field: row => roundFrenchPercentage(row.saturday, 0) },
+        { name: 'sunday', label: 'Dimanche', align: 'center', field: row => roundFrenchPercentage(row.sunday, 0) },
         { name: 'evening', label: 'Soirée', align: 'center', field: row => roundFrenchPercentage(row.evening, 0) },
         {
           name: 'eveningStartTime',
@@ -1127,13 +1127,18 @@ export default {
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
-      const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const selectedTpp = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const { _id, name, address, email: tppEmail, unitTTCRate, billingMode, isApa, teletransmissionId } = selectedTpp;
+
       this.editedThirdPartyPayer = {
-        address: {},
-        ...pick(
-          currentThirdPartyPayer,
-          ['_id', 'name', 'address', 'email', 'unitTTCRate', 'billingMode', 'isApa', 'teletransmissionId']
-        ),
+        _id,
+        name: name || '',
+        email: tppEmail || '',
+        address: address || {},
+        unitTTCRate: unitTTCRate || 0,
+        billingMode: billingMode || '',
+        isApa: isApa || false,
+        teletransmissionId: teletransmissionId || '',
       };
     },
     resetThirdPartyPayerCreation () {
