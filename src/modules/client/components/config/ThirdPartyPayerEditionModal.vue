@@ -20,7 +20,7 @@
       <div class="row q-mb-md light-checkbox">
         <q-checkbox :value="editedThirdPartyPayer.isApa" label="Financement APA" @input="update($event, 'isApa')"
           dense />
-    </div>
+      </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
           :loading="loading" @click="submit" />
