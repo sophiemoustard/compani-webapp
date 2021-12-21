@@ -139,8 +139,8 @@ export default {
   ::v-deep .q-field__append
     display: none
   ::v-deep .q-field__bottom
-      color: $secondary
-      padding-top: 3px
+    color: $secondary
+    padding-top: 3px
 
   ::v-deep .q-uploader
     width: 100%

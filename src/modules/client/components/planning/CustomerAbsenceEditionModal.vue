@@ -86,11 +86,11 @@ export default {
 
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .modal-subtitle
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  /deep/ .date-container
-    justify-content: flex-start;
+    display: flex
+    justify-content: space-between
+    margin-bottom: 16px
+  ::v-deep .date-container
+    justify-content: flex-start
 </style>
