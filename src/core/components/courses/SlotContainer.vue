@@ -47,15 +47,13 @@
       </div>
     </div>
 
-    <!-- Course slot creation modal -->
-    <slot-creation-modal v-model="creationModal" :new-course-slot.sync="newCourseSlot" :validations="$v.newCourseSlot"
+    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
       :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
-      :link-error-message="linkErrorMessage" />
+      :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 
-    <!-- Course slot edition modal -->
-    <slot-edition-modal v-model="editionModal" :edited-course-slot.sync="editedCourseSlot" :step-options="stepOptions"
+    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
       :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
-      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" />
+      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 </div>
 </template>
 
@@ -63,6 +61,7 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import has from 'lodash/has';
+import set from 'lodash/set';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
@@ -369,6 +368,11 @@ export default {
           maxDate: maxDate(moment(dates?.startDate).endOf('d')),
         },
       };
+    },
+    setCourseSlot (payload) {
+      const { path, value } = payload;
+      if (this.creationModal) set(this.newCourseSlot, path, value);
+      else if (this.editionModal) set(this.editedCourseSlot, path, value);
     },
   },
 

@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import SearchAddress from '@components/form/SearchAddress';
 import Select from '@components/form/Select';
@@ -98,8 +97,8 @@ export default {
     updateSendWelcome (event) {
       this.$emit('update:send-welcome-msg', event);
     },
-    updateUser (event, path) {
-      this.$emit('update:newUser', set({ ...this.newUser }, path, event));
+    updateUser (value, path) {
+      this.$emit('update-new-user', { value, path });
     },
   },
 };

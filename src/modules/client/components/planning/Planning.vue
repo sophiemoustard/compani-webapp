@@ -305,9 +305,8 @@ export default {
       this.$emit('open-creation-modal', event);
     },
     openEventEditionModal (event) {
-      if (event.type !== CUSTOMER_ABSENCE) {
-        this.$emit('open-edition-modal', event);
-      }
+      if (event.type === CUSTOMER_ABSENCE) this.$emit('open-customer-absence-edition-modal', event);
+      else this.$emit('open-edition-modal', event);
     },
     canDrag (event) {
       return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });

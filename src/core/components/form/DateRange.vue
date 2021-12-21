@@ -70,6 +70,8 @@ export default {
   methods: {
     update (value, key) {
       this.$v.value.$touch();
+      if (key === 'endDate') value = moment(value).endOf('d').toISOString();
+
       this.$emit('input', { ...this.value, [key]: value });
     },
     blur () {
@@ -99,9 +101,12 @@ export default {
     & .delimiter
       margin: 0
       color: $copper-grey-700
+    /deep/ .q-field__control
+      border: none !important
 
   .date-item
-    max-width: 150px
+    /deep/ .q-field__native
+      text-align: center
     /deep/ .q-field--with-bottom
       padding-bottom: 0px
     /deep/ .q-field__bottom

@@ -8,7 +8,7 @@
       <ni-search-address in-modal :value="editedThirdPartyPayer.address" error-message="Adresse invalide"
         @blur="validations.address.$touch" :error="validations.address.$error" @input="update($event, 'address')" />
       <ni-input in-modal caption="Email" :value="editedThirdPartyPayer.email" error-message="Email invalide"
-        :error="!validations.email.email" @input="update($event.trim(), 'email')" />
+        :error="validations.email.$error" @input="update($event.trim(), 'email')" @blur="validations.email.$touch" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
         :value="editedThirdPartyPayer.unitTTCRate" :error="validations.unitTTCRate.$error"
         :error-message="nbrError('unitTTCRate', validations)" @input="update($event, 'unitTTCRate')" />
@@ -61,8 +61,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event, prop) {
-      this.$emit('update:editedThirdPartyPayer', { ...this.editedThirdPartyPayer, [prop]: event });
+    update (value, path) {
+      this.$emit('update', { path, value });
     },
   },
 };

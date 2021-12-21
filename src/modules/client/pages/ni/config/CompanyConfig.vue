@@ -82,15 +82,15 @@
       </div>
     </div>
 
-    <!-- Establishment creation modal -->
-    <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment.sync="newEstablishment"
+    <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment="newEstablishment"
       :validations="$v.newEstablishment" @hide="resetEstablishmentCreationModal" @submit="createNewEstablishment"
-      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
+      :loading="loading" :work-health-services="workHealthServiceList" :urssaf-codes="urssafCodeList"
+      @update="setEstablishment" />
 
-    <!-- Establishment edition modal -->
-    <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment.sync="editedEstablishment"
+    <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment="editedEstablishment"
       :validations="$v.editedEstablishment" @hide="resetEstablishmentEditionModal" @submit="updateEstablishment"
-      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
+      :loading="loading" :work-health-services="workHealthServiceList" :urssaf-codes="urssafCodeList"
+      @update="setEstablishment" />
   </q-page>
 </template>
 
@@ -99,6 +99,7 @@ import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
+import set from 'lodash/set';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Establishments from '@api/Establishments';
 import TitleHeader from '@components/TitleHeader';
@@ -108,8 +109,8 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANY } from '@data/constants';
-import { urssafCodes } from '@data/urssafCodes';
-import { workHealthServices } from '@data/workHealthServices';
+import { urssafCodes as urssafCodeList } from '@data/urssafCodes';
+import { workHealthServices as workHealthServiceList } from '@data/workHealthServices';
 import {
   frAddress,
   validWorkHealthService,
@@ -157,14 +158,14 @@ export default {
           label: 'Service de santé du travail',
           align: 'left',
           field: 'workHealthService',
-          format: value => (value ? get(workHealthServices.find(whs => whs.value === value), 'label', '') : ''),
+          format: value => (value ? get(workHealthServiceList.find(whs => whs.value === value), 'label', '') : ''),
         },
         {
           name: 'urssafCode',
           label: 'Code URSSAF',
           align: 'left',
           field: 'urssafCode',
-          format: value => (value ? get(urssafCodes.find(code => code.value === value), 'label', '') : ''),
+          format: value => (value ? get(urssafCodeList.find(code => code.value === value), 'label', '') : ''),
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -187,8 +188,8 @@ export default {
         urssafCode: '',
       },
       establishmentEditionModal: false,
-      workHealthServices,
-      urssafCodes,
+      workHealthServiceList,
+      urssafCodeList,
       establishmentValidation: {
         name: { required, maxLength: maxLength(32) },
         siret: { required, validSiret },
@@ -283,6 +284,11 @@ export default {
       };
       this.$v.editedEstablishment.$reset();
     },
+    setEstablishment (payload) {
+      const { path, value } = payload;
+      if (this.establishmentCreationModal) set(this.newEstablishment, path, value);
+      else if (this.establishmentEditionModal) set(this.editedEstablishment, path, value);
+    },
     async updateEstablishment () {
       try {
         this.$v.editedEstablishment.$touch();
@@ -290,7 +296,7 @@ export default {
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
+        const fields = ['name', 'siret', 'address', 'phone', 'workHealthService', 'urssafCode'];
         if (this.editedEstablishment.phone) {
           this.editedEstablishment.phone = formatPhoneForPayload(this.editedEstablishment.phone);
         }

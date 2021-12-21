@@ -229,7 +229,8 @@ export const planningModalMixin = {
       if (this.customers.length === 0) return [];
 
       const activeCustomers = this.customers
-        .filter(customer => !customer.stoppedAt || !startDate || isBefore(startDate, customer.stoppedAt));
+        .filter(customer => !customer.archivedAt &&
+          (!customer.stoppedAt || !startDate || isBefore(startDate, customer.stoppedAt)));
       if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
         return formatAndSortIdentityOptions(activeCustomers); // Unassigned event
       }

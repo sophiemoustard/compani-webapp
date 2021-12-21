@@ -62,7 +62,7 @@
           <ni-search-address :value="newEvent.address" :error-message="addressError" @blur="validations.address.$touch"
             :error="validations.address.$error" in-modal @input="updateEvent('address', $event)" />
         </template>
-        <ni-input in-modal :value="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
+        <ni-input in-modal type="textarea" :value="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER"
           @input="updateEvent('misc', $event)" />
       </div>
