@@ -59,27 +59,27 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .q-select
-    width: 100%
-    /deep/ .q-field__control
-      min-height: 38px
-    /deep/ .q-field__inner
-      height: auto
-    /deep/ .q-field__native
-      height: auto
-      padding: 0
-    /deep/ .q-field__append
-      .q-select__dropdown-icon
-        display: none
-    /deep/ .q-chip
-      background-color: $primary
-      padding: 0 8px
-      min-height: 26px
-      color: white
-    /deep/ .q-chip__icon
-      color: white
-      opacity: 1;
-      margin: 0;
-      padding-left: 8px;
+<style lang="sass" scoped>
+.q-select
+  width: 100%
+  ::v-deep .q-field__control
+    min-height: 38px
+  ::v-deep .q-field__inner
+    height: auto
+  ::v-deep .q-field__native
+    height: auto
+    padding: 0
+  ::v-deep .q-field__append
+    .q-select__dropdown-icon
+      display: none
+  ::v-deep .q-chip
+    background-color: $primary
+    padding: 0 8px
+    min-height: 26px
+    color: white
+  ::v-deep .q-chip__icon
+    color: white
+    opacity: 1
+    margin: 0
+    padding-left: 8px
 </style>

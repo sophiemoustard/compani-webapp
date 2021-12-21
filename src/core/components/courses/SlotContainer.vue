@@ -379,7 +379,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .slots-cells
   padding: 10px
   &-container
@@ -421,13 +421,14 @@ export default {
   background: $primary
   margin-left: 10px
   margin-top: 10px
+
 .slot-section-title
-  padding: 0;
+  padding: 0
   margin: 10px 0px
   &-subtitle
-     font-style: italic
-     font-size: 16px
-     @media screen and (max-width: 767px)
+    font-style: italic
+    font-size: 16px
+    @media screen and (max-width: 767px)
       font-size: 13px
 
 .to-plan-text

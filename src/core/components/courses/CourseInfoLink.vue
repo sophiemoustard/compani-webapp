@@ -39,7 +39,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .course-link
   @media screen and (min-width: $breakpoint-md-min)
     display: flex

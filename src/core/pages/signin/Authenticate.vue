@@ -105,25 +105,23 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
+.signup
+  &-bloctext-padding
+    padding: 24px 0px 24px 0px
+  &-body-padding
+    padding: 0px 24px 0px 24px
 
-  .signup
-    &-bloctext-padding
-      padding: 24px 0px 24px 0px
-    &-body-padding
-      padding: 0px 24px 0px 24px
+.client-background
+  min-height: 100vh
+  @media screen and (max-width: 768px)
+    height: 85vh
 
-  .client-background
-    min-height: 100vh
-    @media screen and (max-width: 768px)
-      height: 85vh
-
-  .buttons
-    display: flex
-    justify-content: center
-    @media screen and (max-width: 420px)
-      flex-direction: column-reverse
-      .firstLoginBtn
-        margin-top: 16px
-
+.buttons
+  display: flex
+  justify-content: center
+  @media screen and (max-width: 420px)
+    flex-direction: column-reverse
+    .firstLoginBtn
+      margin-top: 16px
 </style>

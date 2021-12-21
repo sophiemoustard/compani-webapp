@@ -12,10 +12,10 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .dot-container
   display: flex
-  flex-direction row
+  flex-direction: row
   align-items: center
   justify-content: center
 

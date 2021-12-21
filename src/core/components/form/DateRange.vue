@@ -1,5 +1,5 @@
 <template>
-  <div class="col-12">
+  <div class="col-12 date-range">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -81,16 +81,19 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
+  .date-range
+    max-width: 100%
+
   .date-container-borders
     border: solid 1px $copper-grey-300
     border-radius: 3px
 
-  /deep/ .q-field__append
+  ::v-deep .q-field__append
     .text-negative
       display: none
 
-  /deep/ .q-field__bottom
+  ::v-deep .q-field__bottom
     color: $secondary
     padding-top: 3px
 
@@ -101,14 +104,14 @@ export default {
     & .delimiter
       margin: 0
       color: $copper-grey-700
-    /deep/ .q-field__control
+    ::v-deep .q-field__control
       border: none !important
 
   .date-item
-    /deep/ .q-field__native
+    ::v-deep .q-field__native
       text-align: center
-    /deep/ .q-field--with-bottom
+    ::v-deep .q-field--with-bottom
       padding-bottom: 0px
-    /deep/ .q-field__bottom
+    ::v-deep .q-field__bottom
       display: none
 </style>

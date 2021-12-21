@@ -355,7 +355,8 @@ export default {
   },
 };
 </script>
-<style lang="stylus" scoped>
+
+<style lang="sass" scoped>
   .dot
-    margin: 0px;
+    margin: 0px
 </style>

@@ -67,11 +67,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .q-item__section--main
-    & > .q-item__label
+    .q-item__label
       font-size: 0.80rem
   .q-item__section--side
-    & > .q-item__label
+    .q-item__label
       text-align: right
 </style>

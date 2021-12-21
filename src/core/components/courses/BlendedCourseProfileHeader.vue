@@ -83,7 +83,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .delete-container
   position: relative
 </style>

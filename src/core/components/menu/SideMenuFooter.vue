@@ -92,7 +92,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .footer-logo-container
   width: 25px
   flex: auto
@@ -101,5 +101,4 @@ export default {
 .footer-logo-container > img
   width: 25px
   height: 25px
-
 </style>

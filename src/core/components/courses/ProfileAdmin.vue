@@ -367,7 +367,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-item
   padding-left: 0px
 </style>

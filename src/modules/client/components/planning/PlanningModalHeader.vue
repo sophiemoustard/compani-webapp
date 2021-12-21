@@ -54,7 +54,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .person-name
   &-text
     padding: 9px 14px 11px

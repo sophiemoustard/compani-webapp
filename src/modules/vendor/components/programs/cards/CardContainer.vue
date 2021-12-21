@@ -139,9 +139,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .card-list
-  padding: 5px 5px 0 5px
+  padding: 4px 4px 0 4px
   border-radius: 3px
   display: flex
   flex-direction: column

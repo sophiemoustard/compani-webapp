@@ -123,15 +123,15 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .datetime-container
     width: 100%
     border: 1px solid $copper-grey-300
-    border-radius: 3px;
+    border-radius: 3px
     @media screen and (min-width: 768px)
-      flex-wrap: nowrap;
+      flex-wrap: nowrap
 
-  /deep/ .q-field__control
+  ::v-deep .q-field__control
     min-height: 40px
     border: none !important
     .q-field__marginal.q-anchor--skip
@@ -142,13 +142,13 @@ export default {
       width: 26%
     @media screen and (max-width: 767px)
       width: 60%
-    /deep/ .q-field--with-bottom
+    ::v-deep .q-field--with-bottom
       padding: 0
-    /deep/ .q-field__control
+    ::v-deep .q-field__control
       min-height: 35px
-    /deep/ .q-field__native
+    ::v-deep .q-field__native
       min-height: auto
-    /deep/ .q-field__inner
+    ::v-deep .q-field__inner
       .q-field__bottom
         display: none
 
@@ -157,14 +157,14 @@ export default {
       width: 18%
     @media screen and (max-width: 767px)
       width: 40%
-    /deep/ .q-field--with-bottom
+    ::v-deep .q-field--with-bottom
       padding: 0
-    /deep/ .q-field__inner
+    ::v-deep .q-field__inner
       .q-field__bottom
         display: none
-    /deep/ .q-field__control
+    ::v-deep .q-field__control
       min-height: 35px
-    /deep/ .q-field__native
+    ::v-deep .q-field__native
       min-height: auto
 
   .delimiter

@@ -29,15 +29,15 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .q-card
     border-radius: 8px
   .type
-    font-size: 14px;
-    color: $copper-grey-800;
+    font-size: 14px
+    color: $copper-grey-800
   .name
-    word-break: break-word;
-    height: 48px;
+    word-break: break-word
+    height: 48px
   .answers
     border-radius: 8px
     width: 100px

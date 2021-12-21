@@ -80,8 +80,8 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  /deep/ .q-btn-group
+<style lang="sass" scoped>
+  ::v-deep .q-btn-group
     & > .q-btn-item:first-child
       border: 1px solid $copper-grey-300
     & > .q-btn-item:not(:first-child)

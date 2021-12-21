@@ -44,7 +44,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 @media screen and (max-width: 767px)
   .file-uploader
     width: fit-content

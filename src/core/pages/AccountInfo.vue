@@ -171,7 +171,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .account-button
   display: flex
   flex-direction: column

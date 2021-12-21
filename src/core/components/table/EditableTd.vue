@@ -37,9 +37,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .editable-td
-    & /deep/ .q-field
+    & ::v-deep .q-field
       &__control
         height: 30px
         min-width: 60px

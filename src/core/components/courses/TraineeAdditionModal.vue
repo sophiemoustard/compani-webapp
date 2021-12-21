@@ -71,7 +71,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .details
     font-size: 14px
     color: $copper-grey-500

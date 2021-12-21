@@ -98,7 +98,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .indicators-container
     flex-grow: 1
     display: flex
@@ -106,7 +106,7 @@ export default {
     justify-content: space-between
 
   .indicator
-    display: flex;
+    display: flex
     border-top: 1px solid $copper-grey-300
     border-left: 1px solid $copper-grey-300
     border-right: 1px solid $copper-grey-300

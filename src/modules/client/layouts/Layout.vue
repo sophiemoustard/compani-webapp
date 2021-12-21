@@ -70,30 +70,30 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .q-page-sticky
-    z-index: 10
-    @media screen and (min-width: $breakpoint-md-min)
-      display: none;
+<style lang="sass" scoped>
+.q-page-sticky
+  z-index: 10
+  @media screen and (min-width: $breakpoint-md-min)
+    display: none
 
-  .chevron
-    background-color: white
-    border: 1px solid $copper-grey-300
-    top: 5px
-    position: fixed
-    z-index: 5000
-    &-left
-      left: 235px
-    &-right
-      left: 15px
-    @media screen and (max-width: $breakpoint-sm-max)
-      display: none
+.chevron
+  background-color: white
+  border: 1px solid $copper-grey-300
+  top: 5px
+  position: fixed
+  z-index: 5000
+  &-left
+    left: 235px
+  &-right
+    left: 15px
+  @media screen and (max-width: $breakpoint-sm-max)
+    display: none
 
-  .q-btn
-    color: $copper-grey-800
-    &:hover
-      color: $primary
+.q-btn
+  color: $copper-grey-800
+  &:hover
+    color: $primary
 
-  .menu-icon
-    font-size: 17px
+.menu-icon
+  font-size: 17px
 </style>

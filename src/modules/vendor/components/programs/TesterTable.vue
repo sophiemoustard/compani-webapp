@@ -194,7 +194,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .table-title
     flex: 1
 </style>

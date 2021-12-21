@@ -81,7 +81,7 @@ export default {
   },
 };
 </script>
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .questionnaires-container
     display: grid
     grid-auto-flow: row

@@ -197,13 +197,13 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .planning-header
-  /deep/ .q-field__control
+  ::v-deep .q-field__control
     background-color: inherit !important
 
 .person-name
-  font-size: 14px;
+  font-size: 14px
   &-select
     @media screen and (max-width: 767px)
       width: 80%

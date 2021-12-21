@@ -66,7 +66,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .tabs
   flex: 1
 </style>

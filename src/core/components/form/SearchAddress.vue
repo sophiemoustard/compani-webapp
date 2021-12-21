@@ -78,14 +78,14 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  /deep/ .q-select
+<style lang="sass" scoped>
+  ::v-deep .q-select
     width: 100%
     .q-select__dropdown-icon
       display: none
     .q-spinner
       display: none
 
-  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
     color: $copper-grey-900
 </style>

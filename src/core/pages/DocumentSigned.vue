@@ -32,7 +32,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .signed
   position: absolute
   background-color: white

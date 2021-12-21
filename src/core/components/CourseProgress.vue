@@ -21,10 +21,10 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .container
-  justify-content: center;
-  align-items: center;
+  justify-content: center
+  align-items: center
 
 .linear-progress
   border-radius: 4px

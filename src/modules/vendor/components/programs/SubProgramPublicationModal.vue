@@ -72,7 +72,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .select
     margin-top: 32px
 </style>

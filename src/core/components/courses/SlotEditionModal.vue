@@ -101,8 +101,8 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .modal-icon
-    display: flex;
+    display: flex
     justify-content: flex-end
 </style>

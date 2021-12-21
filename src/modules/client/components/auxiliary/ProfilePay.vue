@@ -212,9 +212,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .q-card
-    background: white;
-    width: 100%;
-    margin-bottom: 20px;
+    background: white
+    width: 100%
+    margin-bottom: 20px
 </style>

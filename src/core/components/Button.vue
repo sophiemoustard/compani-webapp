@@ -37,7 +37,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-/deep/ .q-btn__wrapper
+<style lang="sass" scoped>
+::v-deep .q-btn__wrapper
   min-height: 2.572em !important
 </style>

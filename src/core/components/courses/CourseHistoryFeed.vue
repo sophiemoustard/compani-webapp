@@ -53,7 +53,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .scroll-container
     overflow-y: auto
     overflow-x: hidden

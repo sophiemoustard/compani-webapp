@@ -455,7 +455,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .title
     font-size: 1.5em
     margin-bottom: 20px

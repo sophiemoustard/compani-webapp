@@ -66,11 +66,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .q-page-sticky
     z-index: 10
     @media screen and (min-width: $breakpoint-md-min)
-      display: none;
+      display: none
 
   .chevron
     background-color: white

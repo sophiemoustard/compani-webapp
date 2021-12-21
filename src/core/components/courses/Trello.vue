@@ -29,9 +29,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .trello
-  overflow: auto;
+  overflow: auto
   display: flex
   flex-direction: row
   @media screen and (min-width: 768px)

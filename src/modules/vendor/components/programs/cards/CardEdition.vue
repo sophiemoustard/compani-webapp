@@ -97,7 +97,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-scrollarea
   height: 100%
 

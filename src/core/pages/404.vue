@@ -30,7 +30,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-btn
   margin: 5px
   width: 200px

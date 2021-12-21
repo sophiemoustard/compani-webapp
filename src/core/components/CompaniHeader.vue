@@ -17,7 +17,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .signup-header-padding
-      padding: 24px 16px
+<style lang="sass" scoped>
+.signup-header-padding
+  padding: 24px 16px
 </style>
