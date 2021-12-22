@@ -9,10 +9,6 @@ import questionnaire from 'src/modules/vendor/store/questionnaire';
 import card from 'src/modules/vendor/store/card';
 import course from 'src/store/course';
 
-export default function () {
-  const store = createStore({
-    modules: { main, userProfile, planning, customer, program, company, course, questionnaire, card },
-  });
-
-  return store;
-}
+export default createStore({
+  modules: { main, userProfile, planning, customer, program, company, course, questionnaire, card },
+});

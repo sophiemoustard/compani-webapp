@@ -1,13 +1,13 @@
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import { canNavigate } from '@helpers/alenvi';
-import store from 'src/store/index';
 import {
   HELPER,
   AUXILIARY_ROLES,
   COACH_ROLES,
   AUXILIARY_WITHOUT_COMPANY,
 } from 'src/core/data/constants';
+import store from 'src/store/index';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 const routes = [
@@ -18,7 +18,8 @@ const routes = [
       try {
         if (to.path !== '/') return next();
 
-        if (!(await canNavigate())) return logOutAndRedirectToLogin();
+        const canNav = await canNavigate();
+        if (!canNav) return logOutAndRedirectToLogin();
 
         const { loggedUser } = store.state.main;
         const userVendorRole = store.getters['main/getVendorRole'];
