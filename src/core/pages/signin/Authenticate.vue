@@ -14,10 +14,10 @@
             </p>
           </div>
         </div>
-        <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup-enter="submit"
-         :error="$v.credentials.email.$error" :error-message="emailErrorMessage" @blur="$v.credentials.email.$touch" />
+        <ni-input data-cy="email" v-model="credentials.email" caption="Email" @keyup-enter="submit"
+         :error="v$.credentials.email.$error" :error-message="emailErrorMessage" @blur="v$.credentials.email.$touch" />
         <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password"
-          @keyup-enter="submit" :error="$v.credentials.password.$error" @blur="$v.credentials.password.$touch" />
+          @keyup-enter="submit" :error="v$.credentials.password.$error" @blur="v$.credentials.password.$touch" />
         <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
           <small>Mot de passe oublié ?</small>
         </router-link>
@@ -34,7 +34,8 @@
 
 <script>
 import get from 'lodash/get';
-import { required, email } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, email } from '@vuelidate/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
@@ -64,6 +65,9 @@ export default {
       credentials: { email: '', password: '' },
     };
   },
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       credentials: {
@@ -80,7 +84,7 @@ export default {
       return this.clientRole === AUXILIARY_WITHOUT_COMPANY;
     },
     emailErrorMessage () {
-      if (!this.$v.credentials.email.required) return REQUIRED_LABEL;
+      if (!this.v$.credentials.email.required) return REQUIRED_LABEL;
       return 'Email invalide';
     },
   },
@@ -92,8 +96,8 @@ export default {
   methods: {
     async submit () {
       try {
-        this.$v.credentials.$touch();
-        if (this.$v.credentials.$error) return;
+        this.v$.credentials.$touch();
+        if (this.v$.credentials.$error) return;
         await this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
       } catch (e) {
         console.error(e);

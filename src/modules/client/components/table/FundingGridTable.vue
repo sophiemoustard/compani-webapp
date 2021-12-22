@@ -1,5 +1,5 @@
 <template>
-  <q-table class="q-mb-xl" :data="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
+  <q-table class="q-mb-xl" :rows="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
     :visible-columns="formattedVisibleColumns" :pagination.sync="paginationHistory">
     <template #item="props">
       <q-card class="full-width q-mb-md" flat bordered>

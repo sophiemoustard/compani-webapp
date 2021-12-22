@@ -1,6 +1,6 @@
 <template>
-  <q-btn-toggle :class="displayClass" no-wrap :value="value" unelevated :toggle-color="toggleColor" :options="options"
-    @input="input" :text-color="textColor" />
+  <q-btn-toggle :class="displayClass" no-wrap :model-value="value" unelevated :toggle-color="toggleColor"
+    :options="options" @update:model-value="input" :text-color="textColor" />
 </template>
 
 <script>

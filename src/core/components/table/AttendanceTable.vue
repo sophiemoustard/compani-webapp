@@ -1,7 +1,7 @@
 <template>
 <div>
   <q-card flat>
-    <q-table v-if="courseHasSlot" :data="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
+    <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">

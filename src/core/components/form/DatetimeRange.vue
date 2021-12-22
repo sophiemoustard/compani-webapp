@@ -47,6 +47,7 @@ export default {
     startLocked: { type: Boolean, default: false },
     endLocked: { type: Boolean, default: false },
   },
+  emits: ['blur', 'input', 'startLockClick', 'endLockClick'],
   validations () {
     return {
       value: {

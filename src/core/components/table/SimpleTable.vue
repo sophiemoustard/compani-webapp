@@ -1,8 +1,10 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
-      flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners" :selected="selected"
+    <q-table v-if="!loading" :rows="data" :columns="columns" :pagination="pagination" binary-state-sort
+      flat :separator="separator" :selection="selection" :row-key="rowKey" :selected="selected"
       :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom"
+      @update:pagination="$emit('update:pagination')" @update:selected="$emit('update:selected')"
+      @update:expanded="$emit('update:expanded')" @update:row-click="$emit('update:row-click')"
       :class="['q-pa-sm large-table sticky-header', isClientInterface ? 'client-header' : 'vendor-header']">
       <template #header="props">
         <slot name="header" :props="props">
@@ -11,7 +13,7 @@
           </q-tr>
         </slot>
       </template>
-      <template v-if="$scopedSlots['top-row']" #top-row="props">
+      <template v-if="$slots['top-row']" #top-row="props">
         <slot name="top-row" :props="props" />
       </template>
       <template #body="props">
@@ -62,6 +64,7 @@ export default {
     hideBottom: { type: Boolean, default: false },
     rowsPerPage: { type: Array, default: () => [15, 50, 100, 200, 300] },
   },
+  emits: ['update:pagination', 'update:selected', 'update:expanded', 'update:row-click', 'update:pagination'],
   components: {
     'ni-pagination': Pagination,
   },

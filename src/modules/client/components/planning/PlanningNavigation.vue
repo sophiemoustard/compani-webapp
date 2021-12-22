@@ -3,7 +3,7 @@
     <div class="planning-month col-6">
       <q-btn flat dense icon-right="arrow_drop_down" :label="timelineTitle">
         <q-menu self="top middle" anchor="bottom middle">
-          <q-date minimal @input="goToWeek" :value="date" />
+          <q-date minimal @update:model-value="goToWeek" :model-value="date" />
         </q-menu>
       </q-btn>
       <div data-cy="week-number" class="week-number"><span>{{ weekNumber }}</span></div>

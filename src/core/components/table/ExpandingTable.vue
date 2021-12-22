@@ -1,6 +1,6 @@
 <template>
   <q-card class="relative-position table-spinner-container" flat>
-    <q-table v-if="!loading" :data="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
+    <q-table v-if="!loading" :rows="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
       :hide-bottom="hideBottom" :visible-columns="formattedVisibleColumns" binary-state-sort>
       <template #header="props">
         <q-tr :props="props">

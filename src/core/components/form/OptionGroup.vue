@@ -6,8 +6,8 @@
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <q-field dense borderless :error="error" :error-message="errorMessage" class="col-12">
-        <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
-          :disable="disable" v-on="$listeners" />
+        <q-option-group :model-value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
+          :disable="disable" />
       </q-field>
     </div>
   </div>

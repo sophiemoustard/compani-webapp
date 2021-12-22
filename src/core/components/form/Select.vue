@@ -4,11 +4,12 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-select dense borderless :value="model" :bg-color="bgColor" :options="selectableOptions" :multiple="multiple"
-      :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter" use-input
+    <q-select dense borderless :model-value="model" :bg-color="bgColor" :options="selectableOptions" @filter="onFilter"
+      :disable="disable" @focus="onFocus" @blur="onBlur" @update:model-value="onInput" behavior="menu" use-input
       :class="{ 'no-border': noBorder, 'borders': inModal && !noBorder , 'no-bottom': noError }" :error="error"
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" :error-message="errorMessage">
+      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" :error-message="errorMessage"
+      :multiple="multiple">
       <template #append>
         <ni-button v-if="value && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"

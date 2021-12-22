@@ -3,9 +3,9 @@
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
         <p data-cy="customer-identity" class="text-weight-bold text-primary">
-          {{ this.customer.identity | formatIdentity('FL') }}
+          {{ formatIdentity(this.customer.identity,'FL') }}
         </p>
-        <ni-date-range v-model="billingDates" @input="refresh" />
+        <ni-date-range v-model="billingDates" @blur="refresh" />
       </div>
       <div v-if="isHelper && company.billingAssistance" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à
@@ -62,11 +62,11 @@
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :new-payment.sync="newPayment" v-model="paymentCreationModal" :selected-tpp="selectedTpp"
-      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :validations="$v.newPayment"
+      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :validations="v$.newPayment"
       @submit="validatePaymentCreation(taxCertificates)" @hide="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
-    <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
+    <ni-payment-edition-modal :validations="v$.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
       :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment.sync="editedPayment"
       @submit="validatePaymentUpdate" @hide="resetPaymentEditionModal" />
 
@@ -75,12 +75,12 @@
       <template slot="title">
         Ajouter une <span class="text-weight-bold">attestation fiscale</span>
       </template>
-      <ni-date-input caption="Date" v-model="taxCertificate.date" @blur="$v.taxCertificate.date.$touch"
+      <ni-date-input caption="Date" v-model="taxCertificate.date" @blur="v$.taxCertificate.date.$touch"
         :error-message="REQUIRED_LABEL" in-modal required-field />
       <ni-select caption="Année" v-model="taxCertificate.year" :options="yearOptions"
-        @blur="$v.taxCertificate.year.$touch" :error="$v.taxCertificate.year.$error" in-modal required-field />
-      <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="$v.taxCertificate.file.$error"
-        @blur="$v.taxCertificate.file.$touch" in-modal required-field last :error-message="taxCertificateFileError" />
+        @blur="v$.taxCertificate.year.$touch" :error="v$.taxCertificate.year.$error" in-modal required-field />
+      <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="v$.taxCertificate.file.$error"
+        @blur="v$.taxCertificate.file.$touch" in-modal required-field last :error-message="taxCertificateFileError" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
           :loading="modalLoading" @click="createTaxCertificate" />
@@ -91,6 +91,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import useVuelidate from '@vuelidate/core';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import snakeCase from 'lodash/snakeCase';
@@ -147,6 +148,9 @@ export default {
     'ni-button': Button,
   },
   mixins: [paymentMixin, tableMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       pdfLoading: false,
@@ -211,13 +215,13 @@ export default {
       return COACH_ROLES.includes(this.clientRole);
     },
     taxCertificateFileError () {
-      if (!this.$v.taxCertificate.file.required) return REQUIRED_LABEL;
-      if (!this.$v.taxCertificate.file.maxSize) return 'Fichier trop volumineux (> 5 Mo)';
+      if (!this.v$.taxCertificate.file.required) return REQUIRED_LABEL;
+      if (!this.v$.taxCertificate.file.maxSize) return 'Fichier trop volumineux (> 5 Mo)';
       return '';
     },
     taxCertificateYearError () {
-      if (!this.$v.taxCertificate.year.required) return REQUIRED_LABEL;
-      if (!this.$v.taxCertificate.year.validYear) return 'Année invalide';
+      if (!this.v$.taxCertificate.year.required) return REQUIRED_LABEL;
+      if (!this.v$.taxCertificate.year.validYear) return 'Année invalide';
       return '';
     },
     yearOptions () {
@@ -236,6 +240,7 @@ export default {
   },
   methods: {
     get,
+    formatIdentity,
     // Billing dates
     setBillingDates () {
       this.billingDates.endDate = moment().endOf('d').toISOString();
@@ -379,8 +384,8 @@ export default {
     },
     async validatePaymentUpdate () {
       this.paymentEditionLoading = true;
-      this.$v.editedPayment.$touch();
-      if (this.$v.editedPayment.$error) {
+      this.v$.editedPayment.$touch();
+      if (this.v$.editedPayment.$error) {
         this.paymentEditionLoading = false;
         return NotifyWarning('Champ(s) invalide(s)');
       }
@@ -436,12 +441,12 @@ export default {
         year: moment().subtract(1, 'y').format('YYYY'),
         file: null,
       };
-      this.$v.taxCertificate.$reset();
+      this.v$.taxCertificate.$reset();
     },
     async createTaxCertificate () {
       if (!this.customerFolder) return NotifyNegative('Dossier du/de la bénéficiaire manquant.');
-      this.$v.taxCertificate.$touch();
-      if (this.$v.taxCertificate.$error) return NotifyWarning('Champ(s) invalide(s)');
+      this.v$.taxCertificate.$touch();
+      if (this.v$.taxCertificate.$error) return NotifyWarning('Champ(s) invalide(s)');
       this.modalLoading = true;
 
       try {
@@ -524,9 +529,6 @@ export default {
         NotifyNegative('Erreur lors de la suppression du remboursement.');
       }
     },
-  },
-  filters: {
-    formatIdentity,
   },
 };
 </script>

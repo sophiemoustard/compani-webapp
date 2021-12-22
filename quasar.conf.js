@@ -7,7 +7,6 @@ const { configure } = require('quasar/wrappers');
 module.exports = configure(ctx => ({
   boot: [
     // 'vue-croppa',
-    // 'vuelidate',
     // 'vueclipboard',
     // process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
   ],

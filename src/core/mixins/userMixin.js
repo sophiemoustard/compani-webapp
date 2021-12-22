@@ -52,9 +52,9 @@ export const userMixin = {
           return;
         }
 
-        if (get(this.$v.userProfile, path)) {
-          get(this.$v.userProfile, path).$touch();
-          const isValid = await this.waitForValidation(this.$v.userProfile, path);
+        if (get(this.v$.userProfile, path)) {
+          get(this.v$.userProfile, path).$touch();
+          const isValid = await this.waitForValidation(this.v$.userProfile, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (path === 'contact.phone') {

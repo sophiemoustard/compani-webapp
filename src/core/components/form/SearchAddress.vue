@@ -4,9 +4,9 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-      <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
+      <q-select dense borderless :model-value="value.fullAddress" @update:model-value="update" use-input fill-input
         input-debounce="500" :options="options" :class="{ 'borders': inModal }" :disable="disable" behavior="menu"
-        @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color" :error="error"
+        @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color" :error="error" hide-selected
         :error-message="errorMessage">
         <template v-if="value.fullAddress && !disable" #append>
           <ni-button icon="close" @click.stop="resetValue" size="sm" />
@@ -33,6 +33,7 @@ export default {
     disable: { type: Boolean, default: false },
     color: { type: String, default: 'white' },
   },
+  emits: ['blur', 'focus', 'input'],
   components: {
     'ni-button': Button,
   },

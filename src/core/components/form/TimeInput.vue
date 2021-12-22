@@ -5,11 +5,11 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
+    <q-input dense bg-color="white" borderless :model-value="value" @update:model-value="update" :readonly="locked"
       :error-message="errorMessage" :error="error" @blur="onBlur" :rules="['time']" mask="time" data-cy="time-input"
-      :disable="disable && !locked" :readonly="locked">
+      :disable="disable && !locked" :class="{ borders: inModal }">
       <template #append>
-        <q-icon v-if="!locked" name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime"
+        <q-icon v-if="!locked" name="far fa-clock" class="cursor-pointer" @click="selectTime = !selectTime"
           color="copper-grey-500">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-list dense padding>
@@ -20,7 +20,7 @@
             </q-list>
           </q-menu>
         </q-icon>
-        <q-icon v-else name="lock" class="cursor-pointer" @click.native="click" color="copper-500" />
+        <q-icon v-else name="lock" class="cursor-pointer" @click="click" color="copper-500" />
       </template>
     </q-input>
   </div>

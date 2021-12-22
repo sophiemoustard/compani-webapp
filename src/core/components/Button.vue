@@ -1,7 +1,7 @@
 <template>
   <q-btn :flat="flat" small no-caps :color="color" :icon="icon" :disable="disable" :type="type" :href="!disable && href"
     :target="target" :label="label" :dense="!label" :loading="loading" :size="size" unelevated :padding="padding"
-    @click.stop.native="click" />
+    @click.stop="click" />
 </template>
 
 <script>
@@ -19,6 +19,7 @@ export default {
     type: { type: String, default: '' },
     unelevated: { type: Boolean, default: false },
   },
+  emits: ['click'],
   computed: {
     target () {
       return this.type === 'a' ? '_blank' : '';

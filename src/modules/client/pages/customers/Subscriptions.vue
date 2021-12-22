@@ -30,7 +30,7 @@
         </p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
-            <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
+            <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @update:model-value="confirmAgreement"
               :disable="customer.subscriptionsAccepted" dense />
             <span style="vertical-align: middle">
               J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les
@@ -61,13 +61,14 @@
         <p class="title">Paiement</p>
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner"
-            :error="$v.customer.payment.bankAccountOwner.$error" @focus="saveTmp('payment.bankAccountOwner')"
+            :error="v$.customer.payment.bankAccountOwner.$error" @focus="saveTmp('payment.bankAccountOwner')"
             @blur="updateCustomer('payment.bankAccountOwner')" data-cy="bank-account-owner" />
-          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error"
+          <ni-input caption="IBAN" v-model="customer.payment.iban" :error="v$.customer.payment.iban.$error"
             :error-message="ibanError" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')"
             data-cy="iban" />
-          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" data-cy="bic"
-            :error-message="bicError" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
+          <ni-input caption="BIC" v-model="customer.payment.bic" :error="v$.customer.payment.bic.$error"
+            :error-message="bicError" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')"
+            data-cy="bic" />
         </div>
       </div>
       <div class="q-mb-lg">
@@ -75,7 +76,7 @@
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-cell">
           <ni-responsive-table :data="customer.payment.mandates" :columns="mandatesColumns" :loading="mandatesLoading"
-            :pagination.sync="pagination" :visible-columns="mandatesVisibleColumns" data-cy="mandate-table">
+            v-model:pagination="pagination" :visible-columns="mandatesVisibleColumns" data-cy="mandate-table">
             <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -101,7 +102,7 @@
     <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width data-cy="esign-modal">
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end no-wrap">
-          <ni-button icon="close" @click.native="newESignModal = false" />
+          <ni-button icon="close" @click="newESignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
           <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />
@@ -110,17 +111,17 @@
     </q-dialog>
 
     <!-- CSG modal -->
-    <ni-html-modal :title="htmlModalTitle" v-model="gcsModal" :html="gcs" @show="openGcsModal" @hide="closeGcsModal"
-      :loading="gcsLoading" />
+    <ni-html-modal :title="htmlModalTitle" v-model="gcsModal" :html="gcs" @show="openGcsModal"
+      @hide="closeGcsModal" :loading="gcsLoading" />
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
-      <template slot="title">
+      <template #title>
         Historique de la souscription <span class="text-weight-bold">{{ selectedSubscription.service &&
           selectedSubscription.service.name }}</span>
       </template>
       <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
-        :pagination.sync="paginationHistory" data-cy="subscriptions-history" />
+        v-model:pagination="paginationHistory" data-cy="subscriptions-history" />
     </ni-modal>
 
     <!-- Funding modal -->
@@ -132,7 +133,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Esign from '@api/Esign';
@@ -199,6 +201,9 @@ export default {
       extensions: DOC_EXTENSIONS,
     };
   },
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       customer: {
@@ -216,13 +221,13 @@ export default {
       customer: state => state.customer.customer,
     }),
     ibanError () {
-      if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
-      if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
+      if (!this.v$.customer.payment.iban.required) return REQUIRED_LABEL;
+      if (!this.v$.customer.payment.iban.iban) return 'IBAN non valide';
       return '';
     },
     bicError () {
-      if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
-      if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
+      if (!this.v$.customer.payment.bic.required) return REQUIRED_LABEL;
+      if (!this.v$.customer.payment.bic.bic) return 'BIC non valide';
       return '';
     },
     agreement () {
@@ -243,7 +248,7 @@ export default {
       };
     },
     isValidPayment () {
-      return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban;
+      return this.v$.customer.payment.bic.bic && this.v$.customer.payment.iban.iban;
     },
     docsUploadUrl () {
       return this.customer.driveFolder
@@ -260,7 +265,7 @@ export default {
     else {
       this.refreshSubscriptions(this.customer);
       this.refreshFundings(this.customer);
-      this.$v.customer.$touch();
+      this.v$.customer.$touch();
     }
     await this.checkMandates();
   },
@@ -283,7 +288,7 @@ export default {
         this.refreshSubscriptions(this.customer);
         this.refreshFundings(this.customer);
 
-        this.$v.customer.$touch();
+        this.v$.customer.$touch();
       } catch (e) {
         console.error(e);
       } finally {
@@ -299,8 +304,8 @@ export default {
         let value = get(this.customer, path);
         if (this.tmpInput === value) return;
 
-        get(this.$v.customer, path).$touch();
-        if (get(this.$v.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+        get(this.v$.customer, path).$touch();
+        if (get(this.v$.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
@@ -310,8 +315,8 @@ export default {
         NotifyPositive('Modification enregistrée');
 
         if (path.match(/iban/i)) {
-          this.$v.customer.payment.bic.$touch();
-          if (!this.$v.customer.payment.bic.required) return NotifyWarning('Merci de renseigner votre BIC');
+          this.v$.customer.payment.bic.$touch();
+          if (!this.v$.customer.payment.bic.required) return NotifyWarning('Merci de renseigner votre BIC');
         }
       } catch (e) {
         console.error(e);

@@ -18,8 +18,8 @@
           <div v-if="getDriveId(certificate)" class="row justify-between files-container" :key="index">
             <span class="document-caption">{{ caption }}</span>
             <div class="doc-actions">
-              <ni-button icon="save_alt" :disabled="loading" @click.native="downloadDriveDoc(certificate)" />
-              <ni-button icon="delete" :disabled="loading" @click.native="deleteDocument(certificate)" />
+              <ni-button icon="save_alt" :disabled="loading" @click="downloadDriveDoc(certificate)" />
+              <ni-button icon="delete" :disabled="loading" @click="deleteDocument(certificate)" />
             </div>
           </div>
         </template>

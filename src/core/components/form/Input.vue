@@ -8,8 +8,8 @@
     <template v-if="type === 'file'">
       <div class="row input-file-container" :class="{'borders-parent': inModal}">
         <div class="col full-width">
-          <span class="input-file-empty" v-if="!value">Pas de document</span>
-          <template v-else>{{ value.name }}</template>
+          <span class="input-file-empty" v-if="!modelValue">Pas de document</span>
+          <template v-else>{{ modelValue.name }}</template>
         </div>
         <i aria-hidden="true" class="q-icon on-right material-icons self-center relative-position">
           add
@@ -20,12 +20,12 @@
       <div class="file-error" v-if="error">{{ errorMessage }}</div>
     </template>
     <template v-else>
-      <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
+      <q-input borderless dense :ref="name" :model-value="modelValue" bg-color="white" @focus="onFocus"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
-        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage" :mask="mask"
+        @blur="onBlur" @update:model-value="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
-        :data-cy="dataCy" @click="onClick" :hide-bottom-space="readOnly" :input-class="inputClass"
-        :class="{ 'no-border': noBorder }">
+        :data-cy="dataCy" @click="onClick" :hide-bottom-space="readOnly" :input-class="inputClass" :mask="mask"
+        :class="{ 'no-border': noBorder }" :disable="disable">
         <template v-if="icon" #prepend>
           <q-icon size="xs" :name="icon" />
         </template>
@@ -50,7 +50,7 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    value: { type: [String, Number, File], default: '' },
+    modelValue: { type: [String, Number, File], default: '' },
     upperCase: { type: Boolean, default: false },
     lowerCase: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
@@ -72,6 +72,7 @@ export default {
     inputClass: { type: [Array, String, Object], default: '' },
     noBorder: { type: Boolean, default: false },
   },
+  emits: ['update:model-value', 'blur', 'focus', 'click', 'keyup-enter'],
   data () {
     return {
       showPassword: false,
@@ -93,17 +94,17 @@ export default {
       this.showPassword = !this.showPassword;
     },
     updateInputFile () {
-      this.$emit('input', this.$refs.inputFile.files[0]);
+      this.$emit('update:model-value', this.$refs.inputFile.files[0]);
     },
     onBlur (event) {
       if (this.type === 'number') this.$nextTick(() => this.$emit('blur'));
       else this.$emit('blur');
     },
-    onFocus (event) {
+    onFocus () {
       this.$emit('focus');
     },
     update (value) {
-      this.$emit('input', value);
+      this.$emit('update:model-value', value);
     },
     select () {
       this.$refs[this.name].select();

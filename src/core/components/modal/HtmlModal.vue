@@ -1,5 +1,6 @@
 <template>
-  <q-dialog :value="value" v-on="$listeners" full-height full-width>
+  <q-dialog :model-value="modelValue" @update:model-value="$emit('update:mdoel-value')" @update:show="$emit('show')"
+    @update:hide="$emit('hide')" full-height full-width>
     <q-card class="full-height" style="width: 80vw">
       <q-card-section class="row justify-between no-wrap title-modal">
         <div class="q-ml-md q-mb-xs modal-title">{{ title }}</div>
@@ -19,11 +20,12 @@
 export default {
   name: 'HtmlModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     title: { type: String, default: '' },
     html: { type: String, default: '' },
   },
+  emits: ['show', 'hide', 'update:mdoel-value'],
 };
 </script>
 

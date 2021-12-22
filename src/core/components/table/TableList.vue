@@ -1,6 +1,6 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" :data="data" :columns="columns" flat :row-key="rowKey" binary-state-sort
+    <q-table v-if="!loading" :rows="data" :columns="columns" flat :row-key="rowKey" binary-state-sort
       :pagination="pagination" class="table-list" :rows-per-page-options="[]" @update:pagination="update($event)"
       :visible-columns="formattedVisibleColumns">
       <template #body="props">

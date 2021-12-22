@@ -11,8 +11,7 @@
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
         <q-field dense borderless class="col-12">
-          <q-option-group :value="value" :options="options" type="radio" inline dense
-            v-on="$listeners" />
+          <q-option-group :model-value="value" :options="options" type="radio" inline dense />
         </q-field>
       </div>
       <q-field :error="error" :error-message="errorMessage" dense borderless class="error-field" />

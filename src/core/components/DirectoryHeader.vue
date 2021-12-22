@@ -2,15 +2,15 @@
   <div class="row q-mb-md justify-between">
     <div :class="[titleContainerClass, 'page-title']">{{ title }}</div>
     <div v-if="displaySearchBar" :class="searchBarContainerClass">
-      <q-input class="no-border" :value="search" :placeholder="searchPlaceholder" dense borderless
-        @input="input" debounce="0" type="search" bg-color="white">
+      <q-input class="no-border" :model-value="search" :placeholder="searchPlaceholder" dense borderless
+        @update:model-value="input" debounce="0" type="search" bg-color="white">
         <template #prepend>
           <q-icon size="xs" name="search" />
         </template>
       </q-input>
     </div>
     <div v-if="displayToggle" class="col-xs-12 col-md-2 row justify-end">
-      <q-toggle dense :value="toggleValue" color="primary" :label="toggleLabel" @input="toggle" />
+      <q-toggle dense :model-value="toggleValue" color="primary" :label="toggleLabel" @update:model-value="toggle" />
     </div>
   </div>
 </template>
