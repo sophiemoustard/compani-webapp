@@ -636,16 +636,16 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .q-btn-group
-    & ::v-deep button
-      flex: 1
-  .group-error
+.q-btn-group
+  & :deep button
+    flex: 1
+.group-error
+  font-size: 12px
+  color: $secondary
+  &-ok
     font-size: 12px
-    color: $secondary
-    &-ok
-      font-size: 12px
-      color: $green-600
-  ::v-deep .q-field--standard.q-field--focused
-    .q-field__control:after
-      display: none
+    color: $green-600
+:deep .q-field--standard.q-field--focused
+  .q-field__control:after
+    display: none
 </style>

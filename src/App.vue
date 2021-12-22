@@ -1,5 +1,5 @@
 <template>
-  <div id="q-app">
+  <div>
     <router-view />
     <q-ajax-bar color="primary" size="1px" />
   </div>
@@ -10,9 +10,7 @@ export default {
   name: 'App',
   metaInfo: {
     titleTemplate: titleChunk => (titleChunk ? `Compani - ${titleChunk}` : 'Compani'),
-    htmlAttrs: {
-      lang: 'fr',
-    },
+    htmlAttrs: { lang: 'fr' },
   },
 };
 </script>

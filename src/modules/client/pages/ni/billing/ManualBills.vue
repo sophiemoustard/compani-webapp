@@ -4,8 +4,8 @@
     <ni-simple-table :columns="columns" :pagination.sync="pagination" :data="manualBills"
       :loading="tableLoading" :rows-per-page="rowsPerPage" separator="none">
       <template #body="{ props }">
-        <template v-for="(billingItem, index) of props.row.billingItemList">
-          <q-tr :props="props" :key="`${props.row._id}-${index}`" :class="{ 'border-top': index === 0 }">
+        <template v-for="(billingItem, index) of props.row.billingItemList" :key="`${props.row._id}-${index}`">
+          <q-tr :props="props" :class="{ 'border-top': index === 0 }">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'billingItem'">{{ billingItem.name }}</template>

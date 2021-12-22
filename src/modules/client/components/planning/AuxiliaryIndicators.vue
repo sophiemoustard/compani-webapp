@@ -99,41 +99,41 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .indicators-container
-    flex-grow: 1
-    display: flex
-    flex-direction: column
-    justify-content: space-between
+.indicators-container
+  flex-grow: 1
+  display: flex
+  flex-direction: column
+  justify-content: space-between
 
-  .indicator
-    display: flex
-    border-top: 1px solid $copper-grey-300
-    border-left: 1px solid $copper-grey-300
-    border-right: 1px solid $copper-grey-300
-    .indicator-title
-      padding: 5px
-    .indicator-hours
-      padding: 5px
-      border-left:  1px solid $copper-grey-300
-    &:last-child
-      border-bottom: 1px solid $copper-grey-300
+.indicator
+  display: flex
+  border-top: 1px solid $copper-grey-300
+  border-left: 1px solid $copper-grey-300
+  border-right: 1px solid $copper-grey-300
+  .indicator-title
+    padding: 5px
+  .indicator-hours
+    padding: 5px
+    border-left:  1px solid $copper-grey-300
+  &:last-child
+    border-bottom: 1px solid $copper-grey-300
 
-  .highlight
-    color: $primary
-    font-weight: bold
+.highlight
+  color: $primary
+  font-weight: bold
 
-  .indicators
-    padding: 0 24px
-    margin: 0 0 24px
-    @media screen and (max-width: $breakpoint-sm-max)
-      padding: 0 12px
+.indicators
+  padding: 0 24px
+  margin: 0 0 24px
+  @media screen and (max-width: $breakpoint-sm-max)
+    padding: 0 12px
 
-  .economic-indicators
-    border-left: 5px solid $primary !important
-  .quality-indicators
-    border-left: 5px solid $copper-300 !important
+.economic-indicators
+  border-left: 5px solid $primary !important
+.quality-indicators
+  border-left: 5px solid $copper-300 !important
 
-  .quality-indicators-item
-    border-top: 1px solid $copper-grey-300
-    padding: 10px 0
+.quality-indicators-item
+  border-top: 1px solid $copper-grey-300
+  padding: 10px 0
 </style>

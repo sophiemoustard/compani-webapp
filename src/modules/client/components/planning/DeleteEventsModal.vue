@@ -137,7 +137,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-::v-deep .q-option-group--inline
+:deep .q-option-group--inline
     .q-radio
       padding-bottom: 0px !important
 </style>

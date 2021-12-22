@@ -8,13 +8,12 @@
           </q-item-label>
         </div>
         <q-separator />
-        <template v-for="route of routes">
-          <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label"
-              :key="route.ref">
-              <ni-menu-item v-for="item of route.children" :name="item.name" :icon="item.icon" :label="item.label"
-                :key="item.name" :params="item.params" />
-            </q-expansion-item>
-          <q-separator :key="`separator-${route.ref}`" />
+        <template v-for="route of routes" :key="route.ref">
+          <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label">
+            <ni-menu-item v-for="item of route.children" :name="item.name" :icon="item.icon" :label="item.label"
+              :key="item.name" :params="item.params" />
+          </q-expansion-item>
+          <q-separator />
         </template>
         <ni-side-menu-footer :label="userFirstname" :user-id="loggedUser._id" :interface-type="interfaceType" />
       </q-list>
@@ -67,29 +66,29 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .q-page-sticky
-    z-index: 10
-    @media screen and (min-width: $breakpoint-md-min)
-      display: none
+.q-page-sticky
+  z-index: 10
+  @media screen and (min-width: $breakpoint-md-min)
+    display: none
 
-  .chevron
-    background-color: white
-    border: 1px solid $copper-grey-300
-    top: 5px
-    position: fixed
-    z-index: 5000
-    &-left
-      left: 235px
-    &-right
-      left: 15px
-    @media screen and (max-width: $breakpoint-sm-max)
-      display: none
+.chevron
+  background-color: white
+  border: 1px solid $copper-grey-300
+  top: 5px
+  position: fixed
+  z-index: 5000
+  &-left
+    left: 235px
+  &-right
+    left: 15px
+  @media screen and (max-width: $breakpoint-sm-max)
+    display: none
 
-  .q-btn
-    color: $copper-grey-800
-    &:hover
-      color: $primary
+.q-btn
+  color: $copper-grey-800
+  &:hover
+    color: $primary
 
-  .menu-icon
-    font-size: 17px
+.menu-icon
+  font-size: 17px
 </style>

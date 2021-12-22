@@ -94,9 +94,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .q-list
-    width: 100px
+.q-list
+  width: 100px
 
-  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
-    color: $copper-grey-900
+:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+  color: $copper-grey-900
 </style>

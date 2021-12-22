@@ -82,36 +82,36 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .date-range
-    max-width: 100%
+.date-range
+  max-width: 100%
 
-  .date-container-borders
-    border: solid 1px $copper-grey-300
-    border-radius: 3px
+.date-container-borders
+  border: solid 1px $copper-grey-300
+  border-radius: 3px
 
-  ::v-deep .q-field__append
-    .text-negative
-      display: none
+:deep .q-field__append
+  .text-negative
+    display: none
 
-  ::v-deep .q-field__bottom
-    color: $secondary
-    padding-top: 3px
+:deep .q-field__bottom
+  color: $secondary
+  padding-top: 3px
 
-  .date-container
-    width: 100%
-    border-radius: 3px
-    background-color: white
-    & .delimiter
-      margin: 0
-      color: $copper-grey-700
-    ::v-deep .q-field__control
-      border: none !important
+.date-container
+  width: 100%
+  border-radius: 3px
+  background-color: white
+  & .delimiter
+    margin: 0
+    color: $copper-grey-700
+  :deep .q-field__control
+    border: none !important
 
-  .date-item
-    ::v-deep .q-field__native
-      text-align: center
-    ::v-deep .q-field--with-bottom
-      padding-bottom: 0px
-    ::v-deep .q-field__bottom
-      display: none
+.date-item
+  :deep .q-field__native
+    text-align: center
+  :deep .q-field--with-bottom
+    padding-bottom: 0px
+  :deep .q-field__bottom
+    display: none
 </style>

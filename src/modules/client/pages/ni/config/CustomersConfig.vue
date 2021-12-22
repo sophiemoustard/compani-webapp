@@ -1236,11 +1236,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .archived
-    display: flex
-    align-self: center
-  .billing-item-tag
-    background-color: $copper-100
-    border-radius: 8px
-    color: $copper-700
+.archived
+  display: flex
+  align-self: center
+.billing-item-tag
+  background-color: $copper-100
+  border-radius: 8px
+  color: $copper-700
 </style>

@@ -84,7 +84,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-::v-deep .bold-title
+:deep .bold-title
   color: $copper-grey-900
   font-weight: bold
   font-size: 24px

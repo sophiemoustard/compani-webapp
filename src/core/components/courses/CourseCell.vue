@@ -141,80 +141,80 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .q-card__section
-    height: fit-content
-    &:hover
-      cursor: pointer
-    &--vert
-      padding: 10px
-  .title-text
+.q-card__section
+  height: fit-content
+  &:hover
+    cursor: pointer
+  &--vert
+    padding: 10px
+.title-text
+  font-size: 14px
+.items-container
+  display: flex
+  flex-wrap: wrap
+  font-size: 12px
+  color: $copper-grey-600
+.item-section-container
+  display: flex
+.q-item__section--side
+  padding: 0px
+  margin-right: 5px
+.q-item
+  padding: 0px
+  min-height: auto
+  margin-right: 10px
+.infos-course
+  &-nearest-date
+    color: $copper-grey-900 !important
     font-size: 14px
-  .items-container
+  &-container
+    align-items: center
+    margin-top: 10px
+    & > .q-item__section
+      display: flex
+      justify-content: flex-start
+      flex-direction: row
+      &.q-item__section--side
+        margin-right: 10px
+      & > .q-icon
+        margin-right: 5px
+.slots
+  height: 10px
+  flex: 1
+  background-color: $copper-300
+  &-happened
+    background-color: $primary
+  &-to-plan
+    background-color: $secondary
+
+.additional-infos
+  color: $primary
+  font-size: 12px
+  align-items: flex-end
+  &-container
     display: flex
+    justify-content: flex-end
     flex-wrap: wrap
-    font-size: 12px
-    color: $copper-grey-600
-  .item-section-container
-    display: flex
-  .q-item__section--side
-    padding: 0px
-    margin-right: 5px
+
+.to-plan
+  color: $secondary
+
+.slots-timeline-container
+  display: flex
+  flex-direction: column
+  padding: 0px
+  overflow: hidden
   .q-item
-    padding: 0px
-    min-height: auto
-    margin-right: 10px
-  .infos-course
-    &-nearest-date
-      color: $copper-grey-900 !important
-      font-size: 14px
-    &-container
-      align-items: center
-      margin-top: 10px
-      & > .q-item__section
-        display: flex
-        justify-content: flex-start
-        flex-direction: row
-        &.q-item__section--side
-          margin-right: 10px
-        & > .q-icon
-          margin-right: 5px
-  .slots
-    height: 10px
-    flex: 1
-    background-color: $copper-300
-    &-happened
-      background-color: $primary
-    &-to-plan
-      background-color: $secondary
-
+    margin-right: 0px
+  .slots-timeline
+    width: 104%
+    margin-left: -2%
+  .slots-timeline > :nth-child(1)
+    margin-left: 0px
+  .slots-timeline > div
+    margin-left: 1px
   .additional-infos
-    color: $primary
-    font-size: 12px
-    align-items: flex-end
-    &-container
-      display: flex
-      justify-content: flex-end
-      flex-wrap: wrap
-
-  .to-plan
-    color: $secondary
-
-  .slots-timeline-container
     display: flex
-    flex-direction: column
-    padding: 0px
-    overflow: hidden
-    .q-item
-      margin-right: 0px
-    .slots-timeline
-      width: 104%
-      margin-left: -2%
-    .slots-timeline > :nth-child(1)
-      margin-left: 0px
-    .slots-timeline > div
-      margin-left: 1px
-    .additional-infos
-      display: flex
-      padding-right: 10px
-      justify-content: flex-end
+    padding-right: 10px
+    justify-content: flex-end
 </style>

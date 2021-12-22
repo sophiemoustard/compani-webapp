@@ -101,20 +101,20 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .doc-actions
-    .q-btn
-      @media screen and (max-width: 767px)
-        margin: 0px 4px
+.doc-actions
+  .q-btn
+    @media screen and (max-width: 767px)
+      margin: 0px 4px
 
-  ::v-deep .q-item__section--side
-    .q-icon
-      size: 1em
-      color: $primary
+:deep .q-item__section--side
+  .q-icon
+    size: 1em
+    color: $primary
 
-  .files-container
-    width: 100%
-    background-color: white
-    align-items: center
-    padding: 8px
-    margin-bottom: 16px
+.files-container
+  width: 100%
+  background-color: white
+  align-items: center
+  padding: 8px
+  margin-bottom: 16px
 </style>

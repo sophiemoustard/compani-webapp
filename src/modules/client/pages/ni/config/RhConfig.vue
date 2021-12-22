@@ -54,9 +54,9 @@
         <p class="text-weight-bold">Abonnements transports en commun</p>
         <div class="row gutter-profile">
           <template v-if="company.rhConfig.transportSubs">
-            <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
+            <template v-for="(transportSub, index) in company.rhConfig.transportSubs" :key="index">
               <ni-input :caption="transportSub.department" v-model="company.rhConfig.transportSubs[index].price"
-                :error="$v.company.rhConfig.transportSubs.$each[index].$error" type="number" :key="index"
+                :error="$v.company.rhConfig.transportSubs.$each[index].$error" type="number"
                 @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
                 :error-message="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
                 @blur="updateCompanyTransportSubs(index)" />

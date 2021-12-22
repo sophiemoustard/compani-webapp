@@ -83,13 +83,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .q-input
-    ::v-deep .q-field__control
-      font-size: 16px
-      padding-left: 14px
-      padding-right: 14px
-      border-radius: 3px
+.q-input
+  :deep .q-field__control
+    font-size: 16px
+    padding-left: 14px
+    padding-right: 14px
+    border-radius: 3px
 
-  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
-    color: $copper-grey-900
+:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+  color: $copper-grey-900
 </style>

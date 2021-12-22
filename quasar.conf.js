@@ -2,125 +2,123 @@ require('dotenv').config();
 const path = require('path');
 const webpack = require('webpack');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const { configure } = require('quasar/wrappers');
 
-module.exports = function (ctx) {
-  return {
-    boot: [
-      'vue-croppa',
-      'vuelidate',
-      'vueclipboard',
-      process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
+module.exports = configure(ctx => ({
+  boot: [
+    // 'vue-croppa',
+    // 'vuelidate',
+    // 'vueclipboard',
+    // process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
+  ],
+  css: ['app.sass', 'colors.sass'],
+  extras: ['material-icons', 'mdi-v3', 'ionicons-v4', 'fontawesome-v5'],
+  framework: {
+    all: false,
+    lang: 'fr',
+    components: [
+      'QAjaxBar',
+      'QBanner',
+      'QBtn',
+      'QBtnToggle',
+      'QCard',
+      'QCardActions',
+      'QCardSection',
+      'QCheckbox',
+      'QChip',
+      'QCircularProgress',
+      'QDate',
+      'QDialog',
+      'QDrawer',
+      'QExpansionItem',
+      'QField',
+      'QHeader',
+      'QIcon',
+      'QInfiniteScroll',
+      'QInnerLoading',
+      'QInput',
+      'QItem',
+      'QItemLabel',
+      'QItemSection',
+      'QLayout',
+      'QLinearProgress',
+      'QList',
+      'QMenu',
+      'QOptionGroup',
+      'QPage',
+      'QPageContainer',
+      'QPageSticky',
+      'QPopupProxy',
+      'QScrollArea',
+      'QSelect',
+      'QSeparator',
+      'QSlideTransition',
+      'QSpinner',
+      'QSpinnerDots',
+      'QSpinnerFacebook',
+      'QStepper',
+      'QStep',
+      'QTabs',
+      'QTab',
+      'QTabPanels',
+      'QTabPanel',
+      'QTable',
+      'QTab',
+      'QTabPanel',
+      'QTabPanels',
+      'QTabs',
+      'QTd',
+      'QTh',
+      'QTime',
+      'QTr',
+      'QToggle',
+      'QUploader',
     ],
-    css: ['app.sass', 'colors.sass'],
-    extras: ['material-icons', 'mdi-v3', 'ionicons-v4', 'fontawesome-v5'],
-    framework: {
-      all: false,
-      lang: 'fr',
-      components: [
-        'QAjaxBar',
-        'QBanner',
-        'QBtn',
-        'QBtnToggle',
-        'QCard',
-        'QCardActions',
-        'QCardSection',
-        'QCheckbox',
-        'QChip',
-        'QCircularProgress',
-        'QDate',
-        'QDialog',
-        'QDrawer',
-        'QExpansionItem',
-        'QField',
-        'QHeader',
-        'QIcon',
-        'QInfiniteScroll',
-        'QInnerLoading',
-        'QInput',
-        'QItem',
-        'QItemLabel',
-        'QItemSection',
-        'QLayout',
-        'QLinearProgress',
-        'QList',
-        'QMenu',
-        'QOptionGroup',
-        'QPage',
-        'QPageContainer',
-        'QPageSticky',
-        'QPopupProxy',
-        'QScrollArea',
-        'QSelect',
-        'QSeparator',
-        'QSlideTransition',
-        'QSpinner',
-        'QSpinnerDots',
-        'QSpinnerFacebook',
-        'QStepper',
-        'QStep',
-        'QTabs',
-        'QTab',
-        'QTabPanels',
-        'QTabPanel',
-        'QTable',
-        'QTab',
-        'QTabPanel',
-        'QTabPanels',
-        'QTabs',
-        'QTd',
-        'QTh',
-        'QTime',
-        'QTr',
-        'QToggle',
-        'QUploader',
-      ],
-      directives: ['Ripple', 'ClosePopup'],
-      plugins: ['Notify', 'Cookies', 'Loading', 'Dialog', 'LocalStorage'],
+    directives: ['Ripple', 'ClosePopup'],
+    plugins: ['Notify', 'Cookies', 'Loading', 'Dialog', 'LocalStorage'],
+  },
+  animations: ['fadeIn', 'fadeOut'],
+  supportIE: true,
+  build: {
+    scopeHoisting: true,
+    vueRouterMode: 'history',
+    publicPath: '/',
+    gzip: true,
+    useNotifier: false,
+    preloadChunks: true,
+    chainWebpack (chain) {
+      const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
+      chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
     },
-    animations: ['fadeIn', 'fadeOut'],
-    supportIE: true,
-    build: {
-      scopeHoisting: true,
-      vueRouterMode: 'history',
-      publicPath: '/',
-      gzip: true,
-      useNotifier: false,
-      preloadChunks: true,
-      extendWebpack (cfg) {
-        cfg.module.rules.push({
-          test: /\.(html)$/,
-          use: { loader: 'html-loader' },
-        });
-        // eslint-disable-next-line no-param-reassign
-        cfg.resolve.alias = {
-          ...cfg.resolve.alias,
-          '@components': path.resolve(__dirname, './src/core/components'),
-          '@api': path.resolve(__dirname, './src/core/api'),
-          '@helpers': path.resolve(__dirname, './src/core/helpers'),
-          '@data': path.resolve(__dirname, './src/core/data'),
-          '@mixins': path.resolve(__dirname, './src/core/mixins'),
-        };
-        cfg.plugins.push(
-          new ESLintPlugin({ fix: true }),
-          // Select moment locale files
-          new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/),
-          // Ignore astronomia (date-holidays)
-          new webpack.IgnorePlugin(/^\.\/vsop87B.*$/)
-        );
-      },
-      env: {
-        NODE_ENV: process.env.NODE_ENV,
-        API_HOSTNAME: process.env.NODE_ENV === 'test' ? process.env.TEST_API_HOSTNAME : process.env.API_HOSTNAME,
-        COMPANI_HOSTNAME: process.env.COMPANI_HOSTNAME,
-        MESSENGER_LINK: process.env.MESSENGER_LINK,
-        ENTERCODE_LINK: process.env.ENTERCODE_LINK,
-        TOKEN_SECRET: process.env.TOKEN_SECRET,
-        ALENVI_BOT_ID: process.env.ALENVI_BOT_ID,
-        GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-      },
+    extendWebpack (cfg) {
+      cfg.module.rules.push({ test: /\.html$/, use: { loader: 'html-loader' } });
+      // eslint-disable-next-line no-param-reassign
+      cfg.resolve.alias = {
+        ...cfg.resolve.alias,
+        '@components': path.resolve(__dirname, './src/core/components'),
+        '@api': path.resolve(__dirname, './src/core/api'),
+        '@helpers': path.resolve(__dirname, './src/core/helpers'),
+        '@data': path.resolve(__dirname, './src/core/data'),
+        '@mixins': path.resolve(__dirname, './src/core/mixins'),
+      };
+      cfg.plugins.push(
+        new ESLintPlugin({ fix: true }),
+        // Select moment locale files
+        new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/)
+        // // Ignore astronomia (date-holidays)
+        // new webpack.IgnorePlugin(/^\.\/vsop87B.*$/)
+      );
     },
-    devServer: {
-      open: true,
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      API_HOSTNAME: process.env.NODE_ENV === 'test' ? process.env.TEST_API_HOSTNAME : process.env.API_HOSTNAME,
+      COMPANI_HOSTNAME: process.env.COMPANI_HOSTNAME,
+      MESSENGER_LINK: process.env.MESSENGER_LINK,
+      ENTERCODE_LINK: process.env.ENTERCODE_LINK,
+      TOKEN_SECRET: process.env.TOKEN_SECRET,
+      ALENVI_BOT_ID: process.env.ALENVI_BOT_ID,
+      GA_TRACKING_ID: process.env.GA_TRACKING_ID,
     },
-  };
-};
+  },
+  devServer: { open: true },
+}));

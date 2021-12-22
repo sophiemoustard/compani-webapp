@@ -124,52 +124,52 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .datetime-container
-    width: 100%
-    border: 1px solid $copper-grey-300
-    border-radius: 3px
-    @media screen and (min-width: 768px)
-      flex-wrap: nowrap
+.datetime-container
+  width: 100%
+  border: 1px solid $copper-grey-300
+  border-radius: 3px
+  @media screen and (min-width: 768px)
+    flex-wrap: nowrap
 
-  ::v-deep .q-field__control
-    min-height: 40px
-    border: none !important
-    .q-field__marginal.q-anchor--skip
+:deep .q-field__control
+  min-height: 40px
+  border: none !important
+  .q-field__marginal.q-anchor--skip
+    display: none
+
+.date-item
+  @media screen and (min-width: 768px)
+    width: 26%
+  @media screen and (max-width: 767px)
+    width: 60%
+  :deep .q-field--with-bottom
+    padding: 0
+  :deep .q-field__control
+    min-height: 35px
+  :deep .q-field__native
+    min-height: auto
+  :deep .q-field__inner
+    .q-field__bottom
       display: none
 
-  .date-item
-    @media screen and (min-width: 768px)
-      width: 26%
-    @media screen and (max-width: 767px)
-      width: 60%
-    ::v-deep .q-field--with-bottom
-      padding: 0
-    ::v-deep .q-field__control
-      min-height: 35px
-    ::v-deep .q-field__native
-      min-height: auto
-    ::v-deep .q-field__inner
-      .q-field__bottom
-        display: none
-
-  .time-item
-    @media screen and (min-width: 768px)
-      width: 18%
-    @media screen and (max-width: 767px)
-      width: 40%
-    ::v-deep .q-field--with-bottom
-      padding: 0
-    ::v-deep .q-field__inner
-      .q-field__bottom
-        display: none
-    ::v-deep .q-field__control
-      min-height: 35px
-    ::v-deep .q-field__native
-      min-height: auto
-
-  .delimiter
-    margin: 0
-    color: $copper-grey-700
-    @media screen and (max-width: 767px)
+.time-item
+  @media screen and (min-width: 768px)
+    width: 18%
+  @media screen and (max-width: 767px)
+    width: 40%
+  :deep .q-field--with-bottom
+    padding: 0
+  :deep .q-field__inner
+    .q-field__bottom
       display: none
+  :deep .q-field__control
+    min-height: 35px
+  :deep .q-field__native
+    min-height: auto
+
+.delimiter
+  margin: 0
+  color: $copper-grey-700
+  @media screen and (max-width: 767px)
+    display: none
 </style>

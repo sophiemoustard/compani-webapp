@@ -73,15 +73,15 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .surcharge-line
-    display: flex
-    flex-direction: row
-    width: 100%
-    border: 1px solid $copper-grey-300
-    &:not(:nth-child(2)) // first-child is title
-      border-top: none
+.surcharge-line
+  display: flex
+  flex-direction: row
+  width: 100%
+  border: 1px solid $copper-grey-300
+  &:not(:nth-child(2)) // first-child is title
+    border-top: none
 
-  .surcharge-type
-    width: 60%
-    border-right: 1px solid $copper-grey-300
+.surcharge-type
+  width: 60%
+  border-right: 1px solid $copper-grey-300
 </style>

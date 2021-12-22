@@ -36,16 +36,16 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .required::after
-    content: ' *'
-  ::v-deep .q-option-group
-    color: $copper-grey-700 !important
-    .q-radio
-      padding: 10px 0 !important
-      .q-radio__label
-        font-size: 15px
+.required::after
+  content: ' *'
+:deep .q-option-group
+  color: $copper-grey-700 !important
+  .q-radio
+    padding: 10px 0 !important
+    .q-radio__label
+      font-size: 15px
 
-  ::v-deep .q-field__control
-    min-height: 25px !important
-    border: 0
+:deep .q-field__control
+  min-height: 25px !important
+  border: 0
 </style>

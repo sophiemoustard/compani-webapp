@@ -55,15 +55,15 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .footer
-    display: flex
-    justify-content: flex-end
+.footer
+  display: flex
+  justify-content: flex-end
 
-  .program
-    border-radius: 0
-    background-color: $copper-grey-100
+.program
+  border-radius: 0
+  background-color: $copper-grey-100
 
-  .sub-program
-    border-radius: 0
-    background-color: $copper-grey-300
+.sub-program
+  border-radius: 0
+  background-color: $copper-grey-300
 </style>

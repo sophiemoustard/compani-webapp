@@ -257,6 +257,6 @@ export default {
 .q-item
   padding: 0
   min-height: 0
-::v-deep .q-btn__wrapper
+:deep .q-btn__wrapper
   padding: 0px !important
 </style>

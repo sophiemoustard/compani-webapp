@@ -17,7 +17,7 @@ const routes = [
   },
   {
     // Always leave this as last one
-    path: '*',
+    path: '/:catchAll(.*)*',
     name: '404',
     component: () => import('src/core/pages/404'),
   },

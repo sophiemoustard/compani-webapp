@@ -247,22 +247,21 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .bold
-    font-weight: bold
+.bold
+  font-weight: bold
 
-  .q-table tbody tr:hover
-    background: none
+.q-table tbody tr:hover
+  background: none
 
-  .download
-    cursor: pointer
-    color: $primary
-    text-decoration: underline
+.download
+  cursor: pointer
+  color: $primary
+  text-decoration: underline
 
-  .disabled
-    cursor: not-allowed
+.disabled
+  cursor: not-allowed
 
-  ::v-deep .q-item
-    .q-item__section
-      padding: 0px
-
+:deep .q-item
+  .q-item__section
+    padding: 0px
 </style>

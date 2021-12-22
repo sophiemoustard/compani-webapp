@@ -79,13 +79,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  ::v-deep .q-select
-    width: 100%
-    .q-select__dropdown-icon
-      display: none
-    .q-spinner
-      display: none
+:deep .q-select
+  width: 100%
+  .q-select__dropdown-icon
+    display: none
+  .q-spinner
+    display: none
 
-  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
-    color: $copper-grey-900
+:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+  color: $copper-grey-900
 </style>

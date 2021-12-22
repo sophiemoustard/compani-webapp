@@ -127,11 +127,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .progress
-    width: 100%
-  .name
-    width: fit-content
-  .cliquable-name
-    text-decoration: underline
-    color: $primary
+.progress
+  width: 100%
+.name
+  width: fit-content
+.cliquable-name
+  text-decoration: underline
+  color: $primary
 </style>

@@ -303,7 +303,7 @@ export default {
     margin:  0 10px 10px
     font-size: 14px
 
-  ::v-deep .q-layout-header
+  :deep .q-layout-header
     box-shadow: none
 
   .iframe-normal

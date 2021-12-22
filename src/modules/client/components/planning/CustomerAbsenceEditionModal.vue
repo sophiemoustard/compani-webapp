@@ -91,6 +91,6 @@ export default {
     display: flex
     justify-content: space-between
     margin-bottom: 16px
-  ::v-deep .date-container
+  :deep .date-container
     justify-content: flex-start
 </style>

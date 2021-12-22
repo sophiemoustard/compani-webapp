@@ -81,12 +81,12 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  ::v-deep .q-btn-group
-    & > .q-btn-item:first-child
-      border: 1px solid $copper-grey-300
-    & > .q-btn-item:not(:first-child)
-      border: 1px solid $copper-grey-300
-      border-left: none
-    & > .q-btn-item:last-child
-      font-weight: bold
+:deep .q-btn-group
+  & > .q-btn-item:first-child
+    border: 1px solid $copper-grey-300
+  & > .q-btn-item:not(:first-child)
+    border: 1px solid $copper-grey-300
+    border-left: none
+  & > .q-btn-item:last-child
+    font-weight: bold
 </style>

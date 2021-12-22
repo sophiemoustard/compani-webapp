@@ -37,23 +37,23 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .error-field
-    height: 0px
-  .group-title
-    display: flex
-    flex: 1
-    margin: 16px 0px 2px
-  .required::after
-    content: ' *'
-  ::v-deep .q-option-group
-    display: flex
-    flex-direction: column
-    color: $copper-grey-700 !important
-    .q-radio
-      padding: 10px 6px !important
-      .q-radio__label
-        font-size: 15px
-  ::v-deep .q-field__control
-    min-height: 25px !important
-    border: 0
+.error-field
+  height: 0px
+.group-title
+  display: flex
+  flex: 1
+  margin: 16px 0px 2px
+.required::after
+  content: ' *'
+:deep .q-option-group
+  display: flex
+  flex-direction: column
+  color: $copper-grey-700 !important
+  .q-radio
+    padding: 10px 6px !important
+    .q-radio__label
+      font-size: 15px
+:deep .q-field__control
+  min-height: 25px !important
+  border: 0
 </style>

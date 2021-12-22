@@ -115,13 +115,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .no-bottom
-    padding-bottom: 0
-    ::v-deep .q-field__bottom
-      display: none
-  .select-icon
-    margin: 0
+.no-bottom
+  padding-bottom: 0
+  :deep .q-field__bottom
+    display: none
+.select-icon
+  margin: 0
 
-  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
-    color: $copper-grey-900
+:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+  color: $copper-grey-900
 </style>

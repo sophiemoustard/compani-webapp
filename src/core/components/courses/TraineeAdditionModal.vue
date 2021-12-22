@@ -72,7 +72,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .details
-    font-size: 14px
-    color: $copper-grey-500
+.details
+  font-size: 14px
+  color: $copper-grey-500
 </style>

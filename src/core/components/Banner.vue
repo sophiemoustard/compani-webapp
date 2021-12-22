@@ -24,7 +24,7 @@ export default {
 
 <style lang="sass" scoped>
 .q-banner
-  ::v-deep .q-banner__content
+  :deep .q-banner__content
     display: flex
     align-items: center
     .q-icon

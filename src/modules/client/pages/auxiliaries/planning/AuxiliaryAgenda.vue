@@ -199,7 +199,7 @@ export default {
 
 <style lang="sass" scoped>
 .planning-header
-  ::v-deep .q-field__control
+  :deep .q-field__control
     background-color: inherit !important
 
 .person-name

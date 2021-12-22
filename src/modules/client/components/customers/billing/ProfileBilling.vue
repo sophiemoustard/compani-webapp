@@ -532,17 +532,17 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .add-payment
-    background-color: $primary
+.add-payment
+  background-color: $primary
 
-  .title
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    align-items: center
-    flex-wrap: wrap
+.title
+  display: flex
+  flex-direction: row
+  justify-content: space-between
+  align-items: center
+  flex-wrap: wrap
 
-  .message
-    font-style: italic
-    margin: 4px 0
+.message
+  font-style: italic
+  margin: 4px 0
 </style>

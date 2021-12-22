@@ -124,22 +124,22 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .input-file-container
-    padding: 6px 10px
-    .input-file-empty
-      font-size: 12px
-    .input-file
-      opacity: 0
-      max-width: 100%
-      height: 100%
-      width: 100%
-      font-size: 0
-  .file-error
-    color: $secondary
-    line-height: 1
-    font-size: 11px
-    padding-top: 3px
+.input-file-container
+  padding: 6px 10px
+  .input-file-empty
+    font-size: 12px
+  .input-file
+    opacity: 0
+    max-width: 100%
+    height: 100%
+    width: 100%
+    font-size: 0
+.file-error
+  color: $secondary
+  line-height: 1
+  font-size: 11px
+  padding-top: 3px
 
-  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
-    color: $copper-grey-900
+:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+  color: $copper-grey-900
 </style>

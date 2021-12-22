@@ -1,7 +1,7 @@
-<template functional>
-  <q-item dense :to="{ name: props.name, params: props.params, query: props.query }" exact>
-    <q-item-section avatar><q-icon :name="props.icon" size="20px" /></q-item-section>
-    <q-item-section>{{ props.label }}</q-item-section>
+<template>
+  <q-item dense :to="{ name: name, params: params, query: query }" exact>
+    <q-item-section avatar><q-icon :name="icon" size="20px" /></q-item-section>
+    <q-item-section>{{ label }}</q-item-section>
   </q-item>
 </template>
 

@@ -1010,24 +1010,24 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .table-actions > .q-btn__wrapper
+.table-actions > .q-btn__wrapper
+  padding: 0
+
+a
+  color: $primary
+  text-decoration: none
+
+.mandate-table
+  td
+    word-break: break-all
+
+@media screen and (min-width: 768px)
+  .dot
+    margin: 0px
+
+.signedAt
+  :deep .q-field--with-bottom
     padding: 0
-
-  a
-    color: $primary
-    text-decoration: none
-
-  .mandate-table
-    td
-      word-break: break-all
-
-  @media screen and (min-width: 768px)
-    .dot
-      margin: 0px
-
-  .signedAt
-    ::v-deep .q-field--with-bottom
-      padding: 0
-    ::v-deep .q-field__bottom
-      display: none
+  :deep .q-field__bottom
+    display: none
 </style>

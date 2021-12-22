@@ -38,6 +38,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-::v-deep .q-btn__wrapper
+:deep .q-btn__wrapper
   min-height: 2.572em !important
 </style>
