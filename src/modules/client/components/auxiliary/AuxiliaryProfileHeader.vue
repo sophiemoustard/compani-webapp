@@ -36,13 +36,13 @@
 
     <!-- Modal envoi message -->
     <ni-modal v-model="smsModal">
-      <template slot="title">
+      <template #title>
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
       <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="messageType" required-field
         @input="updateMessage" />
       <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click.native="sendMessage" />
       </template>

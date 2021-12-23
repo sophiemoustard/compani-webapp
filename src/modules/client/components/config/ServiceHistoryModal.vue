@@ -1,6 +1,6 @@
 <template>
     <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-      <template slot="title">
+      <template #title>
         Historique du service <span class="text-weight-bold">{{ selectedService.name }}</span>
       </template>
       <ni-responsive-table class="q-mb-sm" :data="selectedService.versions" :columns="serviceColumns"

@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Éditer le <span class="text-weight-bold">plan de majoration</span>
       </template>
       <ni-input in-modal caption="Nom" :value="editedSurcharge.name" :error="validations.name.$error"
@@ -45,7 +45,7 @@
         :error="validations.customEndTime.$error" @blur="validations.customEndTime.$touch"
         :disable="!editedSurcharge.custom" :required-field="!!editedSurcharge.custom" error-message="Heure invalide"
         @input="update($event, 'customEndTime')" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
           color="primary" :loading="loading" @click="submit" />
       </template>
@@ -73,12 +73,13 @@ export default {
     'ni-time-input': TimeInput,
 
   },
+  emits: ['hide', 'update:value', 'submit', 'update:editedSurcharge'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:value', event);
     },
     submit () {
       this.$emit('submit');

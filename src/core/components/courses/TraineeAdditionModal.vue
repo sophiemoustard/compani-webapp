@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
         Ajouter une <span class="text-weight-bold">personne</span>
       </template>
       <ni-select in-modal :value="newTrainee" @input="update" caption="Stagiaire" :error="validations.$error"
@@ -23,7 +23,7 @@
            <ni-button color="primary" icon="add" label="Créer un nouveau compte" @click="openLearnerCreationModal" />
         </template>
       </ni-select>
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>

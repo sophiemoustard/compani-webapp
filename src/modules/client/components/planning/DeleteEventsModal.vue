@@ -18,7 +18,7 @@
       <ni-date-input caption="Date d'arrêt des interventions" v-model="deletedEvents.startDate" type="date"
         required-field in-modal />
     </template>
-    <template slot="footer">
+    <template #footer>
       <q-btn class="modal-btn full-width" color="primary" no-caps :loading="loading" label="Supprimer les interventions"
         @click="validateEventsDeletion" icon-right="close" />
     </template>

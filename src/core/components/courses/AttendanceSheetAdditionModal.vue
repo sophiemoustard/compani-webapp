@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Ajouter une nouvelle <span class="text-weight-bold">feuille d'émargement</span>
     </template>
     <ni-select v-if="course.type === INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch" in-modal
@@ -11,7 +11,7 @@
       required-field />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la feuille d'émargement" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
     </template>

@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
     <ni-input :disable="!firstStep" in-modal :value="newHelper.local.email" caption="Email" required-field
@@ -16,7 +16,7 @@
         caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
         @input="update($event.trim(), 'contact.phone')" />
     </template>
-    <template slot="footer">
+    <template #footer>
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary" @click="nextStep"
         :loading="loading" icon-right="add" />
       <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add"

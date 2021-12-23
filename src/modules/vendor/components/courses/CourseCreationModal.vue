@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
       <ni-option-group :value="newCourse.type" @input="updateType($event)" type="radio" :options="courseTypes"
@@ -18,7 +18,7 @@
         :error="validations.company.$error" />
       <ni-input in-modal :value="newCourse.misc" @input="update($event.trim(), 'misc')"
         caption="Informations Complémentaires" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
       </template>

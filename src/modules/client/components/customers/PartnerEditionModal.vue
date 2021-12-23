@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Editer une <span class="text-weight-bold">personne</span>
     </template>
     <ni-input in-modal :value="editedPartner.identity.firstname" @input="update($event.trim(), 'identity.firstname')"
@@ -15,7 +15,7 @@
       :error-message="phoneNumberError(validations)" />
     <ni-select in-modal :value="editedPartner.job" @input="update($event, 'job')" caption="Fonction"
       :options="jobOptions" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Editer la personne" icon-right="add" color="primary"
         @click="submit" :loading="loading" />
     </template>

@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
       Définir une <span class="text-weight-bold">règle d'accès</span>
     </template>
     <ni-option-group v-model="access" :options="ACCESS_OPTIONS" inline type="radio" @input="resetAccess" />
@@ -12,7 +12,7 @@
       <ni-select class="select" in-modal v-model="accessCompany" required-field caption="Structure"
         :options="companyOptions" :error="$v.accessCompany.$error" />
     </template>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Publier avec cette règle d'accès" color="primary"
         icon-right="add" @click="submit" />
     </template>

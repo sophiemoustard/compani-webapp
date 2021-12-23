@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="paySurchargeDetailsModal" @input="close">
-    <template slot="title">
+    <template #title>
       Détails des <span class="text-weight-bold">majorations</span>
     </template>
     <div v-for="(surchargePlanDetails, surchargePlanId) in pay[surchargeDetailKey]" :key="surchargePlanId"

@@ -1,13 +1,13 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Créer une nouvelle <span class="text-weight-bold">activité</span>
     </template>
     <ni-input in-modal :value="newActivity.name" :error="validations.name.$error" @input="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Nom" />
     <ni-select in-modal caption="Type" :options="ACTIVITY_TYPES" :value="newActivity.type" required-field
       :error="validations.type.$error" @input="update($event, 'type')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>

@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
        Nouvelle <span class="text-weight-bold">note</span>
     </template>
     <ni-input in-modal :value="newNote.title" @input="update($event, 'title')" caption="Titre" required-field
@@ -8,7 +8,7 @@
     <ni-input in-modal :value="newNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" caption="Description"
       required-field />
-    <template slot="footer">
+    <template #footer>
      <q-btn no-caps class="full-width modal-btn" label="Créer la note" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

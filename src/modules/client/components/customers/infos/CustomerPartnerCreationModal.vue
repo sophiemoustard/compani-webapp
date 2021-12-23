@@ -1,11 +1,11 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Ajouter un(e) <span class="text-weight-bold">partenaire</span>
     </template>
     <ni-select in-modal :value="newPartner" @input="update" @blur="validations.$touch" :error="validations.$error"
       required-field caption="Partenaire" :options="partnerOptions" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le/la partenaire" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

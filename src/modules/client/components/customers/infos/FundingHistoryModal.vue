@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Historique du financement <span class="text-weight-bold">{{ funding.thirdPartyPayer.name }}</span>
     </template>
     <ni-funding-grid-table :data="funding.versions" :columns="fundingsColumns" :visible-columns="visibleColumns" />

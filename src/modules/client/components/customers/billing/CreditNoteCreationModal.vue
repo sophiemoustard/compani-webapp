@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
     <ni-select in-modal caption="Bénéficiaire" :value="newCreditNote.customer" :options="customersOptions"
@@ -60,7 +60,7 @@
         :value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error" type="number"
         @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" caption="Montant TTC" suffix="€" />
     </template>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

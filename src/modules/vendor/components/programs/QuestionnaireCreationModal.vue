@@ -1,13 +1,13 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Créer un nouveau <span class="text-weight-bold">questionnaire</span>
     </template>
     <ni-input in-modal :value="newQuestionnaire.name" @input="update($event.trim(), 'name')"
       :error="validations.name.$error" @blur="validations.name.$touch" required-field caption="Nom" />
     <ni-select in-modal :value="newQuestionnaire.type" @input="update($event, 'type')" :options="typeOptions"
       :error="validations.type.$error" @blur="validations.type.$touch" required-field caption="Type" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer le questionnaire" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>

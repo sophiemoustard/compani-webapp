@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
       Créer une nouvelle <span class="text-weight-bold">carte</span>
     </template>
     <h6 class="text-weight-bold">Cours</h6>

@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Paie mensuelle" padding>
-      <template slot="title">
+      <template #title>
         <ni-button icon="save_alt" @click="exportToCSV" :disable="displayedDraftPay.length === 0" class="q-ml-sm" />
       </template>
       <template slot="content">

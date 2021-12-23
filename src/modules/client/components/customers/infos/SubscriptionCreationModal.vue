@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Ajouter une <span class="text-weight-bold">souscription</span>
     </template>
     <ni-select in-modal caption="Service" :options="serviceOptions" :value="newSubscription.service" required-field
@@ -15,7 +15,7 @@
       caption="Dont dimanche (h)" type="number" @input="update($event, 'sundays')" />
     <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" :value="newSubscription.evenings"
       caption="Dont soirée (h)" last type="number" @input="update($event, 'evenings')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

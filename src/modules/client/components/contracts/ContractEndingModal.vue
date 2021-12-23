@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Terminer un <span class="text-weight-bold">contrat</span>
     </template>
     <ni-date-input caption="Date de notification" :value="contractToEnd.endNotificationDate" in-modal
@@ -15,7 +15,7 @@
     <ni-input in-modal caption="Autres" v-if="contractToEnd.endReason === OTHER" :value="contractToEnd.otherMisc"
       required-field @blur="validations.otherMisc.$touch" :error="validations.otherMisc.$error"
       @input="update($event, 'otherMisc')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="close" color="primary"
         :loading="loading" @click="submit" />
     </template>

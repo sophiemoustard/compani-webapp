@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide" padding>
-      <template slot="title">
+      <template #title>
         <ni-button icon="save_alt" @click="exportToCSV" class="q-ml-sm" :disable="!allCustomersFundings.length" />
       </template>
       <template slot="content">

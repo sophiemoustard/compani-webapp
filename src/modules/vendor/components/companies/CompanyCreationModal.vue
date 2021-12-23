@@ -1,13 +1,13 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Créer une nouvelle <span class="text-weight-bold">structure</span>
     </template>
     <ni-input in-modal :value="newCompany.name" @input="update($event.trim(), 'name')" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Raison sociale" />
     <ni-option-group :value="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
       :error="validations.type.$error" required-field @input="update($event, 'type')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>

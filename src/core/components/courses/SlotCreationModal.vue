@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
         Ajouter un <span class="text-weight-bold">créneau</span>
       </template>
       <ni-select in-modal caption="Etape" :options="stepOptions" :value="newCourseSlot.step" required-field
@@ -13,7 +13,7 @@
       <ni-input v-if="getType(this.newCourseSlot.step) === REMOTE" in-modal :error="validations.meetingLink.$error"
         :value="newCourseSlot.meetingLink" @input="update($event, 'meetingLink')" caption="Lien vers la visio"
         :error-message="linkErrorMessage" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>

@@ -154,8 +154,7 @@
         <div class="row gutter-profile">
           <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod"
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
-            :options="billingPeriodOptions" :error="v$.company.customersConfig.billingPeriod.$error"
-            :error-message="REQUIRED_LABEL" />
+            :options="billingPeriodOptions" :error="v$.company.customersConfig.billingPeriod.$error" />
         </div>
       </div>
     </div>

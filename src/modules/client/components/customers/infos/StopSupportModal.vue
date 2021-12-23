@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       <span class="text-weight-bold">Arrêter</span> l'accompagnement
     </template>
     <ni-select in-modal :value="newStatus.stopReason" @input="update($event, 'stopReason')"
@@ -9,7 +9,7 @@
     <ni-date-input :value="newStatus.stoppedAt" caption="Arrêt d'accompagnement à partir du..." in-modal
       @blur="validations.stoppedAt.$touch" :error="validations.stoppedAt.$error" :min="minDate" required-field
       @input="update($event, 'stoppedAt')" :error-message="stoppingDateErrorMessage" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Arrêter" icon-right="add" color="primary"
         :loading="loading" @click="validateSupportStopping" />
     </template>

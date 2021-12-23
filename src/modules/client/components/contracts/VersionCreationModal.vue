@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Créer une <span class="text-weight-bold">version</span>
     </template>
     <ni-input in-modal caption="Volume horaire hebdomadaire" :value="newVersion.weeklyHours" type="number"
@@ -19,7 +19,7 @@
           @input="update($event, 'shouldBeSigned')" />
       </div>
     </div>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

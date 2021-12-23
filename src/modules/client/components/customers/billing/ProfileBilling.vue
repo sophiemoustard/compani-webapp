@@ -72,7 +72,7 @@
 
     <!-- Tax certificate upload modal -->
     <ni-modal v-model="taxCertificateModal" @hide="resetTaxCertificateModal">
-      <template slot="title">
+      <template #title>
         Ajouter une <span class="text-weight-bold">attestation fiscale</span>
       </template>
       <ni-date-input caption="Date" v-model="taxCertificate.date" @blur="v$.taxCertificate.date.$touch"
@@ -81,7 +81,7 @@
         @blur="v$.taxCertificate.year.$touch" :error="v$.taxCertificate.year.$error" in-modal required-field />
       <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="v$.taxCertificate.file.$error"
         @blur="v$.taxCertificate.file.$touch" in-modal required-field last :error-message="taxCertificateFileError" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
           :loading="modalLoading" @click="createTaxCertificate" />
       </template>

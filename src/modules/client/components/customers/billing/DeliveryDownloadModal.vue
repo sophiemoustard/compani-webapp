@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Téléchargement du <span class="text-weight-bold">fichier de télétransmission</span>
     </template>
     <div class="row q-pb-md">
@@ -10,7 +10,7 @@
     </div>
     <ni-select in-modal caption="Mois" :value="deliveryFile.month" required-field :options="monthOptions"
       @blur="validations.month.$touch" :error="validations.month.$error" @input="update($event, 'month')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Télécharger le fichier" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

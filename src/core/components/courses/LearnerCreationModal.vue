@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
         <div v-if="!learnerEdition">Ajouter une <span class="text-weight-bold">personne</span></div>
         <div v-else>Compte apprenant</div>
       </template>
@@ -20,7 +20,7 @@
           @input="update($event.trim(), 'company')" caption="Structure" last @blur="validations.company.$touch"
           :error="validations.company.$error" required-field :disable="disableCompany" />
       </template>
-      <template slot="footer">
+      <template #footer>
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
           :loading="loading" icon-right="add" @click="nextStep" />
         <q-btn v-else no-caps class="full-width modal-btn" color="primary" :label="secondStepFooterLabel"

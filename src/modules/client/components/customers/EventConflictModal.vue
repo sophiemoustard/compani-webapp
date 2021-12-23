@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :v-model="modelValue" @hide="hide">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')">
     <template #title>
       Interventions <span class="text-weight-bold">simultanées</span>
     </template>
@@ -21,7 +21,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     events: { type: Array, default: () => [] },
   },
-  emits: ['hide'],
+  emits: ['hide', 'update:model-value'],
   data () {
     return {
       CUSTOMER,

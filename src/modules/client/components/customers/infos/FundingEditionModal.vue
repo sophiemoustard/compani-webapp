@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Éditer le <span class="text-weight-bold">financement</span>
       </template>
       <ni-input in-modal v-if="needFundingPlanIdForEditedFunding" :value="editedFunding.fundingPlanId"
@@ -30,7 +30,7 @@
       <ni-option-group :value="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
         required-field @input="update($event, 'careDays')" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
           :loading="loading" @click="submit" />
       </template>

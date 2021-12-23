@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Créer un <span class="text-weight-bold">article</span>
     </template>
     <ni-input in-modal caption="Nom" :value="newBillingItem.name" :error="validations.name.$error"
@@ -12,7 +12,7 @@
       @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError" suffix="€" type="number" />
     <ni-input in-modal caption="TVA" suffix="%" :value="newBillingItem.vat" type="number" @input="update($event, 'vat')"
       :error="validations.vat.$error" @blur="validations.vat.$touch" required-field :error-message="vatError" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer un article" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

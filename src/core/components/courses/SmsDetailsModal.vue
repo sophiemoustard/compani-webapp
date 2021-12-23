@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
         Message envoyé le <span class="text-weight-bold">{{ smsDate }}</span>
       </template>
       <ni-banner v-if="missingTraineesPhoneHistory.length" icon="info_outline">

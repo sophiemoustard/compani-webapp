@@ -1,11 +1,11 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Créer un nouveau <span class="text-weight-bold">sous-programme</span>
     </template>
     <ni-input in-modal :value="newSubProgram.name" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Nom" @input="update($event.trim(), 'name')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer le sous-programme" color="primary"
         icon-right="add" @click="submit" :loading="loading" />
     </template>

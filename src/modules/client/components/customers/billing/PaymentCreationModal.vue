@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
     </template>
     <ni-btn-toggle :value="newPayment.nature" :options="paymentNatureOptions" @input="update($event, 'nature')" />
@@ -14,7 +14,7 @@
       :error="validations.type.$error" />
     <ni-date-input :value="newPayment.date" @input="update($event, 'date')" :caption="`Date du ${creationModalNature}`"
       :error="validations.date.$error" @blur="validations.date.$touch" in-modal required-field />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary" :loading="loading"
         @click="submit" />
     </template>

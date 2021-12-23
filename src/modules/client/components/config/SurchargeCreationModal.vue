@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Créer un <span class="text-weight-bold">plan de majoration</span>
       </template>
       <ni-input in-modal caption="Nom" :value="newSurcharge.name" :error="validations.name.$error"
@@ -45,7 +45,7 @@
         :error="validations.customEndTime.$error" @blur="validations.customEndTime.$touch"
         :disable="!newSurcharge.custom" :required-field="!!newSurcharge.custom" error-message="Heure invalide"
         @input="update($event, 'customEndTime')" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>
@@ -67,6 +67,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
+  emits: ['hide', 'update:value', 'submit', 'update:newSurcharge'],
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
@@ -78,7 +79,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:value', event);
     },
     submit () {
       this.$emit('submit');

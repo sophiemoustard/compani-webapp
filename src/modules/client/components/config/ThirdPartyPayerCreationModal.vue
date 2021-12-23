@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Ajouter un <span class="text-weight-bold">tiers payeur</span>
       </template>
       <ni-input in-modal caption="Nom" :value="newThirdPartyPayer.name" :error="validations.name.$error"
@@ -20,7 +20,7 @@
       <div class="row q-mb-md light-checkbox">
         <q-checkbox :value="newThirdPartyPayer.isApa" label="Financement APA" @input="update($event, 'isApa')" dense />
       </div>
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>

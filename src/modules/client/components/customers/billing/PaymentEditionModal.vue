@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Editer le <span class="text-weight-bold">{{ editionModalNature }}</span>
     </template>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
@@ -13,7 +13,7 @@
       @blur="validations.type.$touch" :error="validations.type.$error" />
     <ni-date-input :caption="`Date du ${editionModalNature}`" :value="editedPayment.date" in-modal required-field
       @input="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

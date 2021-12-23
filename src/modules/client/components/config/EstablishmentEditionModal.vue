@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Éditer l'<span class="text-weight-bold">établissement</span>
       </template>
       <ni-input in-modal caption="Nom" :value="editedEstablishment.name" :error="validations.name.$error"
@@ -22,7 +22,7 @@
       <ni-select in-modal caption="Code URSSAF" :value="editedEstablishment.urssafCode" :options="urssafCodes"
         :error="validations.urssafCode.$error" @input="update($event, 'urssafCode')" required-field
         :error-message="establishmentUrssafCodeError(validations)" @blur="validations.urssafCode.$touch" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Editer l'établissement" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>

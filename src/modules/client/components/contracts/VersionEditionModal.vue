@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
     <ni-input in-modal caption="Taux horaire" type="number" :error-message="grossHourlyRateError"
@@ -13,7 +13,7 @@
       <q-checkbox dense :value="editedVersion.shouldBeSigned" label="Signature en ligne"
         @input="update($event, 'shouldBeSigned')" />
     </div>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

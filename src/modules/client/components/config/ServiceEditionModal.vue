@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Éditer le <span class="text-weight-bold">service</span>
     </template>
     <ni-input in-modal caption="Nom" :value="editedService.name" :error="validations.name.$error"
@@ -31,7 +31,7 @@
     </div>
     <ni-bi-color-button label="Ajouter un article de facturation" icon="add" class="q-mb-md" @click="addBillingItem"
       label-color="primary" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
     </template>

@@ -1,11 +1,11 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Ajouter une <span class="text-weight-bold">catégorie</span>
     </template>
     <ni-select in-modal :value="newCategory" :error="validations.$error" :options="categoryOptions" caption="Catégorie"
       @input="$emit('update:new-category', $event)" @blur="validations.$touch" required-field />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la catégorie" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>

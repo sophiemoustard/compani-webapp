@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
         Réutiliser une <span class="text-weight-bold">activité</span>
       </template>
       <ni-select in-modal v-model.trim="selectedProgram" caption="Programme" required-field :options="programOptions"

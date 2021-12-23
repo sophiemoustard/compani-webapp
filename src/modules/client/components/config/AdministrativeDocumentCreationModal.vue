@@ -1,13 +1,13 @@
 <template>
     <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Ajouter un <span class="text-weight-bold">document administratif</span>
       </template>
       <ni-input in-modal caption="Nom" :value="newAdministrativeDocument.name" required-field
         :error="validations.name.$error" @blur="validations.name.$touch" @input="update($event, 'name')" />
       <ni-input caption="Document" type="file" :value="newAdministrativeDocument.file" required-field last
         :error="validations.file.$error" @blur="validations.file.$touch" in-modal @input="update($event, 'file')" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>

@@ -1,11 +1,11 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
       Ajouter une <span class="text-weight-bold">règle d'accès</span>
     </template>
     <ni-select in-modal :value="newAccessRule" @input="update" :error="validations.$error"
       caption="Structure" :options="companyOptions" last required-field />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la règle d'accès" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>

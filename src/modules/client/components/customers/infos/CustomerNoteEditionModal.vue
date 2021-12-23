@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
       <div class="flex-row">
         <ni-input in-modal :value="editedNote.title" @input="update($event, 'title')" :read-only="readOnly"
           @blur="validations.title.$touch" :error="validations.title.$error" @click="removeReadOnly"

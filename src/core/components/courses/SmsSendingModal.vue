@@ -1,13 +1,13 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
       <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :value="newSms.type"
         required-field @input="updateType($event)" />
       <ni-input in-modal caption="Message" :value="newSms.content" @input="update($event, 'content')" type="textarea"
         :rows="7" required-field />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click="send" />
       </template>

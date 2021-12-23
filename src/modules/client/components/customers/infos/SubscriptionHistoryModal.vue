@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Historique de la souscription
       <span v-if="subscription.service" class="text-weight-bold">{{ subscription.service.name }}</span>
     </template>

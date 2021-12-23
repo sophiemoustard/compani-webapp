@@ -1,11 +1,11 @@
 <template>
     <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Editer l'<span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" :value="editedSector.name" :error="validations.name.$error"
         @blur="validations.name.$touch" required-field @input="update($event.trim(), 'name')" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>

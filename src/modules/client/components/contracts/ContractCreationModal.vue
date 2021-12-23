@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Créer un <span class="text-weight-bold">nouveau contrat</span>
     </template>
     <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" :value="newContract.weeklyHours"
@@ -17,7 +17,7 @@
           @input="update($event, 'shouldBeSigned')" />
       </div>
     </div>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

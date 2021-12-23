@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Éditer une <span class="text-weight-bold">personne</span>
     </template>
     <ni-input in-modal :value="editedHelper.local.email" caption="Email" disable />
@@ -12,7 +12,7 @@
     <ni-input in-modal :value="editedHelper.contact.phone" last :error="validations.contact.phone.$error"
       caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
       @input="update($event.trim(), 'contact.phone')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Éditer la personne" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

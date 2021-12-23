@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Créer une <span class="text-weight-bold">facture manuelle</span>
     </template>
     <ni-date-input caption="Date" :value="newManualBill.date" in-modal required-field
@@ -37,7 +37,7 @@
       <div class="col-6 total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
       <div class="col-6 total-text">Total TTC : {{ formatPrice(newManualBill.netInclTaxes) }}</div>
     </div>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la facture" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Editer la <span class="text-weight-bold">souscription</span>
     </template>
     <ni-input in-modal :value="editedSubscription.unitTTCRate" :error="validations.unitTTCRate.$error"
@@ -14,7 +14,7 @@
       caption="Dont dimanche (h)" type="number" @input="update($event, 'sundays')" />
     <ni-input in-modal v-if="editedSubscription.nature !== FIXED" :value="editedSubscription.evenings"
       caption="Dont soirée (h)" last type="number" @input="update($event, 'evenings')" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
     </template>

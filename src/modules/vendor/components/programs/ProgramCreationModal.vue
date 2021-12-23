@@ -1,13 +1,13 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Créer un nouveau <span class="text-weight-bold">programme</span>
     </template>
     <ni-input in-modal :value="newProgram.name" @input="update($event.trim(), 'name')" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Nom" />
     <ni-select in-modal :value="newProgram.category" @input="update($event, 'category')" :options="categoryOptions"
       :error="validations.category.$error" @blur="validations.category.$touch" required-field caption="Catégorie" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>

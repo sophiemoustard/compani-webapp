@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+      <template #title>
         Ajouter un <span class="text-weight-bold">financement</span>
       </template>
       <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" :value="newFunding.thirdPartyPayer"
@@ -42,7 +42,7 @@
       <ni-option-group :value="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
         required-field @input="update($event, 'careDays')" />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>

@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Créer une nouvelle <span class="text-weight-bold">structure partenaire</span>
     </template>
     <ni-input in-modal caption="Nom" :value="newPartnerOrganization.name" @input="update($event.trim(), 'name')"
@@ -13,7 +13,7 @@
       :error-message="addressError(validations)" />
     <ni-input in-modal caption="Email" :value="newPartnerOrganization.email" @input="update($event.trim(), 'email')"
       @blur="validations.email.$touch" :error="validations.email.$error" :error-message="emailError(validations)" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

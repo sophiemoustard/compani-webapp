@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+    <template #title>
       Ajouter un <span class="text-weight-bold">document</span>
     </template>
     <ni-select in-modal caption="Type" required-field :value="newPayDocument.nature" :options="natureOptions"
@@ -9,7 +9,7 @@
       @input="update('date', $event)" />
     <ni-input in-modal caption="Document" type="file" :value="newPayDocument.file" :error-message="fileErrorMessage"
       @input="validations.file.$touch; update('file', $event)" :error="validations.file.$error" required-field last />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>

@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+    <template #title>
         Ajouter une nouvelle <span class="text-weight-bold">étape</span>
       </template>
       <ni-btn-toggle :value="additionType" :options="STEP_ATTACHEMENT_OPTIONS" @input="updateAdditionType($event)" />
@@ -16,7 +16,7 @@
         <ni-multiple-option-group required-field caption="Étapes" :value="reusedStep._id" :options-groups="stepOptions"
           @input="updateReusedStep($event)" :group-titles="stepGroups" :error="validations.reusedStep._id.$error" />
       </template>
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" :label="submitLabel" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
       </template>

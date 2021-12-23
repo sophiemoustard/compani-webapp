@@ -1,6 +1,6 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+    <template #title>
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
     <ni-select :options="traineeFilterOptions" :value="newTraineeAttendance.trainee"
@@ -11,7 +11,7 @@
         :options="slotsOptions" :error="validation.attendances.$error" :error-message="REQUIRED_LABEL" required-field
         type="checkbox" caption="Selectionner les créneaux auxquelles a été présent(e) le/la participant(e)" inline />
     </div>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
     </template>
