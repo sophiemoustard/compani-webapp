@@ -20,7 +20,7 @@ export const blendedCourseProfileMixin = {
   },
   beforeDestroy () {
     this.$store.dispatch('course/resetCourse');
-    if (!['ni courses', 'ni management blended courses', 'trainers courses'].includes(this.$router.currentRoute.name)) {
+    if (!['ni courses', 'ni management blended courses', 'trainers courses'].includes(this.$route.name)) {
       this.$store.dispatch('course/resetFilters');
     }
   },

@@ -47,12 +47,12 @@
       </div>
     </div>
 
-    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
+    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="v$.newCourseSlot"
       :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
       :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
-      :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
+      :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 </div>
 </template>
@@ -64,7 +64,8 @@ import has from 'lodash/has';
 import set from 'lodash/set';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
@@ -91,8 +92,12 @@ export default {
     'slot-creation-modal': SlotCreationModal,
     'ni-button': Button,
   },
+  emits: ['refresh'],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
-    const isVendorInterface = /\/ad\//.test(this.$router.currentRoute.path);
+    const isVendorInterface = /\/ad\//.test(this.$route.path);
 
     return {
       courseSlots: {},
@@ -228,7 +233,7 @@ export default {
         meetingLink: '',
         step: '',
       };
-      this.$v.newCourseSlot.$reset();
+      this.v$.newCourseSlot.$reset();
     },
     formatCreationPayload (courseSlot) {
       return {
@@ -261,7 +266,7 @@ export default {
     },
     resetEditionModal () {
       this.editedCourseSlot = {};
-      this.$v.editedCourseSlot.$reset();
+      this.v$.editedCourseSlot.$reset();
     },
     formatEditionPayload (courseSlot) {
       const stepType = this.course.subProgram.steps.find(step => step._id === courseSlot.step).type;
@@ -275,8 +280,8 @@ export default {
     },
     async addCourseSlot () {
       try {
-        this.$v.newCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.newCourseSlot);
+        this.v$.newCourseSlot.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.newCourseSlot);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
@@ -320,8 +325,8 @@ export default {
     },
     async updateCourseSlot () {
       try {
-        this.$v.editedCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.editedCourseSlot);
+        this.v$.editedCourseSlot.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.editedCourseSlot);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;

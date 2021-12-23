@@ -31,6 +31,7 @@ export default {
   props: {
     courseHistories: { type: Array, default: () => ([]) },
   },
+  emits: ['toggle-history', 'load'],
   computed: {
     height () {
       return window.innerHeight - this.top;
@@ -54,14 +55,14 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .scroll-container
-    overflow-y: auto
-    overflow-x: hidden
+.scroll-container
+  overflow-y: auto
+  overflow-x: hidden
 
-  .loading
-    width: 100%
-    margin: 4px 0
-    display: flex
-    justify-content: center
-    height: 24px
+.loading
+  width: 100%
+  margin: 4px 0
+  display: flex
+  justify-content: center
+  height: 24px
 </style>

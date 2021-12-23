@@ -58,13 +58,14 @@ export default {
   props: {
     course: { type: Object, default: () => ({}) },
   },
+  emits: ['click'],
   data () {
     return {
       INTRA,
       FORTHCOMING,
       IN_PROGRESS,
       COMPLETED,
-      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
+      isVendorInterface: /\/ad\//.test(this.$route.path),
     };
   },
   computed: {

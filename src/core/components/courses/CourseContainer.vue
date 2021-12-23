@@ -20,7 +20,7 @@ export default {
     'course-cell': CourseCell,
   },
   data () {
-    const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
+    const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
 
     return {
       interfaceType,

@@ -14,7 +14,7 @@ export default {
     icon: { type: String, default: 'warning' },
   },
   data () {
-    const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
+    const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
     return {
       backgroundClass: interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
     };

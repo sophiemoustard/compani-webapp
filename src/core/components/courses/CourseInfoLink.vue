@@ -23,6 +23,7 @@ export default {
   props: {
     disableLink: { type: Boolean, default: true },
   },
+  emits: ['download'],
   computed: {
     ...mapState('course', ['course']),
   },

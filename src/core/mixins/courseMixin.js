@@ -78,11 +78,11 @@ export const courseMixin = {
       return get(this.course, path);
     },
     getVAttribute (path) {
-      if (path === 'trainer') return get(this.$v.course, 'trainer._id', '');
-      if (path === 'salesRepresentative') return get(this.$v.course, 'salesRepresentative._id', '');
+      if (path === 'trainer') return get(this.v$.course, 'trainer._id', '');
+      if (path === 'salesRepresentative') return get(this.v$.course, 'salesRepresentative._id', '');
       if (path === 'contact') return '';
 
-      return get(this.$v.course, path);
+      return get(this.v$.course, path);
     },
     async updateCourse (path) {
       try {

@@ -32,7 +32,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
-      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
+      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" v-model:pagination="pagination" class="q-mb-md"
         :loading="smsLoading">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -60,7 +60,7 @@
 
     <!-- Modal envoi message -->
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
-      :new-sms.sync="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
+      v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
@@ -70,7 +70,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
@@ -121,6 +122,9 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       smsModal: false,
@@ -165,7 +169,7 @@ export default {
   },
   watch: {
     course () {
-      const phoneValidation = get(this.$v, 'course.contact.contact.phone', '');
+      const phoneValidation = get(this.v$, 'course.contact.contact.phone', '');
       if (phoneValidation) phoneValidation.$touch();
     },
   },
@@ -212,7 +216,7 @@ export default {
       return this.followUpDisabled || noPhoneNumber;
     },
     isMissingContactPhone () {
-      return !!get(this.course, 'contact._id') && get(this.$v, 'course.contact.contact.phone.$error');
+      return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
     },
   },
   methods: {
@@ -314,8 +318,8 @@ export default {
     },
     async sendMessage () {
       try {
-        this.$v.newSms.$touch();
-        if (this.$v.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newSms.$touch();
+        if (this.v$.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Courses.sendSMS(this.course._id, this.newSms);

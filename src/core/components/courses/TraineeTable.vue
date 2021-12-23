@@ -3,11 +3,11 @@
     <div class="q-mb-xl">
       <div class="row">
         <p class="text-weight-bold table-title">{{ tableTitle }}</p>
-        <ni-copy-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail"
-          :value-to-copy="traineesEmails" @copy-success="handleCopySuccess" />
+        <!-- <ni-copy-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail"
+          :value-to-copy="traineesEmails" @copy-success="handleCopySuccess" /> -->
       </div>
       <q-card>
-        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
+        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
           :visible-columns="traineesVisibleColumns">
           <template #body="{ props }">
             <q-tr :props="props">
@@ -33,17 +33,17 @@
       </q-card>
     </div>
 
-    <trainee-addition-modal v-model="traineeAdditionModal" :new-trainee.sync="newTrainee"
-      :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" @submit="addTrainee"
+    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee="newTrainee"
+      :validations="v$.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" @submit="addTrainee"
       :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
 
-    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee" @submit="updateTrainee"
-      @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="$v.editedTrainee" />
+    <trainee-edition-modal v-model="traineeEditionModal" v-model:edited-trainee="editedTrainee" @submit="updateTrainee"
+      @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="v$.editedTrainee" />
 
-    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" display-company
+      @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal"
-      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" display-company />
+      :validations="v$.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </div>
 </template>
 
@@ -52,6 +52,7 @@ import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
+import useVuelidate from '@vuelidate/core';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -88,6 +89,10 @@ export default {
     'trainee-addition-modal': TraineeAdditionModal,
     'ni-copy-button': CopyButton,
     'learner-creation-modal': LearnerCreationModal,
+  },
+  emits: ['refresh'],
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -200,13 +205,13 @@ export default {
     },
     resetTraineeAdditionForm () {
       this.newTrainee = '';
-      this.$v.newTrainee.$reset();
+      this.v$.newTrainee.$reset();
     },
     async addTrainee () {
       try {
         this.traineeModalLoading = true;
-        this.$v.newTrainee.$touch();
-        if (this.$v.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newTrainee.$touch();
+        if (this.v$.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Courses.addTrainee(this.course._id, { trainee: this.newTrainee });
         this.traineeAdditionModal = false;
@@ -228,14 +233,14 @@ export default {
       this.traineeEditionModal = true;
     },
     resetTraineeEditionForm () {
-      this.$v.editedTrainee.$reset();
+      this.v$.editedTrainee.$reset();
       this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },
     async updateTrainee () {
       try {
         this.traineeModalLoading = true;
-        this.$v.editedTrainee.$touch();
-        if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedTrainee.$touch();
+        if (this.v$.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (get(this.editedTrainee, 'contact.phone')) {
           this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
         }
@@ -286,8 +291,8 @@ export default {
       await this.refreshCompanies();
     },
     async submitLearnerCreationModal () {
-      this.$v.newLearner.$touch();
-      if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
+      this.v$.newLearner.$touch();
+      if (this.v$.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
       this.learnerCreationModalLoading = true;
       try {

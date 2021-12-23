@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from '@vuelidate/validators';
 import { REQUIRED_LABEL } from '@data/constants';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatPhoneForPayload } from '@helpers/utils';

@@ -5,12 +5,12 @@ import Email from '@api/Email';
 import { TRAINEE, INTRA } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { required, email, requiredIf } from 'vuelidate/lib/validators';
+import { required, email, requiredIf } from '@vuelidate/validators';
 
 export const learnerCreationMixin = {
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
-    const isBlendedCourseProfile = !/\/learners/.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
+    const isBlendedCourseProfile = !/\/learners/.test(this.$route.path);
 
     return {
       isClientInterface,
@@ -47,7 +47,7 @@ export const learnerCreationMixin = {
     resetLearnerCreationModal () {
       this.firstStep = true;
       this.newLearner = { ...clear(this.newLearner) };
-      this.$v.newLearner.$reset();
+      this.v$.newLearner.$reset();
       this.userAlreadyHasCompany = false;
       this.learnerAlreadyExists = false;
     },
@@ -70,8 +70,8 @@ export const learnerCreationMixin = {
     },
     async nextStepLearnerCreationModal () {
       try {
-        this.$v.newLearner.$touch();
-        if (this.$v.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
+        this.v$.newLearner.$touch();
+        if (this.v$.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
 
         this.learnerCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newLearner.local.email });
@@ -120,7 +120,7 @@ export const learnerCreationMixin = {
     },
     goToNextStep () {
       this.firstStep = false;
-      this.$v.newLearner.$reset();
+      this.v$.newLearner.$reset();
     },
     async createLearner () {
       try {
