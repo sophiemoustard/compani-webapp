@@ -48,9 +48,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .q-option
+.q-option
+  font-size: 14px
+.q-input
+  :deep .q-field__control
     font-size: 14px
-  .q-input
-    :deep .q-field__control
-      font-size: 14px
 </style>

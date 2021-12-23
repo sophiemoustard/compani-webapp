@@ -3,11 +3,14 @@
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
-      <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
-      <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
-      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativesFilterOptions" :value="selectedSalesRepresentative"
-        @input="updateSelectedSalesRepresentative" />
+      <ni-select :options="companyFilterOptions" :model-value="selectedCompany"
+        @update:model-value="updateSelectedCompany" />
+      <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer"
+        @update:model-value="updateSelectedTrainer" />
+      <ni-select :options="programFilterOptions" :model-value="selectedProgram"
+        @update:model-value="updateSelectedProgram" />
+      <ni-select :options="salesRepresentativesFilterOptions" :model-value="selectedSalesRepresentative"
+        @update:model-value="updateSelectedSalesRepresentative" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -15,13 +18,14 @@
       @click="openCourseCreationModal" />
 
     <!-- Course creation modal -->
-    <course-creation-modal v-model="courseCreationModal" :new-course.sync="newCourse" :is-intra-course="isIntraCourse"
-      :programs="programs" :company-options="companyOptions" :validations="$v.newCourse" :loading="modalLoading"
+    <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :is-intra-course="isIntraCourse"
+      :programs="programs" :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading"
       @hide="resetCreationModal" @submit="createCourse" :sales-representative-options="salesRepresentativeOptions" />
   </q-page>
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
 import omit from 'lodash/omit';
@@ -47,6 +51,9 @@ export default {
     'ni-select': Select,
     'course-creation-modal': CourseCreationModal,
     'ni-trello': Trello,
+  },
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -129,13 +136,13 @@ export default {
       }
     },
     resetCreationModal () {
-      this.$v.newCourse.$reset();
+      this.v$.newCourse.$reset();
       this.newCourse = { program: '', company: '', misc: '', type: INTRA, salesRepresentative: '' };
     },
     async createCourse () {
       try {
-        this.$v.newCourse.$touch();
-        if (this.$v.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newCourse.$touch();
+        if (this.v$.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         await Courses.create(omit(this.newCourse, 'program'));
@@ -155,7 +162,7 @@ export default {
       this.courseCreationModal = true;
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     if (this.$router.currentRoute.name !== 'ni management blended courses info') {
       this.$store.dispatch('course/resetFilters');
     }

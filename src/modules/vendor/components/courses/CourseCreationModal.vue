@@ -1,22 +1,23 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
-      <ni-option-group :value="newCourse.type" @input="updateType($event)" type="radio" :options="courseTypes"
-        caption="Type" required-field inline :error="validations.type.$error" />
-      <ni-select in-modal :value="newCourse.salesRepresentative" @input="update($event, 'salesRepresentative')"
-        @blur="validations.salesRepresentative.$touch" :error="validations.salesRepresentative.$error" required-field
-        caption="Référent Compani" :options="salesRepresentativeOptions" />
-      <ni-select in-modal :value="newCourse.program" @input="update($event, 'program')" :options="programOptions"
-        @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error" />
-      <ni-select in-modal :value="newCourse.subProgram" @input="update($event, 'subProgram')"
+      <ni-option-group :model-value="newCourse.type" @update:model-value="updateType($event)" type="radio"
+        caption="Type" required-field inline :error="validations.type.$error" :options="courseTypes" />
+      <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Référent Compani" required-field
+        @update:model-value="update($event, 'salesRepresentative')" :options="salesRepresentativeOptions"
+        @blur="validations.salesRepresentative.$touch" :error="validations.salesRepresentative.$error" />
+      <ni-select in-modal :model-value="newCourse.program" @update:model-value="update($event, 'program')"
+        @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error"
+        :options="programOptions" />
+      <ni-select in-modal :model-value="newCourse.subProgram" @update:model-value="update($event, 'subProgram')"
         @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions"
         :disable="disableSubProgram" :error="validations.subProgram.$error" />
-      <ni-select v-if="isIntraCourse" in-modal :value="newCourse.company" @input="update($event, 'company')"
+      <ni-select v-if="isIntraCourse" in-modal :model-value="newCourse.company"
         @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions"
-        :error="validations.company.$error" />
-      <ni-input in-modal :value="newCourse.misc" @input="update($event.trim(), 'misc')"
+        :error="validations.company.$error" @update:model-value="update($event, 'company')" />
+      <ni-input in-modal :model-value="newCourse.misc" @update:model-value="update($event.trim(), 'misc')"
         caption="Informations Complémentaires" />
       <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="loading"
@@ -38,7 +39,7 @@ import { formatAndSortOptions } from '@helpers/utils';
 export default {
   name: 'CourseCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     isIntraCourse: { type: Boolean, default: false },
     newCourse: { type: Object, default: () => ({}) },
     programs: { type: Array, default: () => [] },
@@ -53,6 +54,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:newCourse'],
   data () {
     return {
       courseTypes: COURSE_TYPES,
@@ -88,7 +90,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
