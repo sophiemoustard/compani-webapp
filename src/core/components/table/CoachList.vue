@@ -3,7 +3,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Coachs</p>
       <q-card>
-        <ni-responsive-table :data="users" :columns="usersColumns" :pagination.sync="usersPagination"
+        <ni-responsive-table :data="users" :columns="usersColumns" v-model:pagination="usersPagination"
           :loading="usersLoading">
           <template #header="{ props }">
             <q-tr :props="props">
@@ -30,20 +30,21 @@
       </q-card>
     </div>
 
-    <coach-creation-modal v-model="coachCreationModal" :new-coach.sync="newCoach" :email-error="emailError($v.newCoach)"
-      :first-step="firstStep" :loading="loading" :phone-nbr-error="phoneNbrError($v.newCoach)"
+    <coach-creation-modal v-model="coachCreationModal" v-model:new-coach="newCoach" :validations="v$.newCoach"
+      :first-step="firstStep" :loading="loading" :phone-nbr-error="phoneNbrError(v$.newCoach)"
       :role-options="roleOptions" @hide="resetCoachCreationForm" @show="openCoachCreationModal" @submit="createCoach"
-      @go-to-next-step="nextStep" :validations="$v.newCoach" />
+      @go-to-next-step="nextStep" :email-error="emailError(v$.newCoach)" />
 
-    <coach-edition-modal v-model="coachEditionModal" :phone-nbr-error="phoneNbrError($v.selectedCoach)"
-      :validations="$v.selectedCoach" :email-error="emailError($v.selectedCoach)" :selected-coach.sync="selectedCoach"
+    <coach-edition-modal v-model="coachEditionModal" :phone-nbr-error="phoneNbrError(v$.selectedCoach)"
+      :validations="v$.selectedCoach" :email-error="emailError(v$.selectedCoach)" v-model:selected-coach="selectedCoach"
       :role-options="roleOptions" @hide="resetCoachEditionForm" @submit="updateCoach" :loading="loading" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required, email } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -74,6 +75,8 @@ export default {
     company: { type: Object, default: () => ({}) },
   },
   mixins: [userMixin],
+  setup () { return { v$: useVuelidate() }; },
+  validationConfig: { $lazy: true },
   data () {
     return {
       loading: false,
@@ -157,8 +160,8 @@ export default {
     async nextStep () {
       try {
         this.loading = true;
-        this.$v.newCoach.local.email.$touch();
-        if (this.$v.newCoach.local.email.$error || !this.newCoach.local.email) return NotifyWarning('Champs invalides');
+        this.v$.newCoach.local.email.$touch();
+        if (this.v$.newCoach.local.email.$error || !this.newCoach.local.email) return NotifyWarning('Champs invalides');
         const userInfo = await Users.exists({ email: this.newCoach.local.email });
         const { user } = userInfo;
 
@@ -190,8 +193,8 @@ export default {
     async createCoach () {
       try {
         this.loading = true;
-        this.$v.newCoach.$touch();
-        if (this.$v.newCoach.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newCoach.$touch();
+        if (this.v$.newCoach.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Users.create(this.formatUserPayload(this.newCoach));
 
@@ -225,7 +228,7 @@ export default {
     resetCoachCreationForm () {
       this.firstStep = true;
       this.newCoach = { ...clear(this.newCoach) };
-      this.$v.newCoach.$reset();
+      this.v$.newCoach.$reset();
     },
     async getRoles () {
       try {
@@ -251,7 +254,7 @@ export default {
       this.coachEditionModal = true;
     },
     resetCoachEditionForm () {
-      this.$v.selectedCoach.$reset();
+      this.v$.selectedCoach.$reset();
       this.selectedCoach = { identity: {}, local: {}, contact: {} };
     },
     formatUpdatedUserPayload (user) {
@@ -264,8 +267,8 @@ export default {
     async updateCoach () {
       try {
         this.loading = true;
-        this.$v.selectedCoach.$touch();
-        if (this.$v.selectedCoach.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.selectedCoach.$touch();
+        if (this.v$.selectedCoach.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Users.updateById(this.selectedCoach._id, this.formatUpdatedUserPayload(this.selectedCoach));
         this.coachEditionModal = false;

@@ -4,24 +4,24 @@
       <div class="indicator row">
         <div class="col-4 indicator-title">Heures à travailler</div>
         <div class="col-8 row indicator-hours">
-          <div class="col-md-3 col-xs-12">{{ hoursToWork | formatHours }}</div>
+          <div class="col-md-3 col-xs-12">{{ formatHours(hoursToWork) }}</div>
           <div class="col-md-9 col-xs-12">{{ contractHoursDetail }}</div>
         </div>
       </div>
       <div class="indicator row">
         <div class="col-4 indicator-title">Heures travaillées</div>
         <div class="col-8 row indicator-hours">
-          <div class="col-md-3 col-xs-12">{{ workedHours | formatHours }}</div>
+          <div class="col-md-3 col-xs-12">{{ formatHours(workedHours) }}</div>
           <div class="col-md-9 col-xs-12">{{ workedHoursDetail }}</div>
         </div>
       </div>
       <div class="indicator row text-weight-bold">
         <div class="col-4 indicator-title">Soldes d'heures</div>
-        <div class="col-2 indicator-hours">{{ hoursBalance | formatHours }}</div>
+        <div class="col-2 indicator-hours">{{ formatHours(hoursBalance) }}</div>
       </div>
       <div v-if="hoursDetails.counterAndDiffRelevant" class="indicator row text-weight-bold">
         <div class="col-4 indicator-title">Compteur d'heures</div>
-        <div class="col-2 indicator-hours">{{ hoursDetails.hoursCounter | formatHours }}</div>
+        <div class="col-2 indicator-hours">{{ formatHours(hoursDetails.hoursCounter) }}</div>
       </div>
     </div>
     <div class="quality-indicators indicators">
@@ -30,7 +30,7 @@
         <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }} en moyenne</span>
       </div>
       <div class="quality-indicators-item">
-        <span class="highlight">{{ hoursDetails.paidTransportHours | formatHours }}</span> de transport rémunéré
+        <span class="highlight">{{ formatHours(hoursDetails.paidTransportHours) }}</span> de transport rémunéré
       </div>
     </div>
   </div>
@@ -45,9 +45,6 @@ export default {
   props: {
     hoursDetails: { type: Object, default: () => ({}) },
     customersDetails: { type: Object, default: () => ({}) },
-  },
-  filters: {
-    formatHours: hours => formatHours(hours),
   },
   computed: {
     averageTimeByCustomer () {
@@ -89,6 +86,7 @@ export default {
     },
   },
   methods: {
+    formatHours,
     getHoursWithDiff (key) {
       return this.hoursDetails.diff && this.hoursDetails.diff[key] && this.hoursDetails.counterAndDiffRelevant
         ? this.hoursDetails.diff[key] + this.hoursDetails[key]

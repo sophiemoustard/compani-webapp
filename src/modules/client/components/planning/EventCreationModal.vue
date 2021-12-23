@@ -1,19 +1,19 @@
 <template>
-  <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="reset(false)">
+  <q-dialog v-if="Object.keys(newEvent).length !== 0" :model-value="creationModal" @hide="reset(false)">
     <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" :value="newEvent.customer"
           :selected-person="selectedCustomer" @close="close" />
         <ni-planning-modal-header v-else :value="newEvent.auxiliary" :options="auxiliariesOptions"
           :selected-person="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent"
-          @input="updateEvent('auxiliary', $event)" />
-        <ni-btn-toggle :value="newEvent.type" :options="eventTypeOptions" @input="updateType($event)" />
-        <template v-if="newEvent.type !== ABSENCE">
+          @update:value="updateEvent('auxiliary', $event)" />
+        <ni-btn-toggle :value="newEvent.type" :options="eventTypeOptions" @update:value="updateType($event)" />
+        <!-- <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
             :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
             @input="updateEvent('dates', $event)" :max="customerStoppedDate" />
-        </template>
-        <template v-if="newEvent.type === INTERVENTION">
+        </template> -->
+        <!-- <template v-if="newEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="newEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
             @blur="validations.auxiliary.$touch" @input="updateEvent('auxiliary', $event)" />
@@ -23,8 +23,8 @@
           <ni-select in-modal caption="Service" :value="newEvent.subscription" :error="validations.subscription.$error"
             :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch"
             data-cy="event-creation-service" @input="updateEvent('subscription', $event)" />
-        </template>
-        <template v-if="newEvent.type === ABSENCE">
+        </template> -->
+        <!-- <template v-if="newEvent.type === ABSENCE">
           <ni-select in-modal caption="Nature" :value="newEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field @blur="validations.absenceNature.$touch"
             @input="updateAbsenceNature($event)" />
@@ -46,28 +46,28 @@
             :entity="newEvent" name="file" :url="docsUploadUrl" @uploaded="documentUploaded" :extensions="extensions"
             :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id" drive-storage
             :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)" />
-        </template>
-        <template v-if="newEvent.type === INTERNAL_HOUR">
+        </template> -->
+        <!-- <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :value="newEvent.internalHour"
             :options="internalHourOptions" required-field :error="validations.internalHour.$error"
             @blur="validations.internalHour.$touch" @input="updateEvent('internalHour', $event)" />
-        </template>
-        <template v-if="newEvent.type !== ABSENCE && newEvent.repetition">
+        </template> -->
+        <!-- <template v-if="newEvent.type !== ABSENCE && newEvent.repetition">
           <ni-select in-modal caption="Répétition de l'évènement" :value="newEvent.repetition.frequency"
             :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch"
             :disable="!isRepetitionAllowed" @input="updateEvent('repetition.frequency', $event)"
             :error="validations.repetition.frequency.$error" />
-        </template>
-        <template v-if="newEvent.type === INTERNAL_HOUR">
+        </template> -->
+        <!-- <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-search-address :value="newEvent.address" :error-message="addressError" @blur="validations.address.$touch"
             :error="validations.address.$error" in-modal @input="updateEvent('address', $event)" />
-        </template>
+        </template> -->
         <ni-input in-modal type="textarea" :value="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER"
-          @input="updateEvent('misc', $event)" />
+          @update:value="updateEvent('misc', $event)" />
       </div>
       <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
-        <div class="row items-center no-wrap">
+        <!-- <div class="row items-center no-wrap">
           <q-select borderless dense :value="newEvent.address" @input="updateCustomerAddress($event)" emit-value
             :options="customerAddressList(newEvent)" :readonly="customerAddressList(newEvent).length === 1"
             :display-value="newEvent.address.fullAddress" ref="addressSelect" behavior="menu">
@@ -75,7 +75,7 @@
               <ni-button icon="swap_vert" class="select-icon primary-icon" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>
-        </div>
+        </div> -->
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
         @click="submit" icon-right="add" data-cy="event-creation-button" />

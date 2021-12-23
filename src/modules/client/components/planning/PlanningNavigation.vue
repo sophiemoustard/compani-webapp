@@ -46,6 +46,14 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: [
+    'go-to-next-week',
+    'go-to-previous-week',
+    'go-to-week',
+    'go-to-today',
+    'open-delete-events-modal',
+    'toggle-history', 'update-view-mode',
+  ],
   data () {
     return {
       datimeModal: false,

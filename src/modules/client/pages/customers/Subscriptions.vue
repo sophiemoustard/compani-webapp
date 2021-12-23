@@ -111,8 +111,8 @@
     </q-dialog>
 
     <!-- CSG modal -->
-    <ni-html-modal :title="htmlModalTitle" v-model="gcsModal" :html="gcs" @show="openGcsModal"
-      @hide="closeGcsModal" :loading="gcsLoading" />
+    <ni-html-modal :title="htmlModalTitle" v-model="gcsModal" :html="gcs" @show="openGcsModal" @hide="closeGcsModal"
+      :loading="gcsLoading" />
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
@@ -454,7 +454,7 @@ export default {
       }
     },
     closeGcsModal () {
-      this.gcs = null;
+      this.gcs = '';
     },
   },
 };

@@ -7,7 +7,7 @@
       </div>
       <q-field dense borderless :error="error" :error-message="errorMessage" class="col-12">
         <q-option-group :model-value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
-          :disable="disable" />
+          :disable="disable" @update:model-value="udpate" />
       </q-field>
     </div>
   </div>
@@ -31,6 +31,12 @@ export default {
     inline: { type: Boolean, default: false },
     displayCaption: { type: Boolean, default: true },
     disable: { type: Boolean, default: false },
+  },
+  emits: ['update:value'],
+  methods: {
+    update (value) {
+      this.$emit('update:value', value);
+    },
   },
 };
 </script>

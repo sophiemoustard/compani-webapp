@@ -27,6 +27,7 @@ export default {
     displaySearchBar: { type: Boolean, default: true },
     search: { type: String, default: '' },
   },
+  emits: ['update-search', 'toggle'],
   computed: {
     titleContainerClass () {
       return ['col-xs-12', this.displayToggle ? 'col-md-5' : 'col-md-6', { 'q-mb-sm': this.$q.platform.is.mobile }];

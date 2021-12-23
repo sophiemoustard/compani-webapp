@@ -8,14 +8,14 @@
       @update-feeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event="newEvent"
+    <ni-event-creation-modal :validations="v$.newEvent" :loading="loading" :new-event="newEvent"
       :creation-modal="creationModal" :internal-hours="internalHours" @close="closeCreationModal" :customers="customers"
       :person-key="personKey" :active-auxiliaries="activeAuxiliaries" @reset="resetCreationForm"
-      @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
-      @submit="validateCreationEvent" @update-event="setEvent" />
+      @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded" @update-event="setEvent"
+      @submit="validateCreationEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
+    <ni-event-edition-modal :validations="v$.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @refresh-histories="refreshHistories"
       @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core';
 import { mapGetters, mapActions, mapState } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
 import uniqBy from 'lodash/uniqBy';
@@ -65,6 +66,7 @@ export default {
   props: {
     targetedAuxiliaryId: { type: String, default: '' },
   },
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       loading: false,

@@ -1,6 +1,6 @@
 <template>
-  <q-dialog :model-value="modelValue" @update:model-value="$emit('update:model-value')" @update:show="$emit('show')"
-    @update:hide="$emit('hide')">
+  <q-dialog :model-value="modelValue" @update:model-value="$emit('update:model-value')" @show="$emit('show')"
+    @hide="$emit('hide')">
     <div :class="containerClass">
       <div class="modal-padding">
         <div class="row justify-between items-start">

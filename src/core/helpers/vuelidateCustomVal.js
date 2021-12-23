@@ -7,7 +7,7 @@ import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 export const frPhoneNumber = (value) => {
   if (!value) return true;
 
-  return value.match(/^[0]{1}[1-9]{1}[.\-\s]{0,1}([0-9]{2}[.\-\s]{0,1}){4}$/) || false;
+  return /^[0]{1}[1-9]{1}[.\-\s]{0,1}([0-9]{2}[.\-\s]{0,1}){4}$/.test(value) || false;
 };
 
 export const frZipCode = (value) => {

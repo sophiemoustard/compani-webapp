@@ -2,7 +2,7 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
-    <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
       @go-to="goToUserProfile" :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'name'">
@@ -25,14 +25,15 @@
       @click="auxiliaryCreationModal = true" :disable="tableLoading" />
 
     <auxiliary-creation-modal v-model="auxiliaryCreationModal" :new-user="newUser"
-      :validations="$v.newUser" :company-id="company._id" :loading="loading" :email-error="emailError($v.newUser)"
-      :first-step="firstStep" :send-welcome-msg.sync="sendWelcomeMsg" :civility-options="civilityOptions"
+      :validations="v$.newUser" :company-id="company._id" :loading="loading" :email-error="emailError(v$.newUser)"
+      :first-step="firstStep" v-model:send-welcome-msg="sendWelcomeMsg" :civility-options="civilityOptions"
       @hide="resetForm" @submit="submit" @go-to-next-step="nextStep" @update-new-user="setNewUser" />
   </q-page>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import useVuelidate from '@vuelidate/core';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
@@ -62,6 +63,9 @@ export default {
     'auxiliary-creation-modal': AuxiliaryCreationModal,
   },
   mixins: [validationMixin, userMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       tableLoading: false,
@@ -219,7 +223,7 @@ export default {
       this.$router.push({ name: 'ni auxiliaries info', params: { auxiliaryId: row.auxiliary._id } });
     },
     resetForm () {
-      this.$v.newUser.$reset();
+      this.v$.newUser.$reset();
       this.newUser = cloneDeep(this.defaultNewUser);
       this.firstStep = true;
       this.fetchedUser = {};
@@ -281,8 +285,8 @@ export default {
     },
     async nextStep () {
       try {
-        this.$v.newUser.$touch();
-        if (this.$v.newUser.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
+        this.v$.newUser.$touch();
+        if (this.v$.newUser.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         this.loading = true;
         const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
@@ -304,7 +308,7 @@ export default {
         }
 
         this.firstStep = false;
-        this.$v.newUser.$reset();
+        this.v$.newUser.$reset();
       } catch (e) {
         NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
@@ -315,8 +319,8 @@ export default {
       let editedUser = {};
       try {
         this.loading = true;
-        this.$v.newUser.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.newUser);
+        this.v$.newUser.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.newUser);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const folderId = get(this.company, 'auxiliariesFolderId');

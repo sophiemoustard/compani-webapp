@@ -4,7 +4,8 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
 import { subject } from '@casl/ability';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
@@ -32,6 +33,9 @@ import { validationMixin } from '@mixins/validationMixin';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       editedEventHistories: [],

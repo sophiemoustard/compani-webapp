@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :value="editionModal" @hide="hide">
+  <q-dialog :model-value="editionModal" @hide="hide">
     <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" :value="editedEvent.customer"
@@ -21,8 +21,8 @@
             @input="updateEvent('dates', $event)" @blur="validations.dates.$touch"
             :disable-start-date="isEventTimeStamped" :max="customerStoppedDate"
             :disable-start-hour="!!startDateTimeStamped" :disable-end-hour="!!endDateTimeStamped"
-            :start-locked="!!startDateTimeStamped" @startLockClick="openTimeStampCancellationModal(true)"
-            :end-locked="!!endDateTimeStamped" @endLockClick="openTimeStampCancellationModal(false)" />
+            :start-locked="!!startDateTimeStamped" @start-lock-click="openTimeStampCancellationModal(true)"
+            :end-locked="!!endDateTimeStamped" @end-lock-click="openTimeStampCancellationModal(false)" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
@@ -128,14 +128,15 @@
         :disable="historiesLoading" />
     </div>
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
-      @cancelTimeStamping="cancelTimeStamping" :start="isStartCancellation" :reason.sync="timeStampCancellationReason"
-      :validations="$v.timeStampCancellationReason" />
+      @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
+      :validations="v$.timeStampCancellationReason" v-model:reason="timeStampCancellationReason" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -161,11 +162,25 @@ export default {
     eventHistories: { type: Array, default: () => [] },
     historiesLoading: { type: Boolean, default: false },
   },
+  setup () {
+    return { v$: useVuelidate() };
+  },
   components: {
     'ni-button': Button,
     'ni-event-history': NiEventHistory,
     'ni-history-cancellation-modal': NiHistoryCancellationModal,
   },
+  emits: [
+    'refresh-histories',
+    'delete-event',
+    'delete-event-repetition',
+    'submit',
+    'document-uploaded',
+    'delete-document',
+    'hide',
+    'close',
+    'update-event',
+  ],
   data () {
     return {
       displayHistory: false,
@@ -320,15 +335,15 @@ export default {
       this.timeStampCancellationReason = '';
       this.historyCancellationModal = false;
       this.historyToCancel = {};
-      this.$v.timeStampCancellationReason.$reset();
+      this.v$.timeStampCancellationReason.$reset();
     },
     async refreshHistories (eventId) {
       await this.$emit('refresh-histories', eventId);
     },
     async cancelTimeStamping () {
       try {
-        this.$v.timeStampCancellationReason.$touch();
-        if (this.$v.timeStampCancellationReason.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.timeStampCancellationReason.$touch();
+        if (this.v$.timeStampCancellationReason.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await EventHistories.updateById(
           this.historyToCancel._id,

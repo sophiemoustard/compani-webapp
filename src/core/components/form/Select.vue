@@ -11,7 +11,7 @@
       :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" :error-message="errorMessage"
       :multiple="multiple">
       <template #append>
-        <ni-button v-if="value && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
+        <ni-button v-if="modelValue && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
           @click="$refs['selectInput'].showPopup()" />
       </template>
@@ -39,7 +39,7 @@ export default {
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
     options: { type: Array, default: () => [] },
-    value: { type: [String, Number, Object, Date], default: '' },
+    modelValue: { type: [String, Number, Object, Date], default: '' },
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     clearable: { type: Boolean, default: true },
@@ -53,6 +53,7 @@ export default {
     optionSlot: { type: Boolean, default: false },
     noBorder: { type: Boolean, default: false },
   },
+  emits: ['focus', 'blur', 'update:model-value'],
   components: {
     'ni-button': Button,
   },
@@ -63,11 +64,11 @@ export default {
   },
   computed: {
     displayedValue () {
-      const option = this.options.find(opt => opt.value === this.value);
+      const option = this.options.find(opt => opt.value === this.modelVvalue);
       return option ? option.label : '';
     },
     model () {
-      return this.options.find(opt => opt.value === this.value) || null;
+      return this.options.find(opt => opt.value === this.modelValue) || null;
     },
     formattedOptions () {
       return this.options.map(opt => ({
@@ -90,7 +91,7 @@ export default {
       this.$emit('blur');
     },
     onInput (val) {
-      this.$emit('input', val);
+      this.$emit('update:model-value', val);
       this.$refs.selectInput.blur();
     },
     formatStringForFiltering (str) {
