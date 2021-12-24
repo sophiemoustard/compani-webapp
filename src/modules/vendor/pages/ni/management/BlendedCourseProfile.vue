@@ -45,7 +45,7 @@ export default {
           default: this.defaultTab === 'organization',
           component: ProfileOrganization,
         },
-        // { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
+        { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
         // {
         //   label: 'Suivi des stagiaires',
         //   name: 'traineeFollowUp',

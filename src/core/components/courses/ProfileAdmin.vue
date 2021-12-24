@@ -23,7 +23,7 @@
           les attestations de fin de formation.
         </template>
       </ni-banner>
-      <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
+      <!-- <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" /> -->
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
         :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       <ni-bi-color-button icon="file_download" label="Attestations de fin de formation"
@@ -324,12 +324,14 @@ export default {
         this.loading = true;
         await Courses.sendSMS(this.course._id, this.newSms);
         await this.refreshSms();
+
+        this.smsModal = false;
+
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'envoi des SMS');
       } finally {
-        this.smsModal = false;
         this.loading = false;
         this.message = '';
         this.setDefaultMessageType();

@@ -1,12 +1,12 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
     <template #title>
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :value="newSms.type"
-        required-field @input="updateType($event)" />
-      <ni-input in-modal caption="Message" :value="newSms.content" @input="update($event, 'content')" type="textarea"
-        :rows="7" required-field />
+      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :model-value="newSms.type"
+        required-field @update:model-value="updateType($event)" />
+      <ni-input in-modal caption="Message" :model-value="newSms.content" @update:model-value="update($event, 'content')"
+        type="textarea" :rows="7" required-field />
       <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click="send" />
@@ -22,7 +22,7 @@ import Input from '@components/form/Input';
 export default {
   name: 'SmsSendingModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newSms: {
       type: Object,
       validator: p => (typeof p.type === 'string') && (typeof p.content === 'string'),
@@ -36,12 +36,13 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
+  emits: ['hide', 'update:model-value', 'update-type', 'send', 'update:newSms'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     updateType (event) {
       this.$emit('update-type', event);
