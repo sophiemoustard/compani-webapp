@@ -5,7 +5,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Heures internes</p>
         <q-card>
-          <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" :pagination.sync="pagination"
+          <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" v-model:pagination="pagination"
             :loading="internalHoursLoading">
             <template #body="{ props }">
               <q-tr :props="props">
@@ -28,7 +28,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
-          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.grossHourlyRate.$error"
+          <ni-input caption="Taux horaire brut par défaut" :error="v$.company.rhConfig.grossHourlyRate.$error"
             :error-message="nbrError('company.rhConfig.grossHourlyRate')" type="number"
             v-model="company.rhConfig.grossHourlyRate" @focus="saveTmp('rhConfig.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.grossHourlyRate')" />
@@ -37,7 +37,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant des frais" :error="$v.company.rhConfig.phoneFeeAmount.$error" type="number"
+          <ni-input caption="Montant des frais" :error="v$.company.rhConfig.phoneFeeAmount.$error" type="number"
             :error-message="nbrError('company.rhConfig.phoneFeeAmount')" v-model="company.rhConfig.phoneFeeAmount"
             @focus="saveTmp('rhConfig.phoneFeeAmount')" suffix="€" @blur="updateCompany('rhConfig.phoneFeeAmount')" />
         </div>
@@ -45,7 +45,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Taux kilométrique</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error" type="number"
+          <ni-input caption="Montant par kilomètre" :error="v$.company.rhConfig.amountPerKm.$error" type="number"
             :error-message="nbrError('company.rhConfig.amountPerKm')" v-model="company.rhConfig.amountPerKm"
             @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
@@ -56,10 +56,9 @@
           <template v-if="company.rhConfig.transportSubs">
             <template v-for="(transportSub, index) in company.rhConfig.transportSubs" :key="index">
               <ni-input :caption="transportSub.department" v-model="company.rhConfig.transportSubs[index].price"
-                :error="$v.company.rhConfig.transportSubs.$each[index].$error" type="number"
-                @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
-                :error-message="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
-                @blur="updateCompanyTransportSubs(index)" />
+                @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€" type="number"
+                :error-message="getTransportSubErrorMessage(index)" @blur="updateCompanyTransportSubs(index)"
+                :error="getTransportSubError(index)" />
             </template>
           </template>
         </div>
@@ -90,7 +89,7 @@
         <p class="text-weight-bold">Documents administratifs</p>
         <q-card>
           <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
-            :pagination.sync="administrativeDocumentsPagination" :loading="administrativeDocumentsLoading">
+            v-model:pagination="administrativeDocumentsPagination" :loading="administrativeDocumentsLoading">
             <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -117,7 +116,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Équipes</p>
         <q-card>
-          <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorsPagination"
+          <ni-responsive-table :data="sectors" :columns="sectorsColumns" v-model:pagination="sectorsPagination"
             :loading="sectorsLoading">
             <template #body="{ props }">
               <q-tr :props="props">
@@ -125,7 +124,7 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button icon="edit" @click.native="openEditionModal(props.row._id)" />
+                      <ni-button icon="edit" @click="openEditionModal(props.row._id)" />
                       <ni-button icon="delete" :disable="props.row.hasAuxiliaries"
                         @click="validateSectorDeletion(props.row)" />
                     </div>
@@ -143,26 +142,27 @@
       </div>
     </div>
 
-    <internal-hour-creation-modal v-model="internalHourCreationModal" :validations="$v.newInternalHour"
-      :new-internal-hour.sync="newInternalHour" @hide="resetInternalHourCreationModal" @submit="createInternalHour"
+    <internal-hour-creation-modal v-model="internalHourCreationModal" :validations="v$.newInternalHour"
+      v-model:new-internal-hour="newInternalHour" @hide="resetInternalHourCreationModal" @submit="createInternalHour"
       :loading="loading" />
 
     <administrative-document-creation-modal v-model="administrativeDocumentCreationModal" :loading="loading"
-      :new-administrative-document.sync="newAdministrativeDocument" @submit="createNewAdministrativeDocument"
-      :validations="$v.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
+      v-model:new-administrative-document="newAdministrativeDocument" @submit="createNewAdministrativeDocument"
+      :validations="v$.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
 
     <sector-creation-modal v-model="sectorCreationModal" :loading="loading" @hide="resetCreationSectorData"
-      :new-sector.sync="newSector" @submit="createNewSector" :validations="$v.newSector" />
+      v-model:new-sector="newSector" @submit="createNewSector" :validations="v$.newSector" />
 
     <sector-edition-modal v-model="sectorEditionModal" :loading="loading" @hide="resetEditionSectorData"
-      :edited-sector.sync="editedSector" @submit="updateSector" :validations="$v.editedSector" />
+      v-model:edited-sector="editedSector" @submit="updateSector" :validations="v$.editedSector" />
 </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
-import { required, maxValue } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, maxValue, helpers } from '@vuelidate/validators';
 import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
@@ -175,6 +175,7 @@ import FileUploader from '@components/form/FileUploader';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import { REQUIRED_LABEL } from '@data/constants';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -197,6 +198,7 @@ export default {
     'sector-creation-modal': SectorCreationModal,
     'sector-edition-modal': SectorEditionModal,
   },
+  setup () { return { v$: useVuelidate() }; },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
     return {
@@ -246,7 +248,7 @@ export default {
           grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) },
           phoneFeeAmount: { required, positiveNumber, maxValue: maxValue(999) },
           amountPerKm: { required, positiveNumber, maxValue: maxValue(999) },
-          transportSubs: { $each: { price: { required, positiveNumber, maxValue: maxValue(999) } } },
+          transportSubs: { $each: helpers.forEach({ price: { required, positiveNumber, maxValue: maxValue(999) } }) },
         },
       },
       newInternalHour: { name: { required } },
@@ -264,10 +266,24 @@ export default {
     ]);
   },
   methods: {
+    getTransportSubError (index) {
+      const validation = this.v$.company.rhConfig.transportSubs.$each.$response.$errors[index];
+
+      return get(validation, 'price.0.$response') === false;
+    },
+    getTransportSubErrorMessage (index) {
+      const validation = this.v$.company.rhConfig.transportSubs.$each.$response.$errors[index];
+
+      if (get(validation, 'price.0.$validator') === 'required') return REQUIRED_LABEL;
+      if (get(validation, 'price.0.$validator') === 'positiveNumber' ||
+        get(validation, 'price.0.$validator') === 'strictPositiveNumber') return 'Nombre non valide';
+
+      return '';
+    },
     async updateCompanyTransportSubs (index) {
       try {
-        this.$v.company.rhConfig.transportSubs.$each[index].$touch();
-        if (this.$v.company.rhConfig.transportSubs.$each[index].$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.company.rhConfig.transportSubs.$touch();
+        if (this.getTransportSubError(index)) return NotifyWarning('Champ(s) invalide(s)');
 
         const transports = get(this.company, 'rhConfig.transportSubs');
         if (this.tmpInput === transports[index].price) return;
@@ -287,11 +303,11 @@ export default {
     // Internal hours
     resetInternalHourCreationModal () {
       this.newInternalHour = { name: '' };
-      this.$v.newInternalHour.$reset();
+      this.v$.newInternalHour.$reset();
     },
     resetAdministrativeDocumentModal () {
       this.newAdministrativeDocument = { name: '', file: null };
-      this.$v.newAdministrativeDocument.$reset();
+      this.v$.newAdministrativeDocument.$reset();
     },
     async refreshInternalHours () {
       try {
@@ -307,8 +323,8 @@ export default {
     },
     async createInternalHour () {
       try {
-        this.$v.newInternalHour.$touch();
-        if (this.$v.newInternalHour.$error) return;
+        this.v$.newInternalHour.$touch();
+        if (this.v$.newInternalHour.$error) return;
 
         this.loading = true;
         await InternalHours.create(pickBy(this.newInternalHour));
@@ -361,8 +377,8 @@ export default {
     },
     async createNewSector () {
       try {
-        this.$v.newSector.$touch();
-        if (this.$v.newSector.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newSector.$touch();
+        if (this.v$.newSector.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Sectors.create(this.newSector);
@@ -379,7 +395,7 @@ export default {
     },
     resetCreationSectorData () {
       this.newSector = { name: '' };
-      this.$v.newSector.$reset();
+      this.v$.newSector.$reset();
     },
     openEditionModal (id) {
       const selectedSector = this.sectors.find(sector => sector._id === id);
@@ -389,8 +405,8 @@ export default {
     },
     async updateSector () {
       try {
-        this.$v.editedSector.$touch();
-        if (this.$v.editedSector.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedSector.$touch();
+        if (this.v$.editedSector.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
@@ -407,7 +423,7 @@ export default {
     },
     resetEditionSectorData () {
       this.editedSector = { name: '' };
-      this.$v.editedSector.$reset();
+      this.v$.editedSector.$reset();
     },
     async deleteSector (sector) {
       try {
@@ -467,8 +483,8 @@ export default {
       return form;
     },
     async createNewAdministrativeDocument () {
-      this.$v.newAdministrativeDocument.$touch();
-      if (this.$v.newAdministrativeDocument.$error) {
+      this.v$.newAdministrativeDocument.$touch();
+      if (this.v$.newAdministrativeDocument.$error) {
         return NotifyWarning('Champ(s) invalide(s)');
       }
       this.loading = true;

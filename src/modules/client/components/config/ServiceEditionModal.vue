@@ -1,32 +1,32 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
     <template #title>
       Éditer le <span class="text-weight-bold">service</span>
     </template>
-    <ni-input in-modal caption="Nom" :value="editedService.name" :error="validations.name.$error"
-      @blur="validations.name.$touch" required-field @input="update($event, 'name')" />
-    <ni-date-input caption="Date d'effet" :value="editedService.startDate" :error="validations.startDate.$error"
+    <ni-input in-modal caption="Nom" :model-value="editedService.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field @update:model-value="update($event, 'name')" />
+    <ni-date-input caption="Date d'effet" :model-value="editedService.startDate" :error="validations.startDate.$error"
       @blur="validations.startDate.$touch" :min="minStartDate" in-modal required-field
-      @input="update($event, 'startDate')" :error-message="startDateError" />
+      @update:model-value="update($event, 'startDate')" :error-message="startDateError" />
     <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
-      :value="editedService.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
+      :model-value="editedService.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
       @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError"
-      @input="update($event, 'defaultUnitAmount')" />
-    <ni-input in-modal caption="TVA" suffix="%" :value="editedService.vat" :error="validations.vat.$error"
+      @update:model-value="update($event, 'defaultUnitAmount')" />
+    <ni-input in-modal caption="TVA" suffix="%" :model-value="editedService.vat" :error="validations.vat.$error"
       type="number" @blur="validations.vat.$touch" error-message="La TVA doit être positive ou nulle"
-      @input="update($event, 'vat')" />
-    <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration"
-      :value="editedService.surcharge" :options="surchargesOptions" @input="update($event, 'surcharge')" />
+      @update:model-value="update($event, 'vat')" />
+    <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration" :options="surchargesOptions"
+      :model-value="editedService.surcharge" @update:model-value="update($event, 'surcharge')" />
     <div class="row q-mb-md">
-      <q-checkbox label="Exonération de charges" :value="editedService.exemptFromCharges" dense
-        @input="update($event, 'exemptFromCharges')" />
+      <q-checkbox label="Exonération de charges" :model-value="editedService.exemptFromCharges" dense
+        @update:model-value="update($event, 'exemptFromCharges')" />
     </div>
     <p class="text-weight-bold q-mt-md billing-items-title" v-if="get(editedService, 'billingItems.length')">
       Articles facturés par intervention
     </p>
     <div class="row" v-for="(billingItem, index) in editedService.billingItems" :key="index">
-      <ni-select :clearable="false" :value="billingItem" :options="billingItemsOptions"
-        :caption="`Article ${index + 1}`" class="flex-1 q-mr-sm" @input="updateBillingItem(index, $event)" />
+      <ni-select :clearable="false" :model-value="billingItem" :options="billingItemsOptions" class="flex-1 q-mr-sm"
+        :caption="`Article ${index + 1}`" @update:model-value="updateBillingItem(index, $event)" />
       <ni-button icon="close" @click="removeBillingItem(index)" size="sm" />
     </div>
     <ni-bi-color-button label="Ajouter un article de facturation" icon="add" class="q-mb-md" @click="addBillingItem"
@@ -60,7 +60,7 @@ export default {
   },
   props: {
     validations: { type: Object, required: true },
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     editedService: { type: Object, required: true },
     surchargesOptions: { type: Array, required: true },
     defaultUnitAmountError: { type: String, required: true },
@@ -69,6 +69,15 @@ export default {
     minStartDate: { type: String, required: true },
     billingItemsOptions: { type: Array, required: true },
   },
+  emits: [
+    'update:model-value',
+    'hide',
+    'update:editedService',
+    'add-billing-item',
+    'update-billing-item',
+    'remove-billing-item',
+    'submit',
+  ],
   data () {
     return {
       FIXED,
@@ -80,7 +89,7 @@ export default {
       this.$emit('hide');
     },
     input () {
-      this.$emit('input');
+      this.$emit('update:model-value');
     },
     submit () {
       this.$emit('submit');

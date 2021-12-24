@@ -59,9 +59,10 @@ export const configMixin = {
     },
     nbrError (path, validations = this.v$) {
       const val = get(validations, path);
-      if (val.required === false) return REQUIRED_LABEL;
-      if (val.positiveNumber === false || val.numeric === false || val.maxValue === false) return 'Nombre non valide';
-      if (val.twoFractionDigits === false) return 'Décimales non valides';
+      if (get(val, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(val, 'positiveNumber.$response') === false || get(val, 'numeric.$response') === false ||
+        get(val, 'maxValue.$response') === false) return 'Nombre non valide';
+      if (get(val, 'twoFractionDigits.$response') === false) return 'Décimales non valides';
 
       return '';
     },

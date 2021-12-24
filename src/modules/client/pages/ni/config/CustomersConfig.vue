@@ -611,11 +611,11 @@ export default {
         saturday: { positiveNumber },
         sunday: { positiveNumber },
         evening: { positiveNumber },
-        eveningStartTime: { required: requiredIf(item => item.evening) },
-        eveningEndTime: { required: requiredIf(item => item.evening) },
+        eveningStartTime: { required: requiredIf(this.newSurcharge.evening) },
+        eveningEndTime: { required: requiredIf(this.newSurcharge.evening) },
         custom: { numeric },
-        customStartTime: { required: requiredIf(item => item.custom) },
-        customEndTime: { required: requiredIf(item => item.custom) },
+        customStartTime: { required: requiredIf(this.newSurcharge.custom) },
+        customEndTime: { required: requiredIf(this.newSurcharge.custom) },
       },
       editedSurcharge: {
         name: { required },
@@ -626,11 +626,11 @@ export default {
         saturday: { positiveNumber },
         sunday: { positiveNumber },
         evening: { positiveNumber },
-        eveningStartTime: { required: requiredIf(item => item.evening) },
-        eveningEndTime: { required: requiredIf(item => item.evening) },
+        eveningStartTime: { required: requiredIf(this.editedSurcharge.evening) },
+        eveningEndTime: { required: requiredIf(this.editedSurcharge.evening) },
         custom: { numeric },
-        customStartTime: { required: requiredIf(item => item.custom) },
-        customEndTime: { required: requiredIf(item => item.custom) },
+        customStartTime: { required: requiredIf(this.editedSurcharge.custom) },
+        customEndTime: { required: requiredIf(this.editedSurcharge.custom) },
       },
       newService: {
         name: { required },
@@ -658,9 +658,9 @@ export default {
       newThirdPartyPayer: {
         name: { required },
         address: {
-          zipCode: { required: requiredIf(item => !!item.fullAddress) },
-          street: { required: requiredIf(item => !!item.fullAddress) },
-          city: { required: requiredIf(item => !!item.fullAddress) },
+          zipCode: { required: requiredIf(get(this.newThirdPartyPayer, 'address.fullAddress')) },
+          street: { required: requiredIf(get(this.newThirdPartyPayer, 'address.fullAddress')) },
+          city: { required: requiredIf(get(this.newThirdPartyPayer, 'address.fullAddress')) },
           fullAddress: { frAddress },
         },
         email: { email },
@@ -671,9 +671,9 @@ export default {
       editedThirdPartyPayer: {
         name: { required },
         address: {
-          zipCode: { required: requiredIf(item => !!item.fullAddress) },
-          street: { required: requiredIf(item => !!item.fullAddress) },
-          city: { required: requiredIf(item => !!item.fullAddress) },
+          zipCode: { required: requiredIf(get(this.editedThirdPartyPayer, 'address.fullAddress')) },
+          street: { required: requiredIf(get(this.editedThirdPartyPayer, 'address.fullAddress')) },
+          city: { required: requiredIf(get(this.editedThirdPartyPayer, 'address.fullAddress')) },
           fullAddress: { frAddress },
         },
         email: { email },
@@ -696,8 +696,10 @@ export default {
     },
     startDateError () {
       const val = get(this.v$, 'editedService.startDate');
-      if (val.required === false) return REQUIRED_LABEL;
-      if (val.minDate === false) return 'La date d\'effet doit être postérieure à la date de la version précédente.';
+      if (val.required.$response === false) return REQUIRED_LABEL;
+      if (val.minDate.$response === false) {
+        return 'La date d\'effet doit être postérieure à la date de la version précédente.';
+      }
 
       return '';
     },

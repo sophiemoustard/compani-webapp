@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :model-value="value" @hide="hide" @update:model-value="input">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
       <template #title>
         Créer un <span class="text-weight-bold">plan de majoration</span>
       </template>
@@ -63,7 +63,7 @@ export default {
   name: 'SurchargeCreationModal',
   mixins: [configMixin],
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newSurcharge: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },

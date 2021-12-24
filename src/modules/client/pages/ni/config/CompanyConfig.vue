@@ -6,28 +6,28 @@
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
-            @blur="updateCompany('name')" :error="$v.company.name.$error" />
+            @blur="updateCompany('name')" :error="v$.company.name.$error" />
           <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
-            @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
-            :error-message="tradeNameError($v.company)" />
+            @blur="updateCompany('tradeName')" :error="v$.company.tradeName.$error"
+            :error-message="tradeNameError(v$.company)" />
           <ni-search-address v-model="company.address" :error-message="addressError" @blur="updateCompany('address')"
-            @focus="saveTmp('address.fullAddress')" :error="$v.company.address.$error" />
+            @focus="saveTmp('address.fullAddress')" :error="v$.company.address.$error" />
           <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
-            @blur="updateCompany('rcs')" :error="$v.company.rcs.$error" :error-message="rcsError" />
+            @blur="updateCompany('rcs')" :error="v$.company.rcs.$error" :error-message="rcsError" />
           <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
-            @blur="updateCompany('rna')" :error="$v.company.rna.$error" :error-message="rcsError" />
+            @blur="updateCompany('rna')" :error="v$.company.rna.$error" :error-message="rcsError" />
         </div>
       </div>
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Représentant légal</p>
         <div class="row gutter-profile">
-          <ni-input caption="Prénom" :error="$v.company.legalRepresentative.firstname.$error"
+          <ni-input caption="Prénom" :error="v$.company.legalRepresentative.firstname.$error"
             v-model="company.legalRepresentative.firstname" @focus="saveTmp('legalRepresentative.firstname')"
             error-message="Prénom invalide" @blur="updateCompany('legalRepresentative.firstname')" />
-          <ni-input caption="Nom" :error="$v.company.legalRepresentative.lastname.$error" error-message="Nom invalide"
+          <ni-input caption="Nom" :error="v$.company.legalRepresentative.lastname.$error" error-message="Nom invalide"
             v-model="company.legalRepresentative.lastname" @focus="saveTmp('legalRepresentative.lastname')"
             @blur="updateCompany('legalRepresentative.lastname')" />
-          <ni-input caption="Fonction" :error="$v.company.legalRepresentative.position.$error"
+          <ni-input caption="Fonction" :error="v$.company.legalRepresentative.position.$error"
             v-model="company.legalRepresentative.position" @focus="saveTmp('legalRepresentative.position')"
             error-message="Fonction invalide" @blur="updateCompany('legalRepresentative.position')" />
         </div>
@@ -35,13 +35,13 @@
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Facturation</p>
         <div class="row gutter-profile">
-          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-message="ibanError"
+          <ni-input caption="IBAN" :error="v$.company.iban.$error" :error-message="ibanError"
             v-model.trim="company.iban" @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
-          <ni-input caption="BIC" :error="$v.company.bic.$error" :error-message="bicError" upper-case
+          <ni-input caption="BIC" :error="v$.company.bic.$error" :error-message="bicError" upper-case
             v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')"
-            :error="$v.company.ics.$error" />
-          <ni-input caption="Support facturation" :error="$v.company.billingAssistance.$error"
+            :error="v$.company.ics.$error" />
+          <ni-input caption="Support facturation" :error="v$.company.billingAssistance.$error"
             :error-message="billingAssistanceError" v-model.trim="company.billingAssistance"
             @focus="saveTmp('billingAssistance')" @blur="updateCompany('billingAssistance')" />
         </div>
@@ -49,7 +49,7 @@
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Paie</p>
         <div class="row gutter-profile">
-          <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-message="Code APE/NAF invalide"
+          <ni-input caption="Code APE/NAF" :error="v$.company.apeCode.$error" error-message="Code APE/NAF invalide"
             v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
         </div>
       </div>
@@ -57,7 +57,7 @@
         <p class="text-weight-bold">Établissements</p>
         <q-card>
           <ni-responsive-table :data="establishments" :columns="establishmentsColumns" :loading="establishmentsLoading"
-            :pagination.sync="establishmentsPagination">
+            v-model:pagination="establishmentsPagination">
             <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -83,12 +83,12 @@
     </div>
 
     <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment="newEstablishment"
-      :validations="$v.newEstablishment" @hide="resetEstablishmentCreationModal" @submit="createNewEstablishment"
+      :validations="v$.newEstablishment" @hide="resetEstablishmentCreationModal" @submit="createNewEstablishment"
       :loading="loading" :work-health-services="workHealthServiceList" :urssaf-codes="urssafCodeList"
       @update="setEstablishment" />
 
     <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment="editedEstablishment"
-      :validations="$v.editedEstablishment" @hide="resetEstablishmentEditionModal" @submit="updateEstablishment"
+      :validations="v$.editedEstablishment" @hide="resetEstablishmentEditionModal" @submit="updateEstablishment"
       :loading="loading" :work-health-services="workHealthServiceList" :urssaf-codes="urssafCodeList"
       @update="setEstablishment" />
   </q-page>
@@ -100,7 +100,8 @@ import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import set from 'lodash/set';
-import { required, maxLength } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, maxLength } from '@vuelidate/validators';
 import Establishments from '@api/Establishments';
 import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
@@ -139,6 +140,7 @@ export default {
     'establishment-creation-modal': EstablishmentCreationModal,
     'establishment-edition-modal': EstablishmentEditionModal,
   },
+  setup () { return { v$: useVuelidate() }; },
   mixins: [configMixin, validationMixin, tableMixin, companyMixin],
   data () {
     return {
@@ -234,6 +236,7 @@ export default {
       }
     },
     resetEstablishmentCreationModal () {
+      this.establishmentCreationModal = false;
       this.newEstablishment = {
         name: '',
         siret: '',
@@ -242,12 +245,12 @@ export default {
         workHealthService: '',
         urssafCode: '',
       };
-      this.$v.newEstablishment.$reset();
+      this.v$.newEstablishment.$reset();
     },
     async createNewEstablishment () {
       try {
-        this.$v.newEstablishment.$touch();
-        const formIsValid = await this.waitForFormValidation(this.$v.newEstablishment);
+        this.v$.newEstablishment.$touch();
+        const formIsValid = await this.waitForFormValidation(this.v$.newEstablishment);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
@@ -282,7 +285,7 @@ export default {
         workHealthService: '',
         urssafCode: '',
       };
-      this.$v.editedEstablishment.$reset();
+      this.v$.editedEstablishment.$reset();
     },
     setEstablishment (payload) {
       const { path, value } = payload;
@@ -291,8 +294,8 @@ export default {
     },
     async updateEstablishment () {
       try {
-        this.$v.editedEstablishment.$touch();
-        const formIsValid = await this.waitForFormValidation(this.$v.editedEstablishment);
+        this.v$.editedEstablishment.$touch();
+        const formIsValid = await this.waitForFormValidation(this.v$.editedEstablishment);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
