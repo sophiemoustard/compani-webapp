@@ -10,9 +10,11 @@
       <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTarget" ref="infiniteScroll">
         <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
           :course-history="courseHistory" />
-        <div class="loading" slot="loading">
-          <q-spinner />
-        </div>
+        <template #loading>
+          <div class="loading">
+            <q-spinner />
+          </div>
+      </template>
       </q-infinite-scroll>
     </div>
   </div>

@@ -282,7 +282,7 @@ export default {
       try {
         this.v$.newCourseSlot.$touch();
         const isValid = await this.waitForFormValidation(this.v$.newCourseSlot);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
+        // if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         await CourseSlots.create(this.formatCreationPayload(this.newCourseSlot));
@@ -327,7 +327,7 @@ export default {
       try {
         this.v$.editedCourseSlot.$touch();
         const isValid = await this.waitForFormValidation(this.v$.editedCourseSlot);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
+        // if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         const payload = this.formatEditionPayload(this.editedCourseSlot);

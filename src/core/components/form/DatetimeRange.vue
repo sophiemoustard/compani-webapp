@@ -6,7 +6,7 @@
     </div>
     <q-field :error="hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
       <div class="datetime-container row justify-evenly items-center">
-        <ni-date-input :model-value="model-value.startDate" @update:model-value="update($event, 'startDate')"
+        <ni-date-input :model-value="modelValue.startDate" @update:model-value="update($event, 'startDate')"
           @blur="blurHandler" :disable="disable || disableStartDate" :max="max" class="date-item" />
         <ni-time-input :model-value="startHour" @update:model-value="updateHours($event, 'startHour')" class="time-item"
           @blur="blurHandler" :disable="disable || disableStartHour" @lock-click="startClick" :locked="startLocked" />
@@ -14,17 +14,19 @@
         <ni-time-input :model-value="endHour" @update:model-value="updateHours($event, 'endHour')" class="time-item"
           :disable="disable || disableEndHour" :min="min" @lock-click="endClick" :locked="endLocked"
           @blur="blurHandler" />
-        <ni-date-input :model-value="model-value.endDate" @update:model-value="update($event, 'endDate')"
-          @blur="blurHandler" :min="model-value.startDate" :disable="disable || disableEndDate" :max="max"
-           class="date-item" />
+        <ni-date-input :model-value="modelValue.endDate" @update:model-value="update($event, 'endDate')"
+          @blur="blurHandler" :min="modelValue.startDate" :disable="disable || disableEndDate" :max="max"
+          class="date-item" />
       </div>
     </q-field>
   </div>
 </template>
 
 <script>
+import get from 'lodash/get';
 import pick from 'lodash/pick';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import DateInput from '@components/form/DateInput';
 import TimeInput from '@components/form/TimeInput';
 import { minDate } from '@helpers/vuelidateCustomVal';
@@ -50,6 +52,9 @@ export default {
     endLocked: { type: Boolean, default: false },
   },
   emits: ['blur', 'update:model-value', 'start-lock-click', 'end-lock-click'],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       modelValue: {
@@ -60,7 +65,7 @@ export default {
   },
   computed: {
     hasError () {
-      if (this.error || this.$v.modelValue.$error) return true;
+      if (this.error || get(this.v$, 'modelValue.$error.$response')) return true;
 
       return moment(this.modelValue.startDate).isAfter(moment(this.modelValue.endDate));
     },
@@ -80,7 +85,7 @@ export default {
   },
   methods: {
     blurHandler () {
-      this.$v.modelValue.$touch();
+      this.v$.modelValue.$touch();
       this.$emit('blur');
     },
     setDateHours (date, hour) {

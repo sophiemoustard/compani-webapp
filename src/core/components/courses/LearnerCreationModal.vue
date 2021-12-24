@@ -1,24 +1,24 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
         <div v-if="!learnerEdition">Ajouter une <span class="text-weight-bold">personne</span></div>
         <div v-else>Compte apprenant</div>
       </template>
-      <ni-input in-modal :value="newUser.local.email" @input="update($event.trim(), 'local.email')"
+      <ni-input in-modal :model-value="newUser.local.email" @update:model-value="update($event.trim(), 'local.email')"
         @blur="validations.local.email.$touch" caption="Email" :error-message="emailError(validations)"
         :error="validations.local.email.$error" required-field :last="firstStep" :disable="!firstStep" />
       <template v-if="!firstStep">
-        <ni-input in-modal :value="newUser.identity.firstname" @input="update($event, 'identity.firstname')"
-          caption="Prénom" />
-        <ni-input in-modal :value="newUser.identity.lastname" @input="update($event, 'identity.lastname')"
+        <ni-input in-modal caption="Prénom" :model-value="newUser.identity.firstname"
+          @update:model-value="update($event, 'identity.firstname')" />
+        <ni-input in-modal :model-value="newUser.identity.lastname" :error="validations.identity.lastname.$error"
           required-field @blur="validations.identity.lastname.$touch" caption="Nom"
-          :error="validations.identity.lastname.$error" />
-        <ni-input in-modal :value="newUser.contact.phone" @input="update($event.trim(), 'contact.phone')"
+          @update:model-value="update($event, 'identity.lastname')" />
+        <ni-input in-modal :model-value="newUser.contact.phone" :last="!displayCompany" required-field
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
-          :error-message="phoneNbrError(validations)" :last="!displayCompany" required-field />
+          :error-message="phoneNbrError(validations)" @update:model-value="update($event.trim(), 'contact.phone')" />
         <ni-select v-if="displayCompany" in-modal :options="companyOptions" :value="newUser.company"
-          @input="update($event.trim(), 'company')" caption="Structure" last @blur="validations.company.$touch"
-          :error="validations.company.$error" required-field :disable="disableCompany" />
+          @update:model-value="update($event.trim(), 'company')" caption="Structure" last required-field
+          @blur="validations.company.$touch" :error="validations.company.$error" :disable="disableCompany" />
       </template>
       <template #footer>
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
@@ -40,7 +40,7 @@ export default {
   name: 'LearnerCreationModal',
   mixins: [userMixin],
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
     displayCompany: { type: Boolean, default: false },
     disableCompany: { type: Boolean, default: false },
@@ -60,12 +60,13 @@ export default {
       return this.learnerEdition ? 'Suivant' : 'Ajouter la personne';
     },
   },
+  emits: ['hide', 'update:model-value', 'submit', 'next-step', 'update:newUser'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     nextStep () {
       this.$emit('next-step');

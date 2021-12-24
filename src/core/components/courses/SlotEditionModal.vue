@@ -1,21 +1,22 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
+  <ni-modal :model-value="value" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
         Editer un <span class="text-weight-bold">créneau</span>
       </template>
       <div class="modal-icon">
         <ni-button icon="delete" @click="validateDeletion(editedCourseSlot._id)" />
       </div>
-      <ni-select in-modal caption="Etape" :options="stepOptions" :value="editedCourseSlot.step" required-field
-        @blur="validations.step.$touch" :error="validations.step.$error" @input="updateStep" />
-      <ni-datetime-range caption="Dates et heures" :value="editedCourseSlot.dates" required-field disable-end-date
-        :error="validations.dates.$error" @blur="validations.dates.$touch" @input="update($event, 'dates')" />
-      <ni-search-address v-if="getType(this.editedCourseSlot.step) === ON_SITE" :value="editedCourseSlot.address"
+      <ni-select in-modal caption="Etape" :options="stepOptions" :model-value="editedCourseSlot.step" required-field
+        @blur="validations.step.$touch" :error="validations.step.$error" @update:model-value="updateStep" />
+      <ni-datetime-range caption="Dates et heures" :model-value="editedCourseSlot.dates" disable-end-date
+        :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
+        required-field />
+      <ni-search-address v-if="getType(this.editedCourseSlot.step) === ON_SITE" :model-value="editedCourseSlot.address"
         :error-message="addressError" in-modal last @blur="validations.address.$touch"
-        :error="validations.address.$error" @input="update($event, 'address')" />
-      <ni-input v-if="getType(this.editedCourseSlot.step) === REMOTE" in-modal :value="editedCourseSlot.meetingLink"
-        @input="update($event, 'meetingLink')" caption="Lien vers la visio" :error="validations.meetingLink.$error"
-        :error-message="linkErrorMessage" />
+        :error="validations.address.$error" @update:model-value="update($event, 'address')" />
+      <ni-input v-if="getType(this.editedCourseSlot.step) === REMOTE" :model-value="editedCourseSlot.meetingLink"
+        @update:model-value="update($event, 'meetingLink')" caption="Lien vers la visio" in-modal
+        :error-message="linkErrorMessage" :error="validations.meetingLink.$error" />
       <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -51,6 +52,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
+  emits: ['hide', 'input', 'submit', 'delete', 'update'],
   data () {
     return {
       ON_SITE,
@@ -77,7 +79,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');

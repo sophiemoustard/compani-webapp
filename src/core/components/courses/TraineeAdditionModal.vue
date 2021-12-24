@@ -1,10 +1,10 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
         Ajouter une <span class="text-weight-bold">personne</span>
       </template>
-      <ni-select in-modal :value="newTrainee" @input="update" caption="Stagiaire" :error="validations.$error"
-        :options="traineesOptions" required-field option-slot>
+      <ni-select in-modal :model-value="newTrainee" @update:model-value="update" caption="Stagiaire"
+        :options="traineesOptions" required-field option-slot :error="validations.$error">
         <template #option="scope">
           <q-item v-bind="scope.scope.itemProps" v-on="scope.scope.itemEvents">
             <q-item-section avatar>
@@ -19,8 +19,8 @@
             </q-item-section>
           </q-item>
         </template>
-        <template slot="no-option">
-           <ni-button color="primary" icon="add" label="Créer un nouveau compte" @click="openLearnerCreationModal" />
+        <template #no-option>
+          <ni-button color="primary" icon="add" label="Créer un nouveau compte" @click="openLearnerCreationModal" />
         </template>
       </ni-select>
       <template #footer>
@@ -40,7 +40,7 @@ export default {
   name: 'TraineeAdditionModal',
   mixins: [userMixin],
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     traineesOptions: { type: Array, default: () => [] },
     newTrainee: { type: String, default: '' },
     validations: { type: Object, default: () => ({}) },
@@ -51,12 +51,13 @@ export default {
     'ni-select': Select,
     'ni-button': Button,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:newTrainee', 'open-learner-creation-modal'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');

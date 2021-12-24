@@ -37,7 +37,6 @@ import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
-import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
@@ -95,8 +94,6 @@ export default {
         trainer: { _id: { required }, identity: { required } },
         salesRepresentative: { _id: { required }, identity: { required } },
       },
-      // newTrainee: this.traineeValidations,
-      // editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
     };
   },
   computed: {

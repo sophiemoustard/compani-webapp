@@ -53,6 +53,8 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import useVuelidate from '@vuelidate/core';
+import { required, email, requiredIf } from '@vuelidate/validators';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -93,6 +95,21 @@ export default {
   emits: ['refresh'],
   setup () {
     return { v$: useVuelidate() };
+  },
+  validations () {
+    return {
+      newLearner: {
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
+        contact: { phone: { required, frPhoneNumber } },
+        company: { required: requiredIf(() => !this.isClientInterface) },
+      },
+      newTrainee: { required },
+      editedTrainee: {
+        identity: { lastname: { required } },
+        contact: { phone: { required, frPhoneNumber } },
+      },
+    };
   },
   data () {
     return {
@@ -334,6 +351,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .table-title
-    flex: 1
+.table-title
+  flex: 1
 </style>

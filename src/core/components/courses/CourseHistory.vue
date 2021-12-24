@@ -3,7 +3,8 @@
     <div class="history-cell">
       <div class="history-title">
         <div class="history-title-text">
-          {{ formatedHistory.title.pre }}<span class="history-type"> {{ formatedHistory.title.type }}</span>
+          {{ formatedHistory.title.pre }}
+          <span class="history-type">{{ formatedHistory.title.type }}</span>
           {{ formatedHistory.title.post }}
           <span class="history-info"> {{ formatedHistory.title.infos }}.</span>
         </div>
