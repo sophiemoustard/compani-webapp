@@ -11,7 +11,8 @@
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
         <q-field dense borderless class="col-12">
-          <q-option-group :model-value="value" :options="options" type="radio" inline dense />
+          <q-option-group :model-value="modelValue" :options="options" type="radio" inline dense
+            @update:model-value="$emit('update:model-value')" />
         </q-field>
       </div>
       <q-field :error="error" :error-message="errorMessage" dense borderless class="error-field" />
@@ -28,10 +29,11 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    value: { type: String, default: '' },
+    modelValue: { type: String, default: '' },
     optionsGroups: { type: Array, default: () => [] },
     groupTitles: { type: Array, default: () => [] },
   },
+  emits: ['update:model-value'],
 };
 </script>
 

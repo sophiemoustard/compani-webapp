@@ -6,15 +6,17 @@
     </div>
     <q-field :error="hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
       <div class="datetime-container row justify-evenly items-center">
-        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
-          @blur="blurHandler" :disable="disable || disableStartDate" :max="max" />
-        <ni-time-input :value="startHour" @input="updateHours($event, 'startHour')" class="time-item"
-          @blur="blurHandler" :disable="disable || disableStartHour" @lockClick="startClick" :locked="startLocked" />
+        <ni-date-input :model-value="model-value.startDate" @update:model-value="update($event, 'startDate')"
+          @blur="blurHandler" :disable="disable || disableStartDate" :max="max" class="date-item" />
+        <ni-time-input :model-value="startHour" @update:model-value="updateHours($event, 'startHour')" class="time-item"
+          @blur="blurHandler" :disable="disable || disableStartHour" @lock-click="startClick" :locked="startLocked" />
         <p class="delimiter">-</p>
-        <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item" @blur="blurHandler"
-          :disable="disable || disableEndHour" :min="min" @lockClick="endClick" :locked="endLocked" />
-        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" :max="max" />
+        <ni-time-input :model-value="endHour" @update:model-value="updateHours($event, 'endHour')" class="time-item"
+          :disable="disable || disableEndHour" :min="min" @lock-click="endClick" :locked="endLocked"
+          @blur="blurHandler" />
+        <ni-date-input :model-value="model-value.endDate" @update:model-value="update($event, 'endDate')"
+          @blur="blurHandler" :min="model-value.startDate" :disable="disable || disableEndDate" :max="max"
+           class="date-item" />
       </div>
     </q-field>
   </div>
@@ -36,7 +38,7 @@ export default {
   props: {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
-    value: { type: Object, default: () => ({}) },
+    modelValue: { type: Object, default: () => ({}) },
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     disableStartDate: { type: Boolean, default: false },
@@ -47,29 +49,30 @@ export default {
     startLocked: { type: Boolean, default: false },
     endLocked: { type: Boolean, default: false },
   },
-  emits: ['blur', 'input', 'startLockClick', 'endLockClick'],
+  emits: ['blur', 'update:model-value', 'start-lock-click', 'end-lock-click'],
   validations () {
     return {
-      value: {
+      modelValue: {
         startDate: { required },
-        endDate: { required, minDate: minDate(this.value.startDate) },
+        endDate: { required, minDate: minDate(this.modelValue.startDate) },
       },
     };
   },
   computed: {
     hasError () {
-      if (this.error || this.$v.value.$error) return true;
+      if (this.error || this.$v.modelValue.$error) return true;
 
-      return moment(this.value.startDate).isAfter(moment(this.value.endDate));
+      return moment(this.modelValue.startDate).isAfter(moment(this.modelValue.endDate));
     },
     startHour () {
-      return moment(this.value.startDate).format('HH:mm');
+      return moment(this.modelValue.startDate).format('HH:mm');
     },
     endHour () {
-      return moment(this.value.endDate).format('HH:mm');
+      return moment(this.modelValue.endDate).format('HH:mm');
     },
     min () {
-      if (moment(this.value.startDate).format('YYYY/MM/DD') === moment(this.value.endDate).format('YYYY/MM/DD')) {
+      if (moment(this.modelValue.startDate).format('YYYY/MM/DD')
+        === moment(this.modelValue.endDate).format('YYYY/MM/DD')) {
         return this.startHour;
       }
       return null;
@@ -77,7 +80,7 @@ export default {
   },
   methods: {
     blurHandler () {
-      this.$v.value.$touch();
+      this.$v.modelValue.$touch();
       this.$emit('blur');
     },
     setDateHours (date, hour) {
@@ -91,18 +94,18 @@ export default {
     },
     update (date, key) {
       const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
-      const dateObject = pick(moment(this.value[key]).toObject(), hoursFields);
-      const dates = { ...this.value, [key]: moment(date).set({ ...dateObject }).toISOString() };
+      const dateObject = pick(moment(this.modelValue[key]).toObject(), hoursFields);
+      const dates = { ...this.modelValue, [key]: moment(date).set({ ...dateObject }).toISOString() };
       if (key === 'startDate' && this.disableEndDate) {
-        const endDateObject = pick(moment(this.value.endDate).toObject(), hoursFields);
+        const endDateObject = pick(moment(this.modelValue.endDate).toObject(), hoursFields);
         dates.endDate = moment(date).set({ ...endDateObject }).toISOString();
       }
       if (key === 'endDate') dates.endDate = moment(dates.endDate).endOf('d').toISOString();
 
-      this.$emit('input', dates);
+      this.$emit('update:model-value', dates);
     },
     updateHours (value, key) {
-      const dates = { ...this.value };
+      const dates = { ...this.modelValue };
       if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
       if (key === 'startHour') {
         dates.startDate = this.setDateHours(dates.startDate, value);
@@ -112,13 +115,13 @@ export default {
         }
       }
 
-      this.$emit('input', dates);
+      this.$emit('update:model-value', dates);
     },
     startClick () {
-      this.$emit('startLockClick');
+      this.$emit('start-lock-click');
     },
     endClick () {
-      this.$emit('endLockClick');
+      this.$emit('end-lock-click');
     },
   },
 };

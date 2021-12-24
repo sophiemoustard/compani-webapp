@@ -25,6 +25,7 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: ['click'],
   methods: {
     click (event) {
       this.$emit('click', event);

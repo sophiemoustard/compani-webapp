@@ -3,7 +3,8 @@
     <template #title>
         Ajouter une nouvelle <span class="text-weight-bold">étape</span>
       </template>
-      <ni-btn-toggle :value="additionType" :options="STEP_ATTACHEMENT_OPTIONS" @input="updateAdditionType($event)" />
+      <ni-btn-toggle :model-value="additionType" :options="STEP_ATTACHEMENT_OPTIONS"
+        @update:model-value="updateAdditionType($event)" />
       <template v-if="additionType === CREATE_STEP">
         <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options="STEP_TYPES"
           required-field @input="updateNewStep($event, 'type')" />

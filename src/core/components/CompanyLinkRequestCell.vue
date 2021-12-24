@@ -32,6 +32,7 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: ['click'],
   data () {
     return {
       formatIdentity,

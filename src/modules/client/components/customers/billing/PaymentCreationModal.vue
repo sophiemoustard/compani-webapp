@@ -3,7 +3,8 @@
     <template #title>
       Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
     </template>
-    <ni-btn-toggle :value="newPayment.nature" :options="paymentNatureOptions" @input="update($event, 'nature')" />
+    <ni-btn-toggle :model-value="newPayment.nature" :options="paymentNatureOptions"
+      @update:model-value="update($event, 'nature')" />
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
     <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number" required-field

@@ -7,7 +7,8 @@
         <ni-planning-modal-header v-else :value="newEvent.auxiliary" :options="auxiliariesOptions"
           :selected-person="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent"
           @update:value="updateEvent('auxiliary', $event)" />
-        <ni-btn-toggle :value="newEvent.type" :options="eventTypeOptions" @update:value="updateType($event)" />
+        <ni-btn-toggle :model-value="newEvent.type" :options="eventTypeOptions"
+          @update:model-value="updateType($event)" />
         <!-- <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
             :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date

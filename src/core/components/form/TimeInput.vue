@@ -5,7 +5,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-input dense bg-color="white" borderless :model-value="value" @update:model-value="update" :readonly="locked"
+    <q-input dense bg-color="white" borderless :model-value="modelValue" @update:model-value="update" :readonly="locked"
       :error-message="errorMessage" :error="error" @blur="onBlur" :rules="['time']" mask="time" data-cy="time-input"
       :disable="disable && !locked" :class="{ borders: inModal }">
       <template #append>
@@ -32,13 +32,14 @@ import moment from '@helpers/moment';
 
 export default {
   name: 'NiTimeInput',
+  emits: ['update:model-value', 'blur', 'lock-click'],
   data () {
     return {
       selectTime: false,
     };
   },
   props: {
-    value: { type: String, default: '' },
+    modelValue: { type: String, default: '' },
     min: { type: String, default: '' },
     inModal: { type: Boolean, default: false },
     caption: { type: String, default: '' },
@@ -81,13 +82,13 @@ export default {
       this.$refs.qTimeMenu.hide();
     },
     update (value) {
-      this.$emit('input', value);
+      this.$emit('update:model-value', value);
     },
     onBlur () {
       this.$emit('blur');
     },
     click () {
-      this.$emit('lockClick');
+      this.$emit('lock-click');
     },
   },
 };

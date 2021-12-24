@@ -6,8 +6,8 @@
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <q-field dense borderless :error="error" :error-message="errorMessage" class="col-12">
-        <q-option-group :model-value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
-          :disable="disable" @update:model-value="udpate" />
+        <q-option-group :model-value="modelValue" :options="options" :readonly="readOnly" :type="type" :inline="inline"
+          :disable="disable" @update:model-value="udpate" dense />
       </q-field>
     </div>
   </div>
@@ -22,7 +22,7 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    value: { type: [String, Array, Boolean], default: '' },
+    modelValue: { type: [String, Array, Boolean], default: '' },
     last: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
@@ -32,10 +32,10 @@ export default {
     displayCaption: { type: Boolean, default: true },
     disable: { type: Boolean, default: false },
   },
-  emits: ['update:value'],
+  emits: ['update:model-value'],
   methods: {
     update (value) {
-      this.$emit('update:value', value);
+      this.$emit('update:model-value', value);
     },
   },
 };

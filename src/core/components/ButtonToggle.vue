@@ -1,5 +1,5 @@
 <template>
-  <q-btn-toggle :class="displayClass" no-wrap :model-value="value" unelevated :toggle-color="toggleColor"
+  <q-btn-toggle :class="displayClass" no-wrap :model-value="modelValue" unelevated :toggle-color="toggleColor"
     :options="options" @update:model-value="input" :text-color="textColor" />
 </template>
 
@@ -9,13 +9,14 @@ export default {
   props: {
     toggleColor: { type: String, default: 'primary' },
     textColor: { type: String, default: 'copper-grey-700' },
-    value: { type: String, default: '' },
+    modelValue: { type: String, default: '' },
     displayClass: { type: String, default: '' },
     options: { type: Array, default: () => [] },
   },
+  emits: ['update:model-value'],
   methods: {
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
   },
 };

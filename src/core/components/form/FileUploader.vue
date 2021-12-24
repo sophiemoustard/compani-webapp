@@ -57,6 +57,7 @@ export default {
     'ni-button': Button,
     'ni-custom-img': CustomImg,
   },
+  emits: ['start', 'finish', 'delete', 'uploaded'],
   data () {
     return {
       loading: false,

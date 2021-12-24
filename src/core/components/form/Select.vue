@@ -64,7 +64,7 @@ export default {
   },
   computed: {
     displayedValue () {
-      const option = this.options.find(opt => opt.value === this.modelVvalue);
+      const option = this.options.find(opt => opt.value === this.modelValue);
       return option ? option.label : '';
     },
     model () {

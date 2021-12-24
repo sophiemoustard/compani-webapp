@@ -21,6 +21,7 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: ['copy-success'],
   methods: {
     copySuccess () {
       this.$emit('copy-success');

@@ -48,6 +48,7 @@ export default {
   components: {
     'ni-pagination': Pagination,
   },
+  emits: ['go-to', 'update:pagination'],
   computed: {
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
