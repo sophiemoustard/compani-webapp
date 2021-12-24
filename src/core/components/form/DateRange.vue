@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { minDate } from '@helpers/vuelidateCustomVal';
@@ -61,8 +62,11 @@ export default {
       return this.error || this.v$.modelValue.$error;
     },
     innerErrorMessage () {
-      if (!this.v$.modelValue.startDate.required || !this.v$.modelValue.endDate.required) return REQUIRED_LABEL;
-      if (!this.v$.modelValue.endDate.minDate) return 'La date de fin doit être postérieure à la date de début';
+      if (get(this.v$.modelValue.startDate, 'required.$reponse') === false ||
+        get(this.v$.modelValue.endDate, 'required.$reponse') === false) return REQUIRED_LABEL;
+      if (get(this.v$.modelValue.endDate, 'minDate.$reponse') === false) {
+        return 'La date de fin doit être postérieure à la date de début';
+      }
 
       return this.errorMessage;
     },
