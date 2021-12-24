@@ -7,7 +7,7 @@
       </div>
       <q-field dense borderless :error="error" :error-message="errorMessage" class="col-12">
         <q-option-group :model-value="modelValue" :options="options" :readonly="readOnly" :type="type" :inline="inline"
-          :disable="disable" @update:model-value="udpate" dense />
+          :disable="disable" @update:model-value="update" dense />
       </q-field>
     </div>
   </div>

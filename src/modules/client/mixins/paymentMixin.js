@@ -1,111 +1,219 @@
-import pickBy from 'lodash/pickBy';
+import { ref, computed } from 'vue';
+import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 import Payments from '@api/Payments';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '@data/constants';
-import { strictPositiveNumber, validYear } from '@helpers/vuelidateCustomVal';
+import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 
-export const paymentMixin = {
-  data () {
-    return {
-      paymentCreationLoading: false,
-      paymentCreationModal: false,
-      selectedCustomer: { identity: {} },
-      selectedTpp: {},
-      PAYMENT,
-      DIRECT_DEBIT,
-      PAYMENT_OPTIONS,
-      newPayment: {},
-    };
-  },
-  validations () {
-    return {
-      newPayment: {
-        customer: { required },
-        nature: { required },
-        netInclTaxes: { required, strictPositiveNumber },
-        type: { required },
-        date: { required },
-      },
-      editedPayment: {
-        nature: { required },
-        netInclTaxes: { required, strictPositiveNumber },
-        type: { required },
-        date: { required },
-      },
-      taxCertificate: {
-        date: { required },
-        year: { required, validYear },
-        file: { required, maxSize: file => !!file && file.size < 5000000 },
-      },
-    };
-  },
-  methods: {
-    openPaymentCreationModal (customer, tpp) {
-      this.selectedCustomer = { ...customer };
-      this.newPayment = {
-        customer: customer._id,
-        nature: PAYMENT,
-        date: moment().toISOString(),
-        netInclTaxes: 0,
-        type: '',
-      };
-      if (tpp) {
-        this.selectedTpp = { ...tpp };
-        this.newPayment.thirdPartyPayer = tpp._id;
-      }
-      this.paymentCreationModal = true;
-    },
-    resetPaymentCreationModal () {
-      this.paymentCreationModal = false;
-      this.selectedCustomer = { identity: {} };
-      this.selectedTpp = {};
-      this.newPayment = {
-        nature: PAYMENT,
-        date: moment().toISOString(),
-        netInclTaxes: 0,
-        type: '',
-      };
-      this.$v.newPayment.$reset();
-    },
-    hasTaxCertificateOnSameYear (payment, taxCertificates) {
-      const paymentDate = (new Date(payment.date)).getFullYear().toString();
-      return taxCertificates.some(tax => tax.year === paymentDate);
-    },
-    validatePaymentCreation (taxCertificates) {
-      this.paymentCreationLoading = true;
-      this.$v.newPayment.$touch();
-      if (this.$v.newPayment.$error) {
-        this.paymentCreationLoading = false;
-        return NotifyWarning('Champ(s) invalide(s)');
-      }
+export const usePaymentMixin = (refresh) => {
+  const paymentCreationLoading = ref(false);
+  const paymentCreationModal = ref(false);
+  const newPayment = ref({});
+  const paymentEditionModal = ref(false);
+  const paymentEditionLoading = ref(false);
+  const editedPayment = ref({});
+  const selectedCustomer = ref({ identity: {} });
+  const selectedTpp = ref({});
 
-      if (!this.hasTaxCertificateOnSameYear(this.newPayment, taxCertificates)) return this.createPayment();
+  const rules = computed(() => ({
+    newPayment: {
+      customer: { required },
+      nature: { required },
+      netInclTaxes: { required, strictPositiveNumber },
+      type: { required },
+      date: { required },
+    },
+    editedPayment: {
+      nature: { required },
+      netInclTaxes: { required, strictPositiveNumber },
+      type: { required },
+      date: { required },
+    },
+  }));
 
-      this.$q.dialog({
+  const v$ = useVuelidate(rules, { newPayment, editedPayment });
+
+  const openPaymentCreationModal = (customer, tpp) => {
+    selectedCustomer.value = { ...customer };
+    newPayment.value = {
+      customer: customer._id,
+      nature: PAYMENT,
+      date: moment().toISOString(),
+      netInclTaxes: 0,
+      type: '',
+    };
+    if (tpp) {
+      selectedTpp.value = { ...tpp };
+      newPayment.value.thirdPartyPayer = tpp._id;
+    }
+    paymentCreationModal.value = true;
+  };
+
+  const resetPaymentCreationModal = () => {
+    paymentCreationModal.value = false;
+    selectedCustomer.value = { identity: {} };
+    selectedTpp.value = {};
+    newPayment.value = {
+      nature: PAYMENT,
+      date: moment().toISOString(),
+      netInclTaxes: 0,
+      type: '',
+    };
+    v$.value.newPayment.$reset();
+  };
+
+  const hasTaxCertificateOnSameYear = (payment, taxCertificates) => {
+    const paymentDate = (new Date(payment.date)).getFullYear().toString();
+    return taxCertificates.some(tax => tax.year === paymentDate);
+  };
+
+  const createPayment = async () => {
+    try {
+      await Payments.create(pickBy(newPayment.value));
+      NotifyPositive('Règlement créé');
+      await refresh();
+      paymentCreationModal.value = false;
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la création du règlement.');
+    } finally {
+      paymentCreationLoading.value = false;
+    }
+  };
+
+  const validatePaymentCreation = (taxCertificates) => {
+    paymentCreationLoading.value = true;
+    v$.value.newPayment.$touch();
+    if (v$.value.newPayment.$error) {
+      paymentCreationLoading.value = false;
+      return NotifyWarning('Champ(s) invalide(s)');
+    }
+
+    if (!hasTaxCertificateOnSameYear(newPayment.value, taxCertificates)) return createPayment();
+
+    this.$q
+      .dialog({
         title: 'Confirmation',
         message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le créer ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.createPayment())
-        .onCancel(() => {
-          NotifyPositive('Création annulée.');
-          this.paymentCreationLoading = false;
-        });
-    },
-    async createPayment () {
-      try {
-        await Payments.create(pickBy(this.newPayment));
-        NotifyPositive('Règlement créé');
-        await this.refresh();
-        this.paymentCreationModal = false;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement.');
-      } finally {
-        this.paymentCreationLoading = false;
-      }
-    },
-  },
+      })
+      .onOk(() => createPayment())
+      .onCancel(() => {
+        NotifyPositive('Création annulée.');
+        paymentCreationLoading.value = false;
+      });
+  };
+
+  const openEditionModal = (payment) => {
+    editedPayment.value = {
+      _id: payment._id,
+      nature: payment.nature,
+      netInclTaxes: payment.netInclTaxes,
+      type: payment.type,
+      date: payment.date,
+    };
+
+    selectedCustomer.value = payment.customer;
+    if (payment.thirdPartyPayer) {
+      selectedTpp.value = payment.thirdPartyPayer;
+      editedPayment.value.thirdPartyPayer = payment.thirdPartyPayer;
+    }
+
+    paymentEditionModal.value = true;
+  };
+
+  const resetPaymentEditionModal = () => {
+    paymentEditionModal.value = false;
+    selectedCustomer.value = { identity: {} };
+    selectedTpp.value = {};
+    editedPayment.value = {};
+  };
+
+  const validatePaymentUpdate = async (taxCertificates) => {
+    paymentEditionLoading.value = true;
+    v$.editedPayment.$touch();
+    if (v$.editedPayment.$error) {
+      paymentEditionLoading.value = false;
+      return NotifyWarning('Champ(s) invalide(s)');
+    }
+
+    if (!hasTaxCertificateOnSameYear(editedPayment.value, taxCertificates)) return updatePayment();
+
+    this.$q
+      .dialog({
+        title: 'Confirmation',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le modifier ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      })
+      .onOk(() => updatePayment())
+      .onCancel(() => {
+        NotifyPositive('Modification annulée.');
+        paymentEditionLoading.value = false;
+      });
+  };
+
+  const updatePayment = async () => {
+    try {
+      const payload = omit(editedPayment.value, ['_id', 'thirdPartyPayer']);
+      await Payments.update(editedPayment.value._id, payload);
+      paymentEditionModal.value = false;
+      NotifyPositive('Règlement modifié.');
+      await refresh();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de l\'édition du règlement.');
+    } finally {
+      paymentEditionLoading.value = false;
+    }
+  };
+
+  const validateRefundDeletion = (refund, taxCertificates) => {
+    const message = hasTaxCertificateOnSameYear(refund, taxCertificates)
+      ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le supprimer ?'
+      : 'Êtes-vous sûr(e) de vouloir supprimer ce remboursement ?';
+
+    this.$q.dialog({ title: 'Confirmation', message, ok: 'OK', cancel: 'Annuler' })
+      .onOk(() => deleteRefund(refund._id))
+      .onCancel(() => NotifyPositive('Suppression annulée.'));
+  };
+
+  const deleteRefund = async (refundId) => {
+    try {
+      await Payments.remove(refundId);
+      await refresh();
+      NotifyPositive('Remboursement supprimé.');
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la suppression du remboursement.');
+    }
+  };
+
+  return {
+    paymentCreationLoading,
+    paymentCreationModal,
+    selectedCustomer,
+    selectedTpp,
+    newPayment,
+    paymentEditionModal,
+    paymentEditionLoading,
+    editedPayment,
+    v$,
+    PAYMENT,
+    DIRECT_DEBIT,
+    PAYMENT_OPTIONS,
+    openPaymentCreationModal,
+    resetPaymentCreationModal,
+    hasTaxCertificateOnSameYear,
+    validatePaymentCreation,
+    openEditionModal,
+    resetPaymentEditionModal,
+    validatePaymentUpdate,
+    validateRefundDeletion,
+  };
 };

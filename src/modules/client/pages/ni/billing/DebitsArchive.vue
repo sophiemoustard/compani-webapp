@@ -2,7 +2,7 @@
   <q-page class="client-background">
     <ni-title-header title="Archive Prélèvements" padding />
     <div class="q-pa-sm">
-      <ni-simple-table :data="directDebits" :columns="columns" :pagination.sync="pagination" :loading="loading">
+      <ni-simple-table :data="directDebits" :columns="columns" v-model:pagination="pagination" :loading="loading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">

@@ -3,8 +3,8 @@
     <q-table v-if="!loading" :rows="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
       binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="data.length ? separator : 'none'"
       :hide-bottom="hideBottom" :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm"
-      @update:pagination="$emit('update:pagination')" @selected="$emit('selected')" @expanded="$emit('expanded')"
-      @row-click="$emit('row-click')" :color="'#ff0000'">
+      @update:pagination="$emit('update:pagination')" @update:selected="$emit('update:selected')"
+      @row-click="$emit('row-click')" :color="'#ff0000'" @update:expanded="$emit('update:expanded')">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
@@ -51,7 +51,7 @@ export default {
     hideBottom: { type: Boolean, default: true },
     noDataLabel: { type: String, default: '' },
   },
-  emits: ['update:pagination', 'selected', 'expanded', 'row-click'],
+  emits: ['update:pagination', 'update:selected', 'update:expanded', 'row-click'],
   computed: {
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);

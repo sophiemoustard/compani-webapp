@@ -1,15 +1,16 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
       Téléchargement du <span class="text-weight-bold">fichier de télétransmission</span>
     </template>
     <div class="row q-pb-md">
-      <ni-option-group caption="Tiers payeur" :value="deliveryFile.thirdPartyPayers" required-field type="checkbox"
-        :options="tppOptions" @input="update($event, 'thirdPartyPayers')" :error="validations.thirdPartyPayers.$error"
-        inline />
+      <ni-option-group caption="Tiers payeur" :model-value="deliveryFile.thirdPartyPayers" required-field
+        @update:model-value="update($event, 'thirdPartyPayers')" :error="validations.thirdPartyPayers.$error"
+        inline :options="tppOptions" type="checkbox" />
     </div>
-    <ni-select in-modal caption="Mois" :value="deliveryFile.month" required-field :options="monthOptions"
-      @blur="validations.month.$touch" :error="validations.month.$error" @input="update($event, 'month')" />
+    <ni-select caption="Mois" :model-value="deliveryFile.month" required-field @blur="validations.month.$touch"
+      :error="validations.month.$error" @update:model-value="update($event, 'month')" :options="monthOptions"
+      in-modal />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Télécharger le fichier" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -32,18 +33,19 @@ export default {
   },
   props: {
     deliveryFile: { type: Object, default: () => ({}) },
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     tppOptions: { type: Array, default: () => [] },
     monthOptions: { type: Array, default: () => [] },
   },
+  emits: ['update:model-value', 'hide', 'submit', 'update:deliveryFile'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit (value) {
       this.$emit('submit', value);

@@ -4,14 +4,14 @@
       <template #title>
         <ni-button icon="save_alt" @click="exportToCSV" :disable="!filteredBalances.length" class="q-ml-sm" />
       </template>
-      <template slot="content">
+      <template #content>
         <div class="col-xs-12 col-md-6 on-left">
           <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" />
         </div>
       </template>
     </ni-title-header>
     <ni-simple-table :data="filteredBalances" :columns="columns" row-key="rowId" :loading="tableLoading"
-      selection="multiple" :pagination.sync="pagination" :selected.sync="selected">
+      selection="multiple" v-model:pagination="pagination" v-model:selected="selected">
       <template #header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
@@ -46,9 +46,9 @@
     </ni-simple-table>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal v-model="paymentCreationModal" :new-payment.sync="newPayment"
+    <ni-payment-creation-modal v-model="paymentCreationModal" v-model:new-payment="newPayment"
       :selected-tpp="selectedTpp" :loading="paymentCreationLoading" @hide="resetPaymentCreationModal"
-      @submit="submitPaymentCreation" :selected-customer="selectedCustomer" :validations="$v.newPayment" />
+      @submit="submitPaymentCreation" :selected-customer="selectedCustomer" :validations="v$.newPayment" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
       :disable="selected.length === 0" @click="validatePaymentListCreation" />
@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import { onMounted, ref, computed } from 'vue';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
@@ -80,7 +81,7 @@ import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
-import { paymentMixin } from 'src/modules/client/mixins/paymentMixin';
+import { usePaymentMixin } from 'src/modules/client/mixins/paymentMixin';
 
 export default {
   name: 'ClientsBalances',
@@ -93,12 +94,158 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-select': Select,
   },
-  mixins: [paymentMixin],
+  setup () {
+    const tableLoading = ref(false);
+    const selected = ref([]);
+    const balances = ref([]);
+    const balancesOption = ref(0);
+
+    const filteredBalances = computed(() => {
+      const orderedByCustomerBalances = orderBy(
+        balances.value,
+        row => get(row, 'customer.identity.lastname', '').toLowerCase(),
+        ['asc']
+      );
+      if (balancesOption.value === 1) return orderedByCustomerBalances.filter(balance => !balance.thirdPartyPayer);
+      if (balancesOption.value === 2) {
+        return orderBy(
+          orderedByCustomerBalances.filter(balance => balance.thirdPartyPayer),
+          row => get(row, 'thirdPartyPayer.name', '').toLowerCase(),
+          ['asc']
+        );
+      }
+      return orderedByCustomerBalances;
+    });
+
+    onMounted(async () => { await refresh(); });
+
+    const refresh = async () => {
+      try {
+        tableLoading.value = true;
+        balances.value = await Balances.list();
+        balances.value = balances.value.map(balance => ({ ...balance, rowId: uniqueId() }));
+      } catch (e) {
+        balances.value = [];
+        console.error(e);
+      } finally {
+        tableLoading.value = false;
+      }
+    };
+
+    const resetSelected = () => { selected.value = []; };
+
+    const selectRows = (oldValue) => {
+      if (oldValue) selected.value = [];
+      else selected.value = balances.value.filter(bl => bl.toPay > 0);
+    };
+
+    const createPaymentList = async () => {
+      try {
+        const payload = this.selected.map(row => ({
+          nature: this.PAYMENT,
+          customer: row._id.customer,
+          customerInfo: row.customer,
+          netInclTaxes: row.toPay,
+          type: this.PAYMENT_OPTIONS[0].value,
+          date: new Date(),
+          rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
+        }));
+
+        await Payments.createList(payload);
+        NotifyPositive('Règlement(s) créé(s)');
+        await refresh();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du(des) règlement(s).');
+      } finally {
+        selected.value = [];
+      }
+    };
+
+    const validatePaymentListCreation = () => {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(this.createPaymentList)
+        .onCancel(() => NotifyPositive('Création des règlements annulée'));
+    };
+
+    const exportToCSV = async () => {
+      const csvData = [[
+        'Client',
+        'Bénéficiaire',
+        'Taux de participation',
+        'Facturé TTC',
+        'Payé TTC',
+        'Solde',
+        'A prélever',
+      ]];
+
+      for (const clientData of filteredBalances.value) {
+        csvData.push([
+          this.formatClient(clientData),
+          this.formatCustomer(clientData),
+          clientData.thirdPartyPayer ? '' : formatNumberForCSV(clientData.participationRate),
+          formatNumberForCSV(clientData.billed),
+          formatNumberForCSV(clientData.paid),
+          formatNumberForCSV(clientData.balance),
+          formatNumberForCSV(clientData.toPay),
+        ]);
+      }
+
+      return downloadCsv(csvData, `clients_balances_${moment().format('DD_MM_YYYY')}.csv`);
+    };
+
+    const {
+      paymentCreationLoading,
+      paymentCreationModal,
+      selectedCustomer,
+      selectedTpp,
+      newPayment,
+      v$,
+      PAYMENT,
+      DIRECT_DEBIT,
+      PAYMENT_OPTIONS,
+      openPaymentCreationModal,
+      resetPaymentCreationModal,
+      validatePaymentCreation,
+    } = usePaymentMixin(refresh);
+
+    const submitPaymentCreation = async () => {
+      const taxCertificates = await TaxCertificates.list({ customer: newPayment.value.customer });
+      return validatePaymentCreation(taxCertificates);
+    };
+
+    return {
+      tableLoading,
+      paymentCreationLoading,
+      paymentCreationModal,
+      selectedCustomer,
+      selectedTpp,
+      newPayment,
+      selected,
+      balances,
+      balancesOption,
+      filteredBalances,
+      v$,
+      PAYMENT,
+      DIRECT_DEBIT,
+      PAYMENT_OPTIONS,
+      openPaymentCreationModal,
+      resetPaymentCreationModal,
+      validatePaymentCreation,
+      validatePaymentListCreation,
+      exportToCSV,
+      submitPaymentCreation,
+      resetSelected,
+      selectRows,
+      createPaymentList,
+    };
+  },
   data () {
     return {
-      tableLoading: false,
-      selected: [],
-      balances: [],
       columns: [
         {
           name: 'client',
@@ -137,119 +284,18 @@ export default {
         { label: 'Bénéficiaires', value: 1 },
         { label: 'Tiers payeurs', value: 2 },
       ],
-      balancesOption: 0,
     };
   },
-  computed: {
-    filteredBalances () {
-      const orderedByCustomerBalances = orderBy(
-        this.balances,
-        row => get(row, 'customer.identity.lastname', '').toLowerCase(),
-        ['asc']
-      );
-      if (this.balancesOption === 1) return orderedByCustomerBalances.filter(balance => !balance.thirdPartyPayer);
-      if (this.balancesOption === 2) {
-        return orderBy(
-          orderedByCustomerBalances.filter(balance => balance.thirdPartyPayer),
-          row => get(row, 'thirdPartyPayer.name', '').toLowerCase(),
-          ['asc']
-        );
-      }
-      return orderedByCustomerBalances;
-    },
-  },
-  async mounted () {
-    await this.refresh();
-  },
   methods: {
-    resetSelected () {
-      this.selected = [];
-    },
     goToCustomerBillingPage (customerId) {
       this.$router.push({ name: 'ni customers info', params: { customerId, defaultTab: 'billing' } });
     },
-    selectRows (oldValue) {
-      if (oldValue) this.selected = [];
-      else this.selected = this.balances.filter(bl => bl.toPay > 0);
-    },
     // Refresh
-    async refresh () {
-      try {
-        this.tableLoading = true;
-        this.balances = await Balances.list();
-        this.balances = this.balances.map(balance => ({ ...balance, rowId: uniqueId() }));
-      } catch (e) {
-        this.balances = [];
-        console.error(e);
-      } finally {
-        this.tableLoading = false;
-      }
-    },
-    async createPaymentList () {
-      try {
-        const payload = this.selected.map(row => ({
-          nature: this.PAYMENT,
-          customer: row._id.customer,
-          customerInfo: row.customer,
-          netInclTaxes: row.toPay,
-          type: this.PAYMENT_OPTIONS[0].value,
-          date: new Date(),
-          rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
-        }));
-
-        await Payments.createList(payload);
-        NotifyPositive('Règlement(s) créé(s)');
-        await this.refresh();
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création du(des) règlement(s).');
-      } finally {
-        this.selected = [];
-      }
-    },
-    validatePaymentListCreation () {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Cette opération est définitive. Confirmez-vous ?',
-        ok: 'Oui',
-        cancel: 'Non',
-      }).onOk(this.createPaymentList)
-        .onCancel(() => NotifyPositive('Création des règlements annulée'));
-    },
     formatClient (data) {
       return data.thirdPartyPayer ? data.thirdPartyPayer.name : formatIdentity(data.customer.identity, 'Lf');
     },
     formatCustomer (data) {
       return formatIdentity(data.customer.identity, 'Lf');
-    },
-    async exportToCSV () {
-      const csvData = [[
-        'Client',
-        'Bénéficiaire',
-        'Taux de participation',
-        'Facturé TTC',
-        'Payé TTC',
-        'Solde',
-        'A prélever',
-      ]];
-
-      for (const clientData of this.filteredBalances) {
-        csvData.push([
-          this.formatClient(clientData),
-          this.formatCustomer(clientData),
-          clientData.thirdPartyPayer ? '' : formatNumberForCSV(clientData.participationRate),
-          formatNumberForCSV(clientData.billed),
-          formatNumberForCSV(clientData.paid),
-          formatNumberForCSV(clientData.balance),
-          formatNumberForCSV(clientData.toPay),
-        ]);
-      }
-
-      return downloadCsv(csvData, `clients_balances_${moment().format('DD_MM_YYYY')}.csv`);
-    },
-    async submitPaymentCreation () {
-      const taxCertificates = await TaxCertificates.list({ customer: this.newPayment.customer });
-      return this.validatePaymentCreation(taxCertificates);
     },
   },
 };

@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="À facturer" padding>
-      <template slot="content">
+      <template #content>
         <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-4">
@@ -9,7 +9,7 @@
                 :clearable="false" />
             </div>
             <div class="col-xs-12 col-sm-8">
-              <ni-date-range v-model="billingDates" @blur="getDraftBills" :error.sync="billingDatesHasError"
+              <ni-date-range v-model="billingDates" @blur="getDraftBills" v-model:error="billingDatesHasError"
                 borderless class="q-ma-sm" />
             </div>
           </div>
@@ -17,8 +17,8 @@
       </template>
     </ni-title-header>
     <ni-button @click="openDeliveryDownloadModal" label="Télécharger un fichier de télétransmission" />
-    <ni-simple-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
-      :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected"
+    <ni-simple-table :data="filteredAndOrderedDraftBills" :columns="columns" v-model:pagination="pagination"
+      :row-key="tableRowKey" :loading="tableLoading" selection="multiple" v-model:selected="selected"
       data-cy="client-table" separator="none">
       <template #header="{ props }">
         <q-tr :props="props">
@@ -31,8 +31,8 @@
       <template #body="{ props }">
         <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
           @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
-          @discount-input="computeTotalAmount(props.row.customerBills)" :index="index" :selected.sync="props.selected"
-          :bill.sync="props.row.customerBills.bills[index]" display-checkbox data-cy="bill-row" />
+          @discount-input="computeTotalAmount(props.row.customerBills)" :index="index" v-model:selected="props.selected"
+          v-model:bill="props.row.customerBills.bills[index]" display-checkbox data-cy="bill-row" />
         <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
           <q-td colspan="10">
             <div class="text-right">Total :</div>
@@ -44,8 +44,8 @@
           <template v-for="tpp in props.row.thirdPartyPayerBills">
             <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" data-cy="bill-row"
               @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
-              @discount-input="computeTotalAmount(tpp)" display-checkbox :index="index" :bill.sync="tpp.bills[index]"
-              :selected.sync="props.selected" />
+              @discount-input="computeTotalAmount(tpp)" display-checkbox :index="index" v-model:bill="tpp.bills[index]"
+              v-model:selected="props.selected" />
           </template>
         </template>
       </template>
@@ -54,7 +54,7 @@
       :label="totalToBillLabel" @click="validateBillListCreation" data-cy="to-bill-button" />
 
     <delivery-download-modal v-model="deliveryDownloadModal" :delivery-file="deliveryFile" :loading="modalLoading"
-      :validations="$v.deliveryFile" :tpp-options="thirdPartyPayerOptions" :month-options="monthOptions"
+      :validations="v$.deliveryFile" :tpp-options="thirdPartyPayerOptions" :month-options="monthOptions"
       @submit="downloadDeliveryFile" @hide="resetDeliveryDownloadModal" />
   </q-page>
 </template>
@@ -63,7 +63,8 @@
 import capitalize from 'lodash/capitalize';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
-import { required } from 'vuelidate/lib/validators';
+import { required } from '@vuelidate/validators';
+import useVuelidate from '@vuelidate/core';
 import { mapGetters } from 'vuex';
 import Bills from '@api/Bills';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
@@ -96,6 +97,7 @@ export default {
     'ni-title-header': TitleHeader,
     'delivery-download-modal': DeliveryDownloadModal,
   },
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       tableLoading: false,
@@ -201,7 +203,7 @@ export default {
       this.deliveryDownloadModal = true;
     },
     resetDeliveryDownloadModal () {
-      this.$v.deliveryFile.$reset();
+      this.v$.deliveryFile.$reset();
       this.deliveryFile = { thirdPartyPayers: [], month: moment().format('MM-YYYY') };
     },
     getFileName () {
@@ -214,8 +216,8 @@ export default {
     },
     async downloadDeliveryFile () {
       try {
-        this.$v.deliveryFile.$touch();
-        if (this.$v.deliveryFile.$error) return NotifyWarning('Champ(s) invalide(s).');
+        this.v$.deliveryFile.$touch();
+        if (this.v$.deliveryFile.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         const file = await Teletransmission.downloadDeliveryFile(this.deliveryFile);
         await downloadFile(file, this.getFileName());
