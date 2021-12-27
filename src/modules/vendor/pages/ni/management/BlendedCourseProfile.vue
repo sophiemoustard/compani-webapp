@@ -87,6 +87,7 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
+  // le beforeUnmount de la mixin BlendedCourseProfileMixin n'est pas triggered et je ne comprends pas pourquoi
   beforeUnmount () {
     this.$store.dispatch('course/resetCourse');
     if (!['ni courses', 'ni management blended courses', 'trainers courses'].includes(this.$route.name)) {
