@@ -4,7 +4,7 @@
       <template #title>
         <ni-button icon="save_alt" @click="exportToCSV" :disable="displayedDraftPay.length === 0" class="q-ml-sm" />
       </template>
-      <template slot="content">
+      <template #content>
         <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-4">
@@ -27,7 +27,7 @@
       <ni-button icon="save_alt" color="primary" @click="exportTxt(PAY)" label="Données paie" />
     </div>
     <ni-simple-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
-      :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
+      v-model:selected="selected" v-model:pagination="pagination" :loading="tableLoading"
       :visible-columns="visibleColumns">
       <template #header="{ props }">
         <q-tr :props="props">
@@ -89,8 +89,8 @@
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="validateCreation" />
 
-    <ni-pay-surcharge-details-modal :pay-surcharge-details-modal.sync="surchargeDetailModal"
-      @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surcharge-detail-key="surchargeDetailKey" />
+    <ni-pay-surcharge-details-modal v-model="surchargeDetailModal"
+      @update:surcharge-detail-modal="resetSurchargeDetail" :pay="pay" :surcharge-detail-key="surchargeDetailKey" />
   </q-page>
 </template>
 

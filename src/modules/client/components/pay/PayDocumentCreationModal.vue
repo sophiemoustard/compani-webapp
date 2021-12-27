@@ -4,7 +4,7 @@
       Ajouter un <span class="text-weight-bold">document</span>
     </template>
     <ni-select in-modal caption="Type" required-field :model-value="newPayDocument.nature" :options="natureOptions"
-      @blur="validations.nature.$touch" @update:model-value="update('nature', $event)" :clearable="false"
+      @blur="validations.nature.$touch" @update:model-value="update('nature', $event)"
       :error="validations.nature.$error" />
     <ni-date-input in-modal caption="Date" required-field :model-value="newPayDocument.date"
       @update:model-value="update('date', $event)" />

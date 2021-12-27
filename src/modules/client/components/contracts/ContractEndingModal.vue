@@ -11,7 +11,7 @@
       @update:model-value="update($event, 'endDate')" />
     <ni-select in-modal caption="Motif" :options="endContractReasons" :model-value="contractToEnd.endReason"
       @blur="validations.endReason.$touch" :error="validations.endReason.$error" required-field
-      @update:model-value="updateAndResetOtherMisc($event, 'endReason')" :clearable="false" />
+      @update:model-value="updateAndResetOtherMisc($event, 'endReason')" />
     <ni-input in-modal caption="Autres" v-if="contractToEnd.endReason === OTHER" :model-value="contractToEnd.otherMisc"
       required-field @blur="validations.otherMisc.$touch" :error="validations.otherMisc.$error"
       @update:model-value="update($event, 'otherMisc')" />

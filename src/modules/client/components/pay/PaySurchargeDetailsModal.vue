@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="paySurchargeDetailsModal" @input="close">
+  <ni-modal :model-value="modelValue" @update:model-value="close">
     <template #title>
       Détails des <span class="text-weight-bold">majorations</span>
     </template>
@@ -47,13 +47,12 @@ export default {
   components: {
     'ni-modal': Modal,
   },
+  emits: ['update:model-value'],
   data () {
-    return {
-      SURCHARGES,
-    };
+    return { SURCHARGES };
   },
   props: {
-    paySurchargeDetailsModal: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     pay: { type: Object, default: () => ({}) },
     surchargeDetailKey: { type: String, default: '' },
   },
@@ -65,7 +64,7 @@ export default {
       return Object.values(plan).some(sur => sur.hours);
     },
     close () {
-      this.$emit('update:paySurchargeDetailsModal', false);
+      this.$emit('update:model-value', false);
     },
     formatHours,
   },

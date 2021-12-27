@@ -42,7 +42,7 @@ export default {
     modelValue: { type: [String, Number, Object, Date], default: '' },
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
-    clearable: { type: Boolean, default: true },
+    clearable: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },

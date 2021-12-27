@@ -6,7 +6,7 @@
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-4">
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp"
-                :clearable="false" />
+                />
             </div>
             <div class="col-xs-12 col-sm-8">
               <ni-date-range v-model="billingDates" @blur="getDraftBills" v-model:error="billingDatesHasError"
