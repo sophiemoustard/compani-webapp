@@ -17,8 +17,8 @@
           </div>
         </q-card>
       </div>
-      <ni-line-chart title="Nombre d'apprenants dans le temps" :chart-data="chartData(this.traineesByMonth)"
-        class="col-md-6 col-xs-12 line-chart-container" />
+      <!-- <ni-line-chart title="Nombre d'apprenants dans le temps" :chart-data="chartData(this.traineesByMonth)"
+        class="col-md-6 col-xs-12 line-chart-container" /> -->
     </div>
     <elearning-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
   </div>

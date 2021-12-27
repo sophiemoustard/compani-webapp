@@ -2,7 +2,7 @@
   <div>
     <p class="text-weight-bold">Règle d'accès</p>
     <q-card>
-      <ni-responsive-table :data="accessRules" :columns="columns" :pagination.sync="pagination"
+      <ni-responsive-table :data="accessRules" :columns="columns" v-model:pagination="pagination"
         no-data-label="Pas de règle - la formation est en libre accès" :hide-bottom="!!accessRules.length">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -10,7 +10,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="close" @click="validateAccessRuleDeletion(col.value)" />
+                  <ni-button icon="close" @click="e =>validateAccessRuleDeletion(col.value, e)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -25,13 +25,14 @@
     </q-card>
 
     <access-rule-creation-modal v-model="accessRuleCreationModal" :loading="modalLoading" @submit="addAccessRule"
-      :validations="$v.newAccessRule" @hide="resetAccessRuleCreationModal" :new-access-rule.sync="newAccessRule"
+      :validations="v$.newAccessRule" @hide="resetAccessRuleCreationModal" v-model:new-access-rule="newAccessRule"
       :company-options="companyOptions" />
   </div>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import { mapState } from 'vuex';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Button from '@components/Button';
@@ -50,6 +51,9 @@ export default {
   },
   props: {
     profileId: { type: String, required: true },
+  },
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -84,8 +88,9 @@ export default {
         console.error(e);
       }
     },
-    async openAddAccessRuleModal () {
+    async openAddAccessRuleModal (event) {
       try {
+        event.preventDefault();
         const companies = await Companies.list();
         const companiesWithoutAccessRules = companies.filter(
           c => !this.accessRules.map(ar => ar.name).includes(c.name)
@@ -102,12 +107,12 @@ export default {
     resetAccessRuleCreationModal () {
       this.companyOptions = [];
       this.newAccessRule = '';
-      this.$v.newAccessRule.$reset();
+      this.v$.newAccessRule.$reset();
     },
     async addAccessRule () {
       try {
-        this.$v.newAccessRule.$touch();
-        if (this.$v.newAccessRule.$error) return NotifyWarning('Une règle d\'accès est requise');
+        this.v$.newAccessRule.$touch();
+        if (this.v$.newAccessRule.$error) return NotifyWarning('Une règle d\'accès est requise');
 
         this.modalLoading = true;
         await Courses.addAccessRule(this.profileId, { company: this.newAccessRule });
@@ -123,7 +128,9 @@ export default {
         this.modalLoading = false;
       }
     },
-    validateAccessRuleDeletion (accessRuleId) {
+    validateAccessRuleDeletion (accessRuleId, event) {
+      event.preventDefault();
+
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir supprimer cette règle d\'accès ?',

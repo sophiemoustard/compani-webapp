@@ -87,5 +87,11 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
+  beforeUnmount () {
+    this.$store.dispatch('course/resetCourse');
+    if (!['ni courses', 'ni management blended courses', 'trainers courses'].includes(this.$route.name)) {
+      this.$store.dispatch('course/resetFilters');
+    }
+  },
 };
 </script>

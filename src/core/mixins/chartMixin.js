@@ -1,4 +1,4 @@
-import { colors } from 'quasar';
+import { getCssVar } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 
@@ -16,7 +16,7 @@ export const chartMixin = {
         labels: this.months,
         datasets: [{
           data,
-          borderColor: colors.getBrand('primary'),
+          borderColor: getCssVar('primary'),
           backgroundColor: 'transparent',
         }],
       };

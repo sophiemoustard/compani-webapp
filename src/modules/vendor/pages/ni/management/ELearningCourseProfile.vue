@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
@@ -34,18 +35,23 @@ export default {
   data () {
     return {
       tabsContent: [
-        { label: 'Suivi', name: 'followUp', default: this.defaultTab === 'followUp', component: ProfileFollowUp },
+        {
+          label: 'Suivi',
+          name: 'followUp',
+          default: this.defaultTab === 'followUp',
+          component: shallowRef(ProfileFollowUp),
+        },
         {
           label: 'Questionnaires',
           name: 'questionnaires',
           default: this.defaultTab === 'questionnaires',
-          component: ProfileQuestionnaires,
+          component: shallowRef(ProfileQuestionnaires),
         },
-        { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: ProfileAccess },
+        { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: shallowRef(ProfileAccess) },
       ],
     };
   },
-  async created () {
+  async mounted () {
     await this.refreshCourse();
   },
   methods: {
