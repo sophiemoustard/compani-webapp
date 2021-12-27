@@ -52,15 +52,19 @@
             </div>
             <div class="gauge-wrapper">
               <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)">
-                <div slot="title" class="q-mt-sm">
-                  <span class="text-weight-bold">Heures internes</span> -
-                  {{ formatHours(getInternalHours(sector)) }}
-                </div>
+                <template #title>
+                  <div class="q-mt-sm">
+                    <span class="text-weight-bold">Heures internes</span> -
+                    {{ formatHours(getInternalHours(sector)) }}
+                  </div>
+                </template>
               </ni-gauge>
               <ni-gauge v-if="getPaidTransport(sector) !== 0" :min="7" :max="16" :value="getPaidTransportRatio(sector)">
-                <div slot="title" class="q-mt-sm">
-                  <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
-                </div>
+                <template #title>
+                  <div class="q-mt-sm">
+                    <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
+                  </div>
+                </template>
               </ni-gauge>
             </div>
           </div>
@@ -116,6 +120,7 @@
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
 import omit from 'lodash/omit';
 import { mapActions, mapGetters, mapState } from 'vuex';
 import Companies from '@api/Companies';
@@ -226,7 +231,7 @@ export default {
         for (const sector of sectorsIds) {
           if (this.auxiliariesStats[sector]) continue;
           sectors.push(sector);
-          this.$set(this.displayStats[sector], 'loadingDetails', true);
+          set(this.displayStats[sector], 'loadingDetails', true);
           auxiliariesStats[sector] = [];
         }
         if (!sectors.length) return;
@@ -248,7 +253,7 @@ export default {
               paidInterventions: omit(auxPaidInterventions, 'sectors'),
               hoursBalanceDetail: omit(auxHoursDetails, ['sectors', 'auxiliary']),
             });
-            this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
+            set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
           }
         }
       } catch (e) {
@@ -305,10 +310,10 @@ export default {
     },
     async openAuxiliariesDetails (sectorId) {
       if (this.displayStats[sectorId].openedDetails) {
-        this.$set(this.displayStats[sectorId], 'openedDetails', false);
+        set(this.displayStats[sectorId], 'openedDetails', false);
         return;
       }
-      this.$set(this.displayStats[sectorId], 'openedDetails', true);
+      set(this.displayStats[sectorId], 'openedDetails', true);
     },
     hoursRatio (sector) {
       return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;

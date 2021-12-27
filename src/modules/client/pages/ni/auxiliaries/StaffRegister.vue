@@ -1,17 +1,17 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Registre unique du personnel" padding />
-    <ni-simple-table :data="staffRegister" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-simple-table :data="staffRegister" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
       row-key="_id">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">
             <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
-                <div class="row justify-center table-actions">
-                  <ni-button @click="downloadDriveDoc(col.value)" icon="file_download"
-                    :disable="!col.value || docLoading" />
-                </div>
+              <div class="row justify-center table-actions">
+                <ni-button @click="downloadDriveDoc(col.value)" icon="file_download"
+                  :disable="!col.value || docLoading" />
+              </div>
             </template>
             <template v-else>{{ col.value }}</template>
           </q-td>

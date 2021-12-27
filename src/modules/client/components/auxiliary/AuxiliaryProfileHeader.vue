@@ -44,7 +44,7 @@
       <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
       <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
-          :loading="loading" @click.native="sendMessage" />
+          :loading="loading" @click="sendMessage" />
       </template>
     </ni-modal>
   </div>

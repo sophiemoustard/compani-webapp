@@ -58,7 +58,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('company/resetCompany');
   },
 };

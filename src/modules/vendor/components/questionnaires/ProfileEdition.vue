@@ -201,7 +201,7 @@ export default {
       }
     },
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$store.dispatch('card/resetCard');
   },
 };

@@ -130,7 +130,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
 };

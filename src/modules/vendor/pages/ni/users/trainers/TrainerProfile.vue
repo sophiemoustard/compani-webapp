@@ -61,7 +61,7 @@ export default {
       if (this.vendorRole !== TRAINER) await this.$store.dispatch('userProfile/updateNotifications');
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
 };

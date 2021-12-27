@@ -40,7 +40,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="remove_red_eye" @click.native="openSmsHistoriesModal(col.value)" />
+                  <ni-button icon="remove_red_eye" @click="openSmsHistoriesModal(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>

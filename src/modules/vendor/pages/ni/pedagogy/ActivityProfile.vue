@@ -233,7 +233,7 @@ export default {
       }
     },
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$store.dispatch('program/resetActivity');
     this.$store.dispatch('card/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {

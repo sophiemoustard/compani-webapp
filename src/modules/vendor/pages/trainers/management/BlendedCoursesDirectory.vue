@@ -54,7 +54,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     if (this.$router.currentRoute.name !== 'trainers courses info') this.$store.dispatch('course/resetFilters');
   },
 };

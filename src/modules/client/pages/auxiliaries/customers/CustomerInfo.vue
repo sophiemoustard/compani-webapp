@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <div v-if="customer">
       <div class="row items-center col-xs-12 header-margin q-mb-xl">
-        <ni-button class="on-left self-center" icon="arrow_back" color="primary" @click.native="$router.go(-1)" />
+        <ni-button class="on-left self-center" icon="arrow_back" color="primary" @click="$router.go(-1)" />
         <ni-title-header :title="customer.identity | formatIdentity('FL')" />
       </div>
       <profile-follow-up />
@@ -36,7 +36,7 @@ export default {
   filters: {
     formatIdentity,
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('customer/resetCustomer');
   },
 };

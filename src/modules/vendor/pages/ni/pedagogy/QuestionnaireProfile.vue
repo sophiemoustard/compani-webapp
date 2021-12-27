@@ -60,7 +60,7 @@ export default {
       await this.$store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: this.questionnaireId });
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('questionnaire/resetQuestionnaire');
   },
 };

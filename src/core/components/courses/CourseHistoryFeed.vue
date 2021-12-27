@@ -3,7 +3,7 @@
     <div class="row history-container-title">
       <div class="col-11">Historique d'activité</div>
       <div class="col-1 cursor-pointer">
-        <ni-button icon="close" size="sm" @click.native="close" />
+        <ni-button icon="close" size="sm" @click="close" />
       </div>
     </div>
     <div class="scroll-container" :style="{ height: `${height - 50}px` }" ref="scrollTarget">

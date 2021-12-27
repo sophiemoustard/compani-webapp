@@ -59,7 +59,7 @@ export default {
       this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
 };

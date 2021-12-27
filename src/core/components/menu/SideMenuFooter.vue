@@ -1,7 +1,7 @@
 <template>
   <div class="sidemenu-footer">
     <q-item class="full-width">
-      <q-item-section v-if="accessBothInterface" class="footer-logo-container" @click.native="switchInterface">
+      <q-item-section v-if="accessBothInterface" class="footer-logo-container" @click="switchInterface">
         <img :src="interfaceLogo" alt="go to other interface">
       </q-item-section>
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
@@ -12,7 +12,7 @@
         </q-item-section>
         <q-item-section v-if="isAuxiliaryWithCompany">
           <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm"
-            @click.native="clickHandler" />
+            @click="clickHandler" />
         </q-item-section>
         <q-item-section>
           <ni-button class="person" icon="person" @click="goToProfile" size="sm" />

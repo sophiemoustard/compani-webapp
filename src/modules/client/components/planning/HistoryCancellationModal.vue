@@ -12,8 +12,8 @@
         <ni-input :value="reason" @input="update" caption="Motif" type="textarea" last class="q-mb-md"
           :error="validations.$error" required-field />
         <div class="row justify-end q-mb-md">
-          <ni-button label="RETOUR" @click.native="hide" />
-          <ni-button label="ANNULER L'HORODATAGE" @click.native="cancelTimeStamping" />
+          <ni-button label="RETOUR" @click="hide" />
+          <ni-button label="ANNULER L'HORODATAGE" @click="cancelTimeStamping" />
         </div>
       </div>
     </q-dialog>

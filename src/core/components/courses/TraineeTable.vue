@@ -15,9 +15,9 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <ni-button icon="edit" @click.native="openTraineeEditionModal(props.row)"
+                    <ni-button icon="edit" @click="openTraineeEditionModal(props.row)"
                       :disable="!!course.archivedAt" />
-                    <ni-button icon="close" @click.native="validateTraineeDeletion(col.value)"
+                    <ni-button icon="close" @click="validateTraineeDeletion(col.value)"
                       :disable="!!course.archivedAt" />
                   </div>
                 </template>

@@ -53,7 +53,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     if (this.$router.currentRoute.name !== 'ni courses info') this.$store.dispatch('course/resetFilters');
   },
 };
