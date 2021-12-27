@@ -1,17 +1,18 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
     <ni-input in-modal caption="Taux horaire" type="number" :error-message="grossHourlyRateError"
-      :value="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error" suffix="€" required-field
-      @input="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch" />
-    <ni-date-input :value="editedVersion.startDate" :min="minStartDate" :error="validations.startDate.$error" in-modal
-      @input="update($event, 'startDate')" required-field @blur="validations.startDate.$touch" caption="Date d'effet"
-      :error-message="startDateError" :class="[!validations.startDate.minDate && $q.platform.is.mobile && 'q-mb-sm']" />
+      :model-value="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error" suffix="€" required-field
+      @update:model-value="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch" />
+    <ni-date-input :model-value="editedVersion.startDate" :min="minStartDate" :error="validations.startDate.$error"
+      @update:model-value="update($event, 'startDate')" required-field @blur="validations.startDate.$touch"
+      :error-message="startDateError" :class="[!validations.startDate.minDate && $q.platform.is.mobile && 'q-mb-sm']"
+       in-modal caption="Date d'effet" />
     <div class="margin-input last">
-      <q-checkbox dense :value="editedVersion.shouldBeSigned" label="Signature en ligne"
-        @input="update($event, 'shouldBeSigned')" />
+      <q-checkbox dense :model-value="editedVersion.shouldBeSigned" label="Signature en ligne"
+        @update:model-value="update($event, 'shouldBeSigned')" />
     </div>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
@@ -28,7 +29,7 @@ import Modal from '@components/modal/Modal';
 export default {
   name: 'VersionEditionModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     editedVersion: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     minStartDate: { type: String, default: '' },
@@ -42,18 +43,19 @@ export default {
     'ni-date-input': DateInput,
     'ni-modal': Modal,
   },
+  emits: ['update:edited-version', 'hide', 'update:model-value', 'submit'],
   methods: {
     submit () {
       this.$emit('submit');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     hide () {
       this.$emit('hide');
     },
     update (event, prop) {
-      this.$emit('update:editedVersion', { ...this.editedVersion, [prop]: event });
+      this.$emit('update:edited-version', { ...this.editedVersion, [prop]: event });
     },
   },
 };

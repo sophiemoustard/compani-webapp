@@ -5,7 +5,7 @@
       <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
         :person-key="COACH" display-actions display-uploader @open-end-contract="openEndContractModal"
         @open-version-edition="openVersionEditionModal" @open-version-creation="openVersionCreationModal"
-        @refresh="refreshContracts" @refreshW-wth-timeout="refreshContractsWithTimeout"
+        @refresh="refreshContracts" @refresh-with-timeout="refreshContractsWithTimeout"
         @delete-version="validateVersionDeletion" :contracts-loading="contractsLoading" />
       <q-btn :disable="missingInfoForCreation || contractsLoading || inProgressContract" class="fixed fab-custom"
         no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
@@ -15,32 +15,33 @@
     </div>
 
     <contract-creation-modal v-model="newContractModal" @hide="resetContractCreationModal" @submit="createContract"
-      :new-contract.sync="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
-      :gross-hourly-rate-error="grossHourlyRateError($v.newContract)" :validations="$v.newContract"
+      v-model:new-contract="newContract" :weekly-hours-error="weeklyHoursError(v$.newContract)" :loading="loading"
+      :gross-hourly-rate-error="grossHourlyRateError(v$.newContract)" :validations="v$.newContract"
       :contract-min-start-date="contractMinStartDate" />
 
-    <version-creation-modal v-model="newVersionModal" :gross-hourly-rate-error="grossHourlyRateError($v.newVersion)"
-      :new-version-min-start-date="newVersionMinStartDate" :new-version.sync="newVersion" :validations="$v.newVersion"
-      :weekly-hours-error="weeklyHoursError($v.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
-      :loading="loading" :start-date-error="startDateError($v.newVersion)" />
+    <version-creation-modal v-model="newVersionModal" :gross-hourly-rate-error="grossHourlyRateError(v$.newVersion)"
+      :new-version-min-start-date="newVersionMinStartDate" v-model:new-version="newVersion" :validations="v$.newVersion"
+      :weekly-hours-error="weeklyHoursError(v$.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
+      :loading="loading" :start-date-error="startDateError(v$.newVersion)" />
 
-    <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
-      :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @submit="editVersion" :start-date-error="startDateError($v.editedVersion)"
-      :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
+    <version-edition-modal v-model="versionEditionModal" v-model:edited-version="editedVersion" :loading="loading"
+      :validations="v$.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
+      @hide="resetVersionEditionModal" @submit="editVersion" :start-date-error="startDateError(v$.editedVersion)"
+      :gross-hourly-rate-error="grossHourlyRateError(v$.editedVersion)" />
 
-    <contract-ending-modal v-model="endContractModal" :contract-to-end.sync="contractToEnd"
-      :validations="$v.contractToEnd" @hide="resetEndContractModal" @submit="endExistingContract"
+    <contract-ending-modal v-model="endContractModal" v-model:contract-to-end="contractToEnd"
+      :validations="v$.contractToEnd" @hide="resetEndContractModal" @submit="endExistingContract"
       :contract-min-end-date="contractMinEndDate" :end-contract-reasons="endContractReasons" :loading="loading" />
   </div>
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf, minValue } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
-import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
 import Users from '@api/Users';
 import Events from '@api/Events';
 import Contracts from '@api/Contracts';
@@ -76,6 +77,7 @@ export default {
     'contract-ending-modal': ContractEndingModal,
     'ni-banner': Banner,
   },
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       OTHER,
@@ -143,7 +145,7 @@ export default {
         endNotificationDate: { required },
         endDate: { required },
         endReason: { required },
-        otherMisc: { required: requiredIf(item => item.endReason === OTHER) },
+        otherMisc: { required: requiredIf(this.contractToEnd.endReason === OTHER) },
       },
     };
   },
@@ -248,7 +250,7 @@ export default {
         grossHourlyRate: '',
         shouldBeSigned: true,
       };
-      this.$v.newContract.$reset();
+      this.v$.newContract.$reset();
     },
     async getContractCreationPayload () {
       const payload = {
@@ -273,8 +275,8 @@ export default {
         const template = this.getContractTemplate();
         if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
-        this.$v.newContract.$touch();
-        if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newContract.$touch();
+        if (this.v$.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = await this.getContractCreationPayload();
@@ -286,7 +288,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 422) {
-          this.$v.newContract.$reset();
+          this.v$.newContract.$reset();
           return NotifyNegative(`Impossible de créer ce contrat : il est en conflit avec les évènements ou autres
             contrats de l'auxiliaire.`);
         }
@@ -305,7 +307,7 @@ export default {
     resetVersionCreationModal () {
       this.newVersionModal = false;
       this.newVersion = { weeklyHours: '', startDate: '', grossHourlyRate: '', shouldBeSigned: true };
-      this.$v.newVersion.$reset();
+      this.v$.newVersion.$reset();
     },
     async getVersionCreationPayload () {
       const payload = pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
@@ -322,8 +324,8 @@ export default {
         const template = this.getVersionTemplate();
         if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
-        this.$v.newVersion.$touch();
-        if (this.$v.newVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newVersion.$touch();
+        if (this.v$.newVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = await this.getVersionCreationPayload();
@@ -381,7 +383,7 @@ export default {
     resetEndContractModal () {
       this.endContractModal = false;
       this.contractToEnd = {};
-      this.$v.contractToEnd.$reset();
+      this.v$.contractToEnd.$reset();
     },
     formatEndContractPayload () {
       const omittedField = ['contract', 'endDate'];
@@ -394,8 +396,8 @@ export default {
     },
     async endExistingContract () {
       try {
-        this.$v.contractToEnd.$touch();
-        if (this.$v.contractToEnd.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.contractToEnd.$touch();
+        if (this.v$.contractToEnd.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Contracts.update(this.contractToEnd.contract._id, this.formatEndContractPayload());

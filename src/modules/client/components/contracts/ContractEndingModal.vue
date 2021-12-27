@@ -1,20 +1,20 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
       Terminer un <span class="text-weight-bold">contrat</span>
     </template>
-    <ni-date-input caption="Date de notification" :value="contractToEnd.endNotificationDate" in-modal
-      @input="update($event, 'endNotificationDate')" required-field @blur="validations.endNotificationDate.$touch"
-      :error="validations.endNotificationDate.$error" />
-    <ni-date-input caption="Date de fin de contrat" :value="contractToEnd.endDate" :min="contractMinEndDate"
+    <ni-date-input caption="Date de notification" :model-value="contractToEnd.endNotificationDate" in-modal
+      @update:model-value="update($event, 'endNotificationDate')" @blur="validations.endNotificationDate.$touch"
+      :error="validations.endNotificationDate.$error" required-field />
+    <ni-date-input caption="Date de fin de contrat" :model-value="contractToEnd.endDate" :min="contractMinEndDate"
       in-modal required-field @blur="validations.endDate.$touch" :error="validations.endDate.$error"
-      @input="update($event, 'endDate')" />
-    <ni-select in-modal caption="Motif" :options="endContractReasons" :value="contractToEnd.endReason" required-field
-      @blur="validations.endReason.$touch" :error="validations.endReason.$error"
-      @input="updateAndResetOtherMisc($event, 'endReason')" />
-    <ni-input in-modal caption="Autres" v-if="contractToEnd.endReason === OTHER" :value="contractToEnd.otherMisc"
+      @update:model-value="update($event, 'endDate')" />
+    <ni-select in-modal caption="Motif" :options="endContractReasons" :model-value="contractToEnd.endReason"
+      @blur="validations.endReason.$touch" :error="validations.endReason.$error" required-field
+      @update:model-value="updateAndResetOtherMisc($event, 'endReason')" :clearable="false" />
+    <ni-input in-modal caption="Autres" v-if="contractToEnd.endReason === OTHER" :model-value="contractToEnd.otherMisc"
       required-field @blur="validations.otherMisc.$touch" :error="validations.otherMisc.$error"
-      @input="update($event, 'otherMisc')" />
+      @update:model-value="update($event, 'otherMisc')" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="close" color="primary"
         :loading="loading" @click="submit" />
@@ -32,13 +32,14 @@ import { OTHER } from '@data/constants';
 export default {
   name: 'ContractEndingModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     contractToEnd: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     contractMinEndDate: { type: String, default: '' },
     endContractReasons: { type: Array, default: () => [] },
   },
+  emits: ['update:model-value', 'hide', 'submit', 'update:contract-to-end'],
   data () {
     return {
       OTHER,
@@ -55,7 +56,7 @@ export default {
       this.$emit('submit');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     hide () {
       this.$emit('hide');
@@ -71,7 +72,7 @@ export default {
       this.resetOtherMisc();
     },
     update (event, prop) {
-      this.$emit('update:contractToEnd', { ...this.contractToEnd, [prop]: event });
+      this.$emit('update:contract-to-end', { ...this.contractToEnd, [prop]: event });
     },
   },
 };

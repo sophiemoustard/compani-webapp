@@ -9,7 +9,7 @@
         @focus="saveTmp('role.client._id')" @blur="updateUser('role.client._id')" />
       <ni-select v-model="userProfile.establishment._id" caption="Établissement" :options="establishmentsOptions"
         @focus="saveTmp('establishment')" @blur="updateUser('establishment._id')"
-        :error="$v.userProfile.establishment.$error" :error-message="REQUIRED_LABEL" option-disable="inactive" />
+        :error="v$.userProfile.establishment.$error" :error-message="REQUIRED_LABEL" option-disable="inactive" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -18,7 +18,7 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-picture-uploader :user="userProfile" :refresh-picture="refreshUser" />
+          <!-- <ni-picture-uploader :user="userProfile" :refresh-picture="refreshUser" /> -->
         </div>
       </div>
     </div>
@@ -28,30 +28,30 @@
         <p :class="groupErrorsClass('identity')">{{ groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom" :error="$v.userProfile.identity.firstname.$error"
+        <ni-input caption="Prénom" :error="v$.userProfile.identity.firstname.$error"
           v-model.trim="userProfile.identity.firstname" @blur="updateUser('identity.firstname')"
           @focus="saveTmp('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.userProfile.identity.lastname.$error"
+        <ni-input caption="Nom" :error="v$.userProfile.identity.lastname.$error"
           v-model.trim="userProfile.identity.lastname" @blur="updateUser('identity.lastname')"
           @focus="saveTmp('identity.lastname')" />
-        <ni-select caption="Nationalité" :error="$v.userProfile.identity.nationality.$error"
+        <ni-select caption="Nationalité" :error="v$.userProfile.identity.nationality.$error"
           :options="nationalitiesOptions" v-model="userProfile.identity.nationality"
           @focus="saveTmp('identity.nationality')" @blur="updateUser('identity.nationality')" />
-        <ni-date-input caption="Date de naissance" :error="$v.userProfile.identity.birthDate.$error"
+        <ni-date-input caption="Date de naissance" :error="v$.userProfile.identity.birthDate.$error"
           v-model="userProfile.identity.birthDate" @focus="saveTmp('identity.birthDate')"
           content-class="col-xs-12 col-md-6" @input="updateUser('identity.birthDate')" />
-        <ni-select caption="Pays de naissance" :error="$v.userProfile.identity.birthCountry.$error"
+        <ni-select caption="Pays de naissance" :error="v$.userProfile.identity.birthCountry.$error"
           :options="countriesOptions" v-model="userProfile.identity.birthCountry"
           @focus="saveTmp('identity.birthCountry')" @blur="updateUser('identity.birthCountry')" />
-        <ni-input caption="Département de naissance" :error="$v.userProfile.identity.birthState.$error"
+        <ni-input caption="Département de naissance" :error="v$.userProfile.identity.birthState.$error"
           :error-message="birthStateError" v-model="userProfile.identity.birthState"
           @blur="updateUser('identity.birthState')" @focus="saveTmp('identity.birthState')"
           :hidden="userProfile.identity.birthCountry !== 'FR'" />
-        <ni-input caption="Ville de naissance" :error="$v.userProfile.identity.birthCity.$error"
+        <ni-input caption="Ville de naissance" :error="v$.userProfile.identity.birthCity.$error"
           v-model="userProfile.identity.birthCity" @focus="saveTmp('identity.birthCity')"
           @blur="updateUser('identity.birthCity')" />
         <ni-input caption="Numéro de sécurité sociale"
-          :error="$v.userProfile.identity.socialSecurityNumber.$error"
+          :error="v$.userProfile.identity.socialSecurityNumber.$error"
           v-model="userProfile.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
           @blur="updateUser('identity.socialSecurityNumber')" :error-message="ssnError" />
       </div>
@@ -62,22 +62,22 @@
         <p :class="groupErrorsClass('contact')">{{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.userProfile.contact.phone.$error"
-          :error-message="phoneNbrError($v.userProfile)" type="tel" v-model.trim="userProfile.contact.phone"
+        <ni-input caption="Numéro de téléphone" :error="v$.userProfile.contact.phone.$error"
+          :error-message="phoneNbrError(v$.userProfile)" type="tel" v-model.trim="userProfile.contact.phone"
           @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
         <div v-if="isCoach" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" name="emailInput" caption="Adresse email" type="email" :disable="emailLock"
-              :error="$v.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
-              :error-message="emailError($v.userProfile)" v-model.trim="userProfile.local.email" />
+              :error="v$.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
+              :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="copper-grey-500" />
+            <ni-button :icon="lockIcon" @click="toggleEmailLock(!emailLock)" color="copper-grey-500" />
           </div>
         </div>
         <ni-search-address v-model="userProfile.contact.address" color="white"
           @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address')"
-          :error-message="addressError" :error="$v.userProfile.contact.address.$error" />
+          :error-message="addressError" :error="v$.userProfile.contact.address.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -86,12 +86,12 @@
         <p :class="groupErrorsClass('emergencyContact')">{{ groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom et nom" :error="$v.userProfile.administrative.emergencyContact.name.$error"
+        <ni-input caption="Prénom et nom" :error="v$.userProfile.administrative.emergencyContact.name.$error"
           v-model="userProfile.administrative.emergencyContact.name"
           @focus="saveTmp('administrative.emergencyContact.name')"
           @blur="updateUser('administrative.emergencyContact.name')" />
         <ni-input caption="Numéro de téléphone"
-          :error="$v.userProfile.administrative.emergencyContact.phoneNumber.$error"
+          :error="v$.userProfile.administrative.emergencyContact.phoneNumber.$error"
           v-model.trim="userProfile.administrative.emergencyContact.phoneNumber"
           @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
           @blur="updateUser('administrative.emergencyContact.phoneNumber')" :error-message="emergencyPhoneNbrError" />
@@ -103,10 +103,10 @@
         <p :class="groupErrorsClass('iban')">{{ groupErrors('iban').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="IBAN" :error="$v.userProfile.administrative.payment.rib.iban.$error"
+        <ni-input caption="IBAN" :error="v$.userProfile.administrative.payment.rib.iban.$error"
           :error-message="ibanError" v-model="userProfile.administrative.payment.rib.iban" upper-case
           @focus="saveTmp('administrative.payment.rib.iban')" @blur="updateUser('administrative.payment.rib.iban')" />
-        <ni-input caption="BIC" :error="$v.userProfile.administrative.payment.rib.bic.$error"
+        <ni-input caption="BIC" :error="v$.userProfile.administrative.payment.rib.bic.$error"
           :error-message="bicError" upper-case v-model.trim="userProfile.administrative.payment.rib.bic"
           @focus="saveTmp('administrative.payment.rib.bic')" @blur="updateUser('administrative.payment.rib.bic')" />
       </div>
@@ -119,7 +119,7 @@
       <div class="row gutter-profile">
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary" v-model="userProfile.administrative.identityDocs"
-            type="radio" :options="identityDocsOptions" :error="$v.userProfile.administrative.identityDocs.$error"
+            type="radio" :options="identityDocsOptions" :error="v$.userProfile.administrative.identityDocs.$error"
             caption="Merci de nous indiquer le type de document d'identité que vous possédez." required-field
             :error-message="requiredLabel" @input="updateUser('administrative.identityDocs')" />
         </div>
@@ -127,7 +127,7 @@
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto"
             :entity="userProfile" name="idCardRecto" @uploaded="documentUploaded" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.idCardRecto')"
-            :error="$v.userProfile.administrative.idCardRecto.driveId.$error" :extensions="extensions"
+            :error="v$.userProfile.administrative.idCardRecto.driveId.$error" :extensions="extensions"
             :additional-value="documentTitle('cni_recto')" drive-storage />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
@@ -140,13 +140,13 @@
           <ni-file-uploader caption="Passeport" path="administrative.passport" :url="docsUploadUrl"
             :entity="userProfile" name="passport" :additional-value="documentTitle('passport')"
             @delete="validateDocumentDeletion('administrative.passport')" @uploaded="documentUploaded"
-            :error="$v.userProfile.administrative.passport.driveId.$error" :extensions="extensions" drive-storage />
+            :error="v$.userProfile.administrative.passport.driveId.$error" :extensions="extensions" drive-storage />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
             :entity="userProfile" @uploaded="documentUploaded" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.residencePermitRecto')" :extensions="extensions"
-            :error="$v.userProfile.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
+            :error="v$.userProfile.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
             :additional-value="documentTitle('titre_de_séjour_recto')" drive-storage />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
@@ -160,14 +160,14 @@
             :entity="userProfile" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion('administrative.healthAttest')"
             name="healthAttest" @uploaded="documentUploaded" :additional-value="documentTitle('attestation_secu')"
-            :error="$v.userProfile.administrative.healthAttest.driveId.$error" drive-storage />
+            :error="v$.userProfile.administrative.healthAttest.driveId.$error" drive-storage />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice"
             :entity="userProfile" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion('administrative.phoneInvoice')"
             name="phoneInvoice" @uploaded="documentUploaded" :additional-value="documentTitle('facture_telephone')"
-            :error="$v.userProfile.administrative.phoneInvoice.driveId.$error" drive-storage />
+            :error="v$.userProfile.administrative.phoneInvoice.driveId.$error" drive-storage />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-multiple-files-uploader caption="Diplôme(s) ou certificat(s)" path="administrative.certificates"
@@ -186,10 +186,10 @@
         <div class="col-xs-12">
           <div v-if="isAuxiliary" class="row justify-between">
             <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise ?</p>
-            <q-icon v-if="$v.userProfile.administrative.mutualFund.has.$error" name="error_outline"
+            <q-icon v-if="v$.userProfile.administrative.mutualFund.has.$error" name="error_outline"
               color="secondary" />
           </div>
-          <q-field dense :error="$v.userProfile.administrative.mutualFund.has.$error"
+          <q-field dense :error="v$.userProfile.administrative.mutualFund.has.$error"
             :error-message="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="copper-grey-700" toggle-color="primary"
               v-model="userProfile.administrative.mutualFund.has" :options="mutualOptions"
@@ -200,7 +200,7 @@
           <ni-file-uploader caption="Justificatif mutuelle" path="administrative.mutualFund" :entity="userProfile"
             :extensions="extensions" name="mutualFund" drive-storage :additional-value="documentTitle('mutuelle')"
             @uploaded="documentUploaded" @delete="validateDocumentDeletion('administrative.mutualFund')"
-            :error="$v.userProfile.administrative.mutualFund.driveId.$error" :url="docsUploadUrl" entity-url="users" />
+            :error="v$.userProfile.administrative.mutualFund.driveId.$error" :url="docsUploadUrl" entity-url="users" />
         </div>
       </div>
     </div>
@@ -214,14 +214,14 @@
           <ni-option-group :display-caption="isAuxiliary"
             v-model="userProfile.administrative.transportInvoice.transportType" :options="transportOptions"
             caption="Par quel moyen comptez-vous vous rendre au travail ?" type="radio" :error-message="requiredLabel"
-            :error="$v.userProfile.administrative.transportInvoice.transportType.$error" required-field
+            :error="v$.userProfile.administrative.transportInvoice.transportType.$error" required-field
             @input="updateUser('administrative.transportInvoice.transportType')" />
         </div>
         <div v-if="userProfile.administrative.transportInvoice.transportType === 'public'"
           class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Justificatif d'abonnement" path="administrative.transportInvoice"
             :entity="userProfile" name="transportInvoice" @uploaded="documentUploaded"
-            :error="$v.userProfile.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
+            :error="v$.userProfile.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
             :extensions="extensions" :additional-value="documentTitle('justif_transport')"
             @delete="validateDocumentDeletion('administrative.transportInvoice')" drive-storage />
         </div>
@@ -243,7 +243,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
+import { required, email, numeric, minLength, maxLength, requiredIf } from '@vuelidate/validators';
+import useVuelidate from '@vuelidate/core';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Roles from '@api/Roles';
@@ -261,7 +262,7 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import PictureUploader from '@components/PictureUploader';
+// import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber, iban, frAddress, bic } from '@helpers/vuelidateCustomVal';
 import {
   AUXILIARY,
@@ -290,8 +291,9 @@ export default {
     'ni-date-input': DateInput,
     'ni-search-address': SearchAddress,
     'ni-option-group': OptionGroup,
-    'ni-picture-uploader': PictureUploader,
+    // 'ni-picture-uploader': PictureUploader,
   },
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       emailLock: true,
@@ -348,12 +350,8 @@ export default {
     return {
       identityType: { required },
       userProfile: {
-        local: {
-          email: { required, email },
-        },
-        picture: {
-          link: { required },
-        },
+        local: { email: { required, email } },
+        picture: { link: { required } },
         sector: { required },
         identity: {
           firstname: { required },
@@ -395,21 +393,16 @@ export default {
           residencePermitRecto: {
             driveId: { required: requiredIf(() => this.userProfile.administrative.identityDocs === 'ts') },
           },
-          healthAttest: {
-            driveId: { required },
-          },
-          phoneInvoice: {
-            driveId: { required },
-          },
+          healthAttest: { driveId: { required } },
+          phoneInvoice: { driveId: { required } },
           payment: {
-            rib: {
-              iban: { required, iban },
-              bic: { required, bic },
-            },
+            rib: { iban: { required, iban }, bic: { required, bic } },
           },
           transportInvoice: {
             transportType: { required },
-            driveId: { required: requiredIf(item => item.transportType === 'public') },
+            driveId: {
+              required: requiredIf(this.userProfile.administrative.transportInvoice.transportType === 'public'),
+            },
           },
           mutualFund: {
             has: { required },
@@ -417,14 +410,14 @@ export default {
           },
         },
       },
-      pictureGroup: this.pictureGroup.map(g => `userProfile.${g}`),
-      identityGroup: this.identityGroup.map(g => `userProfile.${g}`),
-      contactGroup: this.contactGroup.map(g => `userProfile.${g}`),
-      emergencyContactGroup: this.emergencyContactGroup.map(g => `userProfile.${g}`),
-      ibanGroup: this.ibanGroup.map(g => `userProfile.${g}`),
-      documentsGroup: this.documentsGroup.map(g => `userProfile.${g}`),
-      mutualFundGroup: this.mutualFundGroup.map(g => `userProfile.${g}`),
-      transportInvoiceGroup: this.transportInvoiceGroup.map(g => `userProfile.${g}`),
+      // pictureGroup: this.pictureGroup.map(g => `userProfile.${g}`),
+      // identityGroup: this.identityGroup.map(g => `userProfile.${g}`),
+      // contactGroup: this.contactGroup.map(g => `userProfile.${g}`),
+      // emergencyContactGroup: this.emergencyContactGroup.map(g => `userProfile.${g}`),
+      // ibanGroup: this.ibanGroup.map(g => `userProfile.${g}`),
+      // documentsGroup: this.documentsGroup.map(g => `userProfile.${g}`),
+      // mutualFundGroup: this.mutualFundGroup.map(g => `userProfile.${g}`),
+      // transportInvoiceGroup: this.transportInvoiceGroup.map(g => `userProfile.${g}`),
     };
   },
   computed: {
@@ -450,54 +443,60 @@ export default {
       return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/gdrive/${driveId}/upload`;
     },
     birthStateError () {
-      const { required, minLength, maxLength, numeric } = this.$v.userProfile.identity.birthState;
-      if (!required) return REQUIRED_LABEL;
-      if (!minLength || !maxLength || !numeric) return 'Departement non valide';
+      const validations = this.v$.userProfile.identity.birthState;
+      if (validations.required.$response === false) return REQUIRED_LABEL;
+      if (validations.minLength.$response === false || validations.maxLength.$response === false ||
+        validations.numeric.$response === false) return 'Departement non valide';
 
       return '';
     },
     ssnError () {
-      const { required, minLength, maxLength, numeric } = this.$v.userProfile.identity.socialSecurityNumber;
+      const validations = this.v$.userProfile.identity.socialSecurityNumber;
 
-      if (!required) return REQUIRED_LABEL;
-      if (!minLength || !maxLength || !numeric) return 'Numéro de sécurité sociale non valide';
+      if (validations.required.$response === false) return REQUIRED_LABEL;
+      if (validations.minLength.$response === false || validations.maxLength.$response === false ||
+        validations.numeric.$response === false) return 'Numéro de sécurité sociale non valide';
 
       return '';
     },
     zipCodeError () {
-      const { required, frZipCode, maxLength } = this.$v.userProfile.contact.zipCode;
+      const validations = this.v$.userProfile.contact.zipCode;
 
-      if (!required) return REQUIRED_LABEL;
-      if (!frZipCode || !maxLength) return 'Code postal non valide';
+      if (validations.required.$response === false) return REQUIRED_LABEL;
+      if (validations.frZipCode.$response === false || validations.maxLength.$response === false) {
+        return 'Code postal non valide';
+      }
 
       return '';
     },
     emergencyPhoneNbrError () {
-      const { required, frPhoneNumber, maxLength } = this.$v.userProfile.administrative.emergencyContact.phoneNumber;
+      const validations = this.v$.userProfile.administrative.emergencyContact.phoneNumber;
 
-      if (!required) return REQUIRED_LABEL;
-      if (!frPhoneNumber || !maxLength) return 'Numéro de téléphone non valide';
+      if (validations.required.$reponse === false) return REQUIRED_LABEL;
+      if (validations.frPhoneNumber.$reponse === false) return 'Numéro de téléphone non valide';
 
       return '';
     },
     ibanError () {
-      const { required, iban } = this.$v.userProfile.administrative.payment.rib.iban;
+      const validations = this.v$.userProfile.administrative.payment.rib.iban;
 
-      if (!required) return REQUIRED_LABEL;
-      if (!iban) return 'IBAN non valide';
+      if (validations.required.$reponse === false) return REQUIRED_LABEL;
+      if (validations.iban.$reponse === false) return 'IBAN non valide';
 
       return '';
     },
     bicError () {
-      const { required, bic } = this.$v.userProfile.administrative.payment.rib.bic;
+      const validations = this.v$.userProfile.administrative.payment.rib.bic;
 
-      if (!required) return REQUIRED_LABEL;
-      if (!bic) return 'BIC non valide';
+      if (validations.required.$reponse === false) return REQUIRED_LABEL;
+      if (validations.bic.$reponse === false) return 'BIC non valide';
 
       return '';
     },
     addressError () {
-      return !this.$v.userProfile.contact.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
+      return this.v$.userProfile.contact.address.fullAddress.required.$reponse === false
+        ? REQUIRED_LABEL
+        : 'Adresse non valide';
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.clientRole);
@@ -517,7 +516,7 @@ export default {
   },
   async created () {
     if (this.isCoach) await Promise.all([this.getAuxiliaryRoles(), this.getEstablishments()]);
-    this.$v.userProfile.$touch();
+    // this.v$.userProfile.$touch();
     this.isLoaded = true;
   },
   methods: {
@@ -597,11 +596,11 @@ export default {
       NotifyPositive('Document envoyé');
     },
     groupErrors (group) {
-      let j = 0;
-      const groupName = `${group}Group`;
-      for (let i = 0, l = this[groupName].length; i < l; i++) {
-        if (this.$v[groupName][`userProfile.${this[groupName][i]}`].$error) j++;
-      }
+      const j = 0;
+      // const groupName = `${group}Group`;
+      // for (let i = 0, l = this[groupName].length; i < l; i++) {
+      //   if (this.v$[groupName][`userProfile.${this[groupName][i]}`].$error) j++;
+      // }
 
       return {
         errors: j,

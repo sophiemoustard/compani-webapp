@@ -7,7 +7,7 @@
           @click="exportDpae(contract._id)" />
       </q-card-section>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name"
-        :loading="contractsLoading" :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
+        :loading="contractsLoading" v-model:pagination="pagination" :visible-columns="visibleColumns(contract)">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -106,6 +106,14 @@ export default {
     personKey: { type: String, default: () => COACH },
     contractsLoading: { type: Boolean, default: false },
   },
+  emits: [
+    'open-version-creation',
+    'open-version-edition',
+    'delete-version',
+    'open-end-contract',
+    'refresh',
+    'refresh-with-timeout',
+  ],
   data () {
     return {
       CUSTOMER,

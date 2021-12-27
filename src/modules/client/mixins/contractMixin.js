@@ -62,28 +62,30 @@ export const contractMixin = {
   },
   methods: {
     startDateError (validationObj) {
-      if (get(validationObj, 'startDate.required', null) === false) return REQUIRED_LABEL;
-      if (get(validationObj, 'startDate.minDate', null) === false) {
+      if (get(validationObj, 'startDate.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validationObj, 'startDate.minDate.$response') === false) {
         return 'La date d\'effet doit être postérieure à la date de début de la version précédente.';
       }
       return '';
     },
     grossHourlyRateError (validationObj) {
-      if (get(validationObj, 'grossHourlyRate.required', null) === false) return REQUIRED_LABEL;
-      if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
+      if (get(validationObj, 'grossHourlyRate.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validationObj, 'grossHourlyRate.minValue.$response') === false) return 'Taux horaire non valide';
 
       return '';
     },
     weeklyHoursError (validationObj) {
-      if (get(validationObj, 'weeklyHours.required', null) === false) return REQUIRED_LABEL;
-      if (get(validationObj, 'weeklyHours.minValue', null) === false) return 'Volume horaire hebdomadaire non valide';
+      if (get(validationObj, 'weeklyHours.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validationObj, 'weeklyHours.minValue.$response') === false) {
+        return 'Volume horaire hebdomadaire non valide';
+      }
 
       return '';
     },
     resetVersionEditionModal () {
       this.versionEditionModal = false;
       this.editedVersion = {};
-      this.$v.editedVersion.$reset();
+      this.v$.editedVersion.$reset();
     },
     getSignaturePayload (contract, title, template) {
       return {
@@ -117,8 +119,8 @@ export const contractMixin = {
     },
     async saveVersion () {
       try {
-        this.$v.editedVersion.$touch();
-        if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedVersion.$touch();
+        if (this.v$.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = await this.getVersionEditionPayload();
@@ -131,7 +133,7 @@ export const contractMixin = {
       } catch (e) {
         console.error(e);
         if (e.status === 422) {
-          this.$v.editedVersion.$reset();
+          this.v$.editedVersion.$reset();
           return NotifyNegative(`Impossible de modifier ce contrat : il est en conflit avec les évènements ou autres
             contrats de l'auxiliaire.`);
         }

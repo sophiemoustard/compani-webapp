@@ -8,7 +8,9 @@
 </template>
 
 <script>
+import { markRaw } from 'vue';
 import { mapState } from 'vuex';
+import get from 'lodash/get';
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
@@ -33,7 +35,7 @@ export default {
           label: 'Infos personnelles',
           name: 'info',
           default: this.defaultTab === 'info',
-          component: ProfileInfo,
+          component: markRaw(ProfileInfo),
           notification: 'profiles',
         },
         { label: 'Contrats', name: 'contracts', default: this.defaultTab === 'contracts', component: ProfileContracts },
@@ -59,12 +61,12 @@ export default {
   },
   methods: {
     refreshAuxiliaryName () {
-      this.auxiliaryName = this.userProfile.identity
+      this.auxiliaryName = get(this.userProfile, 'identity')
         ? `${this.userProfile.identity.firstname} ${this.userProfile.identity.lastname}`
         : '';
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
 };
