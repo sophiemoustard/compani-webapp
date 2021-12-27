@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import { useQuasar } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import pickBy from 'lodash/pickBy';
@@ -9,7 +10,8 @@ import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 
-export const usePaymentMixin = (refresh) => {
+export const usePayments = (refresh) => {
+  const $q = useQuasar();
   const paymentCreationLoading = ref(false);
   const paymentCreationModal = ref(false);
   const newPayment = ref({});
@@ -95,13 +97,12 @@ export const usePaymentMixin = (refresh) => {
 
     if (!hasTaxCertificateOnSameYear(newPayment.value, taxCertificates)) return createPayment();
 
-    this.$q
-      .dialog({
-        title: 'Confirmation',
-        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le créer ?',
-        ok: 'OK',
-        cancel: 'Annuler',
-      })
+    $q.dialog({
+      title: 'Confirmation',
+      message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le créer ?',
+      ok: 'OK',
+      cancel: 'Annuler',
+    })
       .onOk(() => createPayment())
       .onCancel(() => {
         NotifyPositive('Création annulée.');
@@ -136,21 +137,20 @@ export const usePaymentMixin = (refresh) => {
 
   const validatePaymentUpdate = async (taxCertificates) => {
     paymentEditionLoading.value = true;
-    v$.editedPayment.$touch();
-    if (v$.editedPayment.$error) {
+    v$.value.editedPayment.$touch();
+    if (v$.value.editedPayment.$error) {
       paymentEditionLoading.value = false;
       return NotifyWarning('Champ(s) invalide(s)');
     }
 
     if (!hasTaxCertificateOnSameYear(editedPayment.value, taxCertificates)) return updatePayment();
 
-    this.$q
-      .dialog({
-        title: 'Confirmation',
-        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le modifier ?',
-        ok: 'OK',
-        cancel: 'Annuler',
-      })
+    $q.dialog({
+      title: 'Confirmation',
+      message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le modifier ?',
+      ok: 'OK',
+      cancel: 'Annuler',
+    })
       .onOk(() => updatePayment())
       .onCancel(() => {
         NotifyPositive('Modification annulée.');
@@ -178,7 +178,7 @@ export const usePaymentMixin = (refresh) => {
       ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le supprimer ?'
       : 'Êtes-vous sûr(e) de vouloir supprimer ce remboursement ?';
 
-    this.$q.dialog({ title: 'Confirmation', message, ok: 'OK', cancel: 'Annuler' })
+    $q.dialog({ title: 'Confirmation', message, ok: 'OK', cancel: 'Annuler' })
       .onOk(() => deleteRefund(refund._id))
       .onCancel(() => NotifyPositive('Suppression annulée.'));
   };

@@ -1,20 +1,20 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
     <template #title>
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
-    <ni-input :disable="!firstStep" in-modal :value="newHelper.local.email" caption="Email" required-field
+    <ni-input :disable="!firstStep" in-modal :model-value="newHelper.local.email" caption="Email" required-field
       :error="validations.local.email.$error" @blur="validations.local.email.$touch" :error-message="emailError"
-      :last="firstStep" @input="update($event.trim(), 'local.email')" />
+      :last="firstStep" @update:model-value="update($event.trim(), 'local.email')" />
     <template v-if="!firstStep">
-      <ni-input in-modal :value="newHelper.identity.firstname" caption="Prénom"
-        @input="update($event.trim(), 'identity.firstname')" />
-      <ni-input in-modal :value="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
+      <ni-input in-modal :model-value="newHelper.identity.firstname" caption="Prénom"
+        @update:model-value="update($event.trim(), 'identity.firstname')" />
+      <ni-input in-modal :model-value="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
         caption="Nom" @blur="validations.identity.lastname.$touch" required-field
-        @input="update($event.trim(), 'identity.lastname')" />
-      <ni-input in-modal :value="newHelper.contact.phone" last :error="validations.contact.phone.$error"
+        @update:model-value="update($event.trim(), 'identity.lastname')" />
+      <ni-input in-modal :model-value="newHelper.contact.phone" last :error="validations.contact.phone.$error"
         caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
-        @input="update($event.trim(), 'contact.phone')" />
+        @update:model-value="update($event.trim(), 'contact.phone')" />
     </template>
     <template #footer>
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary" @click="nextStep"
@@ -35,7 +35,7 @@ import { REQUIRED_LABEL } from '@data/constants';
 export default {
   name: 'HelperCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newHelper: { type: Object, default: () => ({}) },
     company: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
@@ -46,6 +46,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'next-step', 'update:new-helper'],
   computed: {
     emailError () {
       if (!this.validations.local.email.required) {
@@ -67,7 +68,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
@@ -76,7 +77,7 @@ export default {
       this.$emit('next-step');
     },
     update (event, path) {
-      this.$emit('update:newHelper', set({ ...this.newHelper }, path, event));
+      this.$emit('update:new-helper', set({ ...this.newHelper }, path, event));
     },
   },
 };

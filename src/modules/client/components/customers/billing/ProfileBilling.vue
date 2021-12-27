@@ -119,9 +119,9 @@ import CustomerBillingTable from 'src/modules/client/components/customers/billin
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
 import PaymentEditionModal from 'src/modules/client/components/customers/billing/PaymentEditionModal';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
-import { usePaymentMixin } from 'src/modules/client/mixins/paymentMixin';
-import { useBalanceMixin } from './balanceMixin';
-import { useTaxCertificatesMixin } from './taxCertificatesMixin';
+import { usePayments } from 'src/modules/client/composables/payments';
+import { useBalance } from 'src/modules/client/composables/balance';
+import { useTaxCertificates } from 'src/modules/client/composables/taxCertificates';
 
 export default {
   name: 'ProfileBilling',
@@ -153,7 +153,7 @@ export default {
       formatDocumentList,
       computeCustomerBalance,
       computeTppBalances,
-    } = useBalanceMixin(customer);
+    } = useBalance(customer);
 
     const {
       taxCertificate,
@@ -161,8 +161,9 @@ export default {
       taxCertificateModal,
       modalLoading,
       pdfLoading,
-      disableAdministrativeDocument,
-      customerFolder,
+      disableTaxCertificate,
+      taxCertificateFileError,
+      taxCertificateYearError,
       getTaxCertificates,
       formatTaxCertificatePayload,
       resetTaxCertificateModal,
@@ -172,7 +173,7 @@ export default {
       validateTaxCertificateDeletion,
       deleteTaxCertificate,
       taxCertificatesValidation,
-    } = useTaxCertificatesMixin(customer);
+    } = useTaxCertificates(customer);
 
     const tableLoading = ref(false);
     const refresh = async () => {
@@ -203,7 +204,7 @@ export default {
       resetPaymentEditionModal,
       validatePaymentUpdate,
       validateRefundDeletion,
-    } = usePaymentMixin(refresh, taxCertificates);
+    } = usePayments(refresh, taxCertificates);
 
     onMounted(async () => {
       setBillingDates();
@@ -242,10 +243,11 @@ export default {
       taxCertificateModal,
       modalLoading,
       pdfLoading,
-      disableAdministrativeDocument,
-      customerFolder,
+      disableTaxCertificate,
       taxCertificate,
       taxCertificatesValidation,
+      taxCertificateFileError,
+      taxCertificateYearError,
       getTaxCertificates,
       formatTaxCertificatePayload,
       resetTaxCertificateModal,

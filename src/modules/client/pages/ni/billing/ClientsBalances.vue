@@ -81,7 +81,7 @@ import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
-import { usePaymentMixin } from 'src/modules/client/mixins/paymentMixin';
+import { usePayments } from 'src/modules/client/composables/payments';
 
 export default {
   name: 'ClientsBalances',
@@ -211,7 +211,7 @@ export default {
       openPaymentCreationModal,
       resetPaymentCreationModal,
       validatePaymentCreation,
-    } = usePaymentMixin(refresh);
+    } = usePayments(refresh);
 
     const submitPaymentCreation = async () => {
       const taxCertificates = await TaxCertificates.list({ customer: newPayment.value.customer });

@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
 import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -32,20 +33,20 @@ export default {
           label: 'Accompagnement',
           name: 'followUp',
           default: this.defaultTab === 'followUp',
-          component: ProfileFollowUp,
+          component: shallowRef(ProfileFollowUp),
         },
         {
           label: 'Infos',
           name: 'info',
           default: this.defaultTab === 'info',
-          component: ProfileInfo,
+          component: shallowRef(ProfileInfo),
           notification: 'profiles',
         },
         {
           label: 'Facturation',
           name: 'billing',
           default: this.defaultTab === 'billing',
-          component: ProfileBilling,
+          component: shallowRef(ProfileBilling),
         },
       ],
       customerName: '',
@@ -61,8 +62,6 @@ export default {
   watch: {
     async customer () {
       await this.$store.dispatch('customer/updateNotifications');
-    },
-    'customer.identity': function () {
       this.refreshCustomerName();
     },
   },
@@ -73,7 +72,7 @@ export default {
         : '';
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('customer/resetCustomer');
   },
 };

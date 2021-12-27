@@ -14,7 +14,7 @@ import {
 import Balances from '@api/Balances';
 import moment from '@helpers/moment';
 
-export const useBalanceMixin = (customer) => {
+export const useBalance = (customer) => {
   const customerDocuments = ref([]);
   const tppDocuments = ref([]);
   const balances = ref([]);

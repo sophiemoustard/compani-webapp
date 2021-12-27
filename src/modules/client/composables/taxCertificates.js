@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import { useQuasar } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -12,13 +13,14 @@ import moment from '@helpers/moment';
 import { formatIdentity } from '@helpers/utils';
 import { validYear } from '@helpers/vuelidateCustomVal';
 
-export const useTaxCertificatesMixin = (customer) => {
+export const useTaxCertificates = (customer) => {
+  const $q = useQuasar();
   const taxCertificates = ref([]);
   const taxCertificateModal = ref(false);
   const modalLoading = ref(false);
   const pdfLoading = ref(false);
-  const disableAdministrativeDocument = ref(false);
-  const customerFolder = computed(() => get(customer, 'driveFolder.driveId', null));
+  const disableTaxCertificate = ref(false);
+  const customerFolder = computed(() => get(customer.value, 'driveFolder.driveId', null));
   const taxCertificate = ref({
     date: moment().toISOString(),
     year: moment().subtract(1, 'y').format('YYYY'),
@@ -26,36 +28,34 @@ export const useTaxCertificatesMixin = (customer) => {
   });
 
   const rules = {
-    taxCertificate: {
-      date: { required },
-      year: { required, validYear },
-      file: { required, maxSize: file => !!file && file.size < 5000000 },
-    },
+    date: { required },
+    year: { required, validYear },
+    file: { required, maxSize: file => !!file && file.size < 5000000 },
   };
-  const taxCertificatesValidation = useVuelidate(rules, { taxCertificate });
+  const taxCertificatesValidation = useVuelidate(rules, taxCertificate);
 
   const taxCertificateFileError = computed(() => {
-    if (taxCertificatesValidation.file.required.$response === false) return REQUIRED_LABEL;
-    if (taxCertificatesValidation.file.maxSize.$response === false) return 'Fichier trop volumineux (> 5 Mo)';
+    if (taxCertificatesValidation.value.file.required.$response === false) return REQUIRED_LABEL;
+    if (taxCertificatesValidation.value.file.maxSize.$response === false) return 'Fichier trop volumineux (> 5 Mo)';
     return '';
   });
 
   const taxCertificateYearError = computed(() => {
-    if (taxCertificatesValidation.year.required.$response === false) return REQUIRED_LABEL;
-    if (taxCertificatesValidation.year.validYear.$response === false) return 'Année invalide';
+    if (taxCertificatesValidation.value.year.required.$response === false) return REQUIRED_LABEL;
+    if (taxCertificatesValidation.value.year.validYear.$response === false) return 'Année invalide';
     return '';
   });
 
   const getTaxCertificates = async () => {
     try {
-      taxCertificates.value = await TaxCertificates.list({ customer: customer._id });
+      taxCertificates.value = await TaxCertificates.list({ customer: customer.value._id });
     } catch (e) {
       console.error(e);
       taxCertificates.value = [];
     }
   };
   const formatTaxCertificatePayload = () => {
-    const { file, date, year } = taxCertificate;
+    const { file, date, year } = taxCertificate.value;
     const form = new FormData();
     const formattedDate = moment(date).format('DD-MM-YYYY-HHmm');
     const customerName = formatIdentity(customer.identity, 'FL');
@@ -66,21 +66,21 @@ export const useTaxCertificatesMixin = (customer) => {
     form.append('taxCertificate', file);
     form.append('mimeType', file.type || 'application/octet-stream');
     form.append('fileName', fileName);
-    form.append('driveFolderId', customerFolder);
-    form.append('customer', customer._id);
+    form.append('driveFolderId', customerFolder.value);
+    form.append('customer', customer.value._id);
 
     return form;
   };
 
   const resetTaxCertificateModal = () => {
     taxCertificate.value = { date: moment().toISOString(), year: moment().subtract(1, 'y').format('YYYY'), file: null };
-    taxCertificatesValidation.$reset();
+    taxCertificatesValidation.value.$reset();
   };
 
   const createTaxCertificate = async () => {
     if (!customerFolder.value) return NotifyNegative('Dossier du/de la bénéficiaire manquant.');
-    taxCertificatesValidation.$touch();
-    if (taxCertificatesValidation.$error) return NotifyWarning('Champ(s) invalide(s)');
+    taxCertificatesValidation.value.$touch();
+    if (taxCertificatesValidation.value.$error) return NotifyWarning('Champ(s) invalide(s)');
     modalLoading.value = true;
 
     try {
@@ -98,12 +98,12 @@ export const useTaxCertificatesMixin = (customer) => {
   };
   const downloadTaxCertificateFromDrive = async (tc) => {
     try {
-      disableAdministrativeDocument.value = true;
+      disableTaxCertificate.value = true;
       await GoogleDrive.downloadFileById(get(tc, 'driveFile.driveId'));
     } catch (e) {
       console.error(e);
     } finally {
-      disableAdministrativeDocument.value = false;
+      disableTaxCertificate.value = false;
     }
   };
 
@@ -123,7 +123,7 @@ export const useTaxCertificatesMixin = (customer) => {
   };
 
   const validateTaxCertificateDeletion = (taxCertificateId, row) => {
-    this.$q.dialog({
+    $q.dialog({
       title: 'Confirmation',
       message: 'Êtes-vous sûr(e) de vouloir supprimer cette attestation ?',
       ok: 'OK',
@@ -136,7 +136,7 @@ export const useTaxCertificatesMixin = (customer) => {
 
   const deleteTaxCertificate = async (taxCertificateId, row) => {
     try {
-      const index = getRowIndex(taxCertificates, row);
+      const index = getRowIndex(taxCertificates.value, row);
       await TaxCertificates.remove(taxCertificateId);
       taxCertificates.value.splice(index, 1);
       NotifyPositive('Attestation fiscale supprimée.');
@@ -147,11 +147,12 @@ export const useTaxCertificatesMixin = (customer) => {
   };
 
   return {
+    taxCertificate,
     taxCertificates,
     taxCertificateModal,
     modalLoading,
     pdfLoading,
-    disableAdministrativeDocument,
+    disableTaxCertificate,
     customerFolder,
     taxCertificateFileError,
     taxCertificateYearError,

@@ -79,6 +79,7 @@ export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPric
 
 export const formatIdentity = (identity, format) => {
   if (!identity) return '';
+
   const formatLower = format.toLowerCase();
   const values = [];
 

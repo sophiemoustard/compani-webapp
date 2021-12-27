@@ -1,18 +1,18 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
       Editer le <span class="text-weight-bold">{{ editionModalNature }}</span>
     </template>
-    <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
+    <ni-input in-modal caption="Bénéficiaire" :model-value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
     <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" @blur="validations.netInclTaxes.$touch"
-      :value="editedPayment.netInclTaxes" @input="update($event, 'netInclTaxes')" type="number" required-field
-      :error="validations.netInclTaxes.$error" :error-message="netInclTaxesError" />
-    <ni-select in-modal :caption="`Type du ${editionModalNature}`" :value="editedPayment.type"
-      @input="update($event, 'type')" :options="paymentOptions" required-field
+      :model-value="editedPayment.netInclTaxes" @update:model-value="update($event, 'netInclTaxes')" type="number"
+      :error="validations.netInclTaxes.$error" :error-message="netInclTaxesError" required-field />
+    <ni-select in-modal :caption="`Type du ${editionModalNature}`" :model-value="editedPayment.type"
+      @update:model-value="update($event, 'type')" :options="paymentOptions" required-field
       @blur="validations.type.$touch" :error="validations.type.$error" />
-    <ni-date-input :caption="`Date du ${editionModalNature}`" :value="editedPayment.date" in-modal required-field
-      @input="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch" />
+    <ni-date-input :caption="`Date du ${editionModalNature}`" :model-value="editedPayment.date" in-modal required-field
+      @update:model-value="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -38,12 +38,13 @@ export default {
   },
   props: {
     editedPayment: { type: Object, default: () => ({}) },
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     selectedCustomer: { type: Object, default: () => ({}) },
     selectedTpp: { type: Object, default: () => ({}) },
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:editedPayment'],
   data () {
     return {
       paymentOptions: PAYMENT_OPTIONS,
@@ -74,7 +75,7 @@ export default {
       this.$emit('hide', { partialReset, type });
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit (value) {
       this.$emit('submit', value);

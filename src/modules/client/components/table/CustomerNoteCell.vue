@@ -16,6 +16,7 @@ export default {
   props: {
     note: { type: Object, required: true },
   },
+  emits: ['open-edited-note-modal'],
   computed: {
     lastHistoryMessage () {
       if (!get(this.note, 'histories.length')) return '';
@@ -30,7 +31,7 @@ export default {
     get,
     formatDate,
     click () {
-      this.$emit('openEditedNoteModal', this.note);
+      this.$emit('open-edited-note-modal', this.note);
     },
   },
 };

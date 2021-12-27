@@ -1,20 +1,21 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
     <template #title>
       Ajouter une <span class="text-weight-bold">souscription</span>
     </template>
-    <ni-select in-modal caption="Service" :options="serviceOptions" :value="newSubscription.service" required-field
-      :error="validations.service.$error" @blur="validations.service.$touch" @input="update($event, 'service')" />
-    <ni-input in-modal :value="newSubscription.unitTTCRate" :error="validations.unitTTCRate.$error"
-      caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number" required-field
-      @input="update($event, 'unitTTCRate')" />
-    <ni-input in-modal :value="newSubscription.estimatedWeeklyVolume" @input="update($event, 'estimatedWeeklyVolume')"
+    <ni-select in-modal caption="Service" :options="serviceOptions" :model-value="newSubscription.service"
+      @blur="validations.service.$touch" @update:model-value="update($event, 'service')" required-field
+      :error="validations.service.$error" />
+    <ni-input in-modal :model-value="newSubscription.unitTTCRate" :error="validations.unitTTCRate.$error" required-field
+      caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number"
+      @update:model-value="update($event, 'unitTTCRate')" />
+    <ni-input in-modal :model-value="newSubscription.estimatedWeeklyVolume" type="number" required-field
       :error="validations.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-      @blur="validations.estimatedWeeklyVolume.$touch" type="number" required-field />
-    <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" :value="newSubscription.sundays"
-      caption="Dont dimanche (h)" type="number" @input="update($event, 'sundays')" />
-    <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" :value="newSubscription.evenings"
-      caption="Dont soirée (h)" last type="number" @input="update($event, 'evenings')" />
+      @blur="validations.estimatedWeeklyVolume.$touch" @update:model-value="update($event, 'estimatedWeeklyVolume')" />
+    <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" :model-value="newSubscription.sundays"
+      caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')" />
+    <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" :model-value="newSubscription.evenings"
+      caption="Dont soirée (h)" last type="number" @update:model-value="update($event, 'evenings')" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -31,7 +32,7 @@ import { FIXED } from '@data/constants';
 export default {
   name: 'SubscriptionCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newSubscription: { type: Object, default: () => ({}) },
     serviceOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
@@ -42,6 +43,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-subscription'],
   data () {
     return {
       FIXED,
@@ -52,13 +54,13 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newSubscription', { ...this.newSubscription, [prop]: event });
+      this.$emit('update:new-subscription', { ...this.newSubscription, [prop]: event });
     },
   },
 };

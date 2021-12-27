@@ -242,7 +242,6 @@
 </template>
 
 <script>
-/* eslint-disable no-shadow */
 import { mapState, mapGetters } from 'vuex';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
