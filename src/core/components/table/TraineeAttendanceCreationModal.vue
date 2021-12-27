@@ -1,15 +1,16 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
     <template #title>
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
-    <ni-select :options="traineeFilterOptions" :value="newTraineeAttendance.trainee"
-      @input="update($event, 'trainee')" caption="Participant(e)" in-modal
+    <ni-select :options="traineeFilterOptions" :model-value="newTraineeAttendance.trainee"
+      @update:model-value="update($event, 'trainee')" caption="Participant(e)" in-modal
       :error="validation.trainee.$error" :error-message="REQUIRED_LABEL" required-field />
     <div class="row q-pb-md">
-      <ni-option-group :value="newTraineeAttendance.attendances" @input="update($event, 'attendances')"
-        :options="slotsOptions" :error="validation.attendances.$error" :error-message="REQUIRED_LABEL" required-field
-        type="checkbox" caption="Selectionner les créneaux auxquelles a été présent(e) le/la participant(e)" inline />
+      <ni-option-group :model-value="newTraineeAttendance.attendances" :error-message="REQUIRED_LABEL" required-field
+        :options="slotsOptions" :error="validation.attendances.$error" type="checkbox" inline
+        caption="Selectionner les créneaux auxquelles a été présent(e) le/la participant(e)"
+        @update:model-value="update($event, 'attendances')" />
     </div>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" color="primary"
@@ -30,7 +31,7 @@ import { formatDate } from '@helpers/date';
 export default {
   name: 'TraineeAttendanceCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     course: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     trainees: { type: Array, default: () => [] },
@@ -43,6 +44,7 @@ export default {
     'ni-option-group': OptionGroup,
     'ni-modal': Modal,
   },
+  emits: ['hide', 'update:model-value', 'update:new-trainee-attendance', 'submit'],
   data () {
     return {
       REQUIRED_LABEL,
@@ -61,10 +63,10 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     update (event, path) {
-      this.$emit('update:newTraineeAttendance', set({ ...this.newTraineeAttendance }, path, event));
+      this.$emit('update:new-trainee-attendance', set({ ...this.newTraineeAttendance }, path, event));
     },
     submit () {
       this.$emit('submit');

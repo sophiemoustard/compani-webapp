@@ -36,8 +36,8 @@
                 </q-item-section>
               </q-item>
             </div>
-            <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
-              @input="updateCheckbox(col.value, col.slot)" :disable="disableCheckBox" />
+            <q-checkbox v-else :model-value="checkboxValue(col.value, col.slot)" dense size="sm"
+              @update:model-value="updateCheckbox(col.value, col.slot)" :disable="disableCheckBox" />
           </q-td>
         </q-tr>
       </template>
@@ -52,7 +52,7 @@
       label="Ajouter un(e) participant(e)" :disable="loading" @click="openTraineeAttendanceAdditionModal" />
   </q-card>
 
-  <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" :pagination.sync="pagination"
+  <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" v-model:pagination="pagination"
     :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
     <template #body="{ props }">
       <q-tr :props="props">
@@ -80,12 +80,12 @@
   </div>
 
   <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
-    :loading="modalLoading" :validation="$v.newTraineeAttendance" :trainee-filter-options="traineeFilterOptions"
-    :new-trainee-attendance.sync="newTraineeAttendance" :trainees="traineesWithAttendance" @submit="addTrainee" />
+    :loading="modalLoading" :validation="v$.newTraineeAttendance" :trainee-filter-options="traineeFilterOptions"
+    v-model:new-trainee-attendance="newTraineeAttendance" :trainees="traineesWithAttendance" @submit="addTrainee" />
 
   <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
-      @submit="addAttendanceSheet" :new-attendance-sheet.sync="newAttendanceSheet" :validations="$v.newAttendanceSheet"
-      :loading="modalLoading" :course="course" />
+      @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
+      :validations="v$.newAttendanceSheet" :course="course" />
 </div>
 </template>
 
@@ -93,7 +93,8 @@
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
 import Attendances from '@api/Attendances';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Users from '@api/Users';
@@ -120,8 +121,11 @@ export default {
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
   },
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
 
     return {
       formatIdentity,
@@ -307,7 +311,7 @@ export default {
       this.attendanceSheetAdditionModal = true;
     },
     resetAttendanceSheetAdditionModal () {
-      this.$v.newAttendanceSheet.$reset();
+      this.v$.newAttendanceSheet.$reset();
       this.newAttendanceSheet = { course: this.course._id };
     },
     formatPayload () {
@@ -323,8 +327,8 @@ export default {
       try {
         if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter une feuille d\'émargement.');
 
-        this.$v.newAttendanceSheet.$touch();
-        if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newAttendanceSheet.$touch();
+        if (this.v$.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
 
         await AttendanceSheets.create(this.formatPayload());
@@ -417,8 +421,8 @@ export default {
       try {
         if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
 
-        this.$v.newTraineeAttendance.$touch();
-        if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
+        this.v$.newTraineeAttendance.$touch();
+        if (this.v$.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
         this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee, s));
         this.traineeAdditionModal = false;
@@ -431,7 +435,7 @@ export default {
       }
     },
     resetNewTraineeAttendance () {
-      this.$v.newTraineeAttendance.$reset();
+      this.v$.newTraineeAttendance.$reset();
       this.newTraineeAttendance = { trainee: '', attendances: [] };
     },
     openTraineeAttendanceAdditionModal () {

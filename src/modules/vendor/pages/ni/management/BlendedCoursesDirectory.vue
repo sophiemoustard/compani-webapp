@@ -17,7 +17,6 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="openCourseCreationModal" />
 
-    <!-- Course creation modal -->
     <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :is-intra-course="isIntraCourse"
       :programs="programs" :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading"
       @hide="resetCreationModal" @submit="createCourse" :sales-representative-options="salesRepresentativeOptions" />
@@ -163,7 +162,7 @@ export default {
     },
   },
   beforeUnmount () {
-    if (this.$router.currentRoute.name !== 'ni management blended courses info') {
+    if (this.$route.name !== 'ni management blended courses info') {
       this.$store.dispatch('course/resetFilters');
     }
   },

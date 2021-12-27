@@ -69,7 +69,8 @@ export default {
     'ni-pagination': Pagination,
   },
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
+
     return {
       isClientInterface,
     };

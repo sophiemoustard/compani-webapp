@@ -58,11 +58,9 @@
         label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
     </div>
 
-    <!-- Modal envoi message -->
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
-    <!-- Modal visualisation message -->
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
       :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
   </div>

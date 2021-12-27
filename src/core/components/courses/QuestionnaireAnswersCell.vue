@@ -20,6 +20,7 @@ export default {
   props: {
     questionnaire: { type: Object, required: true },
   },
+  emits: ['click'],
   data () {
     return {
       formatQuantity,
