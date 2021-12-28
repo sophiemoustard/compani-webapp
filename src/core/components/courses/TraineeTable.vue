@@ -103,7 +103,7 @@ export default {
     const course = computed(() => $store.state.course.course);
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
-    const isClientInterface = !/\/ad\//.test($router.path);
+    const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
 
     const getPotentialTrainees = async () => {
       try {
