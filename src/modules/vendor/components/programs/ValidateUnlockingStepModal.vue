@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :value="value" @input="cancel" @hide="hide">
+  <q-dialog :value="modelValue" @update:model-value="cancel" @hide="hide">
     <div class="modal-container-md">
       <div class="modal-padding">
         <div class="modal-title q-mb-lg">Confirmation</div>
@@ -36,10 +36,11 @@
 export default {
   name: 'ValidateUnlockingStepModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     subProgramsGroupedByProgram: { type: Array, default: () => [] },
     isStepPublished: { type: Boolean, default: false },
   },
+  emits: ['cancel', 'confirm', 'hide'],
   methods: {
     cancel () {
       this.$emit('cancel');

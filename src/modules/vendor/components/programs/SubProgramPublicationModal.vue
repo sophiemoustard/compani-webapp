@@ -1,9 +1,9 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
       Définir une <span class="text-weight-bold">règle d'accès</span>
     </template>
-    <ni-option-group v-model="access" :options="ACCESS_OPTIONS" inline type="radio" @input="resetAccess" />
+    <ni-option-group v-model="access" :options="ACCESS_OPTIONS" inline type="radio" @update:model-value="resetAccess" />
     <template v-if="access === RESTRICTED_ACCESS">
       <span class="text-italic">
         Seuls les apprenants de la structure choisie auront accès à la formation.
@@ -30,7 +30,7 @@ import { FREE_ACCESS, RESTRICTED_ACCESS, ACCESS_OPTIONS } from '@data/constants'
 export default {
   name: 'SubProgramPublicationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
   },
@@ -39,6 +39,7 @@ export default {
     'ni-option-group': OptionGroup,
     'ni-select': Select,
   },
+  emits: ['hide', 'update:model-value', 'submit'],
   data () {
     return {
       access: FREE_ACCESS,
@@ -57,7 +58,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$v.accessCompany.$touch();
@@ -73,6 +74,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .select
-    margin-top: 32px
+.select
+  margin-top: 32px
 </style>

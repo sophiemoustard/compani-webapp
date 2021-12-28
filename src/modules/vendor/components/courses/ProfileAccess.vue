@@ -10,7 +10,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="close" @click="e =>validateAccessRuleDeletion(col.value, e)" />
+                  <ni-button icon="close" @click="validateAccessRuleDeletion(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -88,9 +88,8 @@ export default {
         console.error(e);
       }
     },
-    async openAddAccessRuleModal (event) {
+    async openAddAccessRuleModal () {
       try {
-        event.preventDefault();
         const companies = await Companies.list();
         const companiesWithoutAccessRules = companies.filter(
           c => !this.accessRules.map(ar => ar.name).includes(c.name)
@@ -128,9 +127,7 @@ export default {
         this.modalLoading = false;
       }
     },
-    validateAccessRuleDeletion (accessRuleId, event) {
-      event.preventDefault();
-
+    validateAccessRuleDeletion (accessRuleId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir supprimer cette règle d\'accès ?',

@@ -1,13 +1,13 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide" container-class="modal-container-md">
     <template #title>
         Réutiliser une <span class="text-weight-bold">activité</span>
       </template>
       <ni-select in-modal v-model.trim="selectedProgram" caption="Programme" required-field :options="programOptions"
-        inline @input="refreshActivities" />
+        inline @update:model-value="refreshActivities" />
       <template v-if="!!selectedProgram && !refreshingActivities">
-        <ni-option-group :value="reusedActivity" @input="updateReusedActivity" :options="activityOptions"
-          caption="Activités" required-field type="radio" :error="validations.$error" />
+        <ni-option-group :model-value="reusedActivity" @update:model-value="updateReusedActivity"
+          :options="activityOptions" caption="Activités" required-field type="radio" :error="validations.$error" />
         <div class="buttons q-ma-md">
           <q-btn no-caps flat label="Réutiliser l'activité" color="white" :loading="loading"
             @click="submitReuse" />
@@ -28,7 +28,7 @@ import OptionGroup from '@components/form/OptionGroup';
 export default {
   name: 'ActivityReuseModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     sameStepActivities: { type: Array, default: () => [] },
     programOptions: { type: Array, default: () => [] },
     reusedActivity: { type: String, default: '' },
@@ -40,6 +40,7 @@ export default {
     'ni-modal': Modal,
     'ni-option-group': OptionGroup,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'submit-reuse', 'submit-duplication', 'update:reused-activity'],
   data () {
     return {
       selectedProgram: '',
@@ -73,7 +74,7 @@ export default {
       }
     },
     updateReusedActivity (value) {
-      this.$emit('update:reusedActivity', value);
+      this.$emit('update:reused-activity', value);
     },
     hide () {
       this.selectedProgram = '';
@@ -81,7 +82,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submitReuse () {
       this.$emit('submit-reuse');

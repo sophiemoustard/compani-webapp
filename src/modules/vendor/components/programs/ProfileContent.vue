@@ -6,71 +6,76 @@
         <span class="published-sub-program bg-green-600" v-if="isPublished(subProgram)">Publié</span>
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
-        @blur="updateSubProgramName(index)" :error="v$.program.subPrograms.$each[index].name.$error"
+        @blur="updateSubProgramName(index)" :error="v$.program.subPrograms.name.$error"
         :disable="isPublished(subProgram)" />
       <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
-        :disabled="$q.platform.is.mobile || isPublished(subProgram)">
-        <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step q-mb-sm">
-          <q-card-section class="step-head cursor-pointer row" :id="step._id"
-            :class="{ 'step-lock': isLocked(step) }">
-            <div class="step-info" @click="showActivities(step._id)">
-              <q-item-section side>
-                <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="copper-grey-500" />
-              </q-item-section>
-              <q-item-section>
-                <div class="flex-direction row step-title">
-                  <div class="text-weight-bold">
-                    <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
-                    <ni-button v-if="isLocked(step)" icon="lock" class="q-ml-sm q-px-xs" size="sm"
-                      @click="openValidateUnlockingEditionModal(step)" />
-                  </div>
-                  <published-dot :is-published="isPublished(step)"
-                    :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
-                </div>
-                <div class="step-subtitle">
-                  {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
-                </div>
-              </q-item-section>
-            </div>
-            <div class="flex align-center">
-              <ni-button icon="edit" @click="openStepEditionModal(step)" />
-              <ni-button icon="close" @click="validateStepDetachment(subProgram._id, step._id)"
-                :disable="isPublished(subProgram)" />
-            </div>
-          </q-card-section>
-          <div class="bg-peach-200 activity-container" v-if="areActivitiesVisible[step._id]">
-            <draggable v-model="step.activities" :disabled="$q.platform.is.mobile || isPublishedOrLocked(step)"
-              class="activity-draggable" ghost-class="ghost" @change="dropActivity(subProgram._id, step._id)">
-              <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-                <q-card-section :class="{ 'step-lock': isLocked(step) }">
-                  <div class="cursor-pointer row activity-info"
-                    @click="goToActivityProfile(subProgram, step, activity)">
-                    <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
-                    <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
-                    <div class="gt-xs col-sm-2 activity-content">
-                      {{ formatQuantity('carte', activity.cards.length) }}
+        :disabled="$q.platform.is.mobile || isPublished(subProgram)" item-key="_id">
+        <template #item="{element: step, index: stepIndex}">
+          <q-card flat class="step q-mb-sm">
+            <q-card-section class="step-head cursor-pointer row" :id="step._id"
+              :class="{ 'step-lock': isLocked(step) }">
+              <div class="step-info" @click="showActivities(step._id)">
+                <q-item-section side>
+                  <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="copper-grey-500" />
+                </q-item-section>
+                <q-item-section>
+                  <div class="flex-direction row step-title">
+                    <div class="text-weight-bold">
+                      <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
+                      <ni-button v-if="isLocked(step)" icon="lock" class="q-ml-sm q-px-xs" size="sm"
+                        @click="openValidateUnlockingEditionModal(step)" />
                     </div>
-                    <published-dot :is-published="isPublished(activity)"
-                      :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
+                    <published-dot :is-published="isPublished(step)"
+                      :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
-                  <div class="row no-wrap">
-                    <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
-                      @click="validateActivityDeletion(step, activity._id)" />
+                  <div class="step-subtitle">
+                    {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
                   </div>
-                </q-card-section>
-              </q-card>
-            </draggable>
-            <div v-if="!isPublished(step)" class="q-mt-md" align="right">
-              <ni-button color="primary" icon="add" label="Réutiliser une activité" :disable="isLocked(step)"
-                @click="openActivityReuseModal(step)" />
-              <ni-button color="primary" icon="add" label="Créer une activité" :disable="isLocked(step)"
-                @click="openActivityCreationModal(step._id)" />
+                </q-item-section>
+              </div>
+              <div class="flex align-center">
+                <ni-button icon="edit" @click="openStepEditionModal(step)" />
+                <ni-button icon="close" @click="validateStepDetachment(subProgram._id, step._id)"
+                  :disable="isPublished(subProgram)" />
+              </div>
+            </q-card-section>
+            <div class="bg-peach-200 activity-container" v-if="areActivitiesVisible[step._id]">
+              <draggable v-model="step.activities" :disabled="$q.platform.is.mobile || isPublishedOrLocked(step)"
+                class="activity-draggable" ghost-class="ghost" @change="dropActivity(subProgram._id, step._id)"
+                item-key="_id">
+                <template #item="{element: activity }">
+                  <q-card flat class="activity">
+                    <q-card-section :class="{ 'step-lock': isLocked(step) }">
+                      <div class="cursor-pointer row activity-info"
+                        @click="goToActivityProfile(subProgram, step, activity)">
+                        <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
+                        <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
+                        <div class="gt-xs col-sm-2 activity-content">
+                          {{ formatQuantity('carte', activity.cards.length) }}
+                        </div>
+                        <published-dot :is-published="isPublished(activity)"
+                          :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
+                      </div>
+                      <div class="row no-wrap">
+                        <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
+                          @click="validateActivityDeletion(step, activity._id)" />
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </template>
+              </draggable>
+              <div v-if="!isPublished(step)" class="q-mt-md" align="right">
+                <ni-button color="primary" icon="add" label="Réutiliser une activité" :disable="isLocked(step)"
+                  @click="openActivityReuseModal(step)" />
+                <ni-button color="primary" icon="add" label="Créer une activité" :disable="isLocked(step)"
+                  @click="openActivityCreationModal(step._id)" />
+              </div>
+              <div class="no-activity" v-if="isPublished(step) && !step.activities.length">
+                Il n'y a pas d'activité
+              </div>
             </div>
-            <div class="no-activity" v-if="isPublished(step) && !step.activities.length">
-              Il n'y a pas d'activité
-            </div>
-          </div>
-        </q-card>
+          </q-card>
+        </template>
       </draggable>
       <div class="q-my-md sub-program-footer">
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
@@ -203,7 +208,7 @@ export default {
   },
   validations () {
     return {
-      program: { subPrograms: { $each: { name: { required } } } },
+      program: { subPrograms: { name: { required } } },
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
       reusedStep: { _id: { required }, program: { required } },
@@ -265,7 +270,7 @@ export default {
       return type ? type.label : '';
     },
     showActivities (stepId) {
-      this.$set(this.areActivitiesVisible, stepId, !this.areActivitiesVisible[stepId]);
+      this.areActivitiesVisible[stepId] = !this.areActivitiesVisible[stepId];
     },
     async refreshProgram () {
       try {

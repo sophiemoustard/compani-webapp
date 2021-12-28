@@ -12,7 +12,7 @@
         </div>
         <q-field dense borderless class="col-12">
           <q-option-group :model-value="modelValue" :options="options" type="radio" inline dense
-            @update:model-value="$emit('update:model-value')" />
+            @update:model-value="update" />
         </q-field>
       </div>
       <q-field :error="error" :error-message="errorMessage" dense borderless class="error-field" />
@@ -34,6 +34,11 @@ export default {
     groupTitles: { type: Array, default: () => [] },
   },
   emits: ['update:model-value'],
+  methods: {
+    update (value) {
+      this.$emit('update:model-value', value);
+    },
+  },
 };
 </script>
 

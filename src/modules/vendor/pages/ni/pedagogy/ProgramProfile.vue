@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { shallowRef } from 'vue';
 import get from 'lodash/get';
 import { mapState } from 'vuex';
 import ProfileHeader from '@components/ProfileHeader';
@@ -32,13 +33,13 @@ export default {
           label: 'Infos',
           name: 'infos',
           default: this.defaultTab === 'infos',
-          component: ProfileInfo,
+          component: shallowRef(ProfileInfo),
         },
         {
           label: 'Sous-programmes',
           name: 'content',
           default: this.defaultTab === 'content',
-          component: ProfileContent,
+          component: shallowRef(ProfileContent),
         },
       ],
     };
