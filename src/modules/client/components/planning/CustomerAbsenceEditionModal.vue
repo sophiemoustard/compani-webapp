@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :value="customerAbsenceEditionModal" @hide="hide">
+  <q-dialog :model-value="customerAbsenceEditionModal" @hide="hide">
     <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header :selected-person="editedCustomerAbsence.customer" @close="close" />
@@ -7,12 +7,12 @@
           <q-btn rounded unelevated color="primary" label="Absence" />
           <ni-button class="q-mx-sm" icon="delete" color="copper-grey-400" @click="validateCustomerAbsenceDeletion" />
         </div>
-        <ni-select caption="Motif" :value="editedCustomerAbsence.absenceType" :options="customerAbsenceOptions"
-          required-field @input="update($event, 'absenceType')" />
+        <ni-select caption="Motif" :model-value="editedCustomerAbsence.absenceType" :options="customerAbsenceOptions"
+          required-field @update:model-value="update($event, 'absenceType')" />
       </div>
       <div class="q-mx-lg">
-        <ni-date-range borders class="last" caption="Dates de l'absence" required-field
-          :value="editedCustomerAbsence.dates" @input="update($event, 'dates')" @blur="validations.dates.$touch" />
+        <ni-date-range borders class="last" caption="Dates de l'absence" @blur="validations.dates.$touch"
+          :model-value="editedCustomerAbsence.dates" @update:model-value="update($event, 'dates')" required-field />
       </div>
       <q-btn class="modal-btn full-width" no-caps color="primary" :loading="loading" label="Editer l'absence"
         icon-right="check" @click="submit" />
@@ -37,6 +37,7 @@ export default {
     'ni-date-range': DateRange,
     'ni-button': Button,
   },
+  emits: ['update:editedCustomerAbsence', 'close', 'hide', 'submit'],
   data () {
     return {
       customerAbsenceOptions: CUSTOMER_ABSENCE_TYPES,

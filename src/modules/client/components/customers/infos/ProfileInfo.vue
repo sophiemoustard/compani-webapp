@@ -80,7 +80,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'referent'">
-                  <q-radio v-model="referentHelper" :val="props.row._id" @input="updateReferentHelper" />
+                  <q-radio v-model="referentHelper" :val="props.row._id" @update:model-value="updateReferentHelper" />
                 </template>
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">

@@ -9,9 +9,11 @@
     <div class="scroll-container" ref="scrollTargetRef">
       <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTargetRef">
         <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" class="q-ma-xs" />
-        <div slot="loading" class="loading">
-          <q-spinner />
-        </div>
+         <template #loading>
+          <div class="loading">
+            <q-spinner />
+          </div>
+        </template>
       </q-infinite-scroll>
     </div>
   </div>
@@ -30,6 +32,7 @@ export default {
     'ni-event-history': NiEventHistory,
     'ni-button': Button,
   },
+  emits: ['toggle-history', 'update-feeds'],
   computed: {
     height () {
       return window.innerHeight - this.top;

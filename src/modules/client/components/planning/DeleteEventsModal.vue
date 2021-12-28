@@ -1,18 +1,19 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input" title="Suppression d'interventions sur une période">
+  <ni-modal :model-value="value" @hide="hide" @update:model-value="input"
+    title="Suppression d'interventions sur une période">
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer"
-      :options="getCustomersOptions(deletedEvents.startDate)" required-field @blur="$v.deletedEvents.customer.$touch"
-      :error="$v.deletedEvents.customer.$error" />
+      :options="getCustomersOptions(deletedEvents.startDate)" required-field @blur="v$.deletedEvents.customer.$touch"
+      :error="v$.deletedEvents.customer.$error" />
     <ni-option-group :display-caption="false" v-model="deletedEvents.inRange" type="radio"
       :options="deletetionOptions" inline />
     <template v-if="deletedEvents.inRange">
-      <q-checkbox :value="isCustomerAbsence" label="Créer une absence bénéficiaire" dense class="q-mb-md"
-        @input="allowCustomerAbsenceCreation" />
+      <q-checkbox :model-value="isCustomerAbsence" label="Créer une absence bénéficiaire" dense class="q-mb-md"
+        @update:model-value="allowCustomerAbsenceCreation" />
       <ni-select in-modal v-if="isCustomerAbsence" v-model="deletedEvents.absenceType" caption="Motif de l'absence"
-        :options="customerAbsenceOptions" required-field @blur="$v.deletedEvents.absenceType.$touch"
-        :error="$v.deletedEvents.absenceType.$error" />
+        :options="customerAbsenceOptions" required-field @blur="v$.deletedEvents.absenceType.$touch"
+        :error="v$.deletedEvents.absenceType.$error" />
       <ni-date-range caption="Dates de début et de fin" required-field v-model="deletedEvents" @blur="validateDates"
-        :error="$v.deletedEvents.startDate.$error || $v.deletedEvents.endDate.$error" />
+        :error="v$.deletedEvents.startDate.$error || v$.deletedEvents.endDate.$error" />
     </template>
     <template v-else>
       <ni-date-input caption="Date d'arrêt des interventions" v-model="deletedEvents.startDate" type="date"
@@ -26,7 +27,7 @@
 </template>
 
 <script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Events from '@api/Events';
@@ -38,10 +39,13 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { LEAVE, HOSPITALIZATION, OTHER } from '@data/constants';
+import useVuelidate from '@vuelidate/core';
 
 export default {
   name: 'DeleteEventsModal',
+  setup () { return { v$: useVuelidate() }; },
   mixins: [planningModalMixin, validationMixin],
+  emits: ['hide', 'update:model-value'],
   components: {
     'ni-modal': Modal,
     'ni-select': Select,
@@ -87,11 +91,11 @@ export default {
   methods: {
     hide () {
       this.deletedEvents = { inRange: true };
-      this.$v.deletedEvents.$reset();
+      this.v$.deletedEvents.$reset();
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     validateEventsDeletion () {
       this.$q.dialog({
@@ -107,14 +111,14 @@ export default {
       if (!this.isCustomerAbsence) this.deletedEvents = { ...omit(this.deletedEvents, 'absenceType') };
     },
     validateDates () {
-      this.$v.deletedEvents.startDate.$touch();
-      this.$v.deletedEvents.endDate.$touch();
+      this.v$.deletedEvents.startDate.$touch();
+      this.v$.deletedEvents.endDate.$touch();
     },
     async deleteEvents () {
       try {
         this.loading = true;
-        this.$v.deletedEvents.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.deletedEvents);
+        this.v$.deletedEvents.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.deletedEvents);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         await Events.deleteList(omit(this.deletedEvents, 'inRange'));

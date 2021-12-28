@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :model-value="modelValue" @hide="hide" @input="input" @show="show">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" @show="show">
     <template #title>
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>

@@ -1,10 +1,10 @@
 <template>
-    <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
+    <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
       <template #title>
         Historique du service <span class="text-weight-bold">{{ selectedService.name }}</span>
       </template>
       <ni-responsive-table class="q-mb-sm" :data="selectedService.versions" :columns="serviceColumns"
-        :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns" />
+        v-model:pagination="paginationHistory" :visible-columns="visibleHistoryColumns" />
     </ni-modal>
 </template>
 
@@ -20,10 +20,11 @@ export default {
     'ni-responsive-table': ReponsiveTable,
   },
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     selectedService: { type: Object, required: true },
     serviceColumns: { type: Array, required: true },
   },
+  emits: ['update:model-value', 'hide'],
   data () {
     return {
       FIXED,
@@ -40,7 +41,7 @@ export default {
       this.$emit('hide');
     },
     input () {
-      this.$emit('input');
+      this.$emit('update:model-value');
     },
   },
 };

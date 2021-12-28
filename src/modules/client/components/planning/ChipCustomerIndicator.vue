@@ -1,6 +1,6 @@
 <template>
   <div class="person-inner-cell flex-column">
-    <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('fL') }}</div>
+    <div class="person-name overflow-hidden-nowrap">{{ formatIdentity(person.identity, 'fL') }}</div>
     <div :class="[!staffingView && 'q-mb-sm']">
       <div class="chip-container">
         <q-chip small>
@@ -9,7 +9,7 @@
         </q-chip>
       </div>
     </div>
-    <div class="referent-name overflow-hidden-nowrap">{{ getReferent(person) | formatIdentity('Fl') }}</div>
+    <div class="referent-name overflow-hidden-nowrap">{{ formatIdentity(getReferent(person), 'Fl') }}</div>
   </div>
 </template>
 
@@ -40,6 +40,7 @@ export default {
     },
   },
   methods: {
+    formatIdentity,
     getReferent (person) {
       const referentHistory = person.referentHistories
         .filter(rh => moment(this.startOfWeek).isSameOrAfter(rh.startDate) &&
@@ -51,9 +52,6 @@ export default {
     getAvatar (picture) {
       return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
-  },
-  filters: {
-    formatIdentity,
   },
 };
 </script>

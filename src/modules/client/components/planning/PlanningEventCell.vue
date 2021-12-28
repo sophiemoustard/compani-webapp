@@ -60,6 +60,7 @@ export default {
     personKey: { type: String, default: AUXILIARY },
     inModal: { type: Boolean, default: false },
   },
+  emits: ['drag', 'click'],
   data () {
     return {
       STAFFING_PERCENTAGE_BY_MINUTES,

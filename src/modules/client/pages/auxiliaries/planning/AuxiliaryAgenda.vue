@@ -20,14 +20,14 @@
     </div>
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event="newEvent"
+    <ni-event-creation-modal :validations="eventValidation.newEvent" :loading="loading" :new-event="newEvent"
       :person-key="personKey" :creation-modal="creationModal" :internal-hours="internalHours"
       :active-auxiliaries="activeAuxiliaries" :customers="customers" @reset="resetCreationForm"
       @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
       @submit="validateCreationEvent" @close="closeCreationModal" @update-event="setEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
+    <ni-event-edition-modal :validations="eventValidation.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
       @document-uploaded="documentUploaded" @submit="validateEventEdition" @delete-event="validateEventDeletion"
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
@@ -52,6 +53,7 @@ import Agenda from 'src/modules/client/components/planning/Agenda';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
+import { usePlanningAction } from 'src/modules/client/composables/planningAction';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
@@ -65,6 +67,13 @@ export default {
     'ni-event-edition-modal': EventEditionModal,
     'ni-select': Select,
   },
+  setup () {
+    const personKey = ref(AUXILIARY);
+    const customers = ref([]);
+    const { newEvent, editedEvent, eventValidation } = usePlanningAction(personKey, customers);
+
+    return { personKey, newEvent, editedEvent, customers, eventValidation };
+  },
   mixins: [planningTimelineMixin, planningActionMixin],
   data () {
     return {
@@ -73,16 +82,12 @@ export default {
       height: 0,
       selectedAuxiliary: {},
       auxiliaries: [],
-      customers: [],
       internalHours: [],
       loading: false,
       viewMode: WEEK_VIEW,
       AGENDA,
-      newEvent: {},
       creationModal: false,
-      editedEvent: {},
       editionModal: false,
-      personKey: AUXILIARY,
     };
   },
   computed: {
