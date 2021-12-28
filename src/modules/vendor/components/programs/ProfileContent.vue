@@ -6,7 +6,7 @@
         <span class="published-sub-program bg-green-600" v-if="isPublished(subProgram)">Publié</span>
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
-        @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
+        @blur="updateSubProgramName(index)" :error="v$.program.subPrograms.$each[index].name.$error"
         :disable="isPublished(subProgram)" />
       <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
         :disabled="$q.platform.is.mobile || isPublished(subProgram)">
@@ -85,26 +85,27 @@
       @click="subProgramCreationModal = true" />
 
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
-      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program.sync="newSubProgram" />
+      :validations="v$.newSubProgram" @hide="resetSubProgramCreationModal" v-model:new-sub-program="newSubProgram" />
 
-    <step-addition-modal v-model="stepAdditionModal" :new-step.sync="newStep" :reused-step.sync="reusedStep"
-      @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" :addition-type.sync="additionType"
-      :program="program" :validations="$v" :sub-program-id="currentSubProgramId" />
+    <step-addition-modal v-model="stepAdditionModal" v-model:new-step="newStep" v-model:reused-step="reusedStep"
+      @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" v-model:addition-type="additionType"
+      :program="program" :validations="v$" :sub-program-id="currentSubProgramId" />
 
-    <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
+    <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="v$.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
-    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity" :loading="modalLoading"
-      @hide="resetActivityCreationModal" @submit="createActivity" :validations="$v.newActivity" />
+    <activity-creation-modal v-model="activityCreationModal" v-model:new-activity="newActivity" :loading="modalLoading"
+      @hide="resetActivityCreationModal" @submit="createActivity" :validations="v$.newActivity" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
-      :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
-      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
+      :loading="modalLoading" :validations="v$.reusedActivity" :same-step-activities="sameStepActivities"
+      v-model:reused-activity="reusedActivity" @hide="resetActivityReuseModal"
+      @submit-duplication="duplicateActivity" />
 
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
       :company-options="companyOptions" @hide="resetPublication" />
 
-    <validate-unlocking-step-modal :value="validateUnlockingEditionModal" @cancel="cancelUnlocking"
+    <validate-unlocking-step-modal :model-value="validateUnlockingEditionModal" @cancel="cancelUnlocking"
       :sub-programs-grouped-by-program="subProgramsReusingStepToBeUnlocked" @hide="resetValidateUnlockingEditionModal"
       @confirm="confirmUnlocking" :is-step-published="stepToBeUnlocked.status === PUBLISHED" />
   </div>
@@ -113,7 +114,8 @@
 <script>
 import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
@@ -161,6 +163,9 @@ export default {
     'validate-unlocking-step-modal': ValidateUnlockingStepModal,
     draggable,
     'published-dot': PublishedDot,
+  },
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -276,8 +281,8 @@ export default {
         const subProgramId = get(this.program.subPrograms[index], '_id');
 
         if (this.tmpInput === subProgramName) return;
-        this.$v.program.$touch();
-        if (this.$v.program.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.program.$touch();
+        if (this.v$.program.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await SubPrograms.update(subProgramId, { name: subProgramName });
         NotifyPositive('Modification enregistrée.');
@@ -294,8 +299,8 @@ export default {
     async createSubProgram () {
       try {
         this.modalLoading = true;
-        this.$v.newSubProgram.$touch();
-        if (this.$v.newSubProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newSubProgram.$touch();
+        if (this.v$.newSubProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
         await Programs.addSubProgram(this.profileId, this.newSubProgram);
         NotifyPositive('Sous-programme créé.');
 
@@ -312,7 +317,7 @@ export default {
     resetSubProgramCreationModal () {
       this.subProgramCreationModal = false;
       this.newSubProgram.name = '';
-      this.$v.newSubProgram.$reset();
+      this.v$.newSubProgram.$reset();
     },
     // STEP
     async openStepAdditionModal (subProgramId) {
@@ -327,14 +332,14 @@ export default {
         this.modalLoading = true;
 
         if (this.additionType === CREATE_STEP) {
-          this.$v.newStep.$touch();
-          if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+          this.v$.newStep.$touch();
+          if (this.v$.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
           NotifyPositive('Étape créée.');
         } else {
-          this.$v.reusedStep.$touch();
-          if (this.$v.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+          this.v$.reusedStep.$touch();
+          if (this.v$.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep._id });
           this.setStepLocking(this.reusedStep, true);
@@ -354,8 +359,8 @@ export default {
       this.newStep.name = '';
       this.additionType = CREATE_STEP;
       this.reusedStep = { _id: '', program: '' };
-      this.$v.newStep.$reset();
-      this.$v.reusedStep.$reset();
+      this.v$.newStep.$reset();
+      this.v$.reusedStep.$reset();
     },
     // step edition
     async openStepEditionModal (step) {
@@ -370,8 +375,8 @@ export default {
     async editStep () {
       try {
         this.modalLoading = true;
-        this.$v.editedStep.$touch();
-        if (this.$v.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedStep.$touch();
+        if (this.v$.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['name']));
         this.stepEditionModal = false;
@@ -386,7 +391,7 @@ export default {
     },
     resetStepEditionModal () {
       this.editedStep = { name: '' };
-      this.$v.editedStep.$reset();
+      this.v$.editedStep.$reset();
     },
     // ACTIVITY
     goToActivityProfile (subProgram, step, activity) {
@@ -408,8 +413,8 @@ export default {
     async createActivity () {
       try {
         this.modalLoading = true;
-        this.$v.newActivity.$touch();
-        if (this.$v.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newActivity.$touch();
+        if (this.v$.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
         await Steps.addActivity(this.currentStepId, this.newActivity);
         NotifyPositive('Activitée créée.');
 
@@ -424,7 +429,7 @@ export default {
     },
     resetActivityCreationModal () {
       this.newActivity.name = '';
-      this.$v.newActivity.$reset();
+      this.v$.newActivity.$reset();
     },
     // activity reuse
     openActivityReuseModal (step) {
@@ -447,8 +452,8 @@ export default {
       try {
         this.modalLoading = true;
 
-        this.$v.reusedActivity.$touch();
-        if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.reusedActivity.$touch();
+        if (this.v$.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Steps.reuseActivity(this.currentStepId, { activities: this.reusedActivity });
         this.activityReuseModal = false;
@@ -465,8 +470,8 @@ export default {
       try {
         this.modalLoading = true;
 
-        this.$v.reusedActivity.$touch();
-        if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.reusedActivity.$touch();
+        if (this.v$.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Steps.addActivity(this.currentStepId, { activityId: this.reusedActivity });
         this.activityReuseModal = false;
@@ -481,7 +486,7 @@ export default {
     },
     resetActivityReuseModal () {
       this.reusedActivity = '';
-      this.$v.reusedActivity.$reset();
+      this.v$.reusedActivity.$reset();
     },
     validateStepDetachment (subProgramId, stepId) {
       this.$q.dialog({

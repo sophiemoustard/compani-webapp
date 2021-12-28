@@ -5,7 +5,7 @@
         <p class="text-weight-bold table-title">Testeurs</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="testers" :columns="columns" :pagination.sync="pagination">
+        <ni-responsive-table :data="testers" :columns="columns" v-model:pagination="pagination">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -25,14 +25,15 @@
       </q-card>
     </div>
 
-    <tester-creation-modal v-model="testerCreationModal" :new-tester.sync="newTester" :validations="$v.newTester"
+    <tester-creation-modal v-model="testerCreationModal" v-model:new-tester="newTester" :validations="v$.newTester"
       :first-step="firstStep" :loading="modalLoading" @next-step="nextStepTesterCreationModal"
       @hide="resetTesterCreationModal" @submit="addTester" />
   </div>
 </template>
 
 <script>
-import { required, email } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import { TRAINEE } from '@data/constants';
 import { formatPhone } from '@helpers/utils';
@@ -58,6 +59,10 @@ export default {
     'ni-button': Button,
     'tester-creation-modal': TesterCreationModal,
     'ni-responsive-table': ResponsiveTable,
+  },
+  emits: ['refresh'],
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -110,8 +115,8 @@ export default {
   methods: {
     async nextStepTesterCreationModal () {
       try {
-        this.$v.newTester.local.email.$touch();
-        if (this.$v.newTester.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
+        this.v$.newTester.local.email.$touch();
+        if (this.v$.newTester.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         const userInfo = await Users.exists({ email: this.newTester.local.email });
@@ -134,8 +139,8 @@ export default {
     },
     async addTester () {
       try {
-        this.$v.newTester.$touch();
-        if (this.$v.newTester.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newTester.$touch();
+        if (this.v$.newTester.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         await Programs.addTester(this.programId, this.newTester);
@@ -169,7 +174,7 @@ export default {
         identity: { firstname: '', lastname: '' },
         contact: { phone: '' },
       };
-      this.$v.newTester.$reset();
+      this.v$.newTester.$reset();
     },
     validateTesterDeletion (testerId) {
       this.$q.dialog({
@@ -195,6 +200,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .table-title
-    flex: 1
+.table-title
+  flex: 1
 </style>
