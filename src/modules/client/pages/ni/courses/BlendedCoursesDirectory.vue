@@ -3,8 +3,8 @@
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
-      <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
-      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
+      <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" clearable />
+      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" clearable />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />

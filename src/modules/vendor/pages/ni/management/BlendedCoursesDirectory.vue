@@ -3,11 +3,11 @@
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
-      <ni-select :options="companyFilterOptions" :model-value="selectedCompany"
+      <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
         @update:model-value="updateSelectedCompany" />
-      <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer"
+      <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
         @update:model-value="updateSelectedTrainer" />
-      <ni-select :options="programFilterOptions" :model-value="selectedProgram"
+      <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
       <ni-select :options="salesRepresentativesFilterOptions" :model-value="selectedSalesRepresentative"
         @update:model-value="updateSelectedSalesRepresentative" />

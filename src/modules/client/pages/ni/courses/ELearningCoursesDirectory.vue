@@ -2,7 +2,7 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Formations eLearning" search-placeholder="Rechercher une formation"
       @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
       @go-to="goToELearningCourseProfile" />
   </q-page>
 </template>

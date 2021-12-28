@@ -2,22 +2,22 @@
   <div class="course-link">
     <ni-bi-color-button icon="file_download" label="Convocation papier" :disable="disableLink" size="16px"
       @click="$emit('download')" />
-    <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
-      v-clipboard:copy="!disableLink && courseLink()" v-clipboard:success="handleCopySuccess" />
+    <!-- <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
+      v-clipboard:copy="!disableLink && courseLink()" v-clipboard:success="handleCopySuccess" /> -->
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import { NotifyPositive } from '@components/popup/notify';
-import Button from '@components/Button';
+// import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
 import Courses from '@api/Courses';
 
 export default {
   name: 'CourseInfoLink',
   components: {
-    'ni-button': Button,
+    // 'ni-button': Button,
     'ni-bi-color-button': BiColorButton,
   },
   props: {

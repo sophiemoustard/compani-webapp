@@ -1,16 +1,10 @@
-import escapeRegExp from 'lodash/escapeRegExp';
-import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
-import Users from '@api/Users';
-import { dateDiff, formatDateDiff } from '@helpers/date';
+import { sortStrings } from '@helpers/utils';
+import { formatDateDiff } from '@helpers/date';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 export const learnerDirectoryMixin = {
   data () {
     return {
-      searchStr: '',
-      tableLoading: false,
-      learnerList: [],
       pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
       columns: [
         {
@@ -55,69 +49,12 @@ export const learnerDirectoryMixin = {
       ],
     };
   },
-  computed: {
-    filteredLearners () {
-      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
-
-      return this.learnerList.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
-    },
-  },
   methods: {
     updateSearch (value) {
       this.searchStr = value;
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
-    },
-    getDaysSinceLastActivityHistory (lastActivityHistory) {
-      if (!lastActivityHistory) return null;
-
-      return dateDiff(Date.now(), lastActivityHistory.updatedAt);
-    },
-    formatRow (user) {
-      const formattedName = formatIdentity(user.identity, 'FL');
-
-      return {
-        learner: {
-          _id: user._id,
-          fullName: formattedName,
-          lastname: user.identity.lastname,
-          picture: user.picture ? user.picture.link : null,
-          noDiacriticsName: removeDiacritics(formattedName),
-        },
-        company: user.company ? user.company.name : 'N/A',
-        blendedCoursesCount: user.blendedCoursesCount,
-        eLearningCoursesCount: user.eLearningCoursesCount,
-        activityHistoryCount: user.activityHistoryCount,
-        daysSinceLastActivityHistory: this.getDaysSinceLastActivityHistory(user.lastActivityHistory),
-      };
-    },
-    async getLearnerList (companyId = null) {
-      try {
-        this.tableLoading = true;
-        const learners = await Users.learnerList(companyId ? { company: companyId } : {});
-        this.learnerList = Object.freeze(learners.map(this.formatRow));
-      } catch (e) {
-        console.error(e);
-        this.learnerList = [];
-      } finally {
-        this.tableLoading = false;
-      }
-    },
-    async submitLearnerCreationModal () {
-      this.$v.newLearner.$touch();
-      if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
-
-      try {
-        this.learnerCreationModalLoading = true;
-        await this.createLearner();
-        await this.getLearnerList(this.isClientInterface ? this.company._id : null);
-        this.learnerCreationModal = false;
-      } catch (e) {
-        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
-      } finally {
-        this.learnerCreationModalLoading = false;
-      }
     },
   },
 };

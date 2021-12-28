@@ -16,7 +16,7 @@
         <ni-input in-modal :model-value="newUser.contact.phone" :last="!displayCompany" required-field
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" @update:model-value="update($event.trim(), 'contact.phone')" />
-        <ni-select v-if="displayCompany" in-modal :options="companyOptions" :value="newUser.company"
+        <ni-select v-if="displayCompany" in-modal :options="companyOptions" :model-value="newUser.company"
           @update:model-value="update($event.trim(), 'company')" caption="Structure" last required-field
           @blur="validations.company.$touch" :error="validations.company.$error" :disable="disableCompany" />
       </template>

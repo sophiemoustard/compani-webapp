@@ -139,8 +139,8 @@ export default {
   },
   mixins: [tableMixin],
   setup () {
-    const store = useStore();
-    const customer = computed(() => store.state.customer.customer);
+    const $store = useStore();
+    const customer = computed(() => $store.state.customer.customer);
 
     const {
       billingDates,

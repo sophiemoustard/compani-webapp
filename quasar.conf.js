@@ -99,6 +99,7 @@ module.exports = configure(ctx => ({
         '@helpers': path.resolve(__dirname, './src/core/helpers'),
         '@data': path.resolve(__dirname, './src/core/data'),
         '@mixins': path.resolve(__dirname, './src/core/mixins'),
+        '@composables': path.resolve(__dirname, './src/core/composables'),
       };
       cfg.plugins.push(
         new ESLintPlugin({ fix: true }),

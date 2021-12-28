@@ -53,9 +53,7 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     tabsContent () {
-      if (this.isIntraCourse) {
-        return [this.organizationTab, this.adminTab, this.traineeFollowUpTab];
-      }
+      if (this.isIntraCourse) return [this.organizationTab, this.adminTab, this.traineeFollowUpTab];
 
       return [this.organizationTab, this.traineeFollowUpTab];
     },

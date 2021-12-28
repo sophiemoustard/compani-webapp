@@ -5,7 +5,7 @@
       <p class="text-italic">Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation</p>
       <div class="row gutter-profile">
         <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
-          @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived"
+          @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived" clearable
           error-message="Numéro de téléphone manquant, veuillez le renseigner" />
       </div>
     </div>
@@ -23,7 +23,7 @@
           les attestations de fin de formation.
         </template>
       </ni-banner>
-      <!-- <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" /> -->
+      <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
         :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       <ni-bi-color-button icon="file_download" label="Attestations de fin de formation"
