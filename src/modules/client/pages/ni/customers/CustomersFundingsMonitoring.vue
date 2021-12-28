@@ -13,7 +13,7 @@
             </div>
             <div class="col-xs-12 col-sm-6">
               <ni-select class="q-pl-sm" :options="thirdPartyPayerOptions" v-model="selectedThirdPartyPayer"
-                @input="onInputThirdPartyPayer" allow-null-option caption="Financeur" />
+                @update:model-value="onInputThirdPartyPayer" allow-null-option caption="Financeur" />
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { minLength } from 'vuelidate/lib/validators';
+import { minLength } from '@vuelidate/validators';
 import { REQUIRED_LABEL } from '@data/constants';
 
 export const passwordMixin = {

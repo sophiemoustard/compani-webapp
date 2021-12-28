@@ -6,7 +6,7 @@
       </template>
       <template #content>
         <div class="col-xs-12 col-md-6 on-left">
-          <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" />
+          <ni-select :options="balancesOptions" v-model="balancesOption" @update:model-value="resetSelected" />
         </div>
       </template>
     </ni-title-header>
@@ -16,8 +16,8 @@
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <q-th auto-width>
-            <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" dense
-              :disable="balancesOption === 2" />
+            <q-checkbox @update:model-value="selectRows(props.selected)" v-model="props.selected" dense
+              :disable="balancesOption === 2" indeterminate-value="some" />
           </q-th>
         </q-tr>
       </template>

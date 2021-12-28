@@ -5,8 +5,9 @@
         <div class="col-xs-12 col-sm-5 person-name">
           <template v-if="Object.keys(selectedAuxiliary).length > 0">
             <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-            <ni-select :value="selectedAuxiliary._id" :options="auxiliariesOptions" @input="updateAuxiliary" no-error
-              ref="personSelect" behavior="menu" icon="swap_vert" class="person-name-select" data-cy="agenda-search" />
+            <ni-select :model-value="selectedAuxiliary._id" :options="auxiliariesOptions" no-error
+              ref="personSelect" behavior="menu" icon="swap_vert" class="person-name-select" data-cy="agenda-search"
+              @update:model-value="updateAuxiliary" />
           </template>
         </div>
         <div class="col-xs-12 col-sm-7">

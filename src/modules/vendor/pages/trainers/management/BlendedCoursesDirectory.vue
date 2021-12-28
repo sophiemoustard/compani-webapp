@@ -3,10 +3,12 @@
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
-      <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" clearable />
-      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" clearable />
+      <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
+        @update:model-value="updateSelectedCompany" />
+      <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
+        @update:model-value="updateSelectedProgram" />
       <ni-select :options="salesRepresentativesFilterOptions" clearable
-        :value="selectedSalesRepresentative" @input="updateSelectedSalesRepresentative" />
+        :model-value="selectedSalesRepresentative" @update:model-value="updateSelectedSalesRepresentative" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />

@@ -3,7 +3,7 @@
     <ni-title-header title="Absences" padding>
       <template #content>
         <div class="col-xs-12 col-md-6">
-          <ni-date-range v-model="dates" @input="refresh" v-model:error="datesHasError" />
+          <ni-date-range v-model="dates" @blur="refresh" v-model:error="datesHasError" />
         </div>
       </template>
     </ni-title-header>

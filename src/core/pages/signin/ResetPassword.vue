@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { sameAs, required, requiredIf } from 'vuelidate/lib/validators';
+import { sameAs, required, requiredIf } from '@vuelidate/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Authentication from '@api/Authentication';
@@ -65,7 +65,7 @@ export default {
     return {
       password: { required, ...this.passwordValidation },
       passwordConfirm: {
-        required: requiredIf(item => item.password),
+        required: requiredIf(!!this.passwordConfirm.password),
         sameAsPassword: sameAs('password'),
       },
     };

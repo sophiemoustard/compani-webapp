@@ -19,7 +19,7 @@
 
 <script>
 import useVuelidate from '@vuelidate/core';
-import { email, required } from 'vuelidate/lib/validators';
+import { email, required } from '@vuelidate/validators';
 import Authentication from '@api/Authentication';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';

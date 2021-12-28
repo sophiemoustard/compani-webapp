@@ -12,7 +12,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Abonnements</p>
       <q-checkbox dense v-model="company.subscriptions.erp" color="primary" label="ERP"
-        @input="updateCompany('subscriptions.erp')" />
+        @update:model-value="updateCompany('subscriptions.erp')" />
     </div>
     <ni-coach-list :company="company" />
   </div>

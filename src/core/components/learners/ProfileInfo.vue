@@ -40,7 +40,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import PictureUploader from '@components/PictureUploader';
 import { userMixin } from '@mixins/userMixin';
-import { required, email } from 'vuelidate/lib/validators';
+import { required, email } from '@vuelidate/validators';
 import { AUXILIARY_ROLES } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
