@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { required, requiredIf, maxLength, minLength, email } from 'vuelidate/lib/validators';
+import { required, requiredIf, maxLength, minLength, email } from '@vuelidate/validators';
 import {
   frAddress,
   iban,

@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import AdministrativeDocuments from '@api/AdministrativeDocuments';
 import GoogleDrive from '@api/GoogleDrive';
@@ -30,14 +31,15 @@ import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 import Button from '@components/Button';
 
+const metaInfo = { title: 'Documents' };
+
 export default {
-  metaInfo: { title: 'Documents' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
   },
-
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       pagination: { sortBy: 'title', descending: false, rowsPerPage: 0 },
@@ -50,7 +52,7 @@ export default {
       docLoading: false,
     };
   },
-  async mounted () {
+  async created () {
     try {
       this.loading = true;
       this.documents = await AdministrativeDocuments.list();

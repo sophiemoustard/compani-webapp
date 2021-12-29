@@ -4,8 +4,8 @@
       <img :src="avatar" class="avatar">
       <div class="person-name-text" v-if="options.length === 0">{{ formattedIdentity }}</div>
       <div v-else :class="{ 'col-md-6': $q.platform.is.desktop }" class="person-name-select">
-        <ni-select no-border :value="value" :options="options" @update:value="input" no-error icon="swap_vert"
-          :disable="disable" />
+        <ni-select no-border :model-value="modelValue" :options="options" @update:model-value="input" no-error
+          :disable="disable" icon="swap_vert" />
       </div>
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
@@ -24,7 +24,7 @@ import { UNKNOWN_AVATAR, DEFAULT_AVATAR } from '@data/constants';
 export default {
   name: 'PlanningModalHeader',
   props: {
-    value: { type: String, default: '' },
+    modelValue: { type: String, default: '' },
     options: { type: Array, default: () => [] },
     selectedPerson: { type: Object, default: () => ({}) },
     disable: { type: Boolean, default: false },
@@ -33,7 +33,7 @@ export default {
     'ni-select': Select,
     'ni-button': Button,
   },
-  emits: ['close', 'update-value'],
+  emits: ['close', 'update:model-value'],
   computed: {
     formattedIdentity () {
       return formatIdentity(this.selectedPerson.identity, 'FL');
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     input (event) {
-      this.$emit('update-value', event);
+      this.$emit('update:model-value', event);
     },
     close () {
       this.$emit('close');

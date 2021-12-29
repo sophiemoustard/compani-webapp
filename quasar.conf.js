@@ -74,7 +74,7 @@ module.exports = configure(ctx => ({
       'QUploader',
     ],
     directives: ['Ripple', 'ClosePopup'],
-    plugins: ['Notify', 'Cookies', 'Loading', 'Dialog', 'LocalStorage'],
+    plugins: ['Notify', 'Cookies', 'Loading', 'Dialog', 'LocalStorage', 'Meta'],
   },
   animations: ['fadeIn', 'fadeOut'],
   supportIE: true,

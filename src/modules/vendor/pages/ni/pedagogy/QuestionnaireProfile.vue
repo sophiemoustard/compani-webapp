@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
@@ -16,6 +17,8 @@ import ProfileTabs from '@components/ProfileTabs';
 import { DRAFT, QUESTIONNAIRE_TYPES } from '@data/constants';
 import ProfileEdition from 'src/modules/vendor/components/questionnaires/ProfileEdition';
 import ProfileAnswers from 'src/modules/vendor/components/questionnaires/ProfileAnswers';
+
+const metaInfo = { title: 'Fiche questionnaire' };
 
 export default {
   name: 'QuestionnaireProfile',
@@ -27,6 +30,7 @@ export default {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tabsContent: [

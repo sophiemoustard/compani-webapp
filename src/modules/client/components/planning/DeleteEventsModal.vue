@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :model-value="value" @hide="hide" @update:model-value="input"
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input"
     title="Suppression d'interventions sur une période">
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer"
       :options="getCustomersOptions(deletedEvents.startDate)" required-field @blur="v$.deletedEvents.customer.$touch"
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -39,7 +40,6 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { LEAVE, HOSPITALIZATION, OTHER } from '@data/constants';
-import useVuelidate from '@vuelidate/core';
 
 export default {
   name: 'DeleteEventsModal',
@@ -53,7 +53,7 @@ export default {
     'ni-date-range': DateRange,
   },
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     customers: { type: Array, default: () => [] },
   },
   validations () {

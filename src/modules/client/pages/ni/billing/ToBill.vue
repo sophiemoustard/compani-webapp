@@ -60,12 +60,13 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { mapGetters } from 'vuex';
 import capitalize from 'lodash/capitalize';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
-import { mapGetters } from 'vuex';
 import Bills from '@api/Bills';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import Teletransmission from '@api/Teletransmission';
@@ -86,7 +87,6 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ToBill',
-  metaInfo: { title: 'A facturer' },
   mixins: [tableMixin],
   components: {
     'ni-to-bill-row': ToBillRow,
@@ -97,7 +97,12 @@ export default {
     'ni-title-header': TitleHeader,
     'delivery-download-modal': DeliveryDownloadModal,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'À facturer' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       tableLoading: false,

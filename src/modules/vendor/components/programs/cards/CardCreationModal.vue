@@ -105,7 +105,7 @@ export default {
   components: {
     'ni-modal': Modal,
   },
-  emits: ['hide', 'input', 'submit'],
+  emits: ['hide', 'update:model-value', 'submit'],
   data () {
     return {
       CARD_TEMPLATES,
@@ -137,7 +137,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit (template) {
       this.$emit('submit', template);

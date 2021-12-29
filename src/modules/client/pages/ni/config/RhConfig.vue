@@ -159,6 +159,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
 import useVuelidate from '@vuelidate/core';
@@ -186,7 +187,6 @@ import SectorEditionModal from 'src/modules/client/components/config/SectorEditi
 
 export default {
   name: 'RhConfig',
-  metaInfo: { title: 'Configuration rh' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-button': Button,
@@ -198,7 +198,12 @@ export default {
     'sector-creation-modal': SectorCreationModal,
     'sector-edition-modal': SectorEditionModal,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Configuration rh' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
     return {

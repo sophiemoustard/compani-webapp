@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required, email, requiredIf } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -80,7 +81,6 @@ import PartnerEditionModal from 'src/modules/client/components/customers/Partner
 import { JOB_OPTIONS } from '@data/constants';
 
 export default {
-  metaInfo: { title: 'Fiche structure partenaire' },
   props: {
     partnerOrganizationId: { type: String, required: true },
   },
@@ -93,7 +93,12 @@ export default {
     'partner-creation-modal': PartnerCreationModal,
     'partner-edition-modal': PartnerEditionModal,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Fiche structure partenaire' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   mixins: [validationMixin, partnerOrganizationMixin],
   data () {
     return {

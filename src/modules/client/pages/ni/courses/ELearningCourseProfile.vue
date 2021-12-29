@@ -6,11 +6,14 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import { NotifyNegative } from '@components/popup/notify';
+
+const metaInfo = { title: 'Fiche formation' };
 
 export default {
   name: 'ELearningCourseProfile',
@@ -21,6 +24,7 @@ export default {
   props: {
     courseId: { type: String, required: true },
   },
+  mixins: [createMetaMixin(metaInfo)],
   computed: {
     ...mapState('course', ['course']),
     courseName () {

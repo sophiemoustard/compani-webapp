@@ -95,6 +95,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import Pay from '@api/Pay';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -109,10 +110,11 @@ import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurch
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
 
+const metaInfo = { title: 'Paie mensuelle' };
+
 export default {
   name: 'ToPay',
-  metaInfo: { title: 'Paie mensuelle' },
-  mixins: [payMixin, editableTdMixin],
+  mixins: [payMixin, editableTdMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-select': Select,
     'ni-select-sector': SelectSector,

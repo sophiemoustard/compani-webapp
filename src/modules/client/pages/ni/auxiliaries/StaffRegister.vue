@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import Contracts from '@api/Contracts';
 import GoogleDrive from '@api/GoogleDrive';
@@ -32,14 +33,16 @@ import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
 import { formatDate } from '@helpers/date';
 
+const metaInfo = { title: 'Registre unique du personnel' };
+
 export default {
   name: 'StaffRegister',
-  metaInfo: { title: 'Registre unique du personnel' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       staffRegister: [],
@@ -99,7 +102,7 @@ export default {
       docLoading: false,
     };
   },
-  async mounted () {
+  async created () {
     await this.getStaffRegister();
   },
   methods: {

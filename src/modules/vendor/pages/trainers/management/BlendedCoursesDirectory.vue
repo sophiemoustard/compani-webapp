@@ -23,11 +23,13 @@ import Trello from '@components/courses/Trello';
 import Select from '@components/form/Select';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED } from '@data/constants';
+import { createMetaMixin } from 'quasar';
+
+const metaInfo = { title: 'Catalogue' };
 
 export default {
-  metaInfo: { title: 'Catalogue' },
   name: 'BlendedCoursesDirectory',
-  mixins: [courseFiltersMixin],
+  mixins: [courseFiltersMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
@@ -57,7 +59,7 @@ export default {
     },
   },
   beforeUnmount () {
-    if (this.$router.currentRoute.name !== 'trainers courses info') this.$store.dispatch('course/resetFilters');
+    if (this.$route.name !== 'trainers courses info') this.$store.dispatch('course/resetFilters');
   },
 };
 </script>

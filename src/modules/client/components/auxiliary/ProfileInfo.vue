@@ -508,8 +508,10 @@ export default {
   },
   async created () {
     if (this.isCoach) await Promise.all([this.getAuxiliaryRoles(), this.getEstablishments()]);
-    this.v$.userProfile.$touch();
     this.isLoaded = true;
+  },
+  mounted () {
+    this.v$.userProfile.$touch();
   },
   methods: {
     saveTmp (path) {

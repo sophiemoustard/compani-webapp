@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :value="modelValue" @update:model-value="cancel" @hide="hide">
+  <q-dialog :model-value="modelValue" @update:model-value="cancel" @hide="hide">
     <div class="modal-container-md">
       <div class="modal-padding">
         <div class="modal-title q-mb-lg">Confirmation</div>

@@ -7,19 +7,22 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import Customers from '@api/Customers';
 import escapeRegExp from 'lodash/escapeRegExp';
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 
+const metaInfo = { title: 'Bénéficiaires' };
+
 export default {
   name: 'AuxiliaryCustomersDirectory',
-  metaInfo: { title: 'Bénéficiaires' },
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tableLoading: true,

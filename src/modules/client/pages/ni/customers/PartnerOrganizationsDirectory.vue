@@ -13,7 +13,9 @@
       :validations="v$.newPartnerOrganization" />
   </q-page>
 </template>
+
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required, email, requiredIf } from '@vuelidate/validators';
 import omit from 'lodash/omit';
@@ -31,14 +33,18 @@ import { validationMixin } from '@mixins/validationMixin';
 import PartnerOrganizationCreationModal from 'src/modules/client/components/customers/PartnerOrganizationCreationModal';
 
 export default {
-  metaInfo: { title: 'Structures partenaires' },
   name: 'PartnerOrgarnizationsDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
     'partner-organization-creation-modal': PartnerOrganizationCreationModal,
     'ni-table-list': TableList,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Structures partenaires' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   mixins: [validationMixin],
   data () {
     return {

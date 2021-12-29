@@ -89,6 +89,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import FinalPay from '@api/FinalPay';
 import Button from '@components/Button';
 import EditableTd from '@components/table/EditableTd';
@@ -101,10 +102,11 @@ import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 
+const metaInfo = { title: 'Fins de contract' };
+
 export default {
   name: 'ContractEnds',
-  metaInfo: { title: 'Fins de contract' },
-  mixins: [payMixin, editableTdMixin],
+  mixins: [payMixin, editableTdMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-editable-td': EditableTd,
     'ni-simple-table': SimpleTable,

@@ -29,14 +29,14 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import { required, email } from '@vuelidate/validators';
+import { validationMixin } from '@mixins/validationMixin';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { userMixin } from '@mixins/userMixin';
-import { required, email } from 'vuelidate/lib/validators';
-import { validationMixin } from '@mixins/validationMixin';
 import { TRAINER } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import useVuelidate from '@vuelidate/core';

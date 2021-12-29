@@ -91,7 +91,7 @@ export default {
   },
   data () {
     return {
-      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
+      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.value.path),
       courses: [],
       loading: false,
       pagination: {

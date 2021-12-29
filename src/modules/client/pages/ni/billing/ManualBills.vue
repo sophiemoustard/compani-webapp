@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
@@ -55,13 +56,17 @@ import SimpleTable from '@components/table/SimpleTable';
 
 export default {
   name: 'ManualBills',
-  metaInfo: { title: 'Factures manuelles' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-manual-bill-creation-modal': ManualBillCreationModal,
     'ni-simple-table': SimpleTable,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Factures manuelles' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       rowsPerPage: [1, 5, 15, 50, 100, 200, 300],

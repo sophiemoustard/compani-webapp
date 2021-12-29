@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
@@ -34,12 +35,14 @@ import TitleHeader from '@components/TitleHeader';
 import { DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 
+const metaInfo = { title: 'Contact' };
+
 export default {
   name: 'Contact',
-  metaInfo: { title: 'Contact' },
   components: {
     'ni-title-header': TitleHeader,
   },
+  mixins: [createMetaMixin(metaInfo)],
   computed: {
     ...mapState({
       helper: state => state.main.loggedUser,

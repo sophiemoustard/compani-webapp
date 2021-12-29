@@ -11,8 +11,7 @@
             @click="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
         </q-item-section>
         <q-item-section v-if="isAuxiliaryWithCompany">
-          <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm"
-            @click="clickHandler" />
+          <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm" @click="clickHandler" />
         </q-item-section>
         <q-item-section>
           <ni-button class="person" icon="person" @click="goToProfile" size="sm" />

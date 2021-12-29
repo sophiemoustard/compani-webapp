@@ -6,11 +6,15 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
+
+const metaInfo = {
+  titleTemplate: titleChunk => (titleChunk ? `Compani - ${titleChunk}` : 'Compani'),
+  htmlAttrs: { lang: 'fr' },
+};
+
 export default {
   name: 'App',
-  metaInfo: {
-    titleTemplate: titleChunk => (titleChunk ? `Compani - ${titleChunk}` : 'Compani'),
-    htmlAttrs: { lang: 'fr' },
-  },
+  mixins: [createMetaMixin(metaInfo)],
 };
 </script>

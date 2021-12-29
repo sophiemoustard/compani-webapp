@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { mapState, mapGetters } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import get from 'lodash/get';
@@ -55,7 +56,6 @@ import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/Auxi
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 
 export default {
-  metaInfo: { title: 'Répertoire auxiliaires' },
   name: 'Directory',
   components: {
     'ni-directory-header': DirectoryHeader,
@@ -64,6 +64,9 @@ export default {
   },
   mixins: [validationMixin, userMixin],
   setup () {
+    const metaInfo = { title: 'Répertoire auxiliaires' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {
@@ -294,7 +297,7 @@ export default {
         if (userExistsInfo.exists) {
           const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
           const userHasValidCompany = !get(userExistsInfo, 'user.company') ||
-              get(userExistsInfo, 'user.company') === this.company._id;
+            get(userExistsInfo, 'user.company') === this.company._id;
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
           if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {

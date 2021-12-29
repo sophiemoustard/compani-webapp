@@ -25,6 +25,7 @@ import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { isUserLogged } from '@helpers/alenvi';
+import { useMeta } from 'quasar';
 
 export default {
   components: {
@@ -35,9 +36,10 @@ export default {
     return { v$: useVuelidate() };
   },
   data () {
-    return {
-      email: '',
-    };
+    const metaInfo = { title: 'Mot de passe oublié' };
+    useMeta(metaInfo);
+
+    return { email: '' };
   },
   validations: {
     email: { email, required },

@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
@@ -88,10 +89,11 @@ import moment from '@helpers/moment';
 import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
 import { chartMixin } from '@mixins/chartMixin';
 
+const metaInfo = { title: 'Tableau de bord des formations' };
+
 export default {
   name: 'CourseDashboard',
-  metaInfo: { title: 'Tableau de bord des formations' },
-  mixins: [chartMixin],
+  mixins: [chartMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-title-header': TitleHeader,
     'ni-date-range': DateRange,

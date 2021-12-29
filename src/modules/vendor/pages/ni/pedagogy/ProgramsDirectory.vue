@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -24,7 +25,6 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { removeDiacritics } from '@helpers/utils';
 
 export default {
-  metaInfo: { title: 'Catalogue' },
   name: 'ProgramDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
@@ -32,6 +32,9 @@ export default {
     'program-creation-modal': ProgramCreationModal,
   },
   setup () {
+    const metaInfo = { title: 'Catalogue' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {

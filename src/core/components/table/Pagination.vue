@@ -1,9 +1,8 @@
 <template>
   <div class="row justify-between full-width text-copper-grey-600">
     <div class="row items-center">
-      <q-btn-toggle class="on-left no-shadow" :model-value="rowsPerPage" :options="rowsPerPageOptions" size="12px"
-        toggle-text-color="primary" toggle-color="white" no-caps dense
-        @update:model-value="update($event, 'rowsPerPage')" />
+      <q-btn-toggle class="on-left no-shadow" :model-value="rowsPerPage" :options="rowsPerPageOptions" dense size="12px"
+        toggle-text-color="primary" toggle-color="white" @update:model-value="update($event, 'rowsPerPage')" no-caps />
       <div>Eléments par page</div>
     </div>
     <div class="row items-center">

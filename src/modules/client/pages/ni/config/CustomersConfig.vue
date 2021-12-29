@@ -199,6 +199,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required, numeric, requiredIf, email } from '@vuelidate/validators';
 import capitalize from 'lodash/capitalize';
@@ -258,7 +259,6 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'CustomersConfig',
-  metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
     'ni-file-uploader': FileUploader,
     'ni-title-header': TitleHeader,
@@ -275,7 +275,12 @@ export default {
     'third-party-payer-edition-modal': ThirdPartyPayerEditionModal,
     'service-history-modal': ServiceHistoryModal,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Configuration bénéficiaire' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
     'editedSurcharge.evening': function (value) {

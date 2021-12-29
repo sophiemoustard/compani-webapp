@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required, email, sameAs } from '@vuelidate/validators';
@@ -73,7 +74,6 @@ import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 
 export default {
   name: 'AccountInfo',
-  metaInfo: { title: 'Mon compte' },
   mixins: [passwordMixin, validationMixin, userMixin],
   components: {
     'ni-title-header': TitleHeader,
@@ -83,6 +83,9 @@ export default {
     'new-password-modal': NewPasswordModal,
   },
   setup () {
+    const metaInfo = { title: 'Mon compte' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {

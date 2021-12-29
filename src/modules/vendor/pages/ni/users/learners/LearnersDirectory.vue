@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import TableList from '@components/table/TableList';
@@ -39,7 +40,6 @@ import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { useLearners } from '@composables/learners';
 
 export default {
-  metaInfo: { title: 'Répertoire apprenants' },
   name: 'LearnersDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
@@ -47,6 +47,9 @@ export default {
     'learner-creation-modal': LearnerCreationModal,
   },
   setup () {
+    const metaInfo = { title: 'Répertoire apprenants' };
+    useMeta(metaInfo);
+
     const $store = useStore();
     const company = computed(() => $store.getters['main/getCompany']);
 

@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { required, requiredIf } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import cloneDeep from 'lodash/cloneDeep';
@@ -71,7 +72,6 @@ import CreditNoteCreationModal from 'src/modules/client/components/customers/bil
 
 export default {
   name: 'CreditNotes',
-  metaInfo: { title: 'Avoirs' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-button': Button,
@@ -79,7 +79,12 @@ export default {
     'credit-note-edition-modal': CreditNoteEditionModal,
     'credit-note-creation-modal': CreditNoteCreationModal,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Avoirs' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       loading: false,

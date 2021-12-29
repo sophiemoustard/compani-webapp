@@ -17,9 +17,13 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
+
+const metaInfo = { title: 'Tags' };
+
 export default {
   name: 'TagConfig',
-  metaInfo: { title: 'Tags' },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       contractTags: {

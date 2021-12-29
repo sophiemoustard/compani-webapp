@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import Exports from '@api/Exports';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -25,13 +26,17 @@ import moment from '@helpers/moment';
 
 export default {
   name: 'History',
-  metaInfo: { title: 'Historique' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-select': Select,
     'ni-date-range': DateRange,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Historique' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       exportTypeOptions: EXPORT_HISTORY_TYPES,

@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
@@ -23,10 +24,11 @@ import Trello from '@components/courses/Trello';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED } from '@data/constants';
 
+const metaInfo = { title: 'Catalogue' };
+
 export default {
-  metaInfo: { title: 'Catalogue' },
   name: 'BlendedCoursesDirectory',
-  mixins: [courseFiltersMixin],
+  mixins: [courseFiltersMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-select': Select,
     'ni-directory-header': DirectoryHeader,

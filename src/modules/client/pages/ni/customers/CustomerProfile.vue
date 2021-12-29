@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
 import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
@@ -15,6 +16,8 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 import ProfileInfo from 'src/modules/client/components/customers/infos/ProfileInfo';
 import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling';
+
+const metaInfo = { title: 'Fiche bénéficiaire' };
 
 export default {
   props: {
@@ -25,7 +28,7 @@ export default {
     CustomerProfileHeader,
     ProfileTabs,
   },
-  metaInfo: { title: 'Fiche bénéficiaire' },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tabsContent: [

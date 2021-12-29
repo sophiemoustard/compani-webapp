@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :model-value="value" @hide="hide" @update:model-value="input" container-class="modal-container-md">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
         Editer un <span class="text-weight-bold">créneau</span>
       </template>
@@ -37,7 +37,7 @@ import { REQUIRED_LABEL, ON_SITE, REMOTE } from '@data/constants';
 export default {
   name: 'SlotEditionModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     editedCourseSlot: { type: Object, default: () => ({}) },
     stepOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },

@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { onMounted, ref, computed } from 'vue';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
@@ -85,7 +86,6 @@ import { usePayments } from 'src/modules/client/composables/payments';
 
 export default {
   name: 'ClientsBalances',
-  metaInfo: { title: 'Balances clients' },
   components: {
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
@@ -95,6 +95,9 @@ export default {
     'ni-select': Select,
   },
   setup () {
+    const metaInfo = { title: 'Balances clients' };
+    useMeta(metaInfo);
+
     const tableLoading = ref(false);
     const selected = ref([]);
     const balances = ref([]);

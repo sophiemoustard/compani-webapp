@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, email } from '@vuelidate/validators';
@@ -45,14 +46,6 @@ import { isUserLogged } from '@helpers/alenvi';
 import { logInMixin } from '@mixins/logInMixin';
 
 export default {
-  metaInfo: {
-    title: 'Connexion',
-    meta: [{
-      name: 'description',
-      content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées '
-        + 'par Compani.',
-    }],
-  },
   name: 'Authentication',
   components: {
     'compani-header': CompaniHeader,
@@ -66,6 +59,16 @@ export default {
     };
   },
   setup () {
+    const metaInfo = {
+      title: 'Connexion',
+      meta: [{
+        name: 'description',
+        content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées '
+          + 'par Compani.',
+      }],
+    };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   validations () {

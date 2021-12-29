@@ -21,9 +21,8 @@
 </template>
 
 <script>
-
+import { openURL, createMetaMixin } from 'quasar';
 import { mapGetters } from 'vuex';
-import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative } from '@components/popup/notify';
@@ -31,14 +30,16 @@ import SimpleTable from '@components/table/SimpleTable';
 import Button from '@components/Button';
 import { formatDate } from '@helpers/date';
 
+const metaInfo = { title: 'Archive prélèvements' };
+
 export default {
   name: 'DebitArchive',
-  metaInfo: { title: 'Archive prélèvements' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       directDebits: [],
@@ -59,7 +60,7 @@ export default {
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
   },
-  async mounted () {
+  async created () {
     await this.getDirectDebits();
   },
   methods: {

@@ -8,19 +8,21 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import Contracts from '@api/Contracts';
 import TitleHeader from '@components/TitleHeader';
 import { AUXILIARY } from '@data/constants';
 import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin';
 
+const metaInfo = { title: 'Contrats' };
+
 export default {
-  mixins: [contractMixin],
+  mixins: [contractMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-title-header': TitleHeader,
     'ni-contracts-cell': ContractsCell,
   },
-  metaInfo: { title: 'Contrats' },
   data () {
     return {
       AUXILIARY,
@@ -29,7 +31,7 @@ export default {
       loading: false,
     };
   },
-  async mounted () {
+  async created () {
     await this.refreshContracts();
   },
   methods: {

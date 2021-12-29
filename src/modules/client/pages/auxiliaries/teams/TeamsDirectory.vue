@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -30,13 +31,15 @@ import TableList from '@components/table/TableList';
 import { formatPhone, formatIdentity, removeDiacritics } from '@helpers/utils';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
+const metaInfo = { title: 'Répertoire équipe' };
+
 export default {
   name: 'TeamDirectory',
-  metaInfo: { title: 'Répertoire équipe' },
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tableLoading: false,

@@ -132,6 +132,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -162,7 +163,6 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'Subscriptions',
-  metaInfo: { title: 'Souscriptions' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-input': Input,
@@ -202,6 +202,9 @@ export default {
     };
   },
   setup () {
+    const metaInfo = { title: 'Souscriptions' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   validations () {
@@ -265,9 +268,11 @@ export default {
     else {
       this.refreshSubscriptions(this.customer);
       this.refreshFundings(this.customer);
-      this.v$.customer.$touch();
     }
     await this.checkMandates();
+  },
+  mounted () {
+    this.v$.customer.$touch();
   },
   methods: {
     getSignatureDate (mandate) {
