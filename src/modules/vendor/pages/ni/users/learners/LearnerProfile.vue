@@ -17,9 +17,10 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
@@ -35,12 +36,16 @@ import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLin
 
 export default {
   name: 'LearnerProfile',
-  metaInfo: { title: 'Fiche apprenant' },
   props: {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Fiche apprenant' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   mixins: [learnerMixin],
   components: {
     'ni-profile-header': ProfileHeader,

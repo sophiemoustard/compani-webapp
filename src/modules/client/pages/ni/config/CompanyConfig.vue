@@ -95,6 +95,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
@@ -130,7 +131,6 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'CompanyConfig',
-  metaInfo: { title: 'Configuration générale' },
   components: {
     'ni-input': Input,
     'ni-title-header': TitleHeader,
@@ -140,7 +140,12 @@ export default {
     'establishment-creation-modal': EstablishmentCreationModal,
     'establishment-edition-modal': EstablishmentEditionModal,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Configuration générale' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   mixins: [configMixin, validationMixin, tableMixin, companyMixin],
   data () {
     return {

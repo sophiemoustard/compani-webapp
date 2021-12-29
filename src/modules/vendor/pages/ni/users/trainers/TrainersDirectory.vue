@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
@@ -30,7 +31,6 @@ import { userMixin } from '@mixins/userMixin';
 import TrainerCreationModal from 'src/modules/vendor/components/trainers/TrainerCreationModal';
 
 export default {
-  metaInfo: { title: 'Répertoire formateurs' },
   name: 'TrainersDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
@@ -38,7 +38,12 @@ export default {
     'trainer-creation-modal': TrainerCreationModal,
   },
   mixins: [userMixin],
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Répertoire formateurs' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       trainers: [],

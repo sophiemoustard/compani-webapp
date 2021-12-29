@@ -13,10 +13,12 @@ import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/programs/ProfileInfo';
 import ProfileContent from 'src/modules/vendor/components/programs/ProfileContent';
+import { createMetaMixin } from 'quasar';
+
+const metaInfo = { title: 'Fiche programme' };
 
 export default {
   name: 'ProgramProfile',
-  metadata: { title: 'Fiche programme' },
   props: {
     programId: { type: String, required: true },
     defaultTab: { type: String, default: 'infos' },
@@ -25,6 +27,7 @@ export default {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       programName: '',

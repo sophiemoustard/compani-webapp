@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { ref } from 'vue';
 import { mapGetters, mapActions, mapState } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
@@ -58,7 +59,6 @@ import { planningActionMixin } from 'src/modules/client/mixins/planningActionMix
 export default {
   name: 'AuxiliaryPlanning',
   mixins: [planningActionMixin],
-  metaInfo: { title: 'Planning auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
     'ni-event-creation-modal': EventCreationModal,
@@ -68,6 +68,9 @@ export default {
     targetedAuxiliaryId: { type: String, default: '' },
   },
   setup () {
+    const metaInfo = { title: 'Planning auxiliaires' };
+    useMeta(metaInfo);
+
     const personKey = ref(AUXILIARY);
     const customers = ref([]);
     const { newEvent, editedEvent, eventValidation } = usePlanningAction(personKey, customers);

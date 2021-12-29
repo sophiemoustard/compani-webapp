@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
@@ -17,14 +18,15 @@ import ProfileCourses from '@components/learners/ProfileCourses';
 import { formatIdentity } from '@helpers/utils';
 import { learnerMixin } from '@mixins/learnerMixin';
 
+const metaInfo = { title: 'Fiche apprenant' };
+
 export default {
   name: 'LearnerProfile',
-  metaInfo: { title: 'Fiche apprenant' },
   props: {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
-  mixins: [learnerMixin],
+  mixins: [learnerMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,

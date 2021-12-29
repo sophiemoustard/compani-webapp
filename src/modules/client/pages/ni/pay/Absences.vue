@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { ref } from 'vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -57,7 +58,6 @@ import { usePlanningAction } from 'src/modules/client/composables/planningAction
 
 export default {
   name: 'Absences',
-  metaInfo: { title: 'Absences' },
   components: {
     'ni-button': Button,
     'ni-date-range': DateRange,
@@ -66,6 +66,9 @@ export default {
     'ni-title-header': TitleHeader,
   },
   setup () {
+    const metaInfo = { title: 'Absences' };
+    useMeta(metaInfo);
+
     const personKey = ref(AUXILIARY);
     const { editedEvent, eventValidation } = usePlanningAction(personKey, []);
 

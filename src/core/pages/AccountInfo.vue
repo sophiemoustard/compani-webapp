@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required, email, sameAs } from '@vuelidate/validators';
@@ -71,10 +72,11 @@ import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 
+const metaInfo = { title: 'Mon compte' };
+
 export default {
   name: 'AccountInfo',
-  metaInfo: { title: 'Mon compte' },
-  mixins: [passwordMixin, validationMixin, userMixin],
+  mixins: [passwordMixin, validationMixin, userMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-title-header': TitleHeader,
     'ni-button': Button,

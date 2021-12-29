@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
@@ -45,9 +46,10 @@ import {
   formatNumberForCSV,
 } from '@helpers/utils';
 
+const metaInfo = { title: 'Suivi des plans d\'aide' };
+
 export default {
   name: 'CustomersFundingsMonitoring',
-  metaInfo: { title: 'Suivi des plans d\'aide' },
   components: {
     'ni-button': Button,
     'ni-simple-table': SimpleTable,
@@ -55,6 +57,7 @@ export default {
     'ni-select': Select,
     'ni-select-sector': SelectSector,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tableLoading: false,

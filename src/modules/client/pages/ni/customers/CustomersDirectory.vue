@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -44,7 +45,6 @@ import { customerProfileValidation } from 'src/modules/client/helpers/customerPr
 
 export default {
   name: 'CustomersDirectory',
-  metaInfo: { title: 'Répertoire bénéficiaires' },
   mixins: [validationMixin, customerMixin],
   components: {
     'ni-directory-header': DirectoryHeader,
@@ -52,6 +52,9 @@ export default {
     'ni-table-list': TableList,
   },
   setup () {
+    const metaInfo = { title: 'Répertoire bénéficiaires' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {

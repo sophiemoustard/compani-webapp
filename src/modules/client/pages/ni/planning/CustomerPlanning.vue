@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { ref } from 'vue';
 import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
@@ -61,7 +62,6 @@ import { planningActionMixin } from 'src/modules/client/mixins/planningActionMix
 
 export default {
   name: 'CustomerPlanning',
-  metaInfo: { title: 'Planning bénéficiaire' },
   mixins: [planningActionMixin],
   components: {
     'ni-event-creation-modal': EventCreationModal,
@@ -73,6 +73,9 @@ export default {
     targetedCustomerId: { type: String, default: '' },
   },
   setup () {
+    const metaInfo = { title: 'Planning bénéficiaire' };
+    useMeta(metaInfo);
+
     const personKey = ref(CUSTOMER);
     const customers = ref([]);
     const { newEvent, editedEvent, editedCustomerAbsence, eventValidation } = usePlanningAction(personKey, customers);

@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
@@ -16,10 +17,11 @@ import { STRICTLY_E_LEARNING } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
 import { eLearningCourseDirectoryMixin } from '@mixins/eLearningCourseDirectoryMixin';
 
+const metaInfo = { title: 'Repertoire formation eLearning' };
+
 export default {
-  metaInfo: { title: 'Repertoire formation eLearning' },
   name: 'ELearningCoursesDirectory',
-  mixins: [eLearningCourseDirectoryMixin],
+  mixins: [eLearningCourseDirectoryMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,

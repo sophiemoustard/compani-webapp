@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// import VueMeta from 'vue-meta';
 import pick from 'lodash/pick';
 import { refreshState } from '@helpers/alenvi';
 import { defineAbilitiesFor } from '@helpers/ability';
@@ -8,8 +7,6 @@ import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import store from 'src/store';
 import clientRoutes from 'src/modules/client/router/routes';
 import vendorRoutes from 'src/modules/vendor/router/routes';
-
-// Vue.use(VueMeta);
 
 const Router = createRouter({
   scrollBehavior: () => ({ top: 0 }),

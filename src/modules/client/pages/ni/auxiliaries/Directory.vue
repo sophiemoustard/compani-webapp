@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { mapState, mapGetters } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import get from 'lodash/get';
@@ -55,7 +56,6 @@ import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/Auxi
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 
 export default {
-  metaInfo: { title: 'Répertoire auxiliaires' },
   name: 'Directory',
   components: {
     'ni-directory-header': DirectoryHeader,
@@ -64,6 +64,9 @@ export default {
   },
   mixins: [validationMixin, userMixin],
   setup () {
+    const metaInfo = { title: 'Répertoire auxiliaires' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {

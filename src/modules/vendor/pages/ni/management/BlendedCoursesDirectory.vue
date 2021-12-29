@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
@@ -42,7 +43,6 @@ import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 
 export default {
-  metaInfo: { title: 'Catalogue' },
   name: 'BlendedCoursesDirectory',
   mixins: [courseFiltersMixin],
   components: {
@@ -52,6 +52,9 @@ export default {
     'ni-trello': Trello,
   },
   setup () {
+    const metaInfo = { title: 'Catalogue' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {

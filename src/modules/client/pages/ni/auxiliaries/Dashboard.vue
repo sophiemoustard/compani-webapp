@@ -119,6 +119,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import omit from 'lodash/omit';
@@ -135,14 +136,15 @@ import Gauge from 'src/modules/client/components/Gauge';
 import ChipsAutocomplete from 'src/modules/client/components/planning/ChipsAutocomplete';
 import AuxiliaryIndicators from 'src/modules/client/components/planning/AuxiliaryIndicators';
 
+const metaInfo = { title: 'Tableau de bord' };
 export default {
   name: 'Dashboard',
-  metaInfo: { title: 'Tableau de bord' },
   components: {
     'ni-chips-autocomplete': ChipsAutocomplete,
     'ni-auxiliary-indicators': AuxiliaryIndicators,
     'ni-gauge': Gauge,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       selectedMonth: moment().format('MM-YYYY'),

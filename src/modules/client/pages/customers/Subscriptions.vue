@@ -132,6 +132,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -160,9 +161,10 @@ import { financialCertificatesMixin } from 'src/modules/client/mixins/financialC
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
+const metaInfo = { title: 'Souscriptions' };
+
 export default {
   name: 'Subscriptions',
-  metaInfo: { title: 'Souscriptions' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-input': Input,
@@ -174,7 +176,14 @@ export default {
     'ni-funding-grid-table': FundingGridTable,
     'ni-bi-color-button': BiColorButton,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
+  mixins: [
+    customerMixin,
+    subscriptionMixin,
+    financialCertificatesMixin,
+    fundingMixin,
+    tableMixin,
+    createMetaMixin(metaInfo),
+  ],
   data () {
     return {
       gcs: null,
@@ -265,9 +274,11 @@ export default {
     else {
       this.refreshSubscriptions(this.customer);
       this.refreshFundings(this.customer);
-      this.v$.customer.$touch();
     }
     await this.checkMandates();
+  },
+  mounted () {
+    this.v$.customer.$touch();
   },
   methods: {
     getSignatureDate (mandate) {

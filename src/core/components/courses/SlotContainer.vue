@@ -82,7 +82,6 @@ import { validationMixin } from '@mixins/validationMixin';
 export default {
   name: 'SlotContainer',
   mixins: [courseMixin, validationMixin],
-  metadata: { title: 'Fiche formation' },
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },

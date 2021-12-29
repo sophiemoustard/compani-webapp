@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import pick from 'lodash/pick';
 import Companies from '@api/Companies';
@@ -27,14 +28,18 @@ import { removeDiacritics } from '@helpers/utils';
 import { companyMixin } from '@mixins/companyMixin';
 
 export default {
-  metaInfo: { title: 'Répertoire structures' },
   name: 'CompaniesDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
     'company-creation-modal': CompanyCreationModal,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Répertoire structures' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   mixins: [companyMixin],
   data () {
     return {

@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { markRaw } from 'vue';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
@@ -17,7 +18,10 @@ import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
 import ProfileContracts from 'src/modules/client/components/auxiliary/ProfileContracts';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
+const metaInfo = { title: 'Fiche auxiliaire' };
+
 export default {
+  name: 'AuxiliaryProfile',
   props: {
     auxiliaryId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
@@ -26,8 +30,7 @@ export default {
     'auxiliary-profile-header': AuxiliaryProfileHeader,
     'profile-tabs': ProfileTabs,
   },
-  name: 'AuxiliaryProfile',
-  metaInfo: { title: 'Fiche auxiliaire' },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tabsContent: [

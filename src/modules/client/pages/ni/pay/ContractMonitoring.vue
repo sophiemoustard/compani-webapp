@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -50,7 +51,6 @@ import VersionEditionModal from 'src/modules/client/components/contracts/Version
 
 export default {
   name: 'ContractMonitoring',
-  metaInfo: { title: 'Suivi Contrats/Avenants' },
   mixins: [contractMixin],
   components: {
     'ni-button': Button,
@@ -59,7 +59,12 @@ export default {
     'version-edition-modal': VersionEditionModal,
     'ni-simple-table': SimpleTable,
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const metaInfo = { title: 'Suivi Contrats/Avenants' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       dates: {

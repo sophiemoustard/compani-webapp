@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { ref } from 'vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -60,7 +61,6 @@ import { planningActionMixin } from 'src/modules/client/mixins/planningActionMix
 
 export default {
   name: 'AuxiliaryAgenda',
-  metaInfo: { title: 'Agenda' },
   components: {
     agenda: Agenda,
     'planning-navigation': PlanningNavigation,
@@ -69,6 +69,9 @@ export default {
     'ni-select': Select,
   },
   setup () {
+    const metaInfo = { title: 'Agenda' };
+    useMeta(metaInfo);
+
     const personKey = ref(AUXILIARY);
     const customers = ref([]);
     const { newEvent, editedEvent, eventValidation } = usePlanningAction(personKey, customers);

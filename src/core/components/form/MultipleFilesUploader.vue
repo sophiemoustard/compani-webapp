@@ -59,6 +59,7 @@ export default {
     collapsibleLabel: { type: String, default: '' },
     extensions: { type: String, default: '' },
   },
+  emits: ['delete', 'uploaded'],
   data () {
     return {
       collapsibleOpened: false,

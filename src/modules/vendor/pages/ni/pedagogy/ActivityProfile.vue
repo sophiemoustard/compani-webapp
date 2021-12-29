@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -45,7 +46,6 @@ import { cardMixin } from '@mixins/cardMixin';
 
 export default {
   name: 'ActivityProfile',
-  metadata: { title: 'Fiche activité' },
   props: {
     activityId: { type: String, required: true },
     programId: { type: String, required: true },
@@ -63,6 +63,9 @@ export default {
   },
   mixins: [cardMixin],
   setup () {
+    const metaInfo = { title: 'Fiche activité' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {

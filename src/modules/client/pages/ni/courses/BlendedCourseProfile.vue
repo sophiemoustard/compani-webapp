@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
@@ -17,10 +18,11 @@ import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
+const metaInfo = { title: 'Fiche formation' };
+
 export default {
   name: 'BlendedCourseProfile',
-  metadata: { title: 'Fiche formation' },
-  mixins: [courseMixin, blendedCourseProfileMixin],
+  mixins: [courseMixin, blendedCourseProfileMixin, createMetaMixin(metaInfo)],
   props: {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },

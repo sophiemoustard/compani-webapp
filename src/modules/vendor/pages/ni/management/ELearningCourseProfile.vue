@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
@@ -15,6 +16,8 @@ import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
 import ProfileQuestionnaires from 'src/modules/vendor/components/courses/ProfileQuestionnaires';
 import { NotifyNegative } from '@components/popup/notify';
+
+const metaInfo = { title: 'Fiche formation' };
 
 export default {
   name: 'ELearningCoursesProfile',
@@ -26,6 +29,7 @@ export default {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'followUp' },
   },
+  mixins: [createMetaMixin(metaInfo)],
   computed: {
     ...mapState('course', ['course']),
     courseName () {

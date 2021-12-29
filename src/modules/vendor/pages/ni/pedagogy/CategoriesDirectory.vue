@@ -34,6 +34,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import pick from 'lodash/pick';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -47,7 +48,6 @@ import Categories from '@api/Categories';
 import { upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
-  metaInfo: { title: 'Catégories' },
   name: 'CategoriesDirectory',
   components: {
     'ni-title-header': TitleHeader,
@@ -57,6 +57,9 @@ export default {
     'category-edition-modal': CategoryEditionModal,
   },
   setup () {
+    const metaInfo = { title: 'Catégories' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {

@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import groupBy from 'lodash/groupBy';
@@ -32,7 +33,6 @@ import { QUESTIONNAIRE_TYPES } from '@data/constants';
 import { descendingSort } from '@helpers/date';
 
 export default {
-  metaInfo: { title: 'Questionnaires' },
   name: 'QuestionnairesDirectory',
   components: {
     'ni-title-header': TitleHeader,
@@ -40,6 +40,9 @@ export default {
     'questionnaire-cell': QuestionnaireCell,
   },
   setup () {
+    const metaInfo = { title: 'Questionnaires' };
+    useMeta(metaInfo);
+
     return { v$: useVuelidate() };
   },
   data () {
