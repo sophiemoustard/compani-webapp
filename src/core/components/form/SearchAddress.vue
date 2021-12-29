@@ -80,13 +80,13 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-:deep .q-select
+:deep(.q-select)
   width: 100%
   .q-select__dropdown-icon
     display: none
   .q-spinner
     display: none
 
-:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+:deep(.q-field__native), :deep(.q-field__prefix), :deep(.q-field__suffix), :deep(.q-field__input)
   color: $copper-grey-900
 </style>

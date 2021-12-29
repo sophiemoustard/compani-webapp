@@ -129,23 +129,23 @@ export default {
 .doc-thumbnail
   padding: 13px 0px 40px 12px
 
-:deep .q-field__control
+:deep(.q-field__control)
   height: 40px
   min-height: 40px
   border: 0
 
-:deep .q-uploader__header
+:deep(.q-uploader__header)
   border-radius: 4px
 
-:deep .q-field__append
+:deep(.q-field__append)
   display: none
-:deep .q-field__bottom
+:deep(.q-field__bottom)
   color: $secondary
   padding-top: 3px
 
-:deep .q-uploader
+:deep(.q-uploader)
   width: 100%
-  &--bordered
+  :deep(.q-uploader--bordered)
     border: 1px solid $copper-grey-300
   .q-uploader__list
     display: none

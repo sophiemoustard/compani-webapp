@@ -37,11 +37,11 @@ export default {
 
 <style lang="sass" scoped>
   .editable-td
-    & :deep .q-field
-      &__control
+    & :deep(.q-field)
+      :deep(.q-field__control)
         height: 30px
         min-width: 60px
         padding: 0 4px
-      &__suffix
+      :deep(.q-field__suffix)
         line-height: 20px
 </style>

@@ -140,7 +140,7 @@ export default {
   @media screen and (min-width: 768px)
     flex-wrap: nowrap
 
-:deep .q-field__control
+:deep(.q-field__control)
   min-height: 40px
   border: none !important
   .q-field__marginal.q-anchor--skip
@@ -151,13 +151,13 @@ export default {
     width: 26%
   @media screen and (max-width: 767px)
     width: 60%
-  :deep .q-field--with-bottom
+  :deep(.q-field--with-bottom)
     padding: 0
-  :deep .q-field__control
+  :deep(.q-field__control)
     min-height: 35px
-  :deep .q-field__native
+  :deep(.q-field__native)
     min-height: auto
-  :deep .q-field__inner
+  :deep(.q-field__inner)
     .q-field__bottom
       display: none
 
@@ -166,14 +166,14 @@ export default {
     width: 18%
   @media screen and (max-width: 767px)
     width: 40%
-  :deep .q-field--with-bottom
+  :deep(.q-field--with-bottom)
     padding: 0
-  :deep .q-field__inner
+  :deep(.q-field__inner)
     .q-field__bottom
       display: none
-  :deep .q-field__control
+  :deep(.q-field__control)
     min-height: 35px
-  :deep .q-field__native
+  :deep(.q-field__native)
     min-height: auto
 
 .delimiter

@@ -574,7 +574,7 @@ export default {
     font-size: 12px
   .referent
     display: flex
-    :deep .q-field__append
+    :deep(.q-field__append)
       .q-select__dropdown-icon
         display: none
 </style>

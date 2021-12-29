@@ -63,22 +63,22 @@ export default {
 <style lang="sass" scoped>
 .q-select
   width: 100%
-  :deep .q-field__control
+  :deep(.q-field__control)
     min-height: 38px
-  :deep .q-field__inner
+  :deep(.q-field__inner)
     height: auto
-  :deep .q-field__native
+  :deep(.q-field__native)
     height: auto
     padding: 0
-  :deep .q-field__append
+  :deep(.q-field__append)
     .q-select__dropdown-icon
       display: none
-  :deep .q-chip
+  :deep(.q-chip)
     background-color: $primary
     padding: 0 8px
     min-height: 26px
     color: white
-  :deep .q-chip__icon
+  :deep(.q-chip__icon)
     color: white
     opacity: 1
     margin: 0

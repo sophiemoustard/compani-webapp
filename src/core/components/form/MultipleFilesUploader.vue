@@ -106,7 +106,7 @@ export default {
     @media screen and (max-width: 767px)
       margin: 0px 4px
 
-:deep .q-item__section--side
+:deep(.q-item__section--side)
   .q-icon
     size: 1em
     color: $primary

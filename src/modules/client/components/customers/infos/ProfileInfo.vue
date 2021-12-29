@@ -1027,8 +1027,8 @@ a
     margin: 0px
 
 .signedAt
-  :deep .q-field--with-bottom
+  :deep(.q-field--with-bottom)
     padding: 0
-  :deep .q-field__bottom
+  :deep(.q-field__bottom)
     display: none
 </style>

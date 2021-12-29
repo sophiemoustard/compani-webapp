@@ -59,7 +59,7 @@ export default {
   display: flex
   align-items: center
 
-:deep .q-linear-progress__track
+:deep(.q-linear-progress__track)
   opacity: 0
 
 .bar-label

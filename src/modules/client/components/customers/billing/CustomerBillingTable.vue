@@ -110,6 +110,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
   },
+  emits: ['delete', 'open-edition-modal'],
   data () {
     return {
       docLoading: false,
@@ -261,7 +262,7 @@ export default {
 .disabled
   cursor: not-allowed
 
-:deep .q-item
+:deep(.q-item)
   .q-item__section
     padding: 0px
 </style>

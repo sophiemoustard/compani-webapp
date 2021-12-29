@@ -385,13 +385,13 @@ export default {
             phoneNumber: { required, frPhoneNumber },
           },
           idCardRecto: {
-            driveId: { required: requiredIf(() => this.userProfile.administrative.identityDocs === 'cni') },
+            driveId: { required: requiredIf(this.userProfile.administrative.identityDocs === 'cni') },
           },
           passport: {
-            driveId: { required: requiredIf(() => this.userProfile.administrative.identityDocs === 'pp') },
+            driveId: { required: requiredIf(this.userProfile.administrative.identityDocs === 'pp') },
           },
           residencePermitRecto: {
-            driveId: { required: requiredIf(() => this.userProfile.administrative.identityDocs === 'ts') },
+            driveId: { required: requiredIf(this.userProfile.administrative.identityDocs === 'ts') },
           },
           healthAttest: { driveId: { required } },
           phoneInvoice: { driveId: { required } },
@@ -406,18 +406,10 @@ export default {
           },
           mutualFund: {
             has: { required },
-            driveId: { required: requiredIf(item => item.has) },
+            driveId: { required: requiredIf(this.userProfile.administrative.mutualFund.has) },
           },
         },
       },
-      // pictureGroup: this.pictureGroup.map(g => `userProfile.${g}`),
-      // identityGroup: this.identityGroup.map(g => `userProfile.${g}`),
-      // contactGroup: this.contactGroup.map(g => `userProfile.${g}`),
-      // emergencyContactGroup: this.emergencyContactGroup.map(g => `userProfile.${g}`),
-      // ibanGroup: this.ibanGroup.map(g => `userProfile.${g}`),
-      // documentsGroup: this.documentsGroup.map(g => `userProfile.${g}`),
-      // mutualFundGroup: this.mutualFundGroup.map(g => `userProfile.${g}`),
-      // transportInvoiceGroup: this.transportInvoiceGroup.map(g => `userProfile.${g}`),
     };
   },
   computed: {
@@ -516,7 +508,7 @@ export default {
   },
   async created () {
     if (this.isCoach) await Promise.all([this.getAuxiliaryRoles(), this.getEstablishments()]);
-    // this.v$.userProfile.$touch();
+    this.v$.userProfile.$touch();
     this.isLoaded = true;
   },
   methods: {
@@ -596,11 +588,11 @@ export default {
       NotifyPositive('Document envoyé');
     },
     groupErrors (group) {
-      const j = 0;
-      // const groupName = `${group}Group`;
-      // for (let i = 0, l = this[groupName].length; i < l; i++) {
-      //   if (this.v$[groupName][`userProfile.${this[groupName][i]}`].$error) j++;
-      // }
+      let j = 0;
+      const groupName = `${group}Group`;
+      for (let i = 0, l = this[groupName].length; i < l; i++) {
+        if (get(this.v$, `userProfile.${this[groupName][i]}.$error`)) j++;
+      }
 
       return {
         errors: j,
@@ -635,7 +627,7 @@ export default {
 
 <style lang="sass" scoped>
 .q-btn-group
-  & :deep button
+  & :deep(button)
     flex: 1
 .group-error
   font-size: 12px
@@ -643,7 +635,7 @@ export default {
   &-ok
     font-size: 12px
     color: $green-600
-:deep .q-field--standard.q-field--focused
+:deep(.q-field--standard.q-field--focused)
   .q-field__control:after
     display: none
 </style>

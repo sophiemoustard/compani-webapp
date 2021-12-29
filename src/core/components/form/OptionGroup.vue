@@ -44,14 +44,14 @@ export default {
 <style lang="sass" scoped>
 .required::after
   content: ' *'
-:deep .q-option-group
+:deep(.q-option-group)
   color: $copper-grey-700 !important
   .q-radio
     padding: 10px 0 !important
     .q-radio__label
       font-size: 15px
 
-:deep .q-field__control
+:deep(.q-field__control)
   min-height: 25px !important
   border: 0
 </style>

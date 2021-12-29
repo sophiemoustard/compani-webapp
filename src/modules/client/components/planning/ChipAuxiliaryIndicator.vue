@@ -166,9 +166,9 @@ export default {
   padding: 3px 0
   display: flex
   justify-content: flex-start
-:deep .q-hoverable:hover > .q-focus-helper
+:deep(.q-hoverable:hover > .q-focus-helper)
   background: none !important
-:deep .q-ripple
+:deep(.q-ripple)
   display: none
 
 .person-name.modal

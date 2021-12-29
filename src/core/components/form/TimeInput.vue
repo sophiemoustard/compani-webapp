@@ -98,6 +98,6 @@ export default {
 .q-list
   width: 100px
 
-:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+:deep(.q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input)
   color: $copper-grey-900
 </style>

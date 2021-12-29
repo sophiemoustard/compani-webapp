@@ -95,15 +95,15 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-:deep .q-option-group
+:deep(.q-option-group)
   column-count: 2
   width: 100%
   margin-left: 0
 
-:deep .q-radio
+:deep(.q-radio)
   width: 100%
 
-:deep .q-radio__label
+:deep(.q-radio__label)
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis

@@ -128,20 +128,9 @@ export default {
     };
   },
   validations () {
-    const courseSlotValidation = {
-      step: { required },
-      address: {
-        zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-        street: { required: requiredIf(item => item && !!item.fullAddress) },
-        city: { required: requiredIf(item => item && !!item.fullAddress) },
-        fullAddress: { frAddress },
-      },
-      meetingLink: { urlAddress },
-    };
-
     return {
-      newCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.newCourseSlot.dates) },
-      editedCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.editedCourseSlot.dates) },
+      newCourseSlot: this.courseSlotValidation(this.newCourseSlot),
+      editedCourseSlot: this.courseSlotValidation(this.editedSlot),
     };
   },
   computed: {
@@ -206,6 +195,28 @@ export default {
     else this.groupByCourses();
   },
   methods: {
+    courseSlotValidation (slot) {
+      return {
+        step: { required },
+        address: {
+          zipCode: { required: requiredIf(get(slot, 'address.fullAddress')) },
+          street: { required: requiredIf(get(slot, 'address.fullAddress')) },
+          city: { required: requiredIf(get(slot, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        meetingLink: { urlAddress },
+        dates: {
+          startDate: { required },
+          endDate: {
+            required,
+            ...(!!get(slot, 'dates.startDate') && {
+              maxDate: maxDate(moment(slot.dates.startDate).endOf('d').toISOString()),
+              minDate: minDate(slot.dates.startDate),
+            }),
+          },
+        },
+      };
+    },
     groupByCourses () {
       this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
@@ -282,7 +293,7 @@ export default {
       try {
         this.v$.newCourseSlot.$touch();
         const isValid = await this.waitForFormValidation(this.v$.newCourseSlot);
-        // if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         await CourseSlots.create(this.formatCreationPayload(this.newCourseSlot));
@@ -327,7 +338,7 @@ export default {
       try {
         this.v$.editedCourseSlot.$touch();
         const isValid = await this.waitForFormValidation(this.v$.editedCourseSlot);
-        // if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         const payload = this.formatEditionPayload(this.editedCourseSlot);
@@ -363,16 +374,6 @@ export default {
       if (!slot.step) return '';
       const step = this.stepOptions.find(option => option.value === slot.step._id);
       return step ? step.label : '';
-    },
-    datesValidations (dates) {
-      return {
-        startDate: { required },
-        endDate: {
-          required,
-          minDate: minDate(dates?.startDate),
-          maxDate: maxDate(moment(dates?.startDate).endOf('d')),
-        },
-      };
     },
     setCourseSlot (payload) {
       const { path, value } = payload;

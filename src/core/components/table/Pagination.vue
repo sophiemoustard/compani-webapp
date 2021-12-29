@@ -83,7 +83,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-:deep .q-btn-group
+:deep(.q-btn-group)
   & > .q-btn-item:first-child
     border: 1px solid $copper-grey-300
   & > .q-btn-item:not(:first-child)

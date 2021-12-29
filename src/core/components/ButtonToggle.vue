@@ -29,7 +29,7 @@ export default {
   @media screen and (max-width: 767px)
     display: grid
     grid-template-columns: repeat(2, 1fr)
-  :deep .q-btn-item
+  :deep(.q-btn-item)
     flex-grow: 1
     flex-basis: 0
     border-radius: 20px

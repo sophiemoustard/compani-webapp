@@ -51,6 +51,6 @@ export default {
 .q-option
   font-size: 14px
 .q-input
-  :deep .q-field__control
+  :deep(.q-field__control)
     font-size: 14px
 </style>

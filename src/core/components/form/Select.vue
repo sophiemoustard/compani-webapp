@@ -119,11 +119,11 @@ export default {
 <style lang="sass" scoped>
 .no-bottom
   padding-bottom: 0
-  :deep .q-field__bottom
+  :deep(.q-field__bottom)
     display: none
 .select-icon
   margin: 0
 
-:deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+:deep(.q-field__native), :deep(.q-field__prefix), :deep(.q-field__suffix), :deep(.q-field__input)
   color: $copper-grey-900
 </style>
