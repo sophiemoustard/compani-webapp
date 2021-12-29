@@ -31,6 +31,7 @@ export default {
     questionnaire: { type: Object, required: true },
     index: { type: Number, required: true },
   },
+  emits: ['click'],
   data () {
     return {
       DRAFT,
@@ -64,4 +65,4 @@ export default {
   text-align: center
   color: $copper-grey-800
   background-color: $copper-grey-300
-  </style>
+</style>
