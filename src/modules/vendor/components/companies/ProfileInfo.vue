@@ -3,10 +3,10 @@
     <div class="q-mb-xl">
       <div class="row gutter-profile">
         <ni-input caption="Raison sociale" v-model.trim="company.name" @focus="saveTmp('name')"
-          @blur="updateCompany('name')" :error="$v.company.name.$error" />
+          @blur="updateCompany('name')" :error="v$.company.name.$error" />
         <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
-          @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
-          :error-message="tradeNameError($v.company)" />
+          @blur="updateCompany('tradeName')" :error="v$.company.tradeName.$error"
+          :error-message="tradeNameError(v$.company)" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -20,6 +20,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import useVuelidate from '@vuelidate/core';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
@@ -34,6 +35,7 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
+  setup () { return { v$: useVuelidate() }; },
   components: {
     'ni-input': Input,
     'ni-coach-list': CoachList,
@@ -65,8 +67,8 @@ export default {
       try {
         const value = get(this.company, path);
         if (this.tmpInput === value) return;
-        this.$v.company.$touch();
-        if (this.$v.company.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.company.$touch();
+        if (this.v$.company.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = set({}, path, value);
         await Companies.updateById(this.company._id, payload);
