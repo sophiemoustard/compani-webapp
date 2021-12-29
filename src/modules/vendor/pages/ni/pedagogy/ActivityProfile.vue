@@ -7,12 +7,11 @@
           @click="validateUnlockEdition" />
       </div>
       <div class="row gutter-profile">
-        <ni-input v-model.trim="editedActivity.name" required-field caption="Nom"
-          @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked"
-          :error="$v.editedActivity.name.$error" />
-        <ni-select v-model.trim="editedActivity.type" @input="updateActivity(editedActivity.type, 'type')"
+        <ni-input v-model.trim="editedActivity.name" required-field caption="Nom" :error="v$.editedActivity.name.$error"
+          @blur="updateActivity(editedActivity.name, 'name')" :disable="isEditionLocked" />
+        <ni-select v-model.trim="editedActivity.type" @update:model-value="updateActivity(editedActivity.type, 'type')"
           :options="ACTIVITY_TYPES" caption="Type" :disable="isActivityPublished || isEditionLocked" required-field
-          :error="$v.editedActivity.type.$error" />
+          :error="v$.editedActivity.type.$error" />
       </div>
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
@@ -28,7 +27,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import Activities from '@api/Activities';
@@ -62,6 +62,9 @@ export default {
     'ni-select': Select,
   },
   mixins: [cardMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       programName: '',
@@ -154,14 +157,13 @@ export default {
       }
     },
     validateUnlockEdition () {
-      const activityReusagesExceptCurrentUsage = this.activity.steps
-        .map(step => step.subPrograms
-          .map(sp => ({
-            stepId: step._id,
-            subProgramId: sp._id,
-            programId: get(sp, 'program._id'),
-            programName: get(sp, 'program.name'),
-          })))
+      const activityReusagesExceptCurrentUsage = this.activity.steps.map(step => step.subPrograms
+        .map(sp => ({
+          stepId: step._id,
+          subProgramId: sp._id,
+          programId: get(sp, 'program._id'),
+          programName: get(sp, 'program.name'),
+        })))
         .flat()
         .filter(activity => activity.subProgramId !== this.subProgramId || activity.stepId !== this.stepId);
       const programsReusingActivity = uniqBy(activityReusagesExceptCurrentUsage, 'programId').map(p => p.programName);
@@ -221,9 +223,11 @@ export default {
     },
     async updateActivity (event, path) {
       try {
-        this.$v.editedActivity.$touch();
-        if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedActivity.$touch();
+        if (this.v$.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         await Activities.updateById(this.activity._id, { [path]: event });
+
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
@@ -236,7 +240,7 @@ export default {
   async beforeUnmount () {
     this.$store.dispatch('program/resetActivity');
     this.$store.dispatch('card/resetCard');
-    if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
+    if ((new RegExp(`programs/${this.program._id}`)).test(this.$route.path)) {
       this.$store.dispatch('program/fetchProgram', { programId: this.programId });
       this.$store.dispatch('program/setOpenedStep', { stepId: this.stepId });
     } else {

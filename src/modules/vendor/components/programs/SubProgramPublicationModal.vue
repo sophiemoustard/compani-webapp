@@ -10,7 +10,7 @@
         Vous pourrez modifier et rajouter des règles d’accès par la suite.
       </span>
       <ni-select class="select" in-modal v-model="accessCompany" required-field caption="Structure"
-        :options="companyOptions" :error="$v.accessCompany.$error" />
+        :options="companyOptions" :error="v$.accessCompany.$error" />
     </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Publier avec cette règle d'accès" color="primary"
@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import { requiredIf } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { requiredIf } from '@vuelidate/validators';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
 import Select from '@components/form/Select';
@@ -31,7 +32,6 @@ export default {
   name: 'SubProgramPublicationModal',
   props: {
     modelValue: { type: Boolean, default: false },
-    validations: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
   },
   components: {
@@ -40,6 +40,9 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit'],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       access: FREE_ACCESS,
@@ -61,8 +64,8 @@ export default {
       this.$emit('update:model-value', event);
     },
     submit () {
-      this.$v.accessCompany.$touch();
-      if (this.$v.accessCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
+      this.v$.accessCompany.$touch();
+      if (this.v$.accessCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
 
       this.$emit('submit', this.accessCompany);
     },

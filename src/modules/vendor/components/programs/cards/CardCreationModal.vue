@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide" container-class="modal-container-md">
     <template #title>
       Créer une nouvelle <span class="text-weight-bold">carte</span>
     </template>
@@ -100,11 +100,12 @@ import Modal from '@components/modal/Modal';
 export default {
   name: 'CardCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
   },
+  emits: ['hide', 'input', 'submit'],
   data () {
     return {
       CARD_TEMPLATES,

@@ -1,15 +1,15 @@
 <template>
   <div class="container">
     <ni-input class="q-mb-lg" caption="Texte" v-model="card.gappedText" required-field
-      @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
+      @blur="updateCard('gappedText')" :error="v$.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
-    <q-checkbox v-model="card.canSwitchAnswers" @input="updateCard('canSwitchAnswers')"
+    <q-checkbox v-model="card.canSwitchAnswers" @update:model-value="updateCard('canSwitchAnswers')"
       label="Réponses interchangeables" class="q-mb-lg" dense :disable="disableEdition" />
     <div class="row gutter-profile-x">
       <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-md-6 col-xs-12 answers">
         <ni-input class="input" v-model="card.falsyGapAnswers[i].text" :disable="disableEdition"
           @blur="updateTextAnswer(i)" :caption="`Mot ${i + 1}`" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
-          :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)"
+          :error="getError('falsyGapAnswers', i)" :error-message="falsyGapAnswersErrorMsg(i)"
           :required-field="answerIsRequired(i)" />
         <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
       </div>
@@ -17,13 +17,15 @@
     <ni-button class="add-button q-mb-lg" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
+      @blur="updateCard('explanation')" :error="v$.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
 <script>
+import get from 'lodash/get';
+import useVuelidate from '@vuelidate/core';
+import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
-import { required, maxLength } from 'vuelidate/lib/validators';
 import {
   REQUIRED_LABEL,
   GAP_ANSWER_MAX_LENGTH,
@@ -53,14 +55,17 @@ export default {
     'ni-button': Button,
   },
   mixins: [templateMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       card: {
         gappedText: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
         falsyGapAnswers: {
-          $each: {
+          $each: helpers.forEach({
             text: { required, validCaracters, maxLength: maxLength(GAP_ANSWER_MAX_LENGTH) },
-          },
+          }),
         },
         explanation: { required },
       },
@@ -68,23 +73,23 @@ export default {
   },
   computed: {
     gappedTextTagCodeErrorMsg () {
-      if (this.$v.card.gappedText.required === false) return REQUIRED_LABEL;
-      if (!this.$v.card.gappedText.validTagsCount) {
-        return 'Le nombre de trous doit être de 1 ou 2';
-      }
-      if (!this.$v.card.gappedText.validTagging) {
+      const modifiedText = this.v$.card.gappedText;
+      if (get(modifiedText, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(modifiedText, 'validTagsCount.$response') === false) return 'Le nombre de trous doit être de 1 ou 2';
+      if (get(modifiedText, 'validTagging.$response') === false) {
         return 'Balisage non valide, la bonne syntaxe est : <trou>la réponse</trou>';
       }
-      if (!this.$v.card.gappedText.validAnswerInTag) {
+      if (get(modifiedText, 'validAnswerInTag.$response') === false) {
         return 'Il ne doit pas y avoir d\'espace au début et à la fin de la réponse. '
           + 'La bonne syntaxe est : <trou>la réponse</trou>';
       }
-      if (!this.$v.card.gappedText.validCaractersTags) {
+      if (get(modifiedText, 'validCaractersTags.$response') === false) {
         return 'Caractère invalide détecté entre les balises, seuls les symboles - \' et ESPACE sont permis';
       }
-      if (!this.$v.card.gappedText.validTagLength) {
+      if (get(modifiedText, 'validTagLength.$response') === false) {
         return 'Le nombre de caractères entre les balises doit être entre 1 et 15';
       }
+
       return '';
     },
     disableAnswerCreation () {
@@ -98,11 +103,11 @@ export default {
   },
   methods: {
     falsyGapAnswersErrorMsg (index) {
-      if (!this.$v.card.falsyGapAnswers.$each[index].text.required) return REQUIRED_LABEL;
-      if (!this.$v.card.falsyGapAnswers.$each[index].text.maxLength) {
-        return `${GAP_ANSWER_MAX_LENGTH} caractères maximum.`;
-      }
-      if (!this.$v.card.falsyGapAnswers.$each[index].text.validCaracters) {
+      const validation = this.v$.card.falsyGapAnswers.$each.$response.$errors[index].text;
+
+      if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
+      if (get(validation, '0.$validator') === 'maxLength') return `${GAP_ANSWER_MAX_LENGTH} caractères maximum.`;
+      if (get(validation, '0.$validator') === 'validCaracters') {
         return 'Caractère invalide détecté (seuls - \' ESPACE permis)';
       }
 
@@ -116,14 +121,14 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .container
-    display: flex
-    flex-direction: column
-  .answers
-    display: flex
-    align-items: center
-  .input
-    flex: 1
-  .add-button
-    align-self: flex-end
+.container
+  display: flex
+  flex-direction: column
+.answers
+  display: flex
+  align-items: center
+.input
+  flex: 1
+.add-button
+  align-self: flex-end
 </style>

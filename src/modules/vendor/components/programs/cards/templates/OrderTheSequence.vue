@@ -1,23 +1,24 @@
 <template>
   <div class="container">
     <ni-input class="q-mb-lg" caption="Question" v-model="card.question" required-field :disable="disableEdition"
-      @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea"
+      @focus="saveTmp('question')" @blur="updateCard('question')" :error="v$.card.question.$error" type="textarea"
       :error-message="questionErrorMsg" />
     <div v-for="(orderedAnswers, i) in card.orderedAnswers" :key="i" class="answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.orderedAnswers[i].text"
         @focus="saveTmp(`orderedAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :disable="disableEdition"
-        :error="$v.card.orderedAnswers.$each[i].$error" class="input" :required-field="answerIsRequired(i)" />
+        :error="getError('orderedAnswers', i)" class="input" :required-field="answerIsRequired(i)" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
     :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
+      @blur="updateCard('explanation')" :error="v$.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
 <script>
-import { required, maxLength } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import {
   QUESTION_MAX_LENGTH,
@@ -39,11 +40,14 @@ export default {
     'ni-button': Button,
   },
   mixins: [templateMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
-        orderedAnswers: { $each: { text: { required } } },
+        orderedAnswers: { $each: helpers.forEach({ text: { required } }) },
         explanation: { required },
       },
     };
