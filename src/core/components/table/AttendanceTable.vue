@@ -162,8 +162,8 @@ export default {
       },
       newAttendanceSheet: {
         file: { required },
-        trainee: { required: requiredIf(() => this.course.type !== INTRA) },
-        date: { required: requiredIf(() => this.course.type === INTRA) },
+        trainee: { required: requiredIf(this.course.type !== INTRA) },
+        date: { required: requiredIf(this.course.type === INTRA) },
       },
     };
   },

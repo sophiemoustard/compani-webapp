@@ -47,6 +47,7 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: ['click'],
   data () {
     return {
       interfaceLogo: 'https://storage.googleapis.com/compani-main/icons/blue_icon_small.png',

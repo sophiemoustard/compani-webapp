@@ -3,12 +3,12 @@
     <template #title>
         Modifier mon <span class="text-weight-bold">mot de passe</span>
     </template>
-    <ni-input in-modal :value="newPassword.password" type="password" caption="Nouveau mot de passe"
+    <ni-input in-modal :model-value="newPassword.password" type="password" caption="Nouveau mot de passe"
       :error-message="passwordErrorMessage" required-field @blur="validations.newPassword.password.$touch"
-      :error="validations.newPassword.password.$error" @update:mdoel-value="update($event, 'password')" />
-    <ni-input in-modal :value="newPassword.confirm" :error="validations.newPassword.confirm.$error"
+      :error="validations.newPassword.password.$error" @update:model-value="update($event, 'password')" />
+    <ni-input in-modal :model-value="newPassword.confirm" :error="validations.newPassword.confirm.$error"
       type="password" caption="Confirmation mot de passe" :error-message="confirmErrorMessage" required-field
-      @blur="validations.newPassword.confirm.$touch" @update:mdoel-value="update($event, 'confirm')" />
+      @blur="validations.newPassword.confirm.$touch" @update:model-value="update($event, 'confirm')" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
         icon-right="done" @click="submit" />
@@ -31,7 +31,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:newPassword'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-password'],
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
@@ -47,7 +47,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newPassword', { ...this.newPassword, [prop]: event.trim() });
+      this.$emit('update:new-password', { ...this.newPassword, [prop]: event.trim() });
     },
   },
 };
