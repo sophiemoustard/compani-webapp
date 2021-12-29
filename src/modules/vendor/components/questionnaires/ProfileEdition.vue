@@ -3,7 +3,7 @@
     <div class="row justify-between">
       <div class="row body">
         <ni-input v-model.trim="questionnaire.name" required-field caption="Nom" @blur="updateQuestionnaire"
-          @focus="saveTmpName" :error="$v.questionnaire.name.$error" :disable="nameLock" />
+          @focus="saveTmpName" :error="v$.questionnaire.name.$error" :disable="nameLock" />
         <ni-button v-if="isQuestionnairePublished" color="copper-grey-500" :icon="lockIcon"
           @click="nameLock = !nameLock" />
       </div>
@@ -26,7 +26,8 @@
 <script>
 import get from 'lodash/get';
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import Questionnaires from '@api/Questionnaires';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import Input from '@components/form/Input';
@@ -50,6 +51,9 @@ export default {
     'ni-button': Button,
   },
   mixins: [cardMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       questionnaire: { name: { required } },
@@ -156,9 +160,9 @@ export default {
         else {
           const name = get(this.questionnaire, 'name');
           if (this.tmpInput === name) return;
-          this.$v.questionnaire.$touch();
+          this.v$.questionnaire.$touch();
 
-          if (this.$v.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
+          if (this.v$.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           await Questionnaires.update(this.questionnaire._id, { name });
         }

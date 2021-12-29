@@ -9,6 +9,7 @@
 
 <script>
 import get from 'lodash/get';
+import { shallowRef } from 'vue';
 import { mapState } from 'vuex';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -29,8 +30,18 @@ export default {
   data () {
     return {
       tabsContent: [
-        { label: 'Édition', name: 'edition', default: this.defaultTab === 'edition', component: ProfileEdition },
-        { label: 'Réponses', name: 'answers', default: this.defaultTab === 'answers', component: ProfileAnswers },
+        {
+          label: 'Édition',
+          name: 'edition',
+          default: this.defaultTab === 'edition',
+          component: shallowRef(ProfileEdition),
+        },
+        {
+          label: 'Réponses',
+          name: 'answers',
+          default: this.defaultTab === 'answers',
+          component: shallowRef(ProfileAnswers),
+        },
       ],
       questionnaireName: '',
     };
