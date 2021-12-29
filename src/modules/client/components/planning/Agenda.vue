@@ -87,6 +87,7 @@ export default {
     days: { type: Array, default: () => [] },
     personKey: { type: String, default: '' },
   },
+  emits: ['open-creation-modal', 'open-info-modal'],
   data () {
     return {
       ABSENCE,

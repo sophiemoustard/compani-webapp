@@ -39,7 +39,7 @@
           @focus="saveTmp('identity.nationality')" @blur="updateUser('identity.nationality')" />
         <ni-date-input caption="Date de naissance" :error="v$.userProfile.identity.birthDate.$error"
           v-model="userProfile.identity.birthDate" @focus="saveTmp('identity.birthDate')"
-          content-class="col-xs-12 col-md-6" @input="updateUser('identity.birthDate')" />
+          content-class="col-xs-12 col-md-6" @update:model-value="updateUser('identity.birthDate')" />
         <ni-select caption="Pays de naissance" :error="v$.userProfile.identity.birthCountry.$error"
           :options="countriesOptions" v-model="userProfile.identity.birthCountry"
           @focus="saveTmp('identity.birthCountry')" @blur="updateUser('identity.birthCountry')" />
@@ -121,7 +121,7 @@
           <ni-option-group :display-caption="isAuxiliary" v-model="userProfile.administrative.identityDocs"
             type="radio" :options="identityDocsOptions" :error="v$.userProfile.administrative.identityDocs.$error"
             caption="Merci de nous indiquer le type de document d'identité que vous possédez." required-field
-            :error-message="requiredLabel" @input="updateUser('administrative.identityDocs')" />
+            :error-message="requiredLabel" @update:model-value="updateUser('administrative.identityDocs')" />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto"
@@ -193,7 +193,7 @@
             :error-message="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="copper-grey-700" toggle-color="primary"
               v-model="userProfile.administrative.mutualFund.has" :options="mutualOptions"
-              @input="updateUser('administrative.mutualFund.has')" />
+              @update:model-value="updateUser('administrative.mutualFund.has')" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6" v-if="hasMutual">
@@ -215,7 +215,7 @@
             v-model="userProfile.administrative.transportInvoice.transportType" :options="transportOptions"
             caption="Par quel moyen comptez-vous vous rendre au travail ?" type="radio" :error-message="requiredLabel"
             :error="v$.userProfile.administrative.transportInvoice.transportType.$error" required-field
-            @input="updateUser('administrative.transportInvoice.transportType')" />
+            @update:model-value="updateUser('administrative.transportInvoice.transportType')" />
         </div>
         <div v-if="userProfile.administrative.transportInvoice.transportType === 'public'"
           class="col-xs-12 col-md-6">

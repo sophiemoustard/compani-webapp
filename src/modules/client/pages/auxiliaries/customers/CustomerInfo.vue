@@ -3,7 +3,7 @@
     <div v-if="customer">
       <div class="row items-center col-xs-12 header-margin q-mb-xl">
         <ni-button class="on-left self-center" icon="arrow_back" color="primary" @click="$router.go(-1)" />
-        <ni-title-header :title="customer.identity | formatIdentity('FL')" />
+        <ni-title-header :title="formatIdentity(customer.identity, 'FL')" />
       </div>
       <profile-follow-up />
     </div>
@@ -33,7 +33,7 @@ export default {
   async mounted () {
     await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customerId });
   },
-  filters: {
+  methods: {
     formatIdentity,
   },
   beforeUnmount () {

@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <ni-title-header title="Documents" class="q-mb-xl" />
     <p v-if="documents.length == 0">Aucun document disponible</p>
-    <ni-simple-table :data="documents" :columns="columns" :pagination.sync="pagination" row-key="name"
+    <ni-simple-table :data="documents" :columns="columns" v-model:pagination="pagination" row-key="name"
       :loading="loading">
       <template #body="{ props }">
         <q-tr :props="props">

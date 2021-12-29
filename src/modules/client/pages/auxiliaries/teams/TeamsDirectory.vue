@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
+    <ni-table-list :data="filteredUsers" :columns="columns" v-model:pagination="pagination" :loading="tableLoading"
       :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ col }">
         <q-item v-if="col.name === 'name'">
@@ -66,8 +66,8 @@ export default {
       ],
     };
   },
-  created () {
-    this.getUserList();
+  async created () {
+    await this.getUserList();
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),

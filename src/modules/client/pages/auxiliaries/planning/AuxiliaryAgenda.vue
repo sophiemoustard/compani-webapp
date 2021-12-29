@@ -102,10 +102,7 @@ export default {
     auxiliariesOptions () {
       return this.activeAuxiliaries.length === 0
         ? [{ label: this.placeholder, value: this.selectedAuxiliary._id }]
-        : this.activeAuxiliaries.map(aux => ({
-          label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-          value: aux._id,
-        }));
+        : this.activeAuxiliaries.map(aux => ({ label: formatIdentity(aux.identity, 'FL'), value: aux._id }));
     },
     filteredEvents () {
       return this.events.filter(ev => !ev.isCancelled);

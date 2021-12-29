@@ -54,7 +54,7 @@
 <script>
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf, email, sameAs } from '@vuelidate/validators';
+import { required, email, sameAs } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
@@ -112,10 +112,7 @@ export default {
       },
       newPassword: {
         password: { required, ...this.passwordValidation },
-        confirm: {
-          required: requiredIf(this.newPassword.password),
-          sameAsPassword: sameAs(this.newPassword.password),
-        },
+        confirm: { required, sameAs: sameAs(this.newPassword.password) },
       },
     };
   },

@@ -52,7 +52,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
-  emits: ['hide', 'input', 'submit', 'delete', 'update'],
+  emits: ['hide', 'update:model-value', 'submit', 'delete', 'update'],
   data () {
     return {
       ON_SITE,
