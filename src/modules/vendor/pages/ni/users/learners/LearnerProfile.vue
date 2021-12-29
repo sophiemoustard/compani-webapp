@@ -11,13 +11,14 @@
     </div>
 
     <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkUserToCompany"
-      :validations="$v.newCompany" @hide="resetCompanyLinkModal" :new-company.sync="newCompany"
+      :validations="v$.newCompany" @hide="resetCompanyLinkModal" v-model:new-company="newCompany"
       :company-options="companyOptions" />
   </q-page>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Button from '@components/Button';
@@ -39,6 +40,7 @@ export default {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
+  setup () { return { v$: useVuelidate() }; },
   mixins: [learnerMixin],
   components: {
     'ni-profile-header': ProfileHeader,
@@ -108,12 +110,12 @@ export default {
     resetCompanyLinkModal () {
       this.companyOptions = [];
       this.newCompany = '';
-      this.$v.newCompany.$reset();
+      this.v$.newCompany.$reset();
     },
     async linkUserToCompany () {
       try {
-        this.$v.newCompany.$touch();
-        if (this.$v.newCompany.$error) return NotifyWarning('Une structure est requise.');
+        this.v$.newCompany.$touch();
+        if (this.v$.newCompany.$error) return NotifyWarning('Une structure est requise.');
 
         this.modalLoading = true;
         await Users.updateById(this.userProfile._id, { company: this.newCompany });
