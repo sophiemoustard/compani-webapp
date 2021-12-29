@@ -45,7 +45,7 @@ export default {
     if (this.vendorRole !== TRAINER) {
       await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.trainerId });
     }
-    this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
+    this.userIdentity = formatIdentity(get(this.userProfile, 'identity'), 'FL');
   },
   computed: {
     ...mapState({
@@ -57,7 +57,7 @@ export default {
   },
   watch: {
     async userProfile () {
-      this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
+      this.userIdentity = formatIdentity(get(this.userProfile, 'identity'), 'FL');
       if (this.vendorRole !== TRAINER) await this.$store.dispatch('userProfile/updateNotifications');
     },
   },

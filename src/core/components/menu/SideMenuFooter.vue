@@ -76,8 +76,8 @@ export default {
       window.open(url, '_blank');
     },
     goToProfile () {
-      if (!/account/.test(this.$router.currentRoute.name)) {
-        return /\/ad\//.test(this.$router.currentRoute.path)
+      if (!/account/.test(this.$router.currentRoute.value.name)) {
+        return /\/ad\//.test(this.$router.currentRoute.value.path)
           ? this.$router.push({ name: 'account vendor', params: { id: this.userId } })
           : this.$router.push({ name: 'account client', params: { id: this.userId } });
       }

@@ -2,18 +2,19 @@
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un profil"
       @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
       @go-to="goToTrainerProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="trainerCreationModal = true" :disable="tableLoading" />
 
     <trainer-creation-modal v-model="trainerCreationModal" @hide="resetCreationModal" @submit="createTrainer"
-      :new-trainer.sync="newTrainer" :validations="$v.newTrainer" :loading="modalLoading" @go-to-next-step="nextStep"
-      :email-error="emailError($v.newTrainer)" :first-step="firstStep" />
+      v-model:new-trainer="newTrainer" :validations="v$.newTrainer" :loading="modalLoading" @go-to-next-step="nextStep"
+      :email-error="emailError(v$.newTrainer)" :first-step="firstStep" />
 </q-page>
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -37,6 +38,7 @@ export default {
     'trainer-creation-modal': TrainerCreationModal,
   },
   mixins: [userMixin],
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       trainers: [],
@@ -65,26 +67,24 @@ export default {
   methods: {
     async nextStep () {
       try {
-        this.$v.newTrainer.local.email.$touch();
-        if (this.$v.newTrainer.local.email.$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        this.v$.newTrainer.local.email.$touch();
+        if (this.v$.newTrainer.local.email.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainer.local.email });
 
-        if (userInfo.exists && get(userInfo, 'user.role.vendor')) {
-          NotifyNegative('Compte déjà existant.');
-        } else if (userInfo.exists) {
+        if (!userInfo.exists) this.firstStep = false;
+        else if (get(userInfo, 'user.role.vendor')) NotifyNegative('Compte déjà existant.');
+        else {
           const roles = await Roles.list({ name: TRAINER });
           if (roles.length === 0) throw new Error('Role not found');
+
           await Users.updateById(userInfo.user._id, { role: roles[0]._id });
           NotifyPositive('Compte créé');
+
           await this.refreshTrainers();
           this.resetCreationModal();
           this.trainerCreationModal = false;
-        } else {
-          this.firstStep = false;
         }
       } catch (e) {
         NotifyNegative('Erreur lors de la création du compte.');
@@ -96,7 +96,7 @@ export default {
     resetCreationModal () {
       this.firstStep = true;
       this.newTrainer = { identity: { lastname: '', firstname: '' }, local: { email: '' } };
-      this.$v.newTrainer.$reset();
+      this.v$.newTrainer.$reset();
     },
     updateSearch (value) {
       this.searchStr = value;
@@ -107,11 +107,7 @@ export default {
     formatTrainer (trainer) {
       const formattedName = formatIdentity(trainer.identity, 'FL');
 
-      return {
-        ...trainer,
-        name: formattedName,
-        noDiacriticsName: removeDiacritics(formattedName),
-      };
+      return { ...trainer, name: formattedName, noDiacriticsName: removeDiacritics(formattedName) };
     },
     async refreshTrainers () {
       try {
@@ -129,10 +125,8 @@ export default {
     },
     async createTrainer () {
       try {
-        this.$v.newTrainer.$touch();
-        if (this.$v.newTrainer.$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        this.v$.newTrainer.$touch();
+        if (this.v$.newTrainer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
 
