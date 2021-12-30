@@ -2,22 +2,23 @@
   <div class="course-link">
     <ni-bi-color-button icon="file_download" label="Convocation papier" :disable="disableLink" size="16px"
       @click="$emit('download')" />
-    <!-- <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
-      v-clipboard:copy="!disableLink && courseLink()" v-clipboard:success="handleCopySuccess" /> -->
+    <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
+      @click="copy" />
 </div>
 </template>
 
 <script>
+import { copyToClipboard } from 'quasar';
 import { mapState } from 'vuex';
-import { NotifyPositive } from '@components/popup/notify';
-// import Button from '@components/Button';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
 import Courses from '@api/Courses';
 
 export default {
   name: 'CourseInfoLink',
   components: {
-    // 'ni-button': Button,
+    'ni-button': Button,
     'ni-bi-color-button': BiColorButton,
   },
   props: {
@@ -28,6 +29,13 @@ export default {
     ...mapState('course', ['course']),
   },
   methods: {
+    copy () {
+      if (this.disableLink) return;
+
+      copyToClipboard(this.courseLink())
+        .then(() => NotifyPositive('Lien copié !'))
+        .catch(() => NotifyNegative('Erreur lors de la copie du lien.'));
+    },
     handleCopySuccess () {
       return NotifyPositive('Lien copié !');
     },

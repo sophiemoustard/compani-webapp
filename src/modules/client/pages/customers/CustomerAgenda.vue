@@ -50,7 +50,6 @@ export default {
       events: [],
       conflictingEvents: [],
       height: 0,
-      viewMode: WEEK_VIEW,
       AGENDA,
       personKey: CUSTOMER,
       DEFAULT_AVATAR,

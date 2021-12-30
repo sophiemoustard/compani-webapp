@@ -3,8 +3,7 @@
     <div class="q-mb-xl">
       <div class="row">
         <p class="text-weight-bold table-title">{{ tableTitle }}</p>
-        <!-- <ni-copy-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail"
-          :value-to-copy="traineesEmails" @copy-success="handleCopySuccess" /> -->
+        <ni-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail" @click="copy" />
       </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
@@ -49,6 +48,7 @@
 </template>
 
 <script>
+import { copyToClipboard } from 'quasar';
 import { onMounted, computed, ref } from 'vue';
 import { useStore, mapState, mapGetters } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -77,7 +77,6 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
 import { useLearners } from '@composables/learners';
-// import CopyButton from '@components/CopyButton';
 
 export default {
   name: 'TraineeTable',
@@ -91,7 +90,6 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'trainee-edition-modal': TraineeEditionModal,
     'trainee-addition-modal': TraineeAdditionModal,
-    // 'ni-copy-button': CopyButton,
     'learner-creation-modal': LearnerCreationModal,
   },
   emits: ['refresh'],
@@ -203,6 +201,7 @@ export default {
       tableLoading,
       learnerCreationModalLoading,
       learnerCreationModal,
+      learnerAlreadyExists,
       filteredLearners,
       potentialTrainees,
       learnerValidation,
@@ -384,8 +383,10 @@ export default {
         NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
     },
-    handleCopySuccess () {
-      NotifyPositive('Adresses mail copiées !');
+    copy () {
+      copyToClipboard(this.traineesEmails)
+        .then(() => NotifyPositive('Adresses mail copiées !'))
+        .catch(() => NotifyNegative('Erreur lors de la copie des emails.'));
     },
     openTraineeCreationModal () {
       if (this.course.archivedAt) {

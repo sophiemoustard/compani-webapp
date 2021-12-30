@@ -1,10 +1,11 @@
 import { mapState } from 'vuex';
-import { THREE_DAYS_VIEW } from '@data/constants';
+import { THREE_DAYS_VIEW, WEEK_VIEW } from '@data/constants';
 import moment from '@helpers/moment';
 
 export const planningTimelineMixin = {
   data () {
     return {
+      viewMode: WEEK_VIEW,
       targetDate: '',
       datimeModal: false,
       days: [],
