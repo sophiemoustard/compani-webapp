@@ -22,7 +22,7 @@ export default {
       window.history.go(-1);
     },
     goTo () {
-      return /\/ad\//.test(this.$router.currentRoute.value.path)
+      return /\/ad\//.test(this.$route.path)
         ? this.$router.replace('/ad').catch((e) => {})
         : this.$router.replace('/').catch((e) => {});
     },

@@ -289,33 +289,32 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .cell-container
-    width: 100%
+.cell-container
+  width: 100%
 
-  .contract-cell
-    background: white
-    width: 100%
-    margin-bottom: 20px
+.contract-cell
+  background: white
+  width: 100%
+  margin-bottom: 20px
 
-  .cell-title
-    font-size: 18px
-    padding: 16px 10px
-    display: flex
-    justify-content: space-between
+.cell-title
+  font-size: 18px
+  padding: 16px 10px
+  display: flex
+  justify-content: space-between
 
-  .cell-subtitle
-    margin:  0 10px 10px
-    font-size: 14px
+.cell-subtitle
+  margin:  0 10px 10px
+  font-size: 14px
 
-  :deep(.q-layout-header)
-    box-shadow: none
+:deep(.q-layout-header)
+  box-shadow: none
 
-  .iframe-normal
-    position: absolute
-    width: 100%
-    height:100%
+.iframe-normal
+  position: absolute
+  width: 100%
+  height:100%
 
-  .contract-actions
-    justify-content: normal !important
-
+.contract-actions
+  justify-content: normal !important
 </style>

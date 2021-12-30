@@ -95,7 +95,7 @@ export default {
       newPasswordModal: false,
       newPassword: { password: '', confirm: '' },
       loading: false,
-      backgroundClass: /\/ad\//.test(this.$router.currentRoute.value.path) ? 'vendor-background' : 'client-background',
+      backgroundClass: /\/ad\//.test(this.$route.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
     };
   },

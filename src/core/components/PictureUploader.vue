@@ -55,7 +55,7 @@ export default {
       return get(this.user, 'picture.link') || null;
     },
     canvasColor () {
-      return /\/ad\//.test(this.$router.currentRoute.value.path) ? '#FFEDDA' : '#EEE';
+      return /\/ad\//.test(this.$route.path) ? '#FFEDDA' : '#EEE';
     },
     noDiacriticLastname () {
       return removeDiacritics(get(this.user, 'identity.lastname') || '');

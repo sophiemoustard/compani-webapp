@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import SearchAddress from '@components/form/SearchAddress';
@@ -49,7 +50,7 @@ export default {
   },
   computed: {
     primaryAddressError () {
-      return !this.validations.contact.primaryAddress.fullAddress.required.$reponse
+      return get(this.validations, 'contact.primaryAddress.fullAddress.required.$reponse') === false
         ? REQUIRED_LABEL
         : 'Adresse non valide';
     },

@@ -569,12 +569,12 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .identity-block
-    display: inline-block
-    font-size: 12px
-  .referent
-    display: flex
-    :deep(.q-field__append)
-      .q-select__dropdown-icon
-        display: none
+.identity-block
+  display: inline-block
+  font-size: 12px
+.referent
+  display: flex
+  :deep(.q-field__append)
+    .q-select__dropdown-icon
+      display: none
 </style>

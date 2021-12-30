@@ -58,7 +58,7 @@ export default {
     },
   },
   beforeUnmount () {
-    if (this.$router.currentRoute.value.name !== 'ni courses info') this.$store.dispatch('course/resetFilters');
+    if (this.$route.name !== 'ni courses info') this.$store.dispatch('course/resetFilters');
   },
 };
 </script>

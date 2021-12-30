@@ -70,7 +70,7 @@ export default {
   },
   beforeUnmount () {
     // do not reset program in store if user is editing one program activity
-    if (!(new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.value.path)) {
+    if (!(new RegExp(`programs/${this.program._id}`)).test(this.$route.path)) {
       this.$store.dispatch('program/resetProgram');
     }
   },
