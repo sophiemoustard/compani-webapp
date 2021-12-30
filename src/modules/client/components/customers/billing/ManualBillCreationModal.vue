@@ -80,7 +80,7 @@ export default {
     'submit',
     'remove-billing-item',
     'update-billing-item',
-    'update:newManualBill',
+    'update:new-manual-bill',
     'add-billing-item',
   ],
   data () {
@@ -146,7 +146,7 @@ export default {
       await this.$emit('remove-billing-item', index);
     },
     async update (event, prop) {
-      await this.$emit('update:newManualBill', { ...this.newManualBill, [prop]: event });
+      await this.$emit('update:new-manual-bill', { ...this.newManualBill, [prop]: event });
     },
     addBillingItem () {
       this.$emit('add-billing-item');

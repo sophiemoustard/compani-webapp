@@ -52,7 +52,8 @@ export default {
     'go-to-week',
     'go-to-today',
     'open-delete-events-modal',
-    'toggle-history', 'update-view-mode',
+    'toggle-history',
+    'update-view-mode',
   ],
   data () {
     return {

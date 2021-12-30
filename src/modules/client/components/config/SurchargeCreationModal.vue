@@ -68,7 +68,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:newSurcharge'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-surcharge'],
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
@@ -86,7 +86,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newSurcharge', { ...this.newSurcharge, [prop]: event });
+      this.$emit('update:new-surcharge', { ...this.newSurcharge, [prop]: event });
     },
   },
 };

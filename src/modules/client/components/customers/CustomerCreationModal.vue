@@ -40,7 +40,7 @@ export default {
     civilityOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
   },
-  emits: ['hide', 'submit', 'update:newCustomer', 'update:model-value'],
+  emits: ['hide', 'submit', 'update:new-customer', 'update:model-value'],
   components: {
     'ni-search-address': SearchAddress,
     'ni-input': Input,
@@ -65,7 +65,7 @@ export default {
       this.$emit('submit');
     },
     update (event, path) {
-      this.$emit('update:newCustomer', set({ ...this.newCustomer }, path, event));
+      this.$emit('update:new-customer', set({ ...this.newCustomer }, path, event));
     },
   },
 };

@@ -100,7 +100,7 @@ export default {
     'ni-input': Input,
     'ni-date-input': DateInput,
   },
-  emits: ['udpate:model-value', 'hide', 'submit', 'get-events', 'update:editedCreditNote'],
+  emits: ['udpate:model-value', 'hide', 'submit', 'get-events', 'update:edited-credit-note'],
   computed: {
     editedCreditNoteHasNoEvents () {
       return this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate &&
@@ -127,7 +127,7 @@ export default {
       this.$emit('get-events', value);
     },
     update (event, prop) {
-      this.$emit('update:editedCreditNote', { ...this.editedCreditNote, [prop]: event });
+      this.$emit('update:edited-credit-note', { ...this.editedCreditNote, [prop]: event });
     },
   },
 };

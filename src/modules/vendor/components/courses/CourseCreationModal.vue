@@ -54,7 +54,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:newCourse'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-course'],
   data () {
     return {
       courseTypes: COURSE_TYPES,
@@ -96,10 +96,10 @@ export default {
       this.$emit('submit');
     },
     updateType (event) {
-      this.$emit('update:newCourse', { ...omit(this.newCourse, 'company'), type: event });
+      this.$emit('update:new-course', { ...omit(this.newCourse, 'company'), type: event });
     },
     update (event, prop) {
-      this.$emit('update:newCourse', { ...this.newCourse, [prop]: event });
+      this.$emit('update:new-course', { ...this.newCourse, [prop]: event });
     },
   },
 };

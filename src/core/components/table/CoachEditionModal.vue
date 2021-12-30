@@ -45,7 +45,7 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:selectedCoach'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:selected-coach'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -57,7 +57,7 @@ export default {
       this.$emit('submit');
     },
     update (event, path) {
-      this.$emit('update:selectedCoach', set({ ...this.selectedCoach }, path, event));
+      this.$emit('update:selected-coach', set({ ...this.selectedCoach }, path, event));
     },
   },
 };

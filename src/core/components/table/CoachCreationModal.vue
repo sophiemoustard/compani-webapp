@@ -51,7 +51,7 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
   },
-  emits: ['hide', 'show', 'submit', 'update:model-value', 'go-to-next-step', 'update:newCoach'],
+  emits: ['hide', 'show', 'submit', 'update:model-value', 'go-to-next-step', 'update:new-coach'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -69,7 +69,7 @@ export default {
       this.$emit('go-to-next-step');
     },
     update (event, path) {
-      this.$emit('update:newCoach', set({ ...this.newCoach }, path, event));
+      this.$emit('update:new-coach', set({ ...this.newCoach }, path, event));
     },
   },
 };

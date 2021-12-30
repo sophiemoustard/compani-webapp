@@ -28,7 +28,7 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
   },
-  emits: ['update:model-value', 'hide', 'submit', 'update:editedSector'],
+  emits: ['update:model-value', 'hide', 'submit', 'update:edited-sector'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -40,7 +40,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:editedSector', { ...this.editedSector, [prop]: event });
+      this.$emit('update:edited-sector', { ...this.editedSector, [prop]: event });
     },
   },
 };

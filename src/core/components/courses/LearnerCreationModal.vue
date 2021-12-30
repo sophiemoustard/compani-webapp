@@ -60,7 +60,7 @@ export default {
       return this.learnerEdition ? 'Suivant' : 'Ajouter la personne';
     },
   },
-  emits: ['hide', 'update:model-value', 'submit', 'next-step', 'update:newUser'],
+  emits: ['hide', 'update:model-value', 'submit', 'next-step', 'update:new-user'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -75,7 +75,7 @@ export default {
       this.$emit('submit');
     },
     update (event, path) {
-      this.$emit('update:newUser', set({ ...this.newUser }, path, event));
+      this.$emit('update:new-user', set({ ...this.newUser }, path, event));
     },
   },
 };

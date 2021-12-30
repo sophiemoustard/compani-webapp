@@ -69,15 +69,13 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'go-to-next-step', 'update:send-welcome-msg', 'update-new-user'],
   data () {
-    return {
-      REQUIRED_LABEL,
-    };
+    return { REQUIRED_LABEL };
   },
   computed: {
     mobilePhoneError () {
-      if (!this.validations.contact.phone.required.$response) return REQUIRED_LABEL;
-      if (!this.validations.contact.phone.frPhoneNumber.$response ||
-        !this.validations.contact.phone.maxLength.$response) {
+      if (this.validations.contact.phone.required.$response === false) return REQUIRED_LABEL;
+      if (this.validations.contact.phone.frPhoneNumber.$response === false ||
+        this.validations.contact.phone.maxLength.$response === false) {
         return 'Numéro de téléphone non valide';
       }
       return '';

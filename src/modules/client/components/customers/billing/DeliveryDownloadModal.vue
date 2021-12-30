@@ -39,7 +39,7 @@ export default {
     tppOptions: { type: Array, default: () => [] },
     monthOptions: { type: Array, default: () => [] },
   },
-  emits: ['update:model-value', 'hide', 'submit', 'update:deliveryFile'],
+  emits: ['update:model-value', 'hide', 'submit', 'update:delivery-file'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -51,7 +51,7 @@ export default {
       this.$emit('submit', value);
     },
     update (event, prop) {
-      this.$emit('update:deliveryFile', set(this.deliveryFile, prop, event));
+      this.$emit('update:delivery-file', set(this.deliveryFile, prop, event));
     },
   },
 };

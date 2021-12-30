@@ -35,7 +35,7 @@ export default {
     reason: { type: String, default: '' },
     validations: { type: Object, default: () => ({}) },
   },
-  emits: ['hide', 'update:reason', 'cancelTimeStamping', 'update:model-value'],
+  emits: ['hide', 'update:reason', 'cancel-time-stamping', 'update:model-value'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -44,7 +44,7 @@ export default {
       this.$emit('update:reason', event);
     },
     cancelTimeStamping () {
-      this.$emit('cancelTimeStamping');
+      this.$emit('cancel-time-stamping');
     },
   },
 };

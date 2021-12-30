@@ -69,7 +69,7 @@ export default {
     'update:model-value',
     'hide',
     'submit',
-    'update:newService',
+    'update:new-service',
     'add-billing-item',
     'update-billing-item',
     'remove-billing-item',
@@ -91,7 +91,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newService', { ...this.newService, [prop]: event });
+      this.$emit('update:new-service', { ...this.newService, [prop]: event });
     },
     addBillingItem () {
       this.$emit('add-billing-item');

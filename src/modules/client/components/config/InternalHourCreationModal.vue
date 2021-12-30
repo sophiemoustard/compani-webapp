@@ -28,7 +28,7 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:newInternalHour'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-internal-hour'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -40,7 +40,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newInternalHour', { ...this.newInternalHour, [prop]: event });
+      this.$emit('update:new-internal-hour', { ...this.newInternalHour, [prop]: event });
     },
   },
 };

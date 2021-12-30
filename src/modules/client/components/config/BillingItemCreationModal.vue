@@ -13,7 +13,7 @@
       @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError" suffix="€" type="number" />
     <ni-input in-modal caption="TVA" :model-value="newBillingItem.vat" @update:model-value="update($event, 'vat')"
       :error="validations.vat.$error" @blur="validations.vat.$touch" required-field :error-message="vatError"
-      type="number" uffix="%" />
+      type="number" suffix="%" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer un article" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -42,7 +42,7 @@ export default {
     vatError: { type: String, required: true },
     loading: { type: Boolean, default: false },
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:newBillingItem'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-billing-item'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -54,7 +54,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newBillingItem', { ...this.newBillingItem, [prop]: event });
+      this.$emit('update:new-billing-item', { ...this.newBillingItem, [prop]: event });
     },
   },
 };

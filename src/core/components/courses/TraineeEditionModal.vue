@@ -38,7 +38,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:editedTrainee'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:edited-trainee'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -50,7 +50,7 @@ export default {
       this.$emit('submit');
     },
     update (event, path) {
-      this.$emit('update:editedTrainee', set({ ...this.editedTrainee }, path, event));
+      this.$emit('update:edited-trainee', set({ ...this.editedTrainee }, path, event));
     },
   },
 };

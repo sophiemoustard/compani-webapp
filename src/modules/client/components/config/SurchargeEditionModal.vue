@@ -74,7 +74,7 @@ export default {
     'ni-time-input': TimeInput,
 
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:editedSurcharge'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:edited-surcharge'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -86,7 +86,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:editedSurcharge', { ...this.editedSurcharge, [prop]: event });
+      this.$emit('update:edited-surcharge', { ...this.editedSurcharge, [prop]: event });
     },
   },
 };

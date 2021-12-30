@@ -49,7 +49,7 @@ export default {
     selectedCustomer: { type: Object, default: () => ({}) },
     selectedTpp: { type: Object, default: () => ({}) },
   },
-  emits: ['update:model-value', 'hide', 'submit', 'update:newPayment'],
+  emits: ['update:model-value', 'hide', 'submit', 'update:new-payment'],
   data () {
     return {
       paymentOptions: PAYMENT_OPTIONS,
@@ -86,7 +86,7 @@ export default {
       this.$emit('submit', value);
     },
     update (event, prop) {
-      this.$emit('update:newPayment', { ...this.newPayment, [prop]: event });
+      this.$emit('update:new-payment', { ...this.newPayment, [prop]: event });
     },
   },
 };

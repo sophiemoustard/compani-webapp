@@ -111,8 +111,8 @@ export default {
     'submit',
     'update:model-value',
     'get-events',
-    'update:hasLinkedEvents',
-    'update:newCreditNote',
+    'update:has-linked-events',
+    'update:new-credit-note',
     'reset-customer-data',
   ],
   computed: {
@@ -141,10 +141,10 @@ export default {
       this.$emit('get-events', prop);
     },
     updateHasLinkedEvents (event) {
-      this.$emit('update:hasLinkedEvents', event);
+      this.$emit('update:has-linked-events', event);
     },
     update (event, prop) {
-      this.$emit('update:newCreditNote', { ...this.newCreditNote, [prop]: event });
+      this.$emit('update:new-credit-note', { ...this.newCreditNote, [prop]: event });
     },
     updateCustomer (event) {
       this.update(event, 'customer');

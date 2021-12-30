@@ -36,7 +36,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
-  emits: ['hide', 'update:model-value', 'update-type', 'send', 'update:newSms'],
+  emits: ['hide', 'update:model-value', 'update-type', 'send', 'update:new-sms'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -52,7 +52,7 @@ export default {
       this.$emit('send', this.newSms);
     },
     update (event, prop) {
-      this.$emit('update:newSms', { ...this.newSms, [prop]: event });
+      this.$emit('update:new-sms', { ...this.newSms, [prop]: event });
     },
   },
 };

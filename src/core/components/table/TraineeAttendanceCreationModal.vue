@@ -9,7 +9,7 @@
     <div class="row q-pb-md">
       <ni-option-group :model-value="newTraineeAttendance.attendances" :error-message="REQUIRED_LABEL" required-field
         :options="slotsOptions" :error="validation.attendances.$error" type="checkbox" inline
-        caption="Selectionner les créneaux auxquelles a été présent(e) le/la participant(e)"
+        caption="Selectionner les créneaux auxquels a été présent(e) le/la participant(e)"
         @update:model-value="update($event, 'attendances')" />
     </div>
     <template #footer>

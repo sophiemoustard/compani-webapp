@@ -39,7 +39,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:editedSubscription'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:edited-subscription'],
   data () {
     return {
       FIXED,
@@ -56,7 +56,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:editedSubscription', { ...this.editedSubscription, [prop]: event });
+      this.$emit('update:edited-subscription', { ...this.editedSubscription, [prop]: event });
     },
   },
 };

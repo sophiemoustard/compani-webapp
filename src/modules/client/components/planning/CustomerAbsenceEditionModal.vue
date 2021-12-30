@@ -37,7 +37,7 @@ export default {
     'ni-date-range': DateRange,
     'ni-button': Button,
   },
-  emits: ['update:editedCustomerAbsence', 'close', 'hide', 'submit'],
+  emits: ['update:edited-customer-absence', 'close', 'hide', 'submit'],
   data () {
     return {
       customerAbsenceOptions: CUSTOMER_ABSENCE_TYPES,
@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     update (event, prop) {
-      this.$emit('update:editedCustomerAbsence', { ...this.editedCustomerAbsence, [prop]: event });
+      this.$emit('update:edited-customer-absence', { ...this.editedCustomerAbsence, [prop]: event });
     },
     close () {
       this.$emit('close');

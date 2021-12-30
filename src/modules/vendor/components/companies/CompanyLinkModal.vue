@@ -29,7 +29,7 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:newCompany'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-company'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -41,7 +41,7 @@ export default {
       this.$emit('submit');
     },
     update (value) {
-      this.$emit('update:newCompany', value);
+      this.$emit('update:new-company', value);
     },
   },
 };

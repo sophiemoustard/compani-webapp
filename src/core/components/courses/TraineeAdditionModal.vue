@@ -51,7 +51,7 @@ export default {
     'ni-select': Select,
     'ni-button': Button,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:newTrainee', 'open-learner-creation-modal'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-trainee', 'open-learner-creation-modal'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -63,7 +63,7 @@ export default {
       this.$emit('submit');
     },
     update (event) {
-      this.$emit('update:newTrainee', event);
+      this.$emit('update:new-trainee', event);
     },
     openLearnerCreationModal () {
       this.$emit('open-learner-creation-modal');

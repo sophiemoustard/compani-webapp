@@ -150,7 +150,6 @@ export const usePlanningAction = (personKey, customers) => {
     newEvent,
     editedEvent,
     editedCustomerAbsence,
-    customers,
     // Computed
     eventValidation,
   };

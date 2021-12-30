@@ -9,8 +9,7 @@
     <ni-date-input in-modal caption="Date" required-field :model-value="newPayDocument.date"
       @update:model-value="update('date', $event)" />
     <ni-input in-modal caption="Document" type="file" :model-value="newPayDocument.file" required-field last
-      :error-message="fileErrorMessage" @update:model-value="validations.file.$touch; update('file', $event)"
-      :error="validations.file.$error" />
+      :error-message="fileErrorMessage" @update:model-value="updateDocument" :error="validations.file.$error" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -53,6 +52,10 @@ export default {
     },
   },
   methods: {
+    updateDocument (event) {
+      this.validations.file.$touch();
+      this.update('file', event);
+    },
     hide () {
       this.$emit('hide');
     },

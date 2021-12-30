@@ -31,7 +31,7 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
   },
-  emits: ['update:model-value', 'hide', 'submit', 'update:newAdministrativeDocument'],
+  emits: ['update:model-value', 'hide', 'submit', 'update:new-administrative-document'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -43,7 +43,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newAdministrativeDocument', { ...this.newAdministrativeDocument, [prop]: event });
+      this.$emit('update:new-administrative-document', { ...this.newAdministrativeDocument, [prop]: event });
     },
   },
 };
