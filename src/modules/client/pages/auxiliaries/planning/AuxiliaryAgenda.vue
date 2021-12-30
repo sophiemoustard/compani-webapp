@@ -48,7 +48,7 @@ import Customers from '@api/Customers';
 import Events from '@api/Events';
 import Select from '@components/form/Select';
 import { NotifyWarning } from '@components/popup/notify';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '@data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, AUXILIARY, UNKNOWN_AVATAR } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import Agenda from 'src/modules/client/components/planning/Agenda';
@@ -88,7 +88,6 @@ export default {
       auxiliaries: [],
       internalHours: [],
       loading: false,
-      viewMode: WEEK_VIEW,
       AGENDA,
       creationModal: false,
       editionModal: false,
