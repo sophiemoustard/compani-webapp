@@ -42,11 +42,12 @@
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
                   <ni-button v-if="get(props, 'row.driveFile.driveId')" data-cy="link" color="primary"
-                    @click="downloadTaxCertificateFromDrive(props.row)" icon="file_download" />
+                    @click="downloadTaxCertificateFromDrive(props.row)" icon="file_download"
+                    :disable="pdfLoading || disableTaxCertificate" />
                   <ni-button v-else data-cy="link" color="primary" icon="file_download"
-                    @click="downloadTaxCertificate(props.row)" :disable="pdfLoading" />
-                  <ni-button v-if="isCoach" color="copper-grey-400" icon="delete"
-                    @click="validateTaxCertificateDeletion(col.value, props.row)" />
+                    @click="downloadTaxCertificate(props.row)" :disable="pdfLoading || disableTaxCertificate" />
+                  <ni-button v-if="isCoach" color="copper-grey-400" :disable="pdfLoading || disableTaxCertificate"
+                    @click="validateTaxCertificateDeletion(col.value, props.row)" icon="delete" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -78,9 +79,9 @@
       </template>
       <ni-date-input caption="Date" v-model="taxCertificate.date" @blur="taxCertificatesValidation.date.$touch"
         :error-message="REQUIRED_LABEL" in-modal required-field />
-      <ni-select caption="Année" v-model="taxCertificate.year" :options="yearOptions"
+      <ni-select caption="Année" v-model="taxCertificate.year" :options="yearOptions" required-field
         @blur="taxCertificatesValidation.year.$touch" :error="taxCertificatesValidation.year.$error" in-modal
-          required-field />
+        :error-message="taxCertificateYearError" />
       <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error-message="taxCertificateFileError"
         @blur="taxCertificatesValidation.file.$touch" in-modal :error="taxCertificatesValidation.file.$error" last
         required-field />
@@ -103,15 +104,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
-import {
-  DIRECT_DEBIT,
-  COACH_ROLES,
-  CLIENT_ADMIN,
-  CUSTOMER,
-  THIRD_PARTY_PAYER,
-  HELPER,
-  REQUIRED_LABEL,
-} from '@data/constants';
+import { COACH_ROLES, CLIENT_ADMIN, CUSTOMER, THIRD_PARTY_PAYER, HELPER, REQUIRED_LABEL } from '@data/constants';
 import moment from '@helpers/moment';
 import { formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
@@ -165,13 +158,11 @@ export default {
       taxCertificateFileError,
       taxCertificateYearError,
       getTaxCertificates,
-      formatTaxCertificatePayload,
       resetTaxCertificateModal,
       createTaxCertificate,
       downloadTaxCertificateFromDrive,
       downloadTaxCertificate,
       validateTaxCertificateDeletion,
-      deleteTaxCertificate,
       taxCertificatesValidation,
     } = useTaxCertificates(customer);
 
@@ -195,8 +186,6 @@ export default {
       paymentEditionLoading,
       editedPayment,
       v$,
-      PAYMENT,
-      PAYMENT_OPTIONS,
       openPaymentCreationModal,
       resetPaymentCreationModal,
       validatePaymentCreation,
@@ -224,9 +213,6 @@ export default {
       paymentEditionLoading,
       editedPayment,
       v$,
-      PAYMENT,
-      DIRECT_DEBIT,
-      PAYMENT_OPTIONS,
       openPaymentCreationModal,
       resetPaymentCreationModal,
       validatePaymentCreation,
@@ -248,14 +234,11 @@ export default {
       taxCertificatesValidation,
       taxCertificateFileError,
       taxCertificateYearError,
-      getTaxCertificates,
-      formatTaxCertificatePayload,
       resetTaxCertificateModal,
       createTaxCertificate,
       downloadTaxCertificateFromDrive,
       downloadTaxCertificate,
       validateTaxCertificateDeletion,
-      deleteTaxCertificate,
       refresh,
     };
   },

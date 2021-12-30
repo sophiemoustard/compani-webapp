@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { useMeta } from 'quasar';
+import { useMeta, useQuasar } from 'quasar';
 import { onMounted, ref, computed } from 'vue';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
@@ -70,6 +70,7 @@ import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { PAYMENT, PAYMENT_OPTIONS } from '@data/constants';
 import {
   formatPrice,
   getLastVersion,
@@ -97,6 +98,8 @@ export default {
   setup () {
     const metaInfo = { title: 'Balances clients' };
     useMeta(metaInfo);
+
+    const $q = useQuasar();
 
     const tableLoading = ref(false);
     const selected = ref([]);
@@ -144,12 +147,12 @@ export default {
 
     const createPaymentList = async () => {
       try {
-        const payload = this.selected.map(row => ({
-          nature: this.PAYMENT,
+        const payload = selected.value.map(row => ({
+          nature: PAYMENT,
           customer: row._id.customer,
           customerInfo: row.customer,
           netInclTaxes: row.toPay,
-          type: this.PAYMENT_OPTIONS[0].value,
+          type: PAYMENT_OPTIONS[0].value,
           date: new Date(),
           rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
         }));
@@ -166,14 +169,20 @@ export default {
     };
 
     const validatePaymentListCreation = () => {
-      this.$q.dialog({
+      $q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',
         ok: 'Oui',
         cancel: 'Non',
-      }).onOk(this.createPaymentList)
+      }).onOk(createPaymentList)
         .onCancel(() => NotifyPositive('Création des règlements annulée'));
     };
+
+    const formatClient = data => (data.thirdPartyPayer
+      ? data.thirdPartyPayer.name
+      : formatIdentity(data.customer.identity, 'Lf'));
+
+    const formatCustomer = data => formatIdentity(data.customer.identity, 'Lf');
 
     const exportToCSV = async () => {
       const csvData = [[
@@ -188,8 +197,8 @@ export default {
 
       for (const clientData of filteredBalances.value) {
         csvData.push([
-          this.formatClient(clientData),
-          this.formatCustomer(clientData),
+          formatClient(clientData),
+          formatCustomer(clientData),
           clientData.thirdPartyPayer ? '' : formatNumberForCSV(clientData.participationRate),
           formatNumberForCSV(clientData.billed),
           formatNumberForCSV(clientData.paid),
@@ -208,9 +217,6 @@ export default {
       selectedTpp,
       newPayment,
       v$,
-      PAYMENT,
-      DIRECT_DEBIT,
-      PAYMENT_OPTIONS,
       openPaymentCreationModal,
       resetPaymentCreationModal,
       validatePaymentCreation,
@@ -229,22 +235,18 @@ export default {
       selectedTpp,
       newPayment,
       selected,
-      balances,
       balancesOption,
       filteredBalances,
       v$,
-      PAYMENT,
-      DIRECT_DEBIT,
-      PAYMENT_OPTIONS,
       openPaymentCreationModal,
       resetPaymentCreationModal,
-      validatePaymentCreation,
       validatePaymentListCreation,
       exportToCSV,
       submitPaymentCreation,
       resetSelected,
       selectRows,
-      createPaymentList,
+      formatClient,
+      formatCustomer,
     };
   },
   data () {
@@ -292,13 +294,6 @@ export default {
   methods: {
     goToCustomerBillingPage (customerId) {
       this.$router.push({ name: 'ni customers info', params: { customerId, defaultTab: 'billing' } });
-    },
-    // Refresh
-    formatClient (data) {
-      return data.thirdPartyPayer ? data.thirdPartyPayer.name : formatIdentity(data.customer.identity, 'Lf');
-    },
-    formatCustomer (data) {
-      return formatIdentity(data.customer.identity, 'Lf');
     },
   },
 };
