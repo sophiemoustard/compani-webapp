@@ -226,11 +226,13 @@ export default {
     ibanError () {
       if (!this.v$.customer.payment.iban.required) return REQUIRED_LABEL;
       if (!this.v$.customer.payment.iban.iban) return 'IBAN non valide';
+
       return '';
     },
     bicError () {
       if (!this.v$.customer.payment.bic.required) return REQUIRED_LABEL;
       if (!this.v$.customer.payment.bic.bic) return 'BIC non valide';
+
       return '';
     },
     agreement () {

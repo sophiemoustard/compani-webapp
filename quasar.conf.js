@@ -104,9 +104,15 @@ module.exports = configure(ctx => ({
       cfg.plugins.push(
         new ESLintPlugin({ fix: true }),
         // Select moment locale files
-        new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/)
-        // // Ignore astronomia (date-holidays)
-        // new webpack.IgnorePlugin(/^\.\/vsop87B.*$/)
+        new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/),
+        new webpack.IgnorePlugin({
+          checkResource (resource, context) {
+            // ---- do not bundle astronomia vsop planet data
+            if (/\/astronomia\/data$/.test(context)) return !['./deltat.js', './vsop87Bearth.js'].includes(resource);
+
+            return false;
+          },
+        })
       );
     },
     env: {
