@@ -50,9 +50,6 @@ export const learnerDirectoryMixin = {
     };
   },
   methods: {
-    updateSearch (value) {
-      this.searchStr = value;
-    },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
     },
