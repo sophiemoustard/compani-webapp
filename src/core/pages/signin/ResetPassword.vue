@@ -24,7 +24,7 @@ import useVuelidate from '@vuelidate/core';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Authentication from '@api/Authentication';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { isUserLogged } from '@helpers/alenvi';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { logInMixin } from '@mixins/logInMixin';
@@ -66,7 +66,7 @@ export default {
   validations () {
     return {
       password: { required, ...this.passwordValidation },
-      passwordConfirm: { required, sameAs: sameAs(this.passwordConfirm) },
+      passwordConfirm: { required, sameAs: sameAs(this.password) },
     };
   },
   methods: {
@@ -84,6 +84,9 @@ export default {
     },
     async submit () {
       try {
+        this.v$.$touch();
+        if (this.v$.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         await Authentication.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true });
 
         NotifyPositive('Mot de passe changé. Connexion en cours...');

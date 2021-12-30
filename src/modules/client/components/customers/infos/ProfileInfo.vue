@@ -458,16 +458,19 @@ export default {
     },
     primaryAddressError () {
       if (this.v$.customer.contact.primaryAddress.fullAddress.required.$response === false) return REQUIRED_LABEL;
+
       return 'Adresse non valide';
     },
     ibanError () {
       if (this.v$.customer.payment.iban.required.$response === false) return REQUIRED_LABEL;
       if (this.v$.customer.payment.iban.iban.$response === false) return 'IBAN non valide';
+
       return '';
     },
     bicError () {
       if (this.v$.customer.payment.bic.required.$response === false) return REQUIRED_LABEL;
       if (this.v$.customer.payment.bic.bic.$response === false) return 'BIC non valide';
+
       return '';
     },
     acceptedByHelper () {

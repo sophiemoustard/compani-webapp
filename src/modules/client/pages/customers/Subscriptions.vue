@@ -251,7 +251,8 @@ export default {
       };
     },
     isValidPayment () {
-      return this.v$.customer.payment.bic.bic && this.v$.customer.payment.iban.iban;
+      return get(this.v$, 'customer.payment.bic.bic.$response') === true &&
+        get(this.v$, 'customer.payment.iban.iban.$response') === true;
     },
     docsUploadUrl () {
       return this.customer.driveFolder

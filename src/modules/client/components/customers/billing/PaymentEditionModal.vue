@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
@@ -53,7 +54,7 @@ export default {
   },
   computed: {
     netInclTaxesError () {
-      if (!this.validations.netInclTaxes.required) return REQUIRED_LABEL;
+      if (get(this.validations, 'netInclTaxes.required.$response') === false) return REQUIRED_LABEL;
       return 'Montant TTC non valide';
     },
     editionModalNature () {

@@ -139,23 +139,22 @@ export default {
       ],
     };
   },
-  validations: {
-    newCustomer: {
-      identity: {
-        title: { required },
-        lastname: { required },
-      },
-      contact: {
-        primaryAddress: {
-          zipCode: { required },
-          street: { required },
-          city: { required },
-          fullAddress: { required, frAddress },
+  validations () {
+    return {
+      newCustomer: {
+        identity: { title: { required }, lastname: { required } },
+        contact: {
+          primaryAddress: {
+            zipCode: { required },
+            street: { required },
+            city: { required },
+            fullAddress: { required, frAddress },
+          },
         },
       },
-    },
+    };
   },
-  async mounted () {
+  async created () {
     await this.getCustomers();
   },
   computed: {

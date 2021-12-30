@@ -76,7 +76,6 @@ export default {
   },
   mixins: [userMixin],
   setup () { return { v$: useVuelidate() }; },
-  validationConfig: { $lazy: true },
   data () {
     return {
       loading: false,
@@ -155,6 +154,7 @@ export default {
       const userPayload = removeEmptyProps(user);
       if (this.canSetUserCompany) userPayload.company = this.company._id;
       if (get(user, 'contact.phone')) userPayload.contact.phone = formatPhoneForPayload(user.contact.phone);
+
       return userPayload;
     },
     async nextStep () {
@@ -170,9 +170,8 @@ export default {
         if (userInfo.exists && (!sameOrNoCompany || noDataOnUser)) {
           return NotifyNegative('Ce compte n\'est pas relié à cette structure.');
         }
-        if (userInfo.exists && get(userInfo, 'user.role.client')) {
-          return NotifyNegative('Compte déjà existant.');
-        }
+        if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Compte déjà existant.');
+
         if (userInfo.exists) {
           const payload = { role: this.newCoach.role };
           if (!user.company) payload.company = this.company._id;

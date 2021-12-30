@@ -49,11 +49,9 @@ export default {
   emits: ['hide', 'update:model-value', 'submit', 'next-step', 'update:new-helper'],
   computed: {
     emailError () {
-      if (!this.validations.local.email.required) {
-        return REQUIRED_LABEL;
-      } if (!this.validations.local.email.email) {
-        return 'Email non valide';
-      }
+      if (get(this.validations, 'local.email.required.$response') === false) return REQUIRED_LABEL;
+      if (get(this.validations, 'local.email.email.$response') === false) return 'Email non valide';
+
       return '';
     },
     phoneNbrError () {

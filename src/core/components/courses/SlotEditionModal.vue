@@ -12,7 +12,7 @@
         :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
         required-field />
       <ni-search-address v-if="getType(this.editedCourseSlot.step) === ON_SITE" :model-value="editedCourseSlot.address"
-        :error-message="addressError" in-modal last @blur="validations.address.$touch"
+        error-message="'Adresse non valide'" in-modal last @blur="validations.address.$touch"
         :error="validations.address.$error" @update:model-value="update($event, 'address')" />
       <ni-input v-if="getType(this.editedCourseSlot.step) === REMOTE" :model-value="editedCourseSlot.meetingLink"
         @update:model-value="update($event, 'meetingLink')" caption="Lien vers la visio" in-modal
@@ -32,7 +32,7 @@ import Input from '@components/form/Input';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive } from '@components/popup/notify';
-import { REQUIRED_LABEL, ON_SITE, REMOTE } from '@data/constants';
+import { ON_SITE, REMOTE } from '@data/constants';
 
 export default {
   name: 'SlotEditionModal',
@@ -58,12 +58,6 @@ export default {
       ON_SITE,
       REMOTE,
     };
-  },
-  computed: {
-    addressError () {
-      if (!this.validations.address.fullAddress.required) return REQUIRED_LABEL;
-      return 'Adresse non valide';
-    },
   },
   methods: {
     validateDeletion (slotId) {

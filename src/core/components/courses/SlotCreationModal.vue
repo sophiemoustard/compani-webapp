@@ -1,24 +1,24 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
-        Ajouter un <span class="text-weight-bold">créneau</span>
-      </template>
-      <ni-select in-modal caption="Etape" :options="stepOptions" :model-value="newCourseSlot.step" required-field
-        @blur="validations.step.$touch" :error="validations.step.$error" @update:model-value="updateStep" />
-      <ni-datetime-range caption="Dates et heures" :model-value="newCourseSlot.dates" disable-end-date
-        :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
-        required-field />
-      <ni-search-address v-if="getType(this.newCourseSlot.step) === ON_SITE" :error-message="addressError"
-        :model-value="newCourseSlot.address" @update:model-value="update($event, 'address')"
-        @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
-      <ni-input v-if="getType(this.newCourseSlot.step) === REMOTE" in-modal :error="validations.meetingLink.$error"
-        :model-value="newCourseSlot.meetingLink" @update:model-value="update($event, 'meetingLink')"
-        :error-message="linkErrorMessage" caption="Lien vers la visio" />
-      <template #footer>
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
-          :loading="loading" @click="submit" />
-      </template>
-    </ni-modal>
+      Ajouter un <span class="text-weight-bold">créneau</span>
+    </template>
+    <ni-select in-modal caption="Etape" :options="stepOptions" :model-value="newCourseSlot.step" required-field
+      @blur="validations.step.$touch" :error="validations.step.$error" @update:model-value="updateStep" />
+    <ni-datetime-range caption="Dates et heures" :model-value="newCourseSlot.dates" disable-end-date
+      :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
+      required-field />
+    <ni-search-address v-if="getType(this.newCourseSlot.step) === ON_SITE" error-message="'Adresse non valide'"
+      :model-value="newCourseSlot.address" @update:model-value="update($event, 'address')"
+      @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
+    <ni-input v-if="getType(this.newCourseSlot.step) === REMOTE" in-modal :error="validations.meetingLink.$error"
+      :model-value="newCourseSlot.meetingLink" @update:model-value="update($event, 'meetingLink')"
+      :error-message="linkErrorMessage" caption="Lien vers la visio" />
+    <template #footer>
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
+        :loading="loading" @click="submit" />
+    </template>
+  </ni-modal>
 </template>
 
 <script>
@@ -27,7 +27,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
-import { REQUIRED_LABEL, ON_SITE, REMOTE } from '@data/constants';
+import { ON_SITE, REMOTE } from '@data/constants';
 
 export default {
   name: 'SlotCreationModal',
@@ -48,16 +48,7 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update'],
   data () {
-    return {
-      ON_SITE,
-      REMOTE,
-    };
-  },
-  computed: {
-    addressError () {
-      if (!this.validations.address.fullAddress.required) return REQUIRED_LABEL;
-      return 'Adresse non valide';
-    },
+    return { ON_SITE, REMOTE };
   },
   methods: {
     hide () {

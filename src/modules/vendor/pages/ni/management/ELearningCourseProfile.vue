@@ -20,7 +20,7 @@ import { NotifyNegative } from '@components/popup/notify';
 const metaInfo = { title: 'Fiche formation' };
 
 export default {
-  name: 'ELearningCoursesProfile',
+  name: 'ELearningCourseProfile',
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
@@ -55,7 +55,7 @@ export default {
       ],
     };
   },
-  async mounted () {
+  async created () {
     await this.refreshCourse();
   },
   methods: {

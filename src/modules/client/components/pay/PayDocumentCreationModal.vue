@@ -18,6 +18,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import set from 'lodash/set';
 import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
@@ -47,7 +48,7 @@ export default {
   },
   computed: {
     fileErrorMessage () {
-      if (!this.validations.file.maxSize) return 'Fichier trop volumineux (> 5 Mo)';
+      if (get(this.validations, 'file.maxSize.$response') === false) return 'Fichier trop volumineux (> 5 Mo)';
       return REQUIRED_LABEL;
     },
   },

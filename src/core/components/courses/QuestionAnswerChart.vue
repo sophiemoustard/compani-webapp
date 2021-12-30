@@ -4,7 +4,7 @@
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
     <div v-for="(line, index) in lines" :key="index" class="q-mt-sm bar-container">
       <div class="q-mr-sm percentage">{{ formatPercentage(line.percentage) }}</div>
-      <q-linear-progress size="40px" :model-value="line.percentage" rounded class="text-peach-200 bg-peach-100">
+      <q-linear-progress size="40px" :value="line.percentage" rounded class="text-peach-200 bg-peach-100">
         <div class="bar-label">
           <div>{{ line.title }}</div>
           <div><span class="text-weight-bold">{{ line.total }}</span> réponses</div>

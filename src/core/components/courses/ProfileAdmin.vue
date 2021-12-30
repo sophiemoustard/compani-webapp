@@ -167,7 +167,7 @@ export default {
   },
   watch: {
     course () {
-      const phoneValidation = get(this.v$, 'course.contact.contact.phone', '');
+      const phoneValidation = get(this.v$, 'course.contact.contact.phone');
       if (phoneValidation) phoneValidation.$touch();
     },
   },

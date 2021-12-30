@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import SearchAddress from '@components/form/SearchAddress';
 import Select from '@components/form/Select';
@@ -73,9 +74,8 @@ export default {
   },
   computed: {
     mobilePhoneError () {
-      if (this.validations.contact.phone.required.$response === false) return REQUIRED_LABEL;
-      if (this.validations.contact.phone.frPhoneNumber.$response === false ||
-        this.validations.contact.phone.maxLength.$response === false) {
+      if (get(this.validations, 'contact.phone.required.$response') === false) return REQUIRED_LABEL;
+      if (get(this.validations, 'contact.phone.frPhoneNumber.$response') === false) {
         return 'Numéro de téléphone non valide';
       }
       return '';
