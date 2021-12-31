@@ -22,8 +22,8 @@
             </div>
           </q-card>
         </div>
-        <ni-line-chart title="Nombre total d'activités réalisées par mois"
-          :chart-data="chartData(this.activitiesByMonth)" class="col-md-6 col-xs-12 line-chart-container" />
+        <ni-line-chart :data="this.activitiesByMonth" :labels="months" class="col-md-6 col-xs-12 line-chart-container"
+          title="Nombre total d'activités réalisées par mois" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -72,7 +72,7 @@ import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import { isBetween } from '@helpers/date';
-import LineChart from '@components/charts/LineChart';
+import NiLineChart from '@components/charts/NiLineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -87,7 +87,7 @@ export default {
     'ni-progress': Progress,
     'ni-expanding-table': ExpandingTable,
     'ni-e-learning-indicator': ELearningIndicator,
-    'ni-line-chart': LineChart,
+    'ni-line-chart': NiLineChart,
   },
   data () {
     return {
