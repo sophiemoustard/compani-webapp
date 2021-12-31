@@ -147,15 +147,20 @@ export const useTaxCertificates = (customer) => {
   };
 
   return {
+    // Data
     taxCertificate,
     taxCertificates,
     taxCertificateModal,
     modalLoading,
     pdfLoading,
     disableTaxCertificate,
+    // Computed
     customerFolder,
     taxCertificateFileError,
     taxCertificateYearError,
+    // Validations
+    taxCertificatesValidation,
+    /// Methods
     getTaxCertificates,
     formatTaxCertificatePayload,
     resetTaxCertificateModal,
@@ -164,6 +169,5 @@ export const useTaxCertificates = (customer) => {
     downloadTaxCertificate,
     validateTaxCertificateDeletion,
     deleteTaxCertificate,
-    taxCertificatesValidation,
   };
 };

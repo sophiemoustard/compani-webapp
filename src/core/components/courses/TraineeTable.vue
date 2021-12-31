@@ -192,6 +192,7 @@ export default {
     };
 
     return {
+      // Data
       searchStr,
       newLearner,
       firstStep,
@@ -201,8 +202,10 @@ export default {
       learnerCreationModal,
       learnerAlreadyExists,
       potentialTrainees,
+      // Validations
       learnerValidation,
       v$: useVuelidate(),
+      // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,

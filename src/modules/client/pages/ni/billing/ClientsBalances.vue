@@ -228,16 +228,20 @@ export default {
     };
 
     return {
+      // Data
       tableLoading,
+      selected,
+      balancesOption,
       paymentCreationLoading,
       paymentCreationModal,
       selectedCustomer,
       selectedTpp,
       newPayment,
-      selected,
-      balancesOption,
+      // Computed
       filteredBalances,
+      // Valdiations
       v$,
+      // Methods
       openPaymentCreationModal,
       resetPaymentCreationModal,
       validatePaymentListCreation,
