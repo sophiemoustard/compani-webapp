@@ -7,7 +7,7 @@
       </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
-          :visible-columns="traineesVisibleColumns">
+          :visible-columns="traineesVisibleColumns" :loading="tableLoading">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -128,9 +128,7 @@ export default {
       firstStep,
       userAlreadyHasCompany,
       learnerAlreadyExists,
-      learnerList,
       tableLoading,
-      filteredLearners,
       learnerValidation,
       goToNextStep,
       getLearnerList,
@@ -194,22 +192,23 @@ export default {
     };
 
     return {
+      // Data
       searchStr,
       newLearner,
       firstStep,
-      learnerList,
+      userAlreadyHasCompany,
       tableLoading,
       learnerCreationModalLoading,
       learnerCreationModal,
       learnerAlreadyExists,
-      filteredLearners,
       potentialTrainees,
+      // Validations
       learnerValidation,
       v$: useVuelidate(),
+      // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-      getPotentialTrainees,
     };
   },
   validations () {
@@ -266,7 +265,6 @@ export default {
         local: {},
       },
       companyOptions: [],
-      userAlreadyHasCompany: false,
     };
   },
   computed: {

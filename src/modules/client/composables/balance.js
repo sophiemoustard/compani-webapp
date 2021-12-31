@@ -132,9 +132,11 @@ export const useBalance = (customer) => {
   };
 
   return {
+    // Data
     billingDates,
     customerDocuments,
     tppDocuments,
+    // Methods
     setBillingDates,
     getStartBalance,
     getEndBalance,

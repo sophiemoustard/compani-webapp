@@ -154,6 +154,10 @@ export const useLearners = (company, isClientInterface, refresh) => {
     learnerAlreadyExists.value = false;
   };
 
+  const updateSearch = (value) => {
+    this.searchStr = value;
+  };
+
   return {
     // Data
     searchStr,
@@ -170,6 +174,7 @@ export const useLearners = (company, isClientInterface, refresh) => {
     // Validations
     learnerValidation,
     // Methods
+    updateSearch,
     goToNextStep,
     getLearnerList,
     submitLearnerCreationModal,

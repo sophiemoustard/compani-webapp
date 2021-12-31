@@ -195,6 +195,7 @@ export const usePayments = (refresh) => {
   };
 
   return {
+    // Data
     paymentCreationLoading,
     paymentCreationModal,
     selectedCustomer,
@@ -203,10 +204,12 @@ export const usePayments = (refresh) => {
     paymentEditionModal,
     paymentEditionLoading,
     editedPayment,
-    v$,
     PAYMENT,
     DIRECT_DEBIT,
     PAYMENT_OPTIONS,
+    // Validations
+    v$,
+    // Methods
     openPaymentCreationModal,
     resetPaymentCreationModal,
     hasTaxCertificateOnSameYear,

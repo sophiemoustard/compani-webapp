@@ -63,6 +63,7 @@ export default {
       tableLoading,
       filteredLearners,
       learnerValidation,
+      updateSearch,
       goToNextStep,
       getLearnerList,
       submitLearnerCreationModal,
@@ -112,6 +113,7 @@ export default {
     };
 
     return {
+      // Data
       searchStr,
       newLearner,
       firstStep,
@@ -119,8 +121,12 @@ export default {
       tableLoading,
       learnerCreationModalLoading,
       learnerCreationModal,
+      // Computed
       filteredLearners,
+      // Validations
       learnerValidation,
+      // Methods
+      updateSearch,
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
