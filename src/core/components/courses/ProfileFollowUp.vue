@@ -17,7 +17,7 @@
           </div>
         </q-card>
       </div>
-      <ni-line-chart title="Nombre d'apprenants dans le temps" :chart-data="chartData(this.traineesByMonth)"
+      <ni-line-chart :data="this.traineesByMonth" :labels="months" title="Nombre d'apprenants dans le temps"
         class="col-md-6 col-xs-12 line-chart-container" />
     </div>
     <elearning-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
@@ -27,7 +27,7 @@
 <script>
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
-import LineChart from '@components/charts/LineChart';
+import NiLineChart from '@components/charts/NiLineChart';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 import { chartMixin } from '@mixins/chartMixin';
 
@@ -37,7 +37,7 @@ export default {
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'elearning-follow-up-table': ElearningFollowUpTable,
-    'ni-line-chart': LineChart,
+    'ni-line-chart': NiLineChart,
   },
   props: {
     profileId: { type: String, required: true },
