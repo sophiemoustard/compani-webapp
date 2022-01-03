@@ -19,13 +19,12 @@ import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfile
 import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
-import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
 const metaInfo = { title: 'Fiche formation' };
 
 export default {
   name: 'BlendedCourseProfile',
-  mixins: [courseMixin, blendedCourseProfileMixin, createMetaMixin(metaInfo)],
+  mixins: [courseMixin, createMetaMixin(metaInfo)],
   props: {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },
@@ -33,6 +32,9 @@ export default {
   components: {
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
     'profile-tabs': ProfileTabs,
+  },
+  data () {
+    return { courseName: '' };
   },
   computed: {
     ...mapState('course', ['course']),
@@ -67,6 +69,13 @@ export default {
     },
   },
   methods: {
+    async refreshCourse () {
+      try {
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async deleteCourse () {
       try {
         await Courses.delete(this.course._id);
@@ -89,10 +98,9 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
-  // le beforeUnmount de la mixin BlendedCourseProfileMixin n'est pas triggered et je ne comprends pas pourquoi
   beforeUnmount () {
     this.$store.dispatch('course/resetCourse');
-    if (!['ni courses', 'ni management blended courses', 'trainers courses'].includes(this.$route.name)) {
+    if (!['ni management blended courses', 'trainers courses'].includes(this.$route.name)) {
       this.$store.dispatch('course/resetFilters');
     }
   },

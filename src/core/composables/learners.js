@@ -26,6 +26,9 @@ export const useLearners = (company, isClientInterface, refresh) => {
   const tableLoading = ref(false);
   const userAlreadyHasCompany = ref(false);
   const learnerAlreadyExists = ref(false);
+  const traineeAdditionModal = ref(false);
+  const newTrainee = ref('');
+  const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
 
   const filteredLearners = computed(() => {
     const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
@@ -33,7 +36,7 @@ export const useLearners = (company, isClientInterface, refresh) => {
     return learnerList.value.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
   });
 
-  const rules = computed(() => ({
+  const learnerRules = computed(() => ({
     newLearner: {
       identity: { lastname: { required } },
       local: { email: { required, email } },
@@ -41,8 +44,16 @@ export const useLearners = (company, isClientInterface, refresh) => {
       company: { required: requiredIf(!isClientInterface) },
     },
   }));
+  const traineeRules = computed(() => ({
+    newTrainee: { required },
+    editedTrainee: {
+      identity: { lastname: { required } },
+      contact: { phone: { required, frPhoneNumber } },
+    },
+  }));
 
-  const learnerValidation = useVuelidate(rules, { newLearner });
+  const learnerValidation = useVuelidate(learnerRules, { newLearner });
+  const traineeValidation = useVuelidate(traineeRules, { newTrainee, editedTrainee });
 
   const goToNextStep = () => {
     firstStep.value = false;
@@ -134,11 +145,12 @@ export const useLearners = (company, isClientInterface, refresh) => {
 
     try {
       learnerCreationModalLoading.value = true;
-      if (learnerAlreadyExists.value) await updateLearner();
-      else await createLearner();
+      if (learnerAlreadyExists.value) newTrainee.value = await updateLearner();
+      else newTrainee.value = await createLearner();
 
       await refresh();
       learnerCreationModal.value = false;
+      traineeAdditionModal.value = true;
     } catch (e) {
       NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
     } finally {
@@ -169,10 +181,14 @@ export const useLearners = (company, isClientInterface, refresh) => {
     tableLoading,
     userAlreadyHasCompany,
     learnerAlreadyExists,
+    traineeAdditionModal,
+    newTrainee,
+    editedTrainee,
     // Computed
     filteredLearners,
     // Validations
     learnerValidation,
+    traineeValidation,
     // Methods
     updateSearch,
     goToNextStep,
