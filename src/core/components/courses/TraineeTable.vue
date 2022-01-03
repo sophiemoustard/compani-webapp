@@ -32,12 +32,12 @@
       </q-card>
     </div>
 
-    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee="newTrainee"
-      :validations="v$.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" @submit="addTrainee"
+    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee="newTrainee" @submit="addTrainee"
+      :validations="traineeValidation.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
       :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
 
     <trainee-edition-modal v-model="traineeEditionModal" v-model:edited-trainee="editedTrainee" @submit="updateTrainee"
-      @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="v$.editedTrainee" />
+      @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="traineeValidation.editedTrainee" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" display-company
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -55,9 +55,6 @@ import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -123,6 +120,9 @@ export default {
     const {
       searchStr,
       newLearner,
+      newTrainee,
+      traineeAdditionModal,
+      editedTrainee,
       learnerCreationModal,
       learnerCreationModalLoading,
       firstStep,
@@ -130,6 +130,7 @@ export default {
       learnerAlreadyExists,
       tableLoading,
       learnerValidation,
+      traineeValidation,
       goToNextStep,
       getLearnerList,
       submitLearnerCreationModal,
@@ -202,22 +203,16 @@ export default {
       learnerCreationModal,
       learnerAlreadyExists,
       potentialTrainees,
+      traineeAdditionModal,
+      newTrainee,
+      editedTrainee,
       // Validations
       learnerValidation,
-      v$: useVuelidate(),
+      traineeValidation,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    };
-  },
-  validations () {
-    return {
-      newTrainee: { required },
-      editedTrainee: {
-        identity: { lastname: { required } },
-        contact: { phone: { required, frPhoneNumber } },
-      },
     };
   },
   data () {
@@ -255,15 +250,8 @@ export default {
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       traineesPagination: { rowsPerPage: 0, sortBy: 'lastname' },
-      traineeAdditionModal: false,
-      newTrainee: '',
       traineeEditionModal: false,
       traineeModalLoading: false,
-      editedTrainee: {
-        identity: {},
-        contact: {},
-        local: {},
-      },
       companyOptions: [],
     };
   },
@@ -311,13 +299,13 @@ export default {
   methods: {
     resetTraineeAdditionForm () {
       this.newTrainee = '';
-      this.v$.newTrainee.$reset();
+      this.traineeValidation.newTrainee.$reset();
     },
     async addTrainee () {
       try {
         this.traineeModalLoading = true;
-        this.v$.newTrainee.$touch();
-        if (this.v$.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.traineeValidation.newTrainee.$touch();
+        if (this.traineeValidation.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Courses.addTrainee(this.course._id, { trainee: this.newTrainee });
         this.traineeAdditionModal = false;
@@ -339,14 +327,14 @@ export default {
       this.traineeEditionModal = true;
     },
     resetTraineeEditionForm () {
-      this.v$.editedTrainee.$reset();
+      this.traineeValidation.editedTrainee.$reset();
       this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },
     async updateTrainee () {
       try {
         this.traineeModalLoading = true;
-        this.v$.editedTrainee.$touch();
-        if (this.v$.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.traineeValidation.editedTrainee.$touch();
+        if (this.traineeValidation.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (get(this.editedTrainee, 'contact.phone')) {
           this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
         }
