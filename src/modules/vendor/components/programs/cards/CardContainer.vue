@@ -1,8 +1,7 @@
 <template>
   <div class="card-list bg-white">
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
-      :content-style="{ display:'flex', 'flex-direction': 'column' }"
-      :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
+      :content-style="scrollAreaContentStyle" :content-active-style="scrollAreaContentStyle">
       <draggable v-model="draggableCardsList" ghost-class="ghost" :disabled="isDraggableDisabled"
         @update:model-value="update" item-key="_id">
         <template #item="{element: draggableCard, index: index}">
@@ -65,6 +64,7 @@ export default {
   data () {
     return {
       draggableCardsList: [],
+      scrollAreaContentStyle: { display: 'flex', 'flex-direction': 'column', width: '100%' },
     };
   },
   computed: {
