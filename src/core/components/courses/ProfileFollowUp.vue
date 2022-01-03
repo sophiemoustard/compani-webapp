@@ -27,7 +27,7 @@
 <script>
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
-import NiLineChart from '@components/charts/NiLineChart';
+import LineChart from '@components/charts/LineChart';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 import { chartMixin } from '@mixins/chartMixin';
 
@@ -37,7 +37,7 @@ export default {
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'elearning-follow-up-table': ElearningFollowUpTable,
-    'ni-line-chart': NiLineChart,
+    'ni-line-chart': LineChart,
   },
   props: {
     profileId: { type: String, required: true },

@@ -64,9 +64,9 @@
       <p class="text-weight-bold section-title">Evolution dans le temps</p>
       <div class="row">
         <ni-line-chart :data="this.traineesByMonth" :labels="months" title="Apprenants actifs mensuels"
-          class="col-md-6 col-xs-12 line-chart-container" />
-        <ni-line-chart :data="this.activitiesByMonth" :labels="months" class="col-md-6 col-xs-12 line-chart-container"
-          title="Nombre total d'activités réalisées par mois" />
+          class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
+        <ni-line-chart :data="this.activitiesByMonth" :labels="months"
+          title="Nombre total d'activités réalisées par mois" class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
       </div>
     </div>
   </q-page>
@@ -82,7 +82,7 @@ import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import NiLineChart from '@components/charts/NiLineChart';
+import LineChart from '@components/charts/LineChart';
 import CompanyLinkRequestCell from '@components/CompanyLinkRequestCell';
 import { DEFAULT_AVATAR } from '@data/constants';
 import moment from '@helpers/moment';
@@ -98,7 +98,7 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
-    'ni-line-chart': NiLineChart,
+    'ni-line-chart': LineChart,
     'company-link-request-cell': CompanyLinkRequestCell,
   },
   data () {
