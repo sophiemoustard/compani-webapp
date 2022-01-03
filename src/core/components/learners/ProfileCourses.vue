@@ -72,7 +72,7 @@ import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import { isBetween } from '@helpers/date';
-import NiLineChart from '@components/charts/NiLineChart';
+import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -87,7 +87,7 @@ export default {
     'ni-progress': Progress,
     'ni-expanding-table': ExpandingTable,
     'ni-e-learning-indicator': ELearningIndicator,
-    'ni-line-chart': NiLineChart,
+    'ni-line-chart': LineChart,
   },
   data () {
     return {

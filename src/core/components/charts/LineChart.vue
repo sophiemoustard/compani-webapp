@@ -2,7 +2,7 @@
   <div>
     <q-card flat class="q-pa-md">
       <div class="text-weight-bold q-mb-md">{{ title }}</div>
-      <LineChart v-bind="lineChartProps" class="line-chart" />
+      <vue-chart-line-chart v-bind="lineChartProps" class="line-chart" />
     </q-card>
   </div>
 </template>
@@ -10,17 +10,19 @@
 <script>
 import { getCssVar } from 'quasar';
 import { toRefs, computed } from 'vue';
-import { LineChart, useLineChart } from 'vue-chart-3';
+import { LineChart as VueChartLineChart, useLineChart } from 'vue-chart-3';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
 export default {
-  name: 'NiLineChart',
-  components: { LineChart },
+  name: 'LineChart',
+  components: {
+    'vue-chart-line-chart': VueChartLineChart,
+  },
   props: {
-    data: { type: Array, default: () => ([]) },
-    labels: { type: Array, default: () => ([]) },
+    data: { type: Array, default: () => [] },
+    labels: { type: Array, default: () => [] },
     title: { type: String, default: () => '' },
   },
   setup (props) {
@@ -30,7 +32,6 @@ export default {
       labels: labels.value,
       datasets: [
         {
-          label: 'Bitcoin',
           data: data.value,
           fill: false,
           borderColor: getCssVar('primary'),
@@ -47,10 +48,7 @@ export default {
       maintainAspectRatio: false,
     }));
 
-    const { lineChartProps } = useLineChart({
-      options,
-      chartData,
-    });
+    const { lineChartProps } = useLineChart({ options, chartData });
 
     return {
       lineChartProps,
