@@ -9,20 +9,21 @@
 
 <script>
 import { createMetaMixin } from 'quasar';
-import { mapState } from 'vuex';
+import { onBeforeUnmount, computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
-import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
 const metaInfo = { title: 'Fiche formation' };
 
 export default {
   name: 'BlendedCourseProfile',
-  mixins: [courseMixin, blendedCourseProfileMixin, createMetaMixin(metaInfo)],
+  mixins: [courseMixin, createMetaMixin(metaInfo)],
   props: {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },
@@ -31,29 +32,47 @@ export default {
     'profile-tabs': ProfileTabs,
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
   },
-  data () {
+  setup (props) {
+    const $store = useStore();
+    const $route = useRoute();
+    const course = computed(() => $store.state.course.course);
+    const courseName = ref('');
+
     const organizationTab = {
       label: 'Organisation',
       name: 'organization',
-      default: this.defaultTab === 'organization',
+      default: props.defaultTab === 'organization',
       component: ProfileOrganization,
     };
-    const adminTab = { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin };
+    const adminTab = {
+      label: 'Admin',
+      name: 'admin',
+      default: props.defaultTab === 'admin',
+      component: ProfileAdmin,
+    };
     const traineeFollowUpTab = {
       label: 'Suivi des stagiaires',
       name: 'traineeFollowUp',
-      default: this.defaultTab === 'traineeFollowUp',
+      default: props.defaultTab === 'traineeFollowUp',
       component: ProfileTraineeFollowUp,
     };
 
+    onBeforeUnmount(() => {
+      $store.dispatch('course/resetCourse');
+      if ($route.name !== 'ni courses') $store.dispatch('course/resetFilters');
+    });
+
     return {
+      // Data
       organizationTab,
       adminTab,
       traineeFollowUpTab,
+      courseName,
+      // Computed
+      course,
     };
   },
   computed: {
-    ...mapState('course', ['course']),
     tabsContent () {
       if (this.isIntraCourse) return [this.organizationTab, this.adminTab, this.traineeFollowUpTab];
 
@@ -67,6 +86,15 @@ export default {
   watch: {
     course () {
       this.courseName = this.composeCourseName(this.course);
+    },
+  },
+  methods: {
+    async refreshCourse () {
+      try {
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
+      } catch (e) {
+        console.error(e);
+      }
     },
   },
 };
