@@ -100,7 +100,8 @@ export const templateMixin = {
       }
     },
     getError (path, index) {
-      return get(this.v$, `card.${path}.$each.$response.$errors[${index}].text.0.$response`) === false;
+      return !!get(this.v$, `card.${path}.$dirty`) &&
+        get(this.v$, `card.${path}.$each.$response.$errors[${index}].text.0.$response`) === false;
     },
     async updateTextAnswer (index) {
       try {
