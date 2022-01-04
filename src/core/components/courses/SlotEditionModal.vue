@@ -18,7 +18,7 @@
       @update:model-value="update($event, 'meetingLink')" caption="Lien vers la visio" in-modal
       :error-message="linkErrorMessage" :error="validations.meetingLink.$error" />
     <template #footer>
-      <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
+      <ni-button class="bg-primary full-width modal-btn" label="Editer un créneau" icon-right="add" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>

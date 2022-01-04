@@ -13,7 +13,7 @@
         @blur="validations.contact.phone.$touch" @update:model-value="update($event.trim(), 'contact.phone')"
         :error-message="phoneNbrError(validations)" :error="validations.contact.phone.$error" required-field />
       <template #footer>
-        <q-btn no-caps class="full-width modal-btn" label="Éditer la personne" icon-right="add" color="primary"
+        <ni-button class="bg-primary full-width modal-btn" label="Éditer la personne" icon-right="add" color="white"
           :loading="loading" @click="submit" />
       </template>
     </ni-modal>
@@ -22,6 +22,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import { userMixin } from '@mixins/userMixin';
 import set from 'lodash/set';
 
@@ -36,6 +37,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
     'ni-modal': Modal,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:edited-trainee'],

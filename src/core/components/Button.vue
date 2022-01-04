@@ -11,7 +11,7 @@ export default {
     color: { type: String, default: 'copper-500' },
     disable: { type: Boolean, default: false },
     flat: { type: Boolean, default: true },
-    href: { type: String, default: '' },
+    href: { type: String, default: undefined },
     icon: { type: String, default: undefined },
     label: { type: String, default: '' },
     loading: { type: Boolean, default: false },

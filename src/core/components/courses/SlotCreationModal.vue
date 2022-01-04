@@ -15,7 +15,7 @@
       :model-value="newCourseSlot.meetingLink" @update:model-value="update($event, 'meetingLink')"
       :error-message="linkErrorMessage" caption="Lien vers la visio" />
     <template #footer>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
+      <ni-button class="full-width modal-btn bg-primary" label="Ajouter un créneau" icon-right="add" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
@@ -25,6 +25,7 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
 import { ON_SITE, REMOTE } from '@data/constants';
@@ -45,6 +46,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-input': Input,
+    'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update'],
   data () {
