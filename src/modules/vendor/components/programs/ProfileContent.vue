@@ -6,7 +6,7 @@
         <span class="published-sub-program bg-green-600" v-if="isPublished(subProgram)">Publié</span>
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
-        @blur="updateSubProgramName(index)" :error="v$.program.subPrograms.name.$error"
+        @blur="updateSubProgramName(index)" :error="getSubProgramError(index)"
         :disable="isPublished(subProgram)" />
       <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
         :disabled="$q.platform.is.mobile || isPublished(subProgram)" item-key="_id">
@@ -120,7 +120,7 @@
 import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
@@ -208,7 +208,7 @@ export default {
   },
   validations () {
     return {
-      program: { subPrograms: { name: { required } } },
+      program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
       reusedStep: { _id: { required }, program: { required } },
@@ -232,6 +232,11 @@ export default {
     }
   },
   methods: {
+    getSubProgramError (index) {
+      const validation = this.v$.program.subPrograms.$each.$response.$errors[index];
+
+      return get(validation, 'name.0.$response') === false;
+    },
     async dropStep (subProgramId) {
       try {
         const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
