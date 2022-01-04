@@ -4,14 +4,19 @@
       <img src="~assets/sad.svg" class="error-image">
     </p>
     <p class="text-faded">Désolé, il n'y a rien ici...</p>
-    <q-btn v-if="canGoBack" color="primary" @click="goBack">Retour</q-btn>
-    <q-btn color="primary" @click="goTo">Accueil</q-btn>
+    <ni-button class="bg-primary" v-if="canGoBack" color="white" @click="goBack" label="Retour" />
+    <ni-button class="bg-primary" color="white" @click="goTo" label="Accueil" />
   </div>
 </template>
 
 <script>
+import Button from '@components/Button';
+
 export default {
   name: 'Error404',
+  components: {
+    'ni-button': Button,
+  },
   data () {
     return {
       canGoBack: window.history.length > 1,

@@ -4,13 +4,18 @@
       <img src="~assets/sad.svg" class="error-image">
     </p>
     <p class="text-faded">Le lien de réinitialisation du mot de passe a expiré.</p>
-    <q-btn v-if="canGoBack" class="q-mr-sm" color="primary" @click="goBack">Retour</q-btn>
-    <q-btn color="primary" @click="goToForgot">Recevoir un nouveau lien</q-btn>
+    <ni-button v-if="canGoBack" class="bg-primary q-mr-sm" color="white" @click="goBack" label="Retour" />
+    <ni-button class="bg-primary" color="white" @click="goToForgot" label="Recevoir un nouveau lien" />
   </div>
 </template>
 
 <script>
+import Button from '@components/Button';
+
 export default {
+  components: {
+    'ni-button': Button,
+  },
   data () {
     return {
       canGoBack: window.history.length > 1,

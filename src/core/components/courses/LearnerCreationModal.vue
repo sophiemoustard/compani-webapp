@@ -21,9 +21,9 @@
           @blur="validations.company.$touch" :error="validations.company.$error" :disable="disableCompany" />
       </template>
       <template #footer>
-        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
+        <ni-button v-if="firstStep" class="bg-primary full-width modal-btn" label="Suivant" color="white"
           :loading="loading" icon-right="add" @click="nextStep" />
-        <q-btn v-else no-caps class="full-width modal-btn" color="primary" :label="secondStepFooterLabel"
+        <ni-button v-else class="bg-primary full-width modal-btn" color="white" :label="secondStepFooterLabel"
           :loading="loading" icon-right="add" @click="submit" />
       </template>
     </ni-modal>
@@ -33,6 +33,7 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import { userMixin } from '@mixins/userMixin';
 import set from 'lodash/set';
 
@@ -54,6 +55,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
     'ni-select': Select,
+    'ni-button': Button,
   },
   computed: {
     secondStepFooterLabel () {

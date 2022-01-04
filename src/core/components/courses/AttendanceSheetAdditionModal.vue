@@ -13,8 +13,8 @@
       :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
       :error="validations.file.$error" />
     <template #footer>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter la feuille d'émargement" color="primary"
-        :loading="loading" icon-right="add" @click="submit" />
+      <ni-button class="full-width modal-btn bg-primary" label="Ajouter la feuille d'émargement" :loading="loading"
+        icon-right="add" @click="submit" color="white" />
     </template>
   </ni-modal>
 </template>
@@ -23,6 +23,7 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import { INTRA } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
@@ -34,6 +35,7 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
     'ni-input': Input,
+    'ni-button': Button,
   },
   props: {
     modelValue: { type: Boolean, default: false },

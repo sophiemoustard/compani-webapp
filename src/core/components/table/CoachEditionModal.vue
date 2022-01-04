@@ -17,7 +17,7 @@
       @blur="validations.contact.phone.$touch" @update:model-value="update($event.trim(), 'contact.phone')" last
       :error-message="phoneNbrError" caption="Téléphone" />
     <template #footer>
-      <q-btn no-caps class="full-width modal-btn" label="Éditer la personne" icon-right="check" color="primary"
+      <ni-button class="bg-primary full-width modal-btn" label="Éditer la personne" icon-right="check" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
@@ -27,6 +27,7 @@
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 
 export default {
@@ -43,6 +44,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-select': Select,
+    'ni-button': Button,
     'ni-modal': Modal,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:selected-coach'],

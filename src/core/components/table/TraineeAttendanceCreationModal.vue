@@ -13,8 +13,8 @@
         @update:model-value="update($event, 'attendances')" />
     </div>
     <template #footer>
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" color="primary"
-        :loading="loading" icon-right="add" @click="submit" />
+      <ni-button class="bg-primary full-width modal-btn" label="Ajouter la personne" color="white" :loading="loading"
+        icon-right="add" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -23,6 +23,7 @@
 import set from 'lodash/set';
 import moment from '@helpers/moment';
 import Modal from '@components/modal/Modal';
+import Button from '@components/Button';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { REQUIRED_LABEL } from '@data/constants';
@@ -41,6 +42,7 @@ export default {
   },
   components: {
     'ni-select': Select,
+    'ni-button': Button,
     'ni-option-group': OptionGroup,
     'ni-modal': Modal,
   },

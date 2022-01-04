@@ -8,7 +8,7 @@
       <ni-input in-modal caption="Message" :model-value="newSms.content" @update:model-value="update($event, 'content')"
         type="textarea" :rows="7" required-field />
       <template #footer>
-        <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
+        <ni-button class="bg-primary full-width modal-btn" label="Envoyer message" icon-right="send" color="white"
           :loading="loading" @click="send" />
       </template>
     </ni-modal>
@@ -18,6 +18,7 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 
 export default {
   name: 'SmsSendingModal',
@@ -35,6 +36,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-input': Input,
+    'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'update-type', 'send', 'update:new-sms'],
   methods: {

@@ -24,7 +24,7 @@
         </template>
       </ni-select>
       <template #footer>
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add" color="primary"
+        <ni-button class="bg-primary full-width modal-btn" label="Ajouter la personne" icon-right="add" color="white"
           :loading="loading" @click="submit" />
       </template>
     </ni-modal>
