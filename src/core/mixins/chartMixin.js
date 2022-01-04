@@ -1,4 +1,3 @@
-import { getCssVar } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 
@@ -11,16 +10,6 @@ export const chartMixin = {
     };
   },
   methods: {
-    chartData (data) {
-      return {
-        labels: this.months,
-        datasets: [{
-          data,
-          borderColor: getCssVar('primary'),
-          backgroundColor: 'transparent',
-        }],
-      };
-    },
     formatMonthAndYear (date) {
       const month = new Date(date).getMonth() < 10 ? `0${new Date(date).getMonth()}` : new Date(date).getMonth();
 

@@ -63,10 +63,10 @@
     <div class="q-mt-xl">
       <p class="text-weight-bold section-title">Evolution dans le temps</p>
       <div class="row">
-        <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData(this.traineesByMonth)"
-          class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
-        <ni-line-chart title="Nombre total d'activités réalisées par mois"
-          :chart-data="chartData(this.activitiesByMonth)" class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
+        <ni-line-chart :data="this.traineesByMonth" :labels="months" title="Apprenants actifs mensuels"
+          class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
+        <ni-line-chart :data="this.activitiesByMonth" :labels="months"
+          title="Nombre total d'activités réalisées par mois" class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
       </div>
     </div>
   </q-page>
