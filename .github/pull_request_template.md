@@ -1,12 +1,6 @@
-<details open><summary> POINTS D'ATTENTION POUR CETTE PR  :warning: </summary>
-
+- [ ] J'ai vérifié la fonctionnalité sur mobile
 - [ ] J'ai ajouté une variable d'environnement
   - [ ] Si oui, J'ai précisé sur le [slite de MES](https://alenvi.slite.com/app/channels/K4ziWiq5eN/notes/mE8PaaeZN7) et [MEP](https://alenvi.slite.com/app/channels/K4ziWiq5eN/notes/VSKy3bsY9C) les modifications faites
-- [ ] J'ai vérifié la fonctionnalité sur mobile
-
-</details>
-
-- [ ] Je replie cette section car je n'ai pas fait de modifications entrainant un point d'attention
 
 ### POUR TESTER LA PR  :white_check_mark:
 - Périmètre interfaces / rôles :
