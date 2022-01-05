@@ -41,7 +41,7 @@
       <div class="row gutter-profile">
         <ni-select caption="Situation" v-model="customer.followUp.situation" @focus="saveTmp('followUp.situation')"
           @update:model-value="updateCustomer('followUp.situation')" :options="situationOptions" />
-        <ni-input caption="Environnement du/de la bénéficiaire" v-model="customer.followUp.environment"
+        <ni-input caption="Environnement" v-model="customer.followUp.environment"
           @blur="updateCustomer('followUp.environment')" @focus="saveTmp('followUp.environment')" type="textarea" />
         <ni-input caption="Objectifs de l’accompagnement" v-model="customer.followUp.objectives"
           @blur="updateCustomer('followUp.objectives')" @focus="saveTmp('followUp.objectives')" type="textarea" />
