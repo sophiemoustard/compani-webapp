@@ -61,8 +61,8 @@ export default {
       deletedEvents: {
         customer: { required },
         startDate: { required },
-        endDate: { required: requiredIf(item => item.inRange) },
-        absenceType: { required: requiredIf(() => this.isCustomerAbsence && this.deletedEvents.inRange) },
+        endDate: { required: requiredIf(this.deletedEvents.inRange) },
+        absenceType: { required: requiredIf(this.isCustomerAbsence && this.deletedEvents.inRange) },
       },
     };
   },
@@ -81,6 +81,9 @@ export default {
         { label: 'Autre', value: OTHER },
       ],
     };
+  },
+  computed: {
+    selectedAuxiliary () { return null; },
   },
   watch: {
     'deletedEvents.inRange': function () {

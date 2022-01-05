@@ -144,7 +144,9 @@ export const planningModalMixin = {
       }));
     },
     additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
+      return !get(this.selectedAuxiliary, '_id')
+        ? ''
+        : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
       const driveId = get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
@@ -231,11 +233,9 @@ export const planningModalMixin = {
       const activeCustomers = this.customers
         .filter(customer => !customer.archivedAt &&
           (!customer.stoppedAt || !startDate || isBefore(startDate, customer.stoppedAt)));
-      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
-        return formatAndSortIdentityOptions(activeCustomers); // Unassigned event
-      }
+      if (!get(this.selectedAuxiliary, '_id')) return formatAndSortIdentityOptions(activeCustomers); // Unassigned event
 
-      if (!this.selectedAuxiliary.contracts) return [];
+      if (!get(this.selectedAuxiliary, 'contracts')) return [];
 
       return formatAndSortIdentityOptions(activeCustomers);
     },
