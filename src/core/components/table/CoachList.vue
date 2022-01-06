@@ -196,7 +196,6 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'envoi du mail.');
-        this.loading = false;
       }
     },
     async createCoach () {
