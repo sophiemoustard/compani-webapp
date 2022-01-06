@@ -50,7 +50,7 @@ export default {
     const notifications = computed(() => $store.state.userProfile.notifications);
 
     watch(userProfile, async () => $store.dispatch('userProfile/updateNotifications'));
-    watch(userProfile, () => refreshAuxiliaryName());
+    watch(userProfile, () => { refreshAuxiliaryName(); });
 
     const refreshAuxiliaryName = () => {
       auxiliaryName.value = get(userProfile.value, 'identity')

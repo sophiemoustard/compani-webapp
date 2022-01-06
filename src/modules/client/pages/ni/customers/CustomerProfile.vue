@@ -59,7 +59,7 @@ export default {
     const notifications = computed(() => $store.state.customer.notifications);
 
     watch(customer, async () => $store.dispatch('customer/updateNotifications'));
-    watch(customer, () => refreshCustomerName());
+    watch(customer, () => { refreshCustomerName(); });
 
     const refreshCustomerName = () => {
       customerName.value = get(customer.value, 'identity')
