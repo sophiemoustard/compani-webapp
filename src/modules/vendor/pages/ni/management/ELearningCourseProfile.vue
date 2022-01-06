@@ -7,7 +7,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';

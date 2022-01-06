@@ -9,9 +9,9 @@
 
 <script>
 import { createMetaMixin } from 'quasar';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
-import { shallowRef } from 'vue';
-import { mapState } from 'vuex';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import { DRAFT, QUESTIONNAIRE_TYPES } from '@data/constants';
@@ -31,52 +31,49 @@ export default {
     'profile-tabs': ProfileTabs,
   },
   mixins: [createMetaMixin(metaInfo)],
-  data () {
-    return {
-      tabsContent: [
-        {
-          label: 'Édition',
-          name: 'edition',
-          default: this.defaultTab === 'edition',
-          component: shallowRef(ProfileEdition),
-        },
-        {
-          label: 'Réponses',
-          name: 'answers',
-          default: this.defaultTab === 'answers',
-          component: shallowRef(ProfileAnswers),
-        },
-      ],
-      questionnaireName: '',
-    };
-  },
-  computed: {
-    ...mapState('questionnaire', ['questionnaire']),
-    headerInfo () {
-      const infos = [{ icon: 'bookmark_border', label: QUESTIONNAIRE_TYPES[this.questionnaire.type] }];
+  setup (props) {
+    const tabsContent = [
+      { label: 'Édition', name: 'edition', default: props.defaultTab === 'edition', component: ProfileEdition },
+      { label: 'Réponses', name: 'answers', default: props.defaultTab === 'answers', component: ProfileAnswers },
+    ];
+    const questionnaireName = ref('');
 
-      if (this.questionnaire.status === DRAFT) infos.push({ icon: 'edit', label: 'Brouillon', class: 'info-warning' });
+    const $store = useStore();
+    const questionnaire = computed(() => $store.state.questionnaire.questionnaire);
+    const headerInfo = computed(() => {
+      const infos = [{ icon: 'bookmark_border', label: QUESTIONNAIRE_TYPES[questionnaire.value.type] }];
+
+      if (questionnaire.value.status === DRAFT) infos.push({ icon: 'edit', label: 'Brouillon', class: 'info-warning' });
       else infos.push({ icon: 'check_circle', label: 'Publié', class: 'info-active' });
 
       return infos;
-    },
-  },
-  watch: {
-    questionnaire () {
-      this.questionnaireName = get(this.questionnaire, 'name') || '';
-    },
-  },
-  async created () {
-    await this.refreshQuestionnaire();
-    this.questionnaireName = get(this.questionnaire, 'name') || '';
-  },
-  methods: {
-    async refreshQuestionnaire () {
-      await this.$store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: this.questionnaireId });
-    },
-  },
-  beforeUnmount () {
-    this.$store.dispatch('questionnaire/resetQuestionnaire');
+    });
+
+    watch(questionnaire, () => { refreshProgramName(); });
+
+    const refreshProgramName = () => { questionnaireName.value = get(questionnaire.value, 'name') || ''; };
+
+    const refreshQuestionnaire = async () => {
+      await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: props.questionnaireId });
+    };
+
+    const created = async () => {
+      await refreshQuestionnaire();
+      refreshProgramName();
+    };
+
+    onBeforeUnmount(() => { $store.dispatch('questionnaire/resetQuestionnaire'); });
+
+    created();
+
+    return {
+      // Data
+      tabsContent,
+      questionnaireName,
+      // Computed
+      questionnaire,
+      headerInfo,
+    };
   },
 };
 </script>
