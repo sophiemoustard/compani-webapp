@@ -1,7 +1,7 @@
 <template>
-  <q-btn :flat="flat" small no-caps :color="color" :icon="icon" :disable="disable" :type="type" :href="!disable && href"
+  <q-btn :flat="flat" small no-caps :color="color" :icon="icon" :disable="disable" :type="type"
     :target="target" :label="label" :dense="!label" :loading="loading" :size="size" unelevated :padding="padding"
-    @click.stop="click" />
+    @click.stop="click" :href="innerHref" />
 </template>
 
 <script>
@@ -28,6 +28,9 @@ export default {
       if (this.type === 'a') return 'xs 0px';
 
       return this.label ? 'xs md' : 'xs';
+    },
+    innerHref () {
+      return this.disable ? undefined : this.href;
     },
   },
   methods: {

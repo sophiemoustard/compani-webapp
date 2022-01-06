@@ -36,7 +36,7 @@
         caption="Nb. heures prises en charge" type="number" suffix="h" @update:model-value="update($event, 'careHours')"
         :error="validations.careHours.$error" required-field :error-message="careHoursErrorMessage" />
       <ni-input in-modal v-if="!isFixedFunding" :model-value="newFunding.customerParticipationRate"
-        caption="Taux de participation du/de la bénéficiaire" type="number" suffix="%" required-field
+        caption="Taux de participation" type="number" suffix="%" required-field
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
         @update:model-value="update($event, 'customerParticipationRate')"
         :error-message="customerParticipationRateErrorMessage" />

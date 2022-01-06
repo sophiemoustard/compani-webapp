@@ -626,7 +626,7 @@ export default {
     customerParticipationRateErrorMessage (validations) {
       if (!validations.customerParticipationRate.required) return REQUIRED_LABEL;
       if (!validations.customerParticipationRate.minValue || !validations.customerParticipationRate.maxValue) {
-        return 'Taux de participation du/de la bénéficiaire invalide';
+        return 'Taux de participation invalide';
       }
       return '';
     },

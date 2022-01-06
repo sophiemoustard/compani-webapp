@@ -103,10 +103,7 @@ export default {
         },
         { name: 'actions', label: '', align: 'center' },
       ],
-      usersPagination: {
-        rowsPerPage: 0,
-        sortBy: 'lastname',
-      },
+      usersPagination: { rowsPerPage: 0, sortBy: 'lastname' },
       newCoach: {
         identity: { firstname: '', lastname: '' },
         contact: { phone: '' },
@@ -189,6 +186,18 @@ export default {
         this.loading = false;
       }
     },
+    async sendEmail () {
+      try {
+        const userRole = this.roles.find(role => role._id === this.newCoach.role);
+        if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail.');
+
+        await Email.sendWelcome({ email: this.newCoach.local.email, type: get(userRole, 'name') });
+        NotifyPositive('Email envoyé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'envoi du mail.');
+      }
+    },
     async createCoach () {
       try {
         this.loading = true;
@@ -205,24 +214,10 @@ export default {
         this.loading = false;
       }
 
-      if (!get(this.company, 'subscriptions.erp')) {
-        try {
-          const userRole = this.roles.find(role => role._id === this.newCoach.role);
-          if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail.');
+      if (!get(this.company, 'subscriptions.erp')) await this.sendEmail();
 
-          await Email.sendWelcome({ email: this.newCoach.local.email, type: get(userRole, 'name') });
-          NotifyPositive('Email envoyé.');
-        } catch (e) {
-          console.error(e);
-          NotifyNegative('Erreur lors de l\'envoi du mail.');
-          this.loading = false;
-          this.coachCreationModal = false;
-        }
-      }
-
-      this.loading = false;
+      await this.getUsers();
       this.coachCreationModal = false;
-      this.getUsers();
     },
     resetCoachCreationForm () {
       this.firstStep = true;
@@ -271,7 +266,7 @@ export default {
 
         await Users.updateById(this.selectedCoach._id, this.formatUpdatedUserPayload(this.selectedCoach));
         this.coachEditionModal = false;
-        this.getUsers();
+        await this.getUsers();
         NotifyPositive('Compte modifié.');
       } catch (e) {
         console.error(e);

@@ -113,7 +113,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer le/la bénéficiaire.');
-        if (e.msg) NotifyNegative('Erreur lors de la suppression du/de la bénéficiaire.');
+        if (e.msg) NotifyNegative('Erreur lors de la suppression.');
       }
     },
     validateCustomerDeletion () {
@@ -171,7 +171,7 @@ export default {
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'arrêt du/de la bénéficiaire.');
+        NotifyNegative('Erreur lors de l\'arrêt.');
       } finally {
         this.modalLoading = false;
       }
@@ -197,7 +197,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403 && e.data.message !== 'Forbidden') return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'archivage du/de la bénéficiaire.');
+        NotifyNegative('Erreur lors de l\'archivage.');
       }
     },
   },
