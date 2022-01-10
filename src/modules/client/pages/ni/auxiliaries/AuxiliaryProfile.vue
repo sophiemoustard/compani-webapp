@@ -14,6 +14,7 @@ import { useStore } from 'vuex';
 import get from 'lodash/get';
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
+import { formatIdentity } from '@helpers/utils';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
 import ProfileContracts from 'src/modules/client/components/auxiliary/ProfileContracts';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
@@ -50,12 +51,10 @@ export default {
     const notifications = computed(() => $store.state.userProfile.notifications);
 
     watch(userProfile, async () => $store.dispatch('userProfile/updateNotifications'));
-    watch(userProfile, () => refreshAuxiliaryName());
+    watch(userProfile, () => { refreshAuxiliaryName(); });
 
     const refreshAuxiliaryName = () => {
-      auxiliaryName.value = get(userProfile.value, 'identity')
-        ? `${userProfile.value.identity.firstname} ${userProfile.value.identity.lastname}`
-        : '';
+      auxiliaryName.value = get(userProfile.value, 'identity') ? formatIdentity(userProfile.value.identity, 'FL') : '';
     };
 
     const created = async () => {
