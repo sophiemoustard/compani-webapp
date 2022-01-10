@@ -1,38 +1,31 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide" padding>
-      <template slot="title">
+      <template #title>
         <ni-button icon="save_alt" @click="exportToCSV" class="q-ml-sm" :disable="!allCustomersFundings.length" />
       </template>
-      <template slot="content">
+      <template #content>
         <div class="col-xs-12 header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-6">
-              <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector" allow-null-option />
+              <ni-select-sector class="q-pl-sm" v-model="selectedSector" @update:model-value="onInputSector"
+                allow-null-option />
             </div>
             <div class="col-xs-12 col-sm-6">
               <ni-select class="q-pl-sm" :options="thirdPartyPayerOptions" v-model="selectedThirdPartyPayer"
-                @input="onInputThirdPartyPayer" allow-null-option caption="Financeur" />
+                @update:model-value="onInputThirdPartyPayer" caption="Financeur" clearable />
             </div>
           </div>
         </div>
       </template>
     </ni-title-header>
     <ni-simple-table :data="displayedCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading"
-      row-key="_id" :pagination.sync="pagination">
-      <template #body="{ props }">
-        <q-tr :props="props">
-          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
-            :style="col.style">
-            <template> {{ col.value }} </template>
-          </q-td>
-        </q-tr>
-      </template>
-    </ni-simple-table>
+      row-key="_id" v-model:pagination="pagination" />
   </q-page>
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
@@ -53,9 +46,10 @@ import {
   formatNumberForCSV,
 } from '@helpers/utils';
 
+const metaInfo = { title: 'Suivi des plans d\'aide' };
+
 export default {
   name: 'CustomersFundingsMonitoring',
-  metaInfo: { title: 'Suivi des plans d\'aide' },
   components: {
     'ni-button': Button,
     'ni-simple-table': SimpleTable,
@@ -63,6 +57,7 @@ export default {
     'ni-select': Select,
     'ni-select-sector': SelectSector,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tableLoading: false,
@@ -81,7 +76,7 @@ export default {
           name: 'tpp',
           label: 'Financeur',
           field: row => this.getTppName(row),
-          format: value => truncate(value),
+          format: truncate,
           align: 'left',
           classes: 'text-weight-bold',
         },
@@ -89,7 +84,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           field: 'customer',
-          format: value => this.formatCustomerName(value),
+          format: this.formatCustomerName,
           align: 'left',
           classes: 'text-weight-bold',
           sort: (a, b) => b.lastname.localeCompare(a.lastname),
@@ -98,7 +93,7 @@ export default {
           name: 'referent',
           label: 'Référent',
           field: 'referent',
-          format: value => this.formatReferentName(value),
+          format: this.formatReferentName,
           align: 'left',
         },
         {
@@ -118,14 +113,14 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire',
           field: 'unitTTCRate',
-          format: value => formatPrice(value),
+          format: formatPrice,
           align: 'center',
         },
         {
           name: 'careHours',
           label: 'Nb d\'heures',
           field: 'careHours',
-          format: value => formatHours(value),
+          format: formatHours,
           align: 'center',
           classes: 'text-weight-bold',
         },
@@ -200,7 +195,7 @@ export default {
         'Bénéficiaire',
         'Référent(e)',
         'Equipe',
-        'Taux participation du/de la bénéficiaire',
+        'Taux participation',
         'Prix unitaire',
         'Nb d\'heures',
         'Mois précédent',

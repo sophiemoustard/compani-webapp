@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import Exports from '@api/Exports';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
@@ -17,13 +18,15 @@ import Select from '@components/form/Select';
 import { downloadFile } from '@helpers/file';
 import { EXPORT_TYPES, SERVICE } from '@data/constants';
 
+const metaInfo = { title: 'Données' };
+
 export default {
   name: 'DataExports',
-  metaInfo: { title: 'Données' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-select': Select,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       exportTypeOptions: EXPORT_TYPES,

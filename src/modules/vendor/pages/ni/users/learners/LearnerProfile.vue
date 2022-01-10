@@ -11,14 +11,16 @@
     </div>
 
     <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkUserToCompany"
-      :validations="$v.newCompany" @hide="resetCompanyLinkModal" :new-company.sync="newCompany"
+      :validations="v$.newCompany" @hide="resetCompanyLinkModal" v-model:new-company="newCompany"
       :company-options="companyOptions" />
   </q-page>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
 import { mapState } from 'vuex';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
@@ -34,10 +36,15 @@ import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLin
 
 export default {
   name: 'LearnerProfile',
-  metaInfo: { title: 'Fiche apprenant' },
   props: {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
+  },
+  setup () {
+    const metaInfo = { title: 'Fiche apprenant' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   mixins: [learnerMixin],
   components: {
@@ -108,12 +115,12 @@ export default {
     resetCompanyLinkModal () {
       this.companyOptions = [];
       this.newCompany = '';
-      this.$v.newCompany.$reset();
+      this.v$.newCompany.$reset();
     },
     async linkUserToCompany () {
       try {
-        this.$v.newCompany.$touch();
-        if (this.$v.newCompany.$error) return NotifyWarning('Une structure est requise.');
+        this.v$.newCompany.$touch();
+        if (this.v$.newCompany.$error) return NotifyWarning('Une structure est requise.');
 
         this.modalLoading = true;
         await Users.updateById(this.userProfile._id, { company: this.newCompany });
@@ -130,7 +137,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
 };

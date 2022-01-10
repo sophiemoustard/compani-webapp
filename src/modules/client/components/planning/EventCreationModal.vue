@@ -1,45 +1,47 @@
 <template>
-  <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="reset(false)">
+  <q-dialog v-if="Object.keys(newEvent).length !== 0" :model-value="creationModal" @hide="reset(false)">
     <div class="modal-container-md">
       <div class="modal-padding">
-        <ni-planning-modal-header v-if="isCustomerPlanning" :value="newEvent.customer"
+        <ni-planning-modal-header v-if="isCustomerPlanning" :model-value="newEvent.customer"
           :selected-person="selectedCustomer" @close="close" />
-        <ni-planning-modal-header v-else :value="newEvent.auxiliary" :options="auxiliariesOptions"
+        <ni-planning-modal-header v-else :model-value="newEvent.auxiliary" :options="auxiliariesOptions"
           :selected-person="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent"
-          @input="updateEvent('auxiliary', $event)" />
-        <ni-btn-toggle :value="newEvent.type" :options="eventTypeOptions" @input="updateType($event)" />
+          @update:model-value="updateEvent('auxiliary', $event)" />
+        <ni-btn-toggle :model-value="newEvent.type" :options="eventTypeOptions"
+          @update:model-value="updateType($event)" />
         <template v-if="newEvent.type !== ABSENCE">
-          <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
+          <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="newEvent.dates" required-field
             :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
-            @input="updateEvent('dates', $event)" :max="customerStoppedDate" />
+            @update:model-value="updateEvent('dates', $event)" :max="customerStoppedDate" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
-          <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="newEvent.auxiliary"
+          <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :model-value="newEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-            @blur="validations.auxiliary.$touch" @input="updateEvent('auxiliary', $event)" />
-          <ni-select v-else in-modal caption="Bénéficiaire" :value="newEvent.customer"
+            @blur="validations.auxiliary.$touch" @update:model-value="updateEvent('auxiliary', $event)" />
+          <ni-select v-else in-modal caption="Bénéficiaire" :model-value="newEvent.customer"
             :options="getCustomersOptions(newEvent.dates.startDate)" :error="validations.customer.$error" required-field
-            @blur="validations.customer.$touch" @input="updateCustomer($event)" data-cy="event-creation-customer" />
-          <ni-select in-modal caption="Service" :value="newEvent.subscription" :error="validations.subscription.$error"
-            :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch"
-            data-cy="event-creation-service" @input="updateEvent('subscription', $event)" />
+            @blur="validations.customer.$touch" @update:model-value="updateCustomer($event)"
+            data-cy="event-creation-customer" />
+          <ni-select caption="Service" :model-value="newEvent.subscription" :error="validations.subscription.$error"
+            :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch" in-modal
+            data-cy="event-creation-service" @update:model-value="updateEvent('subscription', $event)" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
-          <ni-select in-modal caption="Nature" :value="newEvent.absenceNature" :options="absenceNatureOptions"
+          <ni-select in-modal caption="Nature" :model-value="newEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field @blur="validations.absenceNature.$touch"
-            @input="updateAbsenceNature($event)" />
-          <ni-select in-modal caption="Type d'absence" :value="newEvent.absence" :options="absenceOptions"
+            @update:model-value="updateAbsenceNature($event)" />
+          <ni-select in-modal caption="Type d'absence" :model-value="newEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
-            :disable="isHourlyAbsence(newEvent)" @input="updateAbsence($event)" />
-          <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
+            :disable="isHourlyAbsence(newEvent)" @update:model-value="updateAbsence($event)" />
+          <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="newEvent.dates" required-field
             :disable-end-date="isHourlyAbsence(newEvent)" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
-            @input="updateEvent('dates', $event)" />
-          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="newEvent.isExtendedAbsence"
-            @input="updateCheckBox" label="Prolongation" dense />
-          <ni-select v-if="newEvent.isExtendedAbsence" :value="newEvent.extension"
-            @input="updateEvent('extension', $event)" required-field in-modal caption="Absence"
+            @update:model-value="updateEvent('dates', $event)" />
+          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :model-value="newEvent.isExtendedAbsence"
+            @update:model-value="updateCheckBox" label="Prolongation" dense />
+          <ni-select v-if="newEvent.isExtendedAbsence" :model-value="newEvent.extension"
+            @update:model-value="updateEvent('extension', $event)" required-field in-modal caption="Absence"
             :options="extendedAbsenceOptions" @blur="validations.extension.$touch"
             :error="validations.extension.$error" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
@@ -48,28 +50,29 @@
             :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
-          <ni-select in-modal caption="Type d'heure interne" :value="newEvent.internalHour"
+          <ni-select in-modal caption="Type d'heure interne" :model-value="newEvent.internalHour"
             :options="internalHourOptions" required-field :error="validations.internalHour.$error"
-            @blur="validations.internalHour.$touch" @input="updateEvent('internalHour', $event)" />
+            @blur="validations.internalHour.$touch" @update:model-value="updateEvent('internalHour', $event)" />
         </template>
         <template v-if="newEvent.type !== ABSENCE && newEvent.repetition">
-          <ni-select in-modal caption="Répétition de l'évènement" :value="newEvent.repetition.frequency"
+          <ni-select in-modal caption="Répétition de l'évènement" :model-value="newEvent.repetition.frequency"
             :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch"
-            :disable="!isRepetitionAllowed" @input="updateEvent('repetition.frequency', $event)"
+            :disable="!isRepetitionAllowed" @update:model-value="updateEvent('repetition.frequency', $event)"
             :error="validations.repetition.frequency.$error" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
-          <ni-search-address :value="newEvent.address" :error-message="addressError" @blur="validations.address.$touch"
-            :error="validations.address.$error" in-modal @input="updateEvent('address', $event)" />
+          <ni-search-address :model-value="newEvent.address" @update:model-value="updateEvent('address', $event)"
+            :error-message="addressError" @blur="validations.address.$touch" :error="validations.address.$error"
+            in-modal />
         </template>
-        <ni-input in-modal type="textarea" :value="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
+        <ni-input in-modal type="textarea" :model-value="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER"
-          @input="updateEvent('misc', $event)" />
+          @update:model-value="updateEvent('misc', $event)" />
       </div>
       <div v-if="newEvent.type === INTERVENTION && customerAddressList(newEvent).length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select borderless dense :value="newEvent.address" @input="updateCustomerAddress($event)" emit-value
-            :options="customerAddressList(newEvent)" :readonly="customerAddressList(newEvent).length === 1"
+          <q-select dense :model-value="newEvent.address" @update:model-value="updateCustomerAddress($event)" emit-value
+            :options="customerAddressList(newEvent)" :readonly="customerAddressList(newEvent).length === 1" borderless
             :display-value="newEvent.address.fullAddress" ref="addressSelect" behavior="menu">
             <template #append v-if="customerAddressList(newEvent).length > 1">
               <ni-button icon="swap_vert" class="select-icon primary-icon" @click.stop="toggleAddressSelect" />
@@ -122,6 +125,7 @@ export default {
     'ni-button': Button,
     'ni-btn-toggle': ButtonToggle,
   },
+  emits: ['update-event', 'close', 'reset', 'delete-document', 'document-uploaded', 'submit'],
   data () {
     return {
       extendedAbsenceOptions: [],

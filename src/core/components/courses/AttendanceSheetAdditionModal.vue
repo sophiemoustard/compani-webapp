@@ -1,19 +1,20 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+    <template #title>
       Ajouter une nouvelle <span class="text-weight-bold">feuille d'émargement</span>
     </template>
-    <ni-select v-if="course.type === INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch" in-modal
-      :error="validations.date.$error" @input="update($event, 'date')" :options="dateOptions" caption="Date"
-      required-field />
-    <ni-select v-else :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch" :options="traineeOptions"
-      :error="validations.trainee.$error" @input="update($event, 'trainee')" in-modal caption="Participant(e)"
-      required-field />
+    <ni-select v-if="course.type === INTRA" :model-value="newAttendanceSheet.date" @blur="validations.date.$touch"
+      :error="validations.date.$error" @update:model-value="update($event, 'date')" :options="dateOptions"
+      required-field in-modal caption="Date" />
+    <ni-select v-else :model-value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
+      :error="validations.trainee.$error" @update:model-value="update($event, 'trainee')" in-modal required-field
+      caption="Participant(e)" :options="traineeOptions" />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
-      :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error" />
-    <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter la feuille d'émargement" color="primary"
-        :loading="loading" icon-right="add" @click="submit" />
+      :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
+      :error="validations.file.$error" />
+    <template #footer>
+      <ni-button class="full-width modal-btn bg-primary" label="Ajouter la feuille d'émargement" :loading="loading"
+        icon-right="add" @click="submit" color="white" />
     </template>
   </ni-modal>
 </template>
@@ -22,6 +23,7 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import { INTRA } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
@@ -33,14 +35,16 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
     'ni-input': Input,
+    'ni-button': Button,
   },
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newAttendanceSheet: { type: Object, default: () => ({}) },
     course: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
+  emits: ['hide', 'update:model-value', 'update:new-attendance-sheet', 'submit'],
   data () {
     return {
       INTRA,
@@ -61,13 +65,13 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newAttendanceSheet', { ...this.newAttendanceSheet, [prop]: event });
+      this.$emit('update:new-attendance-sheet', { ...this.newAttendanceSheet, [prop]: event });
     },
   },
 };

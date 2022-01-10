@@ -4,14 +4,14 @@
     <div class="row justify-center q-layout-padding client-background page-container">
       <div class="col-md-6 col-xs-12">
         <p class="q-mb-lg message">Veuillez renseigner un nouveau mot de passe.</p>
-        <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
-          v-model.trim="password" @blur="$v.password.$touch" type="password"
-          :error-message="passwordError($v.password)" required-field />
-        <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
-          v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
-          :error-message="passwordConfirmError($v.passwordConfirm)" />
+        <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="v$.password.$error"
+          v-model.trim="password" @blur="v$.password.$touch" type="password"
+          :error-message="passwordError(v$.password)" required-field />
+        <ni-input caption="Confirmation nouveau mot de passe" :error="v$.passwordConfirm.$error"
+          v-model.trim="passwordConfirm" @blur="v$.passwordConfirm.$touch" type="password" required-field
+          :error-message="passwordConfirmError(v$.passwordConfirm)" />
         <div class="row justify-center">
-          <q-btn @click="submit" color="primary" :disable="$v.$invalid">Envoyer</q-btn>
+          <q-btn @click="submit" color="primary" :disable="v$.$invalid">Envoyer</q-btn>
         </div>
       </div>
     </div>
@@ -19,11 +19,12 @@
 </template>
 
 <script>
-import { sameAs, required, requiredIf } from 'vuelidate/lib/validators';
+import { sameAs, required } from '@vuelidate/validators';
+import useVuelidate from '@vuelidate/core';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Authentication from '@api/Authentication';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { isUserLogged } from '@helpers/alenvi';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { logInMixin } from '@mixins/logInMixin';
@@ -34,6 +35,7 @@ export default {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
+  setup () { return { v$: useVuelidate() }; },
   mixins: [passwordMixin, logInMixin],
   data () {
     return {
@@ -64,10 +66,7 @@ export default {
   validations () {
     return {
       password: { required, ...this.passwordValidation },
-      passwordConfirm: {
-        required: requiredIf(item => item.password),
-        sameAsPassword: sameAs('password'),
-      },
+      passwordConfirm: { required, sameAs: sameAs(this.password) },
     };
   },
   methods: {
@@ -85,6 +84,9 @@ export default {
     },
     async submit () {
       try {
+        this.v$.$touch();
+        if (this.v$.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         await Authentication.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true });
 
         NotifyPositive('Mot de passe changé. Connexion en cours...');
@@ -95,7 +97,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     clearTimeout(this.timeout);
   },
 };

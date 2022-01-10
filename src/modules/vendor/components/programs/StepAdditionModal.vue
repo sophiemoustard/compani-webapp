@@ -1,22 +1,26 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
+    <template #title>
         Ajouter une nouvelle <span class="text-weight-bold">étape</span>
       </template>
-      <ni-btn-toggle :value="additionType" :options="STEP_ATTACHEMENT_OPTIONS" @input="updateAdditionType($event)" />
+      <ni-btn-toggle :model-value="additionType" :options="STEP_ATTACHEMENT_OPTIONS"
+        @update:model-value="updateAdditionType($event)" />
       <template v-if="additionType === CREATE_STEP">
-        <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options="STEP_TYPES"
-          required-field @input="updateNewStep($event, 'type')" />
-        <ni-input in-modal :value="newStep.name" :error="validations.newStep.name.$error" required-field caption="Nom"
-          @input="updateNewStep($event.trim(), 'name')" @blur="validations.newStep.name.$touch" />
+        <ni-option-group inline caption="Type" :model-value="newStep.type" type="radio" :options="STEP_TYPES"
+          required-field @update:model-value="updateNewStep($event, 'type')" />
+        <ni-input in-modal :model-value="newStep.name" :error="validations.newStep.name.$error" required-field
+          @update:model-value="updateNewStep($event.trim(), 'name')" @blur="validations.newStep.name.$touch"
+          caption="Nom" />
       </template>
       <template v-else-if="additionType === REUSE_STEP">
-        <ni-select in-modal :value="reusedStep.program" caption="Programme" required-field :options="programOptions"
-        inline @input="updateProgram($event)" :error="validations.reusedStep.program.$error" />
-        <ni-multiple-option-group required-field caption="Étapes" :value="reusedStep._id" :options-groups="stepOptions"
-          @input="updateReusedStep($event)" :group-titles="stepGroups" :error="validations.reusedStep._id.$error" />
+        <ni-select in-modal :model-value="reusedStep.program" caption="Programme" required-field
+          inline @update:model-value="updateProgram($event)" :error="validations.reusedStep.program.$error"
+          :options="programOptions" />
+        <ni-multiple-option-group required-field caption="Étapes" :model-value="reusedStep._id"
+          @update:model-value="updateReusedStep($event)" :error="validations.reusedStep._id.$error"
+          :options-groups="stepOptions" :group-titles="stepGroups" />
       </template>
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" :label="submitLabel" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
       </template>
@@ -44,7 +48,7 @@ export default {
   name: 'StepAdditionModal',
   mixins: [courseMixin],
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newStep: { type: Object, default: () => ({}) },
     reusedStep: { type: Object, default: () => ({}) },
     program: { type: Object, default: () => ({}) },
@@ -61,6 +65,7 @@ export default {
     'ni-btn-toggle': ButtonToggle,
     'ni-select': Select,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-step', 'update:reused-step', 'update:addition-type'],
   data () {
     return {
       STEP_TYPES,
@@ -139,23 +144,23 @@ export default {
       this.stepGroups = [];
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     updateNewStep (event, prop) {
-      this.$emit('update:newStep', set(this.newStep, prop, event));
+      this.$emit('update:new-step', set(this.newStep, prop, event));
     },
     async updateProgram (event) {
-      await this.$emit('update:reusedStep', { _id: '', program: event });
+      await this.$emit('update:reused-step', { _id: '', program: event });
       await this.refreshSteps();
     },
     updateReusedStep (value) {
-      this.$emit('update:reusedStep', set(this.reusedStep, '_id', value));
+      this.$emit('update:reused-step', set(this.reusedStep, '_id', value));
     },
     updateAdditionType (value) {
-      this.$emit('update:additionType', value);
+      this.$emit('update:addition-type', value);
     },
   },
 };

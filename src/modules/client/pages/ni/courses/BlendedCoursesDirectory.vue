@@ -3,8 +3,10 @@
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
-      <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
-      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
+      <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
+        @update:model-value="updateSelectedTrainer" />
+      <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
+        @update:model-value="updateSelectedProgram" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -12,6 +14,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
@@ -21,10 +24,11 @@ import Trello from '@components/courses/Trello';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED } from '@data/constants';
 
+const metaInfo = { title: 'Catalogue' };
+
 export default {
-  metaInfo: { title: 'Catalogue' },
   name: 'BlendedCoursesDirectory',
-  mixins: [courseFiltersMixin],
+  mixins: [courseFiltersMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-select': Select,
     'ni-directory-header': DirectoryHeader,
@@ -53,8 +57,8 @@ export default {
       }
     },
   },
-  beforeDestroy () {
-    if (this.$router.currentRoute.name !== 'ni courses info') this.$store.dispatch('course/resetFilters');
+  beforeUnmount () {
+    if (this.$route.name !== 'ni courses info') this.$store.dispatch('course/resetFilters');
   },
 };
 </script>

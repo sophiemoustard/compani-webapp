@@ -81,7 +81,7 @@ export const helperMixin = {
     },
     // Creation
     resetAddHelperForm () {
-      this.$v.newHelper.$reset();
+      this.v$.newHelper.$reset();
       this.newHelper = { ...clear(this.newHelper) };
       this.firstStep = true;
     },
@@ -108,8 +108,8 @@ export const helperMixin = {
     async createHelper () {
       try {
         this.loading = true;
-        this.$v.newHelper.$touch();
-        if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newHelper.$touch();
+        if (this.v$.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = await this.formatHelper();
         await Users.create(pickBy(payload));
@@ -137,8 +137,8 @@ export const helperMixin = {
     async nextStep () {
       try {
         this.loading = true;
-        this.$v.newHelper.local.email.$touch();
-        if (this.$v.newHelper.local.email.$error) return NotifyWarning('Champs invalides');
+        this.v$.newHelper.local.email.$touch();
+        if (this.v$.newHelper.local.email.$error) return NotifyWarning('Champs invalides');
 
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
         const { user } = userInfo;
@@ -169,15 +169,15 @@ export const helperMixin = {
     },
     // Edition
     resetEditedHelperForm () {
-      this.$v.editedHelper.$reset();
+      this.v$.editedHelper.$reset();
       this.editedHelper = { ...clear(this.editedHelper) };
       this.openEditedHelperModal = false;
     },
     async editHelper () {
       try {
         this.loading = true;
-        this.$v.editedHelper.$touch();
-        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedHelper.$touch();
+        if (this.v$.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         if (get(this.editedHelper, 'contact.phone')) {
           this.editedHelper.contact.phone = formatPhoneForPayload(this.editedHelper.contact.phone);

@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
@@ -33,22 +34,22 @@ import Agenda from 'src/modules/client/components/planning/Agenda';
 import EventConflictModal from 'src/modules/client/components/customers/EventConflictModal';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
 
+const metaInfo = { title: 'Agenda' };
+
 export default {
   name: 'CustomerAgenda',
-  metaInfo: { title: 'Agenda' },
   components: {
     agenda: Agenda,
     'planning-navigation': PlanningNavigation,
     'event-conflict-modal': EventConflictModal,
   },
-  mixins: [planningTimelineMixin],
+  mixins: [planningTimelineMixin, createMetaMixin(metaInfo)],
   data () {
     return {
       startOfWeek: '',
       events: [],
       conflictingEvents: [],
       height: 0,
-      viewMode: WEEK_VIEW,
       AGENDA,
       personKey: CUSTOMER,
       DEFAULT_AVATAR,

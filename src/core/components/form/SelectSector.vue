@@ -1,7 +1,7 @@
 <template>
-  <ni-select :in-modal="inModal" :value="value" @input="updateSector" :options="sectors" :error-message="errorMessage"
+  <ni-select :in-modal="inModal" :model-value="modelValue" @update:model-value="updateSector" :options="sectors"
     @blur="blurHandler" @focus="focusHandler" filter-placeholder="Rechercher" :error="error" ref="selectSector"
-    caption="Équipe" :required-field="requiredField" />
+    caption="Équipe" :required-field="requiredField" :error-message="errorMessage" />
 </template>
 
 <script>
@@ -13,7 +13,7 @@ import { REQUIRED_LABEL } from '@data/constants';
 export default {
   name: 'SelectSector',
   props: {
-    value: { type: String, default: '' },
+    modelValue: { type: String, default: '' },
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
     companyId: { type: String, default: '' },
@@ -25,6 +25,7 @@ export default {
   components: {
     'ni-select': Select,
   },
+  emits: ['update:model-value', 'blur', 'focus'],
   data () {
     return {
       sectors: [],
@@ -44,7 +45,7 @@ export default {
       }
     },
     updateSector (value) {
-      this.$emit('input', value);
+      this.$emit('update:model-value', value);
     },
     blurHandler () {
       this.$emit('blur');

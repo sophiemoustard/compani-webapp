@@ -33,7 +33,7 @@ export default {
         const user = await Users.getById(params.userId);
 
         const userClientRole = store.getters['main/getClientRole'];
-        if (userClientRole && !/\/ad\//.test(router.currentRoute.path)) {
+        if (userClientRole && !/\/ad\//.test(router.currentRoute.value.path)) {
           const loggedUserCompany = store.getters['main/getCompany'];
           if (get(user, 'company._id') !== loggedUserCompany._id) return router.replace({ path: '/404' });
         }

@@ -1,14 +1,14 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+    <template #title>
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :value="newSms.type"
-        required-field @input="updateType($event)" />
-      <ni-input in-modal caption="Message" :value="newSms.content" @input="update($event, 'content')" type="textarea"
-        :rows="7" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
+      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :model-value="newSms.type"
+        required-field @update:model-value="updateType($event)" />
+      <ni-input in-modal caption="Message" :model-value="newSms.content" @update:model-value="update($event, 'content')"
+        type="textarea" :rows="7" required-field />
+      <template #footer>
+        <ni-button class="bg-primary full-width modal-btn" label="Envoyer message" icon-right="send" color="white"
           :loading="loading" @click="send" />
       </template>
     </ni-modal>
@@ -18,11 +18,12 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 
 export default {
   name: 'SmsSendingModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newSms: {
       type: Object,
       validator: p => (typeof p.type === 'string') && (typeof p.content === 'string'),
@@ -35,13 +36,15 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-input': Input,
+    'ni-button': Button,
   },
+  emits: ['hide', 'update:model-value', 'update-type', 'send', 'update:new-sms'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     updateType (event) {
       this.$emit('update-type', event);
@@ -51,7 +54,7 @@ export default {
       this.$emit('send', this.newSms);
     },
     update (event, prop) {
-      this.$emit('update:newSms', { ...this.newSms, [prop]: event });
+      this.$emit('update:new-sms', { ...this.newSms, [prop]: event });
     },
   },
 };

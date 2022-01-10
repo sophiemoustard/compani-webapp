@@ -3,16 +3,18 @@
     <div class="row history-container-title">
       <div class="col-11">Historique d'activité</div>
       <div class="col-1 cursor-pointer">
-        <ni-button icon="close" size="sm" @click.native="close" />
+        <ni-button icon="close" size="sm" @click="close" />
       </div>
     </div>
     <div class="scroll-container" :style="{ height: `${height - 50}px` }" ref="scrollTarget">
       <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTarget" ref="infiniteScroll">
         <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
           :course-history="courseHistory" />
-        <div class="loading" slot="loading">
-          <q-spinner />
-        </div>
+        <template #loading>
+          <div class="loading">
+            <q-spinner />
+          </div>
+      </template>
       </q-infinite-scroll>
     </div>
   </div>
@@ -31,6 +33,7 @@ export default {
   props: {
     courseHistories: { type: Array, default: () => ([]) },
   },
+  emits: ['toggle-history', 'load'],
   computed: {
     height () {
       return window.innerHeight - this.top;
@@ -54,14 +57,14 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .scroll-container
-    overflow-y: auto
-    overflow-x: hidden
+.scroll-container
+  overflow-y: auto
+  overflow-x: hidden
 
-  .loading
-    width: 100%
-    margin: 4px 0
-    display: flex
-    justify-content: center
-    height: 24px
+.loading
+  width: 100%
+  margin: 4px 0
+  display: flex
+  justify-content: center
+  height: 24px
 </style>

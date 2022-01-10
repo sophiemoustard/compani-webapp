@@ -150,6 +150,17 @@ export default {
     eventHistories: { type: Array, default: () => [] },
     filters: { type: Array, default: () => [] },
   },
+  emits: [
+    'update-feeds',
+    'refresh',
+    'toggle-all-sectors',
+    'update-start-of-week',
+    'toggle-history',
+    'on-drop',
+    'open-creation-modal',
+    'open-edition-modal',
+    'open-customer-absence-edition-modal',
+  ],
   data () {
     return {
       terms: [],
@@ -167,7 +178,7 @@ export default {
       timeout: null,
     };
   },
-  beforeDestroy () {
+  beforeUnmount () {
     if (this.isCoach) {
       if (!this.isCustomerPlanning) {
         this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.termIds));

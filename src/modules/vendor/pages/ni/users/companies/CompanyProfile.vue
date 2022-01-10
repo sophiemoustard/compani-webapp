@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import { mapState } from 'vuex';
 import { COMPANY_TYPES } from '@data/constants';
@@ -13,13 +14,15 @@ import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
 
+const metaInfo = { title: 'Fiche structure' };
+
 export default {
   name: 'CompanyProfile',
-  metadata: { title: 'Fiche structure' },
   props: {
     companyId: { type: String, required: true },
     defaultTab: { type: String, default: 'infos' },
   },
+  mixins: [createMetaMixin(metaInfo)],
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
@@ -58,7 +61,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('company/resetCompany');
   },
 };

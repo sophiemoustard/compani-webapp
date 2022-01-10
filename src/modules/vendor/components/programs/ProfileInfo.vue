@@ -4,16 +4,16 @@
       <p class="text-weight-bold">Identité</p>
       <div class="row gutter-profile">
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
-          :error="$v.program.name.$error" required-field />
+          :error="v$.program.name.$error" required-field />
         <ni-file-uploader caption="Image" path="image" :entity="program" :url="programsUploadUrl"
           @delete="validateProgramImageDeletion" @uploaded="programImageUploaded" :max-file-size="maxFileSize"
           :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" />
         <ni-input caption="Description" v-model="program.description" type="textarea"
           @focus="saveTmp('description')" @blur="updateProgram('description')" required-field
-          :error="$v.program.description.$error" />
+          :error="v$.program.description.$error" />
         <ni-input caption="Objectifs pédagogiques" v-model="program.learningGoals" type="textarea"
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
-          :error="$v.program.learningGoals.$error" />
+          :error="v$.program.learningGoals.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -34,20 +34,21 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter une catégorie" @click="categoryAdditionModal = true" />
+          <ni-button color="primary" label="Ajouter une catégorie" @click="categoryAdditionModal = true" icon="add" />
         </q-card-actions>
       </q-card>
     </div>
     <tester-table :program-id="profileId" :testers="program.testers" @refresh="refreshProgram" />
 
-    <category-addition-modal v-model="categoryAdditionModal" :new-category.sync="newCategory" :loading="loading"
-      @hide="resetModal" @submit="addCategory" :category-options="categoryOptions" :validations="$v.newCategory" />
+    <category-addition-modal v-model="categoryAdditionModal" v-model:new-category="newCategory" :loading="loading"
+      @hide="resetModal" @submit="addCategory" :category-options="categoryOptions" :validations="v$.newCategory" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Programs from '@api/Programs';
@@ -74,6 +75,9 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'category-addition-modal': CategoryAdditionModal,
     'tester-table': TesterTable,
+  },
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -118,7 +122,7 @@ export default {
   async mounted () {
     await this.refreshCategories();
     if (!this.program) await this.refreshProgram();
-    this.$v.program.$touch();
+    this.v$.program.$touch();
   },
   methods: {
     saveTmp (path) {
@@ -143,8 +147,8 @@ export default {
         const value = get(this.program, path);
         if (this.tmpInput === value) return;
 
-        get(this.$v.program, path).$touch();
-        if (get(this.$v.program, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+        get(this.v$.program, path).$touch();
+        if (get(this.v$.program, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = set({}, path, value.trim());
         await Programs.update(this.profileId, payload);
@@ -185,13 +189,13 @@ export default {
       }
     },
     resetModal () {
-      this.$v.newCategory.$reset();
+      this.v$.newCategory.$reset();
       this.newCategory = '';
     },
     async addCategory () {
       try {
-        this.$v.newCategory.$touch();
-        if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newCategory.$touch();
+        if (this.v$.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Programs.addCategory(this.program._id, { categoryId: this.newCategory });

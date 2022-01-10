@@ -3,15 +3,17 @@
     <div class="row history-container-title">
       <div class="col-11">Flux d'activité</div>
       <div class="col-1 cursor-pointer">
-        <ni-button icon="close" size="sm" @click.native="close" />
+        <ni-button icon="close" size="sm" @click="close" />
       </div>
     </div>
     <div class="scroll-container" ref="scrollTargetRef">
       <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTargetRef">
         <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" class="q-ma-xs" />
-        <div slot="loading" class="loading">
-          <q-spinner />
-        </div>
+         <template #loading>
+          <div class="loading">
+            <q-spinner />
+          </div>
+        </template>
       </q-infinite-scroll>
     </div>
   </div>
@@ -30,6 +32,7 @@ export default {
     'ni-event-history': NiEventHistory,
     'ni-button': Button,
   },
+  emits: ['toggle-history', 'update-feeds'],
   computed: {
     height () {
       return window.innerHeight - this.top;

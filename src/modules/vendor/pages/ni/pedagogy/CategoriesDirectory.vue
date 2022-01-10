@@ -2,7 +2,8 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Catégories" class="q-mb-xl" />
     <q-card>
-      <ni-responsive-table :data="categories" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
+      <ni-responsive-table :data="categories" :columns="columns" v-model:pagination="pagination"
+        :loading="tableLoading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -25,16 +26,18 @@
     </q-card>
 
     <category-creation-modal v-model="categoryCreationModal" @hide="resetCreationModal" @submit="createCategory"
-      :new-category.sync="newCategory" :validations="$v.newCategory" :loading="modalLoading" />
+      v-model:new-category="newCategory" :validations="v$.newCategory" :loading="modalLoading" />
 
     <category-edition-modal v-model="categoryEditionModal" @hide="resetEditionModal" @submit="updateCategory"
-      :edited-category.sync="editedCategory" :validations="$v.editedCategory" :loading="modalLoading" />
+      v-model:edited-category="editedCategory" :validations="v$.editedCategory" :loading="modalLoading" />
   </q-page>
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import pick from 'lodash/pick';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -45,7 +48,6 @@ import Categories from '@api/Categories';
 import { upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
-  metaInfo: { title: 'Catégories' },
   name: 'CategoriesDirectory',
   components: {
     'ni-title-header': TitleHeader,
@@ -53,6 +55,12 @@ export default {
     'ni-button': Button,
     'category-creation-modal': CategoryCreationModal,
     'category-edition-modal': CategoryEditionModal,
+  },
+  setup () {
+    const metaInfo = { title: 'Catégories' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -99,17 +107,17 @@ export default {
       }
     },
     resetCreationModal () {
-      this.$v.newCategory.$reset();
+      this.v$.newCategory.$reset();
       this.newCategory = { name: '' };
     },
     resetEditionModal () {
-      this.$v.editedCategory.$reset();
+      this.v$.editedCategory.$reset();
       this.editedCategory = { name: '' };
     },
     async createCategory () {
       try {
-        this.$v.newCategory.$touch();
-        if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newCategory.$touch();
+        if (this.v$.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         await Categories.create({ name: this.newCategory.name.trim() });
@@ -127,8 +135,8 @@ export default {
     },
     async updateCategory () {
       try {
-        this.$v.editedCategory.$touch();
-        if (this.$v.editedCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedCategory.$touch();
+        if (this.v$.editedCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         await Categories.update(this.editedCategory._id, { name: this.editedCategory.name.trim() });

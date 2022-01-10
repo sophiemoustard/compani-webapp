@@ -11,7 +11,7 @@
           v-model="customer.contact.secondaryAddress" color="white" disable />
         <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes"
           @focus="saveTmp('contact.accessCodes')" @blur="updateCustomer('contact.accessCodes')" />
-        <ni-input v-if="isAuxiliary" type="tel" :error="$v.customer.contact.phone.$error"
+        <ni-input v-if="isAuxiliary" type="tel" :error="v$.customer.contact.phone.$error"
           error-message="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
@@ -30,7 +30,7 @@
         <div class="col-md-6 col-xs-12 referent items-center">
           <img :src="auxiliaryAvatar" class="avatar q-mr-sm">
           <ni-select v-model="customer.referent._id" :options="auxiliariesOptions" no-error icon="swap_vert"
-            @focus="saveTmp('referent')" @input="updateCustomer('referent')" />
+            @focus="saveTmp('referent')" @update:model-value="updateCustomer('referent')" />
         </div>
       </div>
     </div>
@@ -40,8 +40,8 @@
       </div>
       <div class="row gutter-profile">
         <ni-select caption="Situation" v-model="customer.followUp.situation" @focus="saveTmp('followUp.situation')"
-          @input="updateCustomer('followUp.situation')" :options="situationOptions" />
-        <ni-input caption="Environnement du/de la bénéficiaire" v-model="customer.followUp.environment"
+          @update:model-value="updateCustomer('followUp.situation')" :options="situationOptions" />
+        <ni-input caption="Environnement" v-model="customer.followUp.environment"
           @blur="updateCustomer('followUp.environment')" @focus="saveTmp('followUp.environment')" type="textarea" />
         <ni-input caption="Objectifs de l’accompagnement" v-model="customer.followUp.objectives"
           @blur="updateCustomer('followUp.objectives')" @focus="saveTmp('followUp.objectives')" type="textarea" />
@@ -50,15 +50,15 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <customer-notes-container :notes-list="notesList" :display-all-notes.sync="displayAllNotes"
-        @openNewNoteModal="openNewNoteModal = true" @openEditedNoteModal="openNoteEditionModal" />
+      <customer-notes-container :notes-list="notesList" v-model:display-all-notes="displayAllNotes"
+        @open-new-note-modal="openNewNoteModal = true" @open-edited-note-modal="openNoteEditionModal" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
       <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
-        :loading="helpersLoading" :rows-per-page="rowsPerPage" :pagination.sync="pagination">
+        :loading="helpersLoading" :rows-per-page="rowsPerPage" v-model:pagination="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -76,7 +76,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Partenaires</p>
       <q-card>
-        <ni-responsive-table :data="partners" :columns="partnersColumns" :pagination.sync="pagination"
+        <ni-responsive-table :data="partners" :columns="partnersColumns" v-model:pagination="pagination"
           class="q-mb-md" :loading="partnersLoading">
           <template #header="{ props }">
             <q-tr :props="props">
@@ -91,8 +91,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'prescriber'">
-                  <q-checkbox :value="prescriberPartner === props.row._id"
-                    @input="updatePrescriberPartner(props.row._id)" />
+                  <q-checkbox :model-value="prescriberPartner === props.row._id"
+                    @update:model-value="updatePrescriberPartner(props.row._id)" />
                 </template>
                 <template v-if="col.name === 'actions'">
                   <ni-button icon="close" @click="validatePartnerDeletion(col.value)" />
@@ -113,14 +113,14 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
-        :rows-per-page="rowsPerPage" :pagination.sync="pagination" />
+        :rows-per-page="rowsPerPage" v-model:pagination="pagination" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
       <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :loading="followUpLoading"
-        :rows-per-page="rowsPerPage" :pagination.sync="pagination">
+        :rows-per-page="rowsPerPage" v-model:pagination="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -132,7 +132,7 @@
                   </q-item-section>
                   <q-item-section>
                     <span class="identity-block q-mr-sm">
-                      {{ col.value.identity | formatIdentity('Fl') }} ({{ col.value.sector.name }})
+                      {{ formatIdentity(col.value.identity, 'Fl') }} ({{ col.value.sector.name }})
                     </span>
                   </q-item-section>
                 </q-item>
@@ -145,21 +145,22 @@
     </div>
 
     <customer-partner-creation-modal v-model="newPartnerModal" :loading="modalLoading"
-      :partner-options="partnerOptions" :new-partner.sync="newPartner" @submit="addPartner"
-      @hide="resetAddPartnerModal" :validations="$v.newPartner" />
+      :partner-options="partnerOptions" v-model:new-partner="newPartner" @submit="addPartner"
+      @hide="resetAddPartnerModal" :validations="v$.newPartner" />
 
     <customer-note-creation-modal v-model="openNewNoteModal" @hide="resetCreationCustomerNote"
-      @submit="createCustomerNote" :new-note.sync="newNote" :validations="$v.newNote"
+      @submit="createCustomerNote" v-model:new-note="newNote" :validations="v$.newNote"
       :loading="noteLoading" />
 
     <customer-note-edition-modal v-model="openEditedNoteModal" @hide="resetEditionCustomerNote"
-      @submit="editCustomerNote" :edited-note.sync="editedNote" :validations="$v.editedNote" :loading="noteLoading" />
+      @submit="editCustomerNote" v-model:edited-note="editedNote" :validations="v$.editedNote" :loading="noteLoading" />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import Stats from '@api/Stats';
 import Users from '@api/Users';
@@ -210,6 +211,7 @@ export default {
     'ni-bi-color-button': BiColorButton,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       rowsPerPage: [5, 10, 15, 20],
@@ -361,6 +363,7 @@ export default {
     await Promise.all(promises);
   },
   methods: {
+    formatIdentity,
     getAuxiliaryAvatar (picture) {
       return picture ? get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
     },
@@ -407,7 +410,7 @@ export default {
     async refreshCustomer () {
       try {
         await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customer._id });
-        this.$v.customer.$touch();
+        this.v$.customer.$touch();
         this.isLoaded = true;
       } catch (e) {
         console.error(e);
@@ -455,8 +458,8 @@ export default {
     async addPartner () {
       try {
         this.modalLoading = true;
-        this.$v.newPartner.$touch();
-        if (this.$v.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+        this.v$.newPartner.$touch();
+        if (this.v$.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         await CustomerPartners.create({ partner: this.newPartner, customer: this.customer._id });
         NotifyPositive('Partenaire ajouté.');
@@ -472,7 +475,7 @@ export default {
       }
     },
     resetAddPartnerModal () {
-      this.$v.newPartner.$reset();
+      this.v$.newPartner.$reset();
       this.newPartner = '';
     },
     openNewPartnerModal () {
@@ -512,17 +515,17 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     resetCreationCustomerNote () {
-      this.$v.newNote.$reset();
+      this.v$.newNote.$reset();
       this.newNote = { title: '', description: '' };
     },
     resetEditionCustomerNote () {
-      this.$v.editedNote.$reset();
+      this.v$.editedNote.$reset();
       this.editedNoted = { _id: '', title: '', description: '' };
     },
     async createCustomerNote () {
       try {
-        this.$v.newNote.$touch();
-        if (this.$v.newNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newNote.$touch();
+        if (this.v$.newNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.noteLoading = true;
         const payload = { ...this.newNote, customer: this.customer._id };
@@ -544,8 +547,8 @@ export default {
     },
     async editCustomerNote () {
       try {
-        this.$v.editedNote.$touch();
-        if (this.$v.editedNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedNote.$touch();
+        if (this.v$.editedNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.noteLoading = true;
         const payload = { title: this.editedNote.title.trim(), description: this.editedNote.description.trim() };
@@ -562,19 +565,16 @@ export default {
       }
     },
   },
-  filters: {
-    formatIdentity,
-  },
 };
 </script>
 
 <style lang="sass" scoped>
-  .identity-block
-    display: inline-block
-    font-size: 12px
-  .referent
-    display: flex
-    ::v-deep .q-field__append
-      .q-select__dropdown-icon
-        display: none
+.identity-block
+  display: inline-block
+  font-size: 12px
+.referent
+  display: flex
+  :deep(.q-field__append)
+    .q-select__dropdown-icon
+      display: none
 </style>

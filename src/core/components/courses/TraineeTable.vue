@@ -3,21 +3,20 @@
     <div class="q-mb-xl">
       <div class="row">
         <p class="text-weight-bold table-title">{{ tableTitle }}</p>
-        <ni-copy-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail"
-          :value-to-copy="traineesEmails" @copy-success="handleCopySuccess" />
+        <ni-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail" @click="copy" />
       </div>
       <q-card>
-        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
-          :visible-columns="traineesVisibleColumns">
+        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
+          :visible-columns="traineesVisibleColumns" :loading="tableLoading">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <ni-button icon="edit" @click.native="openTraineeEditionModal(props.row)"
+                    <ni-button icon="edit" @click="openTraineeEditionModal(props.row)"
                       :disable="!!course.archivedAt" />
-                    <ni-button icon="close" @click.native="validateTraineeDeletion(col.value)"
+                    <ni-button icon="close" @click="validateTraineeDeletion(col.value)"
                       :disable="!!course.archivedAt" />
                   </div>
                 </template>
@@ -33,22 +32,26 @@
       </q-card>
     </div>
 
-    <trainee-addition-modal v-model="traineeAdditionModal" :new-trainee.sync="newTrainee"
-      :validations="$v.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" @submit="addTrainee"
+    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee="newTrainee" @submit="addTrainee"
+      :validations="traineeValidation.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
       :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
 
-    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee" @submit="updateTrainee"
-      @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="$v.editedTrainee" />
+    <trainee-edition-modal v-model="traineeEditionModal" v-model:edited-trainee="editedTrainee" @submit="updateTrainee"
+      @hide="resetTraineeEditionForm" :loading="traineeModalLoading" :validations="traineeValidation.editedTrainee" />
 
-    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" display-company
+      @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal"
-      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" display-company />
+      :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
+      @submit="submitLearnerCreationModal" />
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { copyToClipboard } from 'quasar';
+import { onMounted, computed, ref } from 'vue';
+import { useStore, mapState, mapGetters } from 'vuex';
+import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -61,7 +64,6 @@ import {
   formatPhoneForPayload,
   formatIdentity,
   formatAndSortOptions,
-  removeEmptyProps,
 } from '@helpers/utils';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -71,12 +73,11 @@ import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
-import { learnerCreationMixin } from '@mixins/learnerCreationMixin';
-import CopyButton from '@components/CopyButton';
+import { useLearners } from '@composables/learners';
 
 export default {
   name: 'TraineeTable',
-  mixins: [userMixin, courseMixin, learnerCreationMixin],
+  mixins: [userMixin, courseMixin],
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -86,8 +87,133 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'trainee-edition-modal': TraineeEditionModal,
     'trainee-addition-modal': TraineeAdditionModal,
-    'ni-copy-button': CopyButton,
     'learner-creation-modal': LearnerCreationModal,
+  },
+  emits: ['refresh'],
+  setup () {
+    const $store = useStore();
+    const $router = useRouter();
+    const potentialTrainees = ref([]);
+    const company = computed(() => $store.getters['main/getCompany']);
+    const course = computed(() => $store.state.course.course);
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
+
+    const getPotentialTrainees = async () => {
+      try {
+        let query;
+
+        if (course.value.type === INTRA) query = { company: get(course.value, 'company._id') };
+        if (course.value.type === INTER_B2B) {
+          query = isClientInterface.value ? { company: get(loggedUser, 'company._id') } : { hasCompany: true };
+        }
+
+        potentialTrainees.value = Object.freeze(await Users.learnerList(query));
+      } catch (error) {
+        potentialTrainees.value = [];
+        console.error(error);
+      }
+    };
+
+    const refresh = async () => getPotentialTrainees();
+    const {
+      searchStr,
+      newLearner,
+      newTrainee,
+      traineeAdditionModal,
+      editedTrainee,
+      learnerCreationModal,
+      learnerCreationModalLoading,
+      firstStep,
+      userAlreadyHasCompany,
+      learnerAlreadyExists,
+      tableLoading,
+      learnerValidation,
+      traineeValidation,
+      goToNextStep,
+      getLearnerList,
+      submitLearnerCreationModal,
+      resetLearnerCreationModal,
+    } = useLearners(company, false, refresh);
+
+    onMounted(async () => {
+      await getLearnerList(company.value._id);
+      await getPotentialTrainees();
+    });
+
+    const setNewLearner = (user) => {
+      newLearner.value._id = user._id;
+      newLearner.value.identity = {
+        firstname: get(user, 'identity.firstname'),
+        lastname: get(user, 'identity.lastname'),
+      };
+      newLearner.value.contact = { phone: get(user, 'contact.phone') };
+
+      if (get(user, 'company._id')) newLearner.value.company = get(user, 'company._id');
+      else if (course.value.type === INTRA) newLearner.value.company = course.value.company._id;
+    };
+
+    const nextStepLearnerCreationModal = async () => {
+      try {
+        learnerValidation.value.newLearner.$touch();
+        if (learnerValidation.value.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
+
+        learnerCreationModalLoading.value = true;
+        const userInfo = await Users.exists({ email: newLearner.value.local.email });
+
+        if (!userInfo.exists) {
+          if (course.value.type === INTRA) newLearner.value.company = course.value.company._id;
+
+          return goToNextStep();
+        }
+
+        const user = await Users.getById(userInfo.user._id);
+
+        const isHelperOrAuxiliaryWithoutCompany = ['helper', 'auxiliary_without_company']
+          .includes(get(user, 'role.client.name'));
+        if (isHelperOrAuxiliaryWithoutCompany && course.value.type === INTRA) {
+          return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
+        }
+        if (course.value.type === INTRA && get(user, 'company._id') && user.company._id !== course.value.company._id) {
+          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+        }
+
+        setNewLearner(user);
+        userAlreadyHasCompany.value = !!get(user, 'company._id');
+        learnerAlreadyExists.value = true;
+
+        return goToNextStep();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
+      } finally {
+        learnerCreationModalLoading.value = false;
+      }
+    };
+
+    return {
+      // Data
+      searchStr,
+      newLearner,
+      firstStep,
+      userAlreadyHasCompany,
+      tableLoading,
+      learnerCreationModalLoading,
+      learnerCreationModal,
+      learnerAlreadyExists,
+      potentialTrainees,
+      traineeAdditionModal,
+      newTrainee,
+      editedTrainee,
+      // Validations
+      learnerValidation,
+      traineeValidation,
+      // Methods
+      nextStepLearnerCreationModal,
+      submitLearnerCreationModal,
+      resetLearnerCreationModal,
+    };
   },
   data () {
     return {
@@ -124,18 +250,9 @@ export default {
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       traineesPagination: { rowsPerPage: 0, sortBy: 'lastname' },
-      potentialTrainees: [],
-      traineeAdditionModal: false,
-      newTrainee: '',
       traineeEditionModal: false,
       traineeModalLoading: false,
-      editedTrainee: {
-        identity: {},
-        contact: {},
-        local: {},
-      },
       companyOptions: [],
-      userAlreadyHasCompany: false,
     };
   },
   computed: {
@@ -179,34 +296,16 @@ export default {
       return this.course.type === INTRA || this.userAlreadyHasCompany;
     },
   },
-  async created () {
-    await this.getPotentialTrainees();
-  },
   methods: {
-    async getPotentialTrainees () {
-      try {
-        let query;
-
-        if (this.course.type === INTRA) query = { company: get(this.course, 'company._id') };
-        if (this.course.type === INTER_B2B) {
-          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
-        }
-
-        this.potentialTrainees = Object.freeze(await Users.learnerList(query));
-      } catch (error) {
-        this.potentialTrainees = [];
-        console.error(error);
-      }
-    },
     resetTraineeAdditionForm () {
       this.newTrainee = '';
-      this.$v.newTrainee.$reset();
+      this.traineeValidation.newTrainee.$reset();
     },
     async addTrainee () {
       try {
         this.traineeModalLoading = true;
-        this.$v.newTrainee.$touch();
-        if (this.$v.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.traineeValidation.newTrainee.$touch();
+        if (this.traineeValidation.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Courses.addTrainee(this.course._id, { trainee: this.newTrainee });
         this.traineeAdditionModal = false;
@@ -228,14 +327,14 @@ export default {
       this.traineeEditionModal = true;
     },
     resetTraineeEditionForm () {
-      this.$v.editedTrainee.$reset();
+      this.traineeValidation.editedTrainee.$reset();
       this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },
     async updateTrainee () {
       try {
         this.traineeModalLoading = true;
-        this.$v.editedTrainee.$touch();
-        if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.traineeValidation.editedTrainee.$touch();
+        if (this.traineeValidation.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (get(this.editedTrainee, 'contact.phone')) {
           this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
         }
@@ -270,8 +369,10 @@ export default {
         NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
     },
-    handleCopySuccess () {
-      NotifyPositive('Adresses mail copiées !');
+    copy () {
+      copyToClipboard(this.traineesEmails)
+        .then(() => NotifyPositive('Adresses mail copiées !'))
+        .catch(() => NotifyNegative('Erreur lors de la copie des emails.'));
     },
     openTraineeCreationModal () {
       if (this.course.archivedAt) {
@@ -284,36 +385,6 @@ export default {
       this.traineeAdditionModal = false;
       this.learnerCreationModal = true;
       await this.refreshCompanies();
-    },
-    async submitLearnerCreationModal () {
-      this.$v.newLearner.$touch();
-      if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
-
-      this.learnerCreationModalLoading = true;
-      try {
-        let learnerId;
-        if (this.learnerAlreadyExists) {
-          const payload = removeEmptyProps(omit(this.newLearner, '_id'));
-          if (get(payload, 'contact.phone')) {
-            payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
-          }
-
-          await Users.updateById(this.newLearner._id, payload);
-          learnerId = this.newLearner._id;
-          NotifyPositive('Apprenant(e) modifié(e).');
-        } else {
-          learnerId = await this.createLearner();
-        }
-
-        await this.getPotentialTrainees();
-        this.newTrainee = learnerId;
-        this.learnerCreationModal = false;
-        this.traineeAdditionModal = true;
-      } catch (error) {
-        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
-      } finally {
-        this.learnerCreationModalLoading = false;
-      }
     },
     async refreshCompanies () {
       try {
@@ -329,6 +400,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .table-title
-    flex: 1
+.table-title
+  flex: 1
 </style>

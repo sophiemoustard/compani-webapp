@@ -1,11 +1,11 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
+    <template #title>
       Ajouter une <span class="text-weight-bold">règle d'accès</span>
     </template>
-    <ni-select in-modal :value="newAccessRule" @input="update" :error="validations.$error"
+    <ni-select in-modal :model-value="newAccessRule" @update:model-value="update" :error="validations.$error"
       caption="Structure" :options="companyOptions" last required-field />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la règle d'accès" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>
@@ -19,12 +19,13 @@ import Select from '@components/form/Select';
 export default {
   name: 'AccessRuleCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     companyOptions: { type: Array, default: () => [] },
     newAccessRule: { type: String, default: '' },
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-access-rule'],
   components: {
     'ni-select': Select,
     'ni-modal': Modal,
@@ -34,13 +35,13 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (value) {
-      this.$emit('update:newAccessRule', value);
+      this.$emit('update:new-access-rule', value);
     },
   },
 };

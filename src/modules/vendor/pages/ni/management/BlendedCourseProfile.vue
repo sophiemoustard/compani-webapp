@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -18,12 +19,12 @@ import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfile
 import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
-import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
+
+const metaInfo = { title: 'Fiche formation' };
 
 export default {
   name: 'BlendedCourseProfile',
-  metadata: { title: 'Fiche formation' },
-  mixins: [courseMixin, blendedCourseProfileMixin],
+  mixins: [courseMixin, createMetaMixin(metaInfo)],
   props: {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },
@@ -31,6 +32,9 @@ export default {
   components: {
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
     'profile-tabs': ProfileTabs,
+  },
+  data () {
+    return { courseName: '' };
   },
   computed: {
     ...mapState('course', ['course']),
@@ -65,6 +69,13 @@ export default {
     },
   },
   methods: {
+    async refreshCourse () {
+      try {
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async deleteCourse () {
       try {
         await Courses.delete(this.course._id);
@@ -86,6 +97,12 @@ export default {
       }).onOk(this.deleteCourse)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
+  },
+  beforeUnmount () {
+    this.$store.dispatch('course/resetCourse');
+    if (!['ni management blended courses', 'trainers courses'].includes(this.$route.name)) {
+      this.$store.dispatch('course/resetFilters');
+    }
   },
 };
 </script>

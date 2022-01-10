@@ -8,9 +8,13 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
+import { useMeta } from 'quasar';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { useStore } from 'vuex';
+import get from 'lodash/get';
 import ProfileTabs from '@components/ProfileTabs';
+import { formatIdentity } from '@helpers/utils';
+import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 import ProfileInfo from 'src/modules/client/components/customers/infos/ProfileInfo';
 import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling';
@@ -21,60 +25,64 @@ export default {
     defaultTab: { type: String, default: () => 'followUp' },
   },
   components: {
-    CustomerProfileHeader,
-    ProfileTabs,
+    'customer-profile-header': CustomerProfileHeader,
+    'profile-tabs': ProfileTabs,
   },
-  metaInfo: { title: 'Fiche bénéficiaire' },
-  data () {
-    return {
-      tabsContent: [
-        {
-          label: 'Accompagnement',
-          name: 'followUp',
-          default: this.defaultTab === 'followUp',
-          component: ProfileFollowUp,
-        },
-        {
-          label: 'Infos',
-          name: 'info',
-          default: this.defaultTab === 'info',
-          component: ProfileInfo,
-          notification: 'profiles',
-        },
-        {
-          label: 'Facturation',
-          name: 'billing',
-          default: this.defaultTab === 'billing',
-          component: ProfileBilling,
-        },
-      ],
-      customerName: '',
+  setup (props) {
+    const metaInfo = { title: 'Fiche bénéficiaire' };
+    useMeta(metaInfo);
+
+    const tabsContent = [
+      {
+        label: 'Accompagnement',
+        name: 'followUp',
+        default: props.defaultTab === 'followUp',
+        component: ProfileFollowUp,
+      },
+      {
+        label: 'Infos',
+        name: 'info',
+        default: props.defaultTab === 'info',
+        component: ProfileInfo,
+        notification: 'profiles',
+      },
+      {
+        label: 'Facturation',
+        name: 'billing',
+        default: props.defaultTab === 'billing',
+        component: ProfileBilling,
+      },
+    ];
+    const customerName = ref('');
+
+    const $store = useStore();
+    const customer = computed(() => $store.state.customer.customer);
+    const notifications = computed(() => $store.state.customer.notifications);
+
+    watch(customer, async () => $store.dispatch('customer/updateNotifications'));
+    watch(customer, () => { refreshCustomerName(); });
+
+    const refreshCustomerName = () => {
+      customerName.value = get(customer.value, 'identity') ? formatIdentity(customer.value.identity, 'FL') : '';
     };
-  },
-  async mounted () {
-    await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customerId });
-    this.refreshCustomerName();
-  },
-  computed: {
-    ...mapState('customer', ['customer', 'notifications']),
-  },
-  watch: {
-    async customer () {
-      await this.$store.dispatch('customer/updateNotifications');
-    },
-    'customer.identity': function () {
-      this.refreshCustomerName();
-    },
-  },
-  methods: {
-    refreshCustomerName () {
-      this.customerName = this.customer.identity
-        ? `${this.customer.identity.firstname} ${this.customer.identity.lastname}`
-        : '';
-    },
-  },
-  beforeDestroy () {
-    this.$store.dispatch('customer/resetCustomer');
+
+    const created = async () => {
+      await $store.dispatch('customer/fetchCustomer', { customerId: props.customerId });
+      refreshCustomerName();
+    };
+
+    onBeforeUnmount(() => { $store.dispatch('customer/resetCustomer'); });
+
+    created();
+
+    return {
+      // Data
+      tabsContent,
+      customerName,
+      // Computed
+      customer,
+      notifications,
+    };
   },
 };
 </script>

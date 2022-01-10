@@ -1,21 +1,22 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+    <template #title>
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
-    <ni-input in-modal :value="newPartner.identity.firstname" @input="update($event.trim(), 'identity.firstname')"
-      caption="Prénom" />
-    <ni-input in-modal :value="newPartner.identity.lastname" @input="update($event.trim(), 'identity.lastname')"
-      @blur="validations.identity.lastname.$touch" :error="validations.identity.lastname.$error" caption="Nom"
-      required-field />
-    <ni-input in-modal :value="newPartner.email" @input="update($event.trim(), 'email')" caption="Email"
-      @blur="validations.email.$touch" :error="validations.email.$error" :error-message="emailError(validations)" />
-    <ni-input in-modal :value="newPartner.phone" @input="update($event.trim(), 'phone')" caption="Téléphone"
-      @blur="validations.phone.$touch" :error="validations.phone.$error"
+    <ni-input in-modal :model-value="newPartner.identity.firstname" caption="Prénom"
+       @update:model-value="update($event.trim(), 'identity.firstname')" />
+    <ni-input in-modal :model-value="newPartner.identity.lastname" @blur="validations.identity.lastname.$touch"
+      @update:model-value="update($event.trim(), 'identity.lastname')" :error="validations.identity.lastname.$error"
+       caption="Nom" required-field />
+    <ni-input in-modal :model-value="newPartner.email" @update:model-value="update($event.trim(), 'email')"
+      @blur="validations.email.$touch" :error="validations.email.$error" :error-message="emailError(validations)"
+      caption="Email" />
+    <ni-input :model-value="newPartner.phone" @update:model-value="update($event.trim(), 'phone')" caption="Téléphone"
+      @blur="validations.phone.$touch" :error="validations.phone.$error" in-modal
       :error-message="phoneNumberError(validations)" />
-    <ni-select in-modal :value="newPartner.job" @input="update($event, 'job')" caption="Fonction"
+    <ni-select in-modal :model-value="newPartner.job" @update:model-value="update($event, 'job')" caption="Fonction"
       :options="jobOptions" />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add" color="primary"
         @click="submit" :loading="loading" />
     </template>
@@ -34,7 +35,7 @@ export default {
   name: 'PartnerCreationModal',
   mixins: [partnerOrganizationMixin],
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newPartner: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
@@ -44,6 +45,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-partner'],
   data () {
     return {
       jobOptions: JOB_OPTIONS,
@@ -54,13 +56,13 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (event, path) {
-      this.$emit('update:newPartner', set({ ...this.newPartner }, path, event));
+      this.$emit('update:new-partner', set({ ...this.newPartner }, path, event));
     },
   },
 };

@@ -4,7 +4,6 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
-import { required, requiredIf } from 'vuelidate/lib/validators';
 import { subject } from '@casl/ability';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
@@ -22,10 +21,8 @@ import {
   SECTOR,
   PERSON,
   CUSTOMER,
-  OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
-import { frAddress, maxDate, positiveNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
@@ -38,115 +35,7 @@ export const planningActionMixin = {
       historiesLoading: false,
     };
   },
-  computed: {
-    ...mapState('main', ['loggedUser']),
-  },
-  validations () {
-    return {
-      newEvent: {
-        type: { required },
-        dates: {
-          startDate: {
-            required,
-            maxDate: this.getCustomerStoppedDate(this.newEvent)
-              ? maxDate(this.getCustomerStoppedDate(this.newEvent))
-              : '',
-          },
-          endDate: {
-            required: requiredIf(() => this.newEvent &&
-              (this.newEvent.type !== ABSENCE || this.newEvent.absenceNature === DAILY)),
-          },
-        },
-        auxiliary: {
-          required: requiredIf(item => item && (item.type !== INTERVENTION || this.personKey === CUSTOMER)),
-        },
-        customer: { required: requiredIf(item => item && item.type === INTERVENTION) },
-        subscription: { required: requiredIf(item => item && item.type === INTERVENTION) },
-        internalHour: { required: requiredIf(item => item && item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf(item => item && item.type === ABSENCE) },
-        absenceNature: { required: requiredIf(item => item && item.type === ABSENCE) },
-        extension: {
-          required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE &&
-            this.newEvent.isExtendedAbsence),
-        },
-        address: {
-          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-          street: { required: requiredIf(item => item && !!item.fullAddress) },
-          city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: this.newEvent && this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
-        },
-        repetition: {
-          frequency: { required: requiredIf(() => this.newEvent && this.newEvent.type !== ABSENCE) },
-        },
-        attachment: {
-          driveId: {
-            required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE &&
-              [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)),
-          },
-          link: {
-            required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE &&
-            [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)),
-          },
-        },
-        misc: { required: requiredIf(item => item && item.type === ABSENCE && item.absence === OTHER) },
-      },
-      editedEvent: {
-        dates: {
-          startDate: {
-            required,
-            maxDate: this.getCustomerStoppedDate(this.editedEvent)
-              ? maxDate(this.getCustomerStoppedDate(this.editedEvent))
-              : '',
-          },
-          endDate: { required },
-        },
-        auxiliary: { required: requiredIf(item => item && item.type !== INTERVENTION) },
-        sector: { required: requiredIf(item => item && !item.auxiliary) },
-        customer: { required: requiredIf(item => item && item.type === INTERVENTION) },
-        subscription: { required: requiredIf(item => item && item.type === INTERVENTION) },
-        internalHour: { required: requiredIf(item => item && item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf(item => item && item.type === ABSENCE) },
-        absenceNature: { required: requiredIf(item => item && item.type === ABSENCE) },
-        address: {
-          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-          street: { required: requiredIf(item => item && !!item.fullAddress) },
-          city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: this.editedEvent && this.editedEvent.type === INTERNAL_HOUR ? { frAddress } : {},
-        },
-        attachment: {
-          driveId: {
-            required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE &&
-              [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)),
-          },
-          link: {
-            required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE &&
-              [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)),
-          },
-        },
-        cancel: {
-          condition: {
-            required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION &&
-              this.editedEvent.isCancelled),
-          },
-          reason: {
-            required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION &&
-              this.editedEvent.isCancelled),
-          },
-        },
-        misc: {
-          required: requiredIf(item => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
-        },
-        kmDuringEvent: { positiveNumber },
-      },
-      editedCustomerAbsence: {
-        absenceType: { required },
-        dates: {
-          startDate: { required },
-          endDate: { required, minDate: minDate(this.editedCustomerAbsence?.dates?.startDate) },
-        },
-      },
-    };
-  },
+  computed: { ...mapState('main', ['loggedUser']) },
   methods: {
     addSavedTerms (endPath) {
       if (this.$q.localStorage.has(`lastSearch${endPath}`) &&
@@ -177,7 +66,7 @@ export const planningActionMixin = {
       return this.hasContractOnEvent(person, selectedDay);
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
-      this.$v.newEvent.$reset();
+      this.eventValidation.newEvent.$reset();
       if (!partialReset) {
         this.creationModal = false;
         this.newEvent = {};
@@ -304,8 +193,8 @@ export const planningActionMixin = {
     },
     async validateCreationEvent () {
       try {
-        this.$v.newEvent.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.newEvent);
+        this.eventValidation.newEvent.$touch();
+        const isValid = await this.waitForFormValidation(this.eventValidation.newEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         if (this.newEvent.type === ABSENCE) {
@@ -434,7 +323,7 @@ export const planningActionMixin = {
       return ability.can('update', subject('Events', event));
     },
     resetEditionForm () {
-      this.$v.editedEvent.$reset();
+      this.eventValidation.editedEvent.$reset();
       this.editionModal = false;
     },
     closeEditionModal () {
@@ -483,8 +372,8 @@ export const planningActionMixin = {
     },
     async validateEventEdition () {
       try {
-        this.$v.editedEvent.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.editedEvent);
+        this.eventValidation.editedEvent.$touch();
+        const isValid = await this.waitForFormValidation(this.eventValidation.editedEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const isRepetition = get(this.editedEvent, 'repetition.frequency') !== NEVER;
@@ -522,15 +411,15 @@ export const planningActionMixin = {
     },
     async updateEvent () {
       try {
-        this.$v.editedEvent.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.editedEvent);
+        this.eventValidation.editedEvent.$touch();
+        const isValid = await this.waitForFormValidation(this.eventValidation.editedEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.getEditionPayload(this.editedEvent);
 
         if (!this.isEditionAllowed(payload, this.editedEvent.type)) {
-          this.$v.editedEvent.$reset();
+          this.eventValidation.editedEvent.$reset();
           return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
@@ -542,7 +431,7 @@ export const planningActionMixin = {
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
-          this.$v.editedEvent.$reset();
+          this.eventValidation.editedEvent.$reset();
           return NotifyNegative(`Impossible : ${e.data.message}`);
         }
         NotifyNegative('Erreur lors de la modification de l\'évènement.');

@@ -1,13 +1,13 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi Contrats/Avenants" padding>
-      <template slot="content">
+      <template #content>
         <div class="col-xs-12 col-md-6">
-          <ni-date-range v-model="dates" @input="refreshContracts" borderless :error.sync="datesHasError" />
+          <ni-date-range v-model="dates" @blur="refreshContracts" borderless v-model:error="datesHasError" />
         </div>
       </template>
     </ni-title-header>
-    <ni-simple-table :data="versionsList" :columns="columns" :pagination.sync="pagination" row-key="name"
+    <ni-simple-table :data="versionsList" :columns="columns" v-model:pagination="pagination" row-key="name"
       :loading="contractsLoading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -19,25 +19,25 @@
                 <ni-button icon="edit" @click="openVersionEditionModal(props.row)" />
               </div>
             </template>
-            <template v-else>
-              {{ col.value }}
-            </template>
+            <template v-else>{{ col.value }}</template>
           </q-td>
         </q-tr>
       </template>
     </ni-simple-table>
 
     <!-- Edition modal -->
-    <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
-      :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" @hide="resetVersionEditionModal"
-      @submit="editVersion" :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"
-      :start-date-error="startDateError($v.editedVersion)" />
+    <version-edition-modal v-model="versionEditionModal" v-model:edited-version="editedVersion" :loading="loading"
+      :validations="v$.editedVersion" :min-start-date="editedVersionMinStartDate" @hide="resetVersionEditionModal"
+      @submit="editVersion" :gross-hourly-rate-error="grossHourlyRateError(v$.editedVersion)"
+      :start-date-error="startDateError(v$.editedVersion)" />
   </q-page>
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required, minValue } from '@vuelidate/validators';
 import get from 'lodash/get';
-import { required, minValue } from 'vuelidate/lib/validators';
 import Contracts from '@api/Contracts';
 import Button from '@components/Button';
 import DateRange from '@components/form/DateRange';
@@ -51,7 +51,6 @@ import VersionEditionModal from 'src/modules/client/components/contracts/Version
 
 export default {
   name: 'ContractMonitoring',
-  metaInfo: { title: 'Suivi Contrats/Avenants' },
   mixins: [contractMixin],
   components: {
     'ni-button': Button,
@@ -59,6 +58,12 @@ export default {
     'ni-title-header': TitleHeader,
     'version-edition-modal': VersionEditionModal,
     'ni-simple-table': SimpleTable,
+  },
+  setup () {
+    const metaInfo = { title: 'Suivi Contrats/Avenants' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -122,7 +127,7 @@ export default {
       },
     };
   },
-  async mounted () {
+  async created () {
     await this.refreshContracts();
   },
   methods: {
@@ -174,12 +179,7 @@ export default {
             }
           }
           if (isInInterval) {
-            const versionToDisplay = {
-              ...version,
-              contractId: contract._id,
-              user: contract.user,
-              type: contractType,
-            };
+            const versionToDisplay = { ...version, contractId: contract._id, user: contract.user, type: contractType };
             this.versionsList.push(versionToDisplay);
           }
         }

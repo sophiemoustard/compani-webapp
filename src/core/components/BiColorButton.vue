@@ -16,7 +16,7 @@ export default {
     icon: { type: String, default: '' },
     label: { type: String, default: '' },
     size: { type: String, default: 'md' },
-    href: { type: String, default: '' },
+    href: { type: String, default: undefined },
     disable: { type: Boolean, default: false },
     type: { type: String, default: '' },
     labelColor: { type: String, default: 'copper-grey-700' },
@@ -25,6 +25,7 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: ['click'],
   methods: {
     click (event) {
       this.$emit('click', event);

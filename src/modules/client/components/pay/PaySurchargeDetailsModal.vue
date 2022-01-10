@@ -1,6 +1,6 @@
 <template>
-  <ni-modal :value="paySurchargeDetailsModal" @input="close">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @update:model-value="close">
+    <template #title>
       Détails des <span class="text-weight-bold">majorations</span>
     </template>
     <div v-for="(surchargePlanDetails, surchargePlanId) in pay[surchargeDetailKey]" :key="surchargePlanId"
@@ -47,13 +47,12 @@ export default {
   components: {
     'ni-modal': Modal,
   },
+  emits: ['update:model-value'],
   data () {
-    return {
-      SURCHARGES,
-    };
+    return { SURCHARGES };
   },
   props: {
-    paySurchargeDetailsModal: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     pay: { type: Object, default: () => ({}) },
     surchargeDetailKey: { type: String, default: '' },
   },
@@ -65,7 +64,7 @@ export default {
       return Object.values(plan).some(sur => sur.hours);
     },
     close () {
-      this.$emit('update:paySurchargeDetailsModal', false);
+      this.$emit('update:model-value', false);
     },
     formatHours,
   },
@@ -73,15 +72,15 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .surcharge-line
-    display: flex
-    flex-direction: row
-    width: 100%
-    border: 1px solid $copper-grey-300
-    &:not(:nth-child(2)) // first-child is title
-      border-top: none
+.surcharge-line
+  display: flex
+  flex-direction: row
+  width: 100%
+  border: 1px solid $copper-grey-300
+  &:not(:nth-child(2)) // first-child is title
+    border-top: none
 
-  .surcharge-type
-    width: 60%
-    border-right: 1px solid $copper-grey-300
+.surcharge-type
+  width: 60%
+  border-right: 1px solid $copper-grey-300
 </style>

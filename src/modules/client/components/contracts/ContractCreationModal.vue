@@ -1,23 +1,23 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
+    <template #title>
       Créer un <span class="text-weight-bold">nouveau contrat</span>
     </template>
-    <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" :value="newContract.weeklyHours"
-      :error="validations.weeklyHours.$error" :error-message="weeklyHoursError" @input="update($event, 'weeklyHours')"
-      @blur="validations.weeklyHours.$touch" suffix="h" required-field />
+    <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" :model-value="newContract.weeklyHours"
+      :error="validations.weeklyHours.$error" :error-message="weeklyHoursError" @blur="validations.weeklyHours.$touch"
+      @update:model-value="update($event, 'weeklyHours')" suffix="h" required-field />
     <ni-input in-modal caption="Taux horaire" :error="validations.grossHourlyRate.$error" type="number"
-      :value="newContract.grossHourlyRate" @blur="validations.grossHourlyRate.$touch" suffix="€" required-field
-      :error-message="grossHourlyRateError" @input="update($event, 'grossHourlyRate')" />
+      :model-value="newContract.grossHourlyRate" @blur="validations.grossHourlyRate.$touch" suffix="€" required-field
+      :error-message="grossHourlyRateError" @update:model-value="update($event, 'grossHourlyRate')" />
     <ni-date-input caption="Date d'effet" :error="validations.startDate.$error" :min="contractMinStartDate"
-      :value="newContract.startDate" in-modal required-field @input="update($event, 'startDate')" />
+      :model-value="newContract.startDate" in-modal required-field @update:model-value="update($event, 'startDate')" />
     <div class="row margin-input last">
       <div class="col-12">
-        <q-checkbox dense :value="newContract.shouldBeSigned" label="Signature en ligne"
-          @input="update($event, 'shouldBeSigned')" />
+        <q-checkbox dense :model-value="newContract.shouldBeSigned" label="Signature en ligne"
+          @update:model-value="update($event, 'shouldBeSigned')" />
       </div>
     </div>
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>
@@ -32,7 +32,7 @@ import Modal from '@components/modal/Modal';
 export default {
   name: 'ContractCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newContract: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
@@ -45,18 +45,19 @@ export default {
     'ni-date-input': DateInput,
     'ni-modal': Modal,
   },
+  emits: ['update:model-value', 'submit', 'hide', 'update:new-contract'],
   methods: {
     submit () {
       this.$emit('submit');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     hide () {
       this.$emit('hide');
     },
     update (event, prop) {
-      this.$emit('update:newContract', { ...this.newContract, [prop]: event });
+      this.$emit('update:new-contract', { ...this.newContract, [prop]: event });
     },
   },
 };

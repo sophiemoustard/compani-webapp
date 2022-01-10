@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :value="value" @input="cancel" @hide="hide">
+  <q-dialog :model-value="modelValue" @update:model-value="cancel" @hide="hide">
     <div class="modal-container-md">
       <div class="modal-padding">
         <div class="modal-title q-mb-lg">Confirmation</div>
@@ -36,10 +36,11 @@
 export default {
   name: 'ValidateUnlockingStepModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     subProgramsGroupedByProgram: { type: Array, default: () => [] },
     isStepPublished: { type: Boolean, default: false },
   },
+  emits: ['cancel', 'confirm', 'hide'],
   methods: {
     cancel () {
       this.$emit('cancel');
@@ -55,15 +56,15 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .footer
-    display: flex
-    justify-content: flex-end
+.footer
+  display: flex
+  justify-content: flex-end
 
-  .program
-    border-radius: 0
-    background-color: $copper-grey-100
+.program
+  border-radius: 0
+  background-color: $copper-grey-100
 
-  .sub-program
-    border-radius: 0
-    background-color: $copper-grey-300
+.sub-program
+  border-radius: 0
+  background-color: $copper-grey-300
 </style>

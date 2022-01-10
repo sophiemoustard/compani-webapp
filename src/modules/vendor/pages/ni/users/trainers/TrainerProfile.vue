@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
@@ -16,9 +17,10 @@ import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
 import { formatIdentity } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
 
+const metaInfo = { title: 'Fiche formateur' };
+
 export default {
   name: 'TrainerProfile',
-  metaInfo: { title: 'Fiche formateur' },
   props: {
     trainerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
@@ -27,6 +29,7 @@ export default {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       userIdentity: '',
@@ -45,7 +48,7 @@ export default {
     if (this.vendorRole !== TRAINER) {
       await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.trainerId });
     }
-    this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
+    this.userIdentity = formatIdentity(get(this.userProfile, 'identity'), 'FL');
   },
   computed: {
     ...mapState({
@@ -57,11 +60,11 @@ export default {
   },
   watch: {
     async userProfile () {
-      this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
+      this.userIdentity = formatIdentity(get(this.userProfile, 'identity'), 'FL');
       if (this.vendorRole !== TRAINER) await this.$store.dispatch('userProfile/updateNotifications');
     },
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
 };

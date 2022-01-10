@@ -1,27 +1,28 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" class="input"
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
-        :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition"
+        :error="getError('qcAnswers', i) || requiredOneCorrectAnswer(i)" :disable="disableEdition"
         :required-field="answerIsRequired(i)" />
-      <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
+      <q-checkbox v-model="card.qcAnswers[i].correct" @update:model-value="updateCorrectAnswer(i)"
         :disable="!card.qcAnswers[i].text || disableEdition" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
+      @blur="updateCard('explanation')" :error="v$.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
 <script>
 import get from 'lodash/get';
-import { required, maxLength } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
@@ -48,15 +49,18 @@ export default {
     'ni-button': Button,
   },
   mixins: [templateMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcAnswers: {
           minOneCorrectAnswer,
-          $each: {
+          $each: helpers.forEach({
             text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
-          },
+          }),
         },
         explanation: { required },
       },
@@ -74,7 +78,8 @@ export default {
   },
   methods: {
     requiredOneCorrectAnswer (index) {
-      return !this.$v.card.qcAnswers.minOneCorrectAnswer && !!this.card.qcAnswers[index].text;
+      return get(this.v$, 'card.qcAnswers.minOneCorrectAnswer.$response') === false &&
+        !!this.card.qcAnswers[index].text;
     },
     async updateCorrectAnswer (index) {
       try {
@@ -93,9 +98,11 @@ export default {
       }
     },
     answersErrorMsg (index) {
-      if (!this.$v.card.qcAnswers.$each[index].text.required) return REQUIRED_LABEL;
+      const validation = this.v$.card.qcAnswers.$each.$response.$errors[index].text;
+
+      if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
       if (this.requiredOneCorrectAnswer(index)) return 'Une bonne réponse est nécessaire.';
-      if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+      if (get(validation, '0.$validator') === 'maxLength') return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
     },
@@ -107,14 +114,14 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .container
-    display: flex
-    flex-direction: column
-  .answers
-    display: flex
-    flex-direction: row
-  .input
-    flex: 1
-  .add-button
-    align-self: flex-end
+.container
+  display: flex
+  flex-direction: column
+.answers
+  display: flex
+  flex-direction: row
+.input
+  flex: 1
+.add-button
+  align-self: flex-end
 </style>

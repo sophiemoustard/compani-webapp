@@ -82,10 +82,10 @@ export default {
 };
 </script>
 <style lang="sass" scoped>
-  .questionnaires-container
-    display: grid
-    grid-auto-flow: row
-    grid-auto-rows: 1fr
-    grid-template-columns: repeat(auto-fill, 224px)
-    grid-gap: 16px
+.questionnaires-container
+  display: grid
+  grid-auto-flow: row
+  grid-auto-rows: 1fr
+  grid-template-columns: repeat(auto-fill, 224px)
+  grid-gap: 16px
 </style>

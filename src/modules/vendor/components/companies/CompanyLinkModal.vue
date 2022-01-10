@@ -1,11 +1,11 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
+    <template #title>
       Rattacher à une <span class="text-weight-bold">structure</span>
     </template>
-    <ni-select in-modal :value="newCompany" @input="update" :error="validations.$error"
+    <ni-select in-modal :model-value="newCompany" @update:model-value="update" :error="validations.$error"
       caption="Structure" :options="companyOptions" last required-field />
-    <template slot="footer">
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Rattacher à la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>
@@ -19,7 +19,7 @@ import Select from '@components/form/Select';
 export default {
   name: 'CompanyLinkModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     companyOptions: { type: Array, default: () => [] },
@@ -29,18 +29,19 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-company'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (value) {
-      this.$emit('update:newCompany', value);
+      this.$emit('update:new-company', value);
     },
   },
 };

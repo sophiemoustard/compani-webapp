@@ -1,5 +1,5 @@
 <template>
-    <q-dialog :value="value" @hide="hide">
+    <q-dialog :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')">
       <div class="modal-container-md modal-padding">
         <div class="title q-mb-md">Confirmation</div>
         <div class="banner row q-pa-sm q-mb-md">
@@ -9,11 +9,11 @@
         <div class="q-mb-md">
           Êtes-vous sûr(e) de vouloir annuler l'horodatage ? Vous pourrez ensuite modifier l'évènement.
         </div>
-        <ni-input :value="reason" @input="update" caption="Motif" type="textarea" last class="q-mb-md"
-          :error="validations.$error" required-field />
+        <ni-input :model-value="reason" @update:model-value="update" caption="Motif" type="textarea" class="q-mb-md"
+          :error="validations.$error" required-field last />
         <div class="row justify-end q-mb-md">
-          <ni-button label="RETOUR" @click.native="hide" />
-          <ni-button label="ANNULER L'HORODATAGE" @click.native="cancelTimeStamping" />
+          <ni-button label="RETOUR" @click="hide" />
+          <ni-button label="ANNULER L'HORODATAGE" @click="cancelTimeStamping" />
         </div>
       </div>
     </q-dialog>
@@ -30,11 +30,12 @@ export default {
     'ni-input': Input,
   },
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     start: { type: Boolean, default: true },
     reason: { type: String, default: '' },
     validations: { type: Object, default: () => ({}) },
   },
+  emits: ['hide', 'update:reason', 'cancel-time-stamping', 'update:model-value'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -43,7 +44,7 @@ export default {
       this.$emit('update:reason', event);
     },
     cancelTimeStamping () {
-      this.$emit('cancelTimeStamping');
+      this.$emit('cancel-time-stamping');
     },
   },
 };

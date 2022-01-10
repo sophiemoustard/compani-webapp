@@ -1,6 +1,6 @@
 <template>
   <div class="person-inner-cell flex-column">
-    <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('fL') }}</div>
+    <div class="person-name overflow-hidden-nowrap">{{ formatIdentity(person.identity, 'fL') }}</div>
     <div :class="[!staffingView && 'q-mb-sm']">
       <div class="chip-container">
         <q-chip small>
@@ -9,7 +9,7 @@
         </q-chip>
       </div>
     </div>
-    <div class="referent-name overflow-hidden-nowrap">{{ getReferent(person) | formatIdentity('Fl') }}</div>
+    <div class="referent-name overflow-hidden-nowrap">{{ formatIdentity(getReferent(person), 'Fl') }}</div>
   </div>
 </template>
 
@@ -40,6 +40,7 @@ export default {
     },
   },
   methods: {
+    formatIdentity,
     getReferent (person) {
       const referentHistory = person.referentHistories
         .filter(rh => moment(this.startOfWeek).isSameOrAfter(rh.startDate) &&
@@ -52,37 +53,34 @@ export default {
       return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
   },
-  filters: {
-    formatIdentity,
-  },
 };
 </script>
 
 <style lang="sass" scoped>
-  .referent-name
-    font-style: italic
+.referent-name
+  font-style: italic
+  @media screen and (min-width: $breakpoint-md-min)
+    margin-top: 16px
+    font-size: 12px
+  @media screen and (min-width: 421px) and (max-width: $breakpoint-sm-max)
+    margin-top: 16px
+    font-size: 8px
+  @media screen and (max-width: 420px)
+    font-size: 8px
+    margin-top: 0px
+
+.person
+  &-name
+    font-weight: 600
+    font-size: 14px
     @media screen and (min-width: $breakpoint-md-min)
-      margin-top: 16px
-      font-size: 12px
+      margin-bottom: 16px
     @media screen and (min-width: 421px) and (max-width: $breakpoint-sm-max)
-      margin-top: 16px
-      font-size: 8px
+      margin-bottom: 16px
+      font-size: 12px
     @media screen and (max-width: 420px)
       font-size: 8px
-      margin-top: 0px
-
-  .person
-    &-name
-      font-weight: 600
-      font-size: 14px
-      @media screen and (min-width: $breakpoint-md-min)
-        margin-bottom: 16px
-      @media screen and (min-width: 421px) and (max-width: $breakpoint-sm-max)
-        margin-bottom: 16px
-        font-size: 12px
-      @media screen and (max-width: 420px)
-        font-size: 8px
-        margin-bottom: 0px
-    &-inner-cell
-      margin-top: 4px
+      margin-bottom: 0px
+  &-inner-cell
+    margin-top: 4px
 </style>

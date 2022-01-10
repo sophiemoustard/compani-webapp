@@ -1,4 +1,5 @@
-import { required, requiredIf, maxLength, minLength, email } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
+import { required, requiredIf, maxLength, minLength, email } from '@vuelidate/validators';
 import {
   frAddress,
   iban,
@@ -50,37 +51,44 @@ export const companyMixin = {
   },
   computed: {
     addressError () {
-      return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
+      const validation = this.v$.company.address.fullAddress;
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'frAddress.$response') === false) return 'Adresse non valide';
+      return '';
     },
     ibanError () {
-      if (!this.$v.company.iban.required) return REQUIRED_LABEL;
-      if (!this.$v.company.iban.iban) return 'IBAN non valide';
+      const validation = this.v$.company.iban;
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'iban.$response') === false) return 'IBAN non valide';
 
       return '';
     },
     bicError () {
-      if (!this.$v.company.bic.required) return REQUIRED_LABEL;
-      if (!this.$v.company.bic.bic) return 'BIC non valide';
+      const validation = this.v$.company.bic;
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'bic.$response') === false) return 'BIC non valide';
 
       return '';
     },
     rcsError () {
-      if (!this.$v.company.rcs.required) return REQUIRED_LABEL;
-      if (!this.$v.company.rcs.maxLength || !this.$v.company.rcs.minLength || !this.$v.company.rcs.rcs) {
+      const validation = this.v$.company.rcs;
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'maxLength.$response') === false || get(validation, 'minLength.$response') === false ||
+        get(validation, 'rcs.$response') === false) {
         return 'Doit contenir 9 chiffres.';
       }
 
       return '';
     },
     billingAssistanceError () {
-      if (!this.$v.company.billingAssistance.email) return 'Email non valide';
+      if (get(this.v$.company.billingAssistance, 'email.$response') === false) return 'Email non valide';
 
       return '';
     },
   },
   methods: {
     tradeNameError (validation) {
-      if (!validation.tradeName.validTradeName) {
+      if (get(validation.tradeName, 'validTradeName.$response') === false) {
         return 'Doit contenir maximum 11 caractères, uniquement alphanumériques.';
       }
 

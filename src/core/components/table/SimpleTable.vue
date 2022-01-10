@@ -1,9 +1,11 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
-      flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners" :selected="selected"
-      :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom"
-      :class="['q-pa-sm large-table sticky-header', isClientInterface ? 'client-header' : 'vendor-header']">
+    <q-table v-if="!loading" flat :columns="columns" :pagination="pagination" binary-state-sort :selection="selection"
+      :rows="data" :separator="separator" :selected="selected" @update:expanded="$emit('update:expanded', $event)"
+      :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom" @row-click="$emit('row-click', $event)"
+      @update:pagination="$emit('update:pagination', $event)" @update:selected="$emit('update:selected', $event)"
+      :class="['q-pa-sm large-table sticky-header', isClientInterface ? 'client-header' : 'vendor-header']"
+      :row-key="rowKey">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
@@ -11,7 +13,7 @@
           </q-tr>
         </slot>
       </template>
-      <template v-if="$scopedSlots['top-row']" #top-row="props">
+      <template v-if="$slots['top-row']" #top-row="props">
         <slot name="top-row" :props="props" />
       </template>
       <template #body="props">
@@ -62,11 +64,13 @@ export default {
     hideBottom: { type: Boolean, default: false },
     rowsPerPage: { type: Array, default: () => [15, 50, 100, 200, 300] },
   },
+  emits: ['update:pagination', 'update:selected', 'row-click', 'update:expanded'],
   components: {
     'ni-pagination': Pagination,
   },
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
+
     return {
       isClientInterface,
     };

@@ -14,7 +14,7 @@ export default {
     icon: { type: String, default: 'warning' },
   },
   data () {
-    const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
+    const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
     return {
       backgroundClass: interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
     };
@@ -24,7 +24,7 @@ export default {
 
 <style lang="sass" scoped>
 .q-banner
-  ::v-deep .q-banner__content
+  :deep(.q-banner__content)
     display: flex
     align-items: center
     .q-icon

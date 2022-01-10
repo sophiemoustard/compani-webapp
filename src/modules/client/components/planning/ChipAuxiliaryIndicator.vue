@@ -11,7 +11,7 @@
         </q-chip>
       </div>
     </div>
-    <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('Fl') }}</div>
+    <div class="person-name overflow-hidden-nowrap">{{ formatIdentity(person.identity, 'Fl') }}</div>
 
     <!-- Indicators modal -->
     <q-dialog v-model="indicatorsModal">
@@ -118,6 +118,7 @@ export default {
     },
   },
   methods: {
+    formatIdentity,
     getAvatar (picture) {
       return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
@@ -150,9 +151,6 @@ export default {
       }
     },
   },
-  filters: {
-    formatIdentity,
-  },
 };
 </script>
 
@@ -168,9 +166,9 @@ export default {
   padding: 3px 0
   display: flex
   justify-content: flex-start
-::v-deep .q-hoverable:hover > .q-focus-helper
+:deep(.q-hoverable:hover > .q-focus-helper)
   background: none !important
-::v-deep .q-ripple
+:deep(.q-ripple)
   display: none
 
 .person-name.modal

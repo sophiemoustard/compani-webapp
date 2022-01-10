@@ -52,15 +52,19 @@
             </div>
             <div class="gauge-wrapper">
               <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)">
-                <div slot="title" class="q-mt-sm">
-                  <span class="text-weight-bold">Heures internes</span> -
-                  {{ formatHours(getInternalHours(sector)) }}
-                </div>
+                <template #title>
+                  <div class="q-mt-sm">
+                    <span class="text-weight-bold">Heures internes</span> -
+                    {{ formatHours(getInternalHours(sector)) }}
+                  </div>
+                </template>
               </ni-gauge>
               <ni-gauge v-if="getPaidTransport(sector) !== 0" :min="7" :max="16" :value="getPaidTransportRatio(sector)">
-                <div slot="title" class="q-mt-sm">
-                  <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
-                </div>
+                <template #title>
+                  <div class="q-mt-sm">
+                    <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
+                  </div>
+                </template>
               </ni-gauge>
             </div>
           </div>
@@ -87,12 +91,8 @@
       <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width column items-end">
         <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
           @click="openAuxiliariesDetails(sector)" />
-        <div v-show="displayStats[sector].loadingDetails" class="col-md-12 col-xs-12 spinner-container">
-          <q-spinner-facebook size="25px" color="primary" />
-        </div>
         <q-slide-transition>
-          <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
-            class="auxiliary-cell-container row">
+          <div v-show="displayStats[sector].openedDetails" class="auxiliary-cell-container row">
             <div v-for="auxiliary in auxiliariesStats[sector]" :key="`${sector}-${auxiliary._id}`"
               class="col-md-6 col-xs-12 auxiliary-cell q-mb-lg">
               <div class="row person-name q-mb-md">
@@ -115,7 +115,9 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import omit from 'lodash/omit';
 import { mapActions, mapGetters, mapState } from 'vuex';
 import Companies from '@api/Companies';
@@ -130,14 +132,15 @@ import Gauge from 'src/modules/client/components/Gauge';
 import ChipsAutocomplete from 'src/modules/client/components/planning/ChipsAutocomplete';
 import AuxiliaryIndicators from 'src/modules/client/components/planning/AuxiliaryIndicators';
 
+const metaInfo = { title: 'Tableau de bord' };
 export default {
   name: 'Dashboard',
-  metaInfo: { title: 'Tableau de bord' },
   components: {
     'ni-chips-autocomplete': ChipsAutocomplete,
     'ni-auxiliary-indicators': AuxiliaryIndicators,
     'ni-gauge': Gauge,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       selectedMonth: moment().format('MM-YYYY'),
@@ -226,7 +229,6 @@ export default {
         for (const sector of sectorsIds) {
           if (this.auxiliariesStats[sector]) continue;
           sectors.push(sector);
-          this.$set(this.displayStats[sector], 'loadingDetails', true);
           auxiliariesStats[sector] = [];
         }
         if (!sectors.length) return;
@@ -248,14 +250,12 @@ export default {
               paidInterventions: omit(auxPaidInterventions, 'sectors'),
               hoursBalanceDetail: omit(auxHoursDetails, ['sectors', 'auxiliary']),
             });
-            this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
+            set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
           }
         }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
-      } finally {
-        this.setDisplayStats(sectorsIds, { loadingDetails: false });
       }
     },
     getCustomersAndDurationBySector (sectorId) {
@@ -305,10 +305,10 @@ export default {
     },
     async openAuxiliariesDetails (sectorId) {
       if (this.displayStats[sectorId].openedDetails) {
-        this.$set(this.displayStats[sectorId], 'openedDetails', false);
+        set(this.displayStats[sectorId], 'openedDetails', false);
         return;
       }
-      this.$set(this.displayStats[sectorId], 'openedDetails', true);
+      set(this.displayStats[sectorId], 'openedDetails', true);
     },
     hoursRatio (sector) {
       return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;

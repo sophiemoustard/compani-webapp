@@ -57,6 +57,7 @@ export default {
     'ni-button': Button,
     'ni-custom-img': CustomImg,
   },
+  emits: ['start', 'finish', 'delete', 'uploaded'],
   data () {
     return {
       loading: false,
@@ -118,54 +119,53 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .files-container
-    width: 100%
-    background-color: white
-    align-items: center
-    padding: 8px
-    margin-bottom: 16px
+.files-container
+  width: 100%
+  background-color: white
+  align-items: center
+  padding: 8px
+  margin-bottom: 16px
 
-  .doc-thumbnail
-    padding: 13px 0px 40px 12px
+.doc-thumbnail
+  padding: 13px 0px 40px 12px
 
-  ::v-deep .q-field__control
-    height: 40px
-    min-height: 40px
-    border: 0
+:deep(.q-field__control)
+  height: 40px
+  min-height: 40px
+  border: 0
 
-  ::v-deep .q-uploader__header
-    border-radius: 4px
+:deep(.q-uploader__header)
+  border-radius: 4px
 
-  ::v-deep .q-field__append
+:deep(.q-field__append)
+  display: none
+:deep(.q-field__bottom)
+  color: $secondary
+  padding-top: 3px
+
+:deep(.q-uploader)
+  width: 100%
+  :deep(.q-uploader--bordered)
+    border: 1px solid $copper-grey-300
+  .q-uploader__list
     display: none
-  ::v-deep .q-field__bottom
-    color: $secondary
-    padding-top: 3px
-
-  ::v-deep .q-uploader
-    width: 100%
-    &--bordered
-      border: 1px solid $copper-grey-300
-    .q-uploader__list
-      display: none
-    .q-uploader__header-content
-      border-radius: 3px
-      height: 38px
-      margin: 0
-      .q-btn__content
-        color: $copper-grey-400
-    .q-btn
-      margin: 0
-      padding: 0
-    .col
-      margin: 0
-    .q-uploader__title
-      font-weight: 400
-      overflow: initial
-    .q-uploader__subtitle
-      display: none
-      height: 0
-    .q-uploader__header:before
-      opacity:0
-
+  .q-uploader__header-content
+    border-radius: 3px
+    height: 38px
+    margin: 0
+    .q-btn__content
+      color: $copper-grey-400
+  .q-btn
+    margin: 0
+    padding: 0
+  .col
+    margin: 0
+  .q-uploader__title
+    font-weight: 400
+    overflow: initial
+  .q-uploader__subtitle
+    display: none
+    height: 0
+  .q-uploader__header:before
+    opacity:0
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <q-btn :flat="flat" small no-caps :color="color" :icon="icon" :disable="disable" :type="type" :href="!disable && href"
+  <q-btn :flat="flat" small no-caps :color="color" :icon="icon" :disable="disable" :type="type"
     :target="target" :label="label" :dense="!label" :loading="loading" :size="size" unelevated :padding="padding"
-    @click.stop.native="click" />
+    @click.stop="click" :href="innerHref" />
 </template>
 
 <script>
@@ -11,7 +11,7 @@ export default {
     color: { type: String, default: 'copper-500' },
     disable: { type: Boolean, default: false },
     flat: { type: Boolean, default: true },
-    href: { type: String, default: '' },
+    href: { type: String, default: undefined },
     icon: { type: String, default: undefined },
     label: { type: String, default: '' },
     loading: { type: Boolean, default: false },
@@ -19,6 +19,7 @@ export default {
     type: { type: String, default: '' },
     unelevated: { type: Boolean, default: false },
   },
+  emits: ['click'],
   computed: {
     target () {
       return this.type === 'a' ? '_blank' : '';
@@ -27,6 +28,9 @@ export default {
       if (this.type === 'a') return 'xs 0px';
 
       return this.label ? 'xs md' : 'xs';
+    },
+    innerHref () {
+      return this.disable ? undefined : this.href;
     },
   },
   methods: {
@@ -38,6 +42,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-::v-deep .q-btn__wrapper
+:deep(.q-btn__wrapper)
   min-height: 2.572em !important
 </style>

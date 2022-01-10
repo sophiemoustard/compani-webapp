@@ -11,8 +11,8 @@
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
         <q-field dense borderless class="col-12">
-          <q-option-group :value="value" :options="options" type="radio" inline dense
-            v-on="$listeners" />
+          <q-option-group :model-value="modelValue" :options="options" type="radio" inline dense
+            @update:model-value="update" />
         </q-field>
       </div>
       <q-field :error="error" :error-message="errorMessage" dense borderless class="error-field" />
@@ -29,31 +29,37 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    value: { type: String, default: '' },
+    modelValue: { type: String, default: '' },
     optionsGroups: { type: Array, default: () => [] },
     groupTitles: { type: Array, default: () => [] },
+  },
+  emits: ['update:model-value'],
+  methods: {
+    update (value) {
+      this.$emit('update:model-value', value);
+    },
   },
 };
 </script>
 
 <style lang="sass" scoped>
-  .error-field
-    height: 0px
-  .group-title
-    display: flex
-    flex: 1
-    margin: 16px 0px 2px
-  .required::after
-    content: ' *'
-  ::v-deep .q-option-group
-    display: flex
-    flex-direction: column
-    color: $copper-grey-700 !important
-    .q-radio
-      padding: 10px 6px !important
-      .q-radio__label
-        font-size: 15px
-  ::v-deep .q-field__control
-    min-height: 25px !important
-    border: 0
+.error-field
+  height: 0px
+.group-title
+  display: flex
+  flex: 1
+  margin: 16px 0px 2px
+.required::after
+  content: ' *'
+:deep(.q-option-group)
+  display: flex
+  flex-direction: column
+  color: $copper-grey-700 !important
+  .q-radio
+    padding: 10px 6px !important
+    .q-radio__label
+      font-size: 15px
+:deep(.q-field__control)
+  min-height: 25px !important
+  border: 0
 </style>

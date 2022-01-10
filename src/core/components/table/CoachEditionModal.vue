@@ -1,23 +1,23 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+    <template #title>
       Éditer une <span class="text-weight-bold">personne</span>
     </template>
-    <ni-input in-modal :value="selectedCoach.local.email" :error="validations.local.email.$error" caption="Email"
-      @blur="validations.local.email.$touch" :error-message="emailError" @input="update($event, 'local.email')"
-      required-field />
-    <ni-select caption="Role" :options="roleOptions" :value="selectedCoach.role" @blur="validations.role.$touch"
-      :error="validations.role.$error" required-field @input="update($event, 'role')" in-modal />
-    <ni-input in-modal :value="selectedCoach.identity.firstname" @input="update($event, 'identity.firstname')"
-      caption="Prénom" />
-    <ni-input :value="selectedCoach.identity.lastname" :error="validations.identity.lastname.$error" caption="Nom"
-      @blur="validations.identity.lastname.$touch" required-field @input="update($event, 'identity.lastname')"
-      in-modal />
-    <ni-input in-modal :value="selectedCoach.contact.phone" :error="validations.contact.phone.$error"
-      caption="Téléphone" @blur="validations.contact.phone.$touch" last @input="update($event.trim(), 'contact.phone')"
-      :error-message="phoneNbrError" />
-    <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Éditer la personne" icon-right="check" color="primary"
+    <ni-input in-modal :model-value="selectedCoach.local.email" :error="validations.local.email.$error" caption="Email"
+      :error-message="emailError" @update:model-value="update($event, 'local.email')" required-field
+      @blur="validations.local.email.$touch" />
+    <ni-select caption="Role" :options="roleOptions" :model-value="selectedCoach.role" @blur="validations.role.$touch"
+      :error="validations.role.$error" required-field @update:model-value="update($event, 'role')" in-modal />
+    <ni-input in-modal :model-value="selectedCoach.identity.firstname" caption="Prénom"
+      @update:model-value="update($event, 'identity.firstname')" />
+    <ni-input :model-value="selectedCoach.identity.lastname" :error="validations.identity.lastname.$error" caption="Nom"
+      @blur="validations.identity.lastname.$touch" @update:model-value="update($event, 'identity.lastname')"
+      in-modal required-field />
+    <ni-input in-modal :model-value="selectedCoach.contact.phone" :error="validations.contact.phone.$error"
+      @blur="validations.contact.phone.$touch" @update:model-value="update($event.trim(), 'contact.phone')" last
+      :error-message="phoneNbrError" caption="Téléphone" />
+    <template #footer>
+      <ni-button class="bg-primary full-width modal-btn" label="Éditer la personne" icon-right="check" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
@@ -27,12 +27,13 @@
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 
 export default {
   name: 'CoachEditionModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     selectedCoach: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     roleOptions: { type: Array, default: () => [] },
@@ -43,20 +44,22 @@ export default {
   components: {
     'ni-input': Input,
     'ni-select': Select,
+    'ni-button': Button,
     'ni-modal': Modal,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:selected-coach'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (event, path) {
-      this.$emit('update:selectedCoach', set({ ...this.selectedCoach }, path, event));
+      this.$emit('update:selected-coach', set({ ...this.selectedCoach }, path, event));
     },
   },
 };

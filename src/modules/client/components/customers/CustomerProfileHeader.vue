@@ -24,14 +24,15 @@
     </div>
 
     <stop-support-modal v-model="stopSupportModal" @hide="resetStopSupportModal" @submit="stopSupport"
-      :new-status.sync="newStatus" :validations="$v.newStatus" :loading="modalLoading" :customer-name="title"
-      :min-date="minStoppingDate" :stopping-date-error-message="setStoppingDateErrorMessage($v.newStatus)" />
+      v-model:new-status="newStatus" :validations="v$.newStatus" :loading="modalLoading" :customer-name="title"
+      :min-date="minStoppingDate" :stopping-date-error-message="setStoppingDateErrorMessage(v$.newStatus)" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
@@ -52,6 +53,7 @@ export default {
     'ni-button': Button,
     'stop-support-modal': StopSupportModal,
   },
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       STATUS_TYPES,
@@ -111,7 +113,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer le/la bénéficiaire.');
-        if (e.msg) NotifyNegative('Erreur lors de la suppression du/de la bénéficiaire.');
+        if (e.msg) NotifyNegative('Erreur lors de la suppression.');
       }
     },
     validateCustomerDeletion () {
@@ -152,7 +154,7 @@ export default {
       return REQUIRED_LABEL;
     },
     resetStopSupportModal () {
-      this.$v.newStatus.$reset();
+      this.v$.newStatus.$reset();
       this.newStatus = { stopReason: '', stoppedAt: '' };
     },
     async stopSupport () {
@@ -169,7 +171,7 @@ export default {
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'arrêt du/de la bénéficiaire.');
+        NotifyNegative('Erreur lors de l\'arrêt.');
       } finally {
         this.modalLoading = false;
       }
@@ -195,7 +197,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403 && e.data.message !== 'Forbidden') return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'archivage du/de la bénéficiaire.');
+        NotifyNegative('Erreur lors de l\'archivage.');
       }
     },
   },

@@ -65,7 +65,7 @@ export default {
     isBlended: { type: Boolean, default: false },
   },
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
 
     return {
       columns: [
@@ -127,11 +127,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .progress
-    width: 100%
-  .name
-    width: fit-content
-  .cliquable-name
-    text-decoration: underline
-    color: $primary
+.progress
+  width: 100%
+.name
+  width: fit-content
+.cliquable-name
+  text-decoration: underline
+  color: $primary
 </style>

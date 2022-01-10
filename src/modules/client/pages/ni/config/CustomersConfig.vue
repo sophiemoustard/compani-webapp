@@ -5,7 +5,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
-          <ni-responsive-table :data="surcharges" :columns="surchargesColumns" :pagination.sync="pagination"
+          <ni-responsive-table :data="surcharges" :columns="surchargesColumns" v-model:pagination="pagination"
             :loading="surchargesLoading">
             <template #body="{ props }">
               <q-tr :props="props">
@@ -13,7 +13,7 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button icon="edit" @click.native="openSurchargeEditionModal(col.value)" />
+                      <ni-button icon="edit" @click="openSurchargeEditionModal(col.value)" />
                       <ni-button icon="delete" @click="validateSurchargeDeletion(col.value, props.row)" />
                     </div>
                   </template>
@@ -31,7 +31,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
         <q-card>
-          <ni-responsive-table :data="services" :columns="serviceColumns" :pagination.sync="pagination"
+          <ni-responsive-table :data="services" :columns="serviceColumns" v-model:pagination="pagination"
             :visible-columns="servicesVisibleColumns" :loading="servicesLoading">
             <template #body="{ props }">
               <q-tr :props="props">
@@ -67,7 +67,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Articles de facturation</p>
         <q-card>
-          <ni-responsive-table :data="billingItems" :columns="billingItemsColumns" :pagination.sync="pagination"
+          <ni-responsive-table :data="billingItems" :columns="billingItemsColumns" v-model:pagination="pagination"
             :loading="billingItemsLoading">
             <template #body="{ props }">
               <q-tr :props="props">
@@ -121,7 +121,7 @@
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card>
           <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" :loading="tppsLoading"
-            :pagination.sync="pagination">
+            v-model:pagination="pagination">
             <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -154,35 +154,34 @@
         <div class="row gutter-profile">
           <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod"
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
-            :options="billingPeriodOptions" :error="$v.company.customersConfig.billingPeriod.$error"
-            :error-message="REQUIRED_LABEL" />
+            :options="billingPeriodOptions" :error="v$.company.customersConfig.billingPeriod.$error" />
         </div>
       </div>
     </div>
 
-    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge.sync="newSurcharge"
-      :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
+    <surcharge-creation-modal v-model="surchargeCreationModal" v-model:new-surcharge="newSurcharge"
+      :validations="v$.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
       :loading="loading" />
 
-    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge.sync="editedSurcharge"
-      :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
+    <surcharge-edition-modal v-model="surchargeEditionModal" v-model:edited-surcharge="editedSurcharge"
+      :validations="v$.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
       :loading="loading" />
 
-    <service-creation-modal v-model="serviceCreationModal" :new-service.sync="newService" :validations="$v.newService"
+    <service-creation-modal v-model="serviceCreationModal" v-model:new-service="newService" :validations="v$.newService"
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
       :loading="loading" @add-billing-item="addBillingItemToService" @update-billing-item="updateBillingItemInService"
       @remove-billing-item="removeBillingItemInService" :billing-items-options="billingItemsOptions" />
 
-    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService" @submit="updateService"
+    <service-edition-modal v-model="serviceEditionModal" v-model:edited-service="editedService" @submit="updateService"
       :default-unit-amount-error="nbrError('editedService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
       @hide="resetEditionServiceData" :min-start-date="minStartDate" @add-billing-item="addBillingItemToService"
       @update-billing-item="updateBillingItemInService" :billing-items-options="billingItemsOptions" :loading="loading"
-      :validations="$v.editedService" @remove-billing-item="removeBillingItemInService"
+      :validations="v$.editedService" @remove-billing-item="removeBillingItemInService"
       :start-date-error="startDateError" />
 
-    <billing-item-creation-modal v-model="billingItemCreationModal" :new-billing-item.sync="newBillingItem"
-      :validations="$v.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
+    <billing-item-creation-modal v-model="billingItemCreationModal" v-model:new-billing-item="newBillingItem"
+      :validations="v$.newBillingItem" :type-options="billingItemTypeOptions" :loading="loading"
       :default-unit-amount-error="nbrError('newBillingItem.defaultUnitAmount')" @hide="resetBillingItemCreation"
       :vat-error="nbrError('newBillingItem.vat')" @submit="createNewBillingItem" />
 
@@ -190,16 +189,19 @@
       :selected-service="selectedService" :service-columns="serviceColumns" />
 
     <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal" @update="setThirdPartyPayer"
-      :validations="$v.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
+      :validations="v$.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
       :loading="loading" :billing-mode-options="billingModeOptions" :new-third-party-payer="newThirdPartyPayer" />
 
-    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" :validations="$v.editedThirdPartyPayer"
+    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" :validations="v$.editedThirdPartyPayer"
       :edited-third-party-payer="editedThirdPartyPayer" @submit="updateThirdPartyPayer" @update="setThirdPartyPayer"
       @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions" />
   </q-page>
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required, numeric, requiredIf, email } from '@vuelidate/validators';
 import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
@@ -209,7 +211,6 @@ import compact from 'lodash/compact';
 import uniq from 'lodash/uniq';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
 import BillingItems from '@api/BillingItems';
 import Surcharges from '@api/Surcharges';
@@ -258,7 +259,6 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'CustomersConfig',
-  metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
     'ni-file-uploader': FileUploader,
     'ni-title-header': TitleHeader,
@@ -274,6 +274,12 @@ export default {
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
     'third-party-payer-edition-modal': ThirdPartyPayerEditionModal,
     'service-history-modal': ServiceHistoryModal,
+  },
+  setup () {
+    const metaInfo = { title: 'Configuration bénéficiaire' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
@@ -610,11 +616,11 @@ export default {
         saturday: { positiveNumber },
         sunday: { positiveNumber },
         evening: { positiveNumber },
-        eveningStartTime: { required: requiredIf(item => item.evening) },
-        eveningEndTime: { required: requiredIf(item => item.evening) },
+        eveningStartTime: { required: requiredIf(this.newSurcharge.evening) },
+        eveningEndTime: { required: requiredIf(this.newSurcharge.evening) },
         custom: { numeric },
-        customStartTime: { required: requiredIf(item => item.custom) },
-        customEndTime: { required: requiredIf(item => item.custom) },
+        customStartTime: { required: requiredIf(this.newSurcharge.custom) },
+        customEndTime: { required: requiredIf(this.newSurcharge.custom) },
       },
       editedSurcharge: {
         name: { required },
@@ -625,11 +631,11 @@ export default {
         saturday: { positiveNumber },
         sunday: { positiveNumber },
         evening: { positiveNumber },
-        eveningStartTime: { required: requiredIf(item => item.evening) },
-        eveningEndTime: { required: requiredIf(item => item.evening) },
+        eveningStartTime: { required: requiredIf(this.editedSurcharge.evening) },
+        eveningEndTime: { required: requiredIf(this.editedSurcharge.evening) },
         custom: { numeric },
-        customStartTime: { required: requiredIf(item => item.custom) },
-        customEndTime: { required: requiredIf(item => item.custom) },
+        customStartTime: { required: requiredIf(this.editedSurcharge.custom) },
+        customEndTime: { required: requiredIf(this.editedSurcharge.custom) },
       },
       newService: {
         name: { required },
@@ -657,9 +663,9 @@ export default {
       newThirdPartyPayer: {
         name: { required },
         address: {
-          zipCode: { required: requiredIf(item => !!item.fullAddress) },
-          street: { required: requiredIf(item => !!item.fullAddress) },
-          city: { required: requiredIf(item => !!item.fullAddress) },
+          zipCode: { required: requiredIf(get(this.newThirdPartyPayer, 'address.fullAddress')) },
+          street: { required: requiredIf(get(this.newThirdPartyPayer, 'address.fullAddress')) },
+          city: { required: requiredIf(get(this.newThirdPartyPayer, 'address.fullAddress')) },
           fullAddress: { frAddress },
         },
         email: { email },
@@ -670,9 +676,9 @@ export default {
       editedThirdPartyPayer: {
         name: { required },
         address: {
-          zipCode: { required: requiredIf(item => !!item.fullAddress) },
-          street: { required: requiredIf(item => !!item.fullAddress) },
-          city: { required: requiredIf(item => !!item.fullAddress) },
+          zipCode: { required: requiredIf(get(this.editedThirdPartyPayer, 'address.fullAddress')) },
+          street: { required: requiredIf(get(this.editedThirdPartyPayer, 'address.fullAddress')) },
+          city: { required: requiredIf(get(this.editedThirdPartyPayer, 'address.fullAddress')) },
           fullAddress: { frAddress },
         },
         email: { email },
@@ -694,9 +700,11 @@ export default {
       return formatAndSortOptions(this.billingItems.filter(bi => bi.type === PER_INTERVENTION), 'name');
     },
     startDateError () {
-      const val = get(this.$v, 'editedService.startDate');
-      if (val.required === false) return REQUIRED_LABEL;
-      if (val.minDate === false) return 'La date d\'effet doit être postérieure à la date de la version précédente.';
+      const val = get(this.v$, 'editedService.startDate');
+      if (val.required.$response === false) return REQUIRED_LABEL;
+      if (val.minDate.$response === false) {
+        return 'La date d\'effet doit être postérieure à la date de la version précédente.';
+      }
 
       return '';
     },
@@ -787,7 +795,7 @@ export default {
         customStartTime: null,
         customEndTime: null,
       };
-      this.$v.newSurcharge.$reset();
+      this.v$.newSurcharge.$reset();
     },
     formatSurchargePayload (surcharge) {
       const payload = cloneDeep(surcharge);
@@ -808,8 +816,8 @@ export default {
     },
     async createNewSurcharge () {
       try {
-        this.$v.newSurcharge.$touch();
-        if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newSurcharge.$touch();
+        if (this.v$.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
 
         const payload = this.formatSurchargePayload(this.newSurcharge);
@@ -861,12 +869,12 @@ export default {
         customStartTime: null,
         customEndTime: null,
       };
-      this.$v.editedSurcharge.$reset();
+      this.v$.editedSurcharge.$reset();
     },
     async updateSurcharge () {
       try {
-        this.$v.editedSurcharge.$touch();
-        if (this.$v.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedSurcharge.$touch();
+        if (this.v$.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.formatSurchargePayload(this.editedSurcharge);
@@ -932,12 +940,12 @@ export default {
         exemptFromCharges: false,
         billingItems: [],
       };
-      this.$v.newService.$reset();
+      this.v$.newService.$reset();
     },
     async createNewService () {
       try {
-        this.$v.newService.$touch();
-        if (this.$v.newService.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newService.$touch();
+        if (this.v$.newService.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.formatCreatedService();
@@ -981,7 +989,7 @@ export default {
         exemptFromCharges: false,
         billingItems: [],
       };
-      this.$v.editedService.$reset();
+      this.v$.editedService.$reset();
     },
     formatEditedService () {
       return {
@@ -991,8 +999,8 @@ export default {
     },
     async updateService () {
       try {
-        this.$v.editedService.$touch();
-        if (this.$v.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedService.$touch();
+        if (this.v$.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.formatEditedService();
@@ -1068,13 +1076,13 @@ export default {
     },
     // Billing Items
     resetBillingItemCreation () {
-      this.$v.newBillingItem.$reset();
+      this.v$.newBillingItem.$reset();
       this.newBillingItem = { name: '', type: '', defaultUnitAmount: 0, vat: 0 };
     },
     async createNewBillingItem () {
       try {
-        this.$v.newBillingItem.$touch();
-        if (this.$v.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newBillingItem.$touch();
+        if (this.v$.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
 
@@ -1142,7 +1150,7 @@ export default {
       };
     },
     resetThirdPartyPayerCreation () {
-      this.$v.newThirdPartyPayer.$reset();
+      this.v$.newThirdPartyPayer.$reset();
       this.newThirdPartyPayer = {
         name: '',
         email: '',
@@ -1166,8 +1174,8 @@ export default {
     },
     async createNewThirdPartyPayer () {
       try {
-        this.$v.newThirdPartyPayer.$touch();
-        const formIsValid = await this.waitForFormValidation(this.$v.newThirdPartyPayer);
+        this.v$.newThirdPartyPayer.$touch();
+        const formIsValid = await this.waitForFormValidation(this.v$.newThirdPartyPayer);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
@@ -1183,13 +1191,13 @@ export default {
       }
     },
     resetThirdPartyPayerEdition () {
-      this.$v.editedThirdPartyPayer.$reset();
+      this.v$.editedThirdPartyPayer.$reset();
       this.editedThirdPartyPayer = { address: {} };
     },
     async updateThirdPartyPayer () {
       try {
-        this.$v.editedThirdPartyPayer.$touch();
-        const formIsValid = await this.waitForFormValidation(this.$v.editedThirdPartyPayer);
+        this.v$.editedThirdPartyPayer.$touch();
+        const formIsValid = await this.waitForFormValidation(this.v$.editedThirdPartyPayer);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
@@ -1236,11 +1244,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .archived
-    display: flex
-    align-self: center
-  .billing-item-tag
-    background-color: $copper-100
-    border-radius: 8px
-    color: $copper-700
+.archived
+  display: flex
+  align-self: center
+.billing-item-tag
+  background-color: $copper-100
+  border-radius: 8px
+  color: $copper-700
 </style>

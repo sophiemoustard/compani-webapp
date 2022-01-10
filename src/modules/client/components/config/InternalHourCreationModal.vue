@@ -1,11 +1,11 @@
 <template>
-    <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+    <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+      <template #title>
         Créer une <span class="text-weight-bold">heure interne</span>
       </template>
-      <ni-input in-modal caption="Nom" :value="newInternalHour.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field @input="update($event, 'name')" />
-      <template slot="footer">
+      <ni-input in-modal caption="Nom" :model-value="newInternalHour.name" :error="validations.name.$error"
+        @blur="validations.name.$touch" required-field @update:model-value="update($event, 'name')" />
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>
@@ -19,7 +19,7 @@ import Input from '@components/form/Input';
 export default {
   name: 'InternalHourCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     newInternalHour: { type: Object, required: true },
@@ -28,18 +28,19 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-internal-hour'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newInternalHour', { ...this.newInternalHour, [prop]: event });
+      this.$emit('update:new-internal-hour', { ...this.newInternalHour, [prop]: event });
     },
   },
 };

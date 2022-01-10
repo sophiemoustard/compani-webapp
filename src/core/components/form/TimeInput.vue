@@ -5,11 +5,11 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
+    <q-input dense bg-color="white" borderless :model-value="modelValue" @update:model-value="update" :readonly="locked"
       :error-message="errorMessage" :error="error" @blur="onBlur" :rules="['time']" mask="time" data-cy="time-input"
-      :disable="disable && !locked" :readonly="locked">
+      :disable="disable && !locked" :class="{ borders: inModal }">
       <template #append>
-        <q-icon v-if="!locked" name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime"
+        <q-icon v-if="!locked" name="far fa-clock" class="cursor-pointer" @click="selectTime = !selectTime"
           color="copper-grey-500">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-list dense padding>
@@ -20,7 +20,7 @@
             </q-list>
           </q-menu>
         </q-icon>
-        <q-icon v-else name="lock" class="cursor-pointer" @click.native="click" color="copper-500" />
+        <q-icon v-else name="lock" class="cursor-pointer" @click="click" color="copper-500" />
       </template>
     </q-input>
   </div>
@@ -32,13 +32,14 @@ import moment from '@helpers/moment';
 
 export default {
   name: 'NiTimeInput',
+  emits: ['update:model-value', 'blur', 'lock-click'],
   data () {
     return {
       selectTime: false,
     };
   },
   props: {
-    value: { type: String, default: '' },
+    modelValue: { type: String, default: '' },
     min: { type: String, default: '' },
     inModal: { type: Boolean, default: false },
     caption: { type: String, default: '' },
@@ -81,22 +82,22 @@ export default {
       this.$refs.qTimeMenu.hide();
     },
     update (value) {
-      this.$emit('input', value);
+      this.$emit('update:model-value', value);
     },
     onBlur () {
       this.$emit('blur');
     },
     click () {
-      this.$emit('lockClick');
+      this.$emit('lock-click');
     },
   },
 };
 </script>
 
 <style lang="sass" scoped>
-  .q-list
-    width: 100px
+.q-list
+  width: 100px
 
-  ::v-deep .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
-    color: $copper-grey-900
+:deep(.q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input)
+  color: $copper-grey-900
 </style>

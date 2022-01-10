@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Avoirs" padding />
-    <ni-simple-table :data="creditNotes" :columns="creditNotesColumns" :pagination.sync="pagination"
+    <ni-simple-table :data="creditNotes" :columns="creditNotesColumns" v-model:pagination="pagination"
       :loading="tableLoading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -25,33 +25,36 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
-      :has-linked-events.sync="hasLinkedEvents" :third-party-payer-options="thirdPartyPayerOptions" :loading="loading"
+      v-model:has-linked-events="hasLinkedEvents" :third-party-payer-options="thirdPartyPayerOptions" :loading="loading"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
-      :validations="$v.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" @get-events="getCreationEvents"
-      :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.$v.newCreditNote)"
-      :customers-options="customersOptions" @hide="resetCreationCreditNoteData" :new-credit-note.sync="newCreditNote"
-      :end-date-error-message="setEndDateErrorMessage(this.$v.newCreditNote, this.newCreditNote.events)"
+      :validations="v$.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" @get-events="getCreationEvents"
+      :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.v$.newCreditNote)"
+      :customers-options="customersOptions" @hide="resetCreationCreditNoteData" v-model:new-credit-note="newCreditNote"
+      :end-date-error-message="setEndDateErrorMessage(this.v$.newCreditNote, this.newCreditNote.events)"
       @reset-customer-data="resetCustomerData" />
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
-      v-model="creditNoteEditionModal" :edited-credit-note.sync="editedCreditNote" :validations="$v.editedCreditNote"
+      v-model="creditNoteEditionModal" v-model:edited-credit-note="editedCreditNote" :validations="v$.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
       @get-events="getEditionEvents" :min-and-max-dates="editionMinAndMaxDates" :loading="loading"
-      :end-date-error-message="setEndDateErrorMessage(this.$v.editedCreditNote, this.editedCreditNote.events)"
-      :start-date-error-message="setStartDateErrorMessage(this.$v.editedCreditNote)" />
+      :end-date-error-message="setEndDateErrorMessage(this.v$.editedCreditNote, this.editedCreditNote.events)"
+      :start-date-error-message="setStartDateErrorMessage(this.v$.editedCreditNote)" />
   </q-page>
 </template>
 
 <script>
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
+import { required, requiredIf } from '@vuelidate/validators';
+import useVuelidate from '@vuelidate/core';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
+import set from 'lodash/set';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
@@ -69,13 +72,18 @@ import CreditNoteCreationModal from 'src/modules/client/components/customers/bil
 
 export default {
   name: 'CreditNotes',
-  metaInfo: { title: 'Avoirs' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-button': Button,
     'ni-simple-table': SimpleTable,
     'credit-note-edition-modal': CreditNoteEditionModal,
     'credit-note-creation-modal': CreditNoteCreationModal,
+  },
+  setup () {
+    const metaInfo = { title: 'Avoirs' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -257,11 +265,11 @@ export default {
         inclTaxesTpp: 0,
       };
 
-      this.$v.newCreditNote.startDate.$reset();
-      this.$v.newCreditNote.endDate.$reset();
-      this.$v.newCreditNote.subscription.$reset();
-      this.$v.newCreditNote.inclTaxesCustomer.$reset();
-      this.$v.newCreditNote.inclTaxesTpp.$reset();
+      this.v$.newCreditNote.startDate.$reset();
+      this.v$.newCreditNote.endDate.$reset();
+      this.v$.newCreditNote.subscription.$reset();
+      this.v$.newCreditNote.inclTaxesCustomer.$reset();
+      this.v$.newCreditNote.inclTaxesTpp.$reset();
     },
     // Refresh data
     async refreshCustomersOptions () {
@@ -335,16 +343,16 @@ export default {
       }
     },
     async getEditionEvents (field) {
-      if (field && this.$v.editedCreditNote[field]) this.$v.editedCreditNote[field].$touch();
-      else this.$v.editedCreditNote.$touch();
+      if (field && this.v$.editedCreditNote[field]) this.v$.editedCreditNote[field].$touch();
+      else this.v$.editedCreditNote.$touch();
 
-      await this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
+      await this.getEvents(this.editedCreditNote, this.v$.editedCreditNote);
     },
     async getCreationEvents (field) {
-      if (this.$v.newCreditNote[field]) this.$v.newCreditNote[field].$touch();
-      this.$set(this.newCreditNote, 'events', []);
+      if (this.v$.newCreditNote[field]) this.v$.newCreditNote[field].$touch();
+      set(this.newCreditNote, 'events', []);
 
-      await this.getEvents(this.newCreditNote, this.$v.newCreditNote);
+      await this.getEvents(this.newCreditNote, this.v$.newCreditNote);
     },
     setMinAndMaxDates (events) {
       if (!events || !events.length) return { maxStartDate: '', minEndDate: '' };
@@ -434,7 +442,7 @@ export default {
       };
       this.creditNoteEvents = [];
       this.hasLinkedEvents = false;
-      this.$v.newCreditNote.$reset();
+      this.v$.newCreditNote.$reset();
     },
     formatPayloadWithSubscription (creditNote) {
       const { customer } = creditNote;
@@ -512,9 +520,9 @@ export default {
     },
     async createNewCreditNote () {
       try {
-        this.$v.newCreditNote.$touch();
+        this.v$.newCreditNote.$touch();
 
-        if (this.$v.newCreditNote.$error || this.noEventSelectedForNewCreditNote) {
+        if (this.v$.newCreditNote.$error || this.noEventSelectedForNewCreditNote) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
         this.loading = true;
@@ -554,15 +562,15 @@ export default {
       this.editedCreditNote = {};
       this.creditNoteEvents = [];
       this.hasLinkedEvents = false;
-      this.$v.editedCreditNote.$reset();
+      this.v$.editedCreditNote.$reset();
     },
     formatEditionPayload () {
       return { ...omit(this.formatPayload(this.editedCreditNote), ['customer', 'thirdPartyPayer']) };
     },
     async updateCreditNote () {
       try {
-        this.$v.editedCreditNote.$touch();
-        if (this.$v.editedCreditNote.$error || this.noEventSelectedForEditedCreditNote) {
+        this.v$.editedCreditNote.$touch();
+        if (this.v$.editedCreditNote.$error || this.noEventSelectedForEditedCreditNote) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 

@@ -22,8 +22,8 @@
             </div>
           </q-card>
         </div>
-        <ni-line-chart title="Nombre total d'activités réalisées par mois"
-          :chart-data="chartData(this.activitiesByMonth)" class="col-md-6 col-xs-12 line-chart-container" />
+        <ni-line-chart :data="this.activitiesByMonth" :labels="months" class="col-md-6 col-xs-12 line-chart-container"
+          title="Nombre total d'activités réalisées par mois" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -91,7 +91,7 @@ export default {
   },
   data () {
     return {
-      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
+      isVendorInterface: /\/ad\//.test(this.$route.path),
       courses: [],
       loading: false,
       pagination: {

@@ -1,37 +1,35 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Bénéficiaires" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
+    <ni-table-list :data="filteredUsers" :columns="columns" v-model:pagination="pagination" :loading="tableLoading"
       @go-to="goToCustomerProfile" :rows-per-page="[15, 50, 100, 200]" />
   </q-page>
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import Customers from '@api/Customers';
 import escapeRegExp from 'lodash/escapeRegExp';
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 
+const metaInfo = { title: 'Bénéficiaires' };
+
 export default {
   name: 'AuxiliaryCustomersDirectory',
-  metaInfo: { title: 'Bénéficiaires' },
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tableLoading: true,
       ownCustomers: true,
       customersList: [],
       searchStr: '',
-      pagination: {
-        sortBy: 'name',
-        descending: false,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
       columns: [
         {
           name: 'name',
