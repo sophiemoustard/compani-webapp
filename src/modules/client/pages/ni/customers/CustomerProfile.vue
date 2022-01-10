@@ -12,8 +12,9 @@ import { useMeta } from 'quasar';
 import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
-import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
+import { formatIdentity } from '@helpers/utils';
+import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 import ProfileInfo from 'src/modules/client/components/customers/infos/ProfileInfo';
 import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling';
@@ -62,9 +63,7 @@ export default {
     watch(customer, () => { refreshCustomerName(); });
 
     const refreshCustomerName = () => {
-      customerName.value = get(customer.value, 'identity')
-        ? `${customer.value.identity.firstname} ${customer.value.identity.lastname}`
-        : '';
+      customerName.value = get(customer.value, 'identity') ? formatIdentity(customer.value.identity, 'FL') : '';
     };
 
     const created = async () => {

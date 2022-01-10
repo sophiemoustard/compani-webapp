@@ -14,6 +14,7 @@ import { useStore } from 'vuex';
 import get from 'lodash/get';
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
+import { formatIdentity } from '@helpers/utils';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
 import ProfileContracts from 'src/modules/client/components/auxiliary/ProfileContracts';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
@@ -53,9 +54,7 @@ export default {
     watch(userProfile, () => { refreshAuxiliaryName(); });
 
     const refreshAuxiliaryName = () => {
-      auxiliaryName.value = get(userProfile.value, 'identity')
-        ? `${userProfile.value.identity.firstname} ${userProfile.value.identity.lastname}`
-        : '';
+      auxiliaryName.value = get(userProfile.value, 'identity') ? formatIdentity(userProfile.value.identity, 'FL') : '';
     };
 
     const created = async () => {
