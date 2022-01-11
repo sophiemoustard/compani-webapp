@@ -131,8 +131,10 @@ export const EDITION = 'edition';
 export const DELETION = 'deletion';
 export const CANCELLATION = 'cancellation';
 export const DAILY = 'daily';
+export const HALF_DAILY = 'half_daily';
 export const ABSENCE_NATURES = [
   { label: 'Journalière', value: DAILY },
+  { label: 'Demi-journalière', value: HALF_DAILY },
   { label: 'Horaire', value: HOURLY },
 ];
 export const EVENT_TYPES = [
