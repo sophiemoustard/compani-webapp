@@ -34,10 +34,9 @@
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
             :disable="isHourlyAbsence(newEvent)" @update:model-value="updateAbsence($event)" />
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="newEvent.dates" required-field
-            :disable-end-date="isHourlyAbsence(newEvent)" :error="validations.dates.$error"
+            :disable-end-date="isAbsenceEndDateDisabled" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
-            :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
-            @update:model-value="updateEvent('dates', $event)" />
+            :disable-start-hour="isAbsenceStartHourDisabled" @update:model-value="updateEvent('dates', $event)" />
           <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :model-value="newEvent.isExtendedAbsence"
             @update:model-value="updateCheckBox" label="Prolongation" dense />
           <ni-select v-if="newEvent.isExtendedAbsence" :model-value="newEvent.extension"
@@ -171,6 +170,13 @@ export default {
     },
     customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
+    },
+    isAbsenceEndDateDisabled () {
+      return this.isHourlyAbsence(this.newEvent) || this.isHalfDailyAbsence(this.newEvent);
+    },
+    isAbsenceStartHourDisabled () {
+      return !this.isIllnessOrWorkAccident(this.newEvent) && !this.isHourlyAbsence(this.newEvent) &&
+        !this.isHalfDailyAbsence(this.newEvent);
     },
   },
   watch: {

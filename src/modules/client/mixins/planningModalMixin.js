@@ -41,6 +41,7 @@ import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { isBefore } from '@helpers/date';
 import PlanningModalHeader from 'src/modules/client/components/planning/PlanningModalHeader';
+import { HALF_DAILY } from '../../../core/data/constants';
 
 export const planningModalMixin = {
   components: {
@@ -205,6 +206,9 @@ export const planningModalMixin = {
     },
     isHourlyAbsence (event) {
       return event.type === ABSENCE && event.absenceNature === HOURLY;
+    },
+    isHalfDailyAbsence (event) {
+      return event.type === ABSENCE && event.absenceNature === HALF_DAILY;
     },
     isIllnessOrWorkAccident (event) {
       return event.absence && [ILLNESS, WORK_ACCIDENT].includes(event.absence);
