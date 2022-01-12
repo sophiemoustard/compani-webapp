@@ -18,7 +18,7 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <!-- <ni-picture-uploader :user="userProfile" :refresh-picture="refreshUser" /> -->
+          <ni-picture-uploader :user="userProfile" :refresh-picture="refreshUser" />
         </div>
       </div>
     </div>
@@ -262,7 +262,7 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-// import PictureUploader from '@components/PictureUploader';
+import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber, iban, frAddress, bic } from '@helpers/vuelidateCustomVal';
 import {
   AUXILIARY,
@@ -291,7 +291,7 @@ export default {
     'ni-date-input': DateInput,
     'ni-search-address': SearchAddress,
     'ni-option-group': OptionGroup,
-    // 'ni-picture-uploader': PictureUploader,
+    'ni-picture-uploader': PictureUploader,
   },
   setup () { return { v$: useVuelidate() }; },
   data () {
