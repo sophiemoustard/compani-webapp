@@ -8,16 +8,15 @@
 </template>
 
 <script>
-import { createMetaMixin } from 'quasar';
-import { mapState, mapGetters } from 'vuex';
+import { useMeta } from 'quasar';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
 import { formatIdentity } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
-
-const metaInfo = { title: 'Fiche formateur' };
 
 export default {
   name: 'TrainerProfile',
@@ -29,43 +28,54 @@ export default {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
   },
-  mixins: [createMetaMixin(metaInfo)],
-  data () {
-    return {
-      userIdentity: '',
-      tabsContent: [
-        {
-          label: 'Infos personnelles',
-          name: 'info',
-          default: this.defaultTab === 'info',
-          component: ProfileInfo,
-          notification: 'profiles',
-        },
-      ],
+  setup (props) {
+    const metaInfo = { title: 'Fiche formateur' };
+    useMeta(metaInfo);
+
+    const userIdentity = ref('');
+    const tabsContent = [
+      {
+        label: 'Infos personnelles',
+        name: 'info',
+        default: props.defaultTab === 'info',
+        component: ProfileInfo,
+        notification: 'profiles',
+      },
+    ];
+
+    const $store = useStore();
+    const userProfile = computed(() => (TRAINER === get($store.state.main.loggedUser, 'role.vendor.name')
+      ? $store.state.main.loggedUser
+      : $store.state.userProfile.userProfile));
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+
+    watch(
+      userProfile,
+      async () => {
+        userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL');
+        if (vendorRole.value !== TRAINER) await $store.dispatch('userProfile/updateNotifications');
+      }
+    );
+
+    onBeforeUnmount(() => { $store.dispatch('userProfile/resetUserProfile'); });
+
+    const created = async () => {
+      if (vendorRole.value !== TRAINER) {
+        await $store.dispatch('userProfile/fetchUserProfile', { userId: props.trainerId });
+      }
+      userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL');
     };
-  },
-  async created () {
-    if (this.vendorRole !== TRAINER) {
-      await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.trainerId });
-    }
-    this.userIdentity = formatIdentity(get(this.userProfile, 'identity'), 'FL');
-  },
-  computed: {
-    ...mapState({
-      userProfile: state => (TRAINER === get(state.main.loggedUser, 'role.vendor.name')
-        ? state.main.loggedUser
-        : state.userProfile.userProfile),
-    }),
-    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
-  },
-  watch: {
-    async userProfile () {
-      this.userIdentity = formatIdentity(get(this.userProfile, 'identity'), 'FL');
-      if (this.vendorRole !== TRAINER) await this.$store.dispatch('userProfile/updateNotifications');
-    },
-  },
-  beforeUnmount () {
-    this.$store.dispatch('userProfile/resetUserProfile');
+
+    created();
+
+    return {
+      // Data
+      userIdentity,
+      tabsContent,
+      // Computed
+      userProfile,
+      vendorRole,
+    };
   },
 };
 </script>
