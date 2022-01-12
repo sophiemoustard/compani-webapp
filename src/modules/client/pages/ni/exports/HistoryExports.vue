@@ -54,13 +54,17 @@ export default {
     return {
       dateRange: {
         startDate: { minDate: minDate(this.min) },
-        endDate: { maxDate: maxDate(this.max) },
+        endDate: { maxDate: maxDate(this.max), minDate: minDate(this.dateRange.startDate) },
       },
     };
   },
   computed: {
     dateRangeErrorMessage () {
-      return 'Date(s) invalide(s) : la période maximale est 1 an.';
+      if (this.dateRange.endDate < this.dateRange.startDate) {
+        return 'La date de fin doit être postérieure à la date de début';
+      }
+
+      return 'Date(s) invalide(s) : la période maximale est 1 an';
     },
   },
   methods: {

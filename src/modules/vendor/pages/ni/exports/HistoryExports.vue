@@ -49,13 +49,19 @@ export default {
     const rules = computed(() => ({
       dateRange: {
         startDate: { minDate: minDate(min.value) },
-        endDate: { maxDate: maxDate(max.value) },
+        endDate: { maxDate: maxDate(max.value), minDate: minDate(dateRange.value.startDate) },
       },
     }));
 
     const v$ = useVuelidate(rules, { dateRange });
 
-    const dateRangeErrorMessage = computed(() => 'Date(s) invalide(s) : la période maximale est 1 an.');
+    const dateRangeErrorMessage = computed(() => {
+      if (dateRange.value.endDate < dateRange.value.startDate) {
+        return 'La date de fin doit être postérieure à la date de début';
+      }
+
+      return 'Date(s) invalide(s) : la période maximale est 1 an';
+    });
 
     const input = (date) => {
       min.value = moment(date.endDate).subtract(1, 'year').add(1, 'day').toISOString();
