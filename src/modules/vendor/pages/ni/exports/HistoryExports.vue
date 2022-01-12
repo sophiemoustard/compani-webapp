@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="client-background q-pb-xl">
+  <q-page padding class="vendor-background q-pb-xl">
     <ni-title-header title="Historique" class="q-mb-xl" />
     <div class="row q-col-gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" />
@@ -24,6 +24,7 @@ import { VENDOR_EXPORT_HISTORY_TYPES, COURSE } from '@data/constants';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
+import { isBefore } from '@helpers/date';
 
 export default {
   name: 'History',
@@ -56,7 +57,7 @@ export default {
     const v$ = useVuelidate(rules, { dateRange });
 
     const dateRangeErrorMessage = computed(() => {
-      if (dateRange.value.endDate < dateRange.value.startDate) {
+      if (isBefore(dateRange.value.endDate, dateRange.value.startDate)) {
         return 'La date de fin doit être postérieure à la date de début';
       }
 
@@ -67,6 +68,7 @@ export default {
       min.value = moment(date.endDate).subtract(1, 'year').add(1, 'day').toISOString();
       max.value = moment(date.startDate).add(1, 'year').subtract(1, 'day').toISOString();
     };
+
     const exportCsv = async () => {
       try {
         loading.value = true;

@@ -23,6 +23,7 @@ import { EXPORT_HISTORY_TYPES, WORKING_EVENT } from '@data/constants';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
+import { isBefore } from '@helpers/date';
 
 export default {
   name: 'History',
@@ -60,7 +61,7 @@ export default {
   },
   computed: {
     dateRangeErrorMessage () {
-      if (this.dateRange.endDate < this.dateRange.startDate) {
+      if (isBefore(this.dateRange.endDate, this.dateRange.startDate)) {
         return 'La date de fin doit être postérieure à la date de début';
       }
 
