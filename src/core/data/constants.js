@@ -309,6 +309,8 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Paies et soldes tout compte', value: PAY },
   { label: 'Contrats', value: CONTRACT },
 ];
+export const COURSE = 'course';
+export const VENDOR_EXPORT_HISTORY_TYPES = [{ label: 'Formations', value: COURSE }];
 
 // ORIGINS
 export const COMPANI = 'compani';

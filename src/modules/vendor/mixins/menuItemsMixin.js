@@ -5,6 +5,7 @@ export const menuItemsMixin = {
         users: { open: false },
         pedagogy: { open: false },
         management: { open: false },
+        exports: { open: false },
       },
       trainerActiveRoutes: {
         administrative: { open: false },
@@ -35,6 +36,13 @@ export const menuItemsMixin = {
             { name: 'ni pedagogy programs', icon: 'view_headline', label: 'Catalogue' },
             { name: 'ni pedagogy categories', icon: 'category', label: 'Catégories' },
             { name: 'ni pedagogy questionnaires', icon: 'assessment', label: 'Questionnaires' },
+          ],
+        },
+        {
+          ref: 'exports',
+          label: 'Exports',
+          children: [
+            { name: 'ni exports history vendor', icon: 'history', label: 'Historique' },
           ],
         },
       ],
