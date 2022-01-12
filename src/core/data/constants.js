@@ -191,6 +191,17 @@ export const PLANNING_REFERENT = 'planning_referent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
+export const ROLE_TRANSLATION = {
+  [HELPER]: 'Aidant(e)',
+  [AUXILIARY]: 'Auxiliaire',
+  [PLANNING_REFERENT]: 'Auxiliaire',
+  [AUXILIARY_WITHOUT_COMPANY]: 'Auxiliaire',
+  [CLIENT_ADMIN]: 'Administrateur(rice)',
+  [VENDOR_ADMIN]: 'Administrateur(rice) Vendeur',
+  [COACH]: 'Coach',
+  [TRAINING_ORGANISATION_MANAGER]: 'Responsable Formation',
+  [TRAINER]: 'Formateur(rice)',
+};
 
 // ROLES VENDOR
 export const VENDOR_ADMIN = 'vendor_admin';

@@ -30,7 +30,7 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { learnerMixin } from '@mixins/learnerMixin';
+import { ROLE_TRANSLATION } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 
@@ -44,9 +44,11 @@ export default {
     const metaInfo = { title: 'Fiche apprenant' };
     useMeta(metaInfo);
 
-    return { v$: useVuelidate() };
+    return {
+      // Validations
+      v$: useVuelidate(),
+    };
   },
-  mixins: [learnerMixin],
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
@@ -87,7 +89,7 @@ export default {
     },
     headerInfo () {
       const infos = [{ icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' }];
-      if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
+      if (this.userProfileRole) infos.push({ icon: 'person', label: ROLE_TRANSLATION[this.userProfileRole] });
 
       return infos;
     },
