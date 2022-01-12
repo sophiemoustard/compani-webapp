@@ -6,7 +6,6 @@ const { configure } = require('quasar/wrappers');
 
 module.exports = configure(ctx => ({
   boot: [
-    // 'vue-croppa',
     // process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
   ],
   css: ['app.sass', 'colors.sass'],
