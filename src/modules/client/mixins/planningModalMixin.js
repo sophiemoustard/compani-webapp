@@ -22,6 +22,7 @@ import {
   ABSENCE_NATURES,
   UNJUSTIFIED,
   DAILY,
+  HALF_DAILY,
   HOURLY,
   ILLNESS,
   WORK_ACCIDENT,
@@ -41,7 +42,6 @@ import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { isBefore } from '@helpers/date';
 import PlanningModalHeader from 'src/modules/client/components/planning/PlanningModalHeader';
-import { HALF_DAILY } from '../../../core/data/constants';
 
 export const planningModalMixin = {
   components: {

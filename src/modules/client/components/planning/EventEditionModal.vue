@@ -59,9 +59,9 @@
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
             :disable="isHourlyAbsence(editedEvent) || historiesLoading" @update:model-value="updateAbsence($event)" />
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
-            :disable-end-date="isHourlyAbsence(editedEvent)" :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)"
+            :disable-end-date="isAbsenceEndDateDisabled" :disable-start-hour="isAbsenceStartHourDisabled"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(editedEvent)" :disable="historiesLoading"
-              :error="validations.dates.$error" @update:model-value="updateEvent('dates', $event)" />
+            :error="validations.dates.$error" @update:model-value="updateEvent('dates', $event)" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence" required-field
             path="attachment" :entity="editedEvent" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additional-value="additionalValue" :error="validations.attachment.$error"
@@ -261,6 +261,13 @@ export default {
     },
     canUpdateAuxiliary () {
       return this.canUpdateIntervention && !this.isEventTimeStamped;
+    },
+    isAbsenceEndDateDisabled () {
+      return this.isHourlyAbsence(this.editedEvent) || this.isHalfDailyAbsence(this.editedEvent);
+    },
+    isAbsenceStartHourDisabled () {
+      return !this.isIllnessOrWorkAccident(this.editedEvent) && !this.isHourlyAbsence(this.editedEvent) &&
+        !this.isHalfDailyAbsence(this.editedEvent);
     },
   },
   methods: {
