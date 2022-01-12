@@ -81,7 +81,7 @@ export default {
       newCourse: {
         program: { required },
         subProgram: { required },
-        company: { required: requiredIf(this.newCourse.type === INTRA) },
+        company: { required: requiredIf(item => item.type === INTRA) },
         type: { required },
         salesRepresentative: { required },
       },

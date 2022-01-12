@@ -511,9 +511,9 @@ export default {
             fullAddress: { required, frAddress },
           },
           secondaryAddress: {
-            zipCode: { required: requiredIf(!!get(this.customer, 'contact.secondaryAddress.fullAddress')) },
-            street: { required: requiredIf(!!get(this.customer, 'contact.secondaryAddress.fullAddress')) },
-            city: { required: requiredIf(!!get(this.customer, 'contact.secondaryAddress.fullAddress')) },
+            zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+            street: { required: requiredIf(item => item && !!item.fullAddress) },
+            city: { required: requiredIf(item => item && !!item.fullAddress) },
             fullAddress: { frAddress },
           },
         },
