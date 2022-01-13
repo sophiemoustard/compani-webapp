@@ -6,10 +6,10 @@
         <span class="ellipsis page-title">{{ title }}</span>
         <ni-button class="q-ml-sm" icon="date_range" @click="goToPlanning" />
       </div>
-      <ni-button :flat="false" v-if="!customer.stoppedAt" class="justify-end" label="Arrêter"
-        @click="stopSupportModal=true" />
-      <ni-button :flat="false" v-else-if="customer.stoppedAt && !customer.archivedAt" class="justify-end"
-        label="Archiver" @click="validateCustomerArchive" />
+      <ni-button :flat="false" v-if="!customer.stoppedAt && !isAuxiliaryInterface" class="justify-end"
+        label="Arrêter" @click="stopSupportModal=true" />
+      <ni-button :flat="false" v-else-if="customer.stoppedAt && !customer.archivedAt && !isAuxiliaryInterface"
+        class="justify-end" label="Archiver" @click="validateCustomerArchive" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -19,7 +19,7 @@
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
         <div class="q-mr-md">{{ statusInfos }}</div>
-        <ni-button icon="delete" @click="validateCustomerDeletion" />
+        <ni-button v-if="!isAuxiliaryInterface" icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
 
@@ -79,6 +79,9 @@ export default {
     },
     minStoppingDate () {
       return getStartOfDay(new Date(this.customer.createdAt)).toISOString();
+    },
+    isAuxiliaryInterface () {
+      return /\/auxiliaries\//.test(this.$route.path);
     },
   },
   validations () {
