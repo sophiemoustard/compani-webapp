@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
@@ -55,7 +56,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import { upperCaseFirstLetter, formatDuration, formatIdentity, sortStrings } from '@helpers/utils';
+import { upperCaseFirstLetter, formatDuration, formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
@@ -88,8 +89,6 @@ export default {
           field: 'trainee',
           format: value => formatIdentity(value.identity, 'FL'),
           align: 'left',
-          sortable: true,
-          sort: (a, b) => sortStrings(a.identity.lastname, b.identity.lastname),
         },
         {
           name: 'unexpectedAttendances',
@@ -157,7 +156,11 @@ export default {
     },
     async getUnsubscribedAttendances () {
       try {
-        const unsubscribedList = await Attendances.listUnsubscribed({ course: this.course._id });
+        const query = {
+          course: this.course._id,
+          ...(this.isClientInterface && { company: this.loggedUser.company._id }),
+        };
+        const unsubscribedList = await Attendances.listUnsubscribed(query);
         const formattedUnsubscribedAttendances = Object.keys(unsubscribedList)
           .map(ul => ({
             _id: unsubscribedList[ul][0].trainee._id,
@@ -165,9 +168,9 @@ export default {
             attendances: unsubscribedList[ul].map(a => ({
               _id: a._id,
               duration: this.getSlotDuration(a.courseSlot),
-              step: a.courseSlot.step.name,
+              step: get(a, 'courseSlot.step.name'),
               slot: { startDate: a.courseSlot.startDate, endDate: a.courseSlot.endDate },
-              trainer: formatIdentity(a.trainer.identity, 'FL'),
+              trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
               misc: a.misc,
             })),
           }));
