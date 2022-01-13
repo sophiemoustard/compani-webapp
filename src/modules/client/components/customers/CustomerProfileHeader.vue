@@ -18,7 +18,7 @@
       </div>
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
-        <div class="q-mr-md">Depuis le {{ statusDate }} ({{ relativeStatusDate }})</div>
+        <div class="q-mr-md">{{ statusInfos }}</div>
         <ni-button icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
@@ -66,20 +66,15 @@ export default {
   },
   computed: {
     ...mapState('customer', ['customer']),
-    statusDate () {
+    statusInfos () {
       switch (this.getStatus(this.customer)) {
-        case ACTIVATED: return formatDate(this.customer.createdAt);
-        case STOPPED: return formatDate(this.customer.stoppedAt);
-        case ARCHIVED: return formatDate(this.customer.archivedAt);
+        case ACTIVATED:
+          return !this.customer.firstIntervention
+            ? `Date de création: ${this.displayDateInfo(this.customer.createdAt)}`
+            : `Première intervention: ${this.displayDateInfo(this.customer.firstIntervention.startDate)}`;
+        case STOPPED: return `Date d'arrêt: ${this.displayDateInfo(this.customer.stoppedAt)}`;
+        case ARCHIVED: return `Date d'archive: ${this.displayDateInfo(this.customer.archivedAt)}`;
         default: return 'N/A';
-      }
-    },
-    relativeStatusDate () {
-      switch (this.getStatus(this.customer)) {
-        case ACTIVATED: return formatDateDiff(dateDiff(new Date(), this.customer.createdAt));
-        case STOPPED: return formatDateDiff(dateDiff(new Date(), this.customer.stoppedAt));
-        case ARCHIVED: return formatDateDiff(dateDiff(new Date(), this.customer.archivedAt));
-        default: return '';
       }
     },
     minStoppingDate () {
@@ -98,6 +93,9 @@ export default {
     };
   },
   methods: {
+    displayDateInfo (date) {
+      return `${formatDate(date)} (${formatDateDiff(dateDiff(new Date(), date))})`;
+    },
     goToPlanning () {
       if (this.customer.subscriptions.length) {
         return this.$router.push({ name: 'ni planning customers', params: { targetedCustomerId: this.customer._id } });
