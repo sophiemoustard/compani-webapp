@@ -7,22 +7,16 @@
     </div>
     <div class="row justify-center col-xs-12">
       <div v-if="!showCropper && hasPicture">
-        <q-btn color="primary" round flat
-          icon="mdi-square-edit-outline" size="1rem" @click="showCropper = true" />
-        <q-btn color="primary" round flat icon="delete" size="1rem"
-          @click="validateImageDeletion" />
-        <q-btn color="primary" round flat icon="save_alt" size="1rem"
-          type="a" :href="pictureDlLink(pictureLink)" target="_blank" />
+        <q-btn color="primary" round flat icon="mdi-square-edit-outline" size="1rem" @click="showCropper = true" />
+        <q-btn color="primary" round flat icon="delete" size="1rem" @click="validateImageDeletion" />
+        <q-btn color="primary" round flat icon="save_alt" size="1rem" type="a" :href="pictureDlLink(pictureLink)"
+          target="_blank" />
       </div>
       <div v-if="showCropper">
-        <q-btn color="primary" icon="close" @click="showCropper = false" round flat
-          size="1rem" />
-        <q-btn color="primary" icon="rotate_left" @click="() => rotate(-90)" round
-          flat size="1rem" />
-        <q-btn color="primary" icon="rotate_right" @click="() => rotate(90)" round
-          flat size="1rem" />
-        <q-btn :loading="loadingImage" color="primary" icon="done"
-          @click="uploadImage" round flat size="1rem" />
+        <q-btn color="primary" round flat size="1rem" icon="close" @click="showCropper = false" />
+        <q-btn color="primary" round flat size="1rem" icon="rotate_left" @click="() => rotate(-90)" />
+        <q-btn color="primary" round flat size="1rem" icon="rotate_right" @click="() => rotate(90)" />
+        <q-btn color="primary" round flat size="1rem" icon="done" @click="uploadImage" :loading="loadingImage" />
       </div>
       <input v-if="!showCropper && !hasPicture" type="file" ref="file" @change="loadImage($event)" accept="image/*"
         class="q-my-md">
