@@ -13,18 +13,51 @@
     </div>
     <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="loading" class="q-mb-xl"
       is-blended />
+    <div v-if="unsubscribedAttendances.length">
+      <div class="text-italic">
+        Certains stagiaires inscrits à cette formation ont émargé dans d’autres formations du même programme
+      </div>
+      <ni-expanding-table :data="unsubscribedAttendances" :columns="columns" :pagination="pagination"
+        :hide-bottom="false" :loading="loading">
+        <template #row="{ props }">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <template v-if="col.name === 'expand'">
+              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+            </template>
+            <template v-else>
+              {{ col.value }}
+            </template>
+          </q-td>
+        </template>
+        <template #expanding-row="{ props }">
+          <q-td colspan="100%">
+            <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props" class="q-my-sm row">
+              <div class="dates text-italic">{{ formatDate(attendance.slot.startDate) }}</div>
+              <div class="dates text-italic">{{ formatSlotHour(attendance.slot) }} ({{ attendance.duration }})</div>
+              <div class="trainer text-italic">{{ attendance.trainer }}</div>
+              <div class="step text-italic">{{ attendance.step }}</div>
+              <div class="misc text-italic">{{ attendance.misc }}</div>
+            </div>
+          </q-td>
+        </template>
+      </ni-expanding-table>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
+import Attendances from '@api/Attendances';
 import { NotifyNegative } from '@components/popup/notify';
 import AttendanceTable from '@components/table/AttendanceTable';
+import ExpandingTable from '@components/table/ExpandingTable';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import { upperCaseFirstLetter } from '@helpers/utils';
+import { upperCaseFirstLetter, formatDuration, formatIdentity, sortStrings } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
+import moment from '@helpers/moment';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
 export default {
@@ -33,6 +66,7 @@ export default {
   components: {
     'elearning-follow-up-table': ElearningFollowUpTable,
     'attendance-table': AttendanceTable,
+    'ni-expanding-table': ExpandingTable,
     'questionnaire-answers-cell': QuestionnaireAnswersCell,
   },
   props: {
@@ -46,10 +80,37 @@ export default {
       QUESTION_ANSWER,
       upperCaseFirstLetter,
       questionnaires: [],
+      unsubscribedAttendances: [],
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          field: 'trainee',
+          format: value => formatIdentity(value.identity, 'FL'),
+          align: 'left',
+          sortable: true,
+          sort: (a, b) => sortStrings(a.identity.lastname, b.identity.lastname),
+        },
+        {
+          name: 'unexpectedAttendances',
+          label: 'Emargements imprévus',
+          field: 'attendancesCount',
+          align: 'center',
+        },
+        {
+          name: 'duration',
+          label: 'Durée',
+          field: 'totalDuration',
+          align: 'center',
+        },
+        { name: 'expand', label: '', field: '' },
+      ],
+      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
+      formatDate,
     };
   },
   async created () {
-    const promises = [this.getLearnersList()];
+    const promises = [this.getLearnersList(), this.getUnsubscribedAttendances()];
     if (!this.isClientInterface) promises.push(this.refreshQuestionnaires());
 
     await Promise.all(promises);
@@ -78,6 +139,49 @@ export default {
         { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
       );
     },
+    getTotalDuration (slots) {
+      const total = slots.reduce(
+        (acc, slot) => acc.add(moment.duration(moment(slot.endDate).diff(slot.startDate))),
+        moment.duration()
+      );
+
+      return formatDuration(total);
+    },
+    getSlotDuration (slot) {
+      const duration = moment.duration(moment(slot.endDate).diff(slot.startDate));
+
+      return formatDuration(duration);
+    },
+    formatSlotHour (slot) {
+      return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;
+    },
+    async getUnsubscribedAttendances () {
+      try {
+        const unsubscribedList = await Attendances.listUnsubscribed({ course: this.course._id });
+        const formattedUnsubscribedAttendances = Object.keys(unsubscribedList)
+          .map(ul => ({
+            _id: unsubscribedList[ul][0].trainee._id,
+            trainee: unsubscribedList[ul][0].trainee,
+            attendances: unsubscribedList[ul].map(a => ({
+              _id: a._id,
+              duration: this.getSlotDuration(a.courseSlot),
+              step: a.courseSlot.step.name,
+              slot: { startDate: a.courseSlot.startDate, endDate: a.courseSlot.endDate },
+              trainer: formatIdentity(a.trainer.identity, 'FL'),
+              misc: a.misc,
+            })),
+          }));
+        this.unsubscribedAttendances = formattedUnsubscribedAttendances.map(attendance => ({
+          ...attendance,
+          attendancesCount: attendance.attendances.length,
+          totalDuration: this.getTotalDuration(attendance.attendances.map(a => a.slot)),
+        }));
+      } catch (e) {
+        console.error(e);
+        this.unsubscribedAttendances = [];
+        NotifyNegative('Erreur lors de la récupération des émargements annexes.');
+      }
+    },
   },
 };
 </script>
@@ -88,4 +192,12 @@ export default {
   grid-auto-rows: 1fr
   grid-template-columns: repeat(auto-fill, 224px)
   grid-gap: 16px
+.dates
+  width: 15%
+.trainer
+  width: 20%
+.step
+  width: 40%
+.misc
+  width: 10%
 </style>

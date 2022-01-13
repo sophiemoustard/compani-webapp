@@ -72,7 +72,7 @@ import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatDuration } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -142,10 +142,7 @@ export default {
         moment.duration()
       );
 
-      const paddedMinutes = this.padMinutes(total.minutes());
-      const hours = total.days() * 24 + total.hours();
-
-      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+      return formatDuration(total);
     },
     formatSlotTitle () {
       const slotsToPlanLength = this.courseSlotsToPlan.length;
@@ -223,9 +220,7 @@ export default {
     getSlotDuration (slot) {
       const duration = moment.duration(moment(slot.endDate).diff(slot.startDate));
 
-      const paddedMinutes = this.padMinutes(duration.minutes());
-
-      return paddedMinutes ? `${duration.hours()}h${paddedMinutes}` : `${duration.hours()}h`;
+      return formatDuration(duration);
     },
     formatSlotHour (slot) {
       return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;

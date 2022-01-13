@@ -56,9 +56,6 @@ export const courseMixin = {
     happened (sameDaySlots) {
       return moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
-    padMinutes (minutes) {
-      return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
-    },
     saveTmp (path) {
       this.tmpInput = this.getValue(path);
     },
