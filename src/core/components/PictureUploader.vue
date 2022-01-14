@@ -1,25 +1,30 @@
 <template>
   <div class="row" style="background: white">
     <div class="row justify-center col-xs-12" style="padding: 12px 0px;">
-      <cropper v-if="showCropper" ref="cropper" :src="image" class="cropper" :stencil-props="{ aspectRatio: 1/1 }" />
-      <ni-custom-img v-if="!showCropper && hasPicture" :image-source="pictureLink" alt="Photo de profil" />
-      <ni-custom-img v-if="!showCropper && !hasPicture" :image-source="DEFAULT_AVATAR" alt="Photo par défaut" />
+      <cropper v-if="displayCropper" ref="cropper" :src="image" class="cropper" :stencil-props="{ aspectRatio: 1/1 }" />
+      <ni-custom-img v-if="!displayCropper && hasPicture" :image-source="pictureLink" alt="Photo de profil" />
+      <ni-custom-img v-if="!displayCropper && !hasPicture" :image-source="DEFAULT_AVATAR" alt="Photo par défaut" />
     </div>
     <div class="row justify-center col-xs-12">
-      <div v-if="!showCropper && hasPicture">
-        <q-btn color="primary" round flat icon="mdi-square-edit-outline" size="1rem" @click="showCropper = true" />
-        <q-btn color="primary" round flat icon="delete" size="1rem" @click="validateImageDeletion" />
-        <q-btn color="primary" round flat icon="save_alt" size="1rem" type="a" :href="pictureDlLink(pictureLink)"
-          target="_blank" />
+      <div v-if="!displayCropper && hasPicture">
+        <ni-button icon="mdi-square-edit-outline" size="1rem" @click="displayCropper = true" />
+        <ni-button icon="delete" size="1rem" @click="validateImageDeletion" />
+        <ni-button icon="save_alt" size="1rem" type="a" :href="pictureDlLink(pictureLink)" />
       </div>
-      <div v-if="showCropper">
-        <q-btn color="primary" round flat size="1rem" icon="close" @click="showCropper = false" />
-        <q-btn color="primary" round flat size="1rem" icon="rotate_left" @click="() => rotate(-90)" />
-        <q-btn color="primary" round flat size="1rem" icon="rotate_right" @click="() => rotate(90)" />
-        <q-btn color="primary" round flat size="1rem" icon="done" @click="uploadImage" :loading="loadingImage" />
+      <div v-if="displayCropper">
+        <ni-button size="1rem" icon="close" @click="displayCropper = false" />
+        <ni-button size="1rem" icon="rotate_left" @click="() => rotate(-90)" />
+        <ni-button size="1rem" icon="rotate_right" @click="() => rotate(90)" />
+        <ni-button size="1rem" icon="done" @click="uploadImage" :loading="loadingImage" />
       </div>
-      <input v-if="!showCropper && !hasPicture" type="file" ref="file" @change="loadImage($event)" accept="image/*"
-        class="q-my-md">
+      <div v-if="!displayCropper && !hasPicture" class="row input-file-container" @click="openFileSelection">
+        <span class="input-file-empty">Ajouter une photo</span>
+        <i aria-hidden="true" class="q-icon on-right material-icons self-center relative-position">
+          add
+          <input ref="file" type="file" class="input-file absolute-full cursor-pointer" accept="image/*"
+            @change="loadImage($event)">
+        </i>
+      </div>
     </div>
   </div>
 </template>
@@ -29,6 +34,7 @@ import { Cropper } from 'vue-advanced-cropper';
 import 'vue-advanced-cropper/dist/style.css';
 import get from 'lodash/get';
 import Users from '@api/Users';
+import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import CustomImg from '@components/form/CustomImg';
 import { DEFAULT_AVATAR } from '@data/constants';
@@ -43,11 +49,12 @@ export default {
   components: {
     cropper: Cropper,
     'ni-custom-img': CustomImg,
+    'ni-button': Button,
   },
   data () {
     return {
       image: '',
-      showCropper: false,
+      displayCropper: false,
       loadingImage: false,
       fileChosen: false,
       DEFAULT_AVATAR,
@@ -74,6 +81,9 @@ export default {
     this.image = get(this.user, 'picture.link') || '';
   },
   methods: {
+    openFileSelection () {
+      this.$refs.file.click();
+    },
     loadImage (event) {
       const { files } = event.target;
 
@@ -85,7 +95,7 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => { this.image = blob; };
         reader.readAsArrayBuffer(files[0]);
-        this.showCropper = true;
+        this.displayCropper = true;
       }
     },
     rotate (angle) {
@@ -105,7 +115,7 @@ export default {
             await Users.uploadImage(this.user._id, data);
             await this.refreshPicture();
 
-            this.showCropper = false;
+            this.displayCropper = false;
             this.loadingImage = false;
           },
           'image/jpeg'
@@ -150,4 +160,16 @@ export default {
 .cropper
   height: 150px
   width: 150px
+
+.input-file-container
+  padding: 6px 10px
+  cursor: pointer
+  .input-file-empty
+    font-size: 14px
+  .input-file
+    opacity: 0
+    max-width: 100%
+    height: 100%
+    width: 100%
+    font-size: 0
 </style>
