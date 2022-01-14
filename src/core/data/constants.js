@@ -292,6 +292,7 @@ export const FUNDING = 'funding';
 export const RUP = 'rup';
 export const REFERENT = 'referent';
 export const WORKING_EVENT = 'working_event';
+export const TRANSPORT = 'transport';
 export const EXPORT_TYPES = [
   { label: 'Services', value: SERVICE },
   { label: 'Souscriptions', value: SUBSCRIPTION },
@@ -310,6 +311,7 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Absences', value: ABSENCE },
   { label: 'Paies et soldes tout compte', value: PAY },
   { label: 'Contrats', value: CONTRACT },
+  { label: 'Transports', value: TRANSPORT },
 ];
 export const COURSE = 'course';
 export const VENDOR_EXPORT_HISTORY_TYPES = [{ label: 'Formations', value: COURSE }];
