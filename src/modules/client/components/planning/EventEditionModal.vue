@@ -266,8 +266,7 @@ export default {
       return this.isHourlyAbsence(this.editedEvent) || this.isHalfDailyAbsence(this.editedEvent);
     },
     isAbsenceStartHourDisabled () {
-      return !this.isIllnessOrWorkAccident(this.editedEvent) && !this.isHourlyAbsence(this.editedEvent) &&
-        !this.isHalfDailyAbsence(this.editedEvent);
+      return this.isDailyAbsence(this.editedEvent) && !this.isIllnessOrWorkAccident(this.editedEvent);
     },
   },
   methods: {
