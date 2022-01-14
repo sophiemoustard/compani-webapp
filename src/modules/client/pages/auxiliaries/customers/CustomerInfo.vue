@@ -1,10 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <div v-if="customer">
-      <div class="row items-center col-xs-12 header-margin q-mb-xl">
-        <ni-button class="on-left self-center" icon="arrow_back" color="primary" @click="$router.go(-1)" />
-        <ni-title-header :title="formatIdentity(customer.identity, 'FL')" />
-      </div>
+      <customer-profil-header :profile-id="customerId" :title="formatIdentity(customer.identity, 'FL')" />
       <profile-follow-up />
     </div>
   </q-page>
@@ -14,17 +11,15 @@
 import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import { formatIdentity } from '@helpers/utils';
-import Button from '@components/Button';
-import TitleHeader from '@components/TitleHeader';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
+import CustomerProfileHeader from '../../../components/customers/CustomerProfileHeader';
 
 const metaInfo = { title: 'Fiche bénéficiaire' };
 
 export default {
   components: {
-    'ni-title-header': TitleHeader,
-    'ni-button': Button,
     'profile-follow-up': ProfileFollowUp,
+    'customer-profil-header': CustomerProfileHeader,
   },
   props: {
     customerId: { type: String, required: true },
