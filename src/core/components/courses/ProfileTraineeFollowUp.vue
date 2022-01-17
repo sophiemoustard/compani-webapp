@@ -91,18 +91,8 @@ export default {
           format: value => formatIdentity(value.identity, 'FL'),
           align: 'left',
         },
-        {
-          name: 'unexpectedAttendances',
-          label: 'Emargements imprévus',
-          field: 'attendancesCount',
-          align: 'center',
-        },
-        {
-          name: 'duration',
-          label: 'Durée',
-          field: 'totalDuration',
-          align: 'center',
-        },
+        { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
+        { name: 'duration', label: 'Durée', field: 'totalDuration', align: 'center' },
         { name: 'expand', label: '', field: '' },
       ],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
@@ -161,12 +151,12 @@ export default {
           course: this.course._id,
           ...(this.isClientInterface && { company: this.loggedUser.company._id }),
         };
-        const unsubscribedList = await Attendances.listUnsubscribed(query);
-        const formattedUnsubscribedAttendances = Object.keys(unsubscribedList)
-          .map(ul => ({
-            _id: unsubscribedList[ul][0].trainee._id,
-            trainee: unsubscribedList[ul][0].trainee,
-            attendances: unsubscribedList[ul].map(a => ({
+        const unsubscribedAttendancesGroupedByTrainees = await Attendances.listUnsubscribed(query);
+        const formattedUnsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByTrainees)
+          .map(traineeId => ({
+            _id: unsubscribedAttendancesGroupedByTrainees[traineeId][0].trainee._id,
+            trainee: unsubscribedAttendancesGroupedByTrainees[traineeId][0].trainee,
+            attendances: unsubscribedAttendancesGroupedByTrainees[traineeId].map(a => ({
               _id: a._id,
               duration: this.getSlotDuration(a.courseSlot),
               step: get(a, 'courseSlot.step.name'),
