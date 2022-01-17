@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { createMetaMixin } from 'quasar';
+import { useMeta } from 'quasar';
 import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
@@ -19,20 +19,20 @@ import ProfileCourses from '@components/learners/ProfileCourses';
 import { formatIdentity } from '@helpers/utils';
 import { ROLE_TRANSLATION } from '@data/constants';
 
-const metaInfo = { title: 'Fiche apprenant' };
-
 export default {
   name: 'LearnerProfile',
   props: {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
-  mixins: [createMetaMixin(metaInfo)],
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
   },
   setup (props) {
+    const metaInfo = { title: 'Fiche apprenant' };
+    useMeta(metaInfo);
+
     const userIdentity = ref('');
     const tabsContent = [
       { label: 'Infos personnelles', name: 'info', default: props.defaultTab === 'info', component: ProfileInfo },
