@@ -11,7 +11,7 @@ import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneF
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (company, isClientInterface, refresh) => {
+export const useLearners = (refresh, isClientInterface, company) => {
   const newLearner = ref({
     identity: { firstname: '', lastname: '' },
     contact: { phone: '' },

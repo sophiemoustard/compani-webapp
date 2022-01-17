@@ -26,8 +26,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
+import { onMounted } from 'vue';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Companies from '@api/Companies';
@@ -50,9 +49,6 @@ export default {
     const metaInfo = { title: 'Répertoire apprenants' };
     useMeta(metaInfo);
 
-    const $store = useStore();
-    const company = computed(() => $store.getters['main/getCompany']);
-
     const refresh = async () => getLearnerList();
 
     const {
@@ -70,11 +66,9 @@ export default {
       getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    } = useLearners(company, false, refresh);
+    } = useLearners(refresh, false, null);
 
-    onMounted(async () => {
-      await getLearnerList(company.value._id);
-    });
+    onMounted(async () => { await refresh(); });
 
     const nextStepLearnerCreationModal = async () => {
       try {
