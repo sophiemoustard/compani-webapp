@@ -31,7 +31,8 @@
         </template>
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
-            <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props" class="q-my-sm row">
+            <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
+              class="q-ma-sm expanding-table-expanded-row">
               <div class="dates text-italic">{{ formatDate(attendance.slot.startDate) }}</div>
               <div class="dates text-italic">{{ formatSlotHour(attendance.slot) }} ({{ attendance.duration }})</div>
               <div class="trainer text-italic">{{ attendance.trainer }}</div>
