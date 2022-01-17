@@ -29,7 +29,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
+        <ni-expanding-table :data="courses" :columns="columns" :loading="loading" v-model:pagination="pagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'progress'">
@@ -94,12 +94,7 @@ export default {
       isVendorInterface: /\/ad\//.test(this.$route.path),
       courses: [],
       loading: false,
-      pagination: {
-        sortBy: 'name',
-        descending: false,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
       columns: [
         {
           name: 'name',
