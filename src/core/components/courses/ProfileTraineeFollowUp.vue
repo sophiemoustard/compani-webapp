@@ -14,7 +14,7 @@
     <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="loading" class="q-mb-xl"
       is-blended />
     <div v-if="unsubscribedAttendances.length">
-      <div class="text-italic">
+      <div class="text-italic q-ma-xs">
         Certains stagiaires inscrits à cette formation ont émargé dans d’autres formations du même programme
       </div>
       <ni-expanding-table :data="unsubscribedAttendances" :columns="columns" :pagination="pagination"
@@ -24,9 +24,7 @@
             <template v-if="col.name === 'expand'">
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
-            <template v-else>
-              {{ col.value }}
-            </template>
+            <template v-else>{{ col.value }}</template>
           </q-td>
         </template>
         <template #expanding-row="{ props }">
@@ -96,7 +94,6 @@ export default {
         { name: 'expand', label: '', field: '' },
       ],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
-      formatDate,
     };
   },
   async created () {
@@ -176,6 +173,7 @@ export default {
         NotifyNegative('Erreur lors de la récupération des émargements annexes.');
       }
     },
+    formatDate,
   },
 };
 </script>
