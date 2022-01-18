@@ -106,7 +106,7 @@ export default {
 
         if (course.value.type === INTRA) query = { company: get(course.value, 'company._id') };
         if (course.value.type === INTER_B2B) {
-          query = isClientInterface.value ? { company: get(loggedUser, 'company._id') } : { hasCompany: true };
+          query = isClientInterface ? { company: get(loggedUser.value, 'company._id') } : { hasCompany: true };
         }
 
         potentialTrainees.value = Object.freeze(await Users.learnerList(query));

@@ -48,7 +48,7 @@
 <script>
 import get from 'lodash/get';
 import { FORTHCOMING, COMPLETED, IN_PROGRESS, INTRA } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatDuration } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -89,10 +89,7 @@ export default {
         );
       }
 
-      const paddedMinutes = this.padMinutes(slotsDuration.minutes());
-      const hours = slotsDuration.days() * 24 + slotsDuration.hours();
-
-      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+      return formatDuration(slotsDuration);
     },
     courseSlotsCount () {
       return this.course.slots.length;

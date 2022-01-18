@@ -167,7 +167,7 @@ export const useLearners = (company, isClientInterface, refresh) => {
   };
 
   const updateSearch = (value) => {
-    this.searchStr = value;
+    searchStr.value = value;
   };
 
   return {
