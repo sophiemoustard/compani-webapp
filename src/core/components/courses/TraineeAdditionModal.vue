@@ -5,16 +5,16 @@
       </template>
       <ni-select in-modal :model-value="newTrainee" @update:model-value="update" caption="Stagiaire"
         :options="traineesOptions" required-field option-slot :error="validations.$error">
-        <template #option="scope">
-          <q-item v-bind="scope.scope.itemProps" v-on="scope.scope.itemEvents">
+        <template #option="{ scope }">
+          <q-item v-bind="scope.itemProps">
             <q-item-section avatar>
-              <img class="avatar" :src="scope.scope.opt.picture">
+              <img class="avatar" :src="scope.opt.picture">
             </q-item-section>
             <q-item-section>
-              <q-item-label>{{ scope.scope.opt.label }}</q-item-label>
+              <q-item-label>{{ scope.opt.label }}</q-item-label>
               <q-item-label class="details">
-                <div class="q-mb-xs">{{ scope.scope.opt.email }}</div>
-                <div>{{ scope.scope.opt.company }}</div>
+                <div class="q-mb-xs">{{ scope.opt.email }}</div>
+                <div>{{ scope.opt.company }}</div>
               </q-item-label>
             </q-item-section>
           </q-item>
