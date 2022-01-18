@@ -2,6 +2,7 @@ import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, email, requiredIf } from '@vuelidate/validators';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import Email from '@api/Email';
@@ -11,7 +12,7 @@ import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneF
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (company, isClientInterface, refresh) => {
+export const useLearners = (refresh, isClientInterface, company) => {
   const newLearner = ref({
     identity: { firstname: '', lastname: '' },
     contact: { phone: '' },
@@ -99,7 +100,7 @@ export const useLearners = (company, isClientInterface, refresh) => {
   };
 
   const formatUserPayload = () => {
-    const payload = removeEmptyProps(newLearner.value);
+    const payload = removeEmptyProps(pick(newLearner.value, ['identity', 'local', 'contact', 'company']));
     if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(newLearner.value.contact.phone);
 
     return isClientInterface ? { ...payload, company: company._id } : payload;

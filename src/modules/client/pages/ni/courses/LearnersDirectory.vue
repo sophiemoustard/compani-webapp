@@ -68,11 +68,9 @@ export default {
       getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    } = useLearners(company, true, refresh);
+    } = useLearners(refresh, true, company);
 
-    onMounted(async () => {
-      await getLearnerList(company.value._id);
-    });
+    onMounted(async () => { await refresh(); });
 
     const nextStepLearnerCreationModal = async () => {
       try {

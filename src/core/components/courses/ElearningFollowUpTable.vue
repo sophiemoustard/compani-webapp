@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="text-weight-bold">Progression eLearning</p>
-    <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
+    <ni-expanding-table :data="learners" :columns="columns" v-model:pagination="pagination" :hide-bottom="false"
       :loading="loading" :visible-columns="visibleColumns">
       <template #row="{ props }">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">

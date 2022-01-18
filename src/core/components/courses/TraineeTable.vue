@@ -135,7 +135,7 @@ export default {
       getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    } = useLearners(company, false, refresh);
+    } = useLearners(refresh, false, company);
 
     onMounted(async () => {
       await getLearnerList(company.value._id);
