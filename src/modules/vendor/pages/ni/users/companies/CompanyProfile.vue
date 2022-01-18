@@ -7,7 +7,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { computed, ref, watch, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import { COMPANY_TYPES } from '@data/constants';
@@ -50,16 +50,18 @@ export default {
       }
     };
 
-    const refreshCompanyName = () => { companyName.value = get(company, 'value.name') || ''; }
+    const refreshCompanyName = () => { companyName.value = get(company, 'value.name') || ''; };
 
     watch(company, refreshCompanyName);
 
-    onMounted(async () => {
+    const created = async () => {
       if (!company.value) await refreshCompany();
       refreshCompanyName();
-    });
+    };
 
     onBeforeUnmount(() => $store.dispatch('company/resetCompany'));
+
+    created();
 
     return {
       // Data
