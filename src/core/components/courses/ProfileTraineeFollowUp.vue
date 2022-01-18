@@ -176,12 +176,23 @@ export default {
   grid-auto-rows: 1fr
   grid-template-columns: repeat(auto-fill, 224px)
   grid-gap: 16px
+
 .dates
   width: 15%
+
 .trainer
   width: 20%
+
 .step
   width: 40%
+
 .misc
   width: 10%
+
+.expanding-table-expanded-row
+  div
+    justify-content: center
+    display: flex
+    align-items: center
+    text-align: center
 </style>
