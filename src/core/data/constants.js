@@ -312,7 +312,11 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Contrats', value: CONTRACT },
 ];
 export const COURSE = 'course';
-export const VENDOR_EXPORT_HISTORY_TYPES = [{ label: 'Formations', value: COURSE }];
+export const COURSE_SLOT = 'course_slot';
+export const VENDOR_EXPORT_HISTORY_TYPES = [
+  { label: 'Formations', value: COURSE },
+  { label: 'Créneaux', value: COURSE_SLOT },
+];
 
 // ORIGINS
 export const COMPANI = 'compani';
