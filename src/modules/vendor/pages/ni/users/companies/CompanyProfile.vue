@@ -42,8 +42,6 @@ export default {
     });
     const headerInfo = computed(() => [{ icon: 'bookmark_border', label: companyTypeLabel.value }]);
 
-    watch(company, () => { companyName.value = get(company, 'value.name') || ''; });
-
     const refreshCompany = async () => {
       try {
         await $store.dispatch('company/fetchCompany', { companyId: props.companyId });
@@ -52,9 +50,13 @@ export default {
       }
     };
 
+    const refreshCompanyName = () => { companyName.value = get(company, 'value.name') || ''; }
+
+    watch(company, refreshCompanyName);
+
     onMounted(async () => {
       if (!company.value) await refreshCompany();
-      companyName.value = get(company.value, 'name') || '';
+      refreshCompanyName();
     });
 
     onBeforeUnmount(() => $store.dispatch('company/resetCompany'));
