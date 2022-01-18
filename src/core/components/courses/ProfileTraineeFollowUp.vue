@@ -19,14 +19,6 @@
       </div>
       <ni-expanding-table :data="unsubscribedAttendances" :columns="columns" :pagination="pagination"
         :hide-bottom="false" :loading="loading">
-        <template #row="{ props }">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <template v-if="col.name === 'expand'">
-              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </template>
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
             <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"

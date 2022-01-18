@@ -10,7 +10,14 @@
       </template>
       <template #body="props">
         <q-tr :props="props" @click="props.expand = !props.expand" class="cursor-pointer">
-          <slot name="row" :props="props" />
+          <slot name="row" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'expand'">
+                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </slot>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
           <slot name="expanding-row" :props="props" />
