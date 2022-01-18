@@ -17,17 +17,9 @@
           pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
-        <template #message>
-          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
-          les attestations de fin de formation.
-        </template>
-      </ni-banner>
       <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
         :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
-      <ni-bi-color-button icon="file_download" label="Attestations de fin de formation"
-        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates" size="16px" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
@@ -100,7 +92,7 @@ import {
   formatAndSortIdentityOptions,
 } from '@helpers/utils';
 import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
-import { downloadFile, downloadZip } from '@helpers/file';
+import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -173,9 +165,6 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    disableDownloadCompletionCertificates () {
-      return this.disableDocDownload || !get(this.course, 'subProgram.program.learningGoals');
-    },
     isFinished () {
       const slots = this.course.slots.filter(slot => moment().isBefore(slot.startDate));
       return !slots.length && !this.course.slotsToPlan.length;
@@ -349,20 +338,6 @@ export default {
           return NotifyNegative(message);
         }
         NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
-      } finally {
-        this.pdfLoading = false;
-      }
-    },
-    async downloadCompletionCertificates () {
-      if (this.disableDownloadCompletionCertificates) return;
-
-      try {
-        this.pdfLoading = true;
-        const pdf = await Courses.downloadCompletionCertificates(this.course._id);
-        downloadZip(pdf, 'attestations.zip');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement des attestations.');
       } finally {
         this.pdfLoading = false;
       }

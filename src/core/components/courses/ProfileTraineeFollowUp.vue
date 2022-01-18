@@ -4,6 +4,17 @@
       <p class="text-weight-bold">Émargements</p>
       <attendance-table :course="course" />
     </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Attestations de formation</p>
+      <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
+        <template #message>
+          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
+          les attestations de fin de formation.
+        </template>
+      </ni-banner>
+      <ni-bi-color-button icon="file_download" label="Attestations"
+        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates" size="16px" />
+    </div>
     <div v-if="areQuestionnaireAnswersVisible" class="q-mb-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaires-container">
@@ -46,20 +57,26 @@ import AttendanceTable from '@components/table/AttendanceTable';
 import ExpandingTable from '@components/table/ExpandingTable';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
+import BiColorButton from '@components/BiColorButton';
+import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
 import { upperCaseFirstLetter, formatDuration, formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
+import { downloadZip } from '@helpers/file';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileTraineeFollowUp',
-  mixins: [traineeFollowUpTableMixin],
+  mixins: [traineeFollowUpTableMixin, courseMixin],
   components: {
     'elearning-follow-up-table': ElearningFollowUpTable,
     'attendance-table': AttendanceTable,
     'ni-expanding-table': ExpandingTable,
     'questionnaire-answers-cell': QuestionnaireAnswersCell,
+    'ni-bi-color-button': BiColorButton,
+    'ni-banner': Banner,
   },
   props: {
     profileId: { type: String, required: true },
@@ -102,8 +119,12 @@ export default {
     courseHasElearningStep () {
       return this.course.subProgram.steps.some(step => step.type === E_LEARNING);
     },
+    disableDownloadCompletionCertificates () {
+      return this.disableDocDownload || !get(this.course, 'subProgram.program.learningGoals');
+    },
   },
   methods: {
+    get,
     async refreshQuestionnaires () {
       try {
         this.questionnaires = await Courses.getCourseQuestionnaires(this.course._id);
@@ -166,6 +187,20 @@ export default {
       }
     },
     formatDate,
+    async downloadCompletionCertificates () {
+      if (this.disableDownloadCompletionCertificates) return;
+
+      try {
+        this.pdfLoading = true;
+        const pdf = await Courses.downloadCompletionCertificates(this.course._id);
+        downloadZip(pdf, 'attestations.zip');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement des attestations.');
+      } finally {
+        this.pdfLoading = false;
+      }
+    },
   },
 };
 </script>
