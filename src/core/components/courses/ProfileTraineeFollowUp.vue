@@ -147,7 +147,6 @@ export default {
             attendances: unsubscribedAttendancesGroupedByTrainees[traineeId].map(a => ({
               _id: a._id,
               duration: this.getSlotDuration(a.courseSlot),
-              step: get(a, 'courseSlot.step.name'),
               slot: { startDate: a.courseSlot.startDate, endDate: a.courseSlot.endDate },
               trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
               misc: a.misc,
@@ -196,4 +195,5 @@ export default {
     align-items: center
     justify-content: flex-start
     margin-right: 2%
+    word-break: break-word
 </style>
