@@ -43,12 +43,11 @@ export const usePlanningAction = (personKey, customers) => {
           maxDate: getCustomerStoppedDate(newEvent.value) ? maxDate(getCustomerStoppedDate(newEvent.value)) : '',
         },
         endDate: {
-          required: requiredIf(newEvent.value.type !== ABSENCE ||
-            get(newEvent.value, 'absenceNature') === DAILY),
+          required: requiredIf(newEvent.value.type !== ABSENCE || get(newEvent.value, 'absenceNature') === DAILY),
         },
       },
       auxiliary: {
-        required: requiredIf(item => (newEvent.value.type !== INTERVENTION || personKey === CUSTOMER)),
+        required: requiredIf(newEvent.value.type !== INTERVENTION || personKey === CUSTOMER),
       },
       customer: { required: requiredIf(newEvent.value.type === INTERVENTION) },
       subscription: { required: requiredIf(newEvent.value.type === INTERVENTION) },
@@ -65,15 +64,15 @@ export const usePlanningAction = (personKey, customers) => {
         fullAddress: newEvent.value.type === INTERNAL_HOUR ? { frAddress } : {},
       },
       repetition: {
-        frequency: { required: requiredIf(() => newEvent.value.type !== ABSENCE) },
+        frequency: { required: requiredIf(newEvent.value.type !== ABSENCE) },
       },
       attachment: {
         driveId: {
-          required: requiredIf(() => newEvent.value.type === ABSENCE &&
+          required: requiredIf(newEvent.value.type === ABSENCE &&
             [ILLNESS, WORK_ACCIDENT].includes(get(newEvent.value, 'absence'))),
         },
         link: {
-          required: requiredIf(() => newEvent.value.type === ABSENCE &&
+          required: requiredIf(newEvent.value.type === ABSENCE &&
           [ILLNESS, WORK_ACCIDENT].includes(get(newEvent.value, 'absence'))),
         },
       },
@@ -90,7 +89,7 @@ export const usePlanningAction = (personKey, customers) => {
         endDate: { required },
       },
       auxiliary: { required: requiredIf(editedEvent.value.type !== INTERVENTION) },
-      sector: { required: requiredIf(item => item && !item.auxiliary) },
+      sector: { required: requiredIf(!editedEvent.value.auxiliary) },
       customer: { required: requiredIf(editedEvent.value.type === INTERVENTION) },
       subscription: { required: requiredIf(editedEvent.value.type === INTERVENTION) },
       internalHour: { required: requiredIf(editedEvent.value.type === INTERNAL_HOUR) },
@@ -104,21 +103,17 @@ export const usePlanningAction = (personKey, customers) => {
       },
       attachment: {
         driveId: {
-          required: requiredIf(() => editedEvent.value.type === ABSENCE &&
+          required: requiredIf(editedEvent.value.type === ABSENCE &&
             [ILLNESS, WORK_ACCIDENT].includes(editedEvent.value.absence)),
         },
         link: {
-          required: requiredIf(() => editedEvent.value.type === ABSENCE &&
+          required: requiredIf(editedEvent.value.type === ABSENCE &&
             [ILLNESS, WORK_ACCIDENT].includes(editedEvent.value.absence)),
         },
       },
       cancel: {
-        condition: {
-          required: requiredIf(() => editedEvent.value.type === INTERVENTION && editedEvent.value.isCancelled),
-        },
-        reason: {
-          required: requiredIf(() => editedEvent.value.type === INTERVENTION && editedEvent.value.isCancelled),
-        },
+        condition: { required: requiredIf(editedEvent.value.type === INTERVENTION && editedEvent.value.isCancelled) },
+        reason: { required: requiredIf(editedEvent.value.type === INTERVENTION && editedEvent.value.isCancelled) },
       },
       misc: {
         required: requiredIf((editedEvent.value.type === ABSENCE && editedEvent.value.absence === OTHER) ||
