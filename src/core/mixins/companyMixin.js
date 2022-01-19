@@ -1,54 +1,7 @@
 import get from 'lodash/get';
-import { required, requiredIf, maxLength, minLength, email } from '@vuelidate/validators';
-import {
-  frAddress,
-  iban,
-  bic,
-  apeCode,
-  rcs,
-  validTradeName,
-} from '@helpers/vuelidateCustomVal';
-import { COMPANY, ASSOCIATION, REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export const companyMixin = {
-  data () {
-    return {
-      companyValidation: {
-        apeCode: { required, apeCode },
-        ics: { required },
-        name: { required },
-        tradeName: { validTradeName },
-        type: { required },
-        rcs: {
-          required: requiredIf(item => item.type === COMPANY),
-          rcs,
-          maxLength: maxLength(9),
-          minLength: minLength(9),
-        },
-        rna: {
-          required: requiredIf(item => item.type === ASSOCIATION),
-          rcs,
-          maxLength: maxLength(9),
-          minLength: minLength(9),
-        },
-        iban: { required, iban },
-        bic: { required, bic },
-        billingAssistance: { email },
-        legalRepresentative: {
-          lastname: { required },
-          firstname: { required },
-          position: { required },
-        },
-        address: {
-          zipCode: { required },
-          street: { required },
-          city: { required },
-          fullAddress: { required, frAddress },
-          location: { required },
-        },
-      },
-    };
-  },
   computed: {
     addressError () {
       const validation = this.v$.company.address.fullAddress;
