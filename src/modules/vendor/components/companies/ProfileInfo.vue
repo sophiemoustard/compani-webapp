@@ -21,13 +21,14 @@
 <script>
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import pick from 'lodash/pick';
 import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { validTradeName } from '@helpers/vuelidateCustomVal';
 import { companyMixin } from '@mixins/companyMixin';
 
 export default {
@@ -43,7 +44,10 @@ export default {
   mixins: [companyMixin],
   validations () {
     return {
-      company: pick(this.companyValidation, ['name', 'tradeName']),
+      company: {
+        name: { required },
+        tradeName: { validTradeName },
+      },
     };
   },
   computed: {

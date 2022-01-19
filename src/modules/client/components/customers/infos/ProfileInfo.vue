@@ -275,7 +275,7 @@
 <script>
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf } from '@vuelidate/validators';
+import { required, requiredIf, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -511,9 +511,9 @@ export default {
             fullAddress: { required, frAddress },
           },
           secondaryAddress: {
-            zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-            street: { required: requiredIf(item => item && !!item.fullAddress) },
-            city: { required: requiredIf(item => item && !!item.fullAddress) },
+            zipCode: { required: requiredIf(get(this.customer, 'contact.secondaryAddress.fullAddress')) },
+            street: { required: requiredIf(get(this.customer, 'contact.secondaryAddress.fullAddress')) },
+            city: { required: requiredIf(get(this.customer, 'contact.secondaryAddress.fullAddress')) },
             fullAddress: { frAddress },
           },
         },
@@ -524,12 +524,14 @@ export default {
         },
       },
       newHelper: {
-        ...pick(this.userValidation, ['identity.lastname', 'local.email']),
         contact: { phone: { frPhoneNumber } },
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
       },
       editedHelper: {
-        ...pick(this.userValidation, ['identity.lastname', 'local.email']),
         contact: { phone: { frPhoneNumber } },
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
       },
       newSubscription: {
         service: { required },
@@ -546,12 +548,12 @@ export default {
         nature: { required },
         frequency: { required },
         ...this.getFundingValidation(this.newFunding),
-        fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForNewFunding) },
+        fundingPlanId: { required: requiredIf(this.needFundingPlanIdForNewFunding) },
 
       },
       editedFunding: {
         ...this.getFundingValidation(this.editedFunding),
-        fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForEditedFunding) },
+        fundingPlanId: { required: requiredIf(this.needFundingPlanIdForEditedFunding) },
       },
     };
   },
@@ -586,15 +588,15 @@ export default {
     getFundingValidation (funding) {
       return {
         amountTTC: {
-          required: requiredIf(item => item.nature === FIXED),
+          required: requiredIf(funding.nature === FIXED),
           minValue: value => (funding.nature === FIXED ? value > 0 : value == null),
         },
         unitTTCRate: {
-          required: requiredIf(item => item.nature === HOURLY),
+          required: requiredIf(funding.nature === HOURLY),
           minValue: value => (funding.nature === HOURLY ? value > 0 : value == null),
         },
         careHours: {
-          required: requiredIf(item => item.nature === HOURLY),
+          required: requiredIf(funding.nature === HOURLY),
           minValue: value => (funding.nature === HOURLY ? value > 0 : value == null),
 
         },
@@ -602,30 +604,31 @@ export default {
         startDate: { required },
         endDate: { minDate: minDate(funding.startDate) },
         customerParticipationRate: {
-          required: requiredIf(item => item.nature === HOURLY),
+          required: requiredIf(funding.nature === HOURLY),
           minValue: value => (funding.nature === HOURLY ? value >= 0 : value == null),
           maxValue: value => (funding.nature === HOURLY ? value < 100 : value == null),
         },
       };
     },
     careHoursErrorMessage (validations) {
-      if (!validations.careHours.required) return REQUIRED_LABEL;
-      if (!validations.careHours.minValue) return 'Nombre d\'heures invalide';
+      if (get(validations, 'careHours.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'careHours.minValue.$response') === false) return 'Nombre d\'heures invalide';
       return '';
     },
     amountTTCErrorMessage (validations) {
-      if (!validations.amountTTC.required) return REQUIRED_LABEL;
-      if (!validations.amountTTC.minValue) return 'Montant forfaitaire TTC invalide';
+      if (get(validations, 'amountTTC.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'amountTTC.minValue.$response') === false) return 'Montant forfaitaire TTC invalide';
       return '';
     },
     unitTTCRateErrorMessage (validations) {
-      if (!validations.unitTTCRate.required) return REQUIRED_LABEL;
-      if (!validations.unitTTCRate.minValue) return 'Prix unitaire TTC invalide';
+      if (get(validations, 'unitTTCRate.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'unitTTCRate.minValue.$response') === false) return 'Prix unitaire TTC invalide';
       return '';
     },
     customerParticipationRateErrorMessage (validations) {
-      if (!validations.customerParticipationRate.required) return REQUIRED_LABEL;
-      if (!validations.customerParticipationRate.minValue || !validations.customerParticipationRate.maxValue) {
+      if (get(validations, 'customerParticipationRate.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'customerParticipationRate.minValue.$response') === false ||
+        get(validations, 'customerParticipationRate.maxValue.$response') === false) {
         return 'Taux de participation invalide';
       }
       return '';
