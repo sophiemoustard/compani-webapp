@@ -52,7 +52,7 @@ export default {
     };
   },
   validations () {
-    return { accessCompany: { required: requiredIf(() => this.access === RESTRICTED_ACCESS) } };
+    return { accessCompany: { required: requiredIf(this.access === RESTRICTED_ACCESS) } };
   },
   methods: {
     hide () {
