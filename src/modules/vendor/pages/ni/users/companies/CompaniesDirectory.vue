@@ -56,12 +56,7 @@ export default {
     };
   },
   validations () {
-    return {
-      newCompany: {
-        name: { required },
-        type: { required },
-      },
-    };
+    return { newCompany: { name: { required }, type: { required } } };
   },
   async created () {
     await this.refreshCompanies();

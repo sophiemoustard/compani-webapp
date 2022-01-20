@@ -43,12 +43,7 @@ export default {
   },
   mixins: [companyMixin],
   validations () {
-    return {
-      company: {
-        name: { required },
-        tradeName: { validTradeName },
-      },
-    };
+    return { company: { name: { required }, tradeName: { validTradeName } } };
   },
   computed: {
     ...mapState('company', ['company']),
