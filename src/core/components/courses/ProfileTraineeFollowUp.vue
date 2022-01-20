@@ -34,11 +34,10 @@
           <q-td colspan="100%">
             <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
               class="q-ma-sm expanding-table-expanded-row">
-              <div class="dates text-italic">{{ formatDate(attendance.slot.startDate) }}</div>
-              <div class="dates text-italic">{{ formatSlotHour(attendance.slot) }} ({{ attendance.duration }})</div>
-              <div class="trainer text-italic">{{ attendance.trainer }}</div>
-              <div class="step text-italic">{{ attendance.step }}</div>
-              <div class="misc text-italic">{{ attendance.misc }}</div>
+              <div class="dates">{{ formatDate(attendance.slot.startDate) }}</div>
+              <div class="hours">{{ formatSlotHour(attendance.slot) }} ({{ attendance.duration }})</div>
+              <div class="misc">{{ attendance.misc }}</div>
+              <div class="trainer">{{ attendance.trainer }}</div>
             </div>
           </q-td>
         </template>
@@ -169,7 +168,6 @@ export default {
             attendances: unsubscribedAttendancesGroupedByTrainees[traineeId].map(a => ({
               _id: a._id,
               duration: this.getSlotDuration(a.courseSlot),
-              step: get(a, 'courseSlot.step.name'),
               slot: { startDate: a.courseSlot.startDate, endDate: a.courseSlot.endDate },
               trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
               misc: a.misc,
@@ -211,12 +209,26 @@ export default {
   grid-auto-rows: 1fr
   grid-template-columns: repeat(auto-fill, 224px)
   grid-gap: 16px
+
 .dates
-  width: 15%
-.trainer
-  width: 20%
-.step
-  width: 40%
-.misc
   width: 10%
+
+.hours
+  width: 15%
+
+.trainer
+  width: 50%
+
+.misc
+  width: 15%
+
+.expanding-table-expanded-row
+  justify-content: flex-start
+  div
+    justify-content: center
+    display: flex
+    align-items: center
+    justify-content: flex-start
+    margin-right: 2%
+    word-break: break-word
 </style>
