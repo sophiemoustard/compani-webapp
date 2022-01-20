@@ -35,6 +35,7 @@
 import { useMeta } from 'quasar';
 import { mapState, mapGetters } from 'vuex';
 import useVuelidate from '@vuelidate/core';
+import { required, requiredIf, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
@@ -50,6 +51,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
+import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/AuxiliaryCreationModal';
@@ -79,20 +81,14 @@ export default {
       sendWelcomeMsg: true,
       civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
-        identity: {
-          lastname: '',
-          firstname: '',
-          title: '',
-        },
+        identity: { lastname: '', firstname: '', title: '' },
         contact: {
           address: { fullAddress: '' },
           phone: '',
         },
         local: { email: '' },
         sector: '',
-        administrative: {
-          transportInvoice: { transportType: 'public' },
-        },
+        administrative: { transportInvoice: { transportType: 'public' } },
       },
       newUser: null,
       userList: [],
@@ -156,7 +152,28 @@ export default {
       REQUIRED_LABEL,
     };
   },
-  validations () { return { newUser: this.userValidation }; },
+  validations () {
+    return {
+      newUser: {
+        identity: {
+          lastname: { required },
+          firstname: { required },
+          title: { required },
+        },
+        contact: {
+          phone: { required, frPhoneNumber },
+          address: {
+            zipCode: { required: requiredIf(!!get(this.newUser, 'contact.address.fullAddress')) },
+            street: { required: requiredIf(!!get(this.newUser, 'contact.address.fullAddress')) },
+            city: { required: requiredIf(!!get(this.newUser, 'contact.address.fullAddress')) },
+            fullAddress: { frAddress },
+          },
+        },
+        local: { email: { required, email } },
+        sector: { required },
+      },
+    };
+  },
   async created () {
     this.newUser = cloneDeep(this.defaultNewUser);
     await this.getUserList();

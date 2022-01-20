@@ -45,11 +45,11 @@ export default {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         label: {
           left: {
-            required: requiredIf(() => !!get(this.card, 'label.right')),
+            required: requiredIf(!!get(this.card, 'label.right')),
             maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
           },
           right: {
-            required: requiredIf(() => !!get(this.card, 'label.left')),
+            required: requiredIf(!!get(this.card, 'label.left')),
             maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
           },
         },

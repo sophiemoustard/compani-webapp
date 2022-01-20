@@ -1,35 +1,9 @@
 import get from 'lodash/get';
-import { required, requiredIf, email } from '@vuelidate/validators';
 import { REQUIRED_LABEL } from '@data/constants';
-import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatPhoneForPayload } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 
 export const userMixin = {
-  data () {
-    return {
-      userValidation: {
-        identity: {
-          lastname: { required },
-          firstname: { required },
-          title: { required },
-        },
-        contact: {
-          phone: { required, frPhoneNumber },
-          address: {
-            zipCode: { required: requiredIf(item => !!item.fullAddress) },
-            street: { required: requiredIf(item => !!item.fullAddress) },
-            city: { required: requiredIf(item => !!item.fullAddress) },
-            fullAddress: { frAddress },
-          },
-        },
-        local: {
-          email: { required, email },
-        },
-        sector: { required },
-      },
-    };
-  },
   computed: {
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';

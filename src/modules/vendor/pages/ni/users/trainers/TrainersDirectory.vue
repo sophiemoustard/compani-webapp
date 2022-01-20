@@ -16,7 +16,7 @@
 <script>
 import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
-import pick from 'lodash/pick';
+import { required, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
@@ -58,7 +58,9 @@ export default {
     };
   },
   validations () {
-    return { newTrainer: { ...pick(this.userValidation, ['identity.lastname', 'local.email']) } };
+    return {
+      newTrainer: { identity: { lastname: { required } }, local: { email: { required, email } } },
+    };
   },
   computed: {
     filteredTrainers () {

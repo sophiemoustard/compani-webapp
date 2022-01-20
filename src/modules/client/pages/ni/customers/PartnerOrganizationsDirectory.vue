@@ -75,9 +75,9 @@ export default {
         name: { required },
         phone: { frPhoneNumber },
         address: {
-          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-          street: { required: requiredIf(item => item && !!item.fullAddress) },
-          city: { required: requiredIf(item => item && !!item.fullAddress) },
+          zipCode: { required: requiredIf(!!get(this.newPartnerOrganization, 'address.fullAddress')) },
+          street: { required: requiredIf(!!get(this.newPartnerOrganization, 'address.fullAddress')) },
+          city: { required: requiredIf(!!get(this.newPartnerOrganization, 'address.fullAddress')) },
           fullAddress: { frAddress },
         },
         email: { email },

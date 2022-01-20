@@ -102,7 +102,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import set from 'lodash/set';
 import useVuelidate from '@vuelidate/core';
-import { required, maxLength } from '@vuelidate/validators';
+import { required, requiredIf, maxLength, minLength, email } from '@vuelidate/validators';
 import Establishments from '@api/Establishments';
 import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
@@ -110,11 +110,16 @@ import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANY } from '@data/constants';
+import { COMPANY, ASSOCIATION } from '@data/constants';
 import { urssafCodes as urssafCodeList } from '@data/urssafCodes';
 import { workHealthServices as workHealthServiceList } from '@data/workHealthServices';
 import {
   frAddress,
+  iban,
+  bic,
+  apeCode,
+  rcs,
+  validTradeName,
   validWorkHealthService,
   validUrssafCode,
   validSiret,
@@ -209,7 +214,40 @@ export default {
   },
   validations () {
     return {
-      company: this.companyValidation,
+      company: {
+        apeCode: { required, apeCode },
+        ics: { required },
+        name: { required },
+        tradeName: { validTradeName },
+        type: { required },
+        rcs: {
+          required: requiredIf(this.company.type === COMPANY),
+          rcs,
+          maxLength: maxLength(9),
+          minLength: minLength(9),
+        },
+        rna: {
+          required: requiredIf(this.company.type === ASSOCIATION),
+          rcs,
+          maxLength: maxLength(9),
+          minLength: minLength(9),
+        },
+        iban: { required, iban },
+        bic: { required, bic },
+        billingAssistance: { email },
+        legalRepresentative: {
+          lastname: { required },
+          firstname: { required },
+          position: { required },
+        },
+        address: {
+          zipCode: { required },
+          street: { required },
+          city: { required },
+          fullAddress: { required, frAddress },
+          location: { required },
+        },
+      },
       newEstablishment: this.establishmentValidation,
       editedEstablishment: this.establishmentValidation,
     };

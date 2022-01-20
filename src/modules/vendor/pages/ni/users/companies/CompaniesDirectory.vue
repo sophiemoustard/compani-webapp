@@ -16,7 +16,7 @@
 <script>
 import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
-import pick from 'lodash/pick';
+import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
 import escapeRegExp from 'lodash/escapeRegExp';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -56,9 +56,7 @@ export default {
     };
   },
   validations () {
-    return {
-      newCompany: pick(this.companyValidation, ['type', 'name']),
-    };
+    return { newCompany: { name: { required }, type: { required } } };
   },
   async created () {
     await this.refreshCompanies();

@@ -189,8 +189,8 @@ export default {
     const creditNoteValidation = {
       date: { required },
       customer: { required },
-      events: { required: requiredIf(() => this.hasLinkedEvents) },
-      subscription: { required: requiredIf(() => !this.hasLinkedEvents) },
+      events: { required: requiredIf(this.hasLinkedEvents) },
+      subscription: { required: requiredIf(!this.hasLinkedEvents) },
       inclTaxesTpp: {},
       inclTaxesCustomer: {},
     };
@@ -372,17 +372,13 @@ export default {
     datesValidations (minAndMaxDates, creditNote) {
       return {
         startDate: {
-          required: requiredIf(() => this.hasLinkedEvents),
-          maxDate: this.isValidDate(minAndMaxDates.maxStartDate)
-            ? maxDate(minAndMaxDates.maxStartDate)
-            : '',
+          required: requiredIf(this.hasLinkedEvents),
+          maxDate: this.isValidDate(minAndMaxDates.maxStartDate) ? maxDate(minAndMaxDates.maxStartDate) : '',
         },
         endDate: {
-          required: requiredIf(() => this.hasLinkedEvents),
+          required: requiredIf(this.hasLinkedEvents),
           minDate: creditNote.startDate
-            ? minDate(this.isValidDate(minAndMaxDates.minEndDate)
-              ? minAndMaxDates.minEndDate
-              : creditNote.startDate)
+            ? minDate(this.isValidDate(minAndMaxDates.minEndDate) ? minAndMaxDates.minEndDate : creditNote.startDate)
             : '',
         },
       };

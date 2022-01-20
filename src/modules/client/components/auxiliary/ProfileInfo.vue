@@ -360,7 +360,7 @@ export default {
           birthDate: { required },
           birthCountry: { required },
           birthState: {
-            required: requiredIf(() => this.userProfile.identity.birthCountry === 'FR'),
+            required: requiredIf(this.userProfile.identity.birthCountry === 'FR'),
             numeric,
             minLength: minLength(2),
             maxLength: maxLength(3),
