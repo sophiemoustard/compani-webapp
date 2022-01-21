@@ -4,7 +4,16 @@
       <p class="text-weight-bold">Émargements</p>
       <attendance-table :course="course" />
     </div>
-    <div class="q-mb-xl">
+    <div v-if="areQuestionnaireAnswersVisible" class="q-mb-xl">
+      <p class="text-weight-bold">Réponses aux questionnaires</p>
+      <div class="questionnaires-container">
+        <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
+          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
+      </div>
+    </div>
+    <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="loading" class="q-mb-xl"
+      is-blended />
+    <div class="q-mb-sm">
       <p class="text-weight-bold">Attestations de formation</p>
       <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
         <template #message>
@@ -15,15 +24,6 @@
       <ni-bi-color-button icon="file_download" label="Attestations"
         :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates" size="16px" />
     </div>
-    <div v-if="areQuestionnaireAnswersVisible" class="q-mb-xl">
-      <p class="text-weight-bold">Réponses aux questionnaires</p>
-      <div class="questionnaires-container">
-        <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
-          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
-      </div>
-    </div>
-    <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="loading" class="q-mb-xl"
-      is-blended />
     <div v-if="unsubscribedAttendances.length">
       <div class="text-italic q-ma-xs">
         Certains stagiaires inscrits à cette formation ont émargé dans d’autres formations du même programme
