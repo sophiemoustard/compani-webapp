@@ -453,7 +453,8 @@ export default {
 
       return availableServices.map(service => ({
         label: getLastVersion(service.versions, 'createdAt').name,
-        value: { _id: service._id, nature: service.nature },
+        value: service._id,
+        nature: service.nature,
       }));
     },
     primaryAddressError () {
@@ -705,7 +706,7 @@ export default {
     // Subscriptions
     formatCreatedSubscription () {
       const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
-      const formattedService = { service: service._id, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
+      const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
 
       if (sundays) formattedService.versions[0].sundays = sundays;
       if (evenings) formattedService.versions[0].evenings = evenings;

@@ -27,7 +27,7 @@ import Input from '@components/form/Input';
 import { FIXED } from '@data/constants';
 
 export default {
-  name: 'SubscriptionCreationModal',
+  name: 'SubscriptionEditionModal',
   props: {
     modelValue: { type: Boolean, default: false },
     editedSubscription: { type: Object, default: () => ({}) },
