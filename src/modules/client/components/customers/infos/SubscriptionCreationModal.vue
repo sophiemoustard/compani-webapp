@@ -12,9 +12,9 @@
     <ni-input in-modal :model-value="newSubscription.estimatedWeeklyVolume" type="number" required-field
       :error="validations.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
       @blur="validations.estimatedWeeklyVolume.$touch" @update:model-value="update($event, 'estimatedWeeklyVolume')" />
-    <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" :model-value="newSubscription.sundays"
+    <ni-input in-modal v-if="serviceNature !== FIXED" :model-value="newSubscription.sundays"
       caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')" />
-    <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" :model-value="newSubscription.evenings"
+    <ni-input in-modal v-if="serviceNature !== FIXED" :model-value="newSubscription.evenings"
       caption="Dont soirée (h)" last type="number" @update:model-value="update($event, 'evenings')" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -48,6 +49,12 @@ export default {
     return {
       FIXED,
     };
+  },
+  computed: {
+    serviceNature () {
+      const service = this.serviceOptions.find(s => s.value === this.newSubscription.service);
+      return get(service, 'nature') || '';
+    },
   },
   methods: {
     hide () {
