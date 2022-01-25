@@ -31,7 +31,7 @@
               {{ step.name }}
             </div>
             <div class="expanding-table-progress-container">
-              <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
+              <ni-progress class="expanding-table-sub-progress" :value="step.progress.eLearning" />
             </div>
           </div>
         </q-td>
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -89,7 +90,7 @@ export default {
         {
           name: 'progress',
           label: 'Progression',
-          field: 'progress',
+          field: row => get(row, 'progress.eLearning'),
           align: 'center',
           sortable: true,
           style: 'min-width: 150px; width: 20%',
