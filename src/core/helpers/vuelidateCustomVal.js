@@ -1,5 +1,6 @@
-import { isValidIBAN, isValidBIC } from 'ibantools';
 import axios from 'axios';
+import { helpers } from '@vuelidate/validators';
+import { isValidIBAN, isValidBIC } from 'ibantools';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
@@ -7,7 +8,7 @@ import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 export const frPhoneNumber = (value) => {
   if (!value) return true;
 
-  return value.match(/^[0]{1}[1-9]{1}[.\-\s]{0,1}([0-9]{2}[.\-\s]{0,1}){4}$/) || false;
+  return /^[0]{1}[1-9]{1}[.\-\s]{0,1}([0-9]{2}[.\-\s]{0,1}){4}$/.test(value) || false;
 };
 
 export const frZipCode = (value) => {
@@ -56,9 +57,9 @@ export const twoFractionDigits = value => /^\d*(\.\d{0,2})?$/.test(value);
 
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
-export const minDate = min => value => !value || new Date(min) <= new Date(value);
+export const minDate = min => helpers.withParams({ value: min }, value => !value || new Date(min) <= new Date(value));
 
-export const maxDate = max => value => !value || new Date(max) >= new Date(value);
+export const maxDate = max => helpers.withParams({ value: max }, value => !value || new Date(max) >= new Date(value));
 
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
 
@@ -132,10 +133,6 @@ export const validTagsCount = (value) => {
 };
 
 export const minArrayLength = minLength => value => value.filter(a => !!a).length >= minLength;
-
-export const maxArrayLength = maxLength => value => value.filter(a => !!a).length <= maxLength;
-
-export const minTextArrayLength = minLength => value => value.filter(a => !!a.text).length >= minLength;
 
 export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;
 

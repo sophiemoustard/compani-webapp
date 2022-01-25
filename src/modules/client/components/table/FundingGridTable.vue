@@ -1,6 +1,6 @@
 <template>
-  <q-table class="q-mb-xl" :data="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
-    :visible-columns="formattedVisibleColumns" :pagination.sync="paginationHistory">
+  <q-table class="q-mb-xl" :rows="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
+    :visible-columns="formattedVisibleColumns" v-model:pagination="paginationHistory">
     <template #item="props">
       <q-card class="full-width q-mb-md" flat bordered>
         <q-list separator dense>
@@ -67,11 +67,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .q-item__section--main
-    & > .q-item__label
+    .q-item__label
       font-size: 0.80rem
   .q-item__section--side
-    & > .q-item__label
+    .q-item__label
       text-align: right
 </style>

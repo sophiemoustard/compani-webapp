@@ -14,7 +14,7 @@ export default {
     icon: { type: String, default: 'warning' },
   },
   data () {
-    const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
+    const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
     return {
       backgroundClass: interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
     };
@@ -22,11 +22,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-banner
-  /deep/ .q-banner__content
-    display: flex;
+  :deep(.q-banner__content)
+    display: flex
     align-items: center
     .q-icon
-      margin-right: 5px
+      margin-right: 4px
 </style>

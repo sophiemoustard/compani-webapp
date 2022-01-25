@@ -3,8 +3,8 @@
     <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-cy="`col-${col.name}`"
       :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
       <template v-if="index === 0 && col.name === 'externalBilling' && bill.thirdPartyPayer">
-        <q-checkbox :value="bill.externalBilling" color="copper-grey-400" @input="update($event, 'externalBilling')"
-          dense />
+        <q-checkbox :model-value="bill.externalBilling" color="copper-grey-400" dense
+          @update:model-value="update($event, 'externalBilling')" />
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">
@@ -20,8 +20,8 @@
         <div class="cursor-pointer text-primary">
           {{ formatDate(bill.startDate) }}
           <q-menu>
-            <q-date :value="bill.startDate" :options="startDateOptions" mask="YYYY-MM-DD" minimal
-              @input="updateDate($event, 'startDate')" no-unset />
+            <q-date :model-value="bill.startDate" :options="startDateOptions" mask="YYYY-MM-DD" minimal
+              @update:model-value="updateDate($event, 'startDate')" no-unset />
           </q-menu>
         </div>
       </template>
@@ -45,8 +45,8 @@
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
     <q-td data-cy="col-selected-bill">
-      <q-checkbox v-if="index === 0 && displayCheckbox" :value="selected" @input="$emit('update:selected', $event)"
-        dense />
+      <q-checkbox v-if="index === 0 && displayCheckbox" :model-value="selected" dense
+        @update:model-value="$emit('update:selected', $event)" />
     </q-td>
   </q-tr>
 </template>
@@ -69,6 +69,7 @@ export default {
     index: { type: Number, default: () => 0 },
     displayCheckbox: { type: Boolean, default: () => false },
   },
+  emits: ['discount-click', 'update:selected', 'discount-input', 'update:bill', 'datetime-input'],
   methods: {
     formatPrice (value) {
       return formatPrice(value);
@@ -118,7 +119,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .border-top td
   border-width: 1px 0 0 0
 </style>

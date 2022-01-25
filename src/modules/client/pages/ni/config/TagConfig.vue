@@ -17,9 +17,13 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
+
+const metaInfo = { title: 'Tags' };
+
 export default {
   name: 'TagConfig',
-  metaInfo: { title: 'Tags' },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       contractTags: {
@@ -108,7 +112,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   th
     text-align: left
 </style>

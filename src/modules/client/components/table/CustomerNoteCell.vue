@@ -16,6 +16,7 @@ export default {
   props: {
     note: { type: Object, required: true },
   },
+  emits: ['open-edited-note-modal'],
   computed: {
     lastHistoryMessage () {
       if (!get(this.note, 'histories.length')) return '';
@@ -30,14 +31,14 @@ export default {
     get,
     formatDate,
     click () {
-      this.$emit('openEditedNoteModal', this.note);
+      this.$emit('open-edited-note-modal', this.note);
     },
   },
 };
 </script>
 
-<style lang="stylus" scoped>
-  .lastHistory
-    color: $copper-grey-500
-    font-size: 12px
+<style lang="sass" scoped>
+.lastHistory
+  color: $copper-grey-500
+  font-size: 12px
 </style>

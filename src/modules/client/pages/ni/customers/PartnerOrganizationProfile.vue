@@ -4,16 +4,16 @@
     <p class="text-weight-bold">Informations</p>
     <div class="row gutter-profile">
       <ni-input caption="Nom" v-model="partnerOrganization.name" @focus="saveTmp('name')"
-        @blur="updatePartnerOrganization('name')" :error="$v.partnerOrganization.name.$error" />
+        @blur="updatePartnerOrganization('name')" :error="v$.partnerOrganization.name.$error" />
       <ni-input caption="Téléphone" v-model="partnerOrganization.phone" @focus="saveTmp('phone')"
-        @blur="updatePartnerOrganization('phone')" :error="$v.partnerOrganization.phone.$error"
-        :error-message="phoneNumberError($v.partnerOrganization)" />
+        @blur="updatePartnerOrganization('phone')" :error="v$.partnerOrganization.phone.$error"
+        :error-message="phoneNumberError(v$.partnerOrganization)" />
       <ni-search-address v-model="partnerOrganization.address" @focus="saveTmp('address')"
-        @blur="updatePartnerOrganization('address')" :error="$v.partnerOrganization.address.$error"
-        :error-message="addressError($v.partnerOrganization)" />
+        @blur="updatePartnerOrganization('address')" :error="v$.partnerOrganization.address.$error"
+        :error-message="addressError(v$.partnerOrganization)" />
       <ni-input caption="Email" v-model="partnerOrganization.email" @focus="saveTmp('email')"
-        @blur="updatePartnerOrganization('email')" :error="$v.partnerOrganization.email.$error"
-        :error-message="emailError($v.partnerOrganization)" />
+        @blur="updatePartnerOrganization('email')" :error="v$.partnerOrganization.email.$error"
+        :error-message="emailError(v$.partnerOrganization)" />
     </div>
     <p class="text-weight-bold q-mt-lg">Partenaires</p>
     <q-card>
@@ -47,16 +47,18 @@
       </q-card-actions>
     </q-card>
 
-    <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner"
-      :validations="$v.newPartner" :loading="modalLoading" @hide="resetCreationModal" />
+    <partner-creation-modal v-model="partnerCreationModal" v-model:new-partner="newPartner" @submit="createPartner"
+      :validations="v$.newPartner" :loading="modalLoading" @hide="resetCreationModal" />
 
-    <partner-edition-modal v-model="partnerEditionModal" :edited-partner.sync="editedPartner" @submit="updatePartner"
-      :validations="$v.editedPartner" :loading="modalLoading" @hide="resetEditionModal" />
+    <partner-edition-modal v-model="partnerEditionModal" v-model:edited-partner="editedPartner" @submit="updatePartner"
+      :validations="v$.editedPartner" :loading="modalLoading" @hide="resetEditionModal" />
   </q-page>
 </template>
 
 <script>
-import { required, email, requiredIf } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required, email, requiredIf } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import omit from 'lodash/omit';
@@ -79,7 +81,6 @@ import PartnerEditionModal from 'src/modules/client/components/customers/Partner
 import { JOB_OPTIONS } from '@data/constants';
 
 export default {
-  metaInfo: { title: 'Fiche structure partenaire' },
   props: {
     partnerOrganizationId: { type: String, required: true },
   },
@@ -91,6 +92,12 @@ export default {
     'ni-expanding-table': ExpandingTable,
     'partner-creation-modal': PartnerCreationModal,
     'partner-edition-modal': PartnerEditionModal,
+  },
+  setup () {
+    const metaInfo = { title: 'Fiche structure partenaire' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   mixins: [validationMixin, partnerOrganizationMixin],
   data () {
@@ -137,28 +144,30 @@ export default {
       formatDate,
     };
   },
-  validations: {
-    partnerOrganization: {
-      name: { required },
-      phone: { frPhoneNumber },
-      address: {
-        zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-        street: { required: requiredIf(item => item && !!item.fullAddress) },
-        city: { required: requiredIf(item => item && !!item.fullAddress) },
-        fullAddress: { frAddress },
+  validations () {
+    return {
+      partnerOrganization: {
+        name: { required },
+        phone: { frPhoneNumber },
+        address: {
+          zipCode: { required: requiredIf(!!get(this.partnerOrganization, 'address.fullAddress')) },
+          street: { required: requiredIf(!!get(this.partnerOrganization, 'address.fullAddress')) },
+          city: { required: requiredIf(!!get(this.partnerOrganization, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        email: { email },
       },
-      email: { email },
-    },
-    newPartner: {
-      identity: { lastname: { required } },
-      phone: { frPhoneNumber },
-      email: { email },
-    },
-    editedPartner: {
-      identity: { lastname: { required } },
-      phone: { frPhoneNumber },
-      email: { email },
-    },
+      newPartner: {
+        identity: { lastname: { required } },
+        phone: { frPhoneNumber },
+        email: { email },
+      },
+      editedPartner: {
+        identity: { lastname: { required } },
+        phone: { frPhoneNumber },
+        email: { email },
+      },
+    };
   },
   async created () {
     await this.refreshPartnerOrganization();
@@ -182,8 +191,8 @@ export default {
         const value = get(this.partnerOrganization, path);
         if (this.tmpInput === value) return;
 
-        this.$v.partnerOrganization.$touch();
-        if (get(this.$v, `partnerOrganization.${path}.$error`)) return NotifyWarning('Champ(s) invalide(s).');
+        this.v$.partnerOrganization.$touch();
+        if (get(this.v$, `partnerOrganization.${path}.$error`)) return NotifyWarning('Champ(s) invalide(s).');
 
         let payload = set({}, path, value);
         if (payload.address && !payload.address.fullAddress) payload = { address: {} };
@@ -204,8 +213,8 @@ export default {
       try {
         this.modalLoading = true;
 
-        this.$v.newPartner.$touch();
-        if (this.$v.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+        this.v$.newPartner.$touch();
+        if (this.v$.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         await PartnerOrganization.createPartner(this.partnerOrganizationId, this.newPartner);
 
@@ -221,7 +230,7 @@ export default {
       }
     },
     resetCreationModal () {
-      this.$v.newPartner.$reset();
+      this.v$.newPartner.$reset();
       this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
     openPartnerEditionModal (row) {
@@ -232,8 +241,8 @@ export default {
       try {
         this.modalLoading = true;
 
-        this.$v.editedPartner.$touch();
-        if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+        this.v$.editedPartner.$touch();
+        if (this.v$.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         const payload = omit(this.editedPartner, ['_id', 'customerPartners', 'partnerOrganization']);
         await Partner.updateById(this.editedPartner._id, payload);
@@ -250,7 +259,7 @@ export default {
       }
     },
     resetEditionModal () {
-      this.$v.editedPartner.$reset();
+      this.v$.editedPartner.$reset();
       this.editedPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
   },

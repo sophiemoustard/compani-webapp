@@ -33,8 +33,8 @@ export const customerMixin = {
         if (path === 'contact.phone') this.customer.contact.phone = formatPhoneForPayload(this.customer.contact.phone);
         let value = path === 'referent' ? get(this.customer, 'referent._id', '') : get(this.customer, path);
         if (this.tmpInput === value) return;
-        if (get(this.$v.customer, path)) {
-          const isValid = await this.waitForValidation(this.$v.customer, path);
+        if (get(this.v$.customer, path)) {
+          const isValid = await this.waitForValidation(this.v$.customer, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (path === 'payment.iban') value = value.split(' ').join('');

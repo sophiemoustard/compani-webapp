@@ -5,8 +5,9 @@
         <div class="col-xs-12 col-sm-5 person-name">
           <template v-if="Object.keys(selectedAuxiliary).length > 0">
             <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-            <ni-select :value="selectedAuxiliary._id" :options="auxiliariesOptions" @input="updateAuxiliary" no-error
-              ref="personSelect" behavior="menu" icon="swap_vert" class="person-name-select" data-cy="agenda-search" />
+            <ni-select :model-value="selectedAuxiliary._id" :options="auxiliariesOptions" no-error
+              ref="personSelect" behavior="menu" icon="swap_vert" class="person-name-select" data-cy="agenda-search"
+              @update:model-value="updateAuxiliary" />
           </template>
         </div>
         <div class="col-xs-12 col-sm-7">
@@ -20,14 +21,14 @@
     </div>
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event="newEvent"
+    <ni-event-creation-modal :validations="eventValidation.newEvent" :loading="loading" :new-event="newEvent"
       :person-key="personKey" :creation-modal="creationModal" :internal-hours="internalHours"
       :active-auxiliaries="activeAuxiliaries" :customers="customers" @reset="resetCreationForm"
       @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
       @submit="validateCreationEvent" @close="closeCreationModal" @update-event="setEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
+    <ni-event-edition-modal :validations="eventValidation.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
       @document-uploaded="documentUploaded" @submit="validateEventEdition" @delete-event="validateEventDeletion"
@@ -38,6 +39,8 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { ref } from 'vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
@@ -45,25 +48,35 @@ import Customers from '@api/Customers';
 import Events from '@api/Events';
 import Select from '@components/form/Select';
 import { NotifyWarning } from '@components/popup/notify';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '@data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, AUXILIARY, UNKNOWN_AVATAR } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import Agenda from 'src/modules/client/components/planning/Agenda';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
+import { usePlanningAction } from 'src/modules/client/composables/planningAction';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
 export default {
   name: 'AuxiliaryAgenda',
-  metaInfo: { title: 'Agenda' },
   components: {
     agenda: Agenda,
     'planning-navigation': PlanningNavigation,
     'ni-event-creation-modal': EventCreationModal,
     'ni-event-edition-modal': EventEditionModal,
     'ni-select': Select,
+  },
+  setup () {
+    const metaInfo = { title: 'Agenda' };
+    useMeta(metaInfo);
+
+    const personKey = ref(AUXILIARY);
+    const customers = ref([]);
+    const { newEvent, editedEvent, eventValidation } = usePlanningAction(personKey, customers);
+
+    return { personKey, newEvent, editedEvent, customers, eventValidation };
   },
   mixins: [planningTimelineMixin, planningActionMixin],
   data () {
@@ -73,16 +86,11 @@ export default {
       height: 0,
       selectedAuxiliary: {},
       auxiliaries: [],
-      customers: [],
       internalHours: [],
       loading: false,
-      viewMode: WEEK_VIEW,
       AGENDA,
-      newEvent: {},
       creationModal: false,
-      editedEvent: {},
       editionModal: false,
-      personKey: AUXILIARY,
     };
   },
   computed: {
@@ -96,10 +104,7 @@ export default {
     auxiliariesOptions () {
       return this.activeAuxiliaries.length === 0
         ? [{ label: this.placeholder, value: this.selectedAuxiliary._id }]
-        : this.activeAuxiliaries.map(aux => ({
-          label: `${aux.identity.firstname || ''} ${aux.identity.lastname}`,
-          value: aux._id,
-        }));
+        : this.activeAuxiliaries.map(aux => ({ label: formatIdentity(aux.identity, 'FL'), value: aux._id }));
     },
     filteredEvents () {
       return this.events.filter(ev => !ev.isCancelled);
@@ -197,13 +202,13 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .planning-header
-  /deep/ .q-field__control
+  :deep(.q-field__control)
     background-color: inherit !important
 
 .person-name
-  font-size: 14px;
+  font-size: 14px
   &-select
     @media screen and (max-width: 767px)
       width: 80%

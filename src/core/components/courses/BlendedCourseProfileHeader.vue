@@ -9,13 +9,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import Courses from '@api/Courses';
 import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
-import moment from '@helpers/moment';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import Courses from '@api/Courses';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
-import { mapState } from 'vuex';
+import moment from '@helpers/moment';
 
 export default {
   name: 'BlendedCourseProfileHeader',
@@ -28,8 +28,9 @@ export default {
     'ni-profile-header': ProfileHeader,
     'ni-button': Button,
   },
+  emits: ['delete', 'refresh'],
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
 
     return {
       isClientInterface,
@@ -83,7 +84,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .delete-container
   position: relative
 </style>

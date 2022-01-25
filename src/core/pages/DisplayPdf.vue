@@ -18,7 +18,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .info
-  text-align: center;
+  text-align: center
 </style>

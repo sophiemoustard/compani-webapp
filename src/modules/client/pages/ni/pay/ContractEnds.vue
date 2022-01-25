@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Fin de contrats" padding>
-      <template slot="content">
+      <template #content>
         <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12">
@@ -14,8 +14,8 @@
     <div class="q-mx-md">
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_END)" label="Données fin de contrats" />
     </div>
-    <ni-simple-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
+    <ni-simple-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
+      row-key="auxiliaryId" selection="multiple" v-model:selected="selected">
       <template #header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :style="col.style" :key="col.name" :props="props">{{ col.label }}</q-th>
@@ -83,12 +83,13 @@
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="validateFinalPayListCreation" />
 
-    <ni-pay-surcharge-details-modal :pay-surcharge-details-modal.sync="surchargeDetailModal"
-      @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surcharge-detail-key="surchargeDetailKey" />
+    <ni-pay-surcharge-details-modal v-model:pay-surcharge-details-modal="surchargeDetailModal"
+      @update:surcharge-detail-modal="resetSurchargeDetail" :pay="pay" :surcharge-detail-key="surchargeDetailKey" />
   </q-page>
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import FinalPay from '@api/FinalPay';
 import Button from '@components/Button';
 import EditableTd from '@components/table/EditableTd';
@@ -101,10 +102,11 @@ import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 
+const metaInfo = { title: 'Fins de contract' };
+
 export default {
   name: 'ContractEnds',
-  metaInfo: { title: 'Fins de contract' },
-  mixins: [payMixin, editableTdMixin],
+  mixins: [payMixin, editableTdMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-editable-td': EditableTd,
     'ni-simple-table': SimpleTable,
@@ -185,7 +187,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .selects
   justify-content: end
   &-container

@@ -47,12 +47,12 @@
       </div>
     </div>
 
-    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
+    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="v$.newCourseSlot"
       :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
       :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
-      :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
+      :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 </div>
 </template>
@@ -64,14 +64,15 @@ import has from 'lodash/has';
 import set from 'lodash/set';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatDuration } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -81,7 +82,6 @@ import { validationMixin } from '@mixins/validationMixin';
 export default {
   name: 'SlotContainer',
   mixins: [courseMixin, validationMixin],
-  metadata: { title: 'Fiche formation' },
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -91,8 +91,12 @@ export default {
     'slot-creation-modal': SlotCreationModal,
     'ni-button': Button,
   },
+  emits: ['refresh'],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
-    const isVendorInterface = /\/ad\//.test(this.$router.currentRoute.path);
+    const isVendorInterface = /\/ad\//.test(this.$route.path);
 
     return {
       courseSlots: {},
@@ -123,20 +127,9 @@ export default {
     };
   },
   validations () {
-    const courseSlotValidation = {
-      step: { required },
-      address: {
-        zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-        street: { required: requiredIf(item => item && !!item.fullAddress) },
-        city: { required: requiredIf(item => item && !!item.fullAddress) },
-        fullAddress: { frAddress },
-      },
-      meetingLink: { urlAddress },
-    };
-
     return {
-      newCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.newCourseSlot.dates) },
-      editedCourseSlot: { ...courseSlotValidation, dates: this.datesValidations(this.editedCourseSlot.dates) },
+      newCourseSlot: this.courseSlotValidation(this.newCourseSlot),
+      editedCourseSlot: this.courseSlotValidation(this.editedSlot),
     };
   },
   computed: {
@@ -149,10 +142,7 @@ export default {
         moment.duration()
       );
 
-      const paddedMinutes = this.padMinutes(total.minutes());
-      const hours = total.days() * 24 + total.hours();
-
-      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+      return formatDuration(total);
     },
     formatSlotTitle () {
       const slotsToPlanLength = this.courseSlotsToPlan.length;
@@ -201,6 +191,28 @@ export default {
     else this.groupByCourses();
   },
   methods: {
+    courseSlotValidation (slot) {
+      return {
+        step: { required },
+        address: {
+          zipCode: { required: requiredIf(get(slot, 'address.fullAddress')) },
+          street: { required: requiredIf(get(slot, 'address.fullAddress')) },
+          city: { required: requiredIf(get(slot, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        meetingLink: { urlAddress },
+        dates: {
+          startDate: { required },
+          endDate: {
+            required,
+            ...(!!get(slot, 'dates.startDate') && {
+              maxDate: maxDate(moment(slot.dates.startDate).endOf('d').toISOString()),
+              minDate: minDate(slot.dates.startDate),
+            }),
+          },
+        },
+      };
+    },
     groupByCourses () {
       this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
@@ -208,9 +220,7 @@ export default {
     getSlotDuration (slot) {
       const duration = moment.duration(moment(slot.endDate).diff(slot.startDate));
 
-      const paddedMinutes = this.padMinutes(duration.minutes());
-
-      return paddedMinutes ? `${duration.hours()}h${paddedMinutes}` : `${duration.hours()}h`;
+      return formatDuration(duration);
     },
     formatSlotHour (slot) {
       return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;
@@ -228,7 +238,7 @@ export default {
         meetingLink: '',
         step: '',
       };
-      this.$v.newCourseSlot.$reset();
+      this.v$.newCourseSlot.$reset();
     },
     formatCreationPayload (courseSlot) {
       return {
@@ -261,7 +271,7 @@ export default {
     },
     resetEditionModal () {
       this.editedCourseSlot = {};
-      this.$v.editedCourseSlot.$reset();
+      this.v$.editedCourseSlot.$reset();
     },
     formatEditionPayload (courseSlot) {
       const stepType = this.course.subProgram.steps.find(step => step._id === courseSlot.step).type;
@@ -275,8 +285,8 @@ export default {
     },
     async addCourseSlot () {
       try {
-        this.$v.newCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.newCourseSlot);
+        this.v$.newCourseSlot.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.newCourseSlot);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
@@ -320,8 +330,8 @@ export default {
     },
     async updateCourseSlot () {
       try {
-        this.$v.editedCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.editedCourseSlot);
+        this.v$.editedCourseSlot.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.editedCourseSlot);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
@@ -359,16 +369,6 @@ export default {
       const step = this.stepOptions.find(option => option.value === slot.step._id);
       return step ? step.label : '';
     },
-    datesValidations (dates) {
-      return {
-        startDate: { required },
-        endDate: {
-          required,
-          minDate: minDate(dates?.startDate),
-          maxDate: maxDate(moment(dates?.startDate).endOf('d')),
-        },
-      };
-    },
     setCourseSlot (payload) {
       const { path, value } = payload;
       if (this.creationModal) set(this.newCourseSlot, path, value);
@@ -379,7 +379,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .slots-cells
   padding: 10px
   &-container
@@ -421,13 +421,14 @@ export default {
   background: $primary
   margin-left: 10px
   margin-top: 10px
+
 .slot-section-title
-  padding: 0;
+  padding: 0
   margin: 10px 0px
   &-subtitle
-     font-style: italic
-     font-size: 16px
-     @media screen and (max-width: 767px)
+    font-style: italic
+    font-size: 16px
+    @media screen and (max-width: 767px)
       font-size: 13px
 
 .to-plan-text

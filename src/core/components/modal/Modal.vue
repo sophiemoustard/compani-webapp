@@ -1,5 +1,6 @@
 <template>
-  <q-dialog :value="value" v-on="$listeners">
+  <q-dialog :model-value="modelValue" @update:model-value="$emit('update:model-value')" @show="$emit('show')"
+    @hide="$emit('hide')">
     <div :class="containerClass">
       <div class="modal-padding">
         <div class="row justify-between items-start">
@@ -24,9 +25,10 @@
 export default {
   name: 'Modal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     containerClass: { type: String, default: () => 'modal-container-sm' },
     title: { type: String, default: '' },
   },
+  emits: ['show', 'hide', 'update:model-value'],
 };
 </script>

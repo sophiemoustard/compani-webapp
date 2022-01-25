@@ -4,24 +4,24 @@
       <div class="indicator row">
         <div class="col-4 indicator-title">Heures à travailler</div>
         <div class="col-8 row indicator-hours">
-          <div class="col-md-3 col-xs-12">{{ hoursToWork | formatHours }}</div>
+          <div class="col-md-3 col-xs-12">{{ formatHours(hoursToWork) }}</div>
           <div class="col-md-9 col-xs-12">{{ contractHoursDetail }}</div>
         </div>
       </div>
       <div class="indicator row">
         <div class="col-4 indicator-title">Heures travaillées</div>
         <div class="col-8 row indicator-hours">
-          <div class="col-md-3 col-xs-12">{{ workedHours | formatHours }}</div>
+          <div class="col-md-3 col-xs-12">{{ formatHours(workedHours) }}</div>
           <div class="col-md-9 col-xs-12">{{ workedHoursDetail }}</div>
         </div>
       </div>
       <div class="indicator row text-weight-bold">
         <div class="col-4 indicator-title">Soldes d'heures</div>
-        <div class="col-2 indicator-hours">{{ hoursBalance | formatHours }}</div>
+        <div class="col-2 indicator-hours">{{ formatHours(hoursBalance) }}</div>
       </div>
       <div v-if="hoursDetails.counterAndDiffRelevant" class="indicator row text-weight-bold">
         <div class="col-4 indicator-title">Compteur d'heures</div>
-        <div class="col-2 indicator-hours">{{ hoursDetails.hoursCounter | formatHours }}</div>
+        <div class="col-2 indicator-hours">{{ formatHours(hoursDetails.hoursCounter) }}</div>
       </div>
     </div>
     <div class="quality-indicators indicators">
@@ -30,7 +30,7 @@
         <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }} en moyenne</span>
       </div>
       <div class="quality-indicators-item">
-        <span class="highlight">{{ hoursDetails.paidTransportHours | formatHours }}</span> de transport rémunéré
+        <span class="highlight">{{ formatHours(hoursDetails.paidTransportHours) }}</span> de transport rémunéré
       </div>
     </div>
   </div>
@@ -45,9 +45,6 @@ export default {
   props: {
     hoursDetails: { type: Object, default: () => ({}) },
     customersDetails: { type: Object, default: () => ({}) },
-  },
-  filters: {
-    formatHours: hours => formatHours(hours),
   },
   computed: {
     averageTimeByCustomer () {
@@ -89,6 +86,7 @@ export default {
     },
   },
   methods: {
+    formatHours,
     getHoursWithDiff (key) {
       return this.hoursDetails.diff && this.hoursDetails.diff[key] && this.hoursDetails.counterAndDiffRelevant
         ? this.hoursDetails.diff[key] + this.hoursDetails[key]
@@ -98,42 +96,42 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .indicators-container
-    flex-grow: 1
-    display: flex
-    flex-direction: column
-    justify-content: space-between
+<style lang="sass" scoped>
+.indicators-container
+  flex-grow: 1
+  display: flex
+  flex-direction: column
+  justify-content: space-between
 
-  .indicator
-    display: flex;
-    border-top: 1px solid $copper-grey-300
-    border-left: 1px solid $copper-grey-300
-    border-right: 1px solid $copper-grey-300
-    .indicator-title
-      padding: 5px
-    .indicator-hours
-      padding: 5px
-      border-left:  1px solid $copper-grey-300
-    &:last-child
-      border-bottom: 1px solid $copper-grey-300
+.indicator
+  display: flex
+  border-top: 1px solid $copper-grey-300
+  border-left: 1px solid $copper-grey-300
+  border-right: 1px solid $copper-grey-300
+  .indicator-title
+    padding: 5px
+  .indicator-hours
+    padding: 5px
+    border-left:  1px solid $copper-grey-300
+  &:last-child
+    border-bottom: 1px solid $copper-grey-300
 
-  .highlight
-    color: $primary
-    font-weight: bold
+.highlight
+  color: $primary
+  font-weight: bold
 
-  .indicators
-    padding: 0 24px
-    margin: 0 0 24px
-    @media screen and (max-width: $breakpoint-sm-max)
-      padding: 0 12px
+.indicators
+  padding: 0 24px
+  margin: 0 0 24px
+  @media screen and (max-width: $breakpoint-sm-max)
+    padding: 0 12px
 
-  .economic-indicators
-    border-left: 5px solid $primary !important
-  .quality-indicators
-    border-left: 5px solid $copper-300 !important
+.economic-indicators
+  border-left: 5px solid $primary !important
+.quality-indicators
+  border-left: 5px solid $copper-300 !important
 
-  .quality-indicators-item
-    border-top: 1px solid $copper-grey-300
-    padding: 10px 0
+.quality-indicators-item
+  border-top: 1px solid $copper-grey-300
+  padding: 10px 0
 </style>

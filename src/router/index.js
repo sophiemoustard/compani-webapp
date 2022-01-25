@@ -1,24 +1,18 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
-import VueMeta from 'vue-meta';
+import { createRouter, createWebHistory } from 'vue-router';
 import pick from 'lodash/pick';
 import { refreshState } from '@helpers/alenvi';
 import { defineAbilitiesFor } from '@helpers/ability';
 import routes from 'src/router/routes';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
-import store from 'src/store/index';
+import store from 'src/store';
 import clientRoutes from 'src/modules/client/router/routes';
 import vendorRoutes from 'src/modules/vendor/router/routes';
 
-Vue.use(VueRouter);
-Vue.use(VueMeta);
-
-const Router = new VueRouter({
-  scrollBehavior: () => ({ y: 0 }),
+const Router = createRouter({
+  scrollBehavior: () => ({ top: 0 }),
   // routes needs to be at the end of array cf. /src/router/routes.js
   routes: [...clientRoutes, ...vendorRoutes, ...routes],
-  mode: process.env.VUE_ROUTER_MODE,
-  base: process.env.VUE_ROUTER_BASE,
+  history: createWebHistory(process.env.VUE_ROUTER_BASE),
 });
 
 Router.beforeEach(async (to, from, next) => {

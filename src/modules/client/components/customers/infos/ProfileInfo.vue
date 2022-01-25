@@ -7,9 +7,9 @@
       <div class="row gutter-profile">
         <ni-input caption="Prénom" v-model.trim="customer.identity.firstname" @focus="saveTmp('identity.firstname')"
           @blur="updateCustomer('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model.trim="customer.identity.lastname"
+        <ni-input caption="Nom" :error="v$.customer.identity.lastname.$error" v-model.trim="customer.identity.lastname"
           @focus="saveTmp('identity.lastname')" @blur="updateCustomer('identity.lastname')" />
-        <ni-select caption="Civilité" :error="$v.customer.identity.title.$error" v-model="customer.identity.title"
+        <ni-select caption="Civilité" :error="v$.customer.identity.title.$error" v-model="customer.identity.title"
           :options="civilityOptions" @focus="saveTmp('identity.title')" @blur="updateCustomer('identity.title')" />
         <ni-date-input v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
           caption="Date de naissance" @blur="updateCustomer('identity.birthDate')" content-class="col-xs-12 col-md-6" />
@@ -21,12 +21,12 @@
       </div>
       <div class="row gutter-profile">
         <ni-search-address v-model="customer.contact.primaryAddress" :error-message="primaryAddressError"
-          :error="$v.customer.contact.primaryAddress.$error" caption="Adresse principale"
+          :error="v$.customer.contact.primaryAddress.$error" caption="Adresse principale"
           @focus="saveTmp('contact.primaryAddress.fullAddress')" @blur="updateCustomer('contact.primaryAddress')" />
         <ni-search-address v-model="customer.contact.secondaryAddress" caption="Adresse secondaire"
-          error-message="Adresse non valide" :error="$v.customer.contact.secondaryAddress.$error"
+          error-message="Adresse non valide" :error="v$.customer.contact.secondaryAddress.$error"
           @focus="saveTmp('contact.secondaryAddress.fullAddress')" @blur="updateCustomer('contact.secondaryAddress')" />
-        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
+        <ni-input caption="Téléphone" type="tel" :error="v$.customer.contact.phone.$error"
           :error-message="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-input caption="Compléments" v-model="customer.contact.others" @blur="updateCustomer('contact.others')"
@@ -80,7 +80,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'referent'">
-                  <q-radio v-model="referentHelper" :val="props.row._id" @input="updateReferentHelper" />
+                  <q-radio v-model="referentHelper" :val="props.row._id" @update:model-value="updateReferentHelper" />
                 </template>
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
@@ -104,12 +104,12 @@
         <p class="text-weight-bold">Moyen de paiement</p>
       </div>
       <div class="row gutter-profile q-mb-lg">
-        <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error"
+        <ni-input caption="Nom associé au compte bancaire" :error="v$.customer.payment.bankAccountOwner.$error"
           v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')"
           @blur="updateCustomer('payment.bankAccountOwner')" />
-        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" :error-message="ibanError"
+        <ni-input caption="IBAN" :error="v$.customer.payment.iban.$error" :error-message="ibanError"
           v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
-        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" :error-message="bicError"
+        <ni-input caption="BIC" :error="v$.customer.payment.bic.$error" :error-message="bicError"
           v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
       </div>
     </div>
@@ -118,8 +118,8 @@
         <p class="text-weight-bold">Mandats de prélèvement</p>
       </div>
       <q-card>
-        <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
-          class="mandate-table" :loading="mandatesLoading">
+        <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates"
+          class="mandate-table" :loading="mandatesLoading" v-model:pagination="pagination">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -166,10 +166,10 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <ni-button icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
-                    <ni-button icon="history" @click.native="showFundingHistory(col.value)" />
-                    <ni-button icon="edit" @click.native="openFundingEditionModal(col.value)" />
-                    <ni-button icon="delete" @click.native="validateFundingDeletion(col.value)" />
+                    <ni-button icon="remove_red_eye" @click="showFundingDetails(col.value)" />
+                    <ni-button icon="history" @click="showFundingHistory(col.value)" />
+                    <ni-button icon="edit" @click="openFundingEditionModal(col.value)" />
+                    <ni-button icon="delete" @click="validateFundingDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -198,7 +198,7 @@
         <p class="text-weight-bold">Devis</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" :pagination.sync="pagination"
+        <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" v-model:pagination="pagination"
           :loading="quotesLoading">
           <template #body="{ props }">
             <q-tr :props="props">
@@ -230,60 +230,52 @@
       </q-card>
     </div>
 
-    <!-- Add helper modal -->
     <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @next-step="nextStep"
-      :new-helper.sync="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
+      v-model:new-helper="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="v$.newHelper"
       :first-step="firstStep" />
 
-    <!-- Edit helper modal -->
-    <helper-edition-modal :edited-helper.sync="editedHelper" v-model="openEditedHelperModal" :loading="loading"
-      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
+    <helper-edition-modal v-model:edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
+      :validations="v$.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
-    <!-- Subscription creation modal -->
-    <subscription-creation-modal v-model="openNewSubscriptionModal" :new-subscription.sync="newSubscription"
-      :service-options="serviceOptions" :validations="$v.newSubscription" @hide="resetCreationSubscriptionData"
+    <subscription-creation-modal v-model="openNewSubscriptionModal" v-model:new-subscription="newSubscription"
+      :service-options="serviceOptions" :validations="v$.newSubscription" @hide="resetCreationSubscriptionData"
       :loading="loading" @submit="createSubscription" />
 
-    <!-- Subscription edition modal -->
-    <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription.sync="editedSubscription"
-      :validations="$v.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
+    <subscription-edition-modal v-model="openEditedSubscriptionModal" v-model:edited-subscription="editedSubscription"
+      :validations="v$.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
       @submit="updateSubscription" />
 
-    <!-- Subscription history modal -->
     <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
       @hide="resetSubscriptionHistoryData" />
 
-    <!-- Funding details modal -->
     <funding-details-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
       :funding="selectedFunding" @hide="resetFundingDetailsData" />
 
-    <!-- Funding history modal -->
     <funding-history-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
       :funding="selectedFunding" @hide="resetFundingHistoryData" />
 
-    <!-- Funding creation modal -->
-    <funding-creation-modal v-model="fundingCreationModal" :new-funding.sync="newFunding" :third-party-payers="ttpList"
-      :care-hours-error-message="careHoursErrorMessage($v.newFunding)" @submit="createFunding" :loading="loading"
-      :amount-ttc-error-message="amountTTCErrorMessage($v.newFunding)" :validations="$v.newFunding"
-      :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.newFunding)" :days-options="daysOptions"
+    <funding-creation-modal v-model="fundingCreationModal" v-model:new-funding="newFunding"
+      :care-hours-error-message="careHoursErrorMessage(v$.newFunding)" @submit="createFunding" :loading="loading"
+      :amount-ttc-error-message="amountTTCErrorMessage(v$.newFunding)" :validations="v$.newFunding"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.newFunding)" :days-options="daysOptions"
       :funding-subscriptions-options="fundingSubscriptionsOptions" @hide="resetCreationFundingData"
-      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.newFunding)"
-      :need-funding-plan-id-for-new-funding="needFundingPlanIdForNewFunding" />
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage(v$.newFunding)"
+      :need-funding-plan-id-for-new-funding="needFundingPlanIdForNewFunding" :third-party-payers="ttpList" />
 
-    <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
-      :edited-funding.sync="editedFunding" @submit="editFunding" :days-options="daysOptions"
-      :validations="$v.editedFunding" :care-hours-error-message="careHoursErrorMessage($v.editedFunding)"
-      :amount-ttc-error-message="amountTTCErrorMessage($v.editedFunding)"
-      :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.editedFunding)"
-      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)"
+      v-model:edited-funding="editedFunding" @submit="editFunding" :days-options="daysOptions"
+      :validations="v$.editedFunding" :care-hours-error-message="careHoursErrorMessage(v$.editedFunding)"
+      :amount-ttc-error-message="amountTTCErrorMessage(v$.editedFunding)"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.editedFunding)"
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage(v$.editedFunding)"
       :need-funding-plan-id-for-edited-funding="needFundingPlanIdForEditedFunding" />
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -301,7 +293,15 @@ import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { days } from '@data/days';
-import { FIXED, HOURLY, MONTHLY, REQUIRED_LABEL, CIVILITY_OPTIONS, DOC_EXTENSIONS, ONCE } from '@data/constants';
+import {
+  FIXED,
+  HOURLY,
+  MONTHLY,
+  REQUIRED_LABEL,
+  CIVILITY_OPTIONS,
+  DOC_EXTENSIONS,
+  ONCE,
+} from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate } from '@helpers/date';
 import { getLastVersion } from '@helpers/utils';
@@ -346,6 +346,7 @@ export default {
     'funding-edition-modal': FundingEditionModal,
     'ni-responsive-table': ResponsiveTable,
   },
+  setup () { return { v$: useVuelidate() }; },
   mixins: [
     customerMixin,
     subscriptionMixin,
@@ -452,21 +453,25 @@ export default {
 
       return availableServices.map(service => ({
         label: getLastVersion(service.versions, 'createdAt').name,
-        value: { _id: service._id, nature: service.nature },
+        value: service._id,
+        nature: service.nature,
       }));
     },
     primaryAddressError () {
-      if (!this.$v.customer.contact.primaryAddress.fullAddress.required) return REQUIRED_LABEL;
+      if (this.v$.customer.contact.primaryAddress.fullAddress.required.$response === false) return REQUIRED_LABEL;
+
       return 'Adresse non valide';
     },
     ibanError () {
-      if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
-      if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
+      if (this.v$.customer.payment.iban.required.$response === false) return REQUIRED_LABEL;
+      if (this.v$.customer.payment.iban.iban.$response === false) return 'IBAN non valide';
+
       return '';
     },
     bicError () {
-      if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
-      if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
+      if (this.v$.customer.payment.bic.required.$response === false) return REQUIRED_LABEL;
+      if (this.v$.customer.payment.bic.bic.$response === false) return 'BIC non valide';
+
       return '';
     },
     acceptedByHelper () {
@@ -507,9 +512,9 @@ export default {
             fullAddress: { required, frAddress },
           },
           secondaryAddress: {
-            zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-            street: { required: requiredIf(item => item && !!item.fullAddress) },
-            city: { required: requiredIf(item => item && !!item.fullAddress) },
+            zipCode: { required: requiredIf(get(this.customer, 'contact.secondaryAddress.fullAddress')) },
+            street: { required: requiredIf(get(this.customer, 'contact.secondaryAddress.fullAddress')) },
+            city: { required: requiredIf(get(this.customer, 'contact.secondaryAddress.fullAddress')) },
             fullAddress: { frAddress },
           },
         },
@@ -520,12 +525,14 @@ export default {
         },
       },
       newHelper: {
-        ...pick(this.userValidation, ['identity.lastname', 'local.email']),
         contact: { phone: { frPhoneNumber } },
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
       },
       editedHelper: {
-        ...pick(this.userValidation, ['identity.lastname', 'local.email']),
         contact: { phone: { frPhoneNumber } },
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
       },
       newSubscription: {
         service: { required },
@@ -542,12 +549,12 @@ export default {
         nature: { required },
         frequency: { required },
         ...this.getFundingValidation(this.newFunding),
-        fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForNewFunding) },
+        fundingPlanId: { required: requiredIf(this.needFundingPlanIdForNewFunding) },
 
       },
       editedFunding: {
         ...this.getFundingValidation(this.editedFunding),
-        fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForEditedFunding) },
+        fundingPlanId: { required: requiredIf(this.needFundingPlanIdForEditedFunding) },
       },
     };
   },
@@ -582,15 +589,15 @@ export default {
     getFundingValidation (funding) {
       return {
         amountTTC: {
-          required: requiredIf(item => item.nature === FIXED),
+          required: requiredIf(funding.nature === FIXED),
           minValue: value => (funding.nature === FIXED ? value > 0 : value == null),
         },
         unitTTCRate: {
-          required: requiredIf(item => item.nature === HOURLY),
+          required: requiredIf(funding.nature === HOURLY),
           minValue: value => (funding.nature === HOURLY ? value > 0 : value == null),
         },
         careHours: {
-          required: requiredIf(item => item.nature === HOURLY),
+          required: requiredIf(funding.nature === HOURLY),
           minValue: value => (funding.nature === HOURLY ? value > 0 : value == null),
 
         },
@@ -598,31 +605,32 @@ export default {
         startDate: { required },
         endDate: { minDate: minDate(funding.startDate) },
         customerParticipationRate: {
-          required: requiredIf(item => item.nature === HOURLY),
+          required: requiredIf(funding.nature === HOURLY),
           minValue: value => (funding.nature === HOURLY ? value >= 0 : value == null),
           maxValue: value => (funding.nature === HOURLY ? value < 100 : value == null),
         },
       };
     },
     careHoursErrorMessage (validations) {
-      if (!validations.careHours.required) return REQUIRED_LABEL;
-      if (!validations.careHours.minValue) return 'Nombre d\'heures invalide';
+      if (get(validations, 'careHours.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'careHours.minValue.$response') === false) return 'Nombre d\'heures invalide';
       return '';
     },
     amountTTCErrorMessage (validations) {
-      if (!validations.amountTTC.required) return REQUIRED_LABEL;
-      if (!validations.amountTTC.minValue) return 'Montant forfaitaire TTC invalide';
+      if (get(validations, 'amountTTC.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'amountTTC.minValue.$response') === false) return 'Montant forfaitaire TTC invalide';
       return '';
     },
     unitTTCRateErrorMessage (validations) {
-      if (!validations.unitTTCRate.required) return REQUIRED_LABEL;
-      if (!validations.unitTTCRate.minValue) return 'Prix unitaire TTC invalide';
+      if (get(validations, 'unitTTCRate.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'unitTTCRate.minValue.$response') === false) return 'Prix unitaire TTC invalide';
       return '';
     },
     customerParticipationRateErrorMessage (validations) {
-      if (!validations.customerParticipationRate.required) return REQUIRED_LABEL;
-      if (!validations.customerParticipationRate.minValue || !validations.customerParticipationRate.maxValue) {
-        return 'Taux de participation du/de la bénéficiaire invalide';
+      if (get(validations, 'customerParticipationRate.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'customerParticipationRate.minValue.$response') === false ||
+        get(validations, 'customerParticipationRate.maxValue.$response') === false) {
+        return 'Taux de participation invalide';
       }
       return '';
     },
@@ -664,7 +672,7 @@ export default {
           'customer/setCustomer',
           { ...this.customer, payment: { ...this.customer.payment, mandates } }
         );
-        this.$v.customer.$touch();
+        this.v$.customer.$touch();
       } catch (e) {
         console.error(e);
       } finally {
@@ -677,7 +685,7 @@ export default {
         const quotes = await Customers.getQuotes(this.customer._id);
 
         this.$store.dispatch('customer/setCustomer', { ...this.customer, quotes });
-        this.$v.customer.$touch();
+        this.v$.customer.$touch();
       } catch (e) {
         console.error(e);
       } finally {
@@ -685,20 +693,20 @@ export default {
       }
     },
     async refreshCustomer () {
-      const customer = await Customers.getById(this.customer._id);
-      await this.refreshSubscriptions(customer);
-      await this.refreshFundings(customer);
+      await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customer._id });
+      await this.refreshSubscriptions(this.customer);
+      await this.refreshFundings(this.customer);
 
       this.$store.dispatch(
         'customer/setCustomer',
-        { ...customer, subscriptions: [...this.subscriptions], fundings: [...this.fundings] }
+        { ...this.customer, subscriptions: [...this.subscriptions], fundings: [...this.fundings] }
       );
-      this.$v.customer.$touch();
+      this.v$.customer.$touch();
     },
     // Subscriptions
     formatCreatedSubscription () {
       const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
-      const formattedService = { service: service._id, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
+      const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
 
       if (sundays) formattedService.versions[0].sundays = sundays;
       if (evenings) formattedService.versions[0].evenings = evenings;
@@ -706,7 +714,7 @@ export default {
       return formattedService;
     },
     resetCreationSubscriptionData () {
-      this.$v.newSubscription.$reset();
+      this.v$.newSubscription.$reset();
       this.newSubscription = {
         service: '',
         unitTTCRate: 0,
@@ -715,8 +723,8 @@ export default {
     },
     async createSubscription () {
       try {
-        this.$v.newSubscription.$touch();
-        if (this.$v.newSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newSubscription.$touch();
+        if (this.v$.newSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.formatCreatedSubscription();
@@ -748,12 +756,12 @@ export default {
     },
     resetEditionSubscriptionData () {
       this.editedSubscription = {};
-      this.$v.editedSubscription.$reset();
+      this.v$.editedSubscription.$reset();
     },
     async updateSubscription () {
       try {
-        this.$v.editedSubscription.$touch();
-        if (this.$v.editedSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedSubscription.$touch();
+        if (this.v$.editedSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const subscriptionId = this.editedSubscription._id;
@@ -896,7 +904,7 @@ export default {
       this.selectedFunding = {};
     },
     resetCreationFundingData () {
-      this.$v.newFunding.$reset();
+      this.v$.newFunding.$reset();
       this.newFunding = {
         thirdPartyPayer: '',
         folderNumber: '',
@@ -925,8 +933,8 @@ export default {
     },
     async createFunding () {
       try {
-        this.$v.newFunding.$touch();
-        if (this.$v.newFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newFunding.$touch();
+        if (this.v$.newFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.formatCreatedFunding();
@@ -976,7 +984,7 @@ export default {
     },
     resetEditionFundingData () {
       this.editedFunding = {};
-      this.$v.editedFunding.$reset();
+      this.v$.editedFunding.$reset();
     },
     formatFundingEditionPayload (funding) {
       const pickedFields = ['folderNumber', 'careDays', 'startDate', 'subscription', 'fundingPlanId'];
@@ -987,8 +995,8 @@ export default {
     },
     async editFunding () {
       try {
-        this.$v.editedFunding.$touch();
-        if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.editedFunding.$touch();
+        if (this.v$.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
 
         const payload = this.formatFundingEditionPayload(this.editedFunding);
@@ -1009,25 +1017,25 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .table-actions > .q-btn__wrapper
+<style lang="sass" scoped>
+.table-actions > .q-btn__wrapper
+  padding: 0
+
+a
+  color: $primary
+  text-decoration: none
+
+.mandate-table
+  td
+    word-break: break-all
+
+@media screen and (min-width: 768px)
+  .dot
+    margin: 0px
+
+.signedAt
+  :deep(.q-field--with-bottom)
     padding: 0
-
-  a
-    color: $primary
-    text-decoration: none
-
-  .mandate-table
-    td
-      word-break: break-all
-
-  @media screen and (min-width: 768px)
-    .dot
-      margin: 0px
-
-  .signedAt
-    /deep/ .q-field--with-bottom
-      padding: 0
-    /deep/ .q-field__bottom
-      display: none
+  :deep(.q-field__bottom)
+    display: none
 </style>

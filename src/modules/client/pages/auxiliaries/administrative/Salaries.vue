@@ -8,9 +8,12 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import TitleHeader from '@components/TitleHeader';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
+
+const metaInfo = { title: 'Documents de paie' };
 
 export default {
   props: {
@@ -20,7 +23,7 @@ export default {
     'ni-title-header': TitleHeader,
     'profile-pay': ProfilePay,
   },
-  metaInfo: { title: 'Documents de paie' },
+  mixins: [createMetaMixin(metaInfo)],
   computed: {
     ...mapState('main', ['loggedUser']),
   },

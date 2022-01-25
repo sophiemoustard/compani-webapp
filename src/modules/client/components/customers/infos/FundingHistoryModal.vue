@@ -1,6 +1,6 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+    <template #title>
       Historique du financement <span class="text-weight-bold">{{ funding.thirdPartyPayer.name }}</span>
     </template>
     <ni-funding-grid-table :data="funding.versions" :columns="fundingsColumns" :visible-columns="visibleColumns" />
@@ -16,7 +16,7 @@ import { FIXED } from '@data/constants';
 export default {
   name: 'FundingHistoryModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     funding: { type: Object, default: () => ({}) },
   },
   components: {
@@ -26,6 +26,7 @@ export default {
   mixins: [
     fundingMixin,
   ],
+  emits: ['hide', 'update:model-value'],
   computed: {
     visibleColumns () {
       const visibleColumns = this.funding.nature === FIXED
@@ -42,7 +43,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
   },
 };

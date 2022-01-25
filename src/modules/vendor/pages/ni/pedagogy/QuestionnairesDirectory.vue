@@ -14,13 +14,15 @@
       @click="questionnaireCreationModal = true" :disable="loading" />
 
     <questionnaire-creation-modal v-model="questionnaireCreationModal" @hide="resetCreationModal"
-      :loading="modalLoading" @submit="createQuestionnaire" :validations="$v.newQuestionnaire"
-      :new-questionnaire.sync="newQuestionnaire" />
+      :loading="modalLoading" @submit="createQuestionnaire" :validations="v$.newQuestionnaire"
+      v-model:new-questionnaire="newQuestionnaire" />
   </q-page>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import groupBy from 'lodash/groupBy';
 import Questionnaires from '@api/Questionnaires';
 import TitleHeader from '@components/TitleHeader';
@@ -31,12 +33,17 @@ import { QUESTIONNAIRE_TYPES } from '@data/constants';
 import { descendingSort } from '@helpers/date';
 
 export default {
-  metaInfo: { title: 'Questionnaires' },
   name: 'QuestionnairesDirectory',
   components: {
     'ni-title-header': TitleHeader,
     'questionnaire-creation-modal': QuestionnaireCreationModal,
     'questionnaire-cell': QuestionnaireCell,
+  },
+  setup () {
+    const metaInfo = { title: 'Questionnaires' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -82,13 +89,13 @@ export default {
       }
     },
     resetCreationModal () {
-      this.$v.newQuestionnaire.$reset();
+      this.v$.newQuestionnaire.$reset();
       this.newQuestionnaire = { name: '', type: '' };
     },
     async createQuestionnaire () {
       try {
-        this.$v.newQuestionnaire.$touch();
-        if (this.$v.newQuestionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newQuestionnaire.$touch();
+        if (this.v$.newQuestionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         await Questionnaires.create(this.newQuestionnaire);

@@ -7,10 +7,10 @@
           Nous allons vous envoyer un email pour réinitialiser votre mot de passe.
           Veuillez renseigner votre adresse email.
         </div>
-        <ni-input caption="Email" :error="$v.email.$error" v-model.trim="email" @blur="$v.email.$touch"
+        <ni-input caption="Email" :error="v$.email.$error" v-model.trim="email" @blur="v$.email.$touch"
           error-message="Veuillez rentrer un email valide. (ex: mail@mail.com)" required-field />
         <div class="row justify-center">
-          <q-btn class="btn-submit" @click="submit" color="primary" :disable="$v.email.$invalid" big>Envoyer</q-btn>
+          <q-btn class="btn-submit" @click="submit" color="primary" :disable="v$.email.$invalid" big>Envoyer</q-btn>
         </div>
       </div>
     </div>
@@ -18,22 +18,28 @@
 </template>
 
 <script>
-import { email, required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { email, required } from '@vuelidate/validators';
 import Authentication from '@api/Authentication';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { isUserLogged } from '@helpers/alenvi';
+import { useMeta } from 'quasar';
 
 export default {
   components: {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
-    return {
-      email: '',
-    };
+    const metaInfo = { title: 'Mot de passe oublié' };
+    useMeta(metaInfo);
+
+    return { email: '' };
   },
   validations: {
     email: { email, required },
@@ -68,7 +74,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .message
   font-size: 14px
 </style>

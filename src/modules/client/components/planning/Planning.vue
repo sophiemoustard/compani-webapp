@@ -150,6 +150,17 @@ export default {
     eventHistories: { type: Array, default: () => [] },
     filters: { type: Array, default: () => [] },
   },
+  emits: [
+    'update-feeds',
+    'refresh',
+    'toggle-all-sectors',
+    'update-start-of-week',
+    'toggle-history',
+    'on-drop',
+    'open-creation-modal',
+    'open-edition-modal',
+    'open-customer-absence-edition-modal',
+  ],
   data () {
     return {
       terms: [],
@@ -167,7 +178,7 @@ export default {
       timeout: null,
     };
   },
-  beforeDestroy () {
+  beforeUnmount () {
     if (this.isCoach) {
       if (!this.isCustomerPlanning) {
         this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.termIds));
@@ -315,47 +326,47 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  th:first-child
-    @media screen and (min-width: 768px) and (max-width: $breakpoint-sm-max)
-      width: 100px;
+<style lang="sass" scoped>
+th:first-child
+  @media screen and (min-width: 768px) and (max-width: $breakpoint-sm-max)
+    width: 100px
+  @media screen and (min-width: $breakpoint-md-min)
+    width: 110px
+
+.staffing
+  .person
+    &-row
+      height: auto
+    &-name
+      margin: 2px 0 4px
+  td
+    position: relative
+    height: 75px
+    z-index: 0
+  .planning-background
+    height: 10px
+    margin-top: 2px
+    .line
+      width: 1px
+      height: 100%
+      background: $copper-grey-100
+      margin: 0
+      position: absolute
+      z-index: -1
+
+.non-staffing
+  .planning-background
+    @media screen and (max-width: $breakpoint-sm-max)
+      padding-bottom: 2rem
     @media screen and (min-width: $breakpoint-md-min)
-      width: 110px;
+      padding-bottom: 1rem
 
-  .staffing
-    .person
-      &-row
-        height: auto;
-      &-name
-        margin: 2px 0 4px;
-    td
-      position: relative;
-      height: 75px;
-      z-index: 0;
-    .planning-background
-      height: 10px;
-      margin-top: 2px;
-      .line
-        width: 1px;
-        height: 100%;
-        background: $copper-grey-100;
-        margin: 0;
-        position: absolute;
-        z-index: -1;
+.to-assign
+  background-color: rgba(253, 243, 229, 0.5)
 
-  .non-staffing
-    .planning-background
-      @media screen and (max-width: $breakpoint-sm-max)
-        padding-bottom: 2rem;
-      @media screen and (min-width: $breakpoint-md-min)
-        padding-bottom: 1rem;
-
-  .to-assign
-    background-color: rgba(253, 243, 229, 0.5);
-
-  .q-page-sticky
-    z-index: 20;
+.q-page-sticky
+  z-index: 20
 
 thead
-  vertical-align: baseline;
+  vertical-align: baseline
 </style>

@@ -12,6 +12,7 @@ import {
   ERP,
   TRAINER,
 } from '@data/constants';
+import router from 'src/router/index';
 
 const getClientAbilities = (role, subscriptions) => roleBasedAccessControl[role]
   .filter(r => !r.subscription || subscriptions.includes(r.subscription))
@@ -20,6 +21,7 @@ const getClientAbilities = (role, subscriptions) => roleBasedAccessControl[role]
 const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 
 export const defineAbilitiesFor = (user) => {
+  const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
   const { role, company, _id, sector } = user;
   const clientRole = get(role, 'client.name');
   const vendorRole = get(role, 'vendor.name');
@@ -31,12 +33,14 @@ export const defineAbilitiesFor = (user) => {
   if (clientRole) can('read', getClientAbilities(clientRole, companySubscriptions));
   if (vendorRole) can('read', getVendorAbilities(vendorRole));
   if (!clientRole && !vendorRole) can('read', 'account client');
-  if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
-  if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER].includes(vendorRole)) {
+  if (isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
+    can('set', 'user_company');
+  }
+  if (isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER].includes(vendorRole)) {
     can('update', 'course_trainee_follow_up');
   }
 
-  if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole) ||
+  if ((isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) ||
       [CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('read', 'learner_info');
 
   if (companySubscriptions.includes(ERP)) {

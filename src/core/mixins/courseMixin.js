@@ -56,9 +56,6 @@ export const courseMixin = {
     happened (sameDaySlots) {
       return moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
-    padMinutes (minutes) {
-      return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
-    },
     saveTmp (path) {
       this.tmpInput = this.getValue(path);
     },
@@ -78,11 +75,11 @@ export const courseMixin = {
       return get(this.course, path);
     },
     getVAttribute (path) {
-      if (path === 'trainer') return get(this.$v.course, 'trainer._id', '');
-      if (path === 'salesRepresentative') return get(this.$v.course, 'salesRepresentative._id', '');
+      if (path === 'trainer') return get(this.v$.course, 'trainer._id', '');
+      if (path === 'salesRepresentative') return get(this.v$.course, 'salesRepresentative._id', '');
       if (path === 'contact') return '';
 
-      return get(this.$v.course, path);
+      return get(this.v$.course, path);
     },
     async updateCourse (path) {
       try {

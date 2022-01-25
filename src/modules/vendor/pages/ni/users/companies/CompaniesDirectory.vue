@@ -3,18 +3,20 @@
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"
-      :pagination.sync="pagination" @go-to="goToCompanyProfile" />
+      v-model:pagination="pagination" @go-to="goToCompanyProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" :disable="tableLoading" />
 
-    <company-creation-modal v-model="companyCreationModal" :new-company.sync="newCompany" :validations="$v.newCompany"
+    <company-creation-modal v-model="companyCreationModal" v-model:new-company="newCompany" :validations="v$.newCompany"
       :loading="modalLoading" :company-type-options="companyTypeOptions" @hide="resetCreationModal"
       @submit="createCompany" />
   </q-page>
 </template>
 
 <script>
-import pick from 'lodash/pick';
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
 import escapeRegExp from 'lodash/escapeRegExp';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -26,12 +28,17 @@ import { removeDiacritics } from '@helpers/utils';
 import { companyMixin } from '@mixins/companyMixin';
 
 export default {
-  metaInfo: { title: 'Répertoire structures' },
   name: 'CompaniesDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
     'company-creation-modal': CompanyCreationModal,
+  },
+  setup () {
+    const metaInfo = { title: 'Répertoire structures' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   mixins: [companyMixin],
   data () {
@@ -44,17 +51,12 @@ export default {
       searchStr: '',
       companyTypeOptions: COMPANY_TYPES,
       companyCreationModal: false,
-      newCompany: {
-        name: '',
-        type: '',
-      },
+      newCompany: { name: '', type: '' },
       modalLoading: false,
     };
   },
   validations () {
-    return {
-      newCompany: pick(this.companyValidation, ['type', 'name']),
-    };
+    return { newCompany: { name: { required }, type: { required } } };
   },
   async created () {
     await this.refreshCompanies();
@@ -88,12 +90,12 @@ export default {
     },
     resetCreationModal () {
       this.newCompany = { name: '', type: '' };
-      this.$v.newCompany.$reset();
+      this.v$.newCompany.$reset();
     },
     async createCompany () {
       try {
-        this.$v.newCompany.$touch();
-        if (this.$v.newCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newCompany.$touch();
+        if (this.v$.newCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
         await Companies.create({ ...this.newCompany });
 

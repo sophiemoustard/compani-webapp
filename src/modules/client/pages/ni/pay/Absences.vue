@@ -1,13 +1,13 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Absences" padding>
-      <template slot="content">
+      <template #content>
         <div class="col-xs-12 col-md-6">
-          <ni-date-range v-model="dates" @input="refresh" :error.sync="datesHasError" />
+          <ni-date-range v-model="dates" @blur="refresh" v-model:error="datesHasError" />
         </div>
       </template>
     </ni-title-header>
-    <ni-simple-table :data="events" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+    <ni-simple-table :data="events" :columns="columns" :loading="tableLoading" v-model:pagination="pagination">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -29,7 +29,7 @@
     </ni-simple-table>
 
     <!-- Absence edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
+    <ni-event-edition-modal :validations="eventValidation.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :person-key="personKey" :active-auxiliaries="activeAuxiliaries"
       @hide="resetEditionForm" @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
       @submit="validateEventEdition" @close="closeEditionModal" @delete-event="validateEventDeletion"
@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { ref } from 'vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Events from '@api/Events';
@@ -52,10 +54,10 @@ import { formatDate } from '@helpers/date';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '@data/constants';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
+import { usePlanningAction } from 'src/modules/client/composables/planningAction';
 
 export default {
   name: 'Absences',
-  metaInfo: { title: 'Absences' },
   components: {
     'ni-button': Button,
     'ni-date-range': DateRange,
@@ -63,14 +65,21 @@ export default {
     'ni-event-edition-modal': EventEditionModal,
     'ni-title-header': TitleHeader,
   },
+  setup () {
+    const metaInfo = { title: 'Absences' };
+    useMeta(metaInfo);
+
+    const personKey = ref(AUXILIARY);
+    const { editedEvent, eventValidation } = usePlanningAction(personKey, []);
+
+    return { personKey, editedEvent, eventValidation };
+  },
   mixins: [planningActionMixin],
   data () {
     return {
-      personKey: AUXILIARY,
       loading: false,
       tableLoading: false,
       events: [],
-      editedEvent: {},
       editionModal: false,
       selectedAuxiliary: { picture: {}, identity: { lastname: '' } },
       pagination: { rowsPerPage: 0, sortBy: 'startDate', descending: true },

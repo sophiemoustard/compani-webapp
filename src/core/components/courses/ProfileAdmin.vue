@@ -5,7 +5,7 @@
       <p class="text-italic">Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation</p>
       <div class="row gutter-profile">
         <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
-          @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived"
+          @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived" clearable
           error-message="Numéro de téléphone manquant, veuillez le renseigner" />
       </div>
     </div>
@@ -17,22 +17,14 @@
           pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
-        <template #message>
-          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
-          les attestations de fin de formation.
-        </template>
-      </ni-banner>
       <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
         :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
-      <ni-bi-color-button icon="file_download" label="Attestations de fin de formation"
-        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates" size="16px" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
-      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
+      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" v-model:pagination="pagination" class="q-mb-md"
         :loading="smsLoading">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -40,7 +32,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="remove_red_eye" @click.native="openSmsHistoriesModal(col.value)" />
+                  <ni-button icon="remove_red_eye" @click="openSmsHistoriesModal(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -58,11 +50,9 @@
         label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
     </div>
 
-    <!-- Modal envoi message -->
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
-      :new-sms.sync="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
+      v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
-    <!-- Modal visualisation message -->
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
       :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
   </div>
@@ -70,7 +60,8 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
@@ -101,7 +92,7 @@ import {
   formatAndSortIdentityOptions,
 } from '@helpers/utils';
 import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
-import { downloadFile, downloadZip } from '@helpers/file';
+import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -120,6 +111,9 @@ export default {
   mixins: [courseMixin],
   props: {
     profileId: { type: String, required: true },
+  },
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -165,15 +159,12 @@ export default {
   },
   watch: {
     course () {
-      const phoneValidation = get(this.$v, 'course.contact.contact.phone', '');
+      const phoneValidation = get(this.v$, 'course.contact.contact.phone');
       if (phoneValidation) phoneValidation.$touch();
     },
   },
   computed: {
     ...mapState('course', ['course']),
-    disableDownloadCompletionCertificates () {
-      return this.disableDocDownload || !get(this.course, 'subProgram.program.learningGoals');
-    },
     isFinished () {
       const slots = this.course.slots.filter(slot => moment().isBefore(slot.startDate));
       return !slots.length && !this.course.slotsToPlan.length;
@@ -212,7 +203,7 @@ export default {
       return this.followUpDisabled || noPhoneNumber;
     },
     isMissingContactPhone () {
-      return !!get(this.course, 'contact._id') && get(this.$v, 'course.contact.contact.phone.$error');
+      return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
     },
   },
   methods: {
@@ -314,18 +305,20 @@ export default {
     },
     async sendMessage () {
       try {
-        this.$v.newSms.$touch();
-        if (this.$v.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newSms.$touch();
+        if (this.v$.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Courses.sendSMS(this.course._id, this.newSms);
         await this.refreshSms();
+
+        this.smsModal = false;
+
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'envoi des SMS');
       } finally {
-        this.smsModal = false;
         this.loading = false;
         this.message = '';
         this.setDefaultMessageType();
@@ -349,25 +342,11 @@ export default {
         this.pdfLoading = false;
       }
     },
-    async downloadCompletionCertificates () {
-      if (this.disableDownloadCompletionCertificates) return;
-
-      try {
-        this.pdfLoading = true;
-        const pdf = await Courses.downloadCompletionCertificates(this.course._id);
-        downloadZip(pdf, 'attestations.zip');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement des attestations.');
-      } finally {
-        this.pdfLoading = false;
-      }
-    },
   },
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-item
   padding-left: 0px
 </style>

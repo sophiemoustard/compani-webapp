@@ -11,14 +11,17 @@
     </div>
 
     <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkUserToCompany"
-      :validations="$v.newCompany" @hide="resetCompanyLinkModal" :new-company.sync="newCompany"
+      :validations="v$.newCompany" @hide="resetCompanyLinkModal" v-model:new-company="newCompany"
       :company-options="companyOptions" />
   </q-page>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
-import { mapState } from 'vuex';
+import { useMeta } from 'quasar';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { useStore } from 'vuex';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
@@ -28,110 +31,126 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { learnerMixin } from '@mixins/learnerMixin';
+import { ROLE_TRANSLATION } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 
 export default {
   name: 'LearnerProfile',
-  metaInfo: { title: 'Fiche apprenant' },
   props: {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
-  mixins: [learnerMixin],
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
     'ni-button': Button,
     'company-link-modal': CompanyLinkModal,
   },
-  data () {
-    return {
-      userIdentity: '',
-      tabsContent: [
-        { label: 'Infos personnelles', name: 'info', default: this.defaultTab === 'info', component: ProfileInfo },
-        { label: 'Formations', name: 'courses', default: this.defaultTab === 'courses', component: ProfileCourses },
-      ],
-      companyOptions: [],
-      companyLinkModal: false,
-      newCompany: '',
-      modalLoading: false,
-    };
-  },
-  async created () {
-    await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.learnerId });
-    this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
-  },
-  watch: {
-    async userProfile () {
-      this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
-    },
-  },
-  validations () {
-    return {
-      newCompany: { required },
-    };
-  },
-  computed: {
-    ...mapState('userProfile', ['userProfile']),
-    userProfileRole () {
-      return get(this.userProfile, 'role.client.name') || get(this.userProfile, 'role.vendor.name') || '';
-    },
-    headerInfo () {
-      const infos = [{ icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' }];
-      if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
+  setup (props) {
+    const metaInfo = { title: 'Fiche apprenant' };
+    useMeta(metaInfo);
+
+    const userIdentity = ref('');
+    const tabsContent = [
+      { label: 'Infos personnelles', name: 'info', default: props.defaultTab === 'info', component: ProfileInfo },
+      { label: 'Formations', name: 'courses', default: props.defaultTab === 'courses', component: ProfileCourses },
+    ];
+    const companyOptions = ref([]);
+    const companyLinkModal = ref(false);
+    const newCompany = ref('');
+    const modalLoading = ref(false);
+
+    const $store = useStore();
+    const userProfile = computed(() => $store.state.userProfile.userProfile);
+    const userProfileRole = computed(() => get(userProfile.value, 'role.client.name') ||
+      get(userProfile.value, 'role.vendor.name') || '');
+    const headerInfo = computed(() => {
+      const infos = [{ icon: 'apartment', label: userProfile.value.company ? userProfile.value.company.name : 'N/A' }];
+      if (userProfileRole.value) infos.push({ icon: 'person', label: ROLE_TRANSLATION[userProfileRole.value] });
 
       return infos;
-    },
-  },
-  methods: {
-    async refreshUserProfile () {
+    });
+
+    const rules = { newCompany: { required } };
+    const v$ = useVuelidate(rules, { newCompany });
+
+    watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
+
+    const refreshUserProfile = async () => {
       try {
-        await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });
+        await $store.dispatch('userProfile/fetchUserProfile', { userId: props.learnerId });
       } catch (e) {
         console.error(e);
       }
-    },
-    async openCompanyLinkModal () {
+    };
+
+    const openCompanyLinkModal = async () => {
       try {
         const companies = await Companies.list();
 
-        this.companyOptions = formatAndSortOptions(companies, 'name');
-        this.companyLinkModal = true;
+        companyOptions.value = formatAndSortOptions(companies, 'name');
+        companyLinkModal.value = true;
       } catch (e) {
         console.error(e);
-        this.companyLinkModal = false;
-        this.companyOptions = [];
+        companyLinkModal.value = false;
+        companyOptions.value = [];
       }
-    },
-    resetCompanyLinkModal () {
-      this.companyOptions = [];
-      this.newCompany = '';
-      this.$v.newCompany.$reset();
-    },
-    async linkUserToCompany () {
+    };
+
+    const resetCompanyLinkModal = () => {
+      companyOptions.value = [];
+      newCompany.value = '';
+      v$.value.newCompany.$reset();
+    };
+
+    const linkUserToCompany = async () => {
       try {
-        this.$v.newCompany.$touch();
-        if (this.$v.newCompany.$error) return NotifyWarning('Une structure est requise.');
+        v$.value.newCompany.$touch();
+        if (v$.value.newCompany.$error) return NotifyWarning('Une structure est requise.');
 
-        this.modalLoading = true;
-        await Users.updateById(this.userProfile._id, { company: this.newCompany });
+        modalLoading.value = true;
+        await Users.updateById(userProfile.value._id, { company: newCompany.value });
 
-        this.companyLinkModal = false;
+        companyLinkModal.value = false;
         NotifyPositive('Rattachement à la structure effectué.');
 
-        await this.refreshUserProfile();
+        await refreshUserProfile();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du rattachement à la structure.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-  },
-  beforeDestroy () {
-    this.$store.dispatch('userProfile/resetUserProfile');
+    };
+
+    onBeforeUnmount(() => { $store.dispatch('userProfile/resetUserProfile'); });
+
+    const created = async () => {
+      await refreshUserProfile();
+      userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL');
+    };
+
+    created();
+
+    return {
+      // Data
+      userIdentity,
+      tabsContent,
+      companyOptions,
+      companyLinkModal,
+      newCompany,
+      modalLoading,
+      // Computed
+      userProfile,
+      headerInfo,
+      // Validations
+      v$,
+      // Methods
+      openCompanyLinkModal,
+      resetCompanyLinkModal,
+      linkUserToCompany,
+    };
   },
 };
 </script>

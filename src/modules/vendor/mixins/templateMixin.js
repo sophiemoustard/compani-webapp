@@ -38,8 +38,11 @@ export const templateMixin = {
       return `${process.env.API_HOSTNAME}/cards/${this.card._id}/upload`;
     },
     questionErrorMsg () {
-      if (!this.$v.card.question.required) return REQUIRED_LABEL;
-      if (!this.$v.card.question.maxLength) return `${QUESTION_MAX_LENGTH} caractères maximum.`;
+      if (get(this.v$, 'card.question.required.$response') === false) return REQUIRED_LABEL;
+      if (get(this.v$, 'card.question.maxLength.$response') === false) {
+        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
+      }
+
       return '';
     },
     extensions () {
@@ -81,7 +84,7 @@ export const templateMixin = {
         const value = get(this.card, path);
         if (this.tmpInput === value) return;
 
-        const validation = get(this.$v.card, path);
+        const validation = get(this.v$.card, path);
         if (validation) {
           validation.$touch();
           if (validation.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -96,6 +99,10 @@ export const templateMixin = {
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
       }
     },
+    getError (path, index) {
+      return !!get(this.v$, `card.${path}.$dirty`) &&
+        get(this.v$, `card.${path}.$each.$response.$errors[${index}].text.0.$response`) === false;
+    },
     async updateTextAnswer (index) {
       try {
         const key = this.getAnswerKeyToUpdate(this.card.template);
@@ -103,8 +110,9 @@ export const templateMixin = {
 
         if (this.tmpInput === editedAnswer.text) return;
 
-        get(this.$v, `card.${key}.$each[${index}]`).$touch();
-        if (get(this.$v, `card.${key}.$each[${index}].text.$error`)) return NotifyWarning('Champ(s) invalide(s).');
+        get(this.v$, `card.${key}`).$touch();
+        const validation = get(this.v$, `card.${key}.$each.$response.$errors[${index}].text.0.$response`);
+        if (validation === false) return NotifyWarning('Champ(s) invalide(s).');
 
         await Cards.updateAnswer(
           { cardId: this.card._id, answerId: editedAnswer._id },

@@ -1,11 +1,11 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Factures manuelles" padding />
-    <ni-simple-table :columns="columns" :pagination.sync="pagination" :data="manualBills"
+    <ni-simple-table :columns="columns" v-model:pagination="pagination" :data="manualBills"
       :loading="tableLoading" :rows-per-page="rowsPerPage" separator="none">
       <template #body="{ props }">
-        <template v-for="(billingItem, index) of props.row.billingItemList">
-          <q-tr :props="props" :key="`${props.row._id}-${index}`" :class="{ 'border-top': index === 0 }">
+        <template v-for="(billingItem, index) of props.row.billingItemList" :key="`${props.row._id}-${index}`">
+          <q-tr :props="props" :class="{ 'border-top': index === 0 }">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'billingItem'">{{ billingItem.name }}</template>
@@ -27,8 +27,8 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer une facture"
       @click="manualBillCreationModal = true" />
 
-    <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="$v.newManualBill"
-      :loading="modalLoading" :new-manual-bill.sync="newManualBill" :customers-options="customersOptions"
+    <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="v$.newManualBill"
+      :loading="modalLoading" v-model:new-manual-bill="newManualBill" :customers-options="customersOptions"
       :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="createManualBill"
       :billing-items="billingItems" @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem"
       @remove-billing-item="removeBillingItem" />
@@ -36,9 +36,12 @@
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
+import set from 'lodash/set';
 import Customers from '@api/Customers';
 import BillingItems from '@api/BillingItems';
 import Bills from '@api/Bills';
@@ -53,11 +56,16 @@ import SimpleTable from '@components/table/SimpleTable';
 
 export default {
   name: 'ManualBills',
-  metaInfo: { title: 'Factures manuelles' },
   components: {
     'ni-title-header': TitleHeader,
     'ni-manual-bill-creation-modal': ManualBillCreationModal,
     'ni-simple-table': SimpleTable,
+  },
+  setup () {
+    const metaInfo = { title: 'Factures manuelles' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -97,11 +105,11 @@ export default {
       date: { required },
       customer: { required },
       billingItemList: {
-        $each: {
+        $each: helpers.forEach({
           billingItem: { required },
           unitInclTaxes: { positiveNumber, required },
           count: { strictPositiveNumber, required },
-        },
+        }),
       },
     },
   },
@@ -158,11 +166,11 @@ export default {
       this.newManualBill.billingItemList.splice(index, 1);
     },
     updateBillingItem (event, index, path) {
-      this.$set(this.newManualBill.billingItemList[index], path, event);
+      set(this.newManualBill.billingItemList[index], path, event);
       if (path === 'billingItem') {
         const billingItem = this.billingItems.find(bi => bi._id === event);
-        this.$set(this.newManualBill.billingItemList[index], 'vat', billingItem?.vat || 0);
-        this.$set(this.newManualBill.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+        set(this.newManualBill.billingItemList[index], 'vat', billingItem?.vat || 0);
+        set(this.newManualBill.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
       }
     },
     resetManualBillCreationModal () {
@@ -171,7 +179,7 @@ export default {
         customer: '',
         billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
-      this.$v.newManualBill.$reset();
+      this.v$.newManualBill.$reset();
     },
     formatCreationPayload () {
       return {
@@ -181,8 +189,8 @@ export default {
     },
     async createManualBill () {
       try {
-        this.$v.newManualBill.$touch();
-        if (this.$v.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newManualBill.$touch();
+        if (this.v$.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
 
@@ -202,7 +210,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .border-top td
   border-width: 1px 0 0 0
 </style>

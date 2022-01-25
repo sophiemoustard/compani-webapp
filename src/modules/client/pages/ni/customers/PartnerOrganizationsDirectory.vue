@@ -3,18 +3,21 @@
     <ni-directory-header title="Structures partenaires" search-placeholder="Rechercher une structure"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredPartnerOrganizations" :columns="columns" :visible-columns="visibleColumns"
-      :pagination.sync="pagination" :rows-per-page="[15, 50]" :loading="tableLoading"
+      v-model:pagination="pagination" :rows-per-page="[15, 50]" :loading="tableLoading"
       @go-to="goToPartnerOrganizationProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="partnerOrganizationCreationModal = true" />
 
     <partner-organization-creation-modal v-model="partnerOrganizationCreationModal" @submit="createPartnerOrganization"
-      :new-partner-organization.sync="newPartnerOrganization" :loading="modalLoading" @hide="resetModal"
-      :validations="$v.newPartnerOrganization" />
+      v-model:new-partner-organization="newPartnerOrganization" :loading="modalLoading" @hide="resetModal"
+      :validations="v$.newPartnerOrganization" />
   </q-page>
 </template>
+
 <script>
-import { required, email, requiredIf } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required, email, requiredIf } from '@vuelidate/validators';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import get from 'lodash/get';
@@ -30,12 +33,17 @@ import { validationMixin } from '@mixins/validationMixin';
 import PartnerOrganizationCreationModal from 'src/modules/client/components/customers/PartnerOrganizationCreationModal';
 
 export default {
-  metaInfo: { title: 'Structures partenaires' },
   name: 'PartnerOrgarnizationsDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
     'partner-organization-creation-modal': PartnerOrganizationCreationModal,
     'ni-table-list': TableList,
+  },
+  setup () {
+    const metaInfo = { title: 'Structures partenaires' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   mixins: [validationMixin],
   data () {
@@ -61,18 +69,20 @@ export default {
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
     };
   },
-  validations: {
-    newPartnerOrganization: {
-      name: { required },
-      phone: { frPhoneNumber },
-      address: {
-        zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-        street: { required: requiredIf(item => item && !!item.fullAddress) },
-        city: { required: requiredIf(item => item && !!item.fullAddress) },
-        fullAddress: { frAddress },
+  validations () {
+    return {
+      newPartnerOrganization: {
+        name: { required },
+        phone: { frPhoneNumber },
+        address: {
+          zipCode: { required: requiredIf(!!get(this.newPartnerOrganization, 'address.fullAddress')) },
+          street: { required: requiredIf(!!get(this.newPartnerOrganization, 'address.fullAddress')) },
+          city: { required: requiredIf(!!get(this.newPartnerOrganization, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        email: { email },
       },
-      email: { email },
-    },
+    };
   },
   computed: {
     filteredPartnerOrganizations () {
@@ -114,8 +124,8 @@ export default {
       try {
         this.modalLoading = true;
 
-        this.$v.newPartnerOrganization.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.newPartnerOrganization);
+        this.v$.newPartnerOrganization.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.newPartnerOrganization);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         const payload = this.formatPayload(this.newPartnerOrganization);
@@ -134,7 +144,7 @@ export default {
       }
     },
     resetModal () {
-      this.$v.newPartnerOrganization.$reset();
+      this.v$.newPartnerOrganization.$reset();
       this.newPartnerOrganization = { name: '', phone: '', address: {}, email: '' };
     },
   },

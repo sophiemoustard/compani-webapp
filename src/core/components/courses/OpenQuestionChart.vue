@@ -24,7 +24,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .card
   padding: 16px 32px
 .subtitle

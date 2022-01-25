@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Bordereaux tiers payeurs" padding />
-    <ni-simple-table :data="billSlipList" :columns="columns" row-key="name" :pagination.sync="pagination"
+    <ni-simple-table :data="billSlipList" :columns="columns" row-key="name" v-model:pagination="pagination"
       :loading="loading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import get from 'lodash/get';
 import BillSlip from '@api/BillSlips';
 import SimpleTable from '@components/table/SimpleTable';
@@ -30,13 +31,15 @@ import { formatPrice } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadDocx } from '@helpers/file';
 
+const metaInfo = { title: 'Bordereaux tiers payeurs' };
+
 export default {
   name: 'TppBillSlips',
-  metaInfo: { title: 'Bordereaux tiers payeurs' },
   components: {
     'ni-simple-table': SimpleTable,
     'ni-title-header': TitleHeader,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       billSlipList: [],
@@ -73,7 +76,7 @@ export default {
       },
     };
   },
-  async mounted () {
+  async created () {
     await this.refreshBillSlips();
   },
   methods: {

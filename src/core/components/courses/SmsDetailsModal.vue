@@ -1,6 +1,6 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+    <template #title>
         Message envoyé le <span class="text-weight-bold">{{ smsDate }}</span>
       </template>
       <ni-banner v-if="missingTraineesPhoneHistory.length" icon="info_outline">
@@ -10,8 +10,8 @@
           {{ missingTraineesPhoneHistory.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" :value="smsHistory.type" disable />
-      <ni-input in-modal caption="Message" :value="smsHistory.message" type="textarea" :rows="7" disable />
+      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" :model-value="smsHistory.type" disable />
+      <ni-input in-modal caption="Message" :model-value="smsHistory.message" type="textarea" :rows="7" disable />
     </ni-modal>
 </template>
 
@@ -26,7 +26,7 @@ import { formatDate } from '@helpers/date';
 export default {
   name: 'SmsDetailsModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     missingTraineesPhoneHistory: { type: Array, default: () => [] },
     messageTypeOptions: { type: Array, default: () => [] },
     smsHistory: { type: Object, default: () => ({}) },
@@ -42,13 +42,14 @@ export default {
       return formatDate(this.smsHistory.date);
     },
   },
+  emits: ['hide', 'update:model-value'],
   methods: {
     formatQuantity,
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
   },
 };

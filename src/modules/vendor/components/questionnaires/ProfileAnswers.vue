@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="filters-container">
-      <ni-select :options="trainerList" :value="selectedTrainer" @input="updateSelectedTrainer" />
-      <ni-select :options="companyList" :value="selectedCompany" @input="updateSelectedCompany" />
-      <ni-select :options="programList" :value="selectedProgram" @input="updateSelectedProgram" />
+      <ni-select :options="trainerList" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer" />
+      <ni-select :options="companyList" :model-value="selectedCompany" @update:model-value="updateSelectedCompany" />
+      <ni-select :options="programList" :model-value="selectedProgram" @update:model-value="updateSelectedProgram" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
@@ -134,9 +134,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .filters-container
     grid-template-columns: repeat(3, 28%) 16%
     @media screen and (max-width: 767px)
-      width: 95%;
+      width: 95%
 </style>

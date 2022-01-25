@@ -1,36 +1,43 @@
 <template>
   <div class="row" style="background: white">
     <div class="row justify-center col-xs-12" style="padding: 12px 0px;">
-      <croppa v-model="croppa" :canvas-color="canvasColor" accept="image/*" :initial-image="pictureLink"
-        :prevent-white-space="true" placeholder="Cliquez ici pour choisir votre photo" placeholder-color="black"
-        :placeholder-font-size="10" :show-remove-button="false" :disable-drag-and-drop="disablePictureEdition"
-        :disable-drag-to-move="disablePictureEdition" :disable-scroll-to-zoom="disablePictureEdition"
-        :disable-pinch-to-zoom="disablePictureEdition" @file-choose="choosePicture" />
+      <cropper v-if="displayCropper" ref="cropper" :src="image" class="cropper" :stencil-props="{ aspectRatio: 1/1 }" />
+      <ni-custom-img v-if="!displayCropper && hasPicture" :image-source="pictureLink" alt="Photo de profil" />
+      <ni-custom-img v-if="!displayCropper && !hasPicture" :image-source="DEFAULT_AVATAR" alt="Photo par défaut" />
     </div>
     <div class="row justify-center col-xs-12">
-      <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat
-        icon="mdi-square-edit-outline" size="1rem" @click="disablePictureEdition = false" />
-      <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem"
-        @click="validateImageDeletion" />
-      <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="save_alt" size="1rem"
-        type="a" :href="pictureDlLink(pictureLink)" target="_blank" />
-      <q-btn v-if="!disablePictureEdition" color="primary" icon="close" @click="closePictureEdition" round flat
-        size="1rem" />
-      <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_left" @click="croppa.rotate(-1)" round
-        flat size="1rem" />
-      <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_right" @click="croppa.rotate(1)" round
-        flat size="1rem" />
-      <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
-        @click="uploadImage" round flat size="1rem" />
+      <div v-if="!displayCropper && hasPicture">
+        <ni-button icon="mdi-square-edit-outline" size="1rem" @click="displayCropper = true" />
+        <ni-button icon="delete" size="1rem" @click="validateImageDeletion" />
+        <ni-button icon="save_alt" size="1rem" type="a" :href="pictureDlLink(pictureLink)" />
+      </div>
+      <div v-if="displayCropper">
+        <ni-button size="1rem" icon="close" @click="displayCropper = false" />
+        <ni-button size="1rem" icon="rotate_left" @click="() => rotate(-90)" />
+        <ni-button size="1rem" icon="rotate_right" @click="() => rotate(90)" />
+        <ni-button size="1rem" icon="done" @click="uploadImage" :loading="loadingImage" />
+      </div>
+      <div v-if="!displayCropper && !hasPicture" class="row input-file-container" @click="openFileSelection">
+        <span class="input-file-empty">Ajouter une photo</span>
+        <i aria-hidden="true" class="q-icon on-right material-icons self-center relative-position">
+          add
+          <input ref="file" type="file" class="input-file absolute-full cursor-pointer" accept="image/*"
+            @change="loadImage($event)">
+        </i>
+      </div>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
-import 'vue-croppa/dist/vue-croppa.css';
+import { Cropper } from 'vue-advanced-cropper';
+import 'vue-advanced-cropper/dist/style.css';
 import get from 'lodash/get';
 import Users from '@api/Users';
+import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import CustomImg from '@components/form/CustomImg';
+import { DEFAULT_AVATAR } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
 
 export default {
@@ -39,12 +46,18 @@ export default {
     user: { type: Object, default: () => ({}) },
     refreshPicture: { type: Function, default: () => {} },
   },
+  components: {
+    cropper: Cropper,
+    'ni-custom-img': CustomImg,
+    'ni-button': Button,
+  },
   data () {
     return {
-      disablePictureEdition: true,
-      croppa: {},
+      image: '',
+      displayCropper: false,
       loadingImage: false,
       fileChosen: false,
+      DEFAULT_AVATAR,
     };
   },
   computed: {
@@ -55,7 +68,7 @@ export default {
       return get(this.user, 'picture.link') || null;
     },
     canvasColor () {
-      return /\/ad\//.test(this.$router.currentRoute.path) ? '#FFEDDA' : '#EEE';
+      return /\/ad\//.test(this.$route.path) ? '#FFEDDA' : '#EEE';
     },
     noDiacriticLastname () {
       return removeDiacritics(get(this.user, 'identity.lastname') || '');
@@ -64,46 +77,49 @@ export default {
       return removeDiacritics(get(this.user, 'identity.firstname') || '');
     },
   },
+  created () {
+    this.image = get(this.user, 'picture.link') || '';
+  },
   methods: {
-    async formatImagePayload () {
-      const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
-
-      const data = new FormData();
-      data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
-      data.append('file', blob);
-
-      return data;
+    openFileSelection () {
+      this.$refs.file.click();
     },
-    async uploadImage () {
-      try {
-        if (this.hasPicture && !this.fileChosen) await Users.deleteImage(this.user._id);
+    loadImage (event) {
+      const { files } = event.target;
 
-        this.loadingImage = true;
-        const payload = await this.formatImagePayload();
-        await Users.uploadImage(this.user._id, payload);
+      if (files && files[0]) {
+        if (this.image) URL.revokeObjectURL(this.image);
 
-        await this.refreshPicture();
-        this.closePictureEdition();
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification.');
-      } finally {
-        this.loadingImage = false;
+        const blob = URL.createObjectURL(files[0]);
+
+        const reader = new FileReader();
+        reader.onload = (e) => { this.image = blob; };
+        reader.readAsArrayBuffer(files[0]);
+        this.displayCropper = true;
       }
     },
-    async deleteImage () {
-      try {
-        if (get(this.user, 'picture.publicId')) {
-          await Users.deleteImage(this.user._id);
-          this.croppa.remove();
+    rotate (angle) {
+      this.$refs.cropper.rotate(angle);
+    },
+    async uploadImage () {
+      const { canvas } = this.$refs.cropper.getResult();
+      if (canvas) {
+        await canvas.toBlob(
+          async (blob) => {
+            this.loadingImage = true;
 
-          await this.refreshPicture();
-          NotifyPositive('Photo supprimée');
-        } else NotifyNegative('Erreur lors de la suppression de la photo.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la photo.');
+            const data = new FormData();
+            data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
+            data.append('file', blob);
+
+            await Users.uploadImage(this.user._id, data);
+            await this.refreshPicture();
+
+            this.displayCropper = false;
+            this.loadingImage = false;
+          },
+          'image/jpeg'
+        );
       }
     },
     validateImageDeletion () {
@@ -116,16 +132,20 @@ export default {
         .onOk(this.deleteImage)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
-    choosePicture () {
-      this.fileChosen = true;
-      this.disablePictureEdition = false;
-      this.croppa.chooseFile();
-    },
-    closePictureEdition () {
-      this.disablePictureEdition = true;
-      this.fileChosen = false;
-      if (!this.hasPicture && !this.fileChosen) this.croppa.remove();
-      if (this.hasPicture && !this.fileChosen) this.croppa.refresh();
+    async deleteImage () {
+      try {
+        if (get(this.user, 'picture.publicId')) {
+          await Users.deleteImage(this.user._id);
+          this.image = '';
+
+          await this.refreshPicture();
+
+          NotifyPositive('Photo supprimée');
+        } else NotifyNegative('Erreur lors de la suppression de la photo.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la photo.');
+      }
     },
     pictureDlLink (link) {
       return link
@@ -135,3 +155,22 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.cropper
+  height: 150px
+  width: 150px
+
+.input-file-container
+  padding: 6px 10px
+  color: $copper-500
+  cursor: pointer
+  .input-file-empty
+    font-size: 14px
+  .input-file
+    opacity: 0
+    max-width: 100%
+    height: 100%
+    width: 100%
+    font-size: 0
+</style>

@@ -31,6 +31,7 @@ export default {
     questionnaire: { type: Object, required: true },
     index: { type: Number, required: true },
   },
+  emits: ['click'],
   data () {
     return {
       DRAFT,
@@ -40,28 +41,28 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .q-card__section
-    width: 184px
-    padding: 8px
-    &:hover
-      cursor: pointer
-  .version
-    font-size: 14px;
-    color: $copper-grey-800;
-  .draft
-    font-size: 12px;
-  .published
-    font-size: 12px;
-  .name
-    margin 16px 0px;
-    word-break: break-word;
-    height: 48px;
-  .answers
-    font-size: 14px
-    border-radius: 8px
-    width: 100px
-    text-align: center
-    color: $copper-grey-800
-    background-color: $copper-grey-300
-  </style>
+<style lang="sass" scoped>
+.q-card__section
+  width: 184px
+  padding: 8px
+  &:hover
+    cursor: pointer
+.version
+  font-size: 14px
+  color: $copper-grey-800
+.draft
+  font-size: 12px
+.published
+  font-size: 12px
+.name
+  margin: 16px 0px
+  word-break: break-word
+  height: 48px
+.answers
+  font-size: 14px
+  border-radius: 8px
+  width: 100px
+  text-align: center
+  color: $copper-grey-800
+  background-color: $copper-grey-300
+</style>

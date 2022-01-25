@@ -271,6 +271,15 @@ const routes = [
           parent: 'pedagogy',
         },
       },
+      {
+        path: 'ni/exports/history',
+        name: 'ni exports history vendor',
+        component: () => import('src/modules/vendor/pages/ni/exports/HistoryExports'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'exports',
+        },
+      },
     ],
   },
 ];

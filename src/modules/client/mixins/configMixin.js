@@ -33,15 +33,15 @@ export const configMixin = {
     async refreshCompany () {
       await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
       this.company = { ...extend(this.resetCompany, this.loggedCompany) };
-      this.$v.company.$touch();
+      this.v$.company.$touch();
     },
     async updateCompany (path) {
       try {
         if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
         if (this.tmpInput === get(this.company, path)) return;
 
-        if (get(this.$v.company, path)) {
-          const isValid = await this.waitForValidation(this.$v.company, path);
+        if (get(this.v$.company, path)) {
+          const isValid = await this.waitForValidation(this.v$.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
@@ -57,11 +57,12 @@ export const configMixin = {
         this.tmpInput = '';
       }
     },
-    nbrError (path, validations = this.$v) {
+    nbrError (path, validations = this.v$) {
       const val = get(validations, path);
-      if (val.required === false) return REQUIRED_LABEL;
-      if (val.positiveNumber === false || val.numeric === false || val.maxValue === false) return 'Nombre non valide';
-      if (val.twoFractionDigits === false) return 'Décimales non valides';
+      if (get(val, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(val, 'positiveNumber.$response') === false || get(val, 'numeric.$response') === false ||
+        get(val, 'maxValue.$response') === false) return 'Nombre non valide';
+      if (get(val, 'twoFractionDigits.$response') === false) return 'Décimales non valides';
 
       return '';
     },

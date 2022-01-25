@@ -11,7 +11,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .elearning-indicator
   font-size: 36px
 </style>

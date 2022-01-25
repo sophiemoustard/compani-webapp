@@ -1,6 +1,6 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')">
+    <template #title>
       Interventions <span class="text-weight-bold">simultanées</span>
     </template>
     <div class="q-mb-md">
@@ -18,9 +18,10 @@ import { CUSTOMER } from '@data/constants';
 export default {
   name: 'EventConflictModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     events: { type: Array, default: () => [] },
   },
+  emits: ['hide', 'update:model-value'],
   data () {
     return {
       CUSTOMER,

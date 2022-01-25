@@ -6,9 +6,12 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapGetters } from 'vuex';
 import TitleHeader from '@components/TitleHeader';
 import CoachList from '@components/table/CoachList';
+
+const metaInfo = { title: 'Configuration coachs' };
 
 export default {
   name: 'CoachConfig',
@@ -16,6 +19,7 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-coach-list': CoachList,
   },
+  mixins: [createMetaMixin(metaInfo)],
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
   },

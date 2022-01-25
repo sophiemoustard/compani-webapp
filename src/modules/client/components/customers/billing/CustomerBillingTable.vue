@@ -110,6 +110,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
   },
+  emits: ['delete', 'open-edition-modal'],
   data () {
     return {
       docLoading: false,
@@ -246,23 +247,22 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .bold
-    font-weight bold;
+<style lang="sass" scoped>
+.bold
+  font-weight: bold
 
-  .q-table tbody tr:hover
-    background: none;
+.q-table tbody tr:hover
+  background: none
 
-  .download
-    cursor: pointer;
-    color: $primary;
-    text-decoration underline;
+.download
+  cursor: pointer
+  color: $primary
+  text-decoration: underline
 
-  .disabled
-    cursor: not-allowed;
+.disabled
+  cursor: not-allowed
 
-  /deep/ .q-item
-    .q-item__section
-      padding: 0px;
-
+:deep(.q-item)
+  .q-item__section
+    padding: 0px
 </style>

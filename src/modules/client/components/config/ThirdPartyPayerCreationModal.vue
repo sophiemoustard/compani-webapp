@@ -1,26 +1,29 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-      <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+      <template #title>
         Ajouter un <span class="text-weight-bold">tiers payeur</span>
       </template>
-      <ni-input in-modal caption="Nom" :value="newThirdPartyPayer.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field @input="update($event, 'name')" />
-      <ni-search-address :value="newThirdPartyPayer.address" error-message="Adresse invalide" in-modal
-        @blur="validations.address.$touch" :error="validations.address.$error" @input="update($event, 'address')" />
-      <ni-input in-modal caption="Email" :value="newThirdPartyPayer.email" error-message="Email non valide"
-        :error="validations.email.$error" @input="update($event.trim(), 'email')" @blur="validations.email.$touch" />
+      <ni-input in-modal caption="Nom" :model-value="newThirdPartyPayer.name" :error="validations.name.$error"
+        @blur="validations.name.$touch" required-field @update:model-value="update($event, 'name')" />
+      <ni-search-address :model-value="newThirdPartyPayer.address" error-message="Adresse invalide" in-modal
+        @blur="validations.address.$touch" @update:model-value="update($event, 'address')"
+        :error="validations.address.$error" />
+      <ni-input in-modal caption="Email" :model-value="newThirdPartyPayer.email" error-message="Email non valide"
+        :error="validations.email.$error" @update:model-value="update($event.trim(), 'email')"
+        @blur="validations.email.$touch" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
-        :value="newThirdPartyPayer.unitTTCRate" :error="validations.unitTTCRate.$error"
-        :error-message="nbrError('unitTTCRate', validations)" @input="update($event, 'unitTTCRate')" />
-      <ni-select in-modal :value="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
-        :filter="false" required-field :error="validations.billingMode.$error"
-        @blur="validations.billingMode.$touch" @input="update($event, 'billingMode')" />
-      <ni-input in-modal caption="ID de télétransmission" :value="newThirdPartyPayer.teletransmissionId"
-        @input="update($event, 'teletransmissionId')" />
+        :model-value="newThirdPartyPayer.unitTTCRate" :error="validations.unitTTCRate.$error"
+        :error-message="nbrError('unitTTCRate', validations)" @update:model-value="update($event, 'unitTTCRate')" />
+      <ni-select :model-value="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
+        :filter="false" required-field :error="validations.billingMode.$error" in-modal
+        @blur="validations.billingMode.$touch" @update:model-value="update($event, 'billingMode')" />
+      <ni-input in-modal caption="ID de télétransmission" :model-value="newThirdPartyPayer.teletransmissionId"
+        @update:model-value="update($event, 'teletransmissionId')" />
       <div class="row q-mb-md light-checkbox">
-        <q-checkbox :value="newThirdPartyPayer.isApa" label="Financement APA" @input="update($event, 'isApa')" dense />
+        <q-checkbox :model-value="newThirdPartyPayer.isApa" @update:model-value="update($event, 'isApa')" dense
+          label="Financement APA" />
       </div>
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>
@@ -38,7 +41,7 @@ export default {
   name: 'ThirdPartyPayerCreationModal',
   mixins: [configMixin],
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newThirdPartyPayer: { type: Object, default: () => ({}) },
     billingModeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
@@ -50,12 +53,13 @@ export default {
     'ni-select': Select,
     'ni-search-address': SearchAddress,
   },
+  emits: ['update:model-value', 'hide', 'submit', 'update'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');

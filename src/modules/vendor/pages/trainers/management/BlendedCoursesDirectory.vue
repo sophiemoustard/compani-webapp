@@ -3,10 +3,12 @@
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
     <div class="filters-container">
-      <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
-      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativesFilterOptions"
-        :value="selectedSalesRepresentative" @input="updateSelectedSalesRepresentative" />
+      <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
+        @update:model-value="updateSelectedCompany" />
+      <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
+        @update:model-value="updateSelectedProgram" />
+      <ni-select :options="salesRepresentativesFilterOptions" clearable
+        :model-value="selectedSalesRepresentative" @update:model-value="updateSelectedSalesRepresentative" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -21,11 +23,13 @@ import Trello from '@components/courses/Trello';
 import Select from '@components/form/Select';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED } from '@data/constants';
+import { createMetaMixin } from 'quasar';
+
+const metaInfo = { title: 'Catalogue' };
 
 export default {
-  metaInfo: { title: 'Catalogue' },
   name: 'BlendedCoursesDirectory',
-  mixins: [courseFiltersMixin],
+  mixins: [courseFiltersMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
@@ -54,8 +58,8 @@ export default {
       }
     },
   },
-  beforeDestroy () {
-    if (this.$router.currentRoute.name !== 'trainers courses info') this.$store.dispatch('course/resetFilters');
+  beforeUnmount () {
+    if (this.$route.name !== 'trainers courses info') this.$store.dispatch('course/resetFilters');
   },
 };
 </script>

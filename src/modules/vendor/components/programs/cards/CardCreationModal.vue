@@ -1,6 +1,6 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide" container-class="modal-container-md">
+    <template #title>
       Créer une nouvelle <span class="text-weight-bold">carte</span>
     </template>
     <h6 class="text-weight-bold">Cours</h6>
@@ -100,11 +100,12 @@ import Modal from '@components/modal/Modal';
 export default {
   name: 'CardCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
   },
+  emits: ['hide', 'update:model-value', 'submit'],
   data () {
     return {
       CARD_TEMPLATES,
@@ -136,7 +137,7 @@ export default {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit (template) {
       this.$emit('submit', template);
@@ -148,7 +149,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 h6
   margin-bottom: 3px
 
@@ -180,7 +181,7 @@ h6
 
   .flashcard
     justify-content: center
-    & > div
+    div
       width: 40%
       height: 35px
       margin: 5px 2px

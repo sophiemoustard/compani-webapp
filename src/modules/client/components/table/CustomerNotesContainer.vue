@@ -9,7 +9,7 @@
     </div>
     <template v-if="visibleNotesList.length">
       <div v-for="note of visibleNotesList" :key="note._id">
-        <customer-note-cell :note="note" @openEditedNoteModal="openEditedNoteModal" />
+        <customer-note-cell :note="note" @open-edited-note-modal="openEditedNoteModal" />
         <q-separator v-if="notesList.length > 1" class="q-mx-sm q-mb-sm" />
       </div>
     </template>
@@ -34,6 +34,7 @@ export default {
     notesList: { type: Array, required: true, default: () => [] },
     displayAllNotes: { type: Boolean, default: false },
   },
+  emits: ['update:display-all-notes', 'open-new-note-modal', 'open-edited-note-modal'],
   computed: {
     visibleNotesList () {
       if (this.displayAllNotes || this.notesList.length < 3) return this.notesList;
@@ -42,13 +43,13 @@ export default {
   },
   methods: {
     openNewNoteModal () {
-      this.$emit('openNewNoteModal');
+      this.$emit('open-new-note-modal');
     },
     openEditedNoteModal (editedNote) {
-      this.$emit('openEditedNoteModal', editedNote);
+      this.$emit('open-edited-note-modal', editedNote);
     },
     update (event) {
-      this.$emit('update:displayAllNotes', event);
+      this.$emit('update:display-all-notes', event);
     },
   },
 };

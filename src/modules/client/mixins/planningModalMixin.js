@@ -22,6 +22,7 @@ import {
   ABSENCE_NATURES,
   UNJUSTIFIED,
   DAILY,
+  HALF_DAILY,
   HOURLY,
   ILLNESS,
   WORK_ACCIDENT,
@@ -144,7 +145,9 @@ export const planningModalMixin = {
       }));
     },
     additionalValue () {
-      return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
+      return !get(this.selectedAuxiliary, '_id')
+        ? ''
+        : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
       const driveId = get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
@@ -204,6 +207,9 @@ export const planningModalMixin = {
     isHourlyAbsence (event) {
       return event.type === ABSENCE && event.absenceNature === HOURLY;
     },
+    isHalfDailyAbsence (event) {
+      return event.type === ABSENCE && event.absenceNature === HALF_DAILY;
+    },
     isIllnessOrWorkAccident (event) {
       return event.absence && [ILLNESS, WORK_ACCIDENT].includes(event.absence);
     },
@@ -231,11 +237,9 @@ export const planningModalMixin = {
       const activeCustomers = this.customers
         .filter(customer => !customer.archivedAt &&
           (!customer.stoppedAt || !startDate || isBefore(startDate, customer.stoppedAt)));
-      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
-        return formatAndSortIdentityOptions(activeCustomers); // Unassigned event
-      }
+      if (!get(this.selectedAuxiliary, '_id')) return formatAndSortIdentityOptions(activeCustomers); // Unassigned event
 
-      if (!this.selectedAuxiliary.contracts) return [];
+      if (!get(this.selectedAuxiliary, 'contracts')) return [];
 
       return formatAndSortIdentityOptions(activeCustomers);
     },

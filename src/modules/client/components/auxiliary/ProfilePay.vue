@@ -5,7 +5,7 @@
         <p class="text-weight-bold">Documents</p>
       </div>
       <ni-simple-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
-        :pagination.sync="pagination" row-key="name" :loading="payDocumentsLoading">
+        v-model:pagination="pagination" row-key="name" :loading="payDocumentsLoading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -30,15 +30,16 @@
         label="Ajouter un document" @click="documentUpload = true" :disable="payDocumentsLoading" />
 
       <!-- Document upload modal -->
-      <pay-document-creation-modal v-model="documentUpload" :validations="$v.newPayDocument" @submit="createDocument"
-        :new-pay-document.sync="newPayDocument" :loading="loading" @hide="resetNewPayDocument" />
+      <pay-document-creation-modal v-model="documentUpload" :validations="v$.newPayDocument" @submit="createDocument"
+        v-model:new-pay-document="newPayDocument" :loading="loading" @hide="resetNewPayDocument" />
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
@@ -55,6 +56,7 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ProfilePay',
+  setup () { return { v$: useVuelidate() }; },
   mixins: [tableMixin, validationMixin],
   components: {
     'pay-document-creation-modal': PayDocumentCreationModal,
@@ -147,18 +149,14 @@ export default {
       return form;
     },
     resetNewPayDocument () {
-      this.newPayDocument = {
-        nature: null,
-        date: new Date().toISOString(),
-        file: null,
-      };
-      this.$v.newPayDocument.$reset();
+      this.newPayDocument = { nature: null, date: new Date().toISOString(), file: null };
+      this.v$.newPayDocument.$reset();
     },
     async createDocument () {
       if (!this.driveFolder) NotifyNegative('Dossier Google Drive manquant.');
 
-      this.$v.newPayDocument.$touch();
-      const isValid = await this.waitForFormValidation(this.$v.newPayDocument);
+      this.v$.newPayDocument.$touch();
+      const isValid = await this.waitForFormValidation(this.v$.newPayDocument);
       if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
       this.loading = true;
@@ -212,9 +210,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .q-card
-    background: white;
-    width: 100%;
-    margin-bottom: 20px;
+    background: white
+    width: 100%
+    margin-bottom: 20px
 </style>

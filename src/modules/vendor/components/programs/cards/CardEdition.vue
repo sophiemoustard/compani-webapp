@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue';
 import { mapState } from 'vuex';
 import {
   TRANSITION,
@@ -34,6 +35,7 @@ export default {
     disableEdition: { type: Boolean, default: false },
     cardParent: { type: Object, default: () => ({}) },
   },
+  emits: ['refresh'],
   data () {
     return {
       TRANSITION,
@@ -56,29 +58,45 @@ export default {
     templateInstance () {
       switch (this.currentTemplate) {
         case TRANSITION:
-          return () => import('src/modules/vendor/components/programs/cards/templates/Transition');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/Transition')
+          );
         case TITLE_TEXT_MEDIA:
-          return () => import('src/modules/vendor/components/programs/cards/templates/TitleTextMedia');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/TitleTextMedia')
+          );
         case TITLE_TEXT:
-          return () => import('src/modules/vendor/components/programs/cards/templates/TitleText');
+          return defineAsyncComponent(() => import('src/modules/vendor/components/programs/cards/templates/TitleText'));
         case TEXT_MEDIA:
-          return () => import('src/modules/vendor/components/programs/cards/templates/TextMedia');
+          return defineAsyncComponent(() => import('src/modules/vendor/components/programs/cards/templates/TextMedia'));
         case FLASHCARD:
-          return () => import('src/modules/vendor/components/programs/cards/templates/Flashcard');
+          return defineAsyncComponent(() => import('src/modules/vendor/components/programs/cards/templates/Flashcard'));
         case FILL_THE_GAPS:
-          return () => import('src/modules/vendor/components/programs/cards/templates/FillTheGaps');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/FillTheGaps')
+          );
         case ORDER_THE_SEQUENCE:
-          return () => import('src/modules/vendor/components/programs/cards/templates/OrderTheSequence');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/OrderTheSequence')
+          );
         case SINGLE_CHOICE_QUESTION:
-          return () => import('src/modules/vendor/components/programs/cards/templates/SingleChoiceQuestion');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/SingleChoiceQuestion')
+          );
         case MULTIPLE_CHOICE_QUESTION:
-          return () => import('src/modules/vendor/components/programs/cards/templates/MultipleChoiceQuestion');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/MultipleChoiceQuestion')
+          );
         case SURVEY:
-          return () => import('src/modules/vendor/components/programs/cards/templates/Survey');
+          return defineAsyncComponent(() => import('src/modules/vendor/components/programs/cards/templates/Survey'));
         case OPEN_QUESTION:
-          return () => import('src/modules/vendor/components/programs/cards/templates/OpenQuestion');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/OpenQuestion')
+          );
         case QUESTION_ANSWER:
-          return () => import('src/modules/vendor/components/programs/cards/templates/QuestionAnswer');
+          return defineAsyncComponent(
+            () => import('src/modules/vendor/components/programs/cards/templates/QuestionAnswer')
+          );
         default:
           return null;
       }
@@ -97,7 +115,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-scrollarea
   height: 100%
 

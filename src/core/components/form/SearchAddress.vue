@@ -4,11 +4,11 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-      <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
+      <q-select dense borderless :model-value="modelValue.fullAddress" @update:model-value="update" use-input fill-input
         input-debounce="500" :options="options" :class="{ 'borders': inModal }" :disable="disable" behavior="menu"
-        @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color" :error="error"
+        @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color" :error="error" hide-selected
         :error-message="errorMessage">
-        <template v-if="value.fullAddress && !disable" #append>
+        <template v-if="modelValue.fullAddress && !disable" #append>
           <ni-button icon="close" @click.stop="resetValue" size="sm" />
         </template>
       </q-select>
@@ -24,7 +24,7 @@ import Button from '@components/Button';
 export default {
   name: 'SearchAddress',
   props: {
-    value: { type: Object, default: () => ({ street: '', zipCode: '', city: '', fullAddress: '' }) },
+    modelValue: { type: Object, default: () => ({ street: '', zipCode: '', city: '', fullAddress: '' }) },
     caption: { type: String, default: 'Adresse' },
     errorMessage: { type: String, default: REQUIRED_LABEL },
     error: { type: Boolean, default: false },
@@ -33,6 +33,7 @@ export default {
     disable: { type: Boolean, default: false },
     color: { type: String, default: 'white' },
   },
+  emits: ['blur', 'focus', 'update:model-value'],
   components: {
     'ni-button': Button,
   },
@@ -69,23 +70,23 @@ export default {
       this.$emit('focus');
     },
     update (value) {
-      this.$emit('input', pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
+      this.$emit('update:model-value', pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
     },
     resetValue () {
-      this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' });
+      this.$emit('update:model-value', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' });
     },
   },
 };
 </script>
 
-<style lang="stylus" scoped>
-  /deep/ .q-select
-    width: 100%
-    .q-select__dropdown-icon
-      display: none
-    .q-spinner
-      display: none
+<style lang="sass" scoped>
+:deep(.q-select)
+  width: 100%
+  .q-select__dropdown-icon
+    display: none
+  .q-spinner
+    display: none
 
-  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
-    color: $copper-grey-900
+:deep(.q-field__native), :deep(.q-field__prefix), :deep(.q-field__suffix), :deep(.q-field__input)
+  color: $copper-grey-900
 </style>

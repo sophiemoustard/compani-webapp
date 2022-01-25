@@ -3,7 +3,7 @@
     <div class="planning-month col-6">
       <q-btn flat dense icon-right="arrow_drop_down" :label="timelineTitle">
         <q-menu self="top middle" anchor="bottom middle">
-          <q-date minimal @input="goToWeek" :value="date" />
+          <q-date minimal @update:model-value="goToWeek" :model-value="date" />
         </q-menu>
       </q-btn>
       <div data-cy="week-number" class="week-number"><span>{{ weekNumber }}</span></div>
@@ -46,6 +46,15 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: [
+    'go-to-next-week',
+    'go-to-previous-week',
+    'go-to-week',
+    'go-to-today',
+    'open-delete-events-modal',
+    'toggle-history',
+    'update-view-mode',
+  ],
   data () {
     return {
       datimeModal: false,
@@ -95,21 +104,21 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .planning-history-button
-    display: flex;
-    align-items: center;
+<style lang="sass" scoped>
+.planning-history-button
+  display: flex
+  align-items: center
 
-  .planning-month
-    align-items: center
+.planning-month
+  align-items: center
 
-  .week-number
-    font-size: 12px
-    border: solid 1px
-    display: flex
-    height: 20px
-    width: 20px
-    border-radius: 50%
-    align-content: center
-    justify-content: center
+.week-number
+  font-size: 12px
+  border: solid 1px
+  display: flex
+  height: 20px
+  width: 20px
+  border-radius: 50%
+  align-content: center
+  justify-content: center
 </style>

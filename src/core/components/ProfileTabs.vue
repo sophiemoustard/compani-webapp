@@ -38,55 +38,55 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .profile-tabs
-    /deep/ .q-tab--active
-      & > .q-tab__indicator
-        color: $primary
-    /deep/.q-tab__indicator
-      color: $copper-grey-300
-      opacity: 1
-    .q-tab-panels
-      background-color: inherit
+<style lang="sass" scoped>
+.profile-tabs
+  :deep(.q-tab--active)
+    & > .q-tab__indicator
+      color: $primary
+  :deep(.q-tab__indicator)
+    color: $copper-grey-300
+    opacity: 1
+  .q-tab-panels
+    background-color: inherit
+    flex: 1
+    display: flex
+    flex-direction: column
+    .scroll
+      overflow: initial
+    :deep(.q-panel)
       flex: 1
       display: flex
       flex-direction: column
-      .scroll
-        overflow: initial
-      /deep/ .q-panel
+      .q-tab-panel
         flex: 1
         display: flex
         flex-direction: column
-        .q-tab-panel
+        > div
           flex: 1
-          display: flex
-          flex-direction: column
-          > div
-            flex: 1
-    & /deep/ .q-tabs
-      & .q-tabs__content
-        & .q-tab
-          flex: 1 1 0
-          padding-left: 0px
-          justify-content: start
-          margin-right: 24px
-          @media screen and (max-width: 767px)
-            max-width: 66%
-          @media screen and (min-width: 768px)
-            max-width: 33%
-          & .q-tab__content
-            & .q-tab__label
-              font-size: 24px
-            & .q-tab__alert
-              background: $secondary
-          &:before
-            background: none
-        & :not(.q-tab--active)
-          & .q-tab__content
-            & .q-tab__label
-              color: $copper-grey-800
-        & .q-tab--active
-          & .q-tab__content
-            & .q-tab__label
-              color: $primary
+  & :deep(.q-tabs)
+    & .q-tabs__content
+      & .q-tab
+        flex: 1 1 0
+        padding-left: 0px
+        justify-content: start
+        margin-right: 24px
+        @media screen and (max-width: 767px)
+          max-width: 66%
+        @media screen and (min-width: 768px)
+          max-width: 33%
+        & .q-tab__content
+          & .q-tab__label
+            font-size: 24px
+          & .q-tab__alert
+            background: $secondary
+        &:before
+          background: none
+      & :not(.q-tab--active)
+        & .q-tab__content
+          & .q-tab__label
+            color: $copper-grey-800
+      & .q-tab--active
+        & .q-tab__content
+          & .q-tab__label
+            color: $primary
 </style>

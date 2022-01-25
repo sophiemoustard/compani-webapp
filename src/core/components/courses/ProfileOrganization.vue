@@ -16,9 +16,9 @@
           <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id"
             @blur="updateCourse('salesRepresentative')" caption="Référent(e) Compani" :disable="!isAdmin || isArchived"
             :options="salesRepresentativeOptions" @focus="saveTmp('salesRepresentative')"
-            :error="$v.course.salesRepresentative._id.$error" />
+            :error="v$.course.salesRepresentative._id.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
-            caption="Intervenant(e)" :options="trainerOptions" :error="$v.course.trainer._id.$error"
+            caption="Intervenant(e)" :options="trainerOptions" :error="v$.course.trainer._id.$error"
             @blur="updateCourse('trainer')" :disable="isArchived" />
         </div>
       </div>
@@ -34,9 +34,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
-import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
@@ -71,8 +71,11 @@ export default {
     'course-history-feed': CourseHistoryFeed,
     'ni-bi-color-button': BiColorButton,
   },
+  setup () {
+    return { v$: useVuelidate() };
+  },
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
 
     return {
       trainerOptions: [],
@@ -91,8 +94,6 @@ export default {
         trainer: { _id: { required }, identity: { required } },
         salesRepresentative: { _id: { required }, identity: { required } },
       },
-      newTrainee: this.traineeValidations,
-      editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
     };
   },
   computed: {
@@ -190,12 +191,11 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .profile-container
-    display: flex
-    flex-direction: column
+<style lang="sass" scoped>
+.profile-container
+  display: flex
+  flex-direction: column
 
-  .button-history
-    align-self: flex-end
-
+.button-history
+  align-self: flex-end
 </style>

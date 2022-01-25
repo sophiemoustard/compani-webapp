@@ -22,14 +22,14 @@
             </div>
           </q-card>
         </div>
-        <ni-line-chart title="Nombre total d'activités réalisées par mois"
-          :chart-data="chartData(this.activitiesByMonth)" class="col-md-6 col-xs-12 line-chart-container" />
+        <ni-line-chart :data="this.activitiesByMonth" :labels="months" class="col-md-6 col-xs-12 line-chart-container"
+          title="Nombre total d'activités réalisées par mois" />
       </div>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
+        <ni-expanding-table :data="courses" :columns="columns" :loading="loading" v-model:pagination="pagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'progress'">
@@ -91,15 +91,10 @@ export default {
   },
   data () {
     return {
-      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
+      isVendorInterface: /\/ad\//.test(this.$route.path),
       courses: [],
       loading: false,
-      pagination: {
-        sortBy: 'name',
-        descending: false,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
       columns: [
         {
           name: 'name',
@@ -217,7 +212,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .name
   width: fit-content
   text-decoration: underline
@@ -230,14 +225,14 @@ export default {
     margin-bottom: 8px
 
 .global-view
-  height: 100%;
+  height: 100%
   &-container
     @media screen and (min-width: $breakpoint-sm-max)
-      padding-right: 16px;
+      padding-right: 16px
 .line-chart-container
   @media screen and (max-width: $breakpoint-sm-max)
-    margin-top: 16px;
+    margin-top: 16px
 
 .learners-data
-  flex: 1;
+  flex: 1
 </style>

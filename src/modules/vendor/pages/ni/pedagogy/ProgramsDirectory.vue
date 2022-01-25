@@ -1,19 +1,21 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme"
-      @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme" @update-search="updateSearch"
+      :search="searchStr" />
+    <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
       @go-to="goToProgramProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un programme"
       @click="programCreationModal = true" :disable="tableLoading" />
 
     <program-creation-modal v-model="programCreationModal" @hide="resetCreationModal" @submit="createProgram"
-      :validations="$v.newProgram" :loading="modalLoading" :new-program.sync="newProgram" />
+      :validations="v$.newProgram" :loading="modalLoading" v-model:new-program="newProgram" />
   </q-page>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -23,12 +25,17 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { removeDiacritics } from '@helpers/utils';
 
 export default {
-  metaInfo: { title: 'Catalogue' },
   name: 'ProgramDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
     'program-creation-modal': ProgramCreationModal,
+  },
+  setup () {
+    const metaInfo = { title: 'Catalogue' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -91,13 +98,13 @@ export default {
       }
     },
     resetCreationModal () {
-      this.$v.newProgram.$reset();
+      this.v$.newProgram.$reset();
       this.newProgram = { name: '' };
     },
     async createProgram () {
       try {
-        this.$v.newProgram.$touch();
-        if (this.$v.newProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newProgram.$touch();
+        if (this.v$.newProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         await Programs.create({ name: this.newProgram.name, categories: [this.newProgram.category] });

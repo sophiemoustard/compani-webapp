@@ -79,6 +79,7 @@ export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPric
 
 export const formatIdentity = (identity, format) => {
   if (!identity) return '';
+
   const formatLower = format.toLowerCase();
   const values = [];
 
@@ -102,6 +103,15 @@ export const formatHours = (value, digits = 2) => {
 };
 
 export const formatHoursWithMinutes = date => `${moment(date).hours()}h${moment(date).format('mm')}`;
+
+export const formatDuration = (duration) => {
+  const paddedMinutes = duration.minutes() > 0 && duration.minutes() < 10
+    ? duration.minutes().toString().padStart(2, 0)
+    : duration.minutes();
+  const hours = (duration.days() * 24) + duration.hours();
+
+  return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+};
 
 export const formatPhone = phoneNumber => (phoneNumber
   ? phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5')

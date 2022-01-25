@@ -1,14 +1,14 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-mb-lg"
-      @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
+      @focus="saveTmp('qcuGoodAnswer')" :error="v$.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Mauvaise réponse ${i + 1}`" class="input"
-        v-model="card.qcAnswers[i].text" :error="$v.card.qcAnswers.$each[i].$error"
+        v-model="card.qcAnswers[i].text" :error="getError('qcAnswers', i)"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
         @blur="updateTextAnswer(i)" :disable="disableEdition" :required-field="answerIsRequired(i)" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
@@ -16,12 +16,14 @@
     <ni-button class="add-button q-mb-lg" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
+      @blur="updateCard('explanation')" :error="v$.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
 <script>
-import { required, maxLength } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
+import useVuelidate from '@vuelidate/core';
+import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import {
   REQUIRED_LABEL,
@@ -46,15 +48,18 @@ export default {
     'ni-button': Button,
   },
   mixins: [templateMixin, validationMixin],
+  setup () {
+    return { v$: useVuelidate() };
+  },
   validations () {
     return {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcuGoodAnswer: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
         qcAnswers: {
-          $each: {
+          $each: helpers.forEach({
             text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
-          },
+          }),
         },
         explanation: { required },
       },
@@ -62,8 +67,10 @@ export default {
   },
   computed: {
     goodAnswerErrorMsg () {
-      if (!this.$v.card.qcuGoodAnswer.required) return REQUIRED_LABEL;
-      if (!this.$v.card.qcuGoodAnswer.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+      if (get(this.v$, 'card.qcuGoodAnswer.required.$response') === false) return REQUIRED_LABEL;
+      if (get(this.v$, 'card.qcuGoodAnswer.maxLength.$response') === false) {
+        return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+      }
 
       return '';
     },
@@ -78,8 +85,10 @@ export default {
   },
   methods: {
     qcuFalsyAnswerErrorMsg (index) {
-      if (!this.$v.card.qcAnswers.$each[index].text.required) return REQUIRED_LABEL;
-      if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+      const validation = this.v$.card.qcAnswers.$each.$response.$errors[index].text;
+
+      if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
+      if (get(validation, '0.$validator') === 'maxLength') return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
     },
@@ -90,7 +99,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .container
     display: flex
     flex-direction: column

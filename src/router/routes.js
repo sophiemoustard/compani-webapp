@@ -1,4 +1,3 @@
-
 const routes = [
   { path: '/login', name: 'login', component: () => import('src/core/pages/signin/Authenticate') },
   { path: '/forgot-password', component: () => import('src/core/pages/signin/ForgotPassword'), name: 'forgotPassword' },
@@ -17,7 +16,7 @@ const routes = [
   },
   {
     // Always leave this as last one
-    path: '*',
+    path: '/:catchAll(.*)*',
     name: '404',
     component: () => import('src/core/pages/404'),
   },

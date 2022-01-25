@@ -1,7 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
       @go-to="goToLearnerProfile" :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ col }">
         <q-item v-if="col.name === 'name'">
@@ -17,39 +17,106 @@
       @click="learnerCreationModal = true" :disable="tableLoading" />
 
     <!-- New learner modal -->
-    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetLearnerCreationModal"
-      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal"
-      display-company />
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
+      @next-step="nextStepLearnerCreationModal" @hide="resetLearnerCreationModal" :company-options="companyOptions"
+      :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading" display-company
+      @submit="submitLearnerCreationModal" />
   </q-page>
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { onMounted } from 'vue';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Companies from '@api/Companies';
+import Users from '@api/Users';
+import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { formatAndSortOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
-import { learnerCreationMixin } from '@mixins/learnerCreationMixin';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
+import { useLearners } from '@composables/learners';
 
 export default {
-  metaInfo: { title: 'Répertoire apprenants' },
   name: 'LearnersDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
     'learner-creation-modal': LearnerCreationModal,
   },
-  mixins: [userMixin, learnerDirectoryMixin, learnerCreationMixin],
+  setup () {
+    const metaInfo = { title: 'Répertoire apprenants' };
+    useMeta(metaInfo);
+
+    const refresh = async () => getLearnerList();
+
+    const {
+      searchStr,
+      newLearner,
+      learnerCreationModal,
+      learnerCreationModalLoading,
+      firstStep,
+      learnerList,
+      tableLoading,
+      filteredLearners,
+      learnerValidation,
+      updateSearch,
+      goToNextStep,
+      getLearnerList,
+      submitLearnerCreationModal,
+      resetLearnerCreationModal,
+    } = useLearners(refresh, false, null);
+
+    onMounted(async () => { await refresh(); });
+
+    const nextStepLearnerCreationModal = async () => {
+      try {
+        learnerValidation.value.newLearner.$touch();
+        if (learnerValidation.value.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
+
+        learnerCreationModalLoading.value = true;
+        const userInfo = await Users.exists({ email: newLearner.value.local.email });
+
+        if (!userInfo.exists) return goToNextStep();
+
+        NotifyWarning('L\'apprenant(e) est déjà ajouté(e).');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
+      } finally {
+        learnerCreationModalLoading.value = false;
+      }
+    };
+
+    return {
+      // Data
+      searchStr,
+      newLearner,
+      firstStep,
+      learnerList,
+      tableLoading,
+      learnerCreationModalLoading,
+      learnerCreationModal,
+      // Computed
+      filteredLearners,
+      // Validations
+      learnerValidation,
+      // Methods
+      updateSearch,
+      nextStepLearnerCreationModal,
+      submitLearnerCreationModal,
+      resetLearnerCreationModal,
+    };
+  },
+  mixins: [userMixin, learnerDirectoryMixin],
   data () {
     return {
       companyOptions: [],
     };
   },
   async created () {
-    await Promise.all([this.refreshCompanies(), this.getLearnerList()]);
+    await Promise.all([this.refreshCompanies()]);
   },
   methods: {
     goToLearnerProfile (row) {

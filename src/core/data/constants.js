@@ -131,8 +131,10 @@ export const EDITION = 'edition';
 export const DELETION = 'deletion';
 export const CANCELLATION = 'cancellation';
 export const DAILY = 'daily';
+export const HALF_DAILY = 'half_daily';
 export const ABSENCE_NATURES = [
   { label: 'Journalière', value: DAILY },
+  { label: 'Demi-journalière', value: HALF_DAILY },
   { label: 'Horaire', value: HOURLY },
 ];
 export const EVENT_TYPES = [
@@ -189,6 +191,17 @@ export const PLANNING_REFERENT = 'planning_referent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
+export const ROLE_TRANSLATION = {
+  [HELPER]: 'Aidant(e)',
+  [AUXILIARY]: 'Auxiliaire',
+  [PLANNING_REFERENT]: 'Auxiliaire',
+  [AUXILIARY_WITHOUT_COMPANY]: 'Auxiliaire',
+  [CLIENT_ADMIN]: 'Administrateur(rice)',
+  [VENDOR_ADMIN]: 'Administrateur(rice) Vendeur',
+  [COACH]: 'Coach',
+  [TRAINING_ORGANISATION_MANAGER]: 'Responsable Formation',
+  [TRAINER]: 'Formateur(rice)',
+};
 
 // ROLES VENDOR
 export const VENDOR_ADMIN = 'vendor_admin';
@@ -290,6 +303,7 @@ export const FUNDING = 'funding';
 export const RUP = 'rup';
 export const REFERENT = 'referent';
 export const WORKING_EVENT = 'working_event';
+export const TRANSPORT = 'transport';
 export const EXPORT_TYPES = [
   { label: 'Services', value: SERVICE },
   { label: 'Souscriptions', value: SUBSCRIPTION },
@@ -308,6 +322,13 @@ export const EXPORT_HISTORY_TYPES = [
   { label: 'Absences', value: ABSENCE },
   { label: 'Paies et soldes tout compte', value: PAY },
   { label: 'Contrats', value: CONTRACT },
+  { label: 'Transports', value: TRANSPORT },
+];
+export const COURSE = 'course';
+export const COURSE_SLOT = 'course_slot';
+export const VENDOR_EXPORT_HISTORY_TYPES = [
+  { label: 'Formations', value: COURSE },
+  { label: 'Créneaux', value: COURSE_SLOT },
 ];
 
 // ORIGINS

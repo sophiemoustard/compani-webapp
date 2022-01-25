@@ -1,8 +1,8 @@
 <template>
   <div class="row justify-between full-width text-copper-grey-600">
     <div class="row items-center">
-      <q-btn-toggle class="on-left no-shadow" :value="rowsPerPage" :options="rowsPerPageOptions" size="12px"
-        toggle-text-color="primary" toggle-color="white" no-caps dense @input="update($event, 'rowsPerPage')" />
+      <q-btn-toggle class="on-left no-shadow" :model-value="rowsPerPage" :options="rowsPerPageOptions" dense size="12px"
+        toggle-text-color="primary" toggle-color="white" @update:model-value="update($event, 'rowsPerPage')" no-caps />
       <div>Eléments par page</div>
     </div>
     <div class="row items-center">
@@ -29,6 +29,7 @@ export default {
     pagination: { type: Object, default: () => ({}) },
     options: { type: Array, default: () => [15, 50, 100, 200, 300] },
   },
+  emits: ['update:pagination'],
   data () {
     return {
       rowsPerPage: 0,
@@ -80,13 +81,13 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  /deep/ .q-btn-group
-    & > .q-btn-item:first-child
-      border: 1px solid $copper-grey-300
-    & > .q-btn-item:not(:first-child)
-      border: 1px solid $copper-grey-300
-      border-left: none
-    & > .q-btn-item:last-child
-      font-weight: bold
+<style lang="sass" scoped>
+:deep(.q-btn-group)
+  & > .q-btn-item:first-child
+    border: 1px solid $copper-grey-300
+  & > .q-btn-item:not(:first-child)
+    border: 1px solid $copper-grey-300
+    border-left: none
+  & > .q-btn-item:last-child
+    font-weight: bold
 </style>

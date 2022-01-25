@@ -6,13 +6,13 @@
       @refresh="refresh" @open-customer-absence-edition-modal="openCustomerAbsenceModal" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :new-event="newEvent" :person-key="personKey"
+    <ni-event-creation-modal :validations="eventValidation.newEvent" :new-event="newEvent" :person-key="personKey"
       :creation-modal="creationModal" :active-auxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
       @reset="resetCreationForm" @submit="validateCreationEvent" @close="closeCreationModal"
       @update-event="setEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event="editedEvent"
+    <ni-event-edition-modal :validations="eventValidation.editedEvent" :loading="loading" :edited-event="editedEvent"
       :edition-modal="editionModal" :active-auxiliaries="activeAuxiliaries" :customers="customers"
       @hide="resetEditionForm" @submit="validateEventEdition" @close="closeEditionModal" :person-key="personKey"
       @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion"
@@ -20,14 +20,16 @@
       @refresh-histories="refreshHistories" @update-event="setEvent" />
 
     <!-- Customer Absence Modal -->
-    <ni-customer-absence-edition-modal :edited-customer-absence.sync="editedCustomerAbsence"
-      :customer-absence-edition-modal="customerAbsenceModal" :validations="$v.editedCustomerAbsence"
+    <ni-customer-absence-edition-modal v-model:edited-customer-absence="editedCustomerAbsence"
+      :customer-absence-edition-modal="customerAbsenceModal" :validations="eventValidation.editedCustomerAbsence"
       @close="closeCustomerAbsenceModal" @hide="resetCustomerAbsenceEditionForm"
       @submit="updateCustomerAbsence" />
   </q-page>
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { ref } from 'vue';
 import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
@@ -51,15 +53,15 @@ import {
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { isAfter } from '@helpers/date';
-import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
+import { usePlanningAction } from 'src/modules/client/composables/planningAction';
 import Planning from 'src/modules/client/components/planning/Planning';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 import CustomerAbsenceEditionModal from 'src/modules/client/components/planning/CustomerAbsenceEditionModal';
+import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
 export default {
   name: 'CustomerPlanning',
-  metaInfo: { title: 'Planning bénéficiaire' },
   mixins: [planningActionMixin],
   components: {
     'ni-event-creation-modal': EventCreationModal,
@@ -70,27 +72,32 @@ export default {
   props: {
     targetedCustomerId: { type: String, default: '' },
   },
+  setup () {
+    const metaInfo = { title: 'Planning bénéficiaire' };
+    useMeta(metaInfo);
+
+    const personKey = ref(CUSTOMER);
+    const customers = ref([]);
+    const { newEvent, editedEvent, editedCustomerAbsence, eventValidation } = usePlanningAction(personKey, customers);
+
+    return { personKey, newEvent, editedEvent, editedCustomerAbsence, customers, eventValidation };
+  },
   data () {
     return {
       loading: false,
       days: [],
       events: {},
-      customers: [],
       auxiliaries: [],
       startOfWeek: '',
       filteredSectors: [],
       filteredCustomers: [],
       DEFAULT_AVATAR,
       // Event creation
-      newEvent: {},
       creationModal: false,
       // Event edition
-      editedEvent: {},
       editionModal: false,
       // Customer Absence edition
-      editedCustomerAbsence: {},
       customerAbsenceModal: false,
-      personKey: CUSTOMER,
       sectorCustomers: [],
     };
   },
@@ -246,6 +253,7 @@ export default {
         ...pick(event, ['_id', 'customer', 'absenceType']),
         dates: { startDate, endDate },
       };
+
       this.customerAbsenceModal = true;
     },
     async closeCustomerAbsenceModal () {
@@ -253,7 +261,7 @@ export default {
       await this.refresh();
     },
     resetCustomerAbsenceEditionForm () {
-      this.$v.editedCustomerAbsence.$reset();
+      this.eventValidation.editedCustomerAbsence.$reset();
       this.customerAbsenceModal = false;
     },
     formatEditedCustomerAbsence () {
@@ -262,8 +270,8 @@ export default {
     },
     async updateCustomerAbsence (value) {
       try {
-        this.$v.editedCustomerAbsence.$touch();
-        if (this.$v.editedCustomerAbsence.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.eventValidation.editedCustomerAbsence.$touch();
+        if (this.eventValidation.editedCustomerAbsence.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = this.formatEditedCustomerAbsence();
         await CustomerAbsences.updateById(this.editedCustomerAbsence._id, payload);

@@ -6,8 +6,10 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { computed, ref, watch, onBeforeUnmount } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
-import { mapState } from 'vuex';
 import { COMPANY_TYPES } from '@data/constants';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -15,7 +17,6 @@ import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
 
 export default {
   name: 'CompanyProfile',
-  metadata: { title: 'Fiche structure' },
   props: {
     companyId: { type: String, required: true },
     defaultTab: { type: String, default: 'infos' },
@@ -24,47 +25,56 @@ export default {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
   },
-  data () {
-    return {
-      companyName: '',
-      tabsContent: [{ label: 'Infos', name: 'infos', default: this.defaultTab === 'infos', component: ProfileInfo }],
-    };
-  },
-  computed: {
-    ...mapState('company', ['company']),
-    companyType () {
-      const companyType = COMPANY_TYPES.find(type => type.value === get(this.company, 'type'));
+  setup (props) {
+    const metaInfo = { title: 'Fiche structure' };
+    useMeta(metaInfo);
+    const $store = useStore();
+
+    const tabsContent = [
+      { label: 'Infos', name: 'infos', default: props.defaultTab === 'infos', component: ProfileInfo },
+    ];
+    const companyName = ref('');
+
+    const company = computed(() => $store.state.company.company);
+    const companyTypeLabel = computed(() => {
+      const companyType = COMPANY_TYPES.find(type => type.value === get(company.value, 'type'));
       return companyType ? companyType.label : '';
-    },
-    headerInfo () {
-      return [{ icon: 'bookmark_border', label: this.companyType }];
-    },
-  },
-  watch: {
-    company () {
-      this.companyName = get(this.company, 'name') || '';
-    },
-  },
-  async created () {
-    if (!this.company) await this.refreshCompany();
-    this.companyName = get(this.company, 'name') || '';
-  },
-  methods: {
-    async refreshCompany () {
+    });
+    const headerInfo = computed(() => [{ icon: 'bookmark_border', label: companyTypeLabel.value }]);
+
+    const refreshCompany = async () => {
       try {
-        await this.$store.dispatch('company/fetchCompany', { companyId: this.companyId });
+        await $store.dispatch('company/fetchCompany', { companyId: props.companyId });
       } catch (e) {
         console.error(e);
       }
-    },
-  },
-  beforeDestroy () {
-    this.$store.dispatch('company/resetCompany');
+    };
+
+    const refreshCompanyName = () => { companyName.value = get(company, 'value.name') || ''; };
+
+    watch(company, refreshCompanyName);
+
+    const created = async () => {
+      if (!company.value) await refreshCompany();
+      refreshCompanyName();
+    };
+
+    onBeforeUnmount(() => $store.dispatch('company/resetCompany'));
+
+    created();
+
+    return {
+      // Data
+      tabsContent,
+      companyName,
+      // Computed
+      headerInfo,
+    };
   },
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .q-item
   padding: 0
   min-height: 0

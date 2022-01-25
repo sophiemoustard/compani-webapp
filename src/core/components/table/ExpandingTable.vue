@@ -1,7 +1,8 @@
 <template>
   <q-card class="relative-position table-spinner-container" flat>
-    <q-table v-if="!loading" :data="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
-      :hide-bottom="hideBottom" :visible-columns="formattedVisibleColumns" binary-state-sort>
+    <q-table v-if="!loading" :rows="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
+      :hide-bottom="hideBottom" :visible-columns="formattedVisibleColumns" binary-state-sort
+      @update:pagination="$emit('update:pagination', $event)">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props"> {{ col.label }} </q-th>
@@ -9,7 +10,14 @@
       </template>
       <template #body="props">
         <q-tr :props="props" @click="props.expand = !props.expand" class="cursor-pointer">
-          <slot name="row" :props="props" />
+          <slot name="row" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'expand'">
+                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </slot>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
           <slot name="expanding-row" :props="props" />
@@ -26,6 +34,7 @@
 <script>
 export default {
   name: 'ExpandingTable',
+  emits: ['update:pagination'],
   computed: {
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(c => c.name);

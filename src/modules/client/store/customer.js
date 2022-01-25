@@ -30,6 +30,7 @@ export default {
         if (!get(customer, 'referent._id')) customer.referent = { _id: '' };
         if (!get(customer, 'contact')) customer.contact = {};
         if (!get(customer, 'followUp')) customer.followUp = {};
+        if (!get(customer, 'contact.secondaryAddress')) customer.contact.secondaryAddress = {};
 
         commit('SET_CUSTOMER', customer);
       } catch (e) {

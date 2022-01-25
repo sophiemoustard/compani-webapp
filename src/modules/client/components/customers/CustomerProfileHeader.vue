@@ -6,10 +6,10 @@
         <span class="ellipsis page-title">{{ title }}</span>
         <ni-button class="q-ml-sm" icon="date_range" @click="goToPlanning" />
       </div>
-      <ni-button :flat="false" v-if="!customer.stoppedAt" class="justify-end" label="Arrêter"
-        @click="stopSupportModal=true" />
-      <ni-button :flat="false" v-else-if="customer.stoppedAt && !customer.archivedAt" class="justify-end"
-        label="Archiver" @click="validateCustomerArchive" />
+      <ni-button :flat="false" v-if="!customer.stoppedAt && !isAuxiliaryInterface" class="justify-end"
+        label="Arrêter" @click="stopSupportModal=true" />
+      <ni-button :flat="false" v-else-if="customer.stoppedAt && !customer.archivedAt && !isAuxiliaryInterface"
+        class="justify-end" label="Archiver" @click="validateCustomerArchive" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -18,20 +18,21 @@
       </div>
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
-        <div class="q-mr-md">Depuis le {{ statusDate }} ({{ relativeStatusDate }})</div>
-        <ni-button icon="delete" @click="validateCustomerDeletion" />
+        <div class="q-mr-md">{{ statusInfos }}</div>
+        <ni-button v-if="!isAuxiliaryInterface" icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
 
     <stop-support-modal v-model="stopSupportModal" @hide="resetStopSupportModal" @submit="stopSupport"
-      :new-status.sync="newStatus" :validations="$v.newStatus" :loading="modalLoading" :customer-name="title"
-      :min-date="minStoppingDate" :stopping-date-error-message="setStoppingDateErrorMessage($v.newStatus)" />
+      v-model:new-status="newStatus" :validations="v$.newStatus" :loading="modalLoading" :customer-name="title"
+      :min-date="minStoppingDate" :stopping-date-error-message="setStoppingDateErrorMessage(v$.newStatus)" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
@@ -52,6 +53,7 @@ export default {
     'ni-button': Button,
     'stop-support-modal': StopSupportModal,
   },
+  setup () { return { v$: useVuelidate() }; },
   data () {
     return {
       STATUS_TYPES,
@@ -64,24 +66,22 @@ export default {
   },
   computed: {
     ...mapState('customer', ['customer']),
-    statusDate () {
+    statusInfos () {
       switch (this.getStatus(this.customer)) {
-        case ACTIVATED: return formatDate(this.customer.createdAt);
-        case STOPPED: return formatDate(this.customer.stoppedAt);
-        case ARCHIVED: return formatDate(this.customer.archivedAt);
+        case ACTIVATED:
+          return !this.customer.firstIntervention
+            ? `Date de création: ${this.displayDateInfo(this.customer.createdAt)}`
+            : `Première intervention: ${this.displayDateInfo(this.customer.firstIntervention.startDate)}`;
+        case STOPPED: return `Date d'arrêt: ${this.displayDateInfo(this.customer.stoppedAt)}`;
+        case ARCHIVED: return `Date d'archive: ${this.displayDateInfo(this.customer.archivedAt)}`;
         default: return 'N/A';
-      }
-    },
-    relativeStatusDate () {
-      switch (this.getStatus(this.customer)) {
-        case ACTIVATED: return formatDateDiff(dateDiff(new Date(), this.customer.createdAt));
-        case STOPPED: return formatDateDiff(dateDiff(new Date(), this.customer.stoppedAt));
-        case ARCHIVED: return formatDateDiff(dateDiff(new Date(), this.customer.archivedAt));
-        default: return '';
       }
     },
     minStoppingDate () {
       return getStartOfDay(new Date(this.customer.createdAt)).toISOString();
+    },
+    isAuxiliaryInterface () {
+      return /\/auxiliaries\//.test(this.$route.path);
     },
   },
   validations () {
@@ -96,6 +96,9 @@ export default {
     };
   },
   methods: {
+    displayDateInfo (date) {
+      return `${formatDate(date)} (${formatDateDiff(dateDiff(new Date(), date))})`;
+    },
     goToPlanning () {
       if (this.customer.subscriptions.length) {
         return this.$router.push({ name: 'ni planning customers', params: { targetedCustomerId: this.customer._id } });
@@ -111,7 +114,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer le/la bénéficiaire.');
-        if (e.msg) NotifyNegative('Erreur lors de la suppression du/de la bénéficiaire.');
+        if (e.msg) NotifyNegative('Erreur lors de la suppression.');
       }
     },
     validateCustomerDeletion () {
@@ -152,7 +155,7 @@ export default {
       return REQUIRED_LABEL;
     },
     resetStopSupportModal () {
-      this.$v.newStatus.$reset();
+      this.v$.newStatus.$reset();
       this.newStatus = { stopReason: '', stoppedAt: '' };
     },
     async stopSupport () {
@@ -169,7 +172,7 @@ export default {
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'arrêt du/de la bénéficiaire.');
+        NotifyNegative('Erreur lors de l\'arrêt.');
       } finally {
         this.modalLoading = false;
       }
@@ -195,14 +198,14 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403 && e.data.message !== 'Forbidden') return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'archivage du/de la bénéficiaire.');
+        NotifyNegative('Erreur lors de l\'archivage.');
       }
     },
   },
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .column
     flex-direction: column
 </style>

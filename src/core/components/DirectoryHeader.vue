@@ -2,15 +2,15 @@
   <div class="row q-mb-md justify-between">
     <div :class="[titleContainerClass, 'page-title']">{{ title }}</div>
     <div v-if="displaySearchBar" :class="searchBarContainerClass">
-      <q-input class="no-border" :value="search" :placeholder="searchPlaceholder" dense borderless
-        @input="input" debounce="0" type="search" bg-color="white">
+      <q-input class="no-border" :model-value="search" :placeholder="searchPlaceholder" dense borderless
+        @update:model-value="input" debounce="0" type="search" bg-color="white">
         <template #prepend>
           <q-icon size="xs" name="search" />
         </template>
       </q-input>
     </div>
     <div v-if="displayToggle" class="col-xs-12 col-md-2 row justify-end">
-      <q-toggle dense :value="toggleValue" color="primary" :label="toggleLabel" @input="toggle" />
+      <q-toggle dense :model-value="toggleValue" color="primary" :label="toggleLabel" @update:model-value="toggle" />
     </div>
   </div>
 </template>
@@ -27,6 +27,7 @@ export default {
     displaySearchBar: { type: Boolean, default: true },
     search: { type: String, default: '' },
   },
+  emits: ['update-search', 'toggle'],
   computed: {
     titleContainerClass () {
       return ['col-xs-12', this.displayToggle ? 'col-md-5' : 'col-md-6', { 'q-mb-sm': this.$q.platform.is.mobile }];
@@ -46,10 +47,10 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .q-option
-    font-size: 14px;
-  .q-input
-    /deep/ .q-field__control
-      font-size: 14px
+<style lang="sass" scoped>
+.q-option
+  font-size: 14px
+.q-input
+  :deep(.q-field__control)
+    font-size: 14px
 </style>

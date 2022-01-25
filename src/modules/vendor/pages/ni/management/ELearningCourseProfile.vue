@@ -6,7 +6,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { useMeta } from 'quasar';
+import { computed, onBeforeUnmount } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -16,7 +18,7 @@ import ProfileQuestionnaires from 'src/modules/vendor/components/courses/Profile
 import { NotifyNegative } from '@components/popup/notify';
 
 export default {
-  name: 'ELearningCoursesProfile',
+  name: 'ELearningCourseProfile',
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
@@ -25,41 +27,52 @@ export default {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'followUp' },
   },
-  computed: {
-    ...mapState('course', ['course']),
-    courseName () {
-      return get(this.course, 'subProgram.program.name');
-    },
-  },
-  data () {
-    return {
-      tabsContent: [
-        { label: 'Suivi', name: 'followUp', default: this.defaultTab === 'followUp', component: ProfileFollowUp },
-        {
-          label: 'Questionnaires',
-          name: 'questionnaires',
-          default: this.defaultTab === 'questionnaires',
-          component: ProfileQuestionnaires,
-        },
-        { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: ProfileAccess },
-      ],
-    };
-  },
-  async created () {
-    await this.refreshCourse();
-  },
-  methods: {
-    async refreshCourse () {
+  setup (props) {
+    const metaInfo = { title: 'Fiche formation' };
+    useMeta(metaInfo);
+
+    const tabsContent = [
+      {
+        label: 'Suivi',
+        name: 'followUp',
+        default: props.defaultTab === 'followUp',
+        component: ProfileFollowUp,
+      },
+      {
+        label: 'Questionnaires',
+        name: 'questionnaires',
+        default: props.defaultTab === 'questionnaires',
+        component: ProfileQuestionnaires,
+      },
+      { label: 'Accès', name: 'access', default: props.defaultTab === 'access', component: ProfileAccess },
+    ];
+
+    const $store = useStore();
+    const course = computed(() => $store.state.course.course);
+    const courseName = computed(() => get(course.value, 'subProgram.program.name'));
+
+    const refreshCourse = async () => {
       try {
-        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
+        await $store.dispatch('course/fetchCourse', { courseId: props.courseId });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération de la formation.');
       }
-    },
-  },
-  beforeDestroy () {
-    this.$store.dispatch('course/resetCourse');
+    };
+
+    const created = async () => { await refreshCourse(); };
+
+    onBeforeUnmount(() => { $store.dispatch('course/resetCourse'); });
+
+    created();
+
+    return {
+      // Data
+      tabsContent,
+      // Computed
+      course,
+      courseName,
+    };
   },
 };
 </script>

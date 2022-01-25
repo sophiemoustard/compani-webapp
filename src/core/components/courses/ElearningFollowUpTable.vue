@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="text-weight-bold">Progression eLearning</p>
-    <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
+    <ni-expanding-table :data="learners" :columns="columns" v-model:pagination="pagination" :hide-bottom="false"
       :loading="loading" :visible-columns="visibleColumns">
       <template #row="{ props }">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -65,7 +65,7 @@ export default {
     isBlended: { type: Boolean, default: false },
   },
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
 
     return {
       columns: [
@@ -126,12 +126,12 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .progress
-    width: 100%
-  .name
-    width: fit-content;
-  .cliquable-name
-    text-decoration: underline
-    color: $primary
+<style lang="sass" scoped>
+.progress
+  width: 100%
+.name
+  width: fit-content
+.cliquable-name
+  text-decoration: underline
+  color: $primary
 </style>

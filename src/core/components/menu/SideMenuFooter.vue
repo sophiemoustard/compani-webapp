@@ -1,7 +1,7 @@
 <template>
   <div class="sidemenu-footer">
     <q-item class="full-width">
-      <q-item-section v-if="accessBothInterface" class="footer-logo-container" @click.native="switchInterface">
+      <q-item-section v-if="accessBothInterface" class="footer-logo-container" @click="switchInterface">
         <img :src="interfaceLogo" alt="go to other interface">
       </q-item-section>
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
@@ -11,8 +11,7 @@
             @click="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
         </q-item-section>
         <q-item-section v-if="isAuxiliaryWithCompany">
-          <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm"
-            @click.native="clickHandler" />
+          <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm" @click="clickHandler" />
         </q-item-section>
         <q-item-section>
           <ni-button class="person" icon="person" @click="goToProfile" size="sm" />
@@ -47,6 +46,7 @@ export default {
   components: {
     'ni-button': Button,
   },
+  emits: ['click'],
   data () {
     return {
       interfaceLogo: 'https://storage.googleapis.com/compani-main/icons/blue_icon_small.png',
@@ -76,8 +76,8 @@ export default {
       window.open(url, '_blank');
     },
     goToProfile () {
-      if (!/account/.test(this.$router.currentRoute.name)) {
-        return /\/ad\//.test(this.$router.currentRoute.path)
+      if (!/account/.test(this.$route.name)) {
+        return /\/ad\//.test(this.$route.path)
           ? this.$router.push({ name: 'account vendor', params: { id: this.userId } })
           : this.$router.push({ name: 'account client', params: { id: this.userId } });
       }
@@ -92,7 +92,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .footer-logo-container
   width: 25px
   flex: auto
@@ -101,5 +101,4 @@ export default {
 .footer-logo-container > img
   width: 25px
   height: 25px
-
 </style>

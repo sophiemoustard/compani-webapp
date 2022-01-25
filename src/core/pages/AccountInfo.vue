@@ -11,25 +11,25 @@
         </div>
       </div>
       <div class="row gutter-profile q-mb-xl">
-        <ni-input caption="Prénom" :error="$v.userProfile.identity.firstname.$error"
+        <ni-input caption="Prénom" :error="v$.userProfile.identity.firstname.$error"
           v-model.trim="userProfile.identity.firstname" @blur="updateUser('identity.firstname')"
           @focus="saveTmp('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.userProfile.identity.lastname.$error"
+        <ni-input caption="Nom" :error="v$.userProfile.identity.lastname.$error"
           v-model.trim="userProfile.identity.lastname" @blur="updateUser('identity.lastname')"
           @focus="saveTmp('identity.lastname')" />
         <div class="col-xs-12 col-md-6 row items-center">
           <div class="col-11">
             <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
-              :error="$v.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
-              :error-message="emailError($v.userProfile)" v-model.trim="userProfile.local.email" />
+              :error="v$.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
+              :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="copper-grey-500" />
+            <ni-button :icon="lockIcon" @click="toggleEmailLock(!emailLock)" color="copper-grey-500" />
           </div>
         </div>
         <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
           error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
-          :error="$v.userProfile.contact.phone.$error" />
+          :error="v$.userProfile.contact.phone.$error" />
       </div>
       <div class="account-button">
         <ni-button @click="newPasswordModal = true" color="white" class="bg-copper-500" icon="mdi-lock-reset"
@@ -44,16 +44,18 @@
       </div>
     </div>
 
-    <new-password-modal :confirm-error-message="passwordConfirmError($v.newPassword.confirm)" :validations="$v"
-      v-model="newPasswordModal" :user-profile="userProfile" @hide="resetForm" :new-password.sync="newPassword"
-      :password-error-message="passwordError($v.newPassword.password)" @submit="submitPasswordChange"
+    <new-password-modal :confirm-error-message="passwordConfirmError(v$.newPassword.confirm)" :validations="v$"
+      v-model="newPasswordModal" :user-profile="userProfile" @hide="resetForm" v-model:new-password="newPassword"
+      :password-error-message="passwordError(v$.newPassword.password)" @submit="submitPasswordChange"
       :loading="loading" />
   </q-page>
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import { mapState } from 'vuex';
-import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
+import useVuelidate from '@vuelidate/core';
+import { required, email, sameAs } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
@@ -72,7 +74,6 @@ import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 
 export default {
   name: 'AccountInfo',
-  metaInfo: { title: 'Mon compte' },
   mixins: [passwordMixin, validationMixin, userMixin],
   components: {
     'ni-title-header': TitleHeader,
@@ -81,6 +82,12 @@ export default {
     'ni-picture-uploader': PictureUploader,
     'new-password-modal': NewPasswordModal,
   },
+  setup () {
+    const metaInfo = { title: 'Mon compte' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
+  },
   data () {
     return {
       tmpInput: '',
@@ -88,7 +95,7 @@ export default {
       newPasswordModal: false,
       newPassword: { password: '', confirm: '' },
       loading: false,
-      backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
+      backgroundClass: /\/ad\//.test(this.$route.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
     };
   },
@@ -108,14 +115,11 @@ export default {
       },
       newPassword: {
         password: { required, ...this.passwordValidation },
-        confirm: {
-          required: requiredIf(() => this.newPassword.password),
-          sameAsPassword: sameAs(() => this.newPassword.password),
-        },
+        confirm: { required, sameAs: sameAs(this.newPassword.password) },
       },
     };
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     if (this.isLoggingOut) this.$store.dispatch('main/resetMain');
   },
   computed: {
@@ -144,8 +148,8 @@ export default {
       try {
         this.loading = true;
 
-        this.$v.newPassword.$touch();
-        if (this.$v.newPassword.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.newPassword.$touch();
+        if (this.v$.newPassword.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = set({}, 'local.password', get(this.newPassword, 'password'));
         await Authentication.updatePassword(this.userProfile._id, payload);
@@ -161,7 +165,7 @@ export default {
     },
     resetForm () {
       this.newPassword = { password: '', confirm: '' };
-      this.$v.newPassword.$reset();
+      this.v$.newPassword.$reset();
     },
     logout () {
       this.isLoggingOut = true;
@@ -171,7 +175,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .account-button
   display: flex
   flex-direction: column

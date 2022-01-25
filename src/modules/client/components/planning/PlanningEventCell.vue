@@ -60,6 +60,7 @@ export default {
     personKey: { type: String, default: AUXILIARY },
     inModal: { type: Boolean, default: false },
   },
+  emits: ['drag', 'click'],
   data () {
     return {
       STAFFING_PERCENTAGE_BY_MINUTES,
@@ -100,16 +101,14 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-
+<style lang="sass" scoped>
 .staffing
   .event
-    position: absolute;
-    top: 2px;
-    bottom: 1px;
-    padding: 1px;
-    margin: 0;
-    border: 1px solid white;
-    font-size: 0.5rem;
-
+    position: absolute
+    top: 2px
+    bottom: 1px
+    padding: 1px
+    margin: 0
+    border: 1px solid white
+    font-size: 0.5rem
 </style>

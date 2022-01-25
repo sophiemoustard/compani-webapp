@@ -1,24 +1,26 @@
 <template>
   <div class="card-list bg-white">
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
-      :content-style="{ display:'flex', 'flex-direction': 'column' }"
-      :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <draggable v-model="draggableCardsList" ghost-class="ghost" :disabled="isDraggableDisabled" @input="update">
-        <div v-for="(draggableCard, index) in draggableCardsList" :key="index" :class="getCardStyle(draggableCard)">
-          <div class="card-actions">
-            <ni-button v-if="isSelected(draggableCard) && !isParentPublished" icon="delete"
-              @click="deleteCard(draggableCard)" :disable="disableEdition" />
-          </div>
-          <div class="card-cell cursor-pointer" @click="selectCard(draggableCard)">
-            <div class="card-cell-title">
-              <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(draggableCard) }}</div>
-              <q-icon v-if="disableEdition" name="lock" :class="{'locked-unselected': !isSelected(draggableCard)}"
-                size="xs" />
+      :content-style="scrollAreaContentStyle" :content-active-style="scrollAreaContentStyle">
+      <draggable v-model="draggableCardsList" ghost-class="ghost" :disabled="isDraggableDisabled"
+        @update:model-value="update" item-key="_id">
+        <template #item="{element: draggableCard, index: index}">
+          <div :class="getCardStyle(draggableCard)">
+            <div class="card-actions">
+              <ni-button v-if="isSelected(draggableCard) && !isParentPublished" icon="delete"
+                @click="deleteCard(draggableCard)" :disable="disableEdition" />
             </div>
-            <div>{{ getTemplateName(draggableCard.template) }}</div>
+            <div class="card-cell cursor-pointer" @click="selectCard(draggableCard)">
+              <div class="card-cell-title">
+                <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(draggableCard) }}</div>
+                <q-icon v-if="disableEdition" name="lock" :class="{'locked-unselected': !isSelected(draggableCard)}"
+                  size="xs" />
+              </div>
+              <div>{{ getTemplateName(draggableCard.template) }}</div>
+            </div>
+            <div v-if="!isSelected(draggableCard) && !draggableCard.isValid" :class="{ 'dot dot-error': true }" />
           </div>
-          <div v-if="!isSelected(draggableCard) && !draggableCard.isValid" :class="{ 'dot dot-error': true }" />
-        </div>
+        </template>
       </draggable>
     </q-scroll-area>
     <ni-button v-if="!isParentPublished && !disableEdition" label="Ajouter une carte" color="primary" icon="add"
@@ -58,9 +60,11 @@ export default {
     'ni-button': Button,
     draggable,
   },
+  emits: ['add', 'delete-card', 'update'],
   data () {
     return {
       draggableCardsList: [],
+      scrollAreaContentStyle: { display: 'flex', 'flex-direction': 'column', width: '100%' },
     };
   },
   computed: {
@@ -123,7 +127,7 @@ export default {
       const scrollArea = this.$refs.cardContainer;
       const scrollTarget = scrollArea.getScrollTarget();
       const duration = 300;
-      scrollArea.setScrollPosition(scrollTarget.scrollHeight, duration);
+      scrollArea.setScrollPosition('vertical', scrollTarget.scrollHeight, duration);
     },
     selectCard (card) {
       this.$store.dispatch('card/fetchCard', card);
@@ -139,9 +143,9 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .card-list
-  padding: 5px 5px 0 5px
+  padding: 4px 4px 0 4px
   border-radius: 3px
   display: flex
   flex-direction: column

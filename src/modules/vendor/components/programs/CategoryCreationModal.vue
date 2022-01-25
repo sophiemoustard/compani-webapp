@@ -1,11 +1,11 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
-    <template slot="title">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input">
+    <template #title>
       Créer une nouvelle <span class="text-weight-bold">catégorie</span>
     </template>
-    <ni-input in-modal :value="newCategory.name" :error="validations.name.$error" @input="update($event, 'name')"
-      @blur="validations.name.$touch" required-field caption="Nom" />
-    <template slot="footer">
+    <ni-input in-modal :model-value="newCategory.name" :error="validations.name.$error"
+      @update:model-value="update($event, 'name')" @blur="validations.name.$touch" required-field caption="Nom" />
+    <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la catégorie" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>
@@ -19,7 +19,7 @@ import Input from '@components/form/Input';
 export default {
   name: 'CategoryCreationModal',
   props: {
-    value: { type: Boolean, default: false },
+    modelValue: { type: Boolean, default: false },
     newCategory: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
@@ -28,18 +28,19 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
   },
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-category'],
   methods: {
     hide () {
       this.$emit('hide');
     },
     input (event) {
-      this.$emit('input', event);
+      this.$emit('update:model-value', event);
     },
     submit () {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newCategory', { ...this.newCategory, [prop]: event });
+      this.$emit('update:new-category', { ...this.newCategory, [prop]: event });
     },
   },
 };

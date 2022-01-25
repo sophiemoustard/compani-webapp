@@ -36,15 +36,15 @@
 
     <!-- Modal envoi message -->
     <ni-modal v-model="smsModal">
-      <template slot="title">
+      <template #title>
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
       <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="messageType" required-field
-        @input="updateMessage" />
+        @update:model-value="updateMessage" />
       <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
-      <template slot="footer">
+      <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
-          :loading="loading" @click.native="sendMessage" />
+          :loading="loading" @click="sendMessage" />
       </template>
     </ni-modal>
   </div>
@@ -186,29 +186,29 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
-  .avatar
-    width: 59px
-    height: 59px
-    border: 1px solid $copper-grey-400
+<style lang="sass" scoped>
+.avatar
+  width: 59px
+  height: 59px
+  border: 1px solid $copper-grey-400
 
-  .send-message-link
-    color: $primary
-    cursor: pointer
-    &:hover
-      text-decoration: underline
+.send-message-link
+  color: $primary
+  cursor: pointer
+  &:hover
+    text-decoration: underline
 
-  .chip-icon
-    height: 14px
-    position: absolute
-    right: 5px
-    top: -4px
-    width: 14px
-    border-radius: 50%
-    background: white
+.chip-icon
+  height: 14px
+  position: absolute
+  right: 5px
+  top: -4px
+  width: 14px
+  border-radius: 50%
+  background: white
 
-  .custom-justify-end
-    justify-content: flex-end
-    @media screen and (max-width: 767px)
-      justify-content: center
+.custom-justify-end
+  justify-content: flex-end
+  @media screen and (max-width: 767px)
+    justify-content: center
 </style>

@@ -40,7 +40,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .thumbnail
     position: relative
     width: 150px
@@ -53,8 +53,7 @@ export default {
     top: 50%
     height: 100%
     width: auto
-    -webkit-transform: translate(-50%,-50%);
-    -ms-transform: translate(-50%,-50%);
-    transform: translate(-50%,-50%);
-
+    -webkit-transform: translate(-50%,-50%)
+    -ms-transform: translate(-50%,-50%)
+    transform: translate(-50%,-50%)
 </style>

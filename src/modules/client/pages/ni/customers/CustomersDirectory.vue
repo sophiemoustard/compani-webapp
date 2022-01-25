@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
+    <ni-table-list :data="filteredCustomers" :columns="columns" v-model:pagination="pagination"
       @go-to="goToCustomerProfile" :loading="tableLoading" :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
@@ -19,13 +19,15 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="customerCreationModal = true" :disable="tableLoading" />
 
-    <customer-creation-modal v-model="customerCreationModal" :new-customer.sync="newCustomer" :loading="loading"
-      :validations="$v.newCustomer" :civility-options="civilityOptions" @hide="resetForm" @submit="createCustomer" />
+    <customer-creation-modal v-model="customerCreationModal" v-model:new-customer="newCustomer" :loading="loading"
+      :validations="v$.newCustomer" :civility-options="civilityOptions" @hide="resetForm" @submit="createCustomer" />
   </q-page>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { useMeta } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Customers from '@api/Customers';
@@ -43,12 +45,17 @@ import { customerProfileValidation } from 'src/modules/client/helpers/customerPr
 
 export default {
   name: 'CustomersDirectory',
-  metaInfo: { title: 'Répertoire bénéficiaires' },
   mixins: [validationMixin, customerMixin],
   components: {
     'ni-directory-header': DirectoryHeader,
     'customer-creation-modal': CustomerCreationModal,
     'ni-table-list': TableList,
+  },
+  setup () {
+    const metaInfo = { title: 'Répertoire bénéficiaires' };
+    useMeta(metaInfo);
+
+    return { v$: useVuelidate() };
   },
   data () {
     return {
@@ -132,21 +139,20 @@ export default {
       ],
     };
   },
-  validations: {
-    newCustomer: {
-      identity: {
-        title: { required },
-        lastname: { required },
-      },
-      contact: {
-        primaryAddress: {
-          zipCode: { required },
-          street: { required },
-          city: { required },
-          fullAddress: { required, frAddress },
+  validations () {
+    return {
+      newCustomer: {
+        identity: { title: { required }, lastname: { required } },
+        contact: {
+          primaryAddress: {
+            zipCode: { required },
+            street: { required },
+            city: { required },
+            fullAddress: { required, frAddress },
+          },
         },
       },
-    },
+    };
   },
   async created () {
     await this.getCustomers();
@@ -197,7 +203,7 @@ export default {
       this.$router.push({ name: 'ni customers info', params: { customerId: customer._id } });
     },
     resetForm () {
-      this.$v.newCustomer.$reset();
+      this.v$.newCustomer.$reset();
       this.newCustomer = {
         identity: { title: '', lastname: '', firstname: '' },
         contact: {
@@ -208,8 +214,8 @@ export default {
     async createCustomer () {
       try {
         this.loading = true;
-        this.$v.newCustomer.$touch();
-        const isValid = await this.waitForFormValidation(this.$v.newCustomer);
+        this.v$.newCustomer.$touch();
+        const isValid = await this.waitForFormValidation(this.v$.newCustomer);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = this.newCustomer;
@@ -236,7 +242,7 @@ export default {
   },
 };
 </script>
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
   .dot
-    margin: 0px;
+    margin: 0px
 </style>

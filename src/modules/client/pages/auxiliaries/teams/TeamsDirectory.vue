@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
+    <ni-table-list :data="filteredUsers" :columns="columns" v-model:pagination="pagination" :loading="tableLoading"
       :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ col }">
         <q-item v-if="col.name === 'name'">
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { createMetaMixin } from 'quasar';
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -30,13 +31,15 @@ import TableList from '@components/table/TableList';
 import { formatPhone, formatIdentity, removeDiacritics } from '@helpers/utils';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
+const metaInfo = { title: 'Répertoire équipe' };
+
 export default {
   name: 'TeamDirectory',
-  metaInfo: { title: 'Répertoire équipe' },
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
+  mixins: [createMetaMixin(metaInfo)],
   data () {
     return {
       tableLoading: false,
@@ -66,8 +69,8 @@ export default {
       ],
     };
   },
-  created () {
-    this.getUserList();
+  async created () {
+    await this.getUserList();
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
@@ -118,7 +121,7 @@ export default {
 };
 </script>
 
-<style lang="stylus" scoped>
+<style lang="sass" scoped>
 .sector-label
   color: $copper-grey-400
   font-size: 14px

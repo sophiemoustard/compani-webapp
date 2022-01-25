@@ -7,7 +7,7 @@
           @click="exportDpae(contract._id)" />
       </q-card-section>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name"
-        :loading="contractsLoading" :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
+        :loading="contractsLoading" v-model:pagination="pagination" :visible-columns="visibleColumns(contract)">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -63,7 +63,7 @@
     <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-height full-width>
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end">
-          <ni-button icon="close" size="sm" @click.native="esignModal = false" />
+          <ni-button icon="close" size="sm" @click="esignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
           <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />
@@ -84,7 +84,6 @@ import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
-import { formatIdentity } from '@helpers/utils';
 import { formatDate, descendingSortArray } from '@helpers/date';
 import moment from '@helpers/moment';
 import { getContractTags } from 'src/modules/client/helpers/tags';
@@ -106,6 +105,14 @@ export default {
     personKey: { type: String, default: () => COACH },
     contractsLoading: { type: Boolean, default: false },
   },
+  emits: [
+    'open-version-creation',
+    'open-version-edition',
+    'delete-version',
+    'open-end-contract',
+    'refresh',
+    'refresh-with-timeout',
+  ],
   data () {
     return {
       CUSTOMER,
@@ -278,40 +285,36 @@ export default {
       }
     },
   },
-  filters: {
-    formatIdentity,
-  },
 };
 </script>
 
-<style lang="stylus" scoped>
-  .cell-container
-    width: 100%
+<style lang="sass" scoped>
+.cell-container
+  width: 100%
 
-  .contract-cell
-    background: white
-    width: 100%
-    margin-bottom: 20px
+.contract-cell
+  background: white
+  width: 100%
+  margin-bottom: 20px
 
-  .cell-title
-    font-size: 18px
-    padding: 16px 10px
-    display: flex
-    justify-content: space-between
+.cell-title
+  font-size: 18px
+  padding: 16px 10px
+  display: flex
+  justify-content: space-between
 
-  .cell-subtitle
-    margin:  0 10px 10px
-    font-size: 14px
+.cell-subtitle
+  margin:  0 10px 10px
+  font-size: 14px
 
-  /deep/ .q-layout-header
-    box-shadow: none
+:deep(.q-layout-header)
+  box-shadow: none
 
-  .iframe-normal
-    position: absolute
-    width: 100%
-    height:100%
+.iframe-normal
+  position: absolute
+  width: 100%
+  height:100%
 
-  .contract-actions
-    justify-content: normal !important
-
+.contract-actions
+  justify-content: normal !important
 </style>
