@@ -7,6 +7,8 @@
         <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
           @blur="updateCompany('tradeName')" :error="v$.company.tradeName.$error"
           :error-message="tradeNameError(v$.company)" />
+        <ni-search-address v-model="company.address" :error-message="addressError" @blur="updateCompany('address')"
+            @focus="saveTmp('address.fullAddress')" :error="v$.company.address.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -25,10 +27,11 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Companies from '@api/Companies';
+import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { validTradeName } from '@helpers/vuelidateCustomVal';
+import { validTradeName, frAddress } from '@helpers/vuelidateCustomVal';
 import { companyMixin } from '@mixins/companyMixin';
 
 export default {
@@ -36,14 +39,29 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  setup () { return { v$: useVuelidate() }; },
+  setup () {
+    const tmpInput = '';
+
+    return { tmpInput, v$: useVuelidate() };
+  },
   components: {
     'ni-input': Input,
     'ni-coach-list': CoachList,
+    'ni-search-address': SearchAddress,
   },
   mixins: [companyMixin],
   validations () {
-    return { company: { name: { required }, tradeName: { validTradeName } } };
+    return { company: {
+      name: { required },
+      tradeName: { validTradeName },
+      address: {
+        zipCode: { required },
+        street: { required },
+        city: { required },
+        fullAddress: { required, frAddress },
+        location: { required },
+      },
+    } };
   },
   computed: {
     ...mapState('company', ['company']),
@@ -65,6 +83,7 @@ export default {
     async updateCompany (path) {
       try {
         const value = get(this.company, path);
+        if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
         if (this.tmpInput === value) return;
         this.v$.company.$touch();
         if (this.v$.company.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -79,7 +98,7 @@ export default {
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        this.tmpInput = null;
+        this.tmpInput = '';
       }
     },
   },
