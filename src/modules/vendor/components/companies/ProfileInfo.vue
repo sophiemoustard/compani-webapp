@@ -33,6 +33,7 @@ import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { validTradeName, frAddress } from '@helpers/vuelidateCustomVal';
 import { companyMixin } from '@mixins/companyMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -49,7 +50,7 @@ export default {
     'ni-coach-list': CoachList,
     'ni-search-address': SearchAddress,
   },
-  mixins: [companyMixin],
+  mixins: [companyMixin, validationMixin],
   validations () {
     return { company: {
       name: { required },
@@ -86,7 +87,11 @@ export default {
         if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
         if (this.tmpInput === value) return;
         this.v$.company.$touch();
-        if (this.v$.company.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        if (get(this.v$.company, path)) {
+          const isValid = await this.waitForValidation(this.v$.company, path);
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         const payload = set({}, path, value);
         await Companies.updateById(this.company._id, payload);
