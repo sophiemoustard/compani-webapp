@@ -67,6 +67,7 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
@@ -211,7 +212,7 @@ export default {
       }
     },
     getStepProgress (step) {
-      if (step.progress.live >= 0) return step.progress.live;
+      if (has(step, 'progress.live')) return step.progress.live;
       return step.progress.eLearning;
     },
   },
