@@ -23,7 +23,7 @@ export const traineeFollowUpTableMixin = {
       return {
         _id: trainee._id,
         identity: { ...trainee.identity, fullName: formattedName },
-        progress: trainee.elearningProgress,
+        progress: trainee.progress,
         steps: trainee.steps,
         firstMobileConnection: trainee.firstMobileConnection,
       };

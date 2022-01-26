@@ -53,7 +53,7 @@
                   {{ stepIndex + 1 }} - {{ step.name }}
                 </div>
                 <div class="expanding-table-progress-container">
-                  <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
+                  <ni-progress class="expanding-table-sub-progress" :value="getStepProgress(step)" />
                 </div>
               </div>
             </q-td>
@@ -67,6 +67,7 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
@@ -118,7 +119,9 @@ export default {
         {
           name: 'progress',
           label: 'Progression',
-          field: 'progress',
+          field: row => (get(row, 'format') === BLENDED
+            ? get(row, 'progress.blended')
+            : get(row, 'progress.eLearning')),
           align: 'center',
           sortable: true,
           style: 'min-width: 150px; width: 20%',
@@ -134,14 +137,14 @@ export default {
       return this.courses.filter(course => course.format === STRICTLY_E_LEARNING) || [];
     },
     eLearningCoursesOnGoing () {
-      return this.eLearningCourses.filter(course => course.progress < 1) || [];
+      return this.eLearningCourses.filter(course => course.progress.eLearning < 1) || [];
     },
     eLearningCoursesOnGoingText () {
       const formation = this.eLearningCoursesOnGoing.length > 1 ? 'formations' : 'formation';
       return `${formation} eLearning en cours`;
     },
     eLearningCoursesCompleted () {
-      return this.eLearningCourses.filter(course => course.progress === 1) || [];
+      return this.eLearningCourses.filter(course => course.progress.eLearning === 1) || [];
     },
     eLearningCoursesCompletedText () {
       return this.eLearningCoursesCompleted.length > 1
@@ -207,6 +210,10 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
       }
+    },
+    getStepProgress (step) {
+      if (has(step, 'progress.live')) return step.progress.live;
+      return step.progress.eLearning;
     },
   },
 };
