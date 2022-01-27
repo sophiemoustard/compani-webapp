@@ -61,8 +61,6 @@ export default {
       tableLoading,
       pagination,
       courseFundingOrganisations,
-      // Validations
-      // Computed
       // Methods
       refreshCourseFundingOrganisations,
     };
