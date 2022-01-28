@@ -73,7 +73,7 @@
       </q-card>
     </div>
     <div v-if="unsubscribedAttendances.length" class="q-mb-xl">
-      <p class="text-weight-bold">Formations suivies</p>
+      <p class="text-weight-bold q-mb-sm">Emargements non prévus</p>
       <div class="text-italic q-ma-xs">
         {{ formatIdentity(userProfile.identity, 'FL') }} a émargé dans certaines formations sans inscription.
       </div>
