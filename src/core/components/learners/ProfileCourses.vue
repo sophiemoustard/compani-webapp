@@ -85,9 +85,8 @@
               class="q-ma-sm expanding-table-expanded-row">
               <div class="dates">{{ attendance.date }}</div>
               <div class="hours">{{ attendance.hours }}</div>
-              <div class="trainer">{{ attendance.trainer }}</div>
-              <div class="step">{{ attendance.step }}</div>
               <div class="misc">{{ attendance.misc }}</div>
+              <div class="trainer">{{ attendance.trainer }}</div>
             </div>
           </q-td>
         </template>
@@ -284,7 +283,6 @@ export default {
                 hours: `${formatSlotHour(a.courseSlot)} (${getSlotDuration(a.courseSlot)})`,
                 trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
                 misc: a.course.misc,
-                step: a.step.name,
               })),
           }));
       } catch (e) {
@@ -336,10 +334,7 @@ export default {
   width: 15%
 
 .trainer
-  width: 20%
-
-.step
-  width: 30%
+  width: 50%
 
 .misc
   width: 15%
