@@ -127,12 +127,7 @@ export default {
           format: value => ((value === BLENDED) ? 'Mixte' : 'ELearning'),
           sort: sortStrings,
         },
-        {
-          name: 'attendances',
-          label: 'Emargements',
-          field: row => get(row, 'progress.presence'),
-          align: 'center',
-        },
+        { name: 'attendances', label: 'Emargements', field: row => get(row, 'progress.presence'), align: 'center' },
         {
           name: 'eLearning',
           label: 'eLearning',
@@ -227,7 +222,7 @@ export default {
       }
     },
     formatDuration (duration) {
-      const durationInHours = duration / 60;
+      const durationInHours = duration.minutes / 60;
       const hours = Math.trunc(durationInHours);
       const paddedMinutes = (durationInHours - hours) * 60;
 
