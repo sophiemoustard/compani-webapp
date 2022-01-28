@@ -9,9 +9,6 @@
         <q-item-section v-if="userCanFeedback">
           <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm" @click="openExtenalUrl(bulbLink)" />
         </q-item-section>
-        <q-item-section v-if="isAuxiliaryWithCompany">
-          <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm" @click="clickHandler" />
-        </q-item-section>
         <q-item-section>
           <ni-button class="person" icon="person" @click="goToProfile" size="sm" />
         </q-item-section>
@@ -57,9 +54,6 @@ export default {
       clientRole: 'main/getClientRole',
       vendorRole: 'main/getVendorRole',
     }),
-    isAuxiliaryWithCompany () {
-      return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
-    },
     userCanFeedback () {
       return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.clientRole) ||
         [TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
@@ -69,9 +63,6 @@ export default {
     },
   },
   methods: {
-    clickHandler () {
-      this.$emit('click');
-    },
     openExtenalUrl (url) {
       window.open(url, '_blank');
     },
