@@ -25,7 +25,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
   },
   setup () {
-    const metaInfo = { title: 'BillingConfig' };
+    const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
 
     const tableLoading = ref(false);
