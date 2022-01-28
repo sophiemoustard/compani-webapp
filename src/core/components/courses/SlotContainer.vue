@@ -72,7 +72,7 @@ import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
-import { formatQuantity, formatDuration } from '@helpers/utils';
+import { formatQuantity, formatDuration, formatSlotHour } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -191,6 +191,7 @@ export default {
     else this.groupByCourses();
   },
   methods: {
+    formatSlotHour,
     courseSlotValidation (slot) {
       return {
         step: { required },
@@ -221,9 +222,6 @@ export default {
       const duration = moment.duration(moment(slot.endDate).diff(slot.startDate));
 
       return formatDuration(duration);
-    },
-    formatSlotHour (slot) {
-      return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;
     },
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';

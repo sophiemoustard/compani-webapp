@@ -34,8 +34,8 @@
           <q-td colspan="100%">
             <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
               class="q-ma-sm expanding-table-expanded-row">
-              <div class="dates">{{ formatDate(attendance.slot.startDate) }}</div>
-              <div class="hours">{{ formatSlotHour(attendance.slot) }} ({{ attendance.duration }})</div>
+              <div class="dates">{{ attendance.date }}</div>
+              <div class="hours">{{ attendance.hours }}</div>
               <div class="misc">{{ attendance.misc }}</div>
               <div class="trainer">{{ attendance.trainer }}</div>
             </div>
@@ -59,9 +59,14 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import { upperCaseFirstLetter, formatIdentity, getTotalDuration, getSlotDuration } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
-import moment from '@helpers/moment';
+import {
+  upperCaseFirstLetter,
+  formatIdentity,
+  getTotalDuration,
+  getSlotDuration,
+  formatSlotHour,
+} from '@helpers/utils';
+import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadZip } from '@helpers/file';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -90,15 +95,9 @@ export default {
       questionnaires: [],
       unsubscribedAttendances: [],
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'trainee',
-          format: value => formatIdentity(value.identity, 'FL'),
-          align: 'left',
-        },
+        { name: 'name', label: 'Nom', field: 'trainee', align: 'left' },
         { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
-        { name: 'duration', label: 'Durée', field: 'totalDuration', align: 'center' },
+        { name: 'duration', label: 'Durée', field: 'duration', align: 'center' },
         { name: 'expand', label: '', field: '' },
       ],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
@@ -124,6 +123,7 @@ export default {
   },
   methods: {
     get,
+    formatSlotHour,
     async refreshQuestionnaires () {
       try {
         this.questionnaires = await Courses.getCourseQuestionnaires(this.course._id);
@@ -138,9 +138,6 @@ export default {
         { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
       );
     },
-    formatSlotHour (slot) {
-      return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;
-    },
     async getUnsubscribedAttendances () {
       try {
         const query = {
@@ -148,23 +145,22 @@ export default {
           ...(this.isClientInterface && { company: this.loggedUser.company._id }),
         };
         const unsubscribedAttendancesGroupedByTrainees = await Attendances.listUnsubscribed(query);
-        const formattedUnsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByTrainees)
+        this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByTrainees)
           .map(traineeId => ({
-            _id: unsubscribedAttendancesGroupedByTrainees[traineeId][0].trainee._id,
-            trainee: unsubscribedAttendancesGroupedByTrainees[traineeId][0].trainee,
-            attendances: unsubscribedAttendancesGroupedByTrainees[traineeId].map(a => ({
-              _id: a._id,
-              duration: getSlotDuration(a.courseSlot),
-              slot: { startDate: a.courseSlot.startDate, endDate: a.courseSlot.endDate },
-              trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
-              misc: a.misc,
-            })),
+            _id: traineeId,
+            trainee: formatIdentity(unsubscribedAttendancesGroupedByTrainees[traineeId][0].trainee.identity, 'FL'),
+            attendancesCount: unsubscribedAttendancesGroupedByTrainees[traineeId].length,
+            duration: getTotalDuration(unsubscribedAttendancesGroupedByTrainees[traineeId].map(a => a.courseSlot)),
+            attendances: unsubscribedAttendancesGroupedByTrainees[traineeId]
+              .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
+              .map(a => ({
+                _id: a._id,
+                date: formatDate(a.courseSlot.startDate),
+                hours: `${formatSlotHour(a.courseSlot)} (${getSlotDuration(a.courseSlot)})`,
+                trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
+                misc: a.misc,
+              })),
           }));
-        this.unsubscribedAttendances = formattedUnsubscribedAttendances.map(attendance => ({
-          ...attendance,
-          attendancesCount: attendance.attendances.length,
-          totalDuration: getTotalDuration(attendance.attendances.map(a => a.slot)),
-        }));
       } catch (e) {
         console.error(e);
         this.unsubscribedAttendances = [];
