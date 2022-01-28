@@ -7,8 +7,7 @@
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
-          <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm"
-            @click="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
+          <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm" @click="openExtenalUrl(bulbLink)" />
         </q-item-section>
         <q-item-section v-if="isAuxiliaryWithCompany">
           <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm" @click="clickHandler" />
@@ -50,6 +49,7 @@ export default {
   data () {
     return {
       interfaceLogo: 'https://storage.googleapis.com/compani-main/icons/blue_icon_small.png',
+      bulbLink: 'https://plugins.crisp.chat/urn:crisp.im:contact-form:0/contact/1304cdd5-33e9-493b-ae30-e85d7f617547',
     };
   },
   computed: {
