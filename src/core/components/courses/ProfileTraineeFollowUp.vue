@@ -59,7 +59,7 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import { upperCaseFirstLetter, formatDuration, formatIdentity } from '@helpers/utils';
+import { upperCaseFirstLetter, formatIdentity, getTotalDuration, getSlotDuration } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 import { downloadZip } from '@helpers/file';
@@ -138,19 +138,6 @@ export default {
         { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
       );
     },
-    getTotalDuration (slots) {
-      const total = slots.reduce(
-        (acc, slot) => acc.add(moment.duration(moment(slot.endDate).diff(slot.startDate))),
-        moment.duration()
-      );
-
-      return formatDuration(total);
-    },
-    getSlotDuration (slot) {
-      const duration = moment.duration(moment(slot.endDate).diff(slot.startDate));
-
-      return formatDuration(duration);
-    },
     formatSlotHour (slot) {
       return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;
     },
@@ -167,7 +154,7 @@ export default {
             trainee: unsubscribedAttendancesGroupedByTrainees[traineeId][0].trainee,
             attendances: unsubscribedAttendancesGroupedByTrainees[traineeId].map(a => ({
               _id: a._id,
-              duration: this.getSlotDuration(a.courseSlot),
+              duration: getSlotDuration(a.courseSlot),
               slot: { startDate: a.courseSlot.startDate, endDate: a.courseSlot.endDate },
               trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
               misc: a.misc,
@@ -176,7 +163,7 @@ export default {
         this.unsubscribedAttendances = formattedUnsubscribedAttendances.map(attendance => ({
           ...attendance,
           attendancesCount: attendance.attendances.length,
-          totalDuration: this.getTotalDuration(attendance.attendances.map(a => a.slot)),
+          totalDuration: getTotalDuration(attendance.attendances.map(a => a.slot)),
         }));
       } catch (e) {
         console.error(e);
