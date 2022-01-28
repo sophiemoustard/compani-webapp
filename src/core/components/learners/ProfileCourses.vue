@@ -29,7 +29,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="columns" :loading="loading" v-model:pagination="pagination">
+        <ni-expanding-table :data="courses" :columns="courseColumns" :loading="loading" v-model:pagination="pagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'attendances' && has(col, 'value.attendanceDuration')">
@@ -72,6 +72,27 @@
         </ni-expanding-table>
       </q-card>
     </div>
+    <div v-if="unsubscribedAttendances.length" class="q-mb-xl">
+      <p class="text-weight-bold">Formations suivies</p>
+      <div class="text-italic q-ma-xs">
+        {{ formatIdentity(userProfile.identity, 'FL') }} a émargé dans certaines formations sans inscription.
+      </div>
+      <ni-expanding-table :data="unsubscribedAttendances" :columns="attendanceColumns" :pagination="pagination"
+        :hide-bottom="false" :loading="loading">
+        <template #expanding-row="{ props }">
+          <q-td colspan="100%">
+            <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
+              class="q-ma-sm expanding-table-expanded-row">
+              <div class="dates">{{ attendance.date }}</div>
+              <div class="hours">{{ attendance.hours }}</div>
+              <div class="trainer">{{ attendance.trainer }}</div>
+              <div class="step">{{ attendance.step }}</div>
+              <div class="misc">{{ attendance.misc }}</div>
+            </div>
+          </q-td>
+        </template>
+      </ni-expanding-table>
+    </div>
   </div>
 </template>
 
@@ -81,9 +102,10 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
+import Attendances from '@api/Attendances';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
-import { sortStrings } from '@helpers/utils';
-import { isBetween } from '@helpers/date';
+import { sortStrings, formatIdentity, getTotalDuration, getSlotDuration, formatSlotHour } from '@helpers/utils';
+import { isBetween, formatDate, ascendingSort } from '@helpers/date';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
@@ -107,7 +129,7 @@ export default {
       courses: [],
       loading: false,
       pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
-      columns: [
+      courseColumns: [
         {
           name: 'name',
           label: 'Nom',
@@ -138,7 +160,14 @@ export default {
         },
         { name: 'expand', label: '', field: '_id' },
       ],
+      attendanceColumns: [
+        { name: 'name', label: 'Nom', field: 'program', align: 'left' },
+        { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
+        { name: 'duration', label: 'Durée', field: 'duration', align: 'center' },
+        { name: 'expand', label: '', field: '' },
+      ],
       E_LEARNING,
+      unsubscribedAttendances: [],
     };
   },
   computed: {
@@ -173,22 +202,14 @@ export default {
         ? 'activités eLearning réalisées'
         : 'activité eLearning réalisée';
     },
-
   },
   async created () {
-    try {
-      this.loading = true;
-      this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
-      await this.computeChartsData();
-    } catch (e) {
-      NotifyNegative('Erreur lors de la récupération des formations');
-      console.error(e);
-      this.courses = [];
-    } finally {
-      this.loading = false;
-    }
+    await this.getUserCourses();
+    this.computeChartsData();
+    this.getUnsubscribedAttendances();
   },
   methods: {
+    formatIdentity,
     goToCourseProfile (props) {
       if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
         return this.$router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
@@ -207,8 +228,21 @@ export default {
         params: { courseId: props.row._id, defaultTab: 'traineeFollowUp' },
       });
     },
+    async getUserCourses () {
+      try {
+        this.loading = true;
+        this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+      } catch (e) {
+        NotifyNegative('Erreur lors de la récupération des formations');
+        console.error(e);
+        this.courses = [];
+      } finally {
+        this.loading = false;
+      }
+    },
     async computeChartsData () {
       try {
+        this.loading = true;
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const sixMonthsHistories = this.eLearningActivitiesCompleted
@@ -219,6 +253,8 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
+      } finally {
+        this.loading = false;
       }
     },
     formatDuration (duration) {
@@ -230,6 +266,33 @@ export default {
     },
     get,
     has,
+    async getUnsubscribedAttendances () {
+      try {
+        const query = { trainee: this.userProfile._id };
+        const unsubscribedAttendancesGroupedByPrograms = await Attendances.listUnsubscribed(query);
+        this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByPrograms)
+          .map(programId => ({
+            _id: programId,
+            program: unsubscribedAttendancesGroupedByPrograms[programId][0].program.name,
+            attendancesCount: unsubscribedAttendancesGroupedByPrograms[programId].length,
+            duration: getTotalDuration(unsubscribedAttendancesGroupedByPrograms[programId].map(a => a.courseSlot)),
+            attendances: unsubscribedAttendancesGroupedByPrograms[programId]
+              .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
+              .map(a => ({
+                _id: a._id,
+                date: formatDate(a.courseSlot.startDate),
+                hours: `${formatSlotHour(a.courseSlot)} (${getSlotDuration(a.courseSlot)})`,
+                trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
+                misc: a.course.misc,
+                step: a.step.name,
+              })),
+          }));
+      } catch (e) {
+        console.error(e);
+        this.unsubscribedAttendances = [];
+        NotifyNegative('Erreur lors de la récupération des émargements non prévus.');
+      }
+    },
   },
 };
 </script>
@@ -265,4 +328,19 @@ export default {
   flex-direction: row
   display: flex
   color: $primary
+
+.dates
+  width: 10%
+
+.hours
+  width: 15%
+
+.trainer
+  width: 20%
+
+.step
+  width: 30%
+
+.misc
+  width: 15%
 </style>
