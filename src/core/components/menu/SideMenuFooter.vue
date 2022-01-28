@@ -46,7 +46,7 @@ export default {
   data () {
     return {
       interfaceLogo: 'https://storage.googleapis.com/compani-main/icons/blue_icon_small.png',
-      bulbLink: 'https://plugins.crisp.chat/urn:crisp.im:contact-form:0/contact/1304cdd5-33e9-493b-ae30-e85d7f617547',
+      bulbLink: process.env.BULB_LINK,
     };
   },
   computed: {
