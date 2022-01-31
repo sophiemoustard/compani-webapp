@@ -12,7 +12,7 @@
       :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
       required-field />
     <ni-search-address v-if="getType(this.editedCourseSlot.step) === ON_SITE" :model-value="editedCourseSlot.address"
-      error-message="'Adresse non valide'" in-modal last @blur="validations.address.$touch"
+      error-message="Adresse non valide" in-modal last @blur="validations.address.$touch"
       :error="validations.address.$error" @update:model-value="update($event, 'address')" />
     <ni-input v-if="getType(this.editedCourseSlot.step) === REMOTE" :model-value="editedCourseSlot.meetingLink"
       @update:model-value="update($event, 'meetingLink')" caption="Lien vers la visio" in-modal

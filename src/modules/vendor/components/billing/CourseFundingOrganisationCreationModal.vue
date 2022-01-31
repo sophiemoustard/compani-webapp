@@ -7,7 +7,7 @@
       :error="validations.name.$error" required-field />
     <ni-search-address in-modal last :model-value="newOrganisation.address" :error="validations.address.$error"
       @update:model-value="update($event, 'address')" @blur="validations.address.$touch"
-      error-message="'Adresse non valide'" required-field />
+      :error-message="addressErrorMessage" required-field />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter" icon-right="add" color="white"
         :loading="loading" @click="submit" />
@@ -21,6 +21,8 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import SearchAddress from '@components/form/SearchAddress';
 import set from 'lodash/set';
+import get from 'lodash/get';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'CourseFundingOrganisationCreationModal',
@@ -37,6 +39,13 @@ export default {
     'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-organisation'],
+  computed: {
+    addressErrorMessage () {
+      return get(this.validations, 'address.fullAddress.frAddress.$response') === false
+        ? 'Adresse non valide'
+        : REQUIRED_LABEL;
+    },
+  },
   methods: {
     hide () {
       this.$emit('hide');
