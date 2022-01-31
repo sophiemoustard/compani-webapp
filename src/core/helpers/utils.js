@@ -122,14 +122,14 @@ export const getTotalDuration = (timePeriods) => {
   return formatDuration(total);
 };
 
-export const getSlotDuration = (timePeriod) => {
+export const getDuration = (timePeriod) => {
   const duration = moment.duration(moment(timePeriod.endDate).diff(timePeriod.startDate));
 
   return formatDuration(duration);
 };
 
-export const formatSlotHour = slot => `${moment(slot.startDate).format('HH:mm')} - `
-  + `${moment(slot.endDate).format('HH:mm')}`;
+export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
+  + `${moment(timePeriod.endDate).format('HH:mm')}`;
 
 export const formatPhone = phoneNumber => (phoneNumber
   ? phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5')

@@ -103,7 +103,7 @@ import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
-import { sortStrings, formatIdentity, getTotalDuration, getSlotDuration, formatSlotHour } from '@helpers/utils';
+import { sortStrings, formatIdentity, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/utils';
 import { isBetween, formatDate, ascendingSort } from '@helpers/date';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
@@ -280,7 +280,7 @@ export default {
               .map(a => ({
                 _id: a._id,
                 date: formatDate(a.courseSlot.startDate),
-                hours: `${formatSlotHour(a.courseSlot)} (${getSlotDuration(a.courseSlot)})`,
+                hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
                 trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
                 misc: a.course.misc,
               })),

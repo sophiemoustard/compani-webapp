@@ -63,8 +63,8 @@ import {
   upperCaseFirstLetter,
   formatIdentity,
   getTotalDuration,
-  getSlotDuration,
-  formatSlotHour,
+  getDuration,
+  formatIntervalHourly,
 } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadZip } from '@helpers/file';
@@ -123,7 +123,7 @@ export default {
   },
   methods: {
     get,
-    formatSlotHour,
+    formatIntervalHourly,
     async refreshQuestionnaires () {
       try {
         this.questionnaires = await Courses.getCourseQuestionnaires(this.course._id);
@@ -156,7 +156,7 @@ export default {
               .map(a => ({
                 _id: a._id,
                 date: formatDate(a.courseSlot.startDate),
-                hours: `${formatSlotHour(a.courseSlot)} (${getSlotDuration(a.courseSlot)})`,
+                hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
                 trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
                 misc: a.misc,
               })),
