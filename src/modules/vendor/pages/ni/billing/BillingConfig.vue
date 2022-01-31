@@ -21,7 +21,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -57,7 +57,7 @@ export default {
     const newOrganisation = ref({ name: '', address: {} });
     const modalLoading = ref(false);
 
-    const rules = computed(() => ({
+    const rules = {
       newOrganisation: {
         address: {
           zipCode: { required },
@@ -67,7 +67,7 @@ export default {
         },
         name: { required },
       },
-    }));
+    };
     const validations = useVuelidate(rules, { newOrganisation });
 
     const refreshCourseFundingOrganisations = async () => {
