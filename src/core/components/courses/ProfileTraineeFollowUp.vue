@@ -138,6 +138,22 @@ export default {
         { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
       );
     },
+    formatTraineeAttendances (traineeAttendances) {
+      return {
+        trainee: formatIdentity(traineeAttendances[0].trainee.identity, 'FL'),
+        attendancesCount: traineeAttendances.length,
+        duration: getTotalDuration(traineeAttendances.map(a => a.courseSlot)),
+        attendances: traineeAttendances
+          .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
+          .map(a => ({
+            _id: a._id,
+            date: formatDate(a.courseSlot.startDate),
+            hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+            trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
+            misc: a.misc,
+          })),
+      };
+    },
     async getUnsubscribedAttendances () {
       try {
         const query = {
@@ -148,18 +164,7 @@ export default {
         this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByTrainees)
           .map(traineeId => ({
             _id: traineeId,
-            trainee: formatIdentity(unsubscribedAttendancesGroupedByTrainees[traineeId][0].trainee.identity, 'FL'),
-            attendancesCount: unsubscribedAttendancesGroupedByTrainees[traineeId].length,
-            duration: getTotalDuration(unsubscribedAttendancesGroupedByTrainees[traineeId].map(a => a.courseSlot)),
-            attendances: unsubscribedAttendancesGroupedByTrainees[traineeId]
-              .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
-              .map(a => ({
-                _id: a._id,
-                date: formatDate(a.courseSlot.startDate),
-                hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
-                trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
-                misc: a.misc,
-              })),
+            ...this.formatTraineeAttendances(unsubscribedAttendancesGroupedByTrainees[traineeId]),
           }));
       } catch (e) {
         console.error(e);

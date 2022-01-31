@@ -209,6 +209,8 @@ export default {
   },
   methods: {
     formatIdentity,
+    get,
+    has,
     goToCourseProfile (props) {
       if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
         return this.$router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
@@ -263,28 +265,28 @@ export default {
 
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
-    get,
-    has,
+    formatProgramAttendances (programAttendances) {
+      return {
+        program: programAttendances[0].program.name,
+        attendancesCount: programAttendances.length,
+        duration: getTotalDuration(programAttendances.map(a => a.courseSlot)),
+        attendances: programAttendances
+          .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
+          .map(a => ({
+            _id: a._id,
+            date: formatDate(a.courseSlot.startDate),
+            hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+            trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
+            misc: a.course.misc,
+          })),
+      };
+    },
     async getUnsubscribedAttendances () {
       try {
         const query = { trainee: this.userProfile._id };
         const unsubscribedAttendancesGroupedByPrograms = await Attendances.listUnsubscribed(query);
         this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByPrograms)
-          .map(programId => ({
-            _id: programId,
-            program: unsubscribedAttendancesGroupedByPrograms[programId][0].program.name,
-            attendancesCount: unsubscribedAttendancesGroupedByPrograms[programId].length,
-            duration: getTotalDuration(unsubscribedAttendancesGroupedByPrograms[programId].map(a => a.courseSlot)),
-            attendances: unsubscribedAttendancesGroupedByPrograms[programId]
-              .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
-              .map(a => ({
-                _id: a._id,
-                date: formatDate(a.courseSlot.startDate),
-                hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
-                trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
-                misc: a.course.misc,
-              })),
-          }));
+          .map(programId => ({ _id: programId, ...this.formatProgramAttendances[programId] }));
       } catch (e) {
         console.error(e);
         this.unsubscribedAttendances = [];
