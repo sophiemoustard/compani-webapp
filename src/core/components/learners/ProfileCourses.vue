@@ -74,7 +74,7 @@
     </div>
     <div v-if="unsubscribedAttendances.length" class="q-mb-xl">
       <p class="text-weight-bold q-mb-sm">Emargements non prévus</p>
-      <div class="text-italic q-ma-xs">
+      <div class="text-italic q-my-xs">
         {{ formatIdentity(userProfile.identity, 'FL') }} a émargé dans certaines formations sans inscription.
       </div>
       <ni-expanding-table :data="unsubscribedAttendances" :columns="attendanceColumns" :pagination="pagination"
@@ -265,12 +265,13 @@ export default {
 
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
-    formatProgramAttendances (programAttendances) {
+    formatProgramAttendances (attendancesGroupedByProgram, programId) {
       return {
-        program: programAttendances[0].program.name,
-        attendancesCount: programAttendances.length,
-        duration: getTotalDuration(programAttendances.map(a => a.courseSlot)),
-        attendances: programAttendances
+        _id: programId,
+        program: attendancesGroupedByProgram[programId][0].program.name,
+        attendancesCount: attendancesGroupedByProgram[programId].length,
+        duration: getTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)),
+        attendances: attendancesGroupedByProgram[programId]
           .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
           .map(a => ({
             _id: a._id,
@@ -286,7 +287,7 @@ export default {
         const query = { trainee: this.userProfile._id };
         const unsubscribedAttendancesGroupedByPrograms = await Attendances.listUnsubscribed(query);
         this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByPrograms)
-          .map(programId => ({ _id: programId, ...this.formatProgramAttendances[programId] }));
+          .map(programId => this.formatProgramAttendances(unsubscribedAttendancesGroupedByPrograms, programId));
       } catch (e) {
         console.error(e);
         this.unsubscribedAttendances = [];

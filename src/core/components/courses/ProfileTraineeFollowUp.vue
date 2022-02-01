@@ -138,12 +138,13 @@ export default {
         { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
       );
     },
-    formatTraineeAttendances (traineeAttendances) {
+    formatTraineeAttendances (attendancesGroupedByTrainee, traineeId) {
       return {
-        trainee: formatIdentity(traineeAttendances[0].trainee.identity, 'FL'),
-        attendancesCount: traineeAttendances.length,
-        duration: getTotalDuration(traineeAttendances.map(a => a.courseSlot)),
-        attendances: traineeAttendances
+        _id: traineeId,
+        trainee: formatIdentity(attendancesGroupedByTrainee[traineeId][0].trainee.identity, 'FL'),
+        attendancesCount: attendancesGroupedByTrainee[traineeId].length,
+        duration: getTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)),
+        attendances: attendancesGroupedByTrainee[traineeId]
           .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
           .map(a => ({
             _id: a._id,
@@ -162,10 +163,7 @@ export default {
         };
         const unsubscribedAttendancesGroupedByTrainees = await Attendances.listUnsubscribed(query);
         this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByTrainees)
-          .map(traineeId => ({
-            _id: traineeId,
-            ...this.formatTraineeAttendances(unsubscribedAttendancesGroupedByTrainees[traineeId]),
-          }));
+          .map(traineeId => this.formatTraineeAttendances(unsubscribedAttendancesGroupedByTrainees, traineeId));
       } catch (e) {
         console.error(e);
         this.unsubscribedAttendances = [];
