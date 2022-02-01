@@ -45,13 +45,13 @@ export const useLearners = (refresh, isClientInterface, company) => {
       company: { required: requiredIf(!isClientInterface) },
     },
   }));
-  const traineeRules = computed(() => ({
+  const traineeRules = {
     newTrainee: { required },
     editedTrainee: {
       identity: { lastname: { required } },
       contact: { phone: { required, frPhoneNumber } },
     },
-  }));
+  };
 
   const learnerValidation = useVuelidate(learnerRules, { newLearner });
   const traineeValidation = useVuelidate(traineeRules, { newTrainee, editedTrainee });
