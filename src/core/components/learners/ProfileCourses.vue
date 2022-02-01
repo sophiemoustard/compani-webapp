@@ -32,7 +32,13 @@
         <ni-expanding-table :data="courses" :columns="columns" :loading="loading" v-model:pagination="pagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <template v-if="col.name === 'progress'">
+              <template v-if="col.name === 'attendances' && has(col, 'value.attendanceDuration')">
+                <div>
+                  {{ formatDuration(get(col, 'value.attendanceDuration')) }}
+                  / {{ formatDuration(get(col, 'value.maxDuration')) }}
+                  </div>
+              </template>
+              <template v-else-if="col.name === 'eLearning' && col.value >= 0">
                 <ni-progress class="q-ml-lg" :value="col.value" />
               </template>
               <template v-else-if="col.name === 'expand'">
@@ -47,13 +53,18 @@
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
               <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-                class="q-ma-sm expanding-table-expanded-row">
+                class="q-ma-sm row">
                 <div>
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   {{ stepIndex + 1 }} - {{ step.name }}
                 </div>
-                <div class="expanding-table-progress-container">
-                  <ni-progress class="expanding-table-sub-progress" :value="getStepProgress(step)" />
+                <div class="step-progress">
+                  <div v-if="has(step, 'progress.presence')">
+                    {{ formatDuration(get(step, 'progress.presence.attendanceDuration')) }}
+                    / {{ formatDuration(get(step, 'progress.presence.maxDuration')) }}
+                  </div>
+                  <ni-progress v-if="has(step, 'progress.eLearning')" class="expanding-table-sub-progress"
+                    :value="step.progress.eLearning" />
                 </div>
               </div>
             </q-td>
@@ -116,12 +127,11 @@ export default {
           format: value => ((value === BLENDED) ? 'Mixte' : 'ELearning'),
           sort: sortStrings,
         },
+        { name: 'attendances', label: 'Emargements', field: row => get(row, 'progress.presence'), align: 'center' },
         {
-          name: 'progress',
-          label: 'Progression',
-          field: row => (get(row, 'format') === BLENDED
-            ? get(row, 'progress.blended')
-            : get(row, 'progress.eLearning')),
+          name: 'eLearning',
+          label: 'eLearning',
+          field: row => get(row, 'progress.eLearning'),
           align: 'center',
           sortable: true,
           style: 'min-width: 150px; width: 20%',
@@ -211,10 +221,15 @@ export default {
         NotifyNegative('Erreur lors de la récupération des données.');
       }
     },
-    getStepProgress (step) {
-      if (has(step, 'progress.live')) return step.progress.live;
-      return step.progress.eLearning;
+    formatDuration (duration) {
+      const durationInHours = duration.minutes / 60;
+      const hours = Math.trunc(durationInHours);
+      const paddedMinutes = (durationInHours - hours) * 60;
+
+      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
+    get,
+    has,
   },
 };
 </script>
@@ -242,4 +257,12 @@ export default {
 
 .learners-data
   flex: 1
+.step-progress
+  align-items: center
+  justify-content: space-between
+  width: 20%
+  margin: 0px 24px
+  flex-direction: row
+  display: flex
+  color: $primary
 </style>
