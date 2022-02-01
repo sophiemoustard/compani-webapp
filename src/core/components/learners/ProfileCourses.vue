@@ -52,19 +52,32 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-                class="q-ma-sm row">
-                <div>
+              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props">
+                <div class="q-ma-sm row">
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   {{ stepIndex + 1 }} - {{ step.name }}
-                </div>
-                <div class="step-progress">
-                  <div v-if="has(step, 'progress.presence')">
-                    {{ formatDuration(get(step, 'progress.presence.attendanceDuration')) }}
-                    / {{ formatDuration(get(step, 'progress.presence.maxDuration')) }}
+                  <div class="step-progress">
+                    <div v-if="has(step, 'progress.presence')">
+                      {{ formatDuration(get(step, 'progress.presence.attendanceDuration')) }}
+                      / {{ formatDuration(get(step, 'progress.presence.maxDuration')) }}
+                    </div>
+                    <ni-progress v-if="has(step, 'progress.eLearning')" class="expanding-table-sub-progress"
+                      :value="step.progress.eLearning" />
                   </div>
-                  <ni-progress v-if="has(step, 'progress.eLearning')" class="expanding-table-sub-progress"
-                    :value="step.progress.eLearning" />
+                </div>
+                <div v-if="step.slots.length">
+                  <div v-for="slot in step.slots" :key="slot._id" class="slot row">
+                    <div class="dates">{{ formatDate(slot.startDate) }}</div>
+                    <div class="hours">{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</div>
+                    <div v-if="slot.attendances.length" class="attendance">
+                      <q-icon size="12px" name="check_circle" color="green-600" />
+                      <span class="text-green-600">Présent</span>
+                    </div>
+                    <div v-else class="attendance">
+                      <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
+                      <span class="text-orange-700">Absent</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </q-td>
@@ -301,6 +314,7 @@ export default {
         NotifyNegative('Erreur lors de la récupération des émargements non prévus.');
       }
     },
+    formatDate,
   },
 };
 </script>
@@ -348,4 +362,9 @@ export default {
 
 .misc
   width: 15%
+.attendance
+  width: 15%
+
+.slot
+  margin: 0px 40px
 </style>
