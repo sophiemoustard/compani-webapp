@@ -68,14 +68,14 @@
                 <div v-if="step.slots.length">
                   <div v-for="slot in step.slots" :key="slot._id" class="slot row">
                     <div class="dates">{{ formatDate(slot.startDate) }}</div>
-                    <div class="hours">{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</div>
+                    <div class="hours">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
                     <div v-if="slot.attendances.length" class="attendance">
                       <q-icon size="12px" name="check_circle" color="green-600" />
-                      <span class="text-green-600">Présent</span>
+                      <span class="text-green-600">Présent(e)</span>
                     </div>
                     <div v-else class="attendance">
                       <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
-                      <span class="text-orange-700">Absent</span>
+                      <span class="text-orange-700">Absent(e)</span>
                     </div>
                   </div>
                 </div>
@@ -315,6 +315,8 @@ export default {
       }
     },
     formatDate,
+    formatIntervalHourly,
+    getDuration,
   },
 };
 </script>
@@ -352,10 +354,12 @@ export default {
   color: $primary
 
 .dates
-  width: 10%
+  @media screen and (min-width: 767px)
+    width: 10%
 
 .hours
-  width: 15%
+  @media screen and (min-width: 767px)
+    width: 15%
 
 .trainer
   width: 50%
@@ -363,8 +367,11 @@ export default {
 .misc
   width: 15%
 .attendance
-  width: 15%
+  @media screen and (min-width: 767px)
+    width: 15%
 
 .slot
   margin: 0px 40px
+  @media screen and (max-width: 767px)
+    justify-content: space-between
 </style>
