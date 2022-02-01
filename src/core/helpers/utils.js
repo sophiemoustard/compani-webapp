@@ -2,7 +2,6 @@ import transform from 'lodash/transform';
 import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
-import moment from '@helpers/moment';
 import { descendingSort } from '@helpers/date';
 
 export const extend = (...sources) => {
@@ -96,40 +95,6 @@ export const formatIdentity = (identity, format) => {
 
   return values.join(' ');
 };
-
-export const formatHours = (value, digits = 2) => {
-  if (!value) return '0,00h';
-  return `${parseFloat(value).toFixed(digits).replace('.', ',')}h`;
-};
-
-export const formatHoursWithMinutes = date => `${moment(date).hours()}h${moment(date).format('mm')}`;
-
-export const formatDuration = (duration) => {
-  const paddedMinutes = duration.minutes() > 0 && duration.minutes() < 10
-    ? duration.minutes().toString().padStart(2, 0)
-    : duration.minutes();
-  const hours = (duration.days() * 24) + duration.hours();
-
-  return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
-};
-
-export const getTotalDuration = (timePeriods) => {
-  const total = timePeriods.reduce(
-    (acc, tp) => acc.add(moment.duration(moment(tp.endDate).diff(tp.startDate))),
-    moment.duration()
-  );
-
-  return formatDuration(total);
-};
-
-export const getDuration = (timePeriod) => {
-  const duration = moment.duration(moment(timePeriod.endDate).diff(timePeriod.startDate));
-
-  return formatDuration(duration);
-};
-
-export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
-  + `${moment(timePeriod.endDate).format('HH:mm')}`;
 
 export const formatPhone = phoneNumber => (phoneNumber
   ? phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5')

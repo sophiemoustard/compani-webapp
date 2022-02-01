@@ -34,7 +34,8 @@ import {
 } from '@data/constants';
 import Button from '@components/Button';
 import moment from '@helpers/moment';
-import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
+import { formatIdentity } from '@helpers/utils';
+import { formatHoursWithMinutes } from '@helpers/date';
 
 export default {
   name: 'CourseHistory',

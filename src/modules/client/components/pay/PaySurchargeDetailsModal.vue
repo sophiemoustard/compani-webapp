@@ -39,7 +39,7 @@
 <script>
 import pick from 'lodash/pick';
 import Modal from '@components/modal/Modal';
-import { formatHours } from '@helpers/utils';
+import { formatHours } from '@helpers/date';
 import { SURCHARGES } from '@data/constants';
 
 export default {

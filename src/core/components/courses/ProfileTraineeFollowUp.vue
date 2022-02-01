@@ -59,14 +59,8 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import {
-  upperCaseFirstLetter,
-  formatIdentity,
-  getTotalDuration,
-  getDuration,
-  formatIntervalHourly,
-} from '@helpers/utils';
-import { formatDate, ascendingSort } from '@helpers/date';
+import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
+import { formatDate, ascendingSort, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/date';
 import { downloadZip } from '@helpers/file';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 import { courseMixin } from '@mixins/courseMixin';

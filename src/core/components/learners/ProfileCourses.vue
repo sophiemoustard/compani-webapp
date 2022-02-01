@@ -52,19 +52,32 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-                class="q-ma-sm row">
-                <div>
+              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props">
+                <div class="q-ma-sm row">
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   {{ stepIndex + 1 }} - {{ step.name }}
-                </div>
-                <div class="step-progress">
-                  <div v-if="has(step, 'progress.presence')">
-                    {{ formatDuration(get(step, 'progress.presence.attendanceDuration')) }}
-                    / {{ formatDuration(get(step, 'progress.presence.maxDuration')) }}
+                  <div class="step-progress">
+                    <div v-if="has(step, 'progress.presence')">
+                      {{ formatDuration(get(step, 'progress.presence.attendanceDuration')) }}
+                      / {{ formatDuration(get(step, 'progress.presence.maxDuration')) }}
+                    </div>
+                    <ni-progress v-if="has(step, 'progress.eLearning')" class="expanding-table-sub-progress"
+                      :value="step.progress.eLearning" />
                   </div>
-                  <ni-progress v-if="has(step, 'progress.eLearning')" class="expanding-table-sub-progress"
-                    :value="step.progress.eLearning" />
+                </div>
+                <div v-if="step.slots.length">
+                  <div v-for="slot in step.slots" :key="slot._id" class="slot row">
+                    <div class="dates">{{ formatDate(slot.startDate) }}</div>
+                    <div class="hours">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                    <div v-if="slot.attendances.length" class="attendance">
+                      <q-icon size="12px" name="check_circle" color="green-600" />
+                      <span class="text-green-600">Présent(e)</span>
+                    </div>
+                    <div v-else class="attendance">
+                      <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
+                      <span class="text-orange-700">Absent(e)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </q-td>
@@ -103,8 +116,15 @@ import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
-import { sortStrings, formatIdentity, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/utils';
-import { isBetween, formatDate, ascendingSort } from '@helpers/date';
+import { sortStrings, formatIdentity } from '@helpers/utils';
+import {
+  isBetween,
+  formatDate,
+  ascendingSort,
+  getTotalDuration,
+  getDuration,
+  formatIntervalHourly,
+} from '@helpers/date';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
@@ -294,6 +314,9 @@ export default {
         NotifyNegative('Erreur lors de la récupération des émargements non prévus.');
       }
     },
+    formatDate,
+    formatIntervalHourly,
+    getDuration,
   },
 };
 </script>
@@ -331,14 +354,24 @@ export default {
   color: $primary
 
 .dates
-  width: 10%
+  @media screen and (min-width: 767px)
+    width: 10%
 
 .hours
-  width: 15%
+  @media screen and (min-width: 767px)
+    width: 15%
 
 .trainer
   width: 50%
 
 .misc
   width: 15%
+.attendance
+  @media screen and (min-width: 767px)
+    width: 15%
+
+.slot
+  margin: 0px 40px
+  @media screen and (max-width: 767px)
+    justify-content: space-between
 </style>

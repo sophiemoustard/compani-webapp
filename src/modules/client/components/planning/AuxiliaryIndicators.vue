@@ -38,7 +38,7 @@
 
 <script>
 import get from 'lodash/get';
-import { formatHours } from '@helpers/utils';
+import { formatHours } from '@helpers/date';
 
 export default {
   name: 'AuxiliaryIndicators',
