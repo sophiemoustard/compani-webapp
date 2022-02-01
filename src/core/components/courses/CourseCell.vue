@@ -48,7 +48,8 @@
 <script>
 import get from 'lodash/get';
 import { FORTHCOMING, COMPLETED, IN_PROGRESS, INTRA } from '@data/constants';
-import { formatQuantity, formatDuration } from '@helpers/utils';
+import { formatQuantity } from '@helpers/utils';
+import { formatDuration } from '@helpers/date';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 

@@ -17,8 +17,8 @@
 <script>
 import get from 'lodash/get';
 import { NOTE_CREATION, NOTE_UPDATE, DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatIdentity } from '@helpers/utils';
+import { formatDate, formatHoursWithMinutes } from '@helpers/date';
 
 export default {
   name: 'CustomerNoteHistory',

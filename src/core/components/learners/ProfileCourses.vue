@@ -103,8 +103,15 @@ import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
-import { sortStrings, formatIdentity, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/utils';
-import { isBetween, formatDate, ascendingSort } from '@helpers/date';
+import { sortStrings, formatIdentity } from '@helpers/utils';
+import {
+  isBetween,
+  formatDate,
+  ascendingSort,
+  getTotalDuration,
+  getDuration,
+  formatIntervalHourly,
+} from '@helpers/date';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
