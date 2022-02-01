@@ -19,7 +19,7 @@
           <div :class="['slots-cells-content', { 'cursor-pointer': canEdit && !course.archivedAt }]"
             v-for="slot in value" :key="slot._id" @click="openEditionModal(slot)">
               <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
-              <q-item>{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</q-item>
+              <q-item>{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</q-item>
               <q-item v-if="slot.step.type === ON_SITE">{{ getSlotAddress(slot) }}</q-item>
               <q-item v-else>
                 <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
@@ -72,7 +72,7 @@ import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
-import { formatQuantity, formatDuration } from '@helpers/utils';
+import { formatQuantity, formatDuration, formatIntervalHourly, getDuration } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -191,6 +191,8 @@ export default {
     else this.groupByCourses();
   },
   methods: {
+    getDuration,
+    formatIntervalHourly,
     courseSlotValidation (slot) {
       return {
         step: { required },
@@ -216,14 +218,6 @@ export default {
     groupByCourses () {
       this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
-    },
-    getSlotDuration (slot) {
-      const duration = moment.duration(moment(slot.endDate).diff(slot.startDate));
-
-      return formatDuration(duration);
-    },
-    formatSlotHour (slot) {
-      return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;
     },
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';

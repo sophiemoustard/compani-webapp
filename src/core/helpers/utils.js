@@ -113,6 +113,24 @@ export const formatDuration = (duration) => {
   return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
 };
 
+export const getTotalDuration = (timePeriods) => {
+  const total = timePeriods.reduce(
+    (acc, tp) => acc.add(moment.duration(moment(tp.endDate).diff(tp.startDate))),
+    moment.duration()
+  );
+
+  return formatDuration(total);
+};
+
+export const getDuration = (timePeriod) => {
+  const duration = moment.duration(moment(timePeriod.endDate).diff(timePeriod.startDate));
+
+  return formatDuration(duration);
+};
+
+export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
+  + `${moment(timePeriod.endDate).format('HH:mm')}`;
+
 export const formatPhone = phoneNumber => (phoneNumber
   ? phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5')
   : '');
