@@ -5,7 +5,21 @@
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
         <ni-responsive-table :data="courseFundingOrganisations" :columns="courseFundingOrganisationColumns"
-          v-model:pagination="pagination" class="q-mb-md" :loading="tableLoading" />
+          v-model:pagination="pagination" class="q-mb-md" :loading="tableLoading">
+          <template #body="{ props }">
+            <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'actions'">
+                    <div class="row no-wrap table-actions">
+                      <ni-button icon="delete" @click="validateOrganisationDeletion(col.value)" />
+                    </div>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
         <q-card-actions align="right">
           <ni-button color="primary" icon="add" label="Ajouter un financeur" :disable="tableLoading"
             @click="openOrganisationCreationModal" />
@@ -20,7 +34,7 @@
 </template>
 
 <script>
-import { useMeta } from 'quasar';
+import { useMeta, Dialog } from 'quasar';
 import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -51,6 +65,7 @@ export default {
     const courseFundingOrganisationColumns = [
       { name: 'name', label: 'Nom', align: 'left', field: 'name' },
       { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
+      { name: 'actions', label: '', align: 'left', field: '_id' },
     ];
     const pagination = { rowsPerPage: 0 };
     const organisationCreationModal = ref(false);
@@ -109,6 +124,26 @@ export default {
       }
     };
 
+    const deleteOrganisation = async (organisationId) => {
+      try {
+        await CourseFundingOrganisations.delete(organisationId);
+        refreshCourseFundingOrganisations();
+        NotifyPositive('Financeur supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du financeur.');
+      }
+    };
+    const validateOrganisationDeletion = (organisationId) => {
+      Dialog.create({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer le financeur ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => deleteOrganisation(organisationId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    };
+
     const created = async () => {
       refreshCourseFundingOrganisations();
     };
@@ -130,6 +165,7 @@ export default {
       resetOrganisationAdditionForm,
       addOrganisation,
       openOrganisationCreationModal,
+      validateOrganisationDeletion,
     };
   },
 };

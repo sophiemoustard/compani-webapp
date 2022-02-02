@@ -9,4 +9,7 @@ export default {
   async create (payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/coursefundingorganisations`, payload);
   },
+  async delete (params) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/coursefundingorganisations/${params}`);
+  },
 };
