@@ -73,6 +73,9 @@
                       <q-icon size="12px" name="check_circle" color="green-600" />
                       <span class="text-green-600">Présent(e)</span>
                     </div>
+                    <div v-else-if="isBefore(new Date(), slot.endDate)" class="attendance">
+                      <span class="q-mx-sm">à venir</span>
+                    </div>
                     <div v-else class="attendance">
                       <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
                       <span class="text-orange-700">Absent(e)</span>
@@ -124,6 +127,7 @@ import {
   getTotalDuration,
   getDuration,
   formatIntervalHourly,
+  isBefore,
 } from '@helpers/date';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
@@ -317,6 +321,7 @@ export default {
     formatDate,
     formatIntervalHourly,
     getDuration,
+    isBefore,
   },
 };
 </script>
