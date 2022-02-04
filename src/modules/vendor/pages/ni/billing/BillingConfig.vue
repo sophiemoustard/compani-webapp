@@ -134,6 +134,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression du financeur.');
       }
     };
+
     const validateOrganisationDeletion = (organisationId) => {
       Dialog.create({
         title: 'Confirmation',
