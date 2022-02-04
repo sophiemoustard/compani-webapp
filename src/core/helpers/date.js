@@ -70,3 +70,37 @@ export const isSameOrBefore = (date1, date2) => new Date(date1) <= new Date(date
 export const isAfter = (date1, date2) => new Date(date1) > new Date(date2);
 
 export const isSameOrAfter = (date1, date2) => new Date(date1) >= new Date(date2);
+
+export const formatHours = (value, digits = 2) => {
+  if (!value) return '0,00h';
+  return `${parseFloat(value).toFixed(digits).replace('.', ',')}h`;
+};
+
+export const formatHoursWithMinutes = date => `${moment(date).hours()}h${moment(date).format('mm')}`;
+
+export const formatDuration = (duration) => {
+  const paddedMinutes = duration.minutes() > 0 && duration.minutes() < 10
+    ? duration.minutes().toString().padStart(2, 0)
+    : duration.minutes();
+  const hours = (duration.days() * 24) + duration.hours();
+
+  return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+};
+
+export const getTotalDuration = (timePeriods) => {
+  const total = timePeriods.reduce(
+    (acc, tp) => acc.add(moment.duration(moment(tp.endDate).diff(tp.startDate))),
+    moment.duration()
+  );
+
+  return formatDuration(total);
+};
+
+export const getDuration = (timePeriod) => {
+  const duration = moment.duration(moment(timePeriod.endDate).diff(timePeriod.startDate));
+
+  return formatDuration(duration);
+};
+
+export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
+  + `${moment(timePeriod.endDate).format('HH:mm')}`;

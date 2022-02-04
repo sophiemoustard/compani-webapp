@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     traineesOnGoingCount () {
-      return this.learners.filter(l => l.progress !== 1).length;
+      return this.learners.filter(l => l.progress.eLearning !== 1).length;
     },
     traineesFinishedCount () {
       return this.learners.length - this.traineesOnGoingCount;

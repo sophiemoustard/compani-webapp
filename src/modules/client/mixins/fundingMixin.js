@@ -1,8 +1,8 @@
 import capitalize from 'lodash/capitalize';
 import { days } from '@data/days';
 import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants';
-import { getLastVersion, formatPrice, formatHours } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { getLastVersion, formatPrice } from '@helpers/utils';
+import { formatDate, formatHours } from '@helpers/date';
 
 export const fundingMixin = {
   data () {

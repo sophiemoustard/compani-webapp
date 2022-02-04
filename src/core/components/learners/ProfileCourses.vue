@@ -29,10 +29,16 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="columns" :loading="loading" v-model:pagination="pagination">
+        <ni-expanding-table :data="courses" :columns="courseColumns" :loading="loading" v-model:pagination="pagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <template v-if="col.name === 'progress'">
+              <template v-if="col.name === 'attendances' && has(col, 'value.attendanceDuration')">
+                <div>
+                  {{ formatDuration(get(col, 'value.attendanceDuration')) }}
+                  / {{ formatDuration(get(col, 'value.maxDuration')) }}
+                  </div>
+              </template>
+              <template v-else-if="col.name === 'eLearning' && col.value >= 0">
                 <ni-progress class="q-ml-lg" :value="col.value" />
               </template>
               <template v-else-if="col.name === 'expand'">
@@ -46,14 +52,35 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-                class="q-ma-sm expanding-table-expanded-row">
-                <div>
+              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props">
+                <div class="q-ma-sm row">
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   {{ stepIndex + 1 }} - {{ step.name }}
+                  <div class="step-progress">
+                    <div v-if="has(step, 'progress.presence')">
+                      {{ formatDuration(get(step, 'progress.presence.attendanceDuration')) }}
+                      / {{ formatDuration(get(step, 'progress.presence.maxDuration')) }}
+                    </div>
+                    <ni-progress v-if="has(step, 'progress.eLearning')" class="expanding-table-sub-progress"
+                      :value="step.progress.eLearning" />
+                  </div>
                 </div>
-                <div class="expanding-table-progress-container">
-                  <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
+                <div v-if="step.slots.length">
+                  <div v-for="slot in step.slots" :key="slot._id" class="slot row">
+                    <div class="dates">{{ formatDate(slot.startDate) }}</div>
+                    <div class="hours">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                    <div v-if="slot.attendances.length" class="attendance">
+                      <q-icon size="12px" name="check_circle" color="green-600" />
+                      <span class="text-green-600">Présent(e)</span>
+                    </div>
+                    <div v-else-if="isBefore(new Date(), slot.endDate)" class="attendance">
+                      <span class="q-mx-sm">à venir</span>
+                    </div>
+                    <div v-else class="attendance">
+                      <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
+                      <span class="text-orange-700">Absent(e)</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </q-td>
@@ -61,17 +88,47 @@
         </ni-expanding-table>
       </q-card>
     </div>
+    <div v-if="unsubscribedAttendances.length" class="q-mb-xl">
+      <p class="text-weight-bold q-mb-sm">Emargements non prévus</p>
+      <div class="text-italic q-my-xs">
+        {{ formatIdentity(userProfile.identity, 'FL') }} a émargé dans certaines formations sans inscription.
+      </div>
+      <ni-expanding-table :data="unsubscribedAttendances" :columns="attendanceColumns" :pagination="pagination"
+        :hide-bottom="false" :loading="loading">
+        <template #expanding-row="{ props }">
+          <q-td colspan="100%">
+            <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
+              class="q-ma-sm expanding-table-expanded-row">
+              <div class="dates">{{ attendance.date }}</div>
+              <div class="hours">{{ attendance.hours }}</div>
+              <div class="misc">{{ attendance.misc }}</div>
+              <div class="trainer">{{ attendance.trainer }}</div>
+            </div>
+          </q-td>
+        </template>
+      </ni-expanding-table>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
+import Attendances from '@api/Attendances';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
-import { sortStrings } from '@helpers/utils';
-import { isBetween } from '@helpers/date';
+import { sortStrings, formatIdentity } from '@helpers/utils';
+import {
+  isBetween,
+  formatDate,
+  ascendingSort,
+  getTotalDuration,
+  getDuration,
+  formatIntervalHourly,
+  isBefore,
+} from '@helpers/date';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
@@ -95,7 +152,7 @@ export default {
       courses: [],
       loading: false,
       pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
-      columns: [
+      courseColumns: [
         {
           name: 'name',
           label: 'Nom',
@@ -115,17 +172,25 @@ export default {
           format: value => ((value === BLENDED) ? 'Mixte' : 'ELearning'),
           sort: sortStrings,
         },
+        { name: 'attendances', label: 'Emargements', field: row => get(row, 'progress.presence'), align: 'center' },
         {
-          name: 'progress',
-          label: 'Progression',
-          field: 'progress',
+          name: 'eLearning',
+          label: 'eLearning',
+          field: row => get(row, 'progress.eLearning'),
           align: 'center',
           sortable: true,
           style: 'min-width: 150px; width: 20%',
         },
         { name: 'expand', label: '', field: '_id' },
       ],
+      attendanceColumns: [
+        { name: 'name', label: 'Nom', field: 'program', align: 'left' },
+        { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
+        { name: 'duration', label: 'Durée', field: 'duration', align: 'center' },
+        { name: 'expand', label: '', field: '' },
+      ],
       E_LEARNING,
+      unsubscribedAttendances: [],
     };
   },
   computed: {
@@ -134,14 +199,14 @@ export default {
       return this.courses.filter(course => course.format === STRICTLY_E_LEARNING) || [];
     },
     eLearningCoursesOnGoing () {
-      return this.eLearningCourses.filter(course => course.progress < 1) || [];
+      return this.eLearningCourses.filter(course => course.progress.eLearning < 1) || [];
     },
     eLearningCoursesOnGoingText () {
       const formation = this.eLearningCoursesOnGoing.length > 1 ? 'formations' : 'formation';
       return `${formation} eLearning en cours`;
     },
     eLearningCoursesCompleted () {
-      return this.eLearningCourses.filter(course => course.progress === 1) || [];
+      return this.eLearningCourses.filter(course => course.progress.eLearning === 1) || [];
     },
     eLearningCoursesCompletedText () {
       return this.eLearningCoursesCompleted.length > 1
@@ -160,22 +225,16 @@ export default {
         ? 'activités eLearning réalisées'
         : 'activité eLearning réalisée';
     },
-
   },
   async created () {
-    try {
-      this.loading = true;
-      this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
-      await this.computeChartsData();
-    } catch (e) {
-      NotifyNegative('Erreur lors de la récupération des formations');
-      console.error(e);
-      this.courses = [];
-    } finally {
-      this.loading = false;
-    }
+    await this.getUserCourses();
+    this.computeChartsData();
+    this.getUnsubscribedAttendances();
   },
   methods: {
+    formatIdentity,
+    get,
+    has,
     goToCourseProfile (props) {
       if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
         return this.$router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
@@ -194,8 +253,21 @@ export default {
         params: { courseId: props.row._id, defaultTab: 'traineeFollowUp' },
       });
     },
+    async getUserCourses () {
+      try {
+        this.loading = true;
+        this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+      } catch (e) {
+        NotifyNegative('Erreur lors de la récupération des formations');
+        console.error(e);
+        this.courses = [];
+      } finally {
+        this.loading = false;
+      }
+    },
     async computeChartsData () {
       try {
+        this.loading = true;
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const sixMonthsHistories = this.eLearningActivitiesCompleted
@@ -206,8 +278,50 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
+      } finally {
+        this.loading = false;
       }
     },
+    formatDuration (duration) {
+      const durationInHours = duration.minutes / 60;
+      const hours = Math.trunc(durationInHours);
+      const paddedMinutes = (durationInHours - hours) * 60;
+
+      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+    },
+    formatProgramAttendances (attendancesGroupedByProgram, programId) {
+      return {
+        _id: programId,
+        program: attendancesGroupedByProgram[programId][0].program.name,
+        attendancesCount: attendancesGroupedByProgram[programId].length,
+        duration: getTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)),
+        attendances: attendancesGroupedByProgram[programId]
+          .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
+          .map(a => ({
+            _id: a._id,
+            date: formatDate(a.courseSlot.startDate),
+            hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+            trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
+            misc: a.course.misc,
+          })),
+      };
+    },
+    async getUnsubscribedAttendances () {
+      try {
+        const query = { trainee: this.userProfile._id };
+        const unsubscribedAttendancesGroupedByPrograms = await Attendances.listUnsubscribed(query);
+        this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByPrograms)
+          .map(programId => this.formatProgramAttendances(unsubscribedAttendancesGroupedByPrograms, programId));
+      } catch (e) {
+        console.error(e);
+        this.unsubscribedAttendances = [];
+        NotifyNegative('Erreur lors de la récupération des émargements non prévus.');
+      }
+    },
+    formatDate,
+    formatIntervalHourly,
+    getDuration,
+    isBefore,
   },
 };
 </script>
@@ -235,4 +349,34 @@ export default {
 
 .learners-data
   flex: 1
+.step-progress
+  align-items: center
+  justify-content: space-between
+  width: 20%
+  margin: 0px 24px
+  flex-direction: row
+  display: flex
+  color: $primary
+
+.dates
+  @media screen and (min-width: 767px)
+    width: 10%
+
+.hours
+  @media screen and (min-width: 767px)
+    width: 15%
+
+.trainer
+  width: 50%
+
+.misc
+  width: 15%
+.attendance
+  @media screen and (min-width: 767px)
+    width: 15%
+
+.slot
+  margin: 0px 40px
+  @media screen and (max-width: 767px)
+    justify-content: space-between
 </style>

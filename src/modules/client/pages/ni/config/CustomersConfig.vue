@@ -236,14 +236,8 @@ import {
   PER_INTERVENTION,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import {
-  roundFrenchPercentage,
-  formatHoursWithMinutes,
-  formatPrice,
-  formatAndSortOptions,
-  sortStrings,
-  getLastVersion,
-} from '@helpers/utils';
+import { roundFrenchPercentage, formatPrice, formatAndSortOptions, sortStrings, getLastVersion } from '@helpers/utils';
+import { formatHoursWithMinutes } from '@helpers/date';
 import { frAddress, positiveNumber, minDate, twoFractionDigits } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';

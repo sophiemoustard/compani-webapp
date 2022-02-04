@@ -36,7 +36,7 @@ export const useBalance = (customer) => {
 
   const getStartBalance = (tpp = null) => {
     const balance = !tpp
-      ? balances.value.find(bal => bal.customer._id === customer._id && !bal.thirdPartyPayer)
+      ? balances.value.find(bal => bal.customer._id === customer.value._id && !bal.thirdPartyPayer)
       : balances.value.find(bal => bal.thirdPartyPayer && bal.thirdPartyPayer._id === tpp._id);
 
     return balance ? balance.balance : 0;

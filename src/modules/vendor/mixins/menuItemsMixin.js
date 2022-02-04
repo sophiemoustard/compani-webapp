@@ -2,9 +2,10 @@ export const menuItemsMixin = {
   data () {
     return {
       adminActiveRoutes: {
-        users: { open: false },
-        pedagogy: { open: false },
         management: { open: false },
+        users: { open: false },
+        billing: { open: false },
+        pedagogy: { open: false },
         exports: { open: false },
       },
       trainerActiveRoutes: {
@@ -27,6 +28,13 @@ export const menuItemsMixin = {
             { name: 'ni users companies', icon: 'apartment', label: 'Structures' },
             { name: 'ni users trainers', icon: 'contacts', label: 'Formateurs' },
             { name: 'ni users learners', icon: 'contacts', label: 'Apprenants' },
+          ],
+        },
+        {
+          ref: 'billing',
+          label: 'Facturation',
+          children: [
+            { name: 'ni billing config vendor', icon: 'settings', label: 'Configuration' },
           ],
         },
         {

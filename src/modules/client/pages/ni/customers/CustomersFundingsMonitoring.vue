@@ -37,14 +37,8 @@ import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import SelectSector from '@components/form/SelectSector';
 import { NotifyNegative } from '@components/popup/notify';
-import {
-  formatIdentity,
-  formatHours,
-  formatPrice,
-  roundFrenchPercentage,
-  truncate,
-  formatNumberForCSV,
-} from '@helpers/utils';
+import { formatIdentity, formatPrice, roundFrenchPercentage, truncate, formatNumberForCSV } from '@helpers/utils';
+import { formatHours } from '@helpers/date';
 
 const metaInfo = { title: 'Suivi des plans d\'aide' };
 

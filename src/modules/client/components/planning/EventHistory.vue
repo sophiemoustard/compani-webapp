@@ -49,7 +49,8 @@ import {
   QR_CODE_TIME_STAMPING,
   TIME_STAMP_CANCELLATION,
 } from '@data/constants';
-import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
+import { formatIdentity } from '@helpers/utils';
+import { formatHoursWithMinutes } from '@helpers/date';
 import moment from '@helpers/moment';
 
 export default {

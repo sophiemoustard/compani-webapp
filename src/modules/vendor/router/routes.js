@@ -244,6 +244,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/billing/config',
+        name: 'ni billing config vendor',
+        component: () => import('src/modules/vendor/pages/ni/billing/BillingConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'billing',
+        },
+      },
+      {
         path: 'ni/pedagogy/categories',
         name: 'ni pedagogy categories',
         component: () => import('src/modules/vendor/pages/ni/pedagogy/CategoriesDirectory'),

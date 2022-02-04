@@ -185,8 +185,8 @@ import {
   JOB_OPTIONS,
 } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { formatIdentity, formatHours, formatAndSortIdentityOptions, formatPhone } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatIdentity, formatAndSortIdentityOptions, formatPhone } from '@helpers/utils';
+import { formatDate, formatHours } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';

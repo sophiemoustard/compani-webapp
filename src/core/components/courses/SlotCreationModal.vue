@@ -8,7 +8,7 @@
     <ni-datetime-range caption="Dates et heures" :model-value="newCourseSlot.dates" disable-end-date
       :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
       required-field />
-    <ni-search-address v-if="getType(this.newCourseSlot.step) === ON_SITE" error-message="'Adresse non valide'"
+    <ni-search-address v-if="getType(this.newCourseSlot.step) === ON_SITE" error-message="Adresse non valide"
       :model-value="newCourseSlot.address" @update:model-value="update($event, 'address')"
       @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
     <ni-input v-if="getType(this.newCourseSlot.step) === REMOTE" in-modal :error="validations.meetingLink.$error"
