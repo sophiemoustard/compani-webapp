@@ -74,7 +74,7 @@
                       <span class="text-green-600">Présent(e)</span>
                     </div>
                     <div v-else-if="isBefore(new Date(), slot.endDate)" class="attendance">
-                      <span class="q-mx-sm">à venir</span>
+                      <span class="q-mx-sm text-italic text-copper-grey-800">à venir</span>
                     </div>
                     <div v-else class="attendance">
                       <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
