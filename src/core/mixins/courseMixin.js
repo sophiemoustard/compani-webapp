@@ -5,7 +5,6 @@ import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
-import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 
 export const courseMixin = {
@@ -24,20 +23,6 @@ export const courseMixin = {
     trainerName () {
       return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
     },
-    followUpDisabled () {
-      return this.followUpMissingInfo.length > 0;
-    },
-    followUpMissingInfo () {
-      const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('l\'intervenant(e)');
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
-
-      if (!get(this.course, 'contact._id')) missingInfo.push('le contact pour la formation');
-      else if (!get(this.course, 'contact.contact.phone')) missingInfo.push('le numéro du contact pour la formation');
-
-      return missingInfo;
-    },
     headerInfo () {
       return [
         { icon: 'bookmark_border', label: this.courseType },
@@ -50,6 +35,11 @@ export const courseMixin = {
     },
     isArchived () {
       return !!this.course.archivedAt;
+    },
+    isIntraOrVendor () {
+      const isVendorInterface = /\/ad\//.test(this.$route.path);
+
+      return this.isIntraCourse || isVendorInterface;
     },
   },
   methods: {
@@ -103,20 +93,6 @@ export const courseMixin = {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
-      }
-    },
-    async downloadConvocation () {
-      if (this.disableDocDownload) return;
-
-      try {
-        this.pdfLoading = true;
-        const pdf = await Courses.downloadConvocation(this.course._id);
-        downloadFile(pdf, 'convocation.pdf');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la convocation.');
-      } finally {
-        this.pdfLoading = false;
       }
     },
     getStepTypeIcon (type) {

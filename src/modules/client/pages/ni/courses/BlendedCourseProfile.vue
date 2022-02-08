@@ -14,7 +14,6 @@ import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
-import ProfileAdmin from '@components/courses/ProfileAdmin';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
@@ -38,24 +37,20 @@ export default {
     const course = computed(() => $store.state.course.course);
     const courseName = ref('');
 
-    const organizationTab = {
-      label: 'Organisation',
-      name: 'organization',
-      default: props.defaultTab === 'organization',
-      component: ProfileOrganization,
-    };
-    const adminTab = {
-      label: 'Admin',
-      name: 'admin',
-      default: props.defaultTab === 'admin',
-      component: ProfileAdmin,
-    };
-    const traineeFollowUpTab = {
-      label: 'Suivi des stagiaires',
-      name: 'traineeFollowUp',
-      default: props.defaultTab === 'traineeFollowUp',
-      component: ProfileTraineeFollowUp,
-    };
+    const tabsContent = computed(() => [
+      {
+        label: 'Organisation',
+        name: 'organization',
+        default: props.defaultTab === 'organization',
+        component: ProfileOrganization,
+      },
+      {
+        label: 'Suivi des stagiaires',
+        name: 'traineeFollowUp',
+        default: props.defaultTab === 'traineeFollowUp',
+        component: ProfileTraineeFollowUp,
+      },
+    ]);
 
     onBeforeUnmount(() => {
       $store.dispatch('course/resetCourse');
@@ -64,20 +59,11 @@ export default {
 
     return {
       // Data
-      organizationTab,
-      adminTab,
-      traineeFollowUpTab,
       courseName,
       // Computed
       course,
+      tabsContent,
     };
-  },
-  computed: {
-    tabsContent () {
-      if (this.isIntraCourse) return [this.organizationTab, this.adminTab, this.traineeFollowUpTab];
-
-      return [this.organizationTab, this.traineeFollowUpTab];
-    },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
