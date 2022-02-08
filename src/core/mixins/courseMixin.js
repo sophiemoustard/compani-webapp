@@ -9,7 +9,10 @@ import moment from '@helpers/moment';
 
 export const courseMixin = {
   data () {
-    return { pdfLoading: false };
+    return {
+      pdfLoading: false,
+      isVendorInterface: /\/ad\//.test(this.$route.path),
+    };
   },
   computed: {
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
@@ -51,9 +54,7 @@ export const courseMixin = {
       return !!this.course.archivedAt;
     },
     isIntraOrVendor () {
-      const isVendorInterface = /\/ad\//.test(this.$route.path);
-
-      return this.isIntraCourse || isVendorInterface;
+      return this.isIntraCourse || this.isVendorInterface;
     },
   },
   methods: {

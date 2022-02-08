@@ -37,8 +37,8 @@
         </p>
         <div class="row gutter-profile">
           <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
-            @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived" clearable
-            error-message="Numéro de téléphone manquant, veuillez le renseigner" />
+            @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived || !isVendorInterface"
+            clearable error-message="Numéro de téléphone manquant, veuillez le renseigner" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -375,14 +375,18 @@ export default {
     },
     async refreshContacts () {
       try {
-        const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        if (this.isVendorInterface) {
+          const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
 
-        const clientUsersFromCompany = this.course.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
-          : [];
+          const clientUsersFromCompany = this.course.type === INTRA
+            ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
+            : [];
 
-        const contacts = uniqBy([...clientUsersFromCompany, ...vendorUsers], '_id');
-        this.contactOptions = Object.freeze(formatAndSortIdentityOptions(contacts));
+          const contacts = uniqBy([...clientUsersFromCompany, ...vendorUsers], '_id');
+          this.contactOptions = Object.freeze(formatAndSortIdentityOptions(contacts));
+        } else {
+          this.contactOptions = Object.freeze(formatAndSortIdentityOptions([this.course.contact]));
+        }
       } catch (e) {
         console.error(e);
       }
