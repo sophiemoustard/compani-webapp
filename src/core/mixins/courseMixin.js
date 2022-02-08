@@ -23,6 +23,20 @@ export const courseMixin = {
     trainerName () {
       return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
     },
+    followUpDisabled () {
+      return this.followUpMissingInfo.length > 0;
+    },
+    followUpMissingInfo () {
+      const missingInfo = [];
+      if (!this.course.trainer) missingInfo.push('l\'intervenant(e)');
+      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
+
+      if (!get(this.course, 'contact._id')) missingInfo.push('le contact pour la formation');
+      else if (!get(this.course, 'contact.contact.phone')) missingInfo.push('le numéro du contact pour la formation');
+
+      return missingInfo;
+    },
     headerInfo () {
       return [
         { icon: 'bookmark_border', label: this.courseType },

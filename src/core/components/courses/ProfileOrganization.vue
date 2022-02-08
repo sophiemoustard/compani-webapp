@@ -167,10 +167,7 @@ export default {
       displayHistory: false,
       courseHistories: [],
       smsModal: false,
-      messageTypeOptions: [
-        { label: 'Convocation', value: CONVOCATION },
-        { label: 'Rappel', value: REMINDER },
-      ],
+      messageTypeOptions: [{ label: 'Convocation', value: CONVOCATION }, { label: 'Rappel', value: REMINDER }],
       newSms: { content: '', type: '' },
       loading: false,
       smsSent: [],
@@ -273,28 +270,13 @@ export default {
     isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
     },
-    followUpDisabled () {
-      return this.followUpMissingInfo.length > 0;
-    },
-    followUpMissingInfo () {
-      const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('l\'intervenant(e)');
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
-
-      if (!get(this.course, 'contact._id')) missingInfo.push('le contact pour la formation');
-      else if (!get(this.course, 'contact.contact.phone')) missingInfo.push('le numéro du contact pour la formation');
-
-      return missingInfo;
-    },
   },
   async created () {
-    if (!this.course) await this.refreshCourse();
+    await Promise.all([this.refreshCourse(), this.refreshSms(), this.refreshContacts()]);
+    this.setDefaultMessageType();
 
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
     else this.salesRepresentativeOptions = formatAndSortIdentityOptions([this.course.salesRepresentative]);
-    await Promise.all([this.refreshSms(), this.refreshContacts()]);
-    this.setDefaultMessageType();
   },
   methods: {
     get,
