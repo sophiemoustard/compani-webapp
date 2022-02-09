@@ -5,11 +5,11 @@
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
         <ni-responsive-table :data="courseFundingOrganisations" :columns="courseFundingOrganisationColumns"
-          v-model:pagination="pagination" class="q-mb-md" :loading="tableLoading">
+          v-model:pagination="pagination" class="q-mb-md" :loading="organisationsLoading">
           <template #body="{ props }">
             <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
+                  :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <ni-button icon="delete" @click="validateOrganisationDeletion(col.value)" />
@@ -21,25 +21,25 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter un financeur" :disable="tableLoading"
+          <ni-button color="primary" icon="add" label="Ajouter un financeur" :disable="organisationsLoading"
             @click="openOrganisationCreationModal" />
         </q-card-actions>
       </q-card>
       <p class="text-weight-bold q-mt-xl">Articles de facturation</p>
       <q-card>
         <ni-responsive-table :data="courseBillingItems" :columns="courseBillingItemColumns"
-          v-model:pagination="pagination" class="q-mb-md" :loading="tableLoading">
+          v-model:pagination="pagination" class="q-mb-md" :loading="itemsLoading">
           <template #body="{ props }">
             <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
+                  :class="col.name">
                   {{ col.value }}
                 </q-td>
             </q-tr>
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter un article" :disable="tableLoading"
+          <ni-button color="primary" icon="add" label="Ajouter un article" :disable="itemsLoading"
             @click="openItemCreationModal" />
         </q-card-actions>
       </q-card>
@@ -47,11 +47,11 @@
 
     <ni-organisation-creation-modal v-model="organisationCreationModal" v-model:new-organisation="newOrganisation"
       @submit="addOrganisation" :validations="validations.newOrganisation" @hide="resetOrganisationAdditionForm"
-      :loading="tableLoading" />
+      :loading="organisationsLoading" />
 
     <ni-item-creation-modal v-model="itemCreationModal" v-model:new-item="newItem"
       @submit="addItem" :validations="validations.newItem" @hide="resetItemAdditionForm"
-      :loading="tableLoading" />
+      :loading="itemsLoading" />
   </div>
 </template>
 
@@ -85,7 +85,8 @@ export default {
     const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
 
-    const tableLoading = ref(false);
+    const organisationsLoading = ref(false);
+    const itemsLoading = ref(false);
     const courseFundingOrganisations = ref([]);
     const courseFundingOrganisationColumns = [
       { name: 'name', label: 'Nom', align: 'left', field: 'name' },
@@ -117,7 +118,7 @@ export default {
 
     const refreshCourseFundingOrganisations = async () => {
       try {
-        tableLoading.value = true;
+        organisationsLoading.value = true;
         const organisations = await CourseFundingOrganisations.list();
         courseFundingOrganisations.value = organisations.sort((a, b) => sortStrings(a.name, b.name));
       } catch (e) {
@@ -125,21 +126,21 @@ export default {
         courseFundingOrganisations.value = [];
         NotifyNegative('Erreur lors de la récupération des financeurs.');
       } finally {
-        tableLoading.value = false;
+        organisationsLoading.value = false;
       }
     };
 
     const refreshCourseBillingItems = async () => {
       try {
-        tableLoading.value = true;
+        itemsLoading.value = true;
         const items = await CourseBillingItems.list();
         courseBillingItems.value = items.sort((a, b) => sortStrings(a.name, b.name));
       } catch (e) {
         console.error(e);
         courseBillingItems.value = [];
-        NotifyNegative('Erreur lors de la récupération des financeurs.');
+        NotifyNegative('Erreur lors de la récupération des articles.');
       } finally {
-        tableLoading.value = false;
+        itemsLoading.value = false;
       }
     };
 
@@ -225,7 +226,8 @@ export default {
       // Data
       courseFundingOrganisationColumns,
       courseBillingItemColumns,
-      tableLoading,
+      organisationsLoading,
+      itemsLoading,
       pagination,
       courseFundingOrganisations,
       courseBillingItems,
