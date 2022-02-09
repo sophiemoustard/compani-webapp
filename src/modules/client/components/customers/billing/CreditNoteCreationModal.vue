@@ -11,8 +11,7 @@
       :options="thirdPartyPayerOptions" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
-    <ni-input caption="Motif" in-modal :model-value="newCreditNote.misc" @update:model-value="update($event, 'misc')"
-      type="textarea" />
+    <ni-input caption="Motif" in-modal v-model="tmpInput" @blur="updateMisc" type="textarea" />
     <div class="row q-mb-md light">
       <q-toggle :model-value="hasLinkedEvents" @update:model-value="updateHasLinkedEvents"
         label="Lié à des interventions ?" />
@@ -117,6 +116,11 @@ export default {
     'update:new-credit-note',
     'reset-customer-data',
   ],
+  data () {
+    return {
+      tmpInput: '',
+    };
+  },
   computed: {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate &&
@@ -152,6 +156,9 @@ export default {
       this.update(event, 'customer');
       this.$emit('reset-customer-data');
       this.$emit('get-events', 'customer');
+    },
+    updateMisc () {
+      this.$emit('update:new-credit-note', { ...this.newCreditNote, misc: this.tmpInput });
     },
   },
 };
