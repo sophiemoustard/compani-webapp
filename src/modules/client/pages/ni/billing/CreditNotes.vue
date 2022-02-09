@@ -25,7 +25,7 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
-      v-model:has-linked-events="hasLinkedEvents" :third-party-payer-options="thirdPartyPayerOptions" :loading="loading"
+      v-model:credit-note-type="creditNoteType" :third-party-payer-options="thirdPartyPayerOptions" :loading="loading"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :validations="v$.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" @get-events="getCreationEvents"
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.v$.newCreditNote)"
@@ -62,7 +62,7 @@ import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANI, REQUIRED_LABEL } from '@data/constants';
+import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS } from '@data/constants';
 import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
 import { strictPositiveNumber, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -91,6 +91,7 @@ export default {
       creditNoteCreationModal: false,
       creditNoteEditionModal: false,
       hasLinkedEvents: false,
+      creditNoteType: SUBSCRIPTION,
       customersOptions: [],
       creditNoteEvents: [],
       newCreditNote: {
@@ -155,7 +156,7 @@ export default {
     };
   },
   watch: {
-    hasLinkedEvents () {
+    creditNoteType () {
       this.resetCustomerData();
     },
     'newCreditNote.customer': function (previousValue, currentValue) {
@@ -172,7 +173,7 @@ export default {
       this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
     },
     'editedCreditNote.events': function (previousValue, currentValue) {
-      if (!isEqual(previousValue, currentValue) && this.hasLinkedEvents) {
+      if (!isEqual(previousValue, currentValue) && this.creditNoteType === EVENTS) {
         const prices = this.computePrices(this.editedCreditNote.events);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
@@ -190,8 +191,8 @@ export default {
     const creditNoteValidation = {
       date: { required },
       customer: { required },
-      events: { required: requiredIf(this.hasLinkedEvents) },
-      subscription: { required: requiredIf(!this.hasLinkedEvents) },
+      events: { required: requiredIf(this.creditNoteType === EVENTS) },
+      subscription: { required: requiredIf(this.creditNoteType === SUBSCRIPTION) },
       inclTaxesTpp: {},
       inclTaxesCustomer: {},
     };
@@ -264,6 +265,7 @@ export default {
         inclTaxesCustomer: 0,
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
+        misc: '',
       };
 
       this.v$.newCreditNote.startDate.$reset();
@@ -318,7 +320,11 @@ export default {
     },
     async getEvents (creditNote, validations) {
       try {
-        if (!this.hasLinkedEvents || !creditNote.customer || !creditNote.startDate || !creditNote.endDate) return;
+        const canGetEvents = this.creditNoteType === EVENTS &&
+          creditNote.customer &&
+          creditNote.startDate &&
+          creditNote.endDate;
+        if (!canGetEvents) return;
         if (validations.startDate.$error || validations.endDate.$error) return;
 
         let query = {
@@ -373,11 +379,11 @@ export default {
     datesValidations (minAndMaxDates, creditNote) {
       return {
         startDate: {
-          required: requiredIf(this.hasLinkedEvents),
+          required: requiredIf(this.creditNoteType === EVENTS),
           maxDate: this.isValidDate(minAndMaxDates.maxStartDate) ? maxDate(minAndMaxDates.maxStartDate) : '',
         },
         endDate: {
-          required: requiredIf(this.hasLinkedEvents),
+          required: requiredIf(this.creditNoteType === EVENTS),
           minDate: creditNote.startDate
             ? minDate(this.isValidDate(minAndMaxDates.minEndDate) ? minAndMaxDates.minEndDate : creditNote.startDate)
             : '',
@@ -438,7 +444,7 @@ export default {
         thirdPartyPayer: '',
       };
       this.creditNoteEvents = [];
-      this.hasLinkedEvents = false;
+      this.creditNoteType = SUBSCRIPTION;
       this.v$.newCreditNote.$reset();
     },
     formatPayloadWithSubscription (creditNote) {
@@ -510,8 +516,9 @@ export default {
     formatPayload (creditNote) {
       let payload = pick(creditNote, ['date', 'customer', 'misc']);
 
-      if (!this.hasLinkedEvents) payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
-      else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
+      if (this.creditNoteType === SUBSCRIPTION) {
+        payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
+      } else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
 
       return pickBy(payload);
     },
@@ -534,9 +541,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    updateHasLinkedEvents (value) {
-      this.hasLinkedEvents = value;
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
