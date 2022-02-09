@@ -100,7 +100,6 @@ export default {
     const itemCreationModal = ref(false);
     const newOrganisation = ref({ name: '', address: {} });
     const newItem = ref({ name: '' });
-    const modalLoading = ref(false);
 
     const rules = {
       newOrganisation: {
@@ -118,29 +117,23 @@ export default {
 
     const refreshCourseFundingOrganisations = async () => {
       try {
-        organisationsLoading.value = true;
         const organisations = await CourseFundingOrganisations.list();
         courseFundingOrganisations.value = organisations.sort((a, b) => sortStrings(a.name, b.name));
       } catch (e) {
         console.error(e);
         courseFundingOrganisations.value = [];
         NotifyNegative('Erreur lors de la récupération des financeurs.');
-      } finally {
-        organisationsLoading.value = false;
       }
     };
 
     const refreshCourseBillingItems = async () => {
       try {
-        itemsLoading.value = true;
         const items = await CourseBillingItems.list();
         courseBillingItems.value = items.sort((a, b) => sortStrings(a.name, b.name));
       } catch (e) {
         console.error(e);
         courseBillingItems.value = [];
         NotifyNegative('Erreur lors de la récupération des articles.');
-      } finally {
-        itemsLoading.value = false;
       }
     };
 
@@ -154,7 +147,7 @@ export default {
         validations.value.newOrganisation.$touch();
         if (validations.value.newOrganisation.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        modalLoading.value = true;
+        organisationsLoading.value = true;
         await CourseFundingOrganisations.create(newOrganisation.value);
         NotifyPositive('Financeur ajouté.');
 
@@ -165,7 +158,7 @@ export default {
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du financeur.');
       } finally {
-        modalLoading.value = false;
+        organisationsLoading.value = false;
       }
     };
 
@@ -200,7 +193,7 @@ export default {
         validations.value.newItem.$touch();
         if (validations.value.newItem.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        modalLoading.value = true;
+        itemsLoading.value = true;
         await CourseBillingItems.create(newItem.value);
         NotifyPositive('Article ajouté.');
 
@@ -211,7 +204,7 @@ export default {
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de l\'article.');
       } finally {
-        modalLoading.value = false;
+        itemsLoading.value = false;
       }
     };
 
