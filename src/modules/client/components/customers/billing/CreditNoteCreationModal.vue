@@ -11,6 +11,8 @@
       :options="thirdPartyPayerOptions" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
+    <ni-input caption="Motif" in-modal :model-value="newCreditNote.misc" @update:model-value="update($event, 'misc')"
+      type="textarea" />
     <div class="row q-mb-md light">
       <q-toggle :model-value="hasLinkedEvents" @update:model-value="updateHasLinkedEvents"
         label="Lié à des interventions ?" />

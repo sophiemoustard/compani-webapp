@@ -105,6 +105,7 @@ export default {
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
         subscription: '',
+        misc: '',
       },
       editedCreditNote: {},
       creditNotes: [],
@@ -507,7 +508,7 @@ export default {
       return payload;
     },
     formatPayload (creditNote) {
-      let payload = pick(creditNote, ['date', 'customer']);
+      let payload = pick(creditNote, ['date', 'customer', 'misc']);
 
       if (!this.hasLinkedEvents) payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
       else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
