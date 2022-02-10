@@ -37,7 +37,7 @@ export default {
     const course = computed(() => $store.state.course.course);
     const courseName = ref('');
 
-    const tabsContent = computed(() => [
+    const tabsContent = [
       {
         label: 'Organisation',
         name: 'organization',
@@ -50,7 +50,7 @@ export default {
         default: props.defaultTab === 'traineeFollowUp',
         component: ProfileTraineeFollowUp,
       },
-    ]);
+    ];
 
     onBeforeUnmount(() => {
       $store.dispatch('course/resetCourse');
@@ -60,9 +60,9 @@ export default {
     return {
       // Data
       courseName,
+      tabsContent,
       // Computed
       course,
-      tabsContent,
     };
   },
   async created () {

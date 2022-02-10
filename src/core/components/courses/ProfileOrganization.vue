@@ -272,7 +272,9 @@ export default {
     },
   },
   async created () {
-    await Promise.all([this.refreshCourse(), this.refreshSms(), this.refreshContacts()]);
+    const promises = [this.refreshCourse()];
+    if (this.isVendorInterface || this.isIntraCourse) promises.push(this.refreshSms(), this.refreshContacts());
+    await Promise.all(promises);
     this.setDefaultMessageType();
 
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();

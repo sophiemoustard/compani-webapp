@@ -3,7 +3,6 @@
     <div class="q-mt-lg q-mb-xl">
       <p class="text-weight-bold">Émargements</p>
       <div v-if="isIntraOrVendor" class="q-mb-xl">
-        <p class="text-weight-bold">Actions utiles</p>
         <ni-banner v-if="followUpDisabled">
           <template #message>
             Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
