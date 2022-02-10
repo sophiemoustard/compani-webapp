@@ -16,7 +16,6 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
-import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -49,7 +48,6 @@ export default {
           default: this.defaultTab === 'organization',
           component: ProfileOrganization,
         },
-        { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
         {
           label: 'Suivi des stagiaires',
           name: 'traineeFollowUp',

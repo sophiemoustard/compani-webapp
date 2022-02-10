@@ -5,12 +5,14 @@ import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
-import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 
 export const courseMixin = {
   data () {
-    return { pdfLoading: false };
+    return {
+      pdfLoading: false,
+      isVendorInterface: /\/ad\//.test(this.$route.path),
+    };
   },
   computed: {
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
@@ -50,6 +52,9 @@ export const courseMixin = {
     },
     isArchived () {
       return !!this.course.archivedAt;
+    },
+    isIntraOrVendor () {
+      return this.isIntraCourse || this.isVendorInterface;
     },
   },
   methods: {
@@ -103,20 +108,6 @@ export const courseMixin = {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
-      }
-    },
-    async downloadConvocation () {
-      if (this.disableDocDownload) return;
-
-      try {
-        this.pdfLoading = true;
-        const pdf = await Courses.downloadConvocation(this.course._id);
-        downloadFile(pdf, 'convocation.pdf');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la convocation.');
-      } finally {
-        this.pdfLoading = false;
       }
     },
     getStepTypeIcon (type) {
