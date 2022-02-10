@@ -320,12 +320,11 @@ export default {
     },
     async getEvents (creditNote, validations) {
       try {
-        const canGetEvents = this.creditNoteType === EVENTS &&
+        const canGetEvents = (this.creditNoteType === EVENTS || this.hasLinkedEvents) &&
           creditNote.customer &&
           creditNote.startDate &&
           creditNote.endDate;
-        if (!canGetEvents) return;
-        if (validations.startDate.$error || validations.endDate.$error) return;
+        if (!canGetEvents || validations.startDate.$error || validations.endDate.$error) return;
 
         let query = {
           startDate: creditNote.startDate,
