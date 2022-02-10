@@ -28,16 +28,7 @@
       <p class="text-weight-bold q-mt-xl">Articles de facturation</p>
       <q-card>
         <ni-responsive-table :data="courseBillingItems" :columns="courseBillingItemColumns"
-          v-model:pagination="pagination" class="q-mb-md" :loading="itemsLoading">
-          <template #body="{ props }">
-            <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
-                  :class="col.name">
-                  {{ col.value }}
-                </q-td>
-            </q-tr>
-          </template>
-        </ni-responsive-table>
+          v-model:pagination="pagination" class="q-mb-md" :loading="itemsLoading" />
         <q-card-actions align="right">
           <ni-button color="primary" icon="add" label="Ajouter un article" :disable="itemsLoading"
             @click="openItemCreationModal" />
@@ -184,10 +175,12 @@ export default {
     };
 
     const openItemCreationModal = () => { itemCreationModal.value = true; };
+
     const resetItemAdditionForm = () => {
       newItem.value = { name: '' };
       validations.value.newItem.$reset();
     };
+
     const addItem = async () => {
       try {
         validations.value.newItem.$touch();
