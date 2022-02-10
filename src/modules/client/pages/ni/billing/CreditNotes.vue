@@ -107,6 +107,7 @@ export default {
         inclTaxesTpp: 0,
         subscription: '',
         misc: '',
+        billingItemList: [],
       },
       editedCreditNote: {},
       creditNotes: [],
@@ -266,6 +267,7 @@ export default {
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
         misc: '',
+        billingItemList: [],
       };
 
       this.v$.newCreditNote.startDate.$reset();
@@ -441,6 +443,8 @@ export default {
         inclTaxesTpp: 0,
         subscription: '',
         thirdPartyPayer: '',
+        misc: '',
+        billingItemList: [],
       };
       this.creditNoteEvents = [];
       this.creditNoteType = SUBSCRIPTION;

@@ -50,7 +50,7 @@
       </div>
     </template>
     <!-- Subscription -->
-    <template v-else>
+    <template v-else-if="creditNoteType === SUBSCRIPTION">
       <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions" required-field
         :model-value="newCreditNote.subscription" :disable="!newCreditNote.customer"
         :error="validations.subscription.$error" @blur="validations.subscription.$touch"
@@ -121,15 +121,13 @@ export default {
       CREDIT_NOTE_TYPE_OPTIONS,
       SUBSCRIPTION,
       EVENTS,
+      inclTaxesError: 'Montant TTC non valide',
     };
   },
   computed: {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate &&
         !this.creditNoteEvents.length;
-    },
-    inclTaxesError () {
-      return 'Montant TTC non valide';
     },
   },
   methods: {
