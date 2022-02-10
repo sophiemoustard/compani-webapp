@@ -32,7 +32,7 @@
       :customers-options="customersOptions" @hide="resetCreationCreditNoteData" v-model:new-credit-note="newCreditNote"
       :end-date-error-message="setEndDateErrorMessage(this.v$.newCreditNote, this.newCreditNote.events)"
       @reset-customer-data="resetCustomerData" :billing-items-options="billingItemsOptions"
-      @add-billing-item="addBillingItem" />
+      @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem" />
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
@@ -96,6 +96,7 @@ export default {
       creditNoteType: SUBSCRIPTION,
       customersOptions: [],
       creditNoteEvents: [],
+      billingItems: [],
       billingItemsOptions: [],
       newCreditNote: {
         customer: '',
@@ -282,6 +283,7 @@ export default {
     // Refresh data
     async refreshBillingItemsOptions () {
       const billingItems = Object.freeze(await BillingItems.list({ type: MANUAL }));
+      this.billingItems = billingItems;
       this.billingItemsOptions = formatAndSortOptions(billingItems, 'name');
     },
     async refreshCustomersOptions () {
@@ -554,6 +556,14 @@ export default {
     },
     addBillingItem () {
       this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+    },
+    updateBillingItem (event, index, path) {
+      set(this.newCreditNote.billingItemList[index], path, event);
+      if (path === 'billingItem') {
+        const billingItem = this.billingItems.find(bi => bi._id === event);
+        set(this.newCreditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
+        set(this.newCreditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+      }
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
