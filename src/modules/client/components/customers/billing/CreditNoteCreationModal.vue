@@ -63,6 +63,33 @@
         :model-value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error" type="number"
         @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" caption="Montant TTC" suffix="€" />
     </template>
+    <!-- Billing items -->
+    <template v-else>
+      {{ newCreditNote.billingItemList }}
+      <!-- <div v-for="(item, index) of newCreditNote.billingItemList" :key="index">
+        <div class="row">
+          <ni-select in-modal @update:model-value="updateBillingItem($event, index, 'billingItem')" required-field
+            :caption="`Article ${index + 1}`" :model-value="item.billingItem" :options="billingItemsOptions"
+            @blur="validations.billingItemList.$touch" :error="getError('billingItem', index)" class="flex-1" />
+          <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
+            :disable="newCreditNote.billingItemList.length === 1" />
+        </div>
+        <div class="flex-row">
+          <div class="q-mr-sm">
+            <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
+              :error-message="getErrorMessage('unitInclTaxes', index)" :model-value="item.unitInclTaxes" required-field
+              :error="getError('unitInclTaxes', index)" type="number" @blur="validations.billingItemList.$touch" />
+            </div>
+          <div class="q-ml-sm">
+            <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
+              @update:model-value="updateBillingItem($event, index, 'count')" :error="getError('count', index)"
+              @blur="validations.billingItemList.$touch" :error-message="getErrorMessage('count', index)" />
+          </div>
+        </div>
+      </div> -->
+      <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
+        label-color="primary" />
+    </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -71,6 +98,7 @@
 </template>
 
 <script>
+import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -105,6 +133,7 @@ export default {
     'ni-input': Input,
     'ni-date-input': DateInput,
     'ni-btn-toggle': ButtonToggle,
+    'ni-bi-color-button': BiColorButton,
   },
   emits: [
     'hide',
@@ -115,6 +144,7 @@ export default {
     'update:new-credit-note',
     'reset-customer-data',
     'update:credit-note-type',
+    'add-billing-item',
   ],
   data () {
     return {
@@ -162,6 +192,9 @@ export default {
     updateCreditNoteType (event) {
       this.$emit('update:credit-note-type', event);
       this.tmpInput = '';
+    },
+    addBillingItem () {
+      this.$emit('add-billing-item');
     },
   },
 };

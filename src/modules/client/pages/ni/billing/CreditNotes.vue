@@ -31,7 +31,8 @@
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.v$.newCreditNote)"
       :customers-options="customersOptions" @hide="resetCreationCreditNoteData" v-model:new-credit-note="newCreditNote"
       :end-date-error-message="setEndDateErrorMessage(this.v$.newCreditNote, this.newCreditNote.events)"
-      @reset-customer-data="resetCustomerData" :billing-items-options="billingItemsOptions" />
+      @reset-customer-data="resetCustomerData" :billing-items-options="billingItemsOptions"
+      @add-billing-item="addBillingItem" />
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
@@ -550,6 +551,9 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    addBillingItem () {
+      this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
