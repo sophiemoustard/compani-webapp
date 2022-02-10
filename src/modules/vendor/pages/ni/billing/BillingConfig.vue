@@ -5,11 +5,11 @@
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
         <ni-responsive-table :data="courseFundingOrganisations" :columns="courseFundingOrganisationColumns"
-          v-model:pagination="pagination" class="q-mb-md" :loading="tableLoading">
+          v-model:pagination="pagination" class="q-mb-md" :loading="organisationsLoading">
           <template #body="{ props }">
             <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
+                  :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <ni-button icon="delete" @click="validateOrganisationDeletion(col.value)" />
@@ -21,15 +21,28 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter un financeur" :disable="tableLoading"
+          <ni-button color="primary" icon="add" label="Ajouter un financeur" :disable="organisationsLoading"
             @click="openOrganisationCreationModal" />
+        </q-card-actions>
+      </q-card>
+      <p class="text-weight-bold q-mt-xl">Articles de facturation</p>
+      <q-card>
+        <ni-responsive-table :data="courseBillingItems" :columns="courseBillingItemColumns"
+          v-model:pagination="pagination" class="q-mb-md" :loading="itemsLoading" />
+        <q-card-actions align="right">
+          <ni-button color="primary" icon="add" label="Ajouter un article" :disable="itemsLoading"
+            @click="openItemCreationModal" />
         </q-card-actions>
       </q-card>
     </q-page>
 
     <ni-organisation-creation-modal v-model="organisationCreationModal" v-model:new-organisation="newOrganisation"
       @submit="addOrganisation" :validations="validations.newOrganisation" @hide="resetOrganisationAdditionForm"
-      :loading="tableLoading" />
+      :loading="organisationsLoading" />
+
+    <ni-item-creation-modal v-model="itemCreationModal" v-model:new-item="newItem"
+      @submit="addItem" :validations="validations.newItem" @hide="resetItemAdditionForm"
+      :loading="itemsLoading" />
   </div>
 </template>
 
@@ -42,11 +55,13 @@ import get from 'lodash/get';
 import { frAddress } from '@helpers/vuelidateCustomVal';
 import { sortStrings } from '@helpers/utils';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
+import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Button from '@components/Button';
 import OrganisationCreationModal from 'src/modules/vendor/components/billing/CourseFundingOrganisationCreationModal';
+import ItemCreationModal from 'src/modules/vendor/components/billing/CourseBillingItemCreationModal';
 
 export default {
   name: 'BillingConfig',
@@ -54,23 +69,28 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-responsive-table': ResponsiveTable,
     'ni-organisation-creation-modal': OrganisationCreationModal,
+    'ni-item-creation-modal': ItemCreationModal,
     'ni-button': Button,
   },
   setup () {
     const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
 
-    const tableLoading = ref(false);
+    const organisationsLoading = ref(false);
+    const itemsLoading = ref(false);
     const courseFundingOrganisations = ref([]);
     const courseFundingOrganisationColumns = [
       { name: 'name', label: 'Nom', align: 'left', field: 'name' },
       { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
       { name: 'actions', label: '', align: 'left', field: '_id' },
     ];
+    const courseBillingItems = ref([]);
+    const courseBillingItemColumns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name' }];
     const pagination = { rowsPerPage: 0 };
     const organisationCreationModal = ref(false);
+    const itemCreationModal = ref(false);
     const newOrganisation = ref({ name: '', address: {} });
-    const modalLoading = ref(false);
+    const newItem = ref({ name: '' });
 
     const rules = {
       newOrganisation: {
@@ -82,20 +102,29 @@ export default {
         },
         name: { required },
       },
+      newItem: { name: { required } },
     };
-    const validations = useVuelidate(rules, { newOrganisation });
+    const validations = useVuelidate(rules, { newOrganisation, newItem });
 
     const refreshCourseFundingOrganisations = async () => {
       try {
-        tableLoading.value = true;
         const organisations = await CourseFundingOrganisations.list();
         courseFundingOrganisations.value = organisations.sort((a, b) => sortStrings(a.name, b.name));
       } catch (e) {
         console.error(e);
         courseFundingOrganisations.value = [];
         NotifyNegative('Erreur lors de la récupération des financeurs.');
-      } finally {
-        tableLoading.value = false;
+      }
+    };
+
+    const refreshCourseBillingItems = async () => {
+      try {
+        const items = await CourseBillingItems.list();
+        courseBillingItems.value = items.sort((a, b) => sortStrings(a.name, b.name));
+      } catch (e) {
+        console.error(e);
+        courseBillingItems.value = [];
+        NotifyNegative('Erreur lors de la récupération des articles.');
       }
     };
 
@@ -109,7 +138,7 @@ export default {
         validations.value.newOrganisation.$touch();
         if (validations.value.newOrganisation.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        modalLoading.value = true;
+        organisationsLoading.value = true;
         await CourseFundingOrganisations.create(newOrganisation.value);
         NotifyPositive('Financeur ajouté.');
 
@@ -120,7 +149,7 @@ export default {
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du financeur.');
       } finally {
-        modalLoading.value = false;
+        organisationsLoading.value = false;
       }
     };
 
@@ -145,8 +174,36 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     };
 
+    const openItemCreationModal = () => { itemCreationModal.value = true; };
+
+    const resetItemAdditionForm = () => {
+      newItem.value = { name: '' };
+      validations.value.newItem.$reset();
+    };
+
+    const addItem = async () => {
+      try {
+        validations.value.newItem.$touch();
+        if (validations.value.newItem.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        itemsLoading.value = true;
+        await CourseBillingItems.create(newItem.value);
+        NotifyPositive('Article ajouté.');
+
+        itemCreationModal.value = false;
+        await refreshCourseBillingItems();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout de l\'article.');
+      } finally {
+        itemsLoading.value = false;
+      }
+    };
+
     const created = async () => {
       refreshCourseFundingOrganisations();
+      refreshCourseBillingItems();
     };
 
     created();
@@ -154,11 +211,16 @@ export default {
     return {
       // Data
       courseFundingOrganisationColumns,
-      tableLoading,
+      courseBillingItemColumns,
+      organisationsLoading,
+      itemsLoading,
       pagination,
       courseFundingOrganisations,
+      courseBillingItems,
       organisationCreationModal,
+      itemCreationModal,
       newOrganisation,
+      newItem,
       // Computed
       validations,
       // Methods
@@ -167,6 +229,10 @@ export default {
       addOrganisation,
       openOrganisationCreationModal,
       validateOrganisationDeletion,
+      refreshCourseBillingItems,
+      resetItemAdditionForm,
+      addItem,
+      openItemCreationModal,
     };
   },
 };
