@@ -125,8 +125,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'emptyMandate'">
-                  <ni-button @click="downloadMandate(props.row)" icon="file_download"
-                    v-if="customer.payment.mandates.every(m => isSameOrBefore(m.createdAt, props.row.createdAt))" />
+                  <ni-button v-if="isLastCreatedMandate(props.row)" @click="downloadMandate(props.row)"
+                    icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
                   <div v-if="!getDriveId(props.row)" class="row justify-center table-actions">
@@ -580,7 +580,6 @@ export default {
   },
   methods: {
     get,
-    isSameOrBefore,
     disableSubscriptionDeletion (sub) {
       const hasFunding = this.fundings.some(f => f.subscription._id === sub._id);
 
@@ -1012,6 +1011,9 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    isLastCreatedMandate (mandate) {
+      return this.customer.payment.mandates.every(m => isSameOrBefore(m.createdAt, mandate.createdAt));
     },
   },
 };
