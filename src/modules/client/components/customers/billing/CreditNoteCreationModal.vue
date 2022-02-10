@@ -146,7 +146,6 @@ export default {
     },
     submit () {
       this.$emit('submit');
-      this.tmpInput = '';
     },
     getEvents (event, prop) {
       this.update(event, prop);
