@@ -31,7 +31,6 @@
     </q-page-sticky>
     <div v-if="isIntraOrVendor">
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Contact pour la formation</p>
         <p class="text-italic">
           Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
         </p>
@@ -42,7 +41,6 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Actions utiles</p>
         <ni-banner v-if="followUpDisabled">
           <template #message>
             Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
