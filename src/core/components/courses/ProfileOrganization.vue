@@ -1,7 +1,7 @@
 <template>
   <div v-if="course">
     <div class="q-mb-xl">
-      <div v-if="isClientInterface && isCourseInter" class="q-mb-xl">
+      <div v-if="isClientInterface && isCourseInter" class="q-mb-lg">
         <p class="text-weight-bold">Informations pratiques</p>
         <ni-banner v-if="followUpDisabled">
           <template #message>{{ missingInfoMsg }}</template>
@@ -30,7 +30,7 @@
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
     <div v-if="isIntraOrVendor">
-      <div class="q-mb-xl">
+      <div class="q-mb-lg">
         <p class="text-italic">
           Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
         </p>
