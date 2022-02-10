@@ -88,6 +88,10 @@
       </div>
       <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
         label-color="primary" />
+      <div class="row q-mb-md">
+        <div class="col-6 total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
+        <div class="col-6 total-text">Total TTC : {{ formatPrice(totalInclTaxes) }}</div>
+      </div>
     </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
@@ -157,12 +161,30 @@ export default {
       SUBSCRIPTION,
       EVENTS,
       inclTaxesError: 'Montant TTC non valide',
+      totalExclTaxes: 0,
+      totalInclTaxes: 0,
     };
   },
   computed: {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate &&
         !this.creditNoteEvents.length;
+    },
+  },
+  watch: {
+    'newCreditNote.billingItemList': {
+      deep: true,
+      handler () {
+        this.totalExclTaxes = this.newCreditNote.billingItemList
+          .reduce(
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
+          );
+        this.totalInclTaxes = this.newCreditNote.billingItemList.reduce(
+          (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
+          0
+        );
+      },
     },
   },
   methods: {
@@ -218,6 +240,9 @@ export default {
         get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
 
       return '';
+    },
+    getExclTaxes (inclTaxes, vat) {
+      return inclTaxes / (1 + vat / 100);
     },
   },
 };
