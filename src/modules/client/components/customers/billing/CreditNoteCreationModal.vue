@@ -96,6 +96,7 @@ export default {
     startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     minAndMaxDates: { type: Object, default: () => ({}) },
+    billingItemsOptions: { type: Array, default: () => ([]) },
   },
   components: {
     'ni-option-group': OptionGroup,

@@ -31,7 +31,7 @@
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.v$.newCreditNote)"
       :customers-options="customersOptions" @hide="resetCreationCreditNoteData" v-model:new-credit-note="newCreditNote"
       :end-date-error-message="setEndDateErrorMessage(this.v$.newCreditNote, this.newCreditNote.events)"
-      @reset-customer-data="resetCustomerData" />
+      @reset-customer-data="resetCustomerData" :billing-items-options="billingItemsOptions" />
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
@@ -55,6 +55,7 @@ import pick from 'lodash/pick';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
+import BillingItems from '@api/BillingItems';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
@@ -62,8 +63,8 @@ import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS } from '@data/constants';
-import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
+import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL } from '@data/constants';
+import { formatPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import { strictPositiveNumber, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
@@ -94,6 +95,7 @@ export default {
       creditNoteType: SUBSCRIPTION,
       customersOptions: [],
       creditNoteEvents: [],
+      billingItemsOptions: [],
       newCreditNote: {
         customer: '',
         thirdPartyPayer: '',
@@ -185,7 +187,7 @@ export default {
   },
   async mounted () {
     this.tableLoading = true;
-    await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions()]);
+    await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions(), this.refreshBillingItemsOptions()]);
     this.tableLoading = false;
   },
   validations () {
@@ -277,6 +279,10 @@ export default {
       this.v$.newCreditNote.inclTaxesTpp.$reset();
     },
     // Refresh data
+    async refreshBillingItemsOptions () {
+      const billingItems = Object.freeze(await BillingItems.list({ type: MANUAL }));
+      this.billingItemsOptions = formatAndSortOptions(billingItems, 'name');
+    },
     async refreshCustomersOptions () {
       try {
         this.customersOptions = [];
