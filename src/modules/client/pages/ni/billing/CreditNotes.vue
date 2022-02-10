@@ -48,7 +48,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { required, requiredIf } from '@vuelidate/validators';
+import { required, requiredIf, helpers } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
@@ -65,9 +65,9 @@ import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL } from '@data/constants';
+import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL, BILLING_ITEMS } from '@data/constants';
 import { formatPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { strictPositiveNumber, minDate, maxDate } from '@helpers/vuelidateCustomVal';
+import { strictPositiveNumber, minDate, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
@@ -112,7 +112,7 @@ export default {
         inclTaxesTpp: 0,
         subscription: '',
         misc: '',
-        billingItemList: [],
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       },
       editedCreditNote: {},
       creditNotes: [],
@@ -199,6 +199,14 @@ export default {
       customer: { required },
       events: { required: requiredIf(this.creditNoteType === EVENTS) },
       subscription: { required: requiredIf(this.creditNoteType === SUBSCRIPTION) },
+      billingItemList: {
+        required: requiredIf(this.creditNoteType === BILLING_ITEMS),
+        $each: helpers.forEach({
+          billingItem: { required },
+          unitInclTaxes: { positiveNumber, required },
+          count: { strictPositiveNumber, required },
+        }),
+      },
       inclTaxesTpp: {},
       inclTaxesCustomer: {},
     };
@@ -272,7 +280,7 @@ export default {
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
         misc: '',
-        billingItemList: [],
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
 
       this.v$.newCreditNote.startDate.$reset();
@@ -454,7 +462,7 @@ export default {
         subscription: '',
         thirdPartyPayer: '',
         misc: '',
-        billingItemList: [],
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
       this.creditNoteEvents = [];
       this.creditNoteType = SUBSCRIPTION;

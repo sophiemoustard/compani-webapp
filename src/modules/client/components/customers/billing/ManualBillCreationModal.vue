@@ -119,14 +119,6 @@ export default {
     getExclTaxes (inclTaxes, vat) {
       return inclTaxes / (1 + vat / 100);
     },
-    nbrError (path, index) {
-      const validation = this.validations.billingItemList.$each.$response.$errors[index];
-      if (get(validation, `${path}.required.$response`) === false) return REQUIRED_LABEL;
-      if (get(validation, `${path}.positiveNumber.$response`) === false ||
-        get(validation, `${path}.strictPositiveNumber.$response`) === false) return 'Nombre non valide';
-
-      return '';
-    },
     hide () {
       this.totalExclTaxes = 0;
       this.selectedBillingItem = null;
