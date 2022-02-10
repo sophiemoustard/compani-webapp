@@ -65,14 +65,13 @@
     </template>
     <!-- Billing items -->
     <template v-else>
-      {{ newCreditNote.billingItemList }}
       <div v-for="(item, index) of newCreditNote.billingItemList" :key="index">
         <div class="row">
           <ni-select in-modal @update:model-value="updateBillingItem($event, index, 'billingItem')" required-field
             :caption="`Article ${index + 1}`" :model-value="item.billingItem" :options="billingItemsOptions"
             class="flex-1" />
-          <!-- <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
-            :disable="newCreditNote.billingItemList.length === 1" /> -->
+          <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
+            :disable="newCreditNote.billingItemList.length === 1" />
         </div>
         <div class="flex-row">
           <div class="q-mr-sm">
@@ -97,6 +96,7 @@
 
 <script>
 import BiColorButton from '@components/BiColorButton';
+import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -132,6 +132,7 @@ export default {
     'ni-date-input': DateInput,
     'ni-btn-toggle': ButtonToggle,
     'ni-bi-color-button': BiColorButton,
+    'ni-button': Button,
   },
   emits: [
     'hide',
@@ -144,6 +145,7 @@ export default {
     'update:credit-note-type',
     'add-billing-item',
     'update-billing-item',
+    'remove-billing-item',
   ],
   data () {
     return {
@@ -195,8 +197,11 @@ export default {
     addBillingItem () {
       this.$emit('add-billing-item');
     },
-    async updateBillingItem (event, index, path) {
-      await this.$emit('update-billing-item', event, index, path);
+    updateBillingItem (event, index, path) {
+      this.$emit('update-billing-item', event, index, path);
+    },
+    removeBillingItem (index) {
+      this.$emit('remove-billing-item', index);
     },
   },
 };
