@@ -41,6 +41,12 @@ export const planningEventMixin = {
       return `${moment(event.displayedStartDate).format('HH:mm')} - `
         + `${moment(event.displayedEndDate).format('HH:mm')}`;
     },
+    getEventStartHour (event) {
+      return `${moment(event.displayedStartDate).format('HH:mm')}`;
+    },
+    getEventEndHour (event) {
+      return `${moment(event.displayedEndDate).format('HH:mm')}`;
+    },
     displayAbsenceType (value) {
       const absence = ABSENCE_TYPES.find(abs => abs.value === value);
       return !absence ? '' : absence.label;

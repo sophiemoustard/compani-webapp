@@ -30,7 +30,15 @@
           {{ event.internalHour.name }}
         </p>
       </div>
-      <p class="no-margin event-subtitle overflow-hidden-nowrap" data-cy="event-hours">{{ getEventHours(event) }}</p>
+      <div class="icon-container">
+        <p class="no-margin event-subtitle overflow-hidden-nowrap" data-cy="event-start-hour">
+          {{ getEventStartHour(event) }}
+        </p>
+        <q-icon name="check" />
+      </div>
+      <p class="no-margin event-subtitle overflow-hidden-nowrap" data-cy="event-end-hour">
+        {{ getEventEndHour(event) }}
+      </p>
       <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
     </div>
   </div>
@@ -111,4 +119,8 @@ export default {
     margin: 0
     border: 1px solid white
     font-size: 0.5rem
+.icon-container
+  display: flex
+  flex-direction: row
+  justify-content: left
 </style>
