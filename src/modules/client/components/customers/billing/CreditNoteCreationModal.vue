@@ -14,16 +14,14 @@
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
     <ni-input caption="Motif" in-modal v-model="tmpInput" @blur="updateMisc" type="textarea" />
-    <!-- Intervention -->
+    <!-- Event -->
     <template v-if="creditNoteType === EVENTS">
       <ni-date-input @blur="validations.startDate.$touch" :max="minAndMaxDates.maxStartDate" in-modal
         :error="validations.startDate.$error" caption="Début période concernée" :model-value="newCreditNote.startDate"
-        @update:model-value="getEvents($event, 'startDate')" :error-message="startDateErrorMessage" required-field
-        :disable="creditNoteType === SUBSCRIPTION" />
+        @update:model-value="getEvents($event, 'startDate')" :error-message="startDateErrorMessage" required-field />
       <ni-date-input caption="Fin période concernée" :model-value="newCreditNote.endDate" required-field in-modal
         :error="validations.endDate.$error" @blur="validations.endDate.$touch" :min="minAndMaxDates.minEndDate"
-        @update:model-value="getEvents($event, 'endDate')" :disable="creditNoteType === SUBSCRIPTION"
-        :error-message="endDateErrorMessage" />
+        @update:model-value="getEvents($event, 'endDate')" :error-message="endDateErrorMessage" />
       <template v-if="creditNoteEvents.length > 0">
         <ni-option-group :model-value="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error"
@@ -54,7 +52,7 @@
     <!-- Subscription -->
     <template v-else>
       <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions" required-field
-        :model-value="newCreditNote.subscription" :disable="creditNoteType === SUBSCRIPTION && !newCreditNote.customer"
+        :model-value="newCreditNote.subscription" :disable="!newCreditNote.customer"
         :error="validations.subscription.$error" @blur="validations.subscription.$touch"
         @update:model-value="update($event, 'subscription')" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"

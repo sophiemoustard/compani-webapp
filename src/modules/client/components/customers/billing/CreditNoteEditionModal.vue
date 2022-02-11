@@ -10,8 +10,8 @@
       <ni-date-input caption="Date de l'avoir" :model-value="editedCreditNote.date" in-modal required-field
         :error="validations.date.$error" @blur="validations.date.$touch" :disable="!editedCreditNote.isEditable"
         @update:model-value="update($event, 'date')" />
-      <!-- Has linked events -->
-      <template v-if="hasLinkedEvents">
+      <!-- Events -->
+      <template v-if="creditNoteType === EVENTS">
         <ni-date-input caption="Début période concernée" :model-value="editedCreditNote.startDate" in-modal
           :disable="!editedCreditNote.events || !editedCreditNote.isEditable" required-field
           :error="validations.startDate.$error" @blur="validations.$touch" :max="minAndMaxDates.maxStartDate"
@@ -47,10 +47,10 @@
           </div>
         </div>
       </template>
-      <!-- Hasn't linked event -->
+      <!-- Subscription -->
       <template v-else>
         <ni-select in-modal caption="Souscription concernée" :model-value="editedCreditNote.subscription"
-          :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editedCreditNote.customer" required-field
+          :options="subscriptionsOptions" :disable="!editedCreditNote.customer" required-field
           :error="validations.subscription.$error" @blur="validations.subscription.$touch"
           @update:model-value="update($event, 'subscription')" />
         <ni-input in-modal v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
@@ -76,14 +76,14 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import { formatPrice, formatIdentity } from '@helpers/utils';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, EVENTS } from '@data/constants';
 
 export default {
   name: 'CreditNoteEditionModal',
   props: {
     modelValue: { type: Boolean, default: false },
     editedCreditNote: { type: Object, default: () => ({}) },
-    hasLinkedEvents: { type: Boolean, default: false },
+    creditNoteType: { type: String, default: '' },
     subscriptionsOptions: { type: Array, default: () => [] },
     creditNoteEvents: { type: Array, default: () => [] },
     creditNoteEventsOptions: { type: Array, default: () => [] },
@@ -92,6 +92,11 @@ export default {
     startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     minAndMaxDates: { type: Object, default: () => ({}) },
+  },
+  data () {
+    return {
+      EVENTS,
+    };
   },
   components: {
     'ni-option-group': OptionGroup,

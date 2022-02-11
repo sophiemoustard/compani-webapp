@@ -37,7 +37,7 @@
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
       v-model="creditNoteEditionModal" v-model:edited-credit-note="editedCreditNote" :validations="v$.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
-      :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
+      :credit-note-type="creditNoteType" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
       @get-events="getEditionEvents" :min-and-max-dates="editionMinAndMaxDates" :loading="loading"
       :end-date-error-message="setEndDateErrorMessage(this.v$.editedCreditNote, this.editedCreditNote.events)"
       :start-date-error-message="setStartDateErrorMessage(this.v$.editedCreditNote)" />
@@ -320,7 +320,7 @@ export default {
     },
     async getEvents (creditNote, validations) {
       try {
-        const canGetEvents = (this.creditNoteType === EVENTS || this.hasLinkedEvents) &&
+        const canGetEvents = this.creditNoteType === EVENTS &&
           creditNote.customer &&
           creditNote.startDate &&
           creditNote.endDate;
@@ -547,8 +547,8 @@ export default {
       this.editedCreditNote.customer = creditNote.customer;
       if (creditNote.thirdPartyPayer) this.editedCreditNote.thirdPartyPayer = creditNote.thirdPartyPayer;
 
-      this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
-      if (this.hasLinkedEvents) {
+      this.creditNoteType = (creditNote.events && creditNote.events.length > 0) ? EVENTS : SUBSCRIPTION;
+      if (this.creditNoteType === EVENTS) {
         await this.getEditionEvents();
         this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
       } else {
@@ -561,7 +561,7 @@ export default {
       this.creditNoteEditionModal = false;
       this.editedCreditNote = {};
       this.creditNoteEvents = [];
-      this.hasLinkedEvents = false;
+      this.creditNoteType = SUBSCRIPTION;
       this.v$.editedCreditNote.$reset();
     },
     formatEditionPayload () {
