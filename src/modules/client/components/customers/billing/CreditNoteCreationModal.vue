@@ -8,9 +8,9 @@
     <ni-select in-modal caption="Bénéficiaire" :model-value="newCreditNote.customer" :options="customersOptions"
       required-field @update:model-value="updateCustomer" @blur="validations.customer.$touch"
       :error="validations.customer.$error" />
-    <ni-select caption="Tiers payeur" @update:model-value="getEvents($event, 'thirdPartyPayer')"
+    <ni-select v-if="creditNoteType !== BILLING_ITEMS" caption="Tiers payeur" :options="thirdPartyPayerOptions"
       in-modal :disable="thirdPartyPayerOptions.length === 0" :model-value="newCreditNote.thirdPartyPayer"
-      :options="thirdPartyPayerOptions" />
+      @update:model-value="getEvents($event, 'thirdPartyPayer')" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
     <ni-input caption="Motif" in-modal v-model="tmpInput" @blur="updateMisc" type="textarea" />
@@ -89,8 +89,8 @@
       <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
         label-color="primary" />
       <div class="row q-mb-md">
-        <div class="col-6 total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
-        <div class="col-6 total-text">Total TTC : {{ formatPrice(totalInclTaxes) }}</div>
+        <div class="col-6 total-text">Total HT : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</div>
+        <div class="col-6 total-text">Total TTC : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</div>
       </div>
     </template>
     <template #footer>
@@ -110,7 +110,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import ButtonToggle from '@components/ButtonToggle';
-import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS } from '@data/constants';
+import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS, BILLING_ITEMS } from '@data/constants';
 import { formatPrice, formatIdentity } from '@helpers/utils';
 
 export default {
@@ -160,6 +160,7 @@ export default {
       CREDIT_NOTE_TYPE_OPTIONS,
       SUBSCRIPTION,
       EVENTS,
+      BILLING_ITEMS,
       inclTaxesError: 'Montant TTC non valide',
       totalExclTaxes: 0,
       totalInclTaxes: 0,
@@ -169,22 +170,6 @@ export default {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate &&
         !this.creditNoteEvents.length;
-    },
-  },
-  watch: {
-    'newCreditNote.billingItemList': {
-      deep: true,
-      handler () {
-        this.totalExclTaxes = this.newCreditNote.billingItemList
-          .reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-            0
-          );
-        this.totalInclTaxes = this.newCreditNote.billingItemList.reduce(
-          (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
-          0
-        );
-      },
     },
   },
   methods: {
@@ -240,9 +225,6 @@ export default {
         get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
 
       return '';
-    },
-    getExclTaxes (inclTaxes, vat) {
-      return inclTaxes / (1 + vat / 100);
     },
   },
 };

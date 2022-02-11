@@ -178,6 +178,20 @@ export default {
       this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
       this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
     },
+    'newCreditNote.billingItemList': {
+      deep: true,
+      handler () {
+        this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList
+          .reduce(
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
+          );
+        this.newCreditNote.inclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
+          (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
+          0
+        );
+      },
+    },
     'editedCreditNote.events': function (previousValue, currentValue) {
       if (!isEqual(previousValue, currentValue) && this.creditNoteType === EVENTS) {
         const prices = this.computePrices(this.editedCreditNote.events);
@@ -547,7 +561,7 @@ export default {
       try {
         this.v$.newCreditNote.$touch();
 
-        if (this.v$.newCreditNote.$error || this.noEventSelectedForNewCreditNote) {
+        if (this.v$.newCreditNote.$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
         this.loading = true;
@@ -576,6 +590,9 @@ export default {
         set(this.newCreditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
         set(this.newCreditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
       }
+    },
+    getExclTaxes (inclTaxes, vat) {
+      return inclTaxes / (1 + vat / 100);
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
