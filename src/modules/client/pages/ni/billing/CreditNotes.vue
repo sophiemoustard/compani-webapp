@@ -9,7 +9,8 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
-                <ni-button icon="edit" :disable="!!props.row.customer.archivedAt"
+                <ni-button icon="edit" :disable="!!props.row.customer.archivedAt ||
+                  !!get(props.row, 'billingItemList.length')"
                   @click="openCreditNoteEditionModal(props.row)" />
                 <ni-button icon="delete" :disable="!props.row.isEditable || !!props.row.customer.archivedAt"
                   @click="validateCNDeletion(col.value, props.row)" />
@@ -159,6 +160,7 @@ export default {
       pagination: { rowsPerPage: 0, sortBy: 'date', descending: true },
       tableLoading: false,
       COMPANI,
+      get,
     };
   },
   watch: {
@@ -548,12 +550,22 @@ export default {
 
       return payload;
     },
+    formatPayloadWithBillingItems (creditNote) {
+      return {
+        ...pick(creditNote, ['exclTaxesCustomer', 'inclTaxesCustomer']),
+        billingItemList: creditNote.billingItemList.map(bi => omit(bi, 'vat')),
+      };
+    },
     formatPayload (creditNote) {
       let payload = pick(creditNote, ['date', 'customer', 'misc']);
 
       if (this.creditNoteType === SUBSCRIPTION) {
         payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
-      } else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
+      } else if (this.creditNoteType === EVENTS) {
+        payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
+      } else {
+        payload = { ...payload, ...this.formatPayloadWithBillingItems(creditNote) };
+      }
 
       return pickBy(payload);
     },
