@@ -546,3 +546,10 @@ export const BILLING_ITEMS_TYPE_OPTIONS = [
   { label: 'Manuel', value: MANUAL },
   { label: 'Par intervention', value: PER_INTERVENTION },
 ];
+
+// CREDIT_NOTES
+export const EVENTS = 'events';
+export const CREDIT_NOTE_TYPE_OPTIONS = [
+  { label: 'Souscription', value: SUBSCRIPTION },
+  { label: 'Intervention', value: EVENTS },
+];

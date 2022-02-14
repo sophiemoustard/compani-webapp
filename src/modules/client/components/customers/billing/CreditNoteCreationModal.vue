@@ -3,6 +3,8 @@
     <template #title>
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
+    <ni-btn-toggle :model-value="creditNoteType" :options="CREDIT_NOTE_TYPE_OPTIONS"
+      @update:model-value="updateCreditNoteType" />
     <ni-select in-modal caption="Bénéficiaire" :model-value="newCreditNote.customer" :options="customersOptions"
       required-field @update:model-value="updateCustomer" @blur="validations.customer.$touch"
       :error="validations.customer.$error" />
@@ -11,20 +13,15 @@
       :options="thirdPartyPayerOptions" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
-    <div class="row q-mb-md light">
-      <q-toggle :model-value="hasLinkedEvents" @update:model-value="updateHasLinkedEvents"
-        label="Lié à des interventions ?" />
-    </div>
-    <!-- Has linked events -->
-    <template v-if="hasLinkedEvents">
-      <ni-date-input @blur="validations.startDate.$touch" :max="minAndMaxDates.maxStartDate" :disable="!hasLinkedEvents"
+    <ni-input caption="Motif" in-modal v-model="tmpInput" @blur="updateMisc" type="textarea" />
+    <!-- Event -->
+    <template v-if="creditNoteType === EVENTS">
+      <ni-date-input @blur="validations.startDate.$touch" :max="minAndMaxDates.maxStartDate" in-modal
         :error="validations.startDate.$error" caption="Début période concernée" :model-value="newCreditNote.startDate"
-        @update:model-value="getEvents($event, 'startDate')" :error-message="startDateErrorMessage" required-field
-        in-modal />
+        @update:model-value="getEvents($event, 'startDate')" :error-message="startDateErrorMessage" required-field />
       <ni-date-input caption="Fin période concernée" :model-value="newCreditNote.endDate" required-field in-modal
-        :error="validations.endDate.$error" @blur="validations.endDate.$touch"
-        @update:model-value="getEvents($event, 'endDate')"
-        :disable="!hasLinkedEvents" :error-message="endDateErrorMessage" :min="minAndMaxDates.minEndDate" />
+        :error="validations.endDate.$error" @blur="validations.endDate.$touch" :min="minAndMaxDates.minEndDate"
+        @update:model-value="getEvents($event, 'endDate')" :error-message="endDateErrorMessage" />
       <template v-if="creditNoteEvents.length > 0">
         <ni-option-group :model-value="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error"
@@ -52,10 +49,10 @@
         </div>
       </div>
     </template>
-    <!-- Hasn't linked event -->
+    <!-- Subscription -->
     <template v-else>
       <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions" required-field
-        :model-value="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer"
+        :model-value="newCreditNote.subscription" :disable="!newCreditNote.customer"
         :error="validations.subscription.$error" @blur="validations.subscription.$touch"
         @update:model-value="update($event, 'subscription')" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
@@ -79,15 +76,16 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
+import ButtonToggle from '@components/ButtonToggle';
+import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS } from '@data/constants';
 import { formatPrice, formatIdentity } from '@helpers/utils';
-import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'CreditNoteCreationModal',
   props: {
     modelValue: { type: Boolean, default: false },
     newCreditNote: { type: Object, default: () => ({}) },
-    hasLinkedEvents: { type: Boolean, default: false },
+    creditNoteType: { type: String, default: '' },
     thirdPartyPayerOptions: { type: Array, default: () => [] },
     customersOptions: { type: Array, default: () => [] },
     subscriptionsOptions: { type: Array, default: () => [] },
@@ -105,6 +103,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
+    'ni-btn-toggle': ButtonToggle,
   },
   emits: [
     'hide',
@@ -114,7 +113,16 @@ export default {
     'update:has-linked-events',
     'update:new-credit-note',
     'reset-customer-data',
+    'update:credit-note-type',
   ],
+  data () {
+    return {
+      tmpInput: '',
+      CREDIT_NOTE_TYPE_OPTIONS,
+      SUBSCRIPTION,
+      EVENTS,
+    };
+  },
   computed: {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate &&
@@ -129,6 +137,7 @@ export default {
     formatIdentity,
     hide () {
       this.$emit('hide');
+      this.tmpInput = '';
     },
     input (event) {
       this.$emit('update:model-value', event);
@@ -140,9 +149,6 @@ export default {
       this.update(event, prop);
       this.$emit('get-events', prop);
     },
-    updateHasLinkedEvents (event) {
-      this.$emit('update:has-linked-events', event);
-    },
     update (event, prop) {
       this.$emit('update:new-credit-note', { ...this.newCreditNote, [prop]: event });
     },
@@ -150,6 +156,13 @@ export default {
       this.update(event, 'customer');
       this.$emit('reset-customer-data');
       this.$emit('get-events', 'customer');
+    },
+    updateMisc () {
+      this.$emit('update:new-credit-note', { ...this.newCreditNote, misc: this.tmpInput });
+    },
+    updateCreditNoteType (event) {
+      this.$emit('update:credit-note-type', event);
+      this.tmpInput = '';
     },
   },
 };
