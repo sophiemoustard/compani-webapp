@@ -31,14 +31,12 @@
         </p>
       </div>
       <div class="icon-container">
-        <p class="no-margin event-subtitle overflow-hidden-nowrap" data-cy="event-start-hour">
-          {{ getEventStartHour(event) }}
-        </p>
-        <q-icon name="check" />
+        <p class="q-mr-xs q-mb-none" data-cy="event-start-hour">{{ getEventStartHour(event) }}</p>
+        <q-icon v-if="event.startDateTimeStamp" class="bold" name="check" />
+        <p class="q-pr-xs q-pl-xs"> - </p>
+        <p class="q-mr-xs q-mb-none" data-cy="event-end-hour">{{ getEventEndHour(event) }}</p>
+        <q-icon v-if="event.endDateTimeStamp" class="bold" name="check" />
       </div>
-      <p class="no-margin event-subtitle overflow-hidden-nowrap" data-cy="event-end-hour">
-        {{ getEventEndHour(event) }}
-      </p>
       <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
     </div>
   </div>
@@ -123,4 +121,8 @@ export default {
   display: flex
   flex-direction: row
   justify-content: left
+  color: $copper-500
+  font-size: 10px
+.bold
+  font-weight: bold
 </style>

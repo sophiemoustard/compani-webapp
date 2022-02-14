@@ -58,9 +58,14 @@ export const planningEventMixin = {
     eventTitle (event) {
       if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
+      const shortenIdentity = {
+        ...event.customer.identity,
+        firstname: (event.customer.identity.firstname).substring(0, 3).concat('.'),
+      };
+
       return this.isCustomerPlanning
         ? formatIdentity(event.auxiliary.identity, 'Fl')
-        : formatIdentity(event.customer.identity, 'fL');
+        : formatIdentity(shortenIdentity, 'FL');
     },
     getDisplayedEvent (event, day, startDisplay, endDisplay) {
       const dayEvent = { ...event };
