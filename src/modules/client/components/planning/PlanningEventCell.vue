@@ -30,13 +30,7 @@
           {{ event.internalHour.name }}
         </p>
       </div>
-      <div class="icon-container">
-        <p class="q-mr-xs q-mb-none" data-cy="event-start-hour">{{ getEventStartHour(event) }}</p>
-        <q-icon v-if="event.startDateTimeStamp" class="bold" name="check" />
-        <p class="q-pr-xs q-pl-xs"> - </p>
-        <p class="q-mr-xs q-mb-none" data-cy="event-end-hour">{{ getEventEndHour(event) }}</p>
-        <q-icon v-if="event.endDateTimeStamp" class="bold" name="check" />
-      </div>
+      <ni-event-hours :event="event" />
       <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
     </div>
   </div>
@@ -55,6 +49,7 @@ import {
   CUSTOMER_ABSENCE,
 } from '@data/constants';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
+import NiEventHours from './EventHours';
 
 export default {
   name: 'PlanningEvent',
@@ -67,6 +62,9 @@ export default {
     inModal: { type: Boolean, default: false },
   },
   emits: ['drag', 'click'],
+  components: {
+    'ni-event-hours': NiEventHours,
+  },
   data () {
     return {
       STAFFING_PERCENTAGE_BY_MINUTES,
@@ -117,12 +115,4 @@ export default {
     margin: 0
     border: 1px solid white
     font-size: 0.5rem
-.icon-container
-  display: flex
-  flex-direction: row
-  justify-content: left
-  color: $copper-500
-  font-size: 10px
-.bold
-  font-weight: bold
 </style>

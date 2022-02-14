@@ -47,9 +47,7 @@
                       {{ event.internalHour.name }}
                     </p>
                   </div>
-                  <p data-cy="event-hours" class="no-margin event-subtitle overflow-hidden-nowrap">
-                    {{ getEventHours(event) }}
-                  </p>
+                  <ni-event-hours :event="event" />
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
                 <div v-if="isCustomerPlanning && event.inConflictEvents && event.inConflictEvents.length > 1"
@@ -78,6 +76,7 @@ import {
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
+import NiEventHours from './EventHours';
 
 export default {
   name: 'Agenda',
@@ -88,6 +87,9 @@ export default {
     personKey: { type: String, default: '' },
   },
   emits: ['open-creation-modal', 'open-info-modal'],
+  components: {
+    'ni-event-hours': NiEventHours,
+  },
   data () {
     return {
       ABSENCE,
@@ -196,5 +198,4 @@ export default {
 
 thead
   vertical-align: baseline
-
 </style>
