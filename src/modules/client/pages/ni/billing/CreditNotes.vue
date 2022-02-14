@@ -160,7 +160,6 @@ export default {
       pagination: { rowsPerPage: 0, sortBy: 'date', descending: true },
       tableLoading: false,
       COMPANI,
-      get,
     };
   },
   watch: {
@@ -183,15 +182,17 @@ export default {
     'newCreditNote.billingItemList': {
       deep: true,
       handler () {
-        this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList
-          .reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+        if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
+          this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList
+            .reduce(
+              (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+              0
+            );
+          this.newCreditNote.inclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
             0
           );
-        this.newCreditNote.inclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
-          (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
-          0
-        );
+        }
       },
     },
     'editedCreditNote.events': function (previousValue, currentValue) {
@@ -215,14 +216,6 @@ export default {
       customer: { required },
       events: { required: requiredIf(this.creditNoteType === EVENTS) },
       subscription: { required: requiredIf(this.creditNoteType === SUBSCRIPTION) },
-      billingItemList: {
-        required: requiredIf(this.creditNoteType === BILLING_ITEMS),
-        $each: helpers.forEach({
-          billingItem: { required },
-          unitInclTaxes: { positiveNumber, required },
-          count: { strictPositiveNumber, required },
-        }),
-      },
       inclTaxesTpp: {},
       inclTaxesCustomer: {},
     };
@@ -236,8 +229,24 @@ export default {
       ? { inclTaxesTpp: inclTaxesValidation }
       : { inclTaxesCustomer: inclTaxesValidation };
 
+    const newCreditNoteBillingItemsValidation = {
+      billingItemList: {
+        required: requiredIf(this.creditNoteType === BILLING_ITEMS),
+        $each: helpers.forEach({
+          billingItem: { required },
+          unitInclTaxes: { positiveNumber, required },
+          count: { strictPositiveNumber, required },
+        }),
+      },
+    };
+
     return {
-      newCreditNote: { ...creditNoteValidation, ...newCreditNoteDateValidation, ...newCreditNoteInclTaxesValidation },
+      newCreditNote: {
+        ...creditNoteValidation,
+        ...newCreditNoteDateValidation,
+        ...newCreditNoteInclTaxesValidation,
+        ...newCreditNoteBillingItemsValidation,
+      },
       editedCreditNote: {
         ...creditNoteValidation,
         ...editedCreditNoteDateValidation,
@@ -283,6 +292,7 @@ export default {
     },
   },
   methods: {
+    get,
     resetCustomerData () {
       this.creditNoteEvents = [];
       this.newCreditNote = {
@@ -571,12 +581,13 @@ export default {
     },
     async createNewCreditNote () {
       try {
-        this.v$.newCreditNote.$touch();
+        if (this.creditNoteType !== BILLING_ITEMS) this.newCreditNote.billingItemList = [];
 
-        if (this.v$.newCreditNote.$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        this.v$.newCreditNote.$touch();
+        if (this.v$.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
+
         await CreditNotes.create(this.formatPayload(this.newCreditNote));
 
         NotifyPositive('Avoir créé');
@@ -616,10 +627,9 @@ export default {
       if (this.creditNoteType === EVENTS) {
         await this.getEditionEvents();
         this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
-      } else {
+      } else if (this.creditNoteType === SUBSCRIPTION) {
         this.editedCreditNote.subscription = creditNote.subscription._id;
       }
-
       this.creditNoteEditionModal = true;
     },
     resetEditionCreditNoteData () {
@@ -635,9 +645,7 @@ export default {
     async updateCreditNote () {
       try {
         this.v$.editedCreditNote.$touch();
-        if (this.v$.editedCreditNote.$error || this.noEventSelectedForEditedCreditNote) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        if (this.v$.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await CreditNotes.updateById(this.editedCreditNote._id, this.formatEditionPayload());

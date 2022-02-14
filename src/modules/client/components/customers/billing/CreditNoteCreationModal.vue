@@ -57,11 +57,12 @@
         @update:model-value="update($event, 'subscription')" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
         :model-value="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
-        @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError"
+        @blur="validations.inclTaxesCustomer.$touch" error-message="Montant TTC non valide"
         @update:model-value="update($event, 'inclTaxesCustomer')" />
       <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" @update:model-value="update($event, 'inclTaxesTpp')"
         :model-value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error" type="number"
-        @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" caption="Montant TTC" suffix="€" />
+        @blur="validations.inclTaxesTpp.$touch" error-message="Montant TTC non valide" caption="Montant TTC"
+        suffix="€" />
     </template>
     <!-- Billing items -->
     <template v-else>
@@ -161,7 +162,6 @@ export default {
       SUBSCRIPTION,
       EVENTS,
       BILLING_ITEMS,
-      inclTaxesError: 'Montant TTC non valide',
       totalExclTaxes: 0,
       totalInclTaxes: 0,
     };
