@@ -37,10 +37,6 @@ export const planningEventMixin = {
     isCurrentDay (momentDay) {
       return moment(momentDay).isSame(new Date(), 'day');
     },
-    getEventHours (event) {
-      return `${moment(event.displayedStartDate).format('HH:mm')} - `
-        + `${moment(event.displayedEndDate).format('HH:mm')}`;
-    },
     getEventStartHour (event) {
       return `${moment(event.displayedStartDate).format('HH:mm')}`;
     },

@@ -29,7 +29,7 @@
                 :key="eventId" @click.stop="openEventInfoModal(event)"
                 class="event" :class="getEventClass(event)" data-cy="agenda-event">
                 <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
-                  <div class="col-12 event-title">
+                  <div class="col-12 event-title" :style="{ 'font-size': '12px' }">
                     <p data-cy="event-title" v-if="event.type === INTERVENTION"
                       class="no-margin overflow-hidden-nowrap">
                       {{ eventTitle(event) }}

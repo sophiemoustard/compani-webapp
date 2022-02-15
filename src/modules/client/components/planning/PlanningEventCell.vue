@@ -15,7 +15,7 @@
     :class="['row', inModal ? '': 'cursor-pointer', 'event',
     event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
     <div class="event-container">
-      <div class="event-title">
+      <div class="event-title" :style="{ 'font-size': '12px' }">
         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">
           {{ eventTitle(event) }}
         </p>
