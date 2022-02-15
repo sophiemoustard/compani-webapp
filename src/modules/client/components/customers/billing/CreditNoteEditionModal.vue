@@ -87,8 +87,8 @@
             </div>
           </div> -->
         </div>
-        <!-- <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
-          label-color="primary" /> -->
+        <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
+          label-color="primary" />
         <div class="row q-mb-md">
           <div class="col-6 total-text">Total HT : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</div>
           <div class="col-6 total-text">Total TTC : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</div>
@@ -102,6 +102,7 @@
 </template>
 
 <script>
+import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -138,8 +139,9 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
+    'ni-bi-color-button': BiColorButton,
   },
-  emits: ['hide', 'submit', 'get-events', 'update:edited-credit-note', 'update:model-value'],
+  emits: ['hide', 'submit', 'get-events', 'update:edited-credit-note', 'update:model-value', 'add-billing-item'],
   computed: {
     editedCreditNoteHasNoEvents () {
       return this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate &&
@@ -167,6 +169,9 @@ export default {
     },
     updateMisc () {
       this.$emit('update:edited-credit-note', { ...this.editedCreditNote, misc: this.tmpInput });
+    },
+    addBillingItem () {
+      this.$emit('add-billing-item');
     },
   },
 };

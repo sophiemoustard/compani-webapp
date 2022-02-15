@@ -42,7 +42,8 @@
       :credit-note-type="creditNoteType" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
       @get-events="getEditionEvents" :min-and-max-dates="editionMinAndMaxDates" :loading="loading"
       :end-date-error-message="setEndDateErrorMessage(this.v$.editedCreditNote, this.editedCreditNote.events)"
-      :start-date-error-message="setStartDateErrorMessage(this.v$.editedCreditNote)" />
+      :start-date-error-message="setStartDateErrorMessage(this.v$.editedCreditNote)" @add-billing-item="addBillingItem"
+      />
   </q-page>
 </template>
 
@@ -603,7 +604,9 @@ export default {
       }
     },
     addBillingItem () {
-      this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+      this.creditNoteCreationModal
+        ? this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 })
+        : this.editedCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
     },
     removeBillingItem (index) {
       this.newCreditNote.billingItemList.splice(index, 1);
