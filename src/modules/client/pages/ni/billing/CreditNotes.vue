@@ -297,6 +297,7 @@ export default {
       this.creditNoteEvents = [];
       this.newCreditNote = {
         ...this.newCreditNote,
+        thirdPartyPayer: '',
         events: [],
         subscription: null,
         startDate: '',
@@ -305,7 +306,6 @@ export default {
         inclTaxesCustomer: 0,
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
-        misc: '',
         billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
 

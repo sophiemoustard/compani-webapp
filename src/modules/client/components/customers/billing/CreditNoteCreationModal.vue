@@ -202,7 +202,6 @@ export default {
     },
     updateCreditNoteType (event) {
       this.$emit('update:credit-note-type', event);
-      this.tmpInput = '';
     },
     addBillingItem () {
       this.$emit('add-billing-item');
