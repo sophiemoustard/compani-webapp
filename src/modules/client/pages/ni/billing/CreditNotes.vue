@@ -9,8 +9,7 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
-                <ni-button icon="edit" :disable="!!props.row.customer.archivedAt ||
-                  !!get(props.row, 'billingItemList.length')"
+                <ni-button icon="edit" :disable="!!props.row.customer.archivedAt"
                   @click="openCreditNoteEditionModal(props.row)" />
                 <ni-button icon="delete" :disable="!props.row.isEditable || !!props.row.customer.archivedAt"
                   @click="validateCNDeletion(col.value, props.row)" />
@@ -626,7 +625,10 @@ export default {
       this.editedCreditNote.customer = creditNote.customer;
       if (creditNote.thirdPartyPayer) this.editedCreditNote.thirdPartyPayer = creditNote.thirdPartyPayer;
 
-      this.creditNoteType = (creditNote.events && creditNote.events.length > 0) ? EVENTS : SUBSCRIPTION;
+      if (creditNote.events && creditNote.events.length > 0) this.creditNoteType = EVENTS;
+      else if (creditNote.subscription) this.creditNoteType = SUBSCRIPTION;
+      else this.creditNoteType = BILLING_ITEMS;
+
       if (this.creditNoteType === EVENTS) {
         await this.getEditionEvents();
         this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);

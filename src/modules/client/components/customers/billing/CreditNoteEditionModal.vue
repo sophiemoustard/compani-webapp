@@ -49,7 +49,7 @@
         </div>
       </template>
       <!-- Subscription -->
-      <template v-else>
+      <template v-else-if="creditNoteType === SUBSCRIPTION">
         <ni-select in-modal caption="Souscription concernée" :model-value="editedCreditNote.subscription"
           :options="subscriptionsOptions" :disable="!editedCreditNote.customer" required-field
           :error="validations.subscription.$error" @blur="validations.subscription.$touch"
@@ -62,6 +62,37 @@
           :model-value="editedCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
           @blur="validations.inclTaxesTpp.$touch" error-message="Montant TTC non valide" type="number"
           @update:model-value="update($event, 'inclTaxesTpp')" />
+      </template>
+      <!-- Billing items -->
+      <template v-else>
+        <div v-for="(item, index) of editedCreditNote.billingItemList" :key="index">
+          {{ item }}
+          <!-- <div class="row">
+            <ni-select in-modal @update:model-value="updateBillingItem($event, index, 'billingItem')" required-field
+              :caption="`Article ${index + 1}`" :model-value="item.billingItem" :options="billingItemsOptions"
+              class="flex-1" @blur="validations.billingItemList.$touch" :error="getError('billingItem', index)" />
+            <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
+              :disable="editedCreditNote.billingItemList.length === 1" />
+          </div>
+          <div class="flex-row">
+            <div class="q-mr-sm">
+              <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
+                :model-value="item.unitInclTaxes" required-field type="number" :error="getError('unitInclTaxes', index)"
+                :error-message="getErrorMessage('unitInclTaxes', index)" @blur="validations.billingItemList.$touch" />
+              </div>
+            <div class="q-ml-sm">
+              <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
+                @update:model-value="updateBillingItem($event, index, 'count')" :error="getError('count', index)"
+              @blur="validations.billingItemList.$touch" :error-message="getErrorMessage('count', index)" />
+            </div>
+          </div> -->
+        </div>
+        <!-- <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
+          label-color="primary" /> -->
+        <div class="row q-mb-md">
+          <div class="col-6 total-text">Total HT : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</div>
+          <div class="col-6 total-text">Total TTC : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</div>
+        </div>
       </template>
       <template v-if="editedCreditNote.isEditable" #footer>
         <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
@@ -77,7 +108,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import { formatPrice, formatIdentity } from '@helpers/utils';
-import { REQUIRED_LABEL, EVENTS } from '@data/constants';
+import { REQUIRED_LABEL, EVENTS, SUBSCRIPTION } from '@data/constants';
 
 export default {
   name: 'CreditNoteEditionModal',
@@ -97,6 +128,7 @@ export default {
   data () {
     return {
       EVENTS,
+      SUBSCRIPTION,
       tmpInput: this.editedCreditNote.misc,
     };
   },
