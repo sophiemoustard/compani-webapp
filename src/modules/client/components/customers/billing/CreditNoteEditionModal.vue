@@ -10,6 +10,7 @@
       <ni-date-input caption="Date de l'avoir" :model-value="editedCreditNote.date" in-modal required-field
         :error="validations.date.$error" @blur="validations.date.$touch" :disable="!editedCreditNote.isEditable"
         @update:model-value="update($event, 'date')" />
+      <ni-input caption="Motif" in-modal v-model="tmpInput" @blur="updateMisc" type="textarea" />
       <!-- Events -->
       <template v-if="creditNoteType === EVENTS">
         <ni-date-input caption="Début période concernée" :model-value="editedCreditNote.startDate" in-modal
@@ -55,11 +56,11 @@
           @update:model-value="update($event, 'subscription')" />
         <ni-input in-modal v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
           :model-value="editedCreditNote.inclTaxesCustomer" :error="validations.inclTaxesCustomer.$error"
-          @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError" required-field
+          @blur="validations.inclTaxesCustomer.$touch" error-message="Montant TTC non valide" required-field
           @update:model-value="update($event, 'inclTaxesCustomer')" />
         <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€"
           :model-value="editedCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
-          @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" type="number"
+          @blur="validations.inclTaxesTpp.$touch" error-message="Montant TTC non valide" type="number"
           @update:model-value="update($event, 'inclTaxesTpp')" />
       </template>
       <template v-if="editedCreditNote.isEditable" #footer>
@@ -96,6 +97,7 @@ export default {
   data () {
     return {
       EVENTS,
+      tmpInput: this.editedCreditNote.misc,
     };
   },
   components: {
@@ -110,9 +112,6 @@ export default {
     editedCreditNoteHasNoEvents () {
       return this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate &&
         !this.creditNoteEvents.length;
-    },
-    inclTaxesError () {
-      return 'Montant TTC non valide';
     },
   },
   methods: {
@@ -133,6 +132,9 @@ export default {
     },
     update (event, prop) {
       this.$emit('update:edited-credit-note', { ...this.editedCreditNote, [prop]: event });
+    },
+    updateMisc () {
+      this.$emit('update:edited-credit-note', { ...this.editedCreditNote, misc: this.tmpInput });
     },
   },
 };
