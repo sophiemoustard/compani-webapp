@@ -66,8 +66,7 @@
       <!-- Billing items -->
       <template v-else>
         <div v-for="(item, index) of editedCreditNote.billingItemList" :key="index">
-          {{ item }}
-          <!-- <div class="row">
+          <div class="row">
             <ni-select in-modal @update:model-value="updateBillingItem($event, index, 'billingItem')" required-field
               :caption="`Article ${index + 1}`" :model-value="item.billingItem" :options="billingItemsOptions"
               class="flex-1" @blur="validations.billingItemList.$touch" :error="getError('billingItem', index)" />
@@ -85,7 +84,7 @@
                 @update:model-value="updateBillingItem($event, index, 'count')" :error="getError('count', index)"
               @blur="validations.billingItemList.$touch" :error-message="getErrorMessage('count', index)" />
             </div>
-          </div> -->
+          </div>
         </div>
         <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
           label-color="primary" />
@@ -102,6 +101,8 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
@@ -125,6 +126,7 @@ export default {
     startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     minAndMaxDates: { type: Object, default: () => ({}) },
+    billingItemsOptions: { type: Array, default: () => ([]) },
   },
   data () {
     return {
@@ -140,8 +142,18 @@ export default {
     'ni-input': Input,
     'ni-date-input': DateInput,
     'ni-bi-color-button': BiColorButton,
+    'ni-button': Button,
   },
-  emits: ['hide', 'submit', 'get-events', 'update:edited-credit-note', 'update:model-value', 'add-billing-item'],
+  emits: [
+    'hide',
+    'submit',
+    'get-events',
+    'update:edited-credit-note',
+    'update:model-value',
+    'add-billing-item',
+    'update-billing-item',
+    'remove-billing-item',
+  ],
   computed: {
     editedCreditNoteHasNoEvents () {
       return this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate &&
@@ -172,6 +184,25 @@ export default {
     },
     addBillingItem () {
       this.$emit('add-billing-item');
+    },
+    updateBillingItem (event, index, path) {
+      this.$emit('update-billing-item', event, index, path);
+    },
+    removeBillingItem (index) {
+      this.$emit('remove-billing-item', index);
+    },
+    getError (path, index) {
+      const validation = this.validations.billingItemList.$each.$response.$errors[index];
+
+      return this.validations.billingItemList.$dirty && get(validation, `${path}.0.$response`) === false;
+    },
+    getErrorMessage (path, index) {
+      const validation = this.validations.billingItemList.$each.$response.$errors[index];
+      if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
+      if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
+        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
+
+      return '';
     },
   },
 };

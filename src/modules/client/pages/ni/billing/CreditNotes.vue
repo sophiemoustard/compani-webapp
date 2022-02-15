@@ -43,7 +43,8 @@
       @get-events="getEditionEvents" :min-and-max-dates="editionMinAndMaxDates" :loading="loading"
       :end-date-error-message="setEndDateErrorMessage(this.v$.editedCreditNote, this.editedCreditNote.events)"
       :start-date-error-message="setStartDateErrorMessage(this.v$.editedCreditNote)" @add-billing-item="addBillingItem"
-      />
+      :billing-items-options="billingItemsOptions" @update-billing-item="updateBillingItem"
+      @remove-billing-item="removeBillingItem" />
   </q-page>
 </template>
 
@@ -204,6 +205,22 @@ export default {
         this.editedCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
       }
     },
+    'editedCreditNote.billingItemList': {
+      deep: true,
+      handler () {
+        if (get(this.editedCreditNote, 'billingItemList[0].billingItem')) {
+          this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList
+            .reduce(
+              (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+              0
+            );
+          this.editedCreditNote.inclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
+            0
+          );
+        }
+      },
+    },
   },
   async mounted () {
     this.tableLoading = true;
@@ -218,6 +235,14 @@ export default {
       subscription: { required: requiredIf(this.creditNoteType === SUBSCRIPTION) },
       inclTaxesTpp: {},
       inclTaxesCustomer: {},
+      billingItemList: {
+        required: requiredIf(this.creditNoteType === BILLING_ITEMS),
+        $each: helpers.forEach({
+          billingItem: { required },
+          unitInclTaxes: { positiveNumber, required },
+          count: { strictPositiveNumber, required },
+        }),
+      },
     };
     const newCreditNoteDateValidation = this.datesValidations(this.creationMinAndMaxDates, this.newCreditNote);
     const editedCreditNoteDateValidation = this.datesValidations(this.editionMinAndMaxDates, this.editedCreditNote);
@@ -229,23 +254,11 @@ export default {
       ? { inclTaxesTpp: inclTaxesValidation }
       : { inclTaxesCustomer: inclTaxesValidation };
 
-    const newCreditNoteBillingItemsValidation = {
-      billingItemList: {
-        required: requiredIf(this.creditNoteType === BILLING_ITEMS),
-        $each: helpers.forEach({
-          billingItem: { required },
-          unitInclTaxes: { positiveNumber, required },
-          count: { strictPositiveNumber, required },
-        }),
-      },
-    };
-
     return {
       newCreditNote: {
         ...creditNoteValidation,
         ...newCreditNoteDateValidation,
         ...newCreditNoteInclTaxesValidation,
-        ...newCreditNoteBillingItemsValidation,
       },
       editedCreditNote: {
         ...creditNoteValidation,
@@ -609,14 +622,25 @@ export default {
         : this.editedCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
     },
     removeBillingItem (index) {
-      this.newCreditNote.billingItemList.splice(index, 1);
+      this.creditNoteCreationModal
+        ? this.newCreditNote.billingItemList.splice(index, 1)
+        : this.editedCreditNote.billingItemList.splice(index, 1);
     },
     updateBillingItem (event, index, path) {
-      set(this.newCreditNote.billingItemList[index], path, event);
-      if (path === 'billingItem') {
-        const billingItem = this.billingItems.find(bi => bi._id === event);
-        set(this.newCreditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
-        set(this.newCreditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+      if (this.creditNoteCreationModal) {
+        set(this.newCreditNote.billingItemList[index], path, event);
+        if (path === 'billingItem') {
+          const billingItem = this.billingItems.find(bi => bi._id === event);
+          set(this.newCreditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
+          set(this.newCreditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+        }
+      } else {
+        set(this.editedCreditNote.billingItemList[index], path, event);
+        if (path === 'billingItem') {
+          const billingItem = this.billingItems.find(bi => bi._id === event);
+          set(this.editedCreditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
+          set(this.editedCreditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+        }
       }
     },
     getExclTaxes (inclTaxes, vat) {
