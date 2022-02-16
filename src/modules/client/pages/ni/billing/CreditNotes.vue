@@ -582,8 +582,8 @@ export default {
     async createNewCreditNote () {
       try {
         if (this.creditNoteType !== BILLING_ITEMS) this.newCreditNote.billingItemList = [];
-        const hasDuplicateBillingItems = this.newCreditNote.billingItemList.map(bi => bi.billingItem).length
-          === [...new Set(this.newCreditNote.billingItemList.map(bi => bi.billingItem))].length;
+        const billingItems = this.newCreditNote.billingItemList.map(bi => bi.billingItem);
+        const hasDuplicateBillingItems = billingItems.length !== [...new Set(billingItems)].length;
         if (hasDuplicateBillingItems) return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
 
         this.v$.newCreditNote.$touch();
