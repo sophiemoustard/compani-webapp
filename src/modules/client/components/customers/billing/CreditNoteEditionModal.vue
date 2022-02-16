@@ -69,20 +69,23 @@
           <div class="row">
             <ni-select in-modal @update:model-value="updateBillingItem($event, index, 'billingItem')" required-field
               :caption="`Article ${index + 1}`" :model-value="item.billingItem" :options="billingItemsOptions"
-              class="flex-1" @blur="validations.billingItemList.$touch" :error="getError('billingItem', index)" />
+              class="flex-1" @blur="validations.billingItemList.$touch"
+              :error="getBillingItemError('billingItem', index)" />
             <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
               :disable="editedCreditNote.billingItemList.length === 1" />
           </div>
           <div class="flex-row">
             <div class="q-mr-sm">
               <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
-                :model-value="item.unitInclTaxes" required-field type="number" :error="getError('unitInclTaxes', index)"
-                :error-message="getErrorMessage('unitInclTaxes', index)" @blur="validations.billingItemList.$touch" />
+                :model-value="item.unitInclTaxes" required-field type="number"
+                :error-message="getBillingItemErrorMessage('unitInclTaxes', index)"
+                :error="getBillingItemError('unitInclTaxes', index)" />
               </div>
             <div class="q-ml-sm">
               <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
-                @update:model-value="updateBillingItem($event, index, 'count')" :error="getError('count', index)"
-              @blur="validations.billingItemList.$touch" :error-message="getErrorMessage('count', index)" />
+                @update:model-value="updateBillingItem($event, index, 'count')"
+                :error="getBillingItemError('count', index)" @blur="validations.billingItemList.$touch"
+                :error-message="getBillingItemErrorMessage('count', index)" />
             </div>
           </div>
         </div>
@@ -183,20 +186,20 @@ export default {
       this.$emit('update:edited-credit-note', { ...this.editedCreditNote, misc: this.tmpInput });
     },
     addBillingItem () {
-      this.$emit('add-billing-item');
+      this.$emit('add-billing-item', this.editedCreditNote);
     },
     updateBillingItem (event, index, path) {
-      this.$emit('update-billing-item', event, index, path);
+      this.$emit('update-billing-item', this.editedCreditNote, event, index, path);
     },
     removeBillingItem (index) {
-      this.$emit('remove-billing-item', index);
+      this.$emit('remove-billing-item', this.editedCreditNote, index);
     },
-    getError (path, index) {
+    getBillingItemError (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
 
       return this.validations.billingItemList.$dirty && get(validation, `${path}.0.$response`) === false;
     },
-    getErrorMessage (path, index) {
+    getBillingItemErrorMessage (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
       if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
       if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||

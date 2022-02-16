@@ -207,13 +207,13 @@ export default {
       this.$emit('update:credit-note-type', event);
     },
     addBillingItem () {
-      this.$emit('add-billing-item');
+      this.$emit('add-billing-item', this.newCreditNote);
     },
     updateBillingItem (event, index, path) {
-      this.$emit('update-billing-item', event, index, path);
+      this.$emit('update-billing-item', this.newCreditNote, event, index, path);
     },
     removeBillingItem (index) {
-      this.$emit('remove-billing-item', index);
+      this.$emit('remove-billing-item', this.newCreditNote, index);
     },
     getBillingItemError (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];

@@ -184,11 +184,10 @@ export default {
       deep: true,
       handler () {
         if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
-          this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList
-            .reduce(
-              (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-              0
-            );
+          this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
+          );
           this.newCreditNote.inclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
             (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
             0
@@ -209,11 +208,10 @@ export default {
       deep: true,
       handler () {
         if (get(this.editedCreditNote, 'billingItemList[0].billingItem')) {
-          this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList
-            .reduce(
-              (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-              0
-            );
+          this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
+          );
           this.editedCreditNote.inclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
             (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
             0
@@ -237,10 +235,12 @@ export default {
       inclTaxesCustomer: {},
       billingItemList: {
         required: requiredIf(this.creditNoteType === BILLING_ITEMS),
-        $each: helpers.forEach({
-          billingItem: { required },
-          unitInclTaxes: { positiveNumber, required },
-          count: { strictPositiveNumber, required },
+        ...(this.creditNoteType === BILLING_ITEMS && {
+          $each: helpers.forEach({
+            billingItem: { required },
+            unitInclTaxes: { positiveNumber, required },
+            count: { strictPositiveNumber, required },
+          }),
         }),
       },
     };
@@ -616,31 +616,18 @@ export default {
         this.loading = false;
       }
     },
-    addBillingItem () {
-      this.creditNoteCreationModal
-        ? this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 })
-        : this.editedCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+    addBillingItem (creditNote) {
+      creditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
     },
-    removeBillingItem (index) {
-      this.creditNoteCreationModal
-        ? this.newCreditNote.billingItemList.splice(index, 1)
-        : this.editedCreditNote.billingItemList.splice(index, 1);
+    removeBillingItem (creditNote, index) {
+      creditNote.billingItemList.splice(index, 1);
     },
-    updateBillingItem (event, index, path) {
-      if (this.creditNoteCreationModal) {
-        set(this.newCreditNote.billingItemList[index], path, event);
-        if (path === 'billingItem') {
-          const billingItem = this.billingItems.find(bi => bi._id === event);
-          set(this.newCreditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
-          set(this.newCreditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
-        }
-      } else {
-        set(this.editedCreditNote.billingItemList[index], path, event);
-        if (path === 'billingItem') {
-          const billingItem = this.billingItems.find(bi => bi._id === event);
-          set(this.editedCreditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
-          set(this.editedCreditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
-        }
+    updateBillingItem (creditNote, event, index, path) {
+      set(creditNote.billingItemList[index], path, event);
+      if (path === 'billingItem') {
+        const billingItem = this.billingItems.find(bi => bi._id === event);
+        set(creditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
+        set(creditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
       }
     },
     getExclTaxes (inclTaxes, vat) {
@@ -672,9 +659,11 @@ export default {
       this.v$.editedCreditNote.$reset();
     },
     formatEditionPayload () {
-      this.editedCreditNote.billingItemList = this.editedCreditNote.billingItemList.map(bi => (
-        { billingItem: bi.billingItem, unitInclTaxes: bi.unitInclTaxes, count: bi.count }
-      ));
+      if (this.creditNoteType === BILLING_ITEMS) {
+        this.editedCreditNote.billingItemList = this.editedCreditNote.billingItemList.map(bi => (
+          { billingItem: bi.billingItem, unitInclTaxes: bi.unitInclTaxes, count: bi.count, vat: bi.vat }
+        ));
+      }
 
       return { ...omit(this.formatPayload(this.editedCreditNote), ['customer', 'thirdPartyPayer']) };
     },
@@ -684,6 +673,7 @@ export default {
         if (this.v$.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
+
         await CreditNotes.updateById(this.editedCreditNote._id, this.formatEditionPayload());
 
         NotifyPositive('Avoir modifié.');
