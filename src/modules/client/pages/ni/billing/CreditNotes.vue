@@ -672,6 +672,10 @@ export default {
       this.v$.editedCreditNote.$reset();
     },
     formatEditionPayload () {
+      this.editedCreditNote.billingItemList = this.editedCreditNote.billingItemList.map(bi => (
+        { billingItem: bi.billingItem, unitInclTaxes: bi.unitInclTaxes, count: bi.count }
+      ));
+
       return { ...omit(this.formatPayload(this.editedCreditNote), ['customer', 'thirdPartyPayer']) };
     },
     async updateCreditNote () {
