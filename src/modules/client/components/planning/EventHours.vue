@@ -1,24 +1,24 @@
 <template>
   <div :class="['icon-container', $q.screen.width < 767 ? 'flex-column' : 'flex-row']">
     <div class="hour-content">
-      <p class="q-pr-xs q-pb-none" data-cy="event-start-hour">{{ getEventStartHour(event) }}</p>
+      <p class="q-pr-xs q-mb-none" data-cy="event-start-hour">{{ startHour }}</p>
       <q-icon v-if="event.startDateTimeStamp" class="bold" name="check" />
     </div>
     <p v-if="!($q.screen.width < 767)" class="q-pr-xs q-pl-xs"> - </p>
-    <div class="hour-content ">
-      <p class="q-pr-xs q-pb-none" data-cy="event-end-hour">{{ getEventEndHour(event) }}</p>
+    <div class="hour-content">
+      <p class="q-pr-xs q-mb-none" data-cy="event-end-hour">{{ endHour }}</p>
       <q-icon v-if="event.endDateTimeStamp" class="bold" name="check" />
     </div>
   </div>
 </template>
 
 <script>
-import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
 
 export default {
   name: 'EventHours',
-  mixins: [planningEventMixin],
   props: {
+    startHour: { type: String, default: '' },
+    endHour: { type: String, default: '' },
     event: { type: Object, default: () => ({}) },
   },
 };

@@ -29,7 +29,7 @@
                 :key="eventId" @click.stop="openEventInfoModal(event)"
                 class="event" :class="getEventClass(event)" data-cy="agenda-event">
                 <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
-                  <div class="col-12 event-title" :style="{ 'font-size': '12px' }">
+                  <div class="col-12 event-title event-title-size">
                     <p data-cy="event-title" v-if="event.type === INTERVENTION"
                       class="no-margin overflow-hidden-nowrap">
                       {{ eventTitle(event) }}
@@ -47,7 +47,8 @@
                       {{ event.internalHour.name }}
                     </p>
                   </div>
-                  <ni-event-hours :event="event" />
+                  <ni-event-hours :event="event" :start-hour="getEventStartHour(event)"
+                    :end-hour="getEventEndHour(event)" />
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
                 <div v-if="isCustomerPlanning && event.inConflictEvents && event.inConflictEvents.length > 1"
@@ -195,7 +196,8 @@ export default {
         line-height: 1
         color: $primary
         font-size: 14px
-
+.event-title-size
+  font-size: 12px
 thead
   vertical-align: baseline
 </style>

@@ -15,7 +15,7 @@
     :class="['row', inModal ? '': 'cursor-pointer', 'event',
     event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
     <div class="event-container">
-      <div class="event-title" :style="{ 'font-size': '12px' }">
+      <div class="event-title event-title-size">
         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">
           {{ eventTitle(event) }}
         </p>
@@ -30,7 +30,7 @@
           {{ event.internalHour.name }}
         </p>
       </div>
-      <ni-event-hours :event="event" />
+      <ni-event-hours :event="event" :start-hour="getEventStartHour(event)" :end-hour="getEventEndHour(event)" />
       <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
     </div>
   </div>
@@ -115,4 +115,7 @@ export default {
     margin: 0
     border: 1px solid white
     font-size: 0.5rem
+
+.event-title-size
+  font-size: 12px
 </style>

@@ -52,16 +52,14 @@ export const planningEventMixin = {
       return !customerAbsence ? '' : customerAbsence.label;
     },
     eventTitle (event) {
-      if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
+      const customerIdentity = event.customer.identity;
+      const shortenCustomerFirstName = `${customerIdentity.firstname.substring(0, 3)}. `;
 
-      const shortenIdentity = {
-        ...event.customer.identity,
-        firstname: (event.customer.identity.firstname).substring(0, 3).concat('.'),
-      };
+      if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
       return this.isCustomerPlanning
         ? formatIdentity(event.auxiliary.identity, 'Fl')
-        : formatIdentity(shortenIdentity, 'FL');
+        : formatIdentity({ ...customerIdentity, firstname: shortenCustomerFirstName }, 'FL');
     },
     getDisplayedEvent (event, day, startDisplay, endDisplay) {
       const dayEvent = { ...event };
