@@ -8,9 +8,9 @@
     <ni-select in-modal caption="Bénéficiaire" :model-value="newCreditNote.customer" :options="customersOptions"
       required-field @update:model-value="updateCustomer" @blur="validations.customer.$touch"
       :error="validations.customer.$error" />
-    <ni-select caption="Tiers payeur" @update:model-value="getEvents($event, 'thirdPartyPayer')"
+    <ni-select v-if="creditNoteType !== BILLING_ITEMS" caption="Tiers payeur" :options="thirdPartyPayerOptions"
       in-modal :disable="thirdPartyPayerOptions.length === 0" :model-value="newCreditNote.thirdPartyPayer"
-      :options="thirdPartyPayerOptions" />
+      @update:model-value="getEvents($event, 'thirdPartyPayer')" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
     <ni-input caption="Motif" in-modal v-model="tmpInput" @blur="updateMisc" type="textarea" />
@@ -50,18 +50,52 @@
       </div>
     </template>
     <!-- Subscription -->
-    <template v-else>
+    <template v-else-if="creditNoteType === SUBSCRIPTION">
       <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions" required-field
         :model-value="newCreditNote.subscription" :disable="!newCreditNote.customer"
         :error="validations.subscription.$error" @blur="validations.subscription.$touch"
         @update:model-value="update($event, 'subscription')" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
         :model-value="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
-        @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError"
+        @blur="validations.inclTaxesCustomer.$touch" error-message="Montant TTC non valide"
         @update:model-value="update($event, 'inclTaxesCustomer')" />
       <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" @update:model-value="update($event, 'inclTaxesTpp')"
         :model-value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error" type="number"
-        @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" caption="Montant TTC" suffix="€" />
+        @blur="validations.inclTaxesTpp.$touch" error-message="Montant TTC non valide" caption="Montant TTC"
+        suffix="€" />
+    </template>
+    <!-- Billing items -->
+    <template v-else>
+      <div v-for="(item, index) of newCreditNote.billingItemList" :key="index">
+        <div class="row">
+          <ni-select in-modal @update:model-value="updateBillingItem($event, index, 'billingItem')" required-field
+            :caption="`Article ${index + 1}`" :model-value="item.billingItem" :options="billingItemsOptions"
+            class="flex-1" @blur="validations.billingItemList.$touch"
+            :error="getBillingItemError('billingItem', index)" />
+          <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
+            :disable="newCreditNote.billingItemList.length === 1" />
+        </div>
+        <div class="flex-row">
+          <div class="q-mr-sm">
+            <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
+              :model-value="item.unitInclTaxes" required-field type="number"
+              :error-message="getBillingItemErrorMessage('unitInclTaxes', index)"
+              :error="getBillingItemError('unitInclTaxes', index)" @blur="validations.billingItemList.$touch" />
+            </div>
+          <div class="q-ml-sm">
+            <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
+              @update:model-value="updateBillingItem($event, index, 'count')"
+              @blur="validations.billingItemList.$touch" :error-message="getBillingItemErrorMessage('count', index)"
+              :error="getBillingItemError('count', index)" />
+          </div>
+        </div>
+      </div>
+      <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
+        label-color="primary" />
+      <div class="row q-mb-md">
+        <div class="col-6 total-text">Total HT : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</div>
+        <div class="col-6 total-text">Total TTC : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</div>
+      </div>
     </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
@@ -71,13 +105,16 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import BiColorButton from '@components/BiColorButton';
+import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import ButtonToggle from '@components/ButtonToggle';
-import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS } from '@data/constants';
+import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS, BILLING_ITEMS } from '@data/constants';
 import { formatPrice, formatIdentity } from '@helpers/utils';
 
 export default {
@@ -96,6 +133,7 @@ export default {
     startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     minAndMaxDates: { type: Object, default: () => ({}) },
+    billingItemsOptions: { type: Array, default: () => ([]) },
   },
   components: {
     'ni-option-group': OptionGroup,
@@ -104,6 +142,8 @@ export default {
     'ni-input': Input,
     'ni-date-input': DateInput,
     'ni-btn-toggle': ButtonToggle,
+    'ni-bi-color-button': BiColorButton,
+    'ni-button': Button,
   },
   emits: [
     'hide',
@@ -114,6 +154,9 @@ export default {
     'update:new-credit-note',
     'reset-customer-data',
     'update:credit-note-type',
+    'add-billing-item',
+    'update-billing-item',
+    'remove-billing-item',
   ],
   data () {
     return {
@@ -121,15 +164,15 @@ export default {
       CREDIT_NOTE_TYPE_OPTIONS,
       SUBSCRIPTION,
       EVENTS,
+      BILLING_ITEMS,
+      totalExclTaxes: 0,
+      totalInclTaxes: 0,
     };
   },
   computed: {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate &&
         !this.creditNoteEvents.length;
-    },
-    inclTaxesError () {
-      return 'Montant TTC non valide';
     },
   },
   methods: {
@@ -162,7 +205,28 @@ export default {
     },
     updateCreditNoteType (event) {
       this.$emit('update:credit-note-type', event);
-      this.tmpInput = '';
+    },
+    addBillingItem () {
+      this.$emit('add-billing-item');
+    },
+    updateBillingItem (event, index, path) {
+      this.$emit('update-billing-item', event, index, path);
+    },
+    removeBillingItem (index) {
+      this.$emit('remove-billing-item', index);
+    },
+    getBillingItemError (path, index) {
+      const validation = this.validations.billingItemList.$each.$response.$errors[index];
+
+      return this.validations.billingItemList.$dirty && get(validation, `${path}.0.$response`) === false;
+    },
+    getBillingItemErrorMessage (path, index) {
+      const validation = this.validations.billingItemList.$each.$response.$errors[index];
+      if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
+      if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
+        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
+
+      return '';
     },
   },
 };
