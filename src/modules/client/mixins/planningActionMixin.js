@@ -342,6 +342,8 @@ export const planningActionMixin = {
         'displayedEndDate',
         'extension',
         'histories',
+        'startDateTimeStamp',
+        'endDateTimeStamp',
       ];
 
       if (event.cancel && Object.keys(event.cancel).length === 0) fieldsToOmit.push('cancel');
@@ -423,7 +425,7 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
-        await Events.updateById(this.editedEvent._id, omit(payload, ['startDateTimeStamp', 'endDateTimeStamp']));
+        await Events.updateById(this.editedEvent._id, payload);
 
         await this.refresh();
         this.editionModal = false;
@@ -483,7 +485,7 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible : l\'évènement est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        await Events.updateById(draggedObject._id, omit(payload, ['startDateTimeStamp', 'endDateTimeStamp']));
+        await Events.updateById(draggedObject._id, payload);
         await this.refresh();
 
         NotifyPositive('Évènement modifié.');

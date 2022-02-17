@@ -15,8 +15,9 @@
     :class="['row', inModal ? '': 'cursor-pointer', 'event',
     event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
     <div class="event-container">
-      <div class="event-title event-title-size">
-        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">
+      <div class="event-title">
+        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap event-title"
+          data-cy="event-title">
           {{ eventTitle(event) }}
         </p>
         <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
@@ -116,6 +117,7 @@ export default {
     border: 1px solid white
     font-size: 0.5rem
 
-.event-title-size
+.event-title
   font-size: 12px
+
 </style>

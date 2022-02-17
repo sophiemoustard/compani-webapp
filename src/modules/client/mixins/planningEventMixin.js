@@ -54,12 +54,13 @@ export const planningEventMixin = {
     eventTitle (event) {
       const customerIdentity = event.customer.identity;
       const shortenCustomerFirstName = `${customerIdentity.firstname.substring(0, 3)}. `;
+      const formatCustomerIdentity = () => (
+        formatIdentity({ ...customerIdentity, firstname: shortenCustomerFirstName }, 'FL').replace(' ', '')
+      );
 
       if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
-      return this.isCustomerPlanning
-        ? formatIdentity(event.auxiliary.identity, 'Fl')
-        : formatIdentity({ ...customerIdentity, firstname: shortenCustomerFirstName }, 'FL');
+      return this.isCustomerPlanning ? formatIdentity(event.auxiliary.identity, 'Fl') : formatCustomerIdentity();
     },
     getDisplayedEvent (event, day, startDisplay, endDisplay) {
       const dayEvent = { ...event };
