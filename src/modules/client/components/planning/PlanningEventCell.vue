@@ -16,7 +16,8 @@
     event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
     <div class="event-container">
       <div class="event-title">
-        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">
+        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap event-title"
+          data-cy="event-title">
           {{ eventTitle(event) }}
         </p>
         <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
@@ -30,7 +31,7 @@
           {{ event.internalHour.name }}
         </p>
       </div>
-      <p class="no-margin event-subtitle overflow-hidden-nowrap" data-cy="event-hours">{{ getEventHours(event) }}</p>
+      <ni-event-hours :event="event" :start-hour="getEventStartHour(event)" :end-hour="getEventEndHour(event)" />
       <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
     </div>
   </div>
@@ -49,6 +50,7 @@ import {
   CUSTOMER_ABSENCE,
 } from '@data/constants';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
+import NiEventHours from './EventHours';
 
 export default {
   name: 'PlanningEvent',
@@ -61,6 +63,9 @@ export default {
     inModal: { type: Boolean, default: false },
   },
   emits: ['drag', 'click'],
+  components: {
+    'ni-event-hours': NiEventHours,
+  },
   data () {
     return {
       STAFFING_PERCENTAGE_BY_MINUTES,
@@ -111,4 +116,8 @@ export default {
     margin: 0
     border: 1px solid white
     font-size: 0.5rem
+
+.event-title
+  font-size: 12px
+
 </style>

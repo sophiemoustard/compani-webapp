@@ -342,6 +342,8 @@ export const planningActionMixin = {
         'displayedEndDate',
         'extension',
         'histories',
+        'startDateTimeStamp',
+        'endDateTimeStamp',
       ];
 
       if (event.cancel && Object.keys(event.cancel).length === 0) fieldsToOmit.push('cancel');
