@@ -13,7 +13,8 @@
       @update:model-value="getEvents($event, 'thirdPartyPayer')" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
-    <ni-input caption="Motif" in-modal v-model="tmpInput" @blur="updateMisc" type="textarea" />
+    <ni-input caption="Motif" in-modal :model-value="newCreditNote.misc" type="textarea" :debounce="500"
+      @update:model-value="update($event, 'misc')" />
     <!-- Event -->
     <template v-if="creditNoteType === EVENTS">
       <ni-date-input @blur="validations.startDate.$touch" :max="minAndMaxDates.maxStartDate" in-modal
@@ -75,19 +76,14 @@
           <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
             :disable="newCreditNote.billingItemList.length === 1" />
         </div>
-        <div class="flex-row">
-          <div class="q-mr-sm">
-            <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
-              :model-value="item.unitInclTaxes" required-field type="number"
-              :error-message="getBillingItemErrorMessage('unitInclTaxes', index)"
-              :error="getBillingItemError('unitInclTaxes', index)" @blur="validations.billingItemList.$touch" />
-            </div>
-          <div class="q-ml-sm">
-            <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
-              @update:model-value="updateBillingItem($event, index, 'count')"
-              @blur="validations.billingItemList.$touch" :error-message="getBillingItemErrorMessage('count', index)"
-              :error="getBillingItemError('count', index)" />
-          </div>
+        <div :class="['row', !$q.platform.is.mobile && 'gutter-profile']">
+          <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
+            :model-value="item.unitInclTaxes" required-field type="number" @blur="validations.billingItemList.$touch"
+            :error-message="getBillingItemErrorMessage('unitInclTaxes', index)"
+            :error="getBillingItemError('unitInclTaxes', index)" />
+          <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
+            @update:model-value="updateBillingItem($event, index, 'count')" @blur="validations.billingItemList.$touch"
+            :error-message="getBillingItemErrorMessage('count', index)" :error="getBillingItemError('count', index)" />
         </div>
       </div>
       <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
@@ -160,7 +156,6 @@ export default {
   ],
   data () {
     return {
-      tmpInput: '',
       CREDIT_NOTE_TYPE_OPTIONS,
       SUBSCRIPTION,
       EVENTS,
@@ -180,7 +175,6 @@ export default {
     formatIdentity,
     hide () {
       this.$emit('hide');
-      this.tmpInput = '';
     },
     input (event) {
       this.$emit('update:model-value', event);
@@ -199,9 +193,6 @@ export default {
       this.update(event, 'customer');
       this.$emit('reset-customer-data');
       this.$emit('get-events', 'customer');
-    },
-    updateMisc () {
-      this.$emit('update:new-credit-note', { ...this.newCreditNote, misc: this.tmpInput });
     },
     updateCreditNoteType (event) {
       this.$emit('update:credit-note-type', event);
