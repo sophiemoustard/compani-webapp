@@ -592,7 +592,8 @@ export default {
 
       return pickBy(payload);
     },
-    hasDuplicateBillingItems (creditNote) {
+    hasDuplicatedBillingItems (creditNote) {
+      if (this.creditNoteType !== BILLING_ITEMS) return false;
       const billingItems = creditNote.billingItemList.map(bi => bi.billingItem);
 
       return billingItems.length !== [...new Set(billingItems)].length;
@@ -601,7 +602,7 @@ export default {
       try {
         if (this.creditNoteType !== BILLING_ITEMS) this.newCreditNote.billingItemList = [];
 
-        if (this.hasDuplicateBillingItems(this.newCreditNote)) {
+        if (this.hasDuplicatedBillingItems(this.newCreditNote)) {
           return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
         }
 
@@ -622,13 +623,16 @@ export default {
         this.loading = false;
       }
     },
-    addBillingItem (creditNote) {
+    addBillingItem () {
+      const creditNote = this.creditNoteCreationModal ? this.newCreditNote : this.editedCreditNote;
       creditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
     },
-    removeBillingItem (creditNote, index) {
+    removeBillingItem (index) {
+      const creditNote = this.creditNoteCreationModal ? this.newCreditNote : this.editedCreditNote;
       creditNote.billingItemList.splice(index, 1);
     },
-    updateBillingItem (creditNote, event, index, path) {
+    updateBillingItem (event, index, path) {
+      const creditNote = this.creditNoteCreationModal ? this.newCreditNote : this.editedCreditNote;
       set(creditNote.billingItemList[index], path, event);
       if (path === 'billingItem') {
         const billingItem = this.billingItems.find(bi => bi._id === event);
@@ -666,16 +670,15 @@ export default {
     },
     formatEditionPayload () {
       if (this.creditNoteType === BILLING_ITEMS) {
-        this.editedCreditNote.billingItemList = this.editedCreditNote.billingItemList.map(bi => (
-          { billingItem: bi.billingItem, unitInclTaxes: bi.unitInclTaxes, count: bi.count, vat: bi.vat }
-        ));
+        this.editedCreditNote.billingItemList = this.editedCreditNote.billingItemList
+          .map(bi => pick(bi, ['billingItem', 'unitInclTaxes', 'count', 'vat']));
       }
 
       return { ...omit(this.formatPayload(this.editedCreditNote), ['customer', 'thirdPartyPayer']) };
     },
     async updateCreditNote () {
       try {
-        if (this.hasDuplicateBillingItems(this.editedCreditNote)) {
+        if (this.hasDuplicatedBillingItems(this.editedCreditNote)) {
           return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
         }
 

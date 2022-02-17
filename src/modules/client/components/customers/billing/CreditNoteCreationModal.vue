@@ -78,14 +78,14 @@
         <div class="flex-row">
           <div class="q-mr-sm">
             <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
-              :model-value="item.unitInclTaxes" required-field type="number"
+              :model-value="item.unitInclTaxes" required-field type="number" @blur="validations.billingItemList.$touch"
               :error-message="getBillingItemErrorMessage('unitInclTaxes', index)"
-              :error="getBillingItemError('unitInclTaxes', index)" @blur="validations.billingItemList.$touch" />
+              :error="getBillingItemError('unitInclTaxes', index)" />
             </div>
           <div class="q-ml-sm">
             <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
-              @update:model-value="updateBillingItem($event, index, 'count')"
-              @blur="validations.billingItemList.$touch" :error-message="getBillingItemErrorMessage('count', index)"
+              @update:model-value="updateBillingItem($event, index, 'count')" @blur="validations.billingItemList.$touch"
+              :error-message="getBillingItemErrorMessage('count', index)"
               :error="getBillingItemError('count', index)" />
           </div>
         </div>
@@ -207,13 +207,13 @@ export default {
       this.$emit('update:credit-note-type', event);
     },
     addBillingItem () {
-      this.$emit('add-billing-item', this.newCreditNote);
+      this.$emit('add-billing-item');
     },
     updateBillingItem (event, index, path) {
-      this.$emit('update-billing-item', this.newCreditNote, event, index, path);
+      this.$emit('update-billing-item', event, index, path);
     },
     removeBillingItem (index) {
-      this.$emit('remove-billing-item', this.newCreditNote, index);
+      this.$emit('remove-billing-item', index);
     },
     getBillingItemError (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];

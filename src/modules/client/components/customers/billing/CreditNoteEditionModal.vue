@@ -186,13 +186,13 @@ export default {
       this.$emit('update:edited-credit-note', { ...this.editedCreditNote, misc: this.tmpInput });
     },
     addBillingItem () {
-      this.$emit('add-billing-item', this.editedCreditNote);
+      this.$emit('add-billing-item');
     },
     updateBillingItem (event, index, path) {
-      this.$emit('update-billing-item', this.editedCreditNote, event, index, path);
+      this.$emit('update-billing-item', event, index, path);
     },
     removeBillingItem (index) {
-      this.$emit('remove-billing-item', this.editedCreditNote, index);
+      this.$emit('remove-billing-item', index);
     },
     getBillingItemError (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
