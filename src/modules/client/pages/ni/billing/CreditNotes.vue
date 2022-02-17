@@ -592,12 +592,18 @@ export default {
 
       return pickBy(payload);
     },
+    hasDuplicateBillingItems (creditNote) {
+      const billingItems = creditNote.billingItemList.map(bi => bi.billingItem);
+
+      return billingItems.length !== [...new Set(billingItems)].length;
+    },
     async createNewCreditNote () {
       try {
         if (this.creditNoteType !== BILLING_ITEMS) this.newCreditNote.billingItemList = [];
-        const billingItems = this.newCreditNote.billingItemList.map(bi => bi.billingItem);
-        const hasDuplicateBillingItems = billingItems.length !== [...new Set(billingItems)].length;
-        if (hasDuplicateBillingItems) return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
+
+        if (this.hasDuplicateBillingItems(this.newCreditNote)) {
+          return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
+        }
 
         this.v$.newCreditNote.$touch();
         if (this.v$.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -639,7 +645,7 @@ export default {
       this.editedCreditNote.customer = creditNote.customer;
       if (creditNote.thirdPartyPayer) this.editedCreditNote.thirdPartyPayer = creditNote.thirdPartyPayer;
 
-      if (creditNote.events && creditNote.events.length > 0) this.creditNoteType = EVENTS;
+      if (get(creditNote, 'events.length')) this.creditNoteType = EVENTS;
       else if (creditNote.subscription) this.creditNoteType = SUBSCRIPTION;
       else this.creditNoteType = BILLING_ITEMS;
 
@@ -669,6 +675,10 @@ export default {
     },
     async updateCreditNote () {
       try {
+        if (this.hasDuplicateBillingItems(this.editedCreditNote)) {
+          return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
+        }
+
         this.v$.editedCreditNote.$touch();
         if (this.v$.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
