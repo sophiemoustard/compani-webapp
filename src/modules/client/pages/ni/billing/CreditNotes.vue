@@ -624,21 +624,30 @@ export default {
       }
     },
     addBillingItem () {
-      const creditNote = this.creditNoteCreationModal ? this.newCreditNote : this.editedCreditNote;
-      creditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+      if (this.creditNoteCreationModal) {
+        this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+      } else if (this.creditNoteEditionModal) {
+        this.editedCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+      }
     },
     removeBillingItem (index) {
-      const creditNote = this.creditNoteCreationModal ? this.newCreditNote : this.editedCreditNote;
-      creditNote.billingItemList.splice(index, 1);
+      if (this.creditNoteCreationModal) this.newCreditNote.billingItemList.splice(index, 1);
+      else if (this.creditNoteEditionModal) this.editedCreditNote.billingItemList.splice(index, 1);
     },
     updateBillingItem (event, index, path) {
-      const creditNote = this.creditNoteCreationModal ? this.newCreditNote : this.editedCreditNote;
-      set(creditNote.billingItemList[index], path, event);
+      const billingItemList = this.creditNoteCreationModal
+        ? [...this.newCreditNote.billingItemList]
+        : [...this.editedCreditNote.billingItemList];
+
+      set(billingItemList[index], path, event);
       if (path === 'billingItem') {
         const billingItem = this.billingItems.find(bi => bi._id === event);
-        set(creditNote.billingItemList[index], 'vat', billingItem?.vat || 0);
-        set(creditNote.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+        set(billingItemList[index], 'vat', billingItem?.vat || 0);
+        set(billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
       }
+
+      if (this.creditNoteCreationModal) set(this.newCreditNote.billingItemList, billingItemList);
+      else if (this.creditNoteEditionModal) set(this.editedCreditNote.billingItemList, billingItemList);
     },
     getExclTaxes (inclTaxes, vat) {
       return inclTaxes / (1 + vat / 100);
