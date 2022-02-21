@@ -118,15 +118,15 @@
         <p class="text-weight-bold">Mandats de prélèvement</p>
       </div>
       <q-card>
-        <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates"
-          class="mandate-table" :loading="mandatesLoading" v-model:pagination="pagination">
+        <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" class="mandate-table"
+          :loading="mandatesLoading" v-model:pagination="pagination">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'emptyMandate'">
-                  <ni-button v-if="customer.payment.mandates && getRowIndex(customer.payment.mandates, props.row) == 0"
-                    @click="downloadMandate(props.row)" icon="file_download" />
+                  <ni-button v-if="isLastCreatedMandate(props.row)" @click="downloadMandate(props.row)"
+                    icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
                   <div v-if="!getDriveId(props.row)" class="row justify-center table-actions">
@@ -138,10 +138,9 @@
                     :disable="docLoading || !getDriveId(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
-                  <ni-date-input
+                  <ni-date-input @blur="updateSignedAt(props.row)" in-modal
                     v-model="customer.payment.mandates[getRowIndex(customer.payment.mandates, props.row)].signedAt"
-                    @blur="updateSignedAt(props.row)"
-                    @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" in-modal />
+                    @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
                   <div :class="[{ 'dot dot-active': col.value, 'dot dot-error': !col.value }]" />
@@ -303,7 +302,7 @@ import {
   ONCE,
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
-import { formatDate } from '@helpers/date';
+import { formatDate, isSameOrBefore } from '@helpers/date';
 import { getLastVersion } from '@helpers/utils';
 import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -1012,6 +1011,9 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    isLastCreatedMandate (mandate) {
+      return this.customer.payment.mandates.every(m => isSameOrBefore(m.createdAt, mandate.createdAt));
     },
   },
 };

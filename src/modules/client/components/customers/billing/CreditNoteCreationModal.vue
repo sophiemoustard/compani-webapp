@@ -3,28 +3,26 @@
     <template #title>
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
+    <ni-btn-toggle :model-value="creditNoteType" :options="CREDIT_NOTE_TYPE_OPTIONS"
+      @update:model-value="updateCreditNoteType" />
     <ni-select in-modal caption="Bénéficiaire" :model-value="newCreditNote.customer" :options="customersOptions"
       required-field @update:model-value="updateCustomer" @blur="validations.customer.$touch"
       :error="validations.customer.$error" />
-    <ni-select caption="Tiers payeur" @update:model-value="getEvents($event, 'thirdPartyPayer')"
+    <ni-select v-if="creditNoteType !== BILLING_ITEMS" caption="Tiers payeur" :options="thirdPartyPayerOptions"
       in-modal :disable="thirdPartyPayerOptions.length === 0" :model-value="newCreditNote.thirdPartyPayer"
-      :options="thirdPartyPayerOptions" />
+      @update:model-value="getEvents($event, 'thirdPartyPayer')" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
-    <div class="row q-mb-md light">
-      <q-toggle :model-value="hasLinkedEvents" @update:model-value="updateHasLinkedEvents"
-        label="Lié à des interventions ?" />
-    </div>
-    <!-- Has linked events -->
-    <template v-if="hasLinkedEvents">
-      <ni-date-input @blur="validations.startDate.$touch" :max="minAndMaxDates.maxStartDate" :disable="!hasLinkedEvents"
+    <ni-input caption="Motif" in-modal :model-value="newCreditNote.misc" type="textarea" :debounce="500"
+      @update:model-value="update($event, 'misc')" />
+    <!-- Event -->
+    <template v-if="creditNoteType === EVENTS">
+      <ni-date-input @blur="validations.startDate.$touch" :max="minAndMaxDates.maxStartDate" in-modal
         :error="validations.startDate.$error" caption="Début période concernée" :model-value="newCreditNote.startDate"
-        @update:model-value="getEvents($event, 'startDate')" :error-message="startDateErrorMessage" required-field
-        in-modal />
+        @update:model-value="getEvents($event, 'startDate')" :error-message="startDateErrorMessage" required-field />
       <ni-date-input caption="Fin période concernée" :model-value="newCreditNote.endDate" required-field in-modal
-        :error="validations.endDate.$error" @blur="validations.endDate.$touch"
-        @update:model-value="getEvents($event, 'endDate')"
-        :disable="!hasLinkedEvents" :error-message="endDateErrorMessage" :min="minAndMaxDates.minEndDate" />
+        :error="validations.endDate.$error" @blur="validations.endDate.$touch" :min="minAndMaxDates.minEndDate"
+        @update:model-value="getEvents($event, 'endDate')" :error-message="endDateErrorMessage" />
       <template v-if="creditNoteEvents.length > 0">
         <ni-option-group :model-value="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error"
@@ -52,19 +50,48 @@
         </div>
       </div>
     </template>
-    <!-- Hasn't linked event -->
-    <template v-else>
+    <!-- Subscription -->
+    <template v-else-if="creditNoteType === SUBSCRIPTION">
       <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions" required-field
-        :model-value="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer"
+        :model-value="newCreditNote.subscription" :disable="!newCreditNote.customer"
         :error="validations.subscription.$error" @blur="validations.subscription.$touch"
         @update:model-value="update($event, 'subscription')" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
         :model-value="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
-        @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError"
+        @blur="validations.inclTaxesCustomer.$touch" error-message="Montant TTC non valide"
         @update:model-value="update($event, 'inclTaxesCustomer')" />
       <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" @update:model-value="update($event, 'inclTaxesTpp')"
         :model-value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error" type="number"
-        @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" caption="Montant TTC" suffix="€" />
+        @blur="validations.inclTaxesTpp.$touch" error-message="Montant TTC non valide" caption="Montant TTC"
+        suffix="€" />
+    </template>
+    <!-- Billing items -->
+    <template v-else>
+      <div v-for="(item, index) of newCreditNote.billingItemList" :key="index">
+        <div class="row">
+          <ni-select in-modal @update:model-value="updateBillingItem($event, index, 'billingItem')" required-field
+            :caption="`Article ${index + 1}`" :model-value="item.billingItem" :options="billingItemsOptions"
+            class="flex-1" @blur="validations.billingItemList.$touch"
+            :error="getBillingItemError('billingItem', index)" />
+          <ni-button icon="close" size="12px" @click="removeBillingItem(index)"
+            :disable="newCreditNote.billingItemList.length === 1" />
+        </div>
+        <div :class="['row', !$q.platform.is.mobile && 'gutter-profile']">
+          <ni-input caption="PU TTC" @update:model-value="updateBillingItem($event, index, 'unitInclTaxes')"
+            :model-value="item.unitInclTaxes" required-field type="number" @blur="validations.billingItemList.$touch"
+            :error-message="getBillingItemErrorMessage('unitInclTaxes', index)"
+            :error="getBillingItemError('unitInclTaxes', index)" />
+          <ni-input caption="Quantité" :model-value="item.count" type="number" required-field
+            @update:model-value="updateBillingItem($event, index, 'count')" @blur="validations.billingItemList.$touch"
+            :error-message="getBillingItemErrorMessage('count', index)" :error="getBillingItemError('count', index)" />
+        </div>
+      </div>
+      <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
+        label-color="primary" />
+      <div class="row q-mb-md">
+        <div class="col-6 total-text">Total HT : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</div>
+        <div class="col-6 total-text">Total TTC : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</div>
+      </div>
     </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
@@ -74,20 +101,24 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import BiColorButton from '@components/BiColorButton';
+import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
+import ButtonToggle from '@components/ButtonToggle';
+import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS, BILLING_ITEMS } from '@data/constants';
 import { formatPrice, formatIdentity } from '@helpers/utils';
-import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'CreditNoteCreationModal',
   props: {
     modelValue: { type: Boolean, default: false },
     newCreditNote: { type: Object, default: () => ({}) },
-    hasLinkedEvents: { type: Boolean, default: false },
+    creditNoteType: { type: String, default: '' },
     thirdPartyPayerOptions: { type: Array, default: () => [] },
     customersOptions: { type: Array, default: () => [] },
     subscriptionsOptions: { type: Array, default: () => [] },
@@ -98,6 +129,7 @@ export default {
     startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
     minAndMaxDates: { type: Object, default: () => ({}) },
+    billingItemsOptions: { type: Array, default: () => ([]) },
   },
   components: {
     'ni-option-group': OptionGroup,
@@ -105,6 +137,9 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
+    'ni-btn-toggle': ButtonToggle,
+    'ni-bi-color-button': BiColorButton,
+    'ni-button': Button,
   },
   emits: [
     'hide',
@@ -114,14 +149,25 @@ export default {
     'update:has-linked-events',
     'update:new-credit-note',
     'reset-customer-data',
+    'update:credit-note-type',
+    'add-billing-item',
+    'update-billing-item',
+    'remove-billing-item',
   ],
+  data () {
+    return {
+      CREDIT_NOTE_TYPE_OPTIONS,
+      SUBSCRIPTION,
+      EVENTS,
+      BILLING_ITEMS,
+      totalExclTaxes: 0,
+      totalInclTaxes: 0,
+    };
+  },
   computed: {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate &&
         !this.creditNoteEvents.length;
-    },
-    inclTaxesError () {
-      return 'Montant TTC non valide';
     },
   },
   methods: {
@@ -140,9 +186,6 @@ export default {
       this.update(event, prop);
       this.$emit('get-events', prop);
     },
-    updateHasLinkedEvents (event) {
-      this.$emit('update:has-linked-events', event);
-    },
     update (event, prop) {
       this.$emit('update:new-credit-note', { ...this.newCreditNote, [prop]: event });
     },
@@ -150,6 +193,31 @@ export default {
       this.update(event, 'customer');
       this.$emit('reset-customer-data');
       this.$emit('get-events', 'customer');
+    },
+    updateCreditNoteType (event) {
+      this.$emit('update:credit-note-type', event);
+    },
+    addBillingItem () {
+      this.$emit('add-billing-item');
+    },
+    updateBillingItem (event, index, path) {
+      this.$emit('update-billing-item', event, index, path);
+    },
+    removeBillingItem (index) {
+      this.$emit('remove-billing-item', index);
+    },
+    getBillingItemError (path, index) {
+      const validation = this.validations.billingItemList.$each.$response.$errors[index];
+
+      return this.validations.billingItemList.$dirty && get(validation, `${path}.0.$response`) === false;
+    },
+    getBillingItemErrorMessage (path, index) {
+      const validation = this.validations.billingItemList.$each.$response.$errors[index];
+      if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
+      if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
+        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
+
+      return '';
     },
   },
 };

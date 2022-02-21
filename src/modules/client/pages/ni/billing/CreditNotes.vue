@@ -25,28 +25,32 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
-      v-model:has-linked-events="hasLinkedEvents" :third-party-payer-options="thirdPartyPayerOptions" :loading="loading"
+      v-model:credit-note-type="creditNoteType" :third-party-payer-options="thirdPartyPayerOptions" :loading="loading"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :validations="v$.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" @get-events="getCreationEvents"
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.v$.newCreditNote)"
       :customers-options="customersOptions" @hide="resetCreationCreditNoteData" v-model:new-credit-note="newCreditNote"
       :end-date-error-message="setEndDateErrorMessage(this.v$.newCreditNote, this.newCreditNote.events)"
-      @reset-customer-data="resetCustomerData" />
+      @reset-customer-data="resetCustomerData" :billing-items-options="billingItemsOptions"
+      @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem"
+      @remove-billing-item="removeBillingItem" />
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
       v-model="creditNoteEditionModal" v-model:edited-credit-note="editedCreditNote" :validations="v$.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
-      :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
+      :credit-note-type="creditNoteType" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
       @get-events="getEditionEvents" :min-and-max-dates="editionMinAndMaxDates" :loading="loading"
       :end-date-error-message="setEndDateErrorMessage(this.v$.editedCreditNote, this.editedCreditNote.events)"
-      :start-date-error-message="setStartDateErrorMessage(this.v$.editedCreditNote)" />
+      :start-date-error-message="setStartDateErrorMessage(this.v$.editedCreditNote)" @add-billing-item="addBillingItem"
+      :billing-items-options="billingItemsOptions" @update-billing-item="updateBillingItem"
+      @remove-billing-item="removeBillingItem" />
   </q-page>
 </template>
 
 <script>
 import { useMeta } from 'quasar';
-import { required, requiredIf } from '@vuelidate/validators';
+import { required, requiredIf, helpers } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
@@ -55,6 +59,7 @@ import pick from 'lodash/pick';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import set from 'lodash/set';
+import BillingItems from '@api/BillingItems';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
@@ -62,9 +67,9 @@ import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANI, REQUIRED_LABEL } from '@data/constants';
-import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
-import { strictPositiveNumber, minDate, maxDate } from '@helpers/vuelidateCustomVal';
+import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL, BILLING_ITEMS } from '@data/constants';
+import { formatPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { strictPositiveNumber, minDate, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
@@ -91,8 +96,11 @@ export default {
       creditNoteCreationModal: false,
       creditNoteEditionModal: false,
       hasLinkedEvents: false,
+      creditNoteType: SUBSCRIPTION,
       customersOptions: [],
       creditNoteEvents: [],
+      billingItems: [],
+      billingItemsOptions: [],
       newCreditNote: {
         customer: '',
         thirdPartyPayer: '',
@@ -105,6 +113,8 @@ export default {
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
         subscription: '',
+        misc: '',
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       },
       editedCreditNote: {},
       creditNotes: [],
@@ -154,7 +164,7 @@ export default {
     };
   },
   watch: {
-    hasLinkedEvents () {
+    creditNoteType () {
       this.resetCustomerData();
     },
     'newCreditNote.customer': function (previousValue, currentValue) {
@@ -170,8 +180,23 @@ export default {
       this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
       this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
     },
+    'newCreditNote.billingItemList': {
+      deep: true,
+      handler () {
+        if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
+          this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
+          );
+          this.newCreditNote.inclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
+            0
+          );
+        }
+      },
+    },
     'editedCreditNote.events': function (previousValue, currentValue) {
-      if (!isEqual(previousValue, currentValue) && this.hasLinkedEvents) {
+      if (!isEqual(previousValue, currentValue) && this.creditNoteType === EVENTS) {
         const prices = this.computePrices(this.editedCreditNote.events);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
@@ -179,20 +204,45 @@ export default {
         this.editedCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
       }
     },
+    'editedCreditNote.billingItemList': {
+      deep: true,
+      handler () {
+        if (get(this.editedCreditNote, 'billingItemList[0].billingItem')) {
+          this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
+            0
+          );
+          this.editedCreditNote.inclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
+            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
+            0
+          );
+        }
+      },
+    },
   },
   async mounted () {
     this.tableLoading = true;
-    await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions()]);
+    await Promise.all([this.refreshCreditNotes(), this.refreshCustomersOptions(), this.refreshBillingItemsOptions()]);
     this.tableLoading = false;
   },
   validations () {
     const creditNoteValidation = {
       date: { required },
       customer: { required },
-      events: { required: requiredIf(this.hasLinkedEvents) },
-      subscription: { required: requiredIf(!this.hasLinkedEvents) },
+      events: { required: requiredIf(this.creditNoteType === EVENTS) },
+      subscription: { required: requiredIf(this.creditNoteType === SUBSCRIPTION) },
       inclTaxesTpp: {},
       inclTaxesCustomer: {},
+      billingItemList: {
+        required: requiredIf(this.creditNoteType === BILLING_ITEMS),
+        ...(this.creditNoteType === BILLING_ITEMS && {
+          $each: helpers.forEach({
+            billingItem: { required },
+            unitInclTaxes: { positiveNumber, required },
+            count: { strictPositiveNumber, required },
+          }),
+        }),
+      },
     };
     const newCreditNoteDateValidation = this.datesValidations(this.creationMinAndMaxDates, this.newCreditNote);
     const editedCreditNoteDateValidation = this.datesValidations(this.editionMinAndMaxDates, this.editedCreditNote);
@@ -205,7 +255,11 @@ export default {
       : { inclTaxesCustomer: inclTaxesValidation };
 
     return {
-      newCreditNote: { ...creditNoteValidation, ...newCreditNoteDateValidation, ...newCreditNoteInclTaxesValidation },
+      newCreditNote: {
+        ...creditNoteValidation,
+        ...newCreditNoteDateValidation,
+        ...newCreditNoteInclTaxesValidation,
+      },
       editedCreditNote: {
         ...creditNoteValidation,
         ...editedCreditNoteDateValidation,
@@ -251,10 +305,12 @@ export default {
     },
   },
   methods: {
+    get,
     resetCustomerData () {
       this.creditNoteEvents = [];
       this.newCreditNote = {
         ...this.newCreditNote,
+        thirdPartyPayer: '',
         events: [],
         subscription: null,
         startDate: '',
@@ -263,6 +319,7 @@ export default {
         inclTaxesCustomer: 0,
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
 
       this.v$.newCreditNote.startDate.$reset();
@@ -272,6 +329,11 @@ export default {
       this.v$.newCreditNote.inclTaxesTpp.$reset();
     },
     // Refresh data
+    async refreshBillingItemsOptions () {
+      const billingItems = Object.freeze(await BillingItems.list({ type: MANUAL }));
+      this.billingItems = billingItems;
+      this.billingItemsOptions = formatAndSortOptions(billingItems, 'name');
+    },
     async refreshCustomersOptions () {
       try {
         this.customersOptions = [];
@@ -317,8 +379,11 @@ export default {
     },
     async getEvents (creditNote, validations) {
       try {
-        if (!this.hasLinkedEvents || !creditNote.customer || !creditNote.startDate || !creditNote.endDate) return;
-        if (validations.startDate.$error || validations.endDate.$error) return;
+        const canGetEvents = this.creditNoteType === EVENTS &&
+          creditNote.customer &&
+          creditNote.startDate &&
+          creditNote.endDate;
+        if (!canGetEvents || validations.startDate.$error || validations.endDate.$error) return;
 
         let query = {
           startDate: creditNote.startDate,
@@ -372,11 +437,11 @@ export default {
     datesValidations (minAndMaxDates, creditNote) {
       return {
         startDate: {
-          required: requiredIf(this.hasLinkedEvents),
+          required: requiredIf(this.creditNoteType === EVENTS),
           maxDate: this.isValidDate(minAndMaxDates.maxStartDate) ? maxDate(minAndMaxDates.maxStartDate) : '',
         },
         endDate: {
-          required: requiredIf(this.hasLinkedEvents),
+          required: requiredIf(this.creditNoteType === EVENTS),
           minDate: creditNote.startDate
             ? minDate(this.isValidDate(minAndMaxDates.minEndDate) ? minAndMaxDates.minEndDate : creditNote.startDate)
             : '',
@@ -435,9 +500,11 @@ export default {
         inclTaxesTpp: 0,
         subscription: '',
         thirdPartyPayer: '',
+        misc: '',
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
       this.creditNoteEvents = [];
-      this.hasLinkedEvents = false;
+      this.creditNoteType = SUBSCRIPTION;
       this.v$.newCreditNote.$reset();
     },
     formatPayloadWithSubscription (creditNote) {
@@ -506,22 +573,44 @@ export default {
 
       return payload;
     },
+    formatPayloadWithBillingItems (creditNote) {
+      return {
+        ...pick(creditNote, ['exclTaxesCustomer', 'inclTaxesCustomer']),
+        billingItemList: creditNote.billingItemList.map(bi => omit(bi, 'vat')),
+      };
+    },
     formatPayload (creditNote) {
-      let payload = pick(creditNote, ['date', 'customer']);
+      let payload = pick(creditNote, ['date', 'customer', 'misc']);
 
-      if (!this.hasLinkedEvents) payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
-      else payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
+      if (this.creditNoteType === SUBSCRIPTION) {
+        payload = { ...payload, ...this.formatPayloadWithSubscription(creditNote) };
+      } else if (this.creditNoteType === EVENTS) {
+        payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote) };
+      } else {
+        payload = { ...payload, ...this.formatPayloadWithBillingItems(creditNote) };
+      }
 
       return pickBy(payload);
     },
+    hasDuplicatedBillingItems (creditNote) {
+      if (this.creditNoteType !== BILLING_ITEMS) return false;
+      const billingItems = creditNote.billingItemList.map(bi => bi.billingItem);
+
+      return billingItems.length !== [...new Set(billingItems)].length;
+    },
     async createNewCreditNote () {
       try {
-        this.v$.newCreditNote.$touch();
+        if (this.creditNoteType !== BILLING_ITEMS) this.newCreditNote.billingItemList = [];
 
-        if (this.v$.newCreditNote.$error || this.noEventSelectedForNewCreditNote) {
-          return NotifyWarning('Champ(s) invalide(s)');
+        if (this.hasDuplicatedBillingItems(this.newCreditNote)) {
+          return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
         }
+
+        this.v$.newCreditNote.$touch();
+        if (this.v$.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
+
         await CreditNotes.create(this.formatPayload(this.newCreditNote));
 
         NotifyPositive('Avoir créé');
@@ -534,8 +623,34 @@ export default {
         this.loading = false;
       }
     },
-    updateHasLinkedEvents (value) {
-      this.hasLinkedEvents = value;
+    addBillingItem () {
+      if (this.creditNoteCreationModal) {
+        this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+      } else if (this.creditNoteEditionModal) {
+        this.editedCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+      }
+    },
+    removeBillingItem (index) {
+      if (this.creditNoteCreationModal) this.newCreditNote.billingItemList.splice(index, 1);
+      else if (this.creditNoteEditionModal) this.editedCreditNote.billingItemList.splice(index, 1);
+    },
+    updateBillingItem (event, index, path) {
+      const billingItemList = this.creditNoteCreationModal
+        ? [...this.newCreditNote.billingItemList]
+        : [...this.editedCreditNote.billingItemList];
+
+      set(billingItemList[index], path, event);
+      if (path === 'billingItem') {
+        const billingItem = this.billingItems.find(bi => bi._id === event);
+        set(billingItemList[index], 'vat', billingItem?.vat || 0);
+        set(billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+      }
+
+      if (this.creditNoteCreationModal) set(this.newCreditNote.billingItemList, billingItemList);
+      else if (this.creditNoteEditionModal) set(this.editedCreditNote.billingItemList, billingItemList);
+    },
+    getExclTaxes (inclTaxes, vat) {
+      return inclTaxes / (1 + vat / 100);
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
@@ -543,34 +658,44 @@ export default {
       this.editedCreditNote.customer = creditNote.customer;
       if (creditNote.thirdPartyPayer) this.editedCreditNote.thirdPartyPayer = creditNote.thirdPartyPayer;
 
-      this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
-      if (this.hasLinkedEvents) {
+      if (get(creditNote, 'events.length')) this.creditNoteType = EVENTS;
+      else if (creditNote.subscription) this.creditNoteType = SUBSCRIPTION;
+      else this.creditNoteType = BILLING_ITEMS;
+
+      if (this.creditNoteType === EVENTS) {
         await this.getEditionEvents();
         this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
-      } else {
+      } else if (this.creditNoteType === SUBSCRIPTION) {
         this.editedCreditNote.subscription = creditNote.subscription._id;
       }
-
       this.creditNoteEditionModal = true;
     },
     resetEditionCreditNoteData () {
       this.creditNoteEditionModal = false;
       this.editedCreditNote = {};
       this.creditNoteEvents = [];
-      this.hasLinkedEvents = false;
+      this.creditNoteType = SUBSCRIPTION;
       this.v$.editedCreditNote.$reset();
     },
     formatEditionPayload () {
+      if (this.creditNoteType === BILLING_ITEMS) {
+        this.editedCreditNote.billingItemList = this.editedCreditNote.billingItemList
+          .map(bi => pick(bi, ['billingItem', 'unitInclTaxes', 'count', 'vat']));
+      }
+
       return { ...omit(this.formatPayload(this.editedCreditNote), ['customer', 'thirdPartyPayer']) };
     },
     async updateCreditNote () {
       try {
-        this.v$.editedCreditNote.$touch();
-        if (this.v$.editedCreditNote.$error || this.noEventSelectedForEditedCreditNote) {
-          return NotifyWarning('Champ(s) invalide(s)');
+        if (this.hasDuplicatedBillingItems(this.editedCreditNote)) {
+          return NotifyWarning('Vous ne pouvez pas ajouter plusieurs fois le même article');
         }
 
+        this.v$.editedCreditNote.$touch();
+        if (this.v$.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
+
         await CreditNotes.updateById(this.editedCreditNote._id, this.formatEditionPayload());
 
         NotifyPositive('Avoir modifié.');

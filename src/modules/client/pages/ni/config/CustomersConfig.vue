@@ -1061,8 +1061,8 @@ export default {
       else if (this.serviceEditionModal) this.editedService.billingItems.push('');
     },
     updateBillingItemInService (index, event) {
-      if (this.serviceCreationModal) this.$set(this.newService.billingItems, index, event);
-      else if (this.serviceEditionModal) this.$set(this.editedService.billingItems, index, event);
+      if (this.serviceCreationModal) set(this.newService.billingItems, index, event);
+      else if (this.serviceEditionModal) set(this.editedService.billingItems, index, event);
     },
     removeBillingItemInService (index) {
       if (this.serviceCreationModal) this.newService.billingItems.splice(index, 1);
