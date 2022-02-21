@@ -28,11 +28,11 @@ export default {
 .icon-container
   display: flex
   justify-content: left
-  color: $copper-500
   font-size: 10px
 .hour-content
   display: flex
   flex-direction: row
+  color: $copper-700
 .bold
   font-weight: bold
 </style>
