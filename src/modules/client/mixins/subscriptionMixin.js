@@ -98,8 +98,11 @@ export const subscriptionMixin = {
       return parseFloat(Math.round(number * 100) / 100).toFixed(2);
     },
     computeWeeklyRate (subscription, funding) {
-      let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (get(subscription, 'service.surcharge', null)) {
+      let weeklyRate = subscription.weeklyHours
+        ? subscription.unitTTCRate * subscription.weeklyHours
+        : subscription.unitTTCRate * subscription.weeklyCount;
+
+      if (get(subscription, 'service.surcharge')) {
         if (subscription.sundays && subscription.service.surcharge.sunday) {
           weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
         }
@@ -115,7 +118,7 @@ export const subscriptionMixin = {
           } else {
             const refundedHours = Math.min(
               funding.frequency === MONTHLY ? funding.careHours / WEEKS_PER_MONTH : funding.careHours,
-              subscription.estimatedWeeklyVolume
+              subscription.weeklyHours
             );
             fundingReduction = refundedHours * funding.unitTTCRate;
           }
