@@ -11,12 +11,7 @@ export const subscriptionMixin = {
       selectedSubscription: {},
       subscriptionHistoryModal: false,
       subscriptionsColumns: [
-        {
-          name: 'service',
-          label: 'Service',
-          align: 'left',
-          field: row => get(row, 'service.name'),
-        },
+        { name: 'service', label: 'Service', align: 'left', field: row => get(row, 'service.name') },
         {
           name: 'nature',
           label: 'Nature',
@@ -45,12 +40,7 @@ export const subscriptionMixin = {
           align: 'center',
           field: row => `${this.formatNumber(this.computeWeeklyRate(row, this.getMatchingFunding(row)))}€`,
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       subscriptionHistoryColumns: [
         {
@@ -85,11 +75,7 @@ export const subscriptionMixin = {
           field: row => (row.sundays ? `${row.sundays}h` : ''),
         },
       ],
-      paginationHistory: {
-        rowsPerPage: 0,
-        sortBy: 'createdAt',
-        descending: true,
-      },
+      paginationHistory: { rowsPerPage: 0, sortBy: 'createdAt', descending: true },
       subscriptionsLoading: false,
     };
   },
@@ -151,12 +137,8 @@ export const subscriptionMixin = {
     refreshSubscriptions (customer) {
       try {
         this.subscriptionsLoading = true;
-        const { subscriptions } = customer;
-        this.subscriptions = subscriptions
-          ? subscriptions.map(sub => ({
-            ...getLastVersion(sub.versions, 'createdAt'),
-            ...sub,
-          }))
+        this.subscriptions = customer.subscriptions
+          ? customer.subscriptions.map(sub => ({ ...getLastVersion(sub.versions, 'createdAt'), ...sub }))
           : [];
       } catch (e) {
         console.error(e);

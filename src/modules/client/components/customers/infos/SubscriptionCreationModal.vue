@@ -9,13 +9,20 @@
     <ni-input in-modal :model-value="newSubscription.unitTTCRate" :error="validations.unitTTCRate.$error" required-field
       caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number"
       @update:model-value="update($event, 'unitTTCRate')" />
-    <ni-input in-modal :model-value="newSubscription.estimatedWeeklyVolume" type="number" required-field
-      :error="validations.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-      @blur="validations.estimatedWeeklyVolume.$touch" @update:model-value="update($event, 'estimatedWeeklyVolume')" />
-    <ni-input in-modal v-if="serviceNature !== FIXED" :model-value="newSubscription.sundays"
-      caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')" />
-    <ni-input in-modal v-if="serviceNature !== FIXED" :model-value="newSubscription.evenings"
-      caption="Dont soirée (h)" last type="number" @update:model-value="update($event, 'evenings')" />
+    <template v-if="serviceNature === FIXED">
+      <ni-input in-modal :model-value="newSubscription.weeklyCount" type="number" required-field
+        :error="validations.weeklyCount.$error" caption="Volume hebdomadaire estimatif"
+        @blur="validations.weeklyCount.$touch" @update:model-value="update($event, 'weeklyCount')" />
+    </template>
+    <template v-else>
+      <ni-input in-modal :model-value="newSubscription.weeklyHours" type="number" required-field
+        :error="validations.weeklyHours.$error" caption="Volume hebdomadaire estimatif"
+        @blur="validations.weeklyHours.$touch" @update:model-value="update($event, 'weeklyHours')" />
+      <ni-input in-modal :model-value="newSubscription.sundays"
+        caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')" />
+      <ni-input in-modal :model-value="newSubscription.evenings"
+        caption="Dont soirée (h)" last type="number" @update:model-value="update($event, 'evenings')" />
+    </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
         :loading="loading" @click="submit" />

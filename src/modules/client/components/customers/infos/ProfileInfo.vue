@@ -376,11 +376,7 @@ export default {
         { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
       ],
       quotesLoading: false,
-      newSubscription: {
-        service: '',
-        unitTTCRate: 0,
-        estimatedWeeklyVolume: '',
-      },
+      newSubscription: { service: '', unitTTCRate: 0, weeklyHours: 0, weeklyCount: 0 },
       editedSubscription: {},
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
@@ -392,11 +388,7 @@ export default {
       mandatesLoading: false,
       fundingsVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
       fundingHistoryModal: false,
-      paginationFundingHistory: {
-        rowsPerPage: 0,
-        sortBy: 'createdAt',
-        descending: true,
-      },
+      paginationFundingHistory: { rowsPerPage: 0, sortBy: 'createdAt', descending: true },
       ttpList: [],
       newFunding: {
         thirdPartyPayer: '',
@@ -418,11 +410,7 @@ export default {
       fundingDetailsModal: false,
       selectedFunding: {},
       editedFunding: {},
-      pagination: {
-        sortBy: 'createdAt',
-        ascending: true,
-        rowsPerPage: 0,
-      },
+      pagination: { sortBy: 'createdAt', ascending: true, rowsPerPage: 0 },
       extensions: DOC_EXTENSIONS,
       firstStep: true,
       docLoading: false,
@@ -494,6 +482,10 @@ export default {
     needFundingPlanIdForEditedFunding () {
       return !!get(this.editedFunding, 'thirdPartyPayer.teletransmissionId');
     },
+    isHourlySubscription () {
+      const service = this.serviceOptions.find(s => s.value === this.newSubscription.service);
+      return get(service, 'nature') === HOURLY;
+    },
   },
   validations () {
     return {
@@ -536,7 +528,8 @@ export default {
       newSubscription: {
         service: { required },
         unitTTCRate: { required },
-        estimatedWeeklyVolume: { required },
+        weeklyHours: { required: requiredIf(this.isHourlySubscription) },
+        weeklyCount: { required: requiredIf(!this.isHourlySubscription) },
       },
       editedSubscription: {
         unitTTCRate: { required },
@@ -704,20 +697,20 @@ export default {
     },
     // Subscriptions
     formatCreatedSubscription () {
-      const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
-      const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
-
-      if (sundays) formattedService.versions[0].sundays = sundays;
-      if (evenings) formattedService.versions[0].evenings = evenings;
-
-      return formattedService;
+      return {
+        service: this.newSubscription.service,
+        versions: [{
+          ...pick(this.newSubscription, ['unitTTCRate', 'weeklyHours', 'sundays', 'evenings', 'weeklyCount']),
+        }],
+      };
     },
     resetCreationSubscriptionData () {
       this.v$.newSubscription.$reset();
       this.newSubscription = {
         service: '',
         unitTTCRate: 0,
-        estimatedWeeklyVolume: '',
+        weeklyHours: 0,
+        weeklyCount: 0,
       };
     },
     async createSubscription () {
