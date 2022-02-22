@@ -34,12 +34,10 @@ export const subscriptionMixin = {
           field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
-          name: 'estimatedWeeklyVolume',
+          name: 'weeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => (get(row, 'service.nature') === HOURLY
-            ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h`
-            : row.estimatedWeeklyVolume),
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : row.weeklyCount),
         },
         {
           name: 'weeklyRate',
@@ -69,12 +67,10 @@ export const subscriptionMixin = {
           field: row => `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
-          name: 'estimatedWeeklyVolume',
+          name: 'weeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => (get(this.selectedSubscription, 'service.nature') === HOURLY
-            ? `${row.estimatedWeeklyVolume}h`
-            : row.estimatedWeeklyVolume),
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : row.weeklyCount),
         },
         {
           name: 'evenings',
