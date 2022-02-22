@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import has from 'lodash/has';
 import capitalize from 'lodash/capitalize';
 import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import { getLastVersion } from '@helpers/utils';
@@ -117,13 +118,13 @@ export const subscriptionMixin = {
     },
     isCompleteFunding (funding) {
       if (!funding || funding === {}) return false;
-      if (!(funding.frequency && funding.nature && funding.customerParticipationRate)) return false;
+      if (!(funding.frequency && funding.nature && has(funding, 'customerParticipationRate'))) return false;
       if (funding.nature === FIXED && !funding.amountTTC) return false;
       if (funding.nature === HOURLY && (!funding.unitTTCRate || !funding.careHours)) return false;
       return true;
     },
     getMatchingFunding (subscription) {
-      return this.fundings.find(fd => fd.subscription === subscription._id &&
+      return this.fundings.find(fd => fd.subscription._id === subscription._id &&
         (fd.endDate ? moment().isBetween(fd.startDate, fd.endDate) : moment().isSameOrAfter(fd.startDate)));
     },
     showHistory (id) {
