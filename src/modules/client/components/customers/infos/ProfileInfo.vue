@@ -306,7 +306,7 @@ import { formatDate, isSameOrBefore } from '@helpers/date';
 import { getLastVersion } from '@helpers/utils';
 import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { getSubscriptionQuoteTags, getQuoteTags, getMandateTags } from 'src/modules/client/helpers/tags';
+import { getTagsToGenerateQuote, getTagsToDownloadQuote, getMandateTags } from 'src/modules/client/helpers/tags';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import HelperEditionModal from 'src/modules/client/components/customers/infos/HelperEditionModal';
@@ -856,7 +856,7 @@ export default {
           estimatedWeeklyRate: this.computeWeeklyRate(subscription),
         }));
 
-        const data = getQuoteTags(this.customer, this.company, { ...quote, subscriptions });
+        const data = getTagsToDownloadQuote(this.customer, this.company, { ...quote, subscriptions });
         const params = { driveId: quoteDriveId };
         await downloadDriveDocx(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
@@ -867,7 +867,7 @@ export default {
     },
     async generateQuote () {
       try {
-        const payload = { subscriptions: this.subscriptions.map(getSubscriptionQuoteTags) };
+        const payload = { subscriptions: this.subscriptions.map(getTagsToGenerateQuote) };
         await Customers.addQuote(this.customer._id, payload);
 
         await this.refreshQuotes();
