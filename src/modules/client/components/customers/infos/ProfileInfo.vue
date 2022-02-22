@@ -483,7 +483,11 @@ export default {
       return !!get(this.editedFunding, 'thirdPartyPayer.teletransmissionId');
     },
     isHourlySubscription () {
-      const service = this.serviceOptions.find(s => s.value === this.newSubscription.service);
+      const selectedService = this.openNewSubscriptionModal
+        ? this.newSubscription.service
+        : this.editedSubscription.service;
+      const service = this.serviceOptions.find(s => s.value === selectedService);
+
       return get(service, 'nature') === HOURLY;
     },
   },
@@ -533,7 +537,8 @@ export default {
       },
       editedSubscription: {
         unitTTCRate: { required },
-        estimatedWeeklyVolume: { required },
+        weeklyHours: { required: requiredIf(this.isHourlySubscription) },
+        weeklyCount: { required: requiredIf(!this.isHourlySubscription) },
       },
       newFunding: {
         thirdPartyPayer: { required },
@@ -734,12 +739,13 @@ export default {
     },
     openSubscriptionEditionModal (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
+      const { _id, service, unitTTCRate, weeklyHours, weeklyCount, evenings, sundays } = selectedSubscription;
       this.editedSubscription = {
         _id,
         nature: service.nature,
         unitTTCRate: unitTTCRate || 0,
-        estimatedWeeklyVolume: estimatedWeeklyVolume || 0,
+        weeklyHours: weeklyHours || 0,
+        weeklyCount: weeklyCount || 0,
         evenings: evenings || 0,
         sundays: sundays || 0,
       };

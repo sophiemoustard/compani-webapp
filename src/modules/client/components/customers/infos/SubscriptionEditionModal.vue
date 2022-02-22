@@ -6,14 +6,20 @@
     <ni-input in-modal :model-value="editedSubscription.unitTTCRate" :error="validations.unitTTCRate.$error"
       caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number" required-field
       @update:model-value="update($event, 'unitTTCRate')" />
-    <ni-input in-modal :model-value="editedSubscription.estimatedWeeklyVolume"
-      :error="validations.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-      @blur="validations.estimatedWeeklyVolume.$touch" type="number" required-field
-      @update:model-value="update($event, 'estimatedWeeklyVolume')" />
-    <ni-input in-modal v-if="editedSubscription.nature !== FIXED" :model-value="editedSubscription.sundays"
-      caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')" />
-    <ni-input in-modal v-if="editedSubscription.nature !== FIXED" :model-value="editedSubscription.evenings"
-      caption="Dont soirée (h)" last type="number" @update:model-value="update($event, 'evenings')" />
+    <template v-if="editedSubscription.nature === FIXED">
+      <ni-input in-modal :model-value="editedSubscription.weeklyCount" :error="validations.weeklyCount.$error"
+        caption="Volume hebdomadaire estimatif" @blur="validations.weeklyCount.$touch" type="number" required-field
+        @update:model-value="update($event, 'weeklyCount')" />
+    </template>
+    <template v-else>
+      <ni-input in-modal :model-value="editedSubscription.weeklyHours" :error="validations.weeklyHours.$error"
+        caption="Volume hebdomadaire estimatif" @blur="validations.weeklyHours.$touch" type="number" required-field
+        @update:model-value="update($event, 'weeklyHours')" />
+      <ni-input in-modal :model-value="editedSubscription.sundays"
+        caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')" />
+      <ni-input in-modal :model-value="editedSubscription.evenings"
+        caption="Dont soirée (h)" last type="number" @update:model-value="update($event, 'evenings')" />
+    </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
