@@ -483,11 +483,10 @@ export default {
     },
     isHourlySubscription () {
       const selectedService = this.openNewSubscriptionModal
-        ? this.newSubscription.service
-        : this.editedSubscription.service;
-      const service = this.serviceOptions.find(s => s.value === selectedService);
+        ? this.serviceOptions.find(s => s.value === this.newSubscription.service)
+        : this.editedSubscription;
 
-      return get(service, 'nature') === HOURLY;
+      return get(selectedService, 'nature') === HOURLY;
     },
   },
   validations () {
@@ -701,13 +700,11 @@ export default {
     },
     // Subscriptions
     formatCreatedSubscription () {
-      const isHourlyService = this.services.find(s => s._id === this.newSubscription.service).nature === HOURLY;
-
       return {
         service: this.newSubscription.service,
         versions: [{
           ...pick(this.newSubscription, ['unitTTCRate', 'weeklyCount']),
-          ...(isHourlyService && pick(this.newSubscription, ['sundays', 'evenings', 'weeklyHours'])),
+          ...(this.isHourlySubscription && pick(this.newSubscription, ['sundays', 'evenings', 'weeklyHours'])),
         }],
       };
     },
@@ -761,11 +758,9 @@ export default {
       this.v$.editedSubscription.$reset();
     },
     formatEditedSubscription () {
-      const isHourlyService = this.editedSubscription.nature === HOURLY;
-
       return {
         ...pick(this.editedSubscription, ['unitTTCRate', 'weeklyCount']),
-        ...(isHourlyService && pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours'])),
+        ...(this.isHourlySubscription && pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours'])),
       };
     },
     async updateSubscription () {
