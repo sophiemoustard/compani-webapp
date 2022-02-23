@@ -16,12 +16,13 @@
       </div>
       <div v-else class="row justify-end">
         <ni-button label="Démarrer la facturation" color="white" class="bg-primary" icon="payment"
-          @click="openBillCreationModal" />
+          @click="openBillCreationModal" :disable="billsLoading" />
       </div>
     </div>
+
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill"
-      @submit="addBill" :validations="validations.newBill" @hide="resetBillAdditionForm"
-      :loading="billsLoading" :payer-options="payerList" :price-error="priceError()" />
+      @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationForm"
+      :loading="billsLoading" :payer-options="payerList" :price-error="priceError" />
   </div>
 </template>
 
@@ -68,6 +69,15 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
+    const priceError = computed(() => {
+      if (get(validations, 'value.newBill.price.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'value.newBill.price.strictPositiveNumber.$response') === false) {
+        return 'Prix non valide';
+      }
+
+      return '';
+    });
+
     const refreshCourseFundingOrganisations = async () => {
       try {
         const organisations = await CourseFundingOrganisations.list();
@@ -84,8 +94,7 @@ export default {
 
     const refreshCourseBills = async () => {
       try {
-        const bills = await CourseBills.list({ course: course.value._id });
-        courseBills.value = bills;
+        courseBills.value = await CourseBills.list({ course: course.value._id });
       } catch (e) {
         console.error(e);
         courseBills.value = [];
@@ -94,10 +103,12 @@ export default {
     };
 
     const openBillCreationModal = () => { billCreationModal.value = true; };
-    const resetBillAdditionForm = () => {
+
+    const resetBillCreationForm = () => {
       newBill.value = { funder: '', price: '' };
       validations.value.newBill.$reset();
     };
+
     const addBill = async () => {
       try {
         validations.value.newBill.$touch();
@@ -121,14 +132,6 @@ export default {
         billsLoading.value = false;
       }
     };
-    const priceError = () => {
-      if (get(validations, 'value.newBill.price.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'value.newBill.price.strictPositiveNumber.$response') === false) {
-        return 'Prix non valide';
-      }
-
-      return '';
-    };
 
     const created = async () => {
       refreshCourseFundingOrganisations();
@@ -142,17 +145,17 @@ export default {
       billsLoading,
       billCreationModal,
       newBill,
+      payerList,
+      courseBills,
       // Computed
       validations,
       course,
-      payerList,
-      courseBills,
+      priceError,
       // Methods
       refreshCourseFundingOrganisations,
-      resetBillAdditionForm,
+      resetBillCreationForm,
       addBill,
       openBillCreationModal,
-      priceError,
       refreshCourseBills,
       get,
       formatPrice,
