@@ -17,7 +17,7 @@
     </template>
     <template v-else>
       <ni-input in-modal :model-value="newSubscription.weeklyHours" type="number" required-field
-        :error="validations.weeklyHours.$error" caption="Volume horaire hebdomadaire estimatif"
+        :error="validations.weeklyHours.$error" caption="Volume horaire hebdomadaire estimatif (h)"
         @blur="validations.weeklyHours.$touch" @update:model-value="update($event, 'weeklyHours')"
         :error-message="weeklyHoursErrorMessage" />
       <ni-input in-modal :model-value="newSubscription.sundays" caption="Dont dimanche (h)" type="number"
@@ -49,7 +49,7 @@ export default {
     serviceOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    unitTtcRateErrorMessage: { type: String, default: 'poiuy' },
+    unitTtcRateErrorMessage: { type: String, default: REQUIRED_LABEL },
     weeklyHoursErrorMessage: { type: String, default: REQUIRED_LABEL },
     weeklyCountErrorMessage: { type: String, default: REQUIRED_LABEL },
     eveningsErrorMessage: { type: String, default: REQUIRED_LABEL },

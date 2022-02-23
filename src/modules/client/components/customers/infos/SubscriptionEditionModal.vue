@@ -13,7 +13,7 @@
     </template>
     <template v-else>
       <ni-input in-modal :model-value="editedSubscription.weeklyHours" :error="validations.weeklyHours.$error"
-        caption="Volume horaire hebdomadaire estimatif" @blur="validations.weeklyHours.$touch" type="number"
+        caption="Volume horaire hebdomadaire estimatif (h)" @blur="validations.weeklyHours.$touch" type="number"
         required-field @update:model-value="update($event, 'weeklyHours')" :error-message="weeklyHoursErrorMessage" />
       <ni-input in-modal :model-value="editedSubscription.sundays" :error-message="sundaysErrorMessage"
         caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')"
