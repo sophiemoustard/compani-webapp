@@ -278,7 +278,6 @@ import { required, requiredIf, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
-import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import GoogleDrive from '@api/GoogleDrive';
@@ -376,7 +375,7 @@ export default {
         { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
       ],
       quotesLoading: false,
-      newSubscription: { service: '', unitTTCRate: 0, weeklyHours: 0, weeklyCount: 0 },
+      newSubscription: { service: '', unitTTCRate: 0, weeklyHours: 0, weeklyCount: 0, sundays: 0, evenings: 0 },
       editedSubscription: {},
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
@@ -702,10 +701,13 @@ export default {
     },
     // Subscriptions
     formatCreatedSubscription () {
+      const isHourlyService = this.services.find(s => s._id === this.newSubscription.service).nature === HOURLY;
+
       return {
         service: this.newSubscription.service,
         versions: [{
-          ...pick(this.newSubscription, ['unitTTCRate', 'weeklyHours', 'sundays', 'evenings', 'weeklyCount']),
+          ...pick(this.newSubscription, ['unitTTCRate', 'weeklyCount']),
+          ...(isHourlyService && pick(this.newSubscription, ['sundays', 'evenings', 'weeklyHours'])),
         }],
       };
     },
@@ -716,6 +718,8 @@ export default {
         unitTTCRate: 0,
         weeklyHours: 0,
         weeklyCount: 0,
+        sundays: 0,
+        evenings: 0,
       };
     },
     async createSubscription () {
@@ -756,6 +760,14 @@ export default {
       this.editedSubscription = {};
       this.v$.editedSubscription.$reset();
     },
+    formatEditedSubscription () {
+      const isHourlyService = this.editedSubscription.nature === HOURLY;
+
+      return {
+        ...pick(this.editedSubscription, ['unitTTCRate', 'weeklyCount']),
+        ...(isHourlyService && pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours'])),
+      };
+    },
     async updateSubscription () {
       try {
         this.v$.editedSubscription.$touch();
@@ -763,7 +775,7 @@ export default {
 
         this.loading = true;
         const subscriptionId = this.editedSubscription._id;
-        const payload = omit(this.editedSubscription, ['_id', 'nature']);
+        const payload = this.formatEditedSubscription();
         await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
 
         this.refreshCustomer();
