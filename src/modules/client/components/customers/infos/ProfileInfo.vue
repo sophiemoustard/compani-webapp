@@ -302,6 +302,7 @@ import {
   HOURLY,
   MONTHLY,
   REQUIRED_LABEL,
+  INVALID_NUMBER,
   CIVILITY_OPTIONS,
   DOC_EXTENSIONS,
   ONCE,
@@ -615,31 +616,31 @@ export default {
         },
       };
     },
-    numberErrorMessage (field, minValueErreurMessage) {
+    numberErrorMessage (field) {
       if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
-      if (get(field, 'minValue.$response') === false) return minValueErreurMessage;
+      if (get(field, 'minValue.$response') === false) return INVALID_NUMBER;
       return '';
     },
     weeklyHoursErrorMessage (validations) {
-      return this.numberErrorMessage(validations.weeklyHours, 'Volume horaire hebdomadaire invalide');
+      return this.numberErrorMessage(validations.weeklyHours);
     },
     weeklyCountErrorMessage (validations) {
-      return this.numberErrorMessage(validations.weeklyCount, 'Nombre d\'interventions hebdomadaire invalide');
+      return this.numberErrorMessage(validations.weeklyCount);
     },
     eveningsErrorMessage (validations) {
-      return this.numberErrorMessage(validations.evenings, 'Nombre de soirées invalide');
+      return this.numberErrorMessage(validations.evenings);
     },
     sundaysErrorMessage (validations) {
-      return this.numberErrorMessage(validations.sundays, 'Nombre de dimanches invalide');
+      return this.numberErrorMessage(validations.sundays);
     },
     careHoursErrorMessage (validations) {
-      return this.numberErrorMessage(validations.unitTTCRate, 'Nombre d\'heures invalide');
+      return this.numberErrorMessage(validations.unitTTCRate);
     },
     amountTTCErrorMessage (validations) {
-      return this.numberErrorMessage(validations.amountTTC, 'Montant forfaitaire TTC invalide');
+      return this.numberErrorMessage(validations.amountTTC);
     },
     unitTTCRateErrorMessage (validations) {
-      return this.numberErrorMessage(validations.unitTTCRate, 'Prix unitaire TTC invalide');
+      return this.numberErrorMessage(validations.unitTTCRate);
     },
     customerParticipationRateErrorMessage (validations) {
       if (get(validations, 'customerParticipationRate.required.$response') === false) return REQUIRED_LABEL;
