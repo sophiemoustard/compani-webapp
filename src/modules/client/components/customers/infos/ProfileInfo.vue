@@ -752,6 +752,9 @@ export default {
       this.v$.customer.$touch();
     },
     // Subscriptions
+    isDefinedOrZero (value) {
+      return !!value || value === 0;
+    },
     formatCreatedSubscription () {
       const hourlySubscriptionFields = ['saturdays', 'sundays', 'evenings', 'weeklyHours'];
       return {
