@@ -237,12 +237,18 @@
       :validations="v$.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
     <subscription-creation-modal v-model="openNewSubscriptionModal" v-model:new-subscription="newSubscription"
-      :service-options="serviceOptions" :validations="v$.newSubscription" @hide="resetCreationSubscriptionData"
-      :loading="loading" @submit="createSubscription" />
+      :weekly-hours-error-message="weeklyHoursErrorMessage(v$.newSubscription)" :loading="loading"
+      :weekly-count-error-message="weeklyCountErrorMessage(v$.newSubscription)" @submit="createSubscription"
+      :evenings-error-message="eveningsErrorMessage(v$.newSubscription)" @hide="resetCreationSubscriptionData"
+      :sundays-error-message="sundaysErrorMessage(v$.newSubscription)" :validations="v$.newSubscription"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.newSubscription)" :service-options="serviceOptions" />
 
     <subscription-edition-modal v-model="openEditedSubscriptionModal" v-model:edited-subscription="editedSubscription"
-      :validations="v$.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
-      @submit="updateSubscription" />
+      @submit="updateSubscription" :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.editedSubscription)"
+      :weekly-hours-error-message="weeklyHoursErrorMessage(v$.editedSubscription)" :loading="loading"
+      :weekly-count-error-message="weeklyCountErrorMessage(v$.editedSubscription)" @hide="resetEditionSubscriptionData"
+      :evenings-error-message="eveningsErrorMessage(v$.editedSubscription)" :validations="v$.editedSubscription"
+      :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" :service-options="serviceOptions" />
 
     <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
       @hide="resetSubscriptionHistoryData" />
@@ -274,7 +280,7 @@
 <script>
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf, email } from '@vuelidate/validators';
+import { required, requiredIf, email, minValue } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -488,6 +494,15 @@ export default {
 
       return get(selectedService, 'nature') === HOURLY;
     },
+    getSubscriptionValidation () {
+      return {
+        unitTTCRate: { required, minValue: minValue(0) },
+        weeklyHours: { required: requiredIf(this.isHourlySubscription), minValue: minValue(0) },
+        weeklyCount: { required: requiredIf(!this.isHourlySubscription), minValue: minValue(0) },
+        sundays: { minValue: minValue(0) },
+        evenings: { minValue: minValue(0) },
+      };
+    },
   },
   validations () {
     return {
@@ -528,16 +543,10 @@ export default {
         local: { email: { required, email } },
       },
       newSubscription: {
+        ...this.getSubscriptionValidation,
         service: { required },
-        unitTTCRate: { required },
-        weeklyHours: { required: requiredIf(this.isHourlySubscription) },
-        weeklyCount: { required: requiredIf(!this.isHourlySubscription) },
       },
-      editedSubscription: {
-        unitTTCRate: { required },
-        weeklyHours: { required: requiredIf(this.isHourlySubscription) },
-        weeklyCount: { required: requiredIf(!this.isHourlySubscription) },
-      },
+      editedSubscription: { ...this.getSubscriptionValidation },
       newFunding: {
         thirdPartyPayer: { required },
         subscription: { required },
@@ -606,20 +615,31 @@ export default {
         },
       };
     },
-    careHoursErrorMessage (validations) {
-      if (get(validations, 'careHours.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'careHours.minValue.$response') === false) return 'Nombre d\'heures invalide';
+    numberErrorMessage (field, minValueErreurMessage) {
+      if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(field, 'minValue.$response') === false) return minValueErreurMessage;
       return '';
+    },
+    weeklyHoursErrorMessage (validations) {
+      return this.numberErrorMessage(validations.weeklyHours, 'Volume horaire hebdomadaire invalide');
+    },
+    weeklyCountErrorMessage (validations) {
+      return this.numberErrorMessage(validations.weeklyCount, 'Nombre d\'interventions hebdomadaire invalide');
+    },
+    eveningsErrorMessage (validations) {
+      return this.numberErrorMessage(validations.evenings, 'Nombre de soirées invalide');
+    },
+    sundaysErrorMessage (validations) {
+      return this.numberErrorMessage(validations.sundays, 'Nombre de dimanches invalide');
+    },
+    careHoursErrorMessage (validations) {
+      return this.numberErrorMessage(validations.unitTTCRate, 'Nombre d\'heures invalide');
     },
     amountTTCErrorMessage (validations) {
-      if (get(validations, 'amountTTC.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'amountTTC.minValue.$response') === false) return 'Montant forfaitaire TTC invalide';
-      return '';
+      return this.numberErrorMessage(validations.amountTTC, 'Montant forfaitaire TTC invalide');
     },
     unitTTCRateErrorMessage (validations) {
-      if (get(validations, 'unitTTCRate.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'unitTTCRate.minValue.$response') === false) return 'Prix unitaire TTC invalide';
-      return '';
+      return this.numberErrorMessage(validations.unitTTCRate, 'Prix unitaire TTC invalide');
     },
     customerParticipationRateErrorMessage (validations) {
       if (get(validations, 'customerParticipationRate.required.$response') === false) return REQUIRED_LABEL;
@@ -703,8 +723,8 @@ export default {
       return {
         service: this.newSubscription.service,
         versions: [{
-          ...pick(this.newSubscription, ['unitTTCRate', 'weeklyCount']),
-          ...(this.isHourlySubscription && pick(this.newSubscription, ['sundays', 'evenings', 'weeklyHours'])),
+          ...pickBy(pick(this.newSubscription, ['unitTTCRate', 'weeklyCount'])),
+          ...(this.isHourlySubscription && pickBy(pick(this.newSubscription, ['sundays', 'evenings', 'weeklyHours']))),
         }],
       };
     },
@@ -759,8 +779,8 @@ export default {
     },
     formatEditedSubscription () {
       return {
-        ...pick(this.editedSubscription, ['unitTTCRate', 'weeklyCount']),
-        ...(this.isHourlySubscription && pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours'])),
+        ...pickBy(pick(this.editedSubscription, ['unitTTCRate', 'weeklyCount'])),
+        ...(this.isHourlySubscription && pickBy(pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours']))),
       };
     },
     async updateSubscription () {
