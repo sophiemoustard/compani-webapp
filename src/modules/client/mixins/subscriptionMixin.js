@@ -30,10 +30,16 @@ export const subscriptionMixin = {
           field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
-          name: 'weeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
+          name: 'weeklyHours',
+          label: 'Volume horaire hebdomadaire estimatif',
           align: 'center',
-          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : row.weeklyCount),
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : ''),
+        },
+        {
+          name: 'weeklyCount',
+          label: 'Nombre d\'interventions hebdomadaire estimatif',
+          align: 'center',
+          field: row => (row.weeklyCount || ''),
         },
         {
           name: 'weeklyRate',
