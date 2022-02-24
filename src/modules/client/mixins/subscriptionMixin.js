@@ -103,6 +103,15 @@ export const subscriptionMixin = {
           weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening / 100;
         }
       }
+
+      if (get(subscription, 'service.billingItems.length')) {
+        const totalBillingItemsAmount = subscription.service.billingItems.reduce(
+          (acc, bi) => (acc += bi.defaultUnitAmount),
+          0
+        );
+        weeklyRate += totalBillingItemsAmount * subscription.weeklyCount;
+      }
+
       let fundingReduction = 0;
       if (this.isCompleteFunding(funding)) {
         if (funding.frequency !== ONCE) {
