@@ -9,13 +9,13 @@
     <ni-input in-modal :model-value="newSubscription.unitTTCRate" :error="validations.unitTTCRate.$error" required-field
       caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number"
       @update:model-value="update($event, 'unitTTCRate')" :error-message="unitTtcRateErrorMessage" />
-    <template v-if="serviceNature === FIXED">
+    <template v-if="serviceNature === FIXED || hasBillingItems">
       <ni-input in-modal :model-value="newSubscription.weeklyCount" type="number" required-field
         :error="validations.weeklyCount.$error" caption="Nombre d'interventions hebdomadaire estimatif"
         @blur="validations.weeklyCount.$touch" @update:model-value="update($event, 'weeklyCount')"
         :error-message="weeklyCountErrorMessage" />
     </template>
-    <template v-else>
+    <template v-if="serviceNature === HOURLY">
       <ni-input in-modal :model-value="newSubscription.weeklyHours" type="number" required-field
         :error="validations.weeklyHours.$error" caption="Volume horaire hebdomadaire estimatif (h)"
         @blur="validations.weeklyHours.$touch" @update:model-value="update($event, 'weeklyHours')"
@@ -39,7 +39,7 @@ import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import { FIXED, REQUIRED_LABEL } from '@data/constants';
+import { FIXED, HOURLY, REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'SubscriptionCreationModal',
@@ -64,12 +64,19 @@ export default {
   data () {
     return {
       FIXED,
+      HOURLY,
     };
   },
   computed: {
     serviceNature () {
       const service = this.serviceOptions.find(s => s.value === this.newSubscription.service);
+
       return get(service, 'nature') || '';
+    },
+    hasBillingItems () {
+      const service = this.serviceOptions.find(s => s.value === this.newSubscription.service);
+
+      return !!get(service, 'billingItems.length') || false;
     },
   },
   methods: {

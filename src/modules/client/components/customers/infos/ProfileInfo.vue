@@ -500,11 +500,21 @@ export default {
 
       return get(selectedService, 'nature') === HOURLY;
     },
+    serviceHasBillingItems () {
+      const selectedService = this.openNewSubscriptionModal
+        ? this.serviceOptions.find(s => s.value === this.newSubscription.service)
+        : this.editedSubscription;
+
+      return !!get(selectedService, 'billingItems.length') || false;
+    },
     getSubscriptionValidation () {
       return {
         unitTTCRate: { required, minValue: minValue(0) },
         weeklyHours: { required: requiredIf(this.isHourlySubscription), minValue: minValue(0) },
-        weeklyCount: { required: requiredIf(!this.isHourlySubscription), minValue: minValue(0) },
+        weeklyCount: {
+          required: requiredIf(!this.isHourlySubscription || this.serviceHasBillingItems),
+          minValue: minValue(0),
+        },
         sundays: { minValue: minValue(0) },
         evenings: { minValue: minValue(0) },
       };
