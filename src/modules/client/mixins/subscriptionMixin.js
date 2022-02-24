@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import has from 'lodash/has';
 import capitalize from 'lodash/capitalize';
 import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import { getLastVersion } from '@helpers/utils';
@@ -11,12 +12,7 @@ export const subscriptionMixin = {
       selectedSubscription: {},
       subscriptionHistoryModal: false,
       subscriptionsColumns: [
-        {
-          name: 'service',
-          label: 'Service',
-          align: 'left',
-          field: row => get(row, 'service.name'),
-        },
+        { name: 'service', label: 'Service', align: 'left', field: row => get(row, 'service.name') },
         {
           name: 'nature',
           label: 'Nature',
@@ -34,12 +30,10 @@ export const subscriptionMixin = {
           field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
-          name: 'estimatedWeeklyVolume',
+          name: 'weeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => (get(row, 'service.nature') === HOURLY
-            ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h`
-            : row.estimatedWeeklyVolume),
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : row.weeklyCount),
         },
         {
           name: 'weeklyRate',
@@ -47,12 +41,7 @@ export const subscriptionMixin = {
           align: 'center',
           field: row => `${this.formatNumber(this.computeWeeklyRate(row, this.getMatchingFunding(row)))}€`,
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       subscriptionHistoryColumns: [
         {
@@ -69,12 +58,10 @@ export const subscriptionMixin = {
           field: row => `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
-          name: 'estimatedWeeklyVolume',
+          name: 'weeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => (get(this.selectedSubscription, 'service.nature') === HOURLY
-            ? `${row.estimatedWeeklyVolume}h`
-            : row.estimatedWeeklyVolume),
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : row.weeklyCount),
         },
         {
           name: 'evenings',
@@ -89,11 +76,7 @@ export const subscriptionMixin = {
           field: row => (row.sundays ? `${row.sundays}h` : ''),
         },
       ],
-      paginationHistory: {
-        rowsPerPage: 0,
-        sortBy: 'createdAt',
-        descending: true,
-      },
+      paginationHistory: { rowsPerPage: 0, sortBy: 'createdAt', descending: true },
       subscriptionsLoading: false,
     };
   },
@@ -102,8 +85,11 @@ export const subscriptionMixin = {
       return parseFloat(Math.round(number * 100) / 100).toFixed(2);
     },
     computeWeeklyRate (subscription, funding) {
-      let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (get(subscription, 'service.surcharge', null)) {
+      let weeklyRate = subscription.weeklyHours
+        ? subscription.unitTTCRate * subscription.weeklyHours
+        : subscription.unitTTCRate * subscription.weeklyCount;
+
+      if (get(subscription, 'service.surcharge')) {
         if (subscription.sundays && subscription.service.surcharge.sunday) {
           weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
         }
@@ -119,7 +105,7 @@ export const subscriptionMixin = {
           } else {
             const refundedHours = Math.min(
               funding.frequency === MONTHLY ? funding.careHours / WEEKS_PER_MONTH : funding.careHours,
-              subscription.estimatedWeeklyVolume
+              subscription.weeklyHours
             );
             fundingReduction = refundedHours * funding.unitTTCRate;
           }
@@ -132,13 +118,13 @@ export const subscriptionMixin = {
     },
     isCompleteFunding (funding) {
       if (!funding || funding === {}) return false;
-      if (!(funding.frequency && funding.nature && funding.customerParticipationRate)) return false;
+      if (!(funding.frequency && funding.nature && has(funding, 'customerParticipationRate'))) return false;
       if (funding.nature === FIXED && !funding.amountTTC) return false;
       if (funding.nature === HOURLY && (!funding.unitTTCRate || !funding.careHours)) return false;
       return true;
     },
     getMatchingFunding (subscription) {
-      return this.fundings.find(fd => fd.subscription === subscription._id &&
+      return this.fundings.find(fd => fd.subscription._id === subscription._id &&
         (fd.endDate ? moment().isBetween(fd.startDate, fd.endDate) : moment().isSameOrAfter(fd.startDate)));
     },
     showHistory (id) {
@@ -152,12 +138,8 @@ export const subscriptionMixin = {
     refreshSubscriptions (customer) {
       try {
         this.subscriptionsLoading = true;
-        const { subscriptions } = customer;
-        this.subscriptions = subscriptions
-          ? subscriptions.map(sub => ({
-            ...getLastVersion(sub.versions, 'createdAt'),
-            ...sub,
-          }))
+        this.subscriptions = customer.subscriptions
+          ? customer.subscriptions.map(sub => ({ ...getLastVersion(sub.versions, 'createdAt'), ...sub }))
           : [];
       } catch (e) {
         console.error(e);

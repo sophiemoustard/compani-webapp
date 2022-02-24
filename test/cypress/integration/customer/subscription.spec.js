@@ -23,7 +23,7 @@ describe('customers subscription tests', () => {
     cy.dataCy('col-service').should('contain', 'Service 1');
     cy.dataCy('col-nature').should('contain', 'Horaire');
     cy.dataCy('col-unitTTCRate').should('contain', '12.00€');
-    cy.dataCy('col-estimatedWeeklyVolume').should('contain', '12h');
+    cy.dataCy('col-weeklyVolume').should('contain', '12h');
     cy.dataCy('col-weeklyRate').should('contain', '144.00€');
   });
 
@@ -51,13 +51,13 @@ describe('customers subscription tests', () => {
 
       cy.dataCy('col-createdAt').eq(0).should('contain', '01/01/2020');
       cy.dataCy('col-unitTTCRate').eq(0).should('contain', '12.00€');
-      cy.dataCy('col-estimatedWeeklyVolume').eq(0).should('contain', '12h');
+      cy.dataCy('col-weeklyVolume').eq(0).should('contain', '12h');
       cy.dataCy('col-evenings').eq(0).should('contain', '2');
       cy.dataCy('col-sundays').eq(0).should('contain', '1');
 
       cy.dataCy('col-createdAt').eq(1).should('contain', '01/06/2019');
       cy.dataCy('col-unitTTCRate').eq(1).should('contain', '10.00€');
-      cy.dataCy('col-estimatedWeeklyVolume').eq(1).should('contain', '8h');
+      cy.dataCy('col-weeklyVolume').eq(1).should('contain', '8h');
       cy.dataCy('col-evenings').eq(1).should('contain', '');
       cy.dataCy('col-sundays').eq(1).should('contain', '2');
     });

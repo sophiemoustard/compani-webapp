@@ -335,22 +335,24 @@ export default {
       }
     },
     // Subscriptions
+    formatSubscriptionForAgreement (subscription) {
+      const lastVersion = getLastVersion(subscription.versions, 'createdAt');
+
+      return {
+        subscriptionId: subscription._id,
+        service: subscription.service.name,
+        unitTTCRate: lastVersion.unitTTCRate,
+        weeklyCount: lastVersion.weeklyCount,
+        startDate: lastVersion.startDate,
+        ...(lastVersion.weeklyHours && { weeklyHours: lastVersion.weeklyHours }),
+        ...(lastVersion.evenings && { evenings: lastVersion.evenings }),
+        ...(lastVersion.sundays && { sundays: lastVersion.sundays }),
+      };
+    },
     async confirmAgreement () {
       try {
         if (this.customer.subscriptionsAccepted) {
-          const subscriptions = this.customer.subscriptions.map((subscription) => {
-            const lastVersion = getLastVersion(subscription.versions, 'createdAt');
-            const obj = {
-              subscriptionId: subscription._id,
-              service: subscription.service.name,
-              unitTTCRate: lastVersion.unitTTCRate,
-              estimatedWeeklyVolume: lastVersion.estimatedWeeklyVolume,
-              startDate: lastVersion.startDate,
-            };
-            if (lastVersion.evenings) obj.evenings = lastVersion.evenings;
-            if (lastVersion.sundays) obj.sundays = lastVersion.sundays;
-            return obj;
-          });
+          const subscriptions = this.customer.subscriptions.map(this.formatSubscriptionForAgreement);
           const payload = {
             subscriptions,
             helper: {
@@ -359,7 +361,9 @@ export default {
               title: this.helper.identity ? this.helper.identity.title : '',
             },
           };
+
           await Customers.addSubscriptionHistory(this.customer._id, payload);
+
           await this.refreshCustomer();
           NotifyPositive('Abonnement validé');
         }

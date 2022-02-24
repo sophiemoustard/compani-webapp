@@ -67,7 +67,7 @@ export const getMandateTags = (customer, company, mandate) => ({
   rum: mandate.rum,
 });
 
-export const getSubscriptionQuoteTags = data => ({
+export const getTagsToGenerateQuote = data => ({
   service: {
     name: get(data, 'service.name'),
     nature: get(data, 'service.nature'),
@@ -79,19 +79,20 @@ export const getSubscriptionQuoteTags = data => ({
     },
   },
   unitTTCRate: data.unitTTCRate,
-  estimatedWeeklyVolume: data.estimatedWeeklyVolume,
+  weeklyCount: data.weeklyCount,
+  weeklyHours: data.weeklyHours,
   ...data.sundays && { sundays: data.sundays },
   ...data.evenings && { evenings: data.evenings },
 });
 
-export const getQuoteTags = (customer, company, quote) => ({
+export const getTagsToDownloadQuote = (customer, company, quote) => ({
   ...getCustomerDocumentTags({ customer, company }),
   quoteNumber: quote.quoteNumber,
   subscriptions: quote.subscriptions.map(subscription => ({
     serviceName: subscription.service.name,
     sundays: subscription.sundays ? subscription.sundays : '',
     evenings: subscription.evenings ? subscription.evenings : '',
-    weeklyVolume: subscription.estimatedWeeklyVolume,
+    weeklyVolume: subscription.weeklyHours || subscription.weeklyCount,
     serviceNature: subscription.service.nature
       ? NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature).label
       : '',

@@ -1,12 +1,12 @@
 <template>
   <div :class="['icon-container', $q.screen.width < 767 ? 'flex-column' : 'flex-row']">
     <div class="hour-content">
-      <p class="q-pr-xs q-mb-none" data-cy="event-start-hour">{{ startHour }}</p>
+      <div class="q-pr-xs" data-cy="event-start-hour">{{ startHour }}</div>
       <q-icon v-if="event.startDateTimeStamp" class="bold" name="check" />
     </div>
-    <p v-if="!($q.screen.width < 767)" class="q-pr-xs q-pl-xs"> - </p>
+    <div v-if="!($q.screen.width < 767)" class="q-pr-xs q-pl-xs"> - </div>
     <div class="hour-content">
-      <p class="q-pr-xs q-mb-none" data-cy="event-end-hour">{{ endHour }}</p>
+      <div class="q-pr-xs" data-cy="event-end-hour">{{ endHour }}</div>
       <q-icon v-if="event.endDateTimeStamp" class="bold" name="check" />
     </div>
   </div>

@@ -237,12 +237,18 @@
       :validations="v$.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
     <subscription-creation-modal v-model="openNewSubscriptionModal" v-model:new-subscription="newSubscription"
-      :service-options="serviceOptions" :validations="v$.newSubscription" @hide="resetCreationSubscriptionData"
-      :loading="loading" @submit="createSubscription" />
+      :weekly-hours-error-message="weeklyHoursErrorMessage(v$.newSubscription)" :loading="loading"
+      :weekly-count-error-message="weeklyCountErrorMessage(v$.newSubscription)" @submit="createSubscription"
+      :evenings-error-message="eveningsErrorMessage(v$.newSubscription)" @hide="resetCreationSubscriptionData"
+      :sundays-error-message="sundaysErrorMessage(v$.newSubscription)" :validations="v$.newSubscription"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.newSubscription)" :service-options="serviceOptions" />
 
     <subscription-edition-modal v-model="openEditedSubscriptionModal" v-model:edited-subscription="editedSubscription"
-      :validations="v$.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
-      @submit="updateSubscription" />
+      @submit="updateSubscription" :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.editedSubscription)"
+      :weekly-hours-error-message="weeklyHoursErrorMessage(v$.editedSubscription)" :loading="loading"
+      :weekly-count-error-message="weeklyCountErrorMessage(v$.editedSubscription)" @hide="resetEditionSubscriptionData"
+      :evenings-error-message="eveningsErrorMessage(v$.editedSubscription)" :validations="v$.editedSubscription"
+      :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" :service-options="serviceOptions" />
 
     <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
       @hide="resetSubscriptionHistoryData" />
@@ -274,11 +280,10 @@
 <script>
 import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf, email } from '@vuelidate/validators';
+import { required, requiredIf, email, minValue } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
-import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import GoogleDrive from '@api/GoogleDrive';
@@ -297,6 +302,7 @@ import {
   HOURLY,
   MONTHLY,
   REQUIRED_LABEL,
+  INVALID_NUMBER,
   CIVILITY_OPTIONS,
   DOC_EXTENSIONS,
   ONCE,
@@ -306,7 +312,7 @@ import { formatDate, isSameOrBefore } from '@helpers/date';
 import { getLastVersion } from '@helpers/utils';
 import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { getSubscriptionQuoteTags, getQuoteTags, getMandateTags } from 'src/modules/client/helpers/tags';
+import { getTagsToGenerateQuote, getTagsToDownloadQuote, getMandateTags } from 'src/modules/client/helpers/tags';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import HelperEditionModal from 'src/modules/client/components/customers/infos/HelperEditionModal';
@@ -376,11 +382,7 @@ export default {
         { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
       ],
       quotesLoading: false,
-      newSubscription: {
-        service: '',
-        unitTTCRate: 0,
-        estimatedWeeklyVolume: '',
-      },
+      newSubscription: { service: '', unitTTCRate: 0, weeklyHours: 0, weeklyCount: 0, sundays: 0, evenings: 0 },
       editedSubscription: {},
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
@@ -392,11 +394,7 @@ export default {
       mandatesLoading: false,
       fundingsVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
       fundingHistoryModal: false,
-      paginationFundingHistory: {
-        rowsPerPage: 0,
-        sortBy: 'createdAt',
-        descending: true,
-      },
+      paginationFundingHistory: { rowsPerPage: 0, sortBy: 'createdAt', descending: true },
       ttpList: [],
       newFunding: {
         thirdPartyPayer: '',
@@ -418,11 +416,7 @@ export default {
       fundingDetailsModal: false,
       selectedFunding: {},
       editedFunding: {},
-      pagination: {
-        sortBy: 'createdAt',
-        ascending: true,
-        rowsPerPage: 0,
-      },
+      pagination: { sortBy: 'createdAt', ascending: true, rowsPerPage: 0 },
       extensions: DOC_EXTENSIONS,
       firstStep: true,
       docLoading: false,
@@ -494,6 +488,22 @@ export default {
     needFundingPlanIdForEditedFunding () {
       return !!get(this.editedFunding, 'thirdPartyPayer.teletransmissionId');
     },
+    isHourlySubscription () {
+      const selectedService = this.openNewSubscriptionModal
+        ? this.serviceOptions.find(s => s.value === this.newSubscription.service)
+        : this.editedSubscription;
+
+      return get(selectedService, 'nature') === HOURLY;
+    },
+    getSubscriptionValidation () {
+      return {
+        unitTTCRate: { required, minValue: minValue(0) },
+        weeklyHours: { required: requiredIf(this.isHourlySubscription), minValue: minValue(0) },
+        weeklyCount: { required: requiredIf(!this.isHourlySubscription), minValue: minValue(0) },
+        sundays: { minValue: minValue(0) },
+        evenings: { minValue: minValue(0) },
+      };
+    },
   },
   validations () {
     return {
@@ -534,14 +544,10 @@ export default {
         local: { email: { required, email } },
       },
       newSubscription: {
+        ...this.getSubscriptionValidation,
         service: { required },
-        unitTTCRate: { required },
-        estimatedWeeklyVolume: { required },
       },
-      editedSubscription: {
-        unitTTCRate: { required },
-        estimatedWeeklyVolume: { required },
-      },
+      editedSubscription: { ...this.getSubscriptionValidation },
       newFunding: {
         thirdPartyPayer: { required },
         subscription: { required },
@@ -610,20 +616,31 @@ export default {
         },
       };
     },
-    careHoursErrorMessage (validations) {
-      if (get(validations, 'careHours.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'careHours.minValue.$response') === false) return 'Nombre d\'heures invalide';
+    numberErrorMessage (field) {
+      if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(field, 'minValue.$response') === false) return INVALID_NUMBER;
       return '';
+    },
+    weeklyHoursErrorMessage (validations) {
+      return this.numberErrorMessage(validations.weeklyHours);
+    },
+    weeklyCountErrorMessage (validations) {
+      return this.numberErrorMessage(validations.weeklyCount);
+    },
+    eveningsErrorMessage (validations) {
+      return this.numberErrorMessage(validations.evenings);
+    },
+    sundaysErrorMessage (validations) {
+      return this.numberErrorMessage(validations.sundays);
+    },
+    careHoursErrorMessage (validations) {
+      return this.numberErrorMessage(validations.unitTTCRate);
     },
     amountTTCErrorMessage (validations) {
-      if (get(validations, 'amountTTC.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'amountTTC.minValue.$response') === false) return 'Montant forfaitaire TTC invalide';
-      return '';
+      return this.numberErrorMessage(validations.amountTTC);
     },
     unitTTCRateErrorMessage (validations) {
-      if (get(validations, 'unitTTCRate.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'unitTTCRate.minValue.$response') === false) return 'Prix unitaire TTC invalide';
-      return '';
+      return this.numberErrorMessage(validations.unitTTCRate);
     },
     customerParticipationRateErrorMessage (validations) {
       if (get(validations, 'customerParticipationRate.required.$response') === false) return REQUIRED_LABEL;
@@ -704,20 +721,23 @@ export default {
     },
     // Subscriptions
     formatCreatedSubscription () {
-      const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
-      const formattedService = { service, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
-
-      if (sundays) formattedService.versions[0].sundays = sundays;
-      if (evenings) formattedService.versions[0].evenings = evenings;
-
-      return formattedService;
+      return {
+        service: this.newSubscription.service,
+        versions: [{
+          ...pickBy(pick(this.newSubscription, ['unitTTCRate', 'weeklyCount'])),
+          ...(this.isHourlySubscription && pickBy(pick(this.newSubscription, ['sundays', 'evenings', 'weeklyHours']))),
+        }],
+      };
     },
     resetCreationSubscriptionData () {
       this.v$.newSubscription.$reset();
       this.newSubscription = {
         service: '',
         unitTTCRate: 0,
-        estimatedWeeklyVolume: '',
+        weeklyHours: 0,
+        weeklyCount: 0,
+        sundays: 0,
+        evenings: 0,
       };
     },
     async createSubscription () {
@@ -741,12 +761,13 @@ export default {
     },
     openSubscriptionEditionModal (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
+      const { _id, service, unitTTCRate, weeklyHours, weeklyCount, evenings, sundays } = selectedSubscription;
       this.editedSubscription = {
         _id,
         nature: service.nature,
         unitTTCRate: unitTTCRate || 0,
-        estimatedWeeklyVolume: estimatedWeeklyVolume || 0,
+        weeklyHours: weeklyHours || 0,
+        weeklyCount: weeklyCount || 0,
         evenings: evenings || 0,
         sundays: sundays || 0,
       };
@@ -757,6 +778,12 @@ export default {
       this.editedSubscription = {};
       this.v$.editedSubscription.$reset();
     },
+    formatEditedSubscription () {
+      return {
+        ...pickBy(pick(this.editedSubscription, ['unitTTCRate', 'weeklyCount'])),
+        ...(this.isHourlySubscription && pickBy(pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours']))),
+      };
+    },
     async updateSubscription () {
       try {
         this.v$.editedSubscription.$touch();
@@ -764,7 +791,7 @@ export default {
 
         this.loading = true;
         const subscriptionId = this.editedSubscription._id;
-        const payload = omit(this.editedSubscription, ['_id', 'nature']);
+        const payload = this.formatEditedSubscription();
         await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
 
         this.refreshCustomer();
@@ -857,7 +884,7 @@ export default {
           estimatedWeeklyRate: this.computeWeeklyRate(subscription),
         }));
 
-        const data = getQuoteTags(this.customer, this.company, { ...quote, subscriptions });
+        const data = getTagsToDownloadQuote(this.customer, this.company, { ...quote, subscriptions });
         const params = { driveId: quoteDriveId };
         await downloadDriveDocx(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
@@ -868,7 +895,7 @@ export default {
     },
     async generateQuote () {
       try {
-        const payload = { subscriptions: this.subscriptions.map(getSubscriptionQuoteTags) };
+        const payload = { subscriptions: this.subscriptions.map(getTagsToGenerateQuote) };
         await Customers.addQuote(this.customer._id, payload);
 
         await this.refreshQuotes();

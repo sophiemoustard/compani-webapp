@@ -8,14 +8,25 @@
       :error="validations.service.$error" />
     <ni-input in-modal :model-value="newSubscription.unitTTCRate" :error="validations.unitTTCRate.$error" required-field
       caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number"
-      @update:model-value="update($event, 'unitTTCRate')" />
-    <ni-input in-modal :model-value="newSubscription.estimatedWeeklyVolume" type="number" required-field
-      :error="validations.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-      @blur="validations.estimatedWeeklyVolume.$touch" @update:model-value="update($event, 'estimatedWeeklyVolume')" />
-    <ni-input in-modal v-if="serviceNature !== FIXED" :model-value="newSubscription.sundays"
-      caption="Dont dimanche (h)" type="number" @update:model-value="update($event, 'sundays')" />
-    <ni-input in-modal v-if="serviceNature !== FIXED" :model-value="newSubscription.evenings"
-      caption="Dont soirée (h)" last type="number" @update:model-value="update($event, 'evenings')" />
+      @update:model-value="update($event, 'unitTTCRate')" :error-message="unitTtcRateErrorMessage" />
+    <template v-if="serviceNature === FIXED">
+      <ni-input in-modal :model-value="newSubscription.weeklyCount" type="number" required-field
+        :error="validations.weeklyCount.$error" caption="Nombre d'interventions hebdomadaire estimatif"
+        @blur="validations.weeklyCount.$touch" @update:model-value="update($event, 'weeklyCount')"
+        :error-message="weeklyCountErrorMessage" />
+    </template>
+    <template v-else>
+      <ni-input in-modal :model-value="newSubscription.weeklyHours" type="number" required-field
+        :error="validations.weeklyHours.$error" caption="Volume horaire hebdomadaire estimatif (h)"
+        @blur="validations.weeklyHours.$touch" @update:model-value="update($event, 'weeklyHours')"
+        :error-message="weeklyHoursErrorMessage" />
+      <ni-input in-modal :model-value="newSubscription.sundays" caption="Dont dimanche (h)" type="number"
+        @update:model-value="update($event, 'sundays')" :error-message="sundaysErrorMessage"
+        :error="validations.sundays.$error" @blur="validations.sundays.$touch" />
+      <ni-input in-modal :model-value="newSubscription.evenings" caption="Dont soirée (h)" last type="number"
+        @update:model-value="update($event, 'evenings')" :error-message="eveningsErrorMessage"
+        :error="validations.evenings.$error" @blur="validations.evenings.$touch" />
+    </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -28,7 +39,7 @@ import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import { FIXED } from '@data/constants';
+import { FIXED, REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'SubscriptionCreationModal',
@@ -38,6 +49,11 @@ export default {
     serviceOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    unitTtcRateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    weeklyHoursErrorMessage: { type: String, default: REQUIRED_LABEL },
+    weeklyCountErrorMessage: { type: String, default: REQUIRED_LABEL },
+    eveningsErrorMessage: { type: String, default: REQUIRED_LABEL },
+    sundaysErrorMessage: { type: String, default: REQUIRED_LABEL },
   },
   components: {
     'ni-input': Input,
