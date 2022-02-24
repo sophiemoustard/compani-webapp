@@ -8,7 +8,10 @@
             <q-card-section class="cursor-pointer row" :id="bill._id">
               <q-item-section>
                 <div class="text-weight-bold">A facturer - {{ formatPrice(bill.netInclTaxes) }}</div>
-                <div>Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}</div>
+                <div @click="openFunderEditionmodal(bill._id)">
+                  Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
+                  <q-icon size="12px" name="edit" color="copper-grey-500" />
+                  </div>
               </q-item-section>
             </q-card-section>
           </q-card>
@@ -21,8 +24,12 @@
     </div>
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill"
-      @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationForm"
+      @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
       :loading="billsLoading" :payer-options="payerList" :price-error="priceError" />
+
+    <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
+      @submit="editFunder" :validations="validations.editedBill.funder" @hide="resetFunderEditionModal"
+      :loading="funderLoading" :payer-options="payerList" />
   </div>
 </template>
 
@@ -41,11 +48,13 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import Button from '@components/Button';
 import { REQUIRED_LABEL } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
+import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
 
 export default {
   name: 'BillingConfig',
   components: {
     'ni-bill-creation-modal': BillCreationModal,
+    'ni-funder-edition-modal': FunderEditionModal,
     'ni-button': Button,
   },
   setup () {
@@ -54,16 +63,20 @@ export default {
     const $store = useStore();
 
     const billsLoading = ref(false);
+    const funderLoading = ref(false);
     const payerList = ref([]);
     const courseBills = ref([]);
     const billCreationModal = ref(false);
+    const funderEditionModal = ref(false);
     const newBill = ref({ funder: '', price: '' });
+    const editedBill = ref({ _id: '', funder: '' });
 
     const rules = {
       newBill: {
         funder: {},
         price: { required, strictPositiveNumber },
       },
+      editedBill: { funder: {} },
     };
     const validations = useVuelidate(rules, { newBill });
 
@@ -104,9 +117,19 @@ export default {
 
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
-    const resetBillCreationForm = () => {
+    const openFunderEditionmodal = (billId) => {
+      editedBill.value._id = billId;
+      funderEditionModal.value = true;
+    };
+
+    const resetBillCreationModal = () => {
       newBill.value = { funder: '', price: '' };
       validations.value.newBill.$reset();
+    };
+
+    const resetFunderEditionModal = () => {
+      editedBill.value = { _id: '', funder: '' };
+      validations.value.editedBill.$reset();
     };
 
     const addBill = async () => {
@@ -133,6 +156,25 @@ export default {
       }
     };
 
+    const editFunder = async () => {
+      try {
+        validations.value.editedBill.$touch();
+        if (validations.value.editedBill.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        funderLoading.value = true;
+        await CourseBills.update(editedBill.value._id, { courseFundingOrganisation: editedBill.value.funder });
+        NotifyPositive('Payeur modifié.');
+
+        funderEditionModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification du payeur.');
+      } finally {
+        funderLoading.value = false;
+      }
+    };
+
     const created = async () => {
       refreshCourseFundingOrganisations();
       refreshCourseBills();
@@ -143,8 +185,11 @@ export default {
     return {
       // Data
       billsLoading,
+      funderLoading,
       billCreationModal,
+      funderEditionModal,
       newBill,
+      editedBill,
       payerList,
       courseBills,
       // Computed
@@ -153,9 +198,12 @@ export default {
       priceError,
       // Methods
       refreshCourseFundingOrganisations,
-      resetBillCreationForm,
+      resetBillCreationModal,
+      resetFunderEditionModal,
       addBill,
+      editFunder,
       openBillCreationModal,
+      openFunderEditionmodal,
       refreshCourseBills,
       get,
       formatPrice,
