@@ -777,6 +777,7 @@ export default {
     openSubscriptionEditionModal (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
       const { _id, service, unitTTCRate, weeklyHours, weeklyCount, evenings, sundays } = selectedSubscription;
+
       this.editedSubscription = {
         _id,
         nature: service.nature,
@@ -785,6 +786,7 @@ export default {
         weeklyCount: weeklyCount || 0,
         evenings: evenings || 0,
         sundays: sundays || 0,
+        billingItems: service.billingItems,
       };
 
       this.openEditedSubscriptionModal = true;

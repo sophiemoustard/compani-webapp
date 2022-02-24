@@ -6,12 +6,12 @@
     <ni-input in-modal :model-value="editedSubscription.unitTTCRate" :error="validations.unitTTCRate.$error"
       caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number" required-field
       @update:model-value="update($event, 'unitTTCRate')" :error-message="unitTtcRateErrorMessage" />
-    <template v-if="editedSubscription.nature === FIXED">
+    <template v-if="editedSubscription.nature === FIXED || !!get(editedSubscription, 'billingItems.length')">
       <ni-input in-modal :model-value="editedSubscription.weeklyCount" :error="validations.weeklyCount.$error"
         caption="Nombre d'interventions hebdomadaire estimatif" @blur="validations.weeklyCount.$touch" type="number"
         @update:model-value="update($event, 'weeklyCount')" required-field :error-message="weeklyCountErrorMessage" />
     </template>
-    <template v-else>
+    <template v-if="editedSubscription.nature === HOURLY">
       <ni-input in-modal :model-value="editedSubscription.weeklyHours" :error="validations.weeklyHours.$error"
         caption="Volume horaire hebdomadaire estimatif (h)" @blur="validations.weeklyHours.$touch" type="number"
         required-field @update:model-value="update($event, 'weeklyHours')" :error-message="weeklyHoursErrorMessage" />
@@ -30,9 +30,10 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import { FIXED, REQUIRED_LABEL } from '@data/constants';
+import { FIXED, HOURLY, REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'SubscriptionEditionModal',
@@ -55,9 +56,11 @@ export default {
   data () {
     return {
       FIXED,
+      HOURLY,
     };
   },
   methods: {
+    get,
     hide () {
       this.$emit('hide');
     },
