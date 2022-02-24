@@ -248,7 +248,7 @@
       :weekly-hours-error-message="weeklyHoursErrorMessage(v$.editedSubscription)" :loading="loading"
       :weekly-count-error-message="weeklyCountErrorMessage(v$.editedSubscription)" @hide="resetEditionSubscriptionData"
       :evenings-error-message="eveningsErrorMessage(v$.editedSubscription)" :validations="v$.editedSubscription"
-      :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" :service-options="serviceOptions" />
+      :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" />
 
     <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
       @hide="resetSubscriptionHistoryData" />
@@ -444,11 +444,16 @@ export default {
       const subscribedServices = this.subscriptions.map(subscription => get(subscription, 'service._id'));
       const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
-      return availableServices.map(service => ({
-        label: getLastVersion(service.versions, 'createdAt').name,
-        value: service._id,
-        nature: service.nature,
-      }));
+      return availableServices.map((service) => {
+        const serviceLastVersion = getLastVersion(service.versions, 'createdAt');
+
+        return ({
+          label: serviceLastVersion.name,
+          value: service._id,
+          nature: service.nature,
+          billingItems: serviceLastVersion.billingItems,
+        });
+      });
     },
     primaryAddressError () {
       if (this.v$.customer.contact.primaryAddress.fullAddress.required.$response === false) return REQUIRED_LABEL;

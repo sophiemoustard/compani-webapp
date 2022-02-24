@@ -39,7 +39,6 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     editedSubscription: { type: Object, default: () => ({}) },
-    serviceOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     unitTtcRateErrorMessage: { type: String, default: REQUIRED_LABEL },
