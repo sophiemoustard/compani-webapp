@@ -118,7 +118,8 @@ export default {
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
     const openFunderEditionmodal = (billId) => {
-      const funder = get(courseBills.value.find(bill => bill._id === billId), 'courseFundingOrganisation._id') || '';
+      const courseBill = courseBills.value.find(bill => bill._id === billId);
+      const funder = get(courseBill, 'courseFundingOrganisation._id') || '';
       editedBill.value = { _id: billId, funder };
       funderEditionModal.value = true;
     };
