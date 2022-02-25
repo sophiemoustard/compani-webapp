@@ -16,13 +16,13 @@
             </q-card-section>
             <div class="bg-peach-200" v-if="areDetailsVisible[bill._id]">
               <q-card-section>
-                  <q-card flat>
-                    <q-card-section class="cursor-pointer">
-                        <div class="text-copper-500">{{ course.subProgram.program.name }}</div>
-                        <div>Prix unitaire : {{ formatPrice(bill.mainFee.price) }}</div>
-                        <div>Quantité : {{ bill.mainFee.count }}</div>
-                    </q-card-section>
-                  </q-card>
+                <q-card flat>
+                  <q-card-section class="cursor-pointer">
+                    <div class="text-copper-500">{{ course.subProgram.program.name }}</div>
+                    <div>Prix unitaire : {{ formatPrice(bill.mainFee.price) }}</div>
+                    <div>Quantité : {{ bill.mainFee.count }}</div>
+                  </q-card-section>
+                </q-card>
               </q-card-section>
             </div>
           </q-card>
@@ -80,7 +80,7 @@ export default {
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
     const editedBill = ref({ _id: '', funder: '' });
-    const newBill = ref({ funder: '', mainFee: { price: '', count: '' } });
+    const newBill = ref({ funder: '', mainFee: { price: '', count: 1 } });
     const areDetailsVisible = ref(Object
       .fromEntries(courseBills.value.map(bill => bill._id).map(id => [id, false])));
 
@@ -149,7 +149,7 @@ export default {
     };
 
     const resetBillCreationModal = () => {
-      newBill.value = { funder: '', mainFee: { price: '', count: '' } };
+      newBill.value = { funder: '', mainFee: { price: '', count: 1 } };
       validations.value.newBill.$reset();
     };
 

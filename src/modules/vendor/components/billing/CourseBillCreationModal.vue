@@ -10,7 +10,7 @@
       :model-value="newBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
       :error-message="errorMessage.price" @update:model-value="update($event, 'mainFee.price')" />
     <ni-input in-modal caption="Quantité" :error="validations.mainFee.count.$error" type="number"
-      :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" suffix="€" required-field
+      :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
       :error-message="errorMessage.count" @update:model-value="update($event, 'mainFee.count')" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Démarrer la facturation" icon-right="add" color="white"
