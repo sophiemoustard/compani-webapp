@@ -6,7 +6,7 @@
     <ni-input in-modal :model-value="editedSubscription.unitTTCRate" :error="validations.unitTTCRate.$error"
       caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number" required-field
       @update:model-value="update($event, 'unitTTCRate')" :error-message="unitTtcRateErrorMessage" />
-    <template v-if="editedSubscription.nature === FIXED || !!get(editedSubscription, 'billingItems.length')">
+    <template v-if="editedSubscription.nature === FIXED || hasBillingItems">
       <ni-input in-modal :model-value="editedSubscription.weeklyCount" :error="validations.weeklyCount.$error"
         caption="Nombre d'interventions hebdomadaire estimatif" @blur="validations.weeklyCount.$touch" type="number"
         @update:model-value="update($event, 'weeklyCount')" required-field :error-message="weeklyCountErrorMessage" />
@@ -58,6 +58,11 @@ export default {
       FIXED,
       HOURLY,
     };
+  },
+  computed: {
+    hasBillingItems () {
+      return !!get(this.editedSubscription, 'billingItems.length');
+    },
   },
   methods: {
     get,

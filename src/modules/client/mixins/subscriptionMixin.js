@@ -105,10 +105,8 @@ export const subscriptionMixin = {
       }
 
       if (get(subscription, 'service.billingItems.length')) {
-        const totalBillingItemsAmount = subscription.service.billingItems.reduce(
-          (acc, bi) => (acc += bi.defaultUnitAmount),
-          0
-        );
+        const totalBillingItemsAmount = subscription.service.billingItems
+          .reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
         weeklyRate += totalBillingItemsAmount * subscription.weeklyCount;
       }
 

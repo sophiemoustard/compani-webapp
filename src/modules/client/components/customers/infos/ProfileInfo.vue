@@ -310,7 +310,7 @@ import {
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { getLastVersion } from '@helpers/utils';
-import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban, bic, frAddress, minDate, integerNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getTagsToGenerateQuote, getTagsToDownloadQuote, getMandateTags } from 'src/modules/client/helpers/tags';
 import { userMixin } from '@mixins/userMixin';
@@ -514,6 +514,7 @@ export default {
         weeklyCount: {
           required: requiredIf(!this.isHourlySubscription || this.serviceHasBillingItems),
           minValue: minValue(0),
+          integer: integerNumber,
         },
         sundays: { minValue: minValue(0) },
         evenings: { minValue: minValue(0) },
@@ -633,7 +634,9 @@ export default {
     },
     numberErrorMessage (field) {
       if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
-      if (get(field, 'minValue.$response') === false) return INVALID_NUMBER;
+      if (get(field, 'minValue.$response') === false || get(field, 'integer.$response') === false) {
+        return INVALID_NUMBER;
+      }
       return '';
     },
     weeklyHoursErrorMessage (validations) {
