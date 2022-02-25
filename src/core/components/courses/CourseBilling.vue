@@ -10,7 +10,7 @@
                 <div class="text-weight-bold">A facturer - {{ formatPrice(bill.netInclTaxes) }}</div>
                 <div @click="openFunderEditionmodal(bill._id)">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
-                  <q-icon size="12px" name="edit" color="copper-grey-500" />
+                  <q-icon size="16px" name="edit" color="copper-grey-500" />
                 </div>
               </q-item-section>
             </q-card-section>
@@ -19,17 +19,17 @@
       </div>
       <div v-else class="row justify-end">
         <ni-button label="Démarrer la facturation" color="white" class="bg-primary" icon="payment"
-          @click="openBillCreationModal" :disable="billsLoading" />
+          @click="openBillCreationModal" :disable="billCreationLoading" />
       </div>
     </div>
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
-      :loading="billsLoading" :payer-options="payerList" :price-error="priceError" />
+      :loading="billCreationLoading" :payer-options="payerList" :price-error="priceError" />
 
     <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
-      @submit="editFunder" :validations="validations.editedBill.funder" @hide="resetFunderEditionModal"
-      :loading="funderLoading" :payer-options="payerList" />
+      @submit="editBill" :validations="validations.editedBill.funder" @hide="resetFunderEditionModal"
+      :loading="billEditionLoading" :payer-options="payerList" />
   </div>
 </template>
 
@@ -62,8 +62,8 @@ export default {
     useMeta(metaInfo);
     const $store = useStore();
 
-    const billsLoading = ref(false);
-    const funderLoading = ref(false);
+    const billCreationLoading = ref(false);
+    const billEditionLoading = ref(false);
     const payerList = ref([]);
     const courseBills = ref([]);
     const billCreationModal = ref(false);
@@ -78,7 +78,7 @@ export default {
       },
       editedBill: { funder: {} },
     };
-    const validations = useVuelidate(rules, { newBill });
+    const validations = useVuelidate(rules, { newBill, editedBill });
 
     const course = computed(() => $store.state.course.course);
 
@@ -138,7 +138,7 @@ export default {
         validations.value.newBill.$touch();
         if (validations.value.newBill.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        billsLoading.value = true;
+        billCreationLoading.value = true;
         await CourseBills.create({
           course: course.value._id,
           mainFee: { price: newBill.value.price },
@@ -153,16 +153,16 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la facture.');
       } finally {
-        billsLoading.value = false;
+        billCreationLoading.value = false;
       }
     };
 
-    const editFunder = async () => {
+    const editBill = async () => {
       try {
         validations.value.editedBill.$touch();
         if (validations.value.editedBill.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        funderLoading.value = true;
+        billEditionLoading.value = true;
         await CourseBills.update(editedBill.value._id, { courseFundingOrganisation: editedBill.value.funder });
         NotifyPositive('Payeur modifié.');
 
@@ -172,7 +172,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification du payeur.');
       } finally {
-        funderLoading.value = false;
+        billEditionLoading.value = false;
       }
     };
 
@@ -185,8 +185,8 @@ export default {
 
     return {
       // Data
-      billsLoading,
-      funderLoading,
+      billCreationLoading,
+      billEditionLoading,
       billCreationModal,
       funderEditionModal,
       newBill,
@@ -202,7 +202,7 @@ export default {
       resetBillCreationModal,
       resetFunderEditionModal,
       addBill,
-      editFunder,
+      editBill,
       openBillCreationModal,
       openFunderEditionmodal,
       refreshCourseBills,
