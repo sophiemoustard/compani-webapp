@@ -6,9 +6,12 @@
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.funder" required-field
       @blur="validations.funder.$touch" :error="validations.funder.$error"
       @update:model-value="update($event, 'funder')" />
-    <ni-input in-modal caption="Prix" :error="validations.price.$error" type="number"
-      :model-value="newBill.price" @blur="validations.price.$touch" suffix="€" required-field
-      :error-message="priceError" @update:model-value="update($event, 'price')" />
+    <ni-input in-modal caption="Prix" :error="validations.mainFee.price.$error" type="number"
+      :model-value="newBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
+      :error-message="errorMessage.price" @update:model-value="update($event, 'mainFee.price')" />
+    <ni-input in-modal caption="Quantité" :error="validations.mainFee.count.$error" type="number"
+      :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" suffix="€" required-field
+      :error-message="errorMessage.count" @update:model-value="update($event, 'mainFee.count')" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Démarrer la facturation" icon-right="add" color="white"
         :loading="loading" @click="submit" />
@@ -29,7 +32,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     newBill: { type: Object, default: () => ({}) },
     payerOptions: { type: Array, default: () => [] },
-    priceError: { type: String, default: '' },
+    errorMessage: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },

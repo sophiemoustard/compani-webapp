@@ -53,6 +53,13 @@ export const strictPositiveNumber = (value) => {
   return value > 0;
 };
 
+export const integerNumber = (value) => {
+  if (!value && value !== 0) return true;
+  if (isNaN(parseFloat(value)) || !isFinite(value)) return false;
+
+  return Number.isInteger(Number(value));
+};
+
 export const twoFractionDigits = value => /^\d*(\.\d{0,2})?$/.test(value);
 
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
