@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import has from 'lodash/has';
 import capitalize from 'lodash/capitalize';
-import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
+import { MONTHLY, FIXED, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import { getLastVersion } from '@helpers/utils';
 import moment from '@helpers/moment';
 
@@ -113,20 +113,16 @@ export const subscriptionMixin = {
       }
 
       let fundingReduction = 0;
-      if (this.isCompleteFunding(funding)) {
-        if (funding.frequency !== ONCE) {
-          if (funding.nature === FIXED) {
-            fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / WEEKS_PER_MONTH : funding.amountTTC;
-          } else {
-            const refundedHours = Math.min(
-              funding.frequency === MONTHLY ? funding.careHours / WEEKS_PER_MONTH : funding.careHours,
-              subscription.weeklyHours
-            );
-            fundingReduction = refundedHours * funding.unitTTCRate;
-          }
-
-          fundingReduction *= (1 - funding.customerParticipationRate / 100);
+      if (this.isCompleteFunding(funding) && funding.frequency === MONTHLY) {
+        if (funding.nature === FIXED) {
+          fundingReduction = funding.amountTTC / WEEKS_PER_MONTH;
         }
+        if (funding.nature === HOURLY) {
+          const refundedHours = Math.min(funding.careHours / WEEKS_PER_MONTH, subscription.weeklyHours);
+          fundingReduction = refundedHours * funding.unitTTCRate;
+        }
+
+        fundingReduction *= (1 - funding.customerParticipationRate / 100);
       }
 
       return Math.max(weeklyRate - fundingReduction, 0);
