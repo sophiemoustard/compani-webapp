@@ -11,7 +11,7 @@
                 <div @click="openFunderEditionmodal(bill._id)">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
                   <q-icon size="12px" name="edit" color="copper-grey-500" />
-                  </div>
+                </div>
               </q-item-section>
             </q-card-section>
           </q-card>
@@ -118,7 +118,8 @@ export default {
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
     const openFunderEditionmodal = (billId) => {
-      editedBill.value._id = billId;
+      const funder = get(courseBills.value.find(bill => bill._id === billId), 'courseFundingOrganisation._id') || '';
+      editedBill.value = { _id: billId, funder };
       funderEditionModal.value = true;
     };
 
