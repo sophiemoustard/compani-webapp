@@ -3,8 +3,8 @@
     <template #title>
       Ajouter un <span class="text-weight-bold">financeur</span>
     </template>
-    <ni-input in-modal caption="Nom" :model-value="newOrganisation.name" @update:model-value="update($event, 'name')"
-      :error="validations.name.$error" required-field />
+    <ni-input in-modal caption="Nom" :model-value="newOrganisation.name" :error="validations.name.$error"
+      @update:model-value="update($event.trim(), 'name')" required-field />
     <ni-search-address in-modal last :model-value="newOrganisation.address" :error="validations.address.$error"
       @update:model-value="update($event, 'address')" @blur="validations.address.$touch"
       :error-message="addressErrorMessage" required-field />

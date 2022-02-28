@@ -3,8 +3,8 @@
       <template #title>
         Editer le <span class="text-weight-bold">tiers payeur</span>
       </template>
-      <ni-input in-modal caption="Nom" :model-value="editedThirdPartyPayer.name" required-field
-        :error="validations.name.$error" @blur="validations.name.$touch" @update:model-value="update($event, 'name')" />
+      <ni-input in-modal caption="Nom" @update:model-value="update($event.trim(), 'name')" required-field
+        :error="validations.name.$error" @blur="validations.name.$touch" :model-value="editedThirdPartyPayer.name" />
       <ni-search-address in-modal :model-value="editedThirdPartyPayer.address" error-message="Adresse invalide"
         @blur="validations.address.$touch" :error="validations.address.$error"
         @update:model-value="update($event, 'address')" />

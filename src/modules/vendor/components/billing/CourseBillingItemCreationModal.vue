@@ -3,7 +3,7 @@
     <template #title>
       Ajouter un <span class="text-weight-bold">article</span>
     </template>
-    <ni-input in-modal caption="Nom" :model-value="newItem.name" @update:model-value="update($event, 'name')"
+    <ni-input in-modal caption="Nom" :model-value="newItem.name" @update:model-value="update($event.trim(), 'name')"
       :error="validations.name.$error" required-field />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter" icon-right="add" color="white"
