@@ -139,7 +139,7 @@
                     :disable="docLoading || !getDriveId(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
-                  <ni-date-input in-modal @update:model-value="updateSignedAt(props.row)"
+                  <ni-date-input in-modal @update:model-value="updateSignedAt($event, props.row)"
                     v-model="customer.payment.mandates[getRowIndex(customer.payment.mandates, props.row)].signedAt"
                     @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" />
                 </template>
@@ -846,11 +846,11 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Mandates
-    async updateSignedAt (mandate) {
+    async updateSignedAt (event, mandate) {
       try {
-        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
+        if (!mandate.signedAt || this.tmpInput === event) return;
         const params = { _id: this.customer._id, mandateId: mandate._id };
-        await Customers.updateMandate(params, mandate);
+        await Customers.updateMandate(params, { ...mandate, signedAt: event });
 
         this.refreshMandates();
         NotifyPositive('Modification enregistrée');
