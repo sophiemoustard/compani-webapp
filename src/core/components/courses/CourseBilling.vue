@@ -8,7 +8,7 @@
             <q-card-section class="cursor-pointer row" :id="bill._id" @click="showDetails(bill._id)">
               <q-item-section>
                 <div class="text-weight-bold">A facturer - {{ formatPrice(bill.netInclTaxes) }}</div>
-                <div @click="openFunderEditionmodal(bill._id)">
+                <div @click.stop="openFunderEditionmodal(bill._id)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
                   <q-icon size="16px" name="edit" color="copper-grey-500" />
                 </div>
@@ -82,7 +82,7 @@ export default {
     const editedBill = ref({ _id: '', funder: '' });
     const newBill = ref({ funder: '', mainFee: { price: '', count: 1 } });
     const areDetailsVisible = ref(Object
-      .fromEntries(courseBills.value.map(bill => bill._id).map(id => [id, false])));
+      .fromEntries(courseBills.value.map(bill => [bill._id, false])));
 
     const rules = {
       newBill: {
@@ -243,3 +243,8 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.payer
+  width: fit-content
+</style>
