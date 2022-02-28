@@ -81,7 +81,7 @@ export default {
     const courseBills = ref([]);
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
-    const newBill = ref({ funder: '', mainFee: { price: '', count: 1 } });
+    const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
     const editedBill = ref({ _id: '', funder: '' });
     const areDetailsVisible = ref(Object
       .fromEntries(courseBills.value.map(bill => [bill._id, false])));
@@ -154,7 +154,7 @@ export default {
     };
 
     const resetBillCreationModal = () => {
-      newBill.value = { funder: '', mainFee: { price: '', count: 1 } };
+      newBill.value = { funder: '', mainFee: { price: 0, count: 1 } };
       validations.value.newBill.$reset();
     };
 
