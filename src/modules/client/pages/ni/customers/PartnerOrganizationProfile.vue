@@ -253,6 +253,7 @@ export default {
         await this.refreshPartnerOrganization();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative('Structure partenaire déjà existante.');
         NotifyNegative('Erreur lors de la modification du/de la partenaire.');
       } finally {
         this.modalLoading = false;

@@ -1123,6 +1123,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403) return NotifyNegative(e.data.message);
+        if (e.status === 409) return NotifyNegative('Article de facturation déjà existant.');
         NotifyNegative('Erreur lors de la suppression de l\'article de facturation.');
       }
     },
@@ -1179,6 +1180,7 @@ export default {
         this.thirdPartyPayerCreationModal = false;
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative('Thiers payeur déjà existant.');
         NotifyNegative('Erreur lors de la création du tiers payeur.');
       } finally {
         this.loading = false;
@@ -1203,6 +1205,7 @@ export default {
         NotifyPositive('Tiers payeur modifié.');
         this.thirdPartyPayerEditionModal = false;
       } catch (e) {
+        if (e.status === 409) return NotifyNegative('Thiers payeur déjà existant.');
         NotifyNegative('Erreur lors de la modification du tiers payeur.');
         console.error(e);
       } finally {
