@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="q-mt-lg q-mb-xl">
+    <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
       <div v-if="courseBills.length">
+        <p class="text-weight-bold">Infos de facturation</p>
         <div v-for="bill of courseBills" :key="bill._id">
-          <p class="text-weight-bold">Infos de facturation</p>
           <q-card flat class="q-mb-sm">
             <q-card-section class="cursor-pointer row" :id="bill._id" @click="showDetails(bill._id)">
               <q-item-section>
@@ -33,6 +33,7 @@
           @click="openBillCreationModal" :disable="billCreationLoading" />
       </div>
     </div>
+    <div v-else class="row justify-center q-mt-md"><q-spinner size="30px" /></div>
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
@@ -75,6 +76,7 @@ export default {
 
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
+    const billsLoading = ref(false);
     const payerList = ref([]);
     const courseBills = ref([]);
     const billCreationModal = ref(false);
@@ -131,11 +133,14 @@ export default {
 
     const refreshCourseBills = async () => {
       try {
+        billsLoading.value = true;
         courseBills.value = await CourseBills.list({ course: course.value._id });
       } catch (e) {
         console.error(e);
         courseBills.value = [];
         NotifyNegative('Erreur lors de la récupération des factures.');
+      } finally {
+        billsLoading.value = false;
       }
     };
 
@@ -206,8 +211,8 @@ export default {
     };
 
     const created = async () => {
-      refreshCourseFundingOrganisations();
       refreshCourseBills();
+      refreshCourseFundingOrganisations();
     };
 
     created();
@@ -216,6 +221,7 @@ export default {
       // Data
       billCreationLoading,
       billEditionLoading,
+      billsLoading,
       billCreationModal,
       funderEditionModal,
       newBill,

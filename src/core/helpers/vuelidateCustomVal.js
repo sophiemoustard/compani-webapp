@@ -55,7 +55,6 @@ export const strictPositiveNumber = (value) => {
 
 export const integerNumber = (value) => {
   if (!value) return true;
-  if (isNaN(parseFloat(value)) || !isFinite(value)) return false;
 
   return Number.isInteger(Number(value));
 };
