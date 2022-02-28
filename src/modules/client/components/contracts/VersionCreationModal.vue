@@ -5,7 +5,7 @@
     </template>
     <ni-input in-modal caption="Volume horaire hebdomadaire" :model-value="newVersion.weeklyHours" type="number"
       :error="validations.weeklyHours.$error" :error-message="weeklyHoursError" @blur="validations.weeklyHours.$touch"
-       @update:model-value="update($event, 'weeklyHours')" suffix="h" required-field />
+      @update:model-value="update($event, 'weeklyHours')" suffix="h" required-field />
     <ni-input in-modal caption="Taux horaire" :error="validations.grossHourlyRate.$error" type="number" suffix="€"
       :model-value="newVersion.grossHourlyRate" required-field @update:model-value="update($event, 'grossHourlyRate')"
       @blur="validations.grossHourlyRate.$touch" :error-message="grossHourlyRateError" />
