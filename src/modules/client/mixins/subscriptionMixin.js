@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import has from 'lodash/has';
 import capitalize from 'lodash/capitalize';
-import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
+import { MONTHLY, FIXED, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import { getLastVersion } from '@helpers/utils';
 import moment from '@helpers/moment';
 
@@ -30,10 +30,16 @@ export const subscriptionMixin = {
           field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
         },
         {
-          name: 'weeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
+          name: 'weeklyHours',
+          label: 'Volume horaire hebdomadaire estimatif',
           align: 'center',
-          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : row.weeklyCount),
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : ''),
+        },
+        {
+          name: 'weeklyCount',
+          label: 'Nombre d\'interventions hebdomadaire estimatif',
+          align: 'center',
+          field: row => (row.weeklyCount || ''),
         },
         {
           name: 'weeklyRate',
@@ -97,21 +103,24 @@ export const subscriptionMixin = {
           weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening / 100;
         }
       }
-      let fundingReduction = 0;
-      if (this.isCompleteFunding(funding)) {
-        if (funding.frequency !== ONCE) {
-          if (funding.nature === FIXED) {
-            fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / WEEKS_PER_MONTH : funding.amountTTC;
-          } else {
-            const refundedHours = Math.min(
-              funding.frequency === MONTHLY ? funding.careHours / WEEKS_PER_MONTH : funding.careHours,
-              subscription.weeklyHours
-            );
-            fundingReduction = refundedHours * funding.unitTTCRate;
-          }
 
-          fundingReduction *= (1 - funding.customerParticipationRate / 100);
+      if (get(subscription, 'service.billingItems.length')) {
+        const totalBillingItemsAmount = subscription.service.billingItems
+          .reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
+        weeklyRate += totalBillingItemsAmount * subscription.weeklyCount;
+      }
+
+      let fundingReduction = 0;
+      if (this.isCompleteFunding(funding) && funding.frequency === MONTHLY) {
+        if (funding.nature === FIXED) {
+          fundingReduction = funding.amountTTC / WEEKS_PER_MONTH;
         }
+        if (funding.nature === HOURLY) {
+          const refundedHours = Math.min(funding.careHours / WEEKS_PER_MONTH, subscription.weeklyHours);
+          fundingReduction = refundedHours * funding.unitTTCRate;
+        }
+
+        fundingReduction *= (1 - funding.customerParticipationRate / 100);
       }
 
       return Math.max(weeklyRate - fundingReduction, 0);

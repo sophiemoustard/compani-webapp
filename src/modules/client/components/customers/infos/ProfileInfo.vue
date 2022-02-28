@@ -248,7 +248,7 @@
       :weekly-hours-error-message="weeklyHoursErrorMessage(v$.editedSubscription)" :loading="loading"
       :weekly-count-error-message="weeklyCountErrorMessage(v$.editedSubscription)" @hide="resetEditionSubscriptionData"
       :evenings-error-message="eveningsErrorMessage(v$.editedSubscription)" :validations="v$.editedSubscription"
-      :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" :service-options="serviceOptions" />
+      :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" />
 
     <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
       @hide="resetSubscriptionHistoryData" />
@@ -310,7 +310,7 @@ import {
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { getLastVersion } from '@helpers/utils';
-import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban, bic, frAddress, minDate, integerNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getTagsToGenerateQuote, getTagsToDownloadQuote, getMandateTags } from 'src/modules/client/helpers/tags';
 import { userMixin } from '@mixins/userMixin';
@@ -444,11 +444,16 @@ export default {
       const subscribedServices = this.subscriptions.map(subscription => get(subscription, 'service._id'));
       const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
-      return availableServices.map(service => ({
-        label: getLastVersion(service.versions, 'createdAt').name,
-        value: service._id,
-        nature: service.nature,
-      }));
+      return availableServices.map((service) => {
+        const serviceLastVersion = getLastVersion(service.versions, 'createdAt');
+
+        return ({
+          label: serviceLastVersion.name,
+          value: service._id,
+          nature: service.nature,
+          billingItems: serviceLastVersion.billingItems,
+        });
+      });
     },
     primaryAddressError () {
       if (this.v$.customer.contact.primaryAddress.fullAddress.required.$response === false) return REQUIRED_LABEL;
@@ -495,11 +500,22 @@ export default {
 
       return get(selectedService, 'nature') === HOURLY;
     },
+    serviceHasBillingItems () {
+      const selectedService = this.openNewSubscriptionModal
+        ? this.serviceOptions.find(s => s.value === this.newSubscription.service)
+        : this.editedSubscription;
+
+      return !!get(selectedService, 'billingItems.length') || false;
+    },
     getSubscriptionValidation () {
       return {
         unitTTCRate: { required, minValue: minValue(0) },
         weeklyHours: { required: requiredIf(this.isHourlySubscription), minValue: minValue(0) },
-        weeklyCount: { required: requiredIf(!this.isHourlySubscription), minValue: minValue(0) },
+        weeklyCount: {
+          required: requiredIf(!this.isHourlySubscription || this.serviceHasBillingItems),
+          minValue: minValue(0),
+          integer: integerNumber,
+        },
         sundays: { minValue: minValue(0) },
         evenings: { minValue: minValue(0) },
       };
@@ -618,7 +634,9 @@ export default {
     },
     numberErrorMessage (field) {
       if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
-      if (get(field, 'minValue.$response') === false) return INVALID_NUMBER;
+      if (get(field, 'minValue.$response') === false || get(field, 'integer.$response') === false) {
+        return INVALID_NUMBER;
+      }
       return '';
     },
     weeklyHoursErrorMessage (validations) {
@@ -762,6 +780,7 @@ export default {
     openSubscriptionEditionModal (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
       const { _id, service, unitTTCRate, weeklyHours, weeklyCount, evenings, sundays } = selectedSubscription;
+
       this.editedSubscription = {
         _id,
         nature: service.nature,
@@ -770,6 +789,7 @@ export default {
         weeklyCount: weeklyCount || 0,
         evenings: evenings || 0,
         sundays: sundays || 0,
+        billingItems: service.billingItems,
       };
 
       this.openEditedSubscriptionModal = true;
