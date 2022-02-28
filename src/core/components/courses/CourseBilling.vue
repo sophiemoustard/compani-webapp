@@ -18,9 +18,9 @@
               <q-card-section>
                 <q-card flat>
                   <q-card-section class="cursor-pointer">
-                    <div class="text-copper-500">{{ course.subProgram.program.name }}</div>
-                    <div>Prix unitaire : {{ formatPrice(bill.mainFee.price) }}</div>
-                    <div>Quantité : {{ bill.mainFee.count }}</div>
+                    <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
+                    <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
+                    <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
                   </q-card-section>
                 </q-card>
               </q-card-section>
@@ -37,7 +37,7 @@
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
-      :loading="billCreationLoading" :payer-options="payerList" :error-message="errorMessage" />
+      :loading="billCreationLoading" :payer-options="payerList" :error-messages="billErrorMessages" />
 
     <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
       @submit="editBill" :validations="validations.editedBill.funder" @hide="resetFunderEditionModal"
@@ -81,8 +81,8 @@ export default {
     const courseBills = ref([]);
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
-    const editedBill = ref({ _id: '', funder: '' });
     const newBill = ref({ funder: '', mainFee: { price: '', count: 1 } });
+    const editedBill = ref({ _id: '', funder: '' });
     const areDetailsVisible = ref(Object
       .fromEntries(courseBills.value.map(bill => [bill._id, false])));
 
@@ -100,7 +100,7 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
-    const errorMessage = computed(() => {
+    const billErrorMessages = computed(() => {
       let price = '';
       let count = '';
       if (get(validations, 'value.newBill.mainFee.price.required.$response') === false) price = REQUIRED_LABEL;
@@ -231,7 +231,7 @@ export default {
       // Computed
       validations,
       course,
-      errorMessage,
+      billErrorMessages,
       areDetailsVisible,
       // Methods
       refreshCourseFundingOrganisations,
