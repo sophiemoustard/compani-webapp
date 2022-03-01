@@ -514,6 +514,7 @@ export default {
       const selectedService = this.openNewSubscriptionModal
         ? this.serviceOptions.find(s => s.value === this.newSubscription.service)
         : this.editedSubscription;
+
       return !!get(selectedService, 'billingItems.length') || false;
     },
     getSubscriptionValidation () {
@@ -527,7 +528,7 @@ export default {
           },
         },
         weeklyCount: {
-          required: requiredIf(!this.isHourlySubscription),
+          required: requiredIf(!this.isHourlySubscription || this.serviceHasBillingItems),
           integer: integerNumber,
           checkValue: (value) => {
             const isForbidden = this.isHourlySubscription && !this.serviceHasBillingItems;
