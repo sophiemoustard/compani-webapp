@@ -521,16 +521,18 @@ export default {
         unitTTCRate: { required, minValue: value => value > 0 },
         weeklyHours: {
           required: requiredIf(this.isHourlySubscription),
-          checkValue: value => (!(value && !this.isHourlySubscription) && value && value > 0) ||
-            (!value && !this.isHourlySubscription),
+          checkValue: (value) => {
+            const isForbidden = !this.isHourlySubscription;
+            return (!isForbidden && value && value > 0) || (!value && isForbidden);
+          },
         },
         weeklyCount: {
           required: requiredIf(!this.isHourlySubscription),
           integer: integerNumber,
-          checkValue: value => (
-            (!(value && this.isHourlySubscription && !this.serviceHasBillingItems) && value && value > 0) ||
-              (!value && this.isHourlySubscription && !this.serviceHasBillingItems)
-          ),
+          checkValue: (value) => {
+            const isForbidden = this.isHourlySubscription && !this.serviceHasBillingItems;
+            return (!isForbidden && value && value > 0) || (!value && isForbidden);
+          },
         },
         saturdays: { minValue: minValue(0) },
         sundays: { minValue: minValue(0) },
