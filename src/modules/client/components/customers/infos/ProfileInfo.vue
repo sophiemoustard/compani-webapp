@@ -249,6 +249,7 @@
       :weekly-hours-error-message="weeklyHoursErrorMessage(v$.editedSubscription)" :loading="loading"
       :weekly-count-error-message="weeklyCountErrorMessage(v$.editedSubscription)" @hide="resetEditionSubscriptionData"
       :evenings-error-message="eveningsErrorMessage(v$.editedSubscription)" :validations="v$.editedSubscription"
+      :saturdays-error-message="saturdaysErrorMessage(v$.editedSubscription)"
       :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" />
 
     <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
@@ -794,7 +795,16 @@ export default {
     },
     openSubscriptionEditionModal (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      const { _id, service, unitTTCRate, weeklyHours, weeklyCount, evenings, sundays } = selectedSubscription;
+      const {
+        _id,
+        service,
+        unitTTCRate,
+        weeklyHours,
+        weeklyCount,
+        evenings,
+        saturdays,
+        sundays,
+      } = selectedSubscription;
 
       this.editedSubscription = {
         _id,
@@ -803,6 +813,7 @@ export default {
         weeklyHours: weeklyHours || 0,
         weeklyCount: weeklyCount || 0,
         evenings: evenings || 0,
+        saturdays: saturdays || 0,
         sundays: sundays || 0,
         billingItems: service.billingItems,
       };
@@ -814,9 +825,10 @@ export default {
       this.v$.editedSubscription.$reset();
     },
     formatEditedSubscription () {
+      const hourlySubscriptionFields = ['saturdays', 'sundays', 'evenings', 'weeklyHours'];
       return {
         ...pickBy(pick(this.editedSubscription, ['unitTTCRate', 'weeklyCount'])),
-        ...(this.isHourlySubscription && pickBy(pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours']))),
+        ...(this.isHourlySubscription && pickBy(pick(this.editedSubscription, hourlySubscriptionFields))),
       };
     },
     async updateSubscription () {
