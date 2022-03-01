@@ -2,10 +2,10 @@
   <div v-if="company">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Raison sociale" v-model.trim="company.name" @focus="saveTmp('name')"
-          @blur="updateCompany('name')" :error="v$.company.name.$error" />
-        <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
-          @blur="updateCompany('tradeName')" :error="v$.company.tradeName.$error"
+        <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
+          @blur="trimAndUpdateCompany('name')" :error="v$.company.name.$error" />
+        <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
+          @blur="trimAndUpdateCompany('tradeName')" :error="v$.company.tradeName.$error"
           :error-message="tradeNameError(v$.company)" />
         <ni-search-address v-model="company.address" :error-message="addressError" @blur="updateCompany('address')"
             @focus="saveTmp('address.fullAddress')" :error="v$.company.address.$error" />
@@ -81,6 +81,12 @@ export default {
         console.error(e);
       }
     },
+    async trimAndUpdateCompany (path) {
+      const value = get(this.company, path);
+      set(this.company, path, value.trim());
+
+      this.updateCompany(path);
+    },
     async updateCompany (path) {
       try {
         const value = get(this.company, path);
@@ -101,7 +107,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
-        if (e.status === 409) return NotifyNegative('Nom de structure déjà existant.');
+        if (e.status === 409) return NotifyWarning('Nom de structure déjà existant.');
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';

@@ -4,7 +4,7 @@
     <p class="text-weight-bold">Informations</p>
     <div class="row gutter-profile">
       <ni-input caption="Nom" v-model.trim="partnerOrganization.name" @focus="saveTmp('name')"
-        @blur="updatePartnerOrganization('name')" :error="v$.partnerOrganization.name.$error" />
+        @blur="trimAndUpdatePartnerOrganization('name')" :error="v$.partnerOrganization.name.$error" />
       <ni-input caption="Téléphone" v-model="partnerOrganization.phone" @focus="saveTmp('phone')"
         @blur="updatePartnerOrganization('phone')" :error="v$.partnerOrganization.phone.$error"
         :error-message="phoneNumberError(v$.partnerOrganization)" />
@@ -185,6 +185,12 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération de la structure partenaire.');
       }
+    },
+    async trimAndUpdatePartnerOrganization (path) {
+      const value = get(this.partnerOrganization, path);
+      set(this.partnerOrganization, path, value.trim());
+
+      this.updatePartnerOrganization(path);
     },
     async updatePartnerOrganization (path) {
       try {

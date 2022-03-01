@@ -137,7 +137,7 @@ export default {
         await this.refreshPartnerOrganizations();
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyWarning(e.data.message);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la création de la structure partenaire.');
       } finally {
         this.modalLoading = false;
