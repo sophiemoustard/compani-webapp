@@ -514,17 +514,22 @@ export default {
       const selectedService = this.openNewSubscriptionModal
         ? this.serviceOptions.find(s => s.value === this.newSubscription.service)
         : this.editedSubscription;
-
       return !!get(selectedService, 'billingItems.length') || false;
     },
     getSubscriptionValidation () {
       return {
-        unitTTCRate: { required, minValue: minValue(0) },
-        weeklyHours: { required: requiredIf(this.isHourlySubscription), minValue: minValue(0) },
+        unitTTCRate: { required, minValue: value => value > 0 },
+        weeklyHours: {
+          required: requiredIf(this.isHourlySubscription),
+          checkValue: value => (!(value && !this.isHourlySubscription) && value && value > 0) ||
+            (!value && !this.isHourlySubscription),
+        },
         weeklyCount: {
-          required: requiredIf(!this.isHourlySubscription || this.serviceHasBillingItems),
-          minValue: minValue(0),
-          integer: integerNumber,
+          required: requiredIf(!this.isHourlySubscription),
+          checkValue: value => (
+            (!(value && this.isHourlySubscription && !this.serviceHasBillingItems) && value && value > 0) ||
+              (!value && this.isHourlySubscription && !this.serviceHasBillingItems)
+          ),
         },
         saturdays: { minValue: minValue(0) },
         sundays: { minValue: minValue(0) },
@@ -752,9 +757,6 @@ export default {
       this.v$.customer.$touch();
     },
     // Subscriptions
-    isDefinedOrZero (value) {
-      return !!value || value === 0;
-    },
     formatCreatedSubscription () {
       const hourlySubscriptionFields = ['saturdays', 'sundays', 'evenings', 'weeklyHours'];
       return {
