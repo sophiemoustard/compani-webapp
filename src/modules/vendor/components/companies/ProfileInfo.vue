@@ -107,7 +107,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
-        if (e.status === 409) return NotifyWarning('Nom de structure déjà existant.');
+        if (e.status === 409) return NotifyNegative('Nom de structure déjà existant.');
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';

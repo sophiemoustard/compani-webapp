@@ -3,7 +3,7 @@
     <ni-profile-header :title="partnerOrganizationName" />
     <p class="text-weight-bold">Informations</p>
     <div class="row gutter-profile">
-      <ni-input caption="Nom" v-model.trim="partnerOrganization.name" @focus="saveTmp('name')"
+      <ni-input caption="Nom" v-model="partnerOrganization.name" @focus="saveTmp('name')"
         @blur="trimAndUpdatePartnerOrganization('name')" :error="v$.partnerOrganization.name.$error" />
       <ni-input caption="Téléphone" v-model="partnerOrganization.phone" @focus="saveTmp('phone')"
         @blur="updatePartnerOrganization('phone')" :error="v$.partnerOrganization.phone.$error"

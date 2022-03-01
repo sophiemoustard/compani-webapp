@@ -1180,7 +1180,7 @@ export default {
         this.thirdPartyPayerCreationModal = false;
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative('Thiers payeur déjà existant.');
+        if (e.status === 409) return NotifyNegative('Tiers payeur déjà existant.');
         NotifyNegative('Erreur lors de la création du tiers payeur.');
       } finally {
         this.loading = false;
@@ -1205,7 +1205,7 @@ export default {
         NotifyPositive('Tiers payeur modifié.');
         this.thirdPartyPayerEditionModal = false;
       } catch (e) {
-        if (e.status === 409) return NotifyNegative('Thiers payeur déjà existant.');
+        if (e.status === 409) return NotifyNegative('Tiers payeur déjà existant.');
         NotifyNegative('Erreur lors de la modification du tiers payeur.');
         console.error(e);
       } finally {
