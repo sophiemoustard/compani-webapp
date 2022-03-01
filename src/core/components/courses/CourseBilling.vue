@@ -14,13 +14,16 @@
                 </div>
               </q-item-section>
             </q-card-section>
-            <div class="bg-peach-200" v-if="areDetailsVisible[bill._id]">
+            <div class="bg-peach-200" v-if="areDetailsVisible[bill._id]" @click="openCourseFeeEditionModal(bill._id)">
               <q-card-section>
                 <q-card flat>
                   <q-card-section class="cursor-pointer">
                     <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                     <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
                     <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
+                    <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
+                      Description : {{ bill.mainFee.description }}
+                    </div>
                   </q-card-section>
                 </q-card>
               </q-card-section>
@@ -37,11 +40,15 @@
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
-      :loading="billCreationLoading" :payer-options="payerList" :error-messages="billErrorMessages" />
+      :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
 
     <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
-      @submit="editBill" :validations="validations.editedBill.funder" @hide="resetFunderEditionModal"
+      @submit="editBill" :validations="validations.editedBill.funder" @hide="resetEditedBillEditionModal"
       :loading="billEditionLoading" :payer-options="payerList" />
+
+    <ni-course-fee-edition-modal v-model="courseFeeEditionModal" v-model:edited-bill="editedBill"
+      @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
+      :loading="billEditionLoading" :error-messages="editedBillErrorMessages" />
   </div>
 </template>
 
@@ -61,12 +68,14 @@ import Button from '@components/Button';
 import { REQUIRED_LABEL } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
+import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
 
 export default {
   name: 'BillingConfig',
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
+    'ni-course-fee-edition-modal': CourseFeeEditionModal,
     'ni-button': Button,
   },
   setup () {
@@ -81,8 +90,9 @@ export default {
     const courseBills = ref([]);
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
+    const courseFeeEditionModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
-    const editedBill = ref({ _id: '', funder: '' });
+    const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
     const areDetailsVisible = ref(Object
       .fromEntries(courseBills.value.map(bill => [bill._id, false])));
 
@@ -94,28 +104,39 @@ export default {
           count: { required, strictPositiveNumber, integerNumber },
         },
       },
-      editedBill: { funder: {} },
+      editedBill: {
+        funder: {},
+        mainFee: {
+          price: { required, strictPositiveNumber },
+          count: { required, strictPositiveNumber, integerNumber },
+          description: {},
+        },
+      },
     };
     const validations = useVuelidate(rules, { newBill, editedBill });
 
     const course = computed(() => $store.state.course.course);
 
-    const billErrorMessages = computed(() => {
+    const newBillErrorMessages = computed(() => getBillErrorMessages('newBill'));
+
+    const editedBillErrorMessages = computed(() => getBillErrorMessages('editedBill'));
+
+    const getBillErrorMessages = (bill) => {
       let price = '';
       let count = '';
-      if (get(validations, 'value.newBill.mainFee.price.required.$response') === false) price = REQUIRED_LABEL;
-      if (get(validations, 'value.newBill.mainFee.price.strictPositiveNumber.$response') === false) {
+      if (get(validations, `value.${bill}.mainFee.price.required.$response`) === false) price = REQUIRED_LABEL;
+      if (get(validations, `value.${bill}.mainFee.price.strictPositiveNumber.$response`) === false) {
         price = 'Prix non valide';
       }
 
-      if (get(validations, 'value.newBill.mainFee.count.required.$response') === false) count = REQUIRED_LABEL;
-      if (get(validations, 'value.newBill.mainFee.count.strictPositiveNumber.$response') === false ||
-        get(validations, 'value.newBill.mainFee.count.integerNumber.$response') === false) {
+      if (get(validations, `value.${bill}.mainFee.count.required.$response`) === false) count = REQUIRED_LABEL;
+      if (get(validations, `value.${bill}.mainFee.count.strictPositiveNumber.$response`) === false ||
+        get(validations, `value.${bill}.mainFee.count.integerNumber.$response`) === false) {
         count = 'Nombre non valide';
       }
 
       return { price, count };
-    });
+    };
 
     const refreshCourseFundingOrganisations = async () => {
       try {
@@ -146,11 +167,29 @@ export default {
 
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
-    const openFunderEditionmodal = (billId) => {
+    const setEditedBill = (billId) => {
       const courseBill = courseBills.value.find(bill => bill._id === billId);
       const funder = get(courseBill, 'courseFundingOrganisation._id') || '';
-      editedBill.value = { _id: billId, funder };
+      editedBill.value = {
+        _id: billId,
+        funder,
+        mainFee: {
+          price: courseBill.mainFee.price,
+          count: courseBill.mainFee.count,
+          description: courseBill.mainFee.description,
+        },
+        title: get(course, 'subProgram.program.name'),
+      };
+    };
+
+    const openFunderEditionmodal = (billId) => {
+      setEditedBill(billId);
       funderEditionModal.value = true;
+    };
+
+    const openCourseFeeEditionModal = (billId) => {
+      setEditedBill(billId);
+      courseFeeEditionModal.value = true;
     };
 
     const resetBillCreationModal = () => {
@@ -158,8 +197,8 @@ export default {
       validations.value.newBill.$reset();
     };
 
-    const resetFunderEditionModal = () => {
-      editedBill.value = { _id: '', funder: '' };
+    const resetEditedBillEditionModal = () => {
+      editedBill.value = { _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } };
       validations.value.editedBill.$reset();
     };
 
@@ -193,14 +232,18 @@ export default {
         if (validations.value.editedBill.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         billEditionLoading.value = true;
-        await CourseBills.update(editedBill.value._id, { courseFundingOrganisation: editedBill.value.funder });
-        NotifyPositive('Payeur modifié.');
+        await CourseBills.update(
+          editedBill.value._id,
+          { courseFundingOrganisation: editedBill.value.funder, mainFee: editedBill.value.mainFee }
+        );
+        NotifyPositive('Facture modifiée.');
 
         funderEditionModal.value = false;
+        courseFeeEditionModal.value = false;
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification du payeur.');
+        NotifyNegative('Erreur lors de la modification de la facture.');
       } finally {
         billEditionLoading.value = false;
       }
@@ -224,6 +267,7 @@ export default {
       billsLoading,
       billCreationModal,
       funderEditionModal,
+      courseFeeEditionModal,
       newBill,
       editedBill,
       payerList,
@@ -231,16 +275,19 @@ export default {
       // Computed
       validations,
       course,
-      billErrorMessages,
+      newBillErrorMessages,
+      editedBillErrorMessages,
       areDetailsVisible,
       // Methods
       refreshCourseFundingOrganisations,
       resetBillCreationModal,
-      resetFunderEditionModal,
+      resetEditedBillEditionModal,
       addBill,
       editBill,
+      getBillErrorMessages,
       openBillCreationModal,
       openFunderEditionmodal,
+      openCourseFeeEditionModal,
       refreshCourseBills,
       showDetails,
       get,

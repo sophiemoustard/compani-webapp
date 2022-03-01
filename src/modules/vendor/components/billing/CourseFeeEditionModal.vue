@@ -1,19 +1,19 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
-      Démarrer la <span class="text-weight-bold">facturation</span>
+      <span class="text-weight-bold">{{ editedBill.title }}</span>
     </template>
-    <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.funder" required-field
-      @blur="validations.funder.$touch" :error="validations.funder.$error"
-      @update:model-value="update($event, 'funder')" />
-    <ni-input in-modal caption="Prix" :error="validations.mainFee.price.$error" type="number"
-      :model-value="newBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
+    <ni-input in-modal caption="Prix unitaire" :error="validations.mainFee.price.$error" type="number"
+      :model-value="editedBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'mainFee.price')" />
     <ni-input in-modal caption="Quantité" :error="validations.mainFee.count.$error" type="number"
-      :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
+      :model-value="editedBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'mainFee.count')" />
+    <ni-input in-modal caption="Description" :error="validations.mainFee.description.$error" type="textarea"
+      :model-value="editedBill.mainFee.description" @blur="validations.mainFee.description.$touch"
+      @update:model-value="update($event, 'mainFee.description')" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" label="Démarrer la facturation" icon-right="add" color="white"
+      <ni-button class="full-width modal-btn bg-primary" label="Éditer le payeur" icon-right="add" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
@@ -21,28 +21,25 @@
 
 <script>
 import Modal from '@components/modal/Modal';
-import Input from '@components/form/Input';
 import Button from '@components/Button';
-import Select from '@components/form/Select';
+import Input from '@components/form/Input';
 import set from 'lodash/set';
 
 export default {
-  name: 'CourseBillCreationModal',
+  name: 'CourseFeeEditionModal',
   props: {
     modelValue: { type: Boolean, default: false },
-    newBill: { type: Object, default: () => ({}) },
-    payerOptions: { type: Array, default: () => [] },
+    editedBill: { type: Object, default: () => ({}) },
     errorMessages: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
-    'ni-input': Input,
     'ni-button': Button,
-    'ni-select': Select,
+    'ni-input': Input,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:new-bill'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:edited-bill'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -54,7 +51,7 @@ export default {
       this.$emit('submit');
     },
     update (event, path) {
-      this.$emit('update:new-bill', set({ ...this.newBill }, path, event));
+      this.$emit('update:edited-bill', set({ ...this.editedBill }, path, event));
     },
   },
 };
