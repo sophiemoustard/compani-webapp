@@ -76,8 +76,14 @@ export const subscriptionMixin = {
           field: row => (row.evenings ? `${row.evenings}h` : ''),
         },
         {
+          name: 'saturdays',
+          label: 'dont samedis',
+          align: 'center',
+          field: row => (row.saturdays ? `${row.saturdays}h` : ''),
+        },
+        {
           name: 'sundays',
-          label: 'dont dimanche',
+          label: 'dont dimanches',
           align: 'center',
           field: row => (row.sundays ? `${row.sundays}h` : ''),
         },

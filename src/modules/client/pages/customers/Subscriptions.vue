@@ -346,6 +346,7 @@ export default {
         startDate: lastVersion.startDate,
         ...(lastVersion.weeklyHours && { weeklyHours: lastVersion.weeklyHours }),
         ...(lastVersion.evenings && { evenings: lastVersion.evenings }),
+        ...(lastVersion.saturdays && { saturdays: lastVersion.saturdays }),
         ...(lastVersion.sundays && { sundays: lastVersion.sundays }),
       };
     },
