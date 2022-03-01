@@ -20,6 +20,9 @@
         :error="validations.weeklyHours.$error" caption="Volume horaire hebdomadaire estimatif (h)"
         @blur="validations.weeklyHours.$touch" @update:model-value="update($event, 'weeklyHours')"
         :error-message="weeklyHoursErrorMessage" />
+      <ni-input in-modal :model-value="newSubscription.saturdays" caption="Dont samedi (h)" type="number"
+        @update:model-value="update($event, 'saturdays')" :error-message="saturdaysErrorMessage"
+        :error="validations.saturdays.$error" @blur="validations.saturdays.$touch" />
       <ni-input in-modal :model-value="newSubscription.sundays" caption="Dont dimanche (h)" type="number"
         @update:model-value="update($event, 'sundays')" :error-message="sundaysErrorMessage"
         :error="validations.sundays.$error" @blur="validations.sundays.$touch" />
@@ -53,6 +56,7 @@ export default {
     weeklyHoursErrorMessage: { type: String, default: REQUIRED_LABEL },
     weeklyCountErrorMessage: { type: String, default: REQUIRED_LABEL },
     eveningsErrorMessage: { type: String, default: REQUIRED_LABEL },
+    saturdaysErrorMessage: { type: String, default: REQUIRED_LABEL },
     sundaysErrorMessage: { type: String, default: REQUIRED_LABEL },
   },
   components: {
