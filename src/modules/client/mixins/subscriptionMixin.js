@@ -96,6 +96,10 @@ export const subscriptionMixin = {
         : subscription.unitTTCRate * subscription.weeklyCount;
 
       if (get(subscription, 'service.surcharge')) {
+        if (subscription.saturdays && subscription.service.surcharge.saturday) {
+          weeklyRate += subscription.saturdays * subscription.unitTTCRate * subscription.service.surcharge.saturday
+            / 100;
+        }
         if (subscription.sundays && subscription.service.surcharge.sunday) {
           weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
         }
