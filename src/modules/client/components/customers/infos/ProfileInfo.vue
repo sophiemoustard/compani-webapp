@@ -526,6 +526,7 @@ export default {
         },
         weeklyCount: {
           required: requiredIf(!this.isHourlySubscription),
+          integer: integerNumber,
           checkValue: value => (
             (!(value && this.isHourlySubscription && !this.serviceHasBillingItems) && value && value > 0) ||
               (!value && this.isHourlySubscription && !this.serviceHasBillingItems)
