@@ -848,7 +848,7 @@ export default {
     // Mandates
     async updateSignedAt (event, mandate) {
       try {
-        if (!mandate.signedAt || this.tmpInput === event) return;
+        if (!event || this.tmpInput === event) return;
         const params = { _id: this.customer._id, mandateId: mandate._id };
         await Customers.updateMandate(params, { ...mandate, signedAt: event });
 
