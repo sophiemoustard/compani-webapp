@@ -241,13 +241,15 @@
       :weekly-count-error-message="weeklyCountErrorMessage(v$.newSubscription)" @submit="createSubscription"
       :evenings-error-message="eveningsErrorMessage(v$.newSubscription)" @hide="resetCreationSubscriptionData"
       :sundays-error-message="sundaysErrorMessage(v$.newSubscription)" :validations="v$.newSubscription"
-      :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.newSubscription)" :service-options="serviceOptions" />
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.newSubscription)" :service-options="serviceOptions"
+      :saturdays-error-message="saturdaysErrorMessage(v$.newSubscription)" />
 
     <subscription-edition-modal v-model="openEditedSubscriptionModal" v-model:edited-subscription="editedSubscription"
       @submit="updateSubscription" :unit-ttc-rate-error-message="unitTTCRateErrorMessage(v$.editedSubscription)"
       :weekly-hours-error-message="weeklyHoursErrorMessage(v$.editedSubscription)" :loading="loading"
       :weekly-count-error-message="weeklyCountErrorMessage(v$.editedSubscription)" @hide="resetEditionSubscriptionData"
       :evenings-error-message="eveningsErrorMessage(v$.editedSubscription)" :validations="v$.editedSubscription"
+      :saturdays-error-message="saturdaysErrorMessage(v$.editedSubscription)"
       :sundays-error-message="sundaysErrorMessage(v$.editedSubscription)" />
 
     <subscription-history-modal v-model="subscriptionHistoryModal" :subscription="selectedSubscription"
@@ -382,7 +384,15 @@ export default {
         { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
       ],
       quotesLoading: false,
-      newSubscription: { service: '', unitTTCRate: 0, weeklyHours: 0, weeklyCount: 0, sundays: 0, evenings: 0 },
+      newSubscription: {
+        service: '',
+        unitTTCRate: 0,
+        weeklyHours: 0,
+        weeklyCount: 0,
+        saturdays: 0,
+        sundays: 0,
+        evenings: 0,
+      },
       editedSubscription: {},
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
@@ -516,6 +526,7 @@ export default {
           minValue: minValue(0),
           integer: integerNumber,
         },
+        saturdays: { minValue: minValue(0) },
         sundays: { minValue: minValue(0) },
         evenings: { minValue: minValue(0) },
       };
@@ -648,6 +659,9 @@ export default {
     eveningsErrorMessage (validations) {
       return this.numberErrorMessage(validations.evenings);
     },
+    saturdaysErrorMessage (validations) {
+      return this.numberErrorMessage(validations.saturdays);
+    },
     sundaysErrorMessage (validations) {
       return this.numberErrorMessage(validations.sundays);
     },
@@ -739,11 +753,12 @@ export default {
     },
     // Subscriptions
     formatCreatedSubscription () {
+      const hourlySubscriptionFields = ['saturdays', 'sundays', 'evenings', 'weeklyHours'];
       return {
         service: this.newSubscription.service,
         versions: [{
           ...pickBy(pick(this.newSubscription, ['unitTTCRate', 'weeklyCount'])),
-          ...(this.isHourlySubscription && pickBy(pick(this.newSubscription, ['sundays', 'evenings', 'weeklyHours']))),
+          ...(this.isHourlySubscription && pickBy(pick(this.newSubscription, hourlySubscriptionFields))),
         }],
       };
     },
@@ -754,6 +769,7 @@ export default {
         unitTTCRate: 0,
         weeklyHours: 0,
         weeklyCount: 0,
+        saturdays: 0,
         sundays: 0,
         evenings: 0,
       };
@@ -779,7 +795,16 @@ export default {
     },
     openSubscriptionEditionModal (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
-      const { _id, service, unitTTCRate, weeklyHours, weeklyCount, evenings, sundays } = selectedSubscription;
+      const {
+        _id,
+        service,
+        unitTTCRate,
+        weeklyHours,
+        weeklyCount,
+        evenings,
+        saturdays,
+        sundays,
+      } = selectedSubscription;
 
       this.editedSubscription = {
         _id,
@@ -788,6 +813,7 @@ export default {
         weeklyHours: weeklyHours || 0,
         weeklyCount: weeklyCount || 0,
         evenings: evenings || 0,
+        saturdays: saturdays || 0,
         sundays: sundays || 0,
         billingItems: service.billingItems,
       };
@@ -799,9 +825,10 @@ export default {
       this.v$.editedSubscription.$reset();
     },
     formatEditedSubscription () {
+      const hourlySubscriptionFields = ['saturdays', 'sundays', 'evenings', 'weeklyHours'];
       return {
         ...pickBy(pick(this.editedSubscription, ['unitTTCRate', 'weeklyCount'])),
-        ...(this.isHourlySubscription && pickBy(pick(this.editedSubscription, ['sundays', 'evenings', 'weeklyHours']))),
+        ...(this.isHourlySubscription && pickBy(pick(this.editedSubscription, hourlySubscriptionFields))),
       };
     },
     async updateSubscription () {
