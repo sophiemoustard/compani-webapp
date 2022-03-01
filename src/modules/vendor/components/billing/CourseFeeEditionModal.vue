@@ -13,7 +13,7 @@
       :model-value="editedBill.mainFee.description" @blur="validations.mainFee.description.$touch"
       @update:model-value="update($event, 'mainFee.description')" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" label="Éditer le payeur" icon-right="add" color="white"
+      <ni-button class="full-width modal-btn bg-primary" label="Enregistrer et fermer" icon-right="save" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>

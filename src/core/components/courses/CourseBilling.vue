@@ -178,7 +178,7 @@ export default {
           count: courseBill.mainFee.count,
           description: courseBill.mainFee.description,
         },
-        title: get(course, 'subProgram.program.name'),
+        title: get(course, 'value.subProgram.program.name'),
       };
     };
 
