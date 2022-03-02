@@ -9,8 +9,7 @@
     <ni-input in-modal caption="Quantité" :error="validations.mainFee.count.$error" type="number"
       :model-value="editedBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'mainFee.count')" />
-    <ni-input in-modal caption="Description" :error="validations.mainFee.description.$error" type="textarea"
-      :model-value="editedBill.mainFee.description" @blur="validations.mainFee.description.$touch"
+    <ni-input in-modal caption="Description" type="textarea" :model-value="editedBill.mainFee.description"
       @update:model-value="update($event, 'mainFee.description')" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Enregistrer et fermer" icon-right="save" color="white"

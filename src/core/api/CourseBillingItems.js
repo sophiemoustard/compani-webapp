@@ -1,8 +1,8 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
-  async list (params) {
-    const courseBillingItems = await alenviAxios.get(`${process.env.API_HOSTNAME}/coursebillingitems`, { params });
+  async list () {
+    const courseBillingItems = await alenviAxios.get(`${process.env.API_HOSTNAME}/coursebillingitems`);
     return courseBillingItems.data.data.courseBillingItems;
   },
   async create (payload) {
