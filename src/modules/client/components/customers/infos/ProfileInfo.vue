@@ -520,20 +520,11 @@ export default {
     getSubscriptionValidation () {
       return {
         unitTTCRate: { required, minValue: value => value > 0 },
-        weeklyHours: {
-          required: requiredIf(this.isHourlySubscription),
-          checkValue: (value) => {
-            const isForbidden = !this.isHourlySubscription;
-            return (!isForbidden && value && value > 0) || (!value && isForbidden);
-          },
-        },
+        weeklyHours: { ...(this.isHourlySubscription && { required, minValue: value => value > 0 }) },
         weeklyCount: {
-          required: requiredIf(!this.isHourlySubscription || this.serviceHasBillingItems),
+          ...((!this.isHourlySubscription || this.serviceHasBillingItems) &&
+            { required, minValue: value => value > 0 }),
           integer: integerNumber,
-          checkValue: (value) => {
-            const isForbidden = this.isHourlySubscription && !this.serviceHasBillingItems;
-            return (!isForbidden && value && value > 0) || (!value && isForbidden);
-          },
         },
         saturdays: { minValue: minValue(0) },
         sundays: { minValue: minValue(0) },
@@ -655,9 +646,7 @@ export default {
     numberErrorMessage (field) {
       if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
 
-      const isInvalidNumber = !get(field, 'minValue.$response') ||
-        !get(field, 'integer.$response') ||
-        !get(field, 'checkValue.$response');
+      const isInvalidNumber = !get(field, 'minValue.$response') || !get(field, 'integer.$response');
       if (isInvalidNumber) return INVALID_NUMBER;
 
       return '';
