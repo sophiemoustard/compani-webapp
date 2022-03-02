@@ -12,7 +12,8 @@
         <ni-select caption="Civilité" :error="v$.customer.identity.title.$error" v-model="customer.identity.title"
           :options="civilityOptions" @focus="saveTmp('identity.title')" @blur="updateCustomer('identity.title')" />
         <ni-date-input v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
-          caption="Date de naissance" @blur="updateCustomer('identity.birthDate')" content-class="col-xs-12 col-md-6" />
+          caption="Date de naissance" @update:model-value="updateCustomer('identity.birthDate')"
+          content-class="col-xs-12 col-md-6" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -138,7 +139,7 @@
                     :disable="docLoading || !getDriveId(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
-                  <ni-date-input @blur="updateSignedAt(props.row)" in-modal
+                  <ni-date-input in-modal @update:model-value="updateSignedAt($event, props.row)"
                     v-model="customer.payment.mandates[getRowIndex(customer.payment.mandates, props.row)].signedAt"
                     @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" />
                 </template>
@@ -872,11 +873,11 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Mandates
-    async updateSignedAt (mandate) {
+    async updateSignedAt (event, mandate) {
       try {
-        if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
+        if (!event || this.tmpInput === event) return;
         const params = { _id: this.customer._id, mandateId: mandate._id };
-        await Customers.updateMandate(params, mandate);
+        await Customers.updateMandate(params, { ...mandate, signedAt: event });
 
         this.refreshMandates();
         NotifyPositive('Modification enregistrée');
