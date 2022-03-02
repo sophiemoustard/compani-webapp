@@ -27,6 +27,10 @@
                   </q-card-section>
                 </q-card>
               </q-card-section>
+              <div class="row justify-end">
+                <ni-button color="primary" icon="add" label="Ajouter un article"
+                  :disable="billingItemCreationLoading" @click="openCourseFeeAdditionModal(bill._id)" />
+              </div>
             </div>
           </q-card>
         </div>
@@ -49,6 +53,11 @@
     <ni-course-fee-edition-modal v-model="courseFeeEditionModal" v-model:edited-bill="editedBill"
       @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
       :loading="billEditionLoading" :error-messages="editedBillErrorMessages" />
+
+    <ni-course-fee-addition-modal v-model="courseFeeAdditionModal" v-model:new-billing-item="newBillingItem"
+      @submit="addBillingItem" :validations="validations.newBillingItem" @hide="resetCourseFeeAdditionModal"
+      :loading="billingItemCreationLoading" :billing-item-options="billingItemList"
+      :error-messages="newBillingItemErrorMessages" />
   </div>
 </template>
 
@@ -59,16 +68,20 @@ import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
+import omit from 'lodash/omit';
+import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
+import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import { REQUIRED_LABEL } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
+import CourseFeeAdditionModal from 'src/modules/vendor/components/billing/CourseFeeAdditionModal';
 
 export default {
   name: 'BillingConfig',
@@ -76,6 +89,7 @@ export default {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
     'ni-course-fee-edition-modal': CourseFeeEditionModal,
+    'ni-course-fee-addition-modal': CourseFeeAdditionModal,
     'ni-button': Button,
   },
   setup () {
@@ -85,14 +99,18 @@ export default {
 
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
+    const billingItemCreationLoading = ref(false);
     const billsLoading = ref(false);
     const payerList = ref([]);
     const courseBills = ref([]);
+    const billingItemList = ref([]);
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
     const courseFeeEditionModal = ref(false);
+    const courseFeeAdditionModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
     const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
+    const newBillingItem = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const areDetailsVisible = ref(Object
       .fromEntries(courseBills.value.map(bill => [bill._id, false])));
 
@@ -112,26 +130,34 @@ export default {
           description: {},
         },
       },
+      newBillingItem: {
+        billingItem: { required },
+        price: { required, strictPositiveNumber },
+        count: { required, strictPositiveNumber, integerNumber },
+        description: {},
+      },
     };
-    const validations = useVuelidate(rules, { newBill, editedBill });
+    const validations = useVuelidate(rules, { newBill, editedBill, newBillingItem });
 
     const course = computed(() => $store.state.course.course);
 
-    const newBillErrorMessages = computed(() => getBillErrorMessages('newBill'));
+    const newBillErrorMessages = computed(() => getBillErrorMessages('newBill.mainFee'));
 
-    const editedBillErrorMessages = computed(() => getBillErrorMessages('editedBill'));
+    const editedBillErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
 
-    const getBillErrorMessages = (bill) => {
+    const newBillingItemErrorMessages = computed(() => getBillErrorMessages('newBillingItem'));
+
+    const getBillErrorMessages = (parent) => {
       let price = '';
       let count = '';
-      if (get(validations, `value.${bill}.mainFee.price.required.$response`) === false) price = REQUIRED_LABEL;
-      if (get(validations, `value.${bill}.mainFee.price.strictPositiveNumber.$response`) === false) {
+      if (get(validations, `value.${parent}.price.required.$response`) === false) price = REQUIRED_LABEL;
+      if (get(validations, `value.${parent}.price.strictPositiveNumber.$response`) === false) {
         price = 'Prix non valide';
       }
 
-      if (get(validations, `value.${bill}.mainFee.count.required.$response`) === false) count = REQUIRED_LABEL;
-      if (get(validations, `value.${bill}.mainFee.count.strictPositiveNumber.$response`) === false ||
-        get(validations, `value.${bill}.mainFee.count.integerNumber.$response`) === false) {
+      if (get(validations, `value.${parent}.count.required.$response`) === false) count = REQUIRED_LABEL;
+      if (get(validations, `value.${parent}.count.strictPositiveNumber.$response`) === false ||
+        get(validations, `value.${parent}.count.integerNumber.$response`) === false) {
         count = 'Nombre non valide';
       }
 
@@ -165,6 +191,20 @@ export default {
       }
     };
 
+    const refreshBillingItems = async () => {
+      try {
+        billsLoading.value = true;
+        const billingItems = await CourseBillingItems.list();
+        billingItemList.value = formatAndSortOptions([...billingItems], 'name');
+      } catch (e) {
+        console.error(e);
+        billingItemList.value = [];
+        NotifyNegative('Erreur lors de la récupération des articles de facturation.');
+      } finally {
+        billsLoading.value = false;
+      }
+    };
+
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
     const setEditedBill = (billId) => {
@@ -192,6 +232,11 @@ export default {
       courseFeeEditionModal.value = true;
     };
 
+    const openCourseFeeAdditionModal = (billId) => {
+      newBillingItem.value.billId = billId;
+      courseFeeAdditionModal.value = true;
+    };
+
     const resetBillCreationModal = () => {
       newBill.value = { funder: '', mainFee: { price: 0, count: 1 } };
       validations.value.newBill.$reset();
@@ -200,6 +245,11 @@ export default {
     const resetEditedBillEditionModal = () => {
       editedBill.value = { _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } };
       validations.value.editedBill.$reset();
+    };
+
+    const resetCourseFeeAdditionModal = () => {
+      newBillingItem.value = { billId: '', billingItem: '', price: 0, count: 1, description: '' };
+      validations.value.newBillingItem.$reset();
     };
 
     const addBill = async () => {
@@ -249,6 +299,26 @@ export default {
       }
     };
 
+    const addBillingItem = async () => {
+      try {
+        validations.value.newBillingItem.$touch();
+        if (validations.value.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        billingItemCreationLoading.value = true;
+
+        await CourseBills.addBillingItem(newBillingItem.value.billId, pickBy(omit(newBillingItem.value, 'billId')));
+        NotifyPositive('Article ajouté.');
+
+        courseFeeAdditionModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de l\'article.');
+      } finally {
+        billingItemCreationLoading.value = false;
+      }
+    };
+
     const showDetails = (billId) => {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
     };
@@ -256,6 +326,7 @@ export default {
     const created = async () => {
       refreshCourseBills();
       refreshCourseFundingOrganisations();
+      refreshBillingItems();
     };
 
     created();
@@ -265,10 +336,14 @@ export default {
       billCreationLoading,
       billEditionLoading,
       billsLoading,
+      billingItemCreationLoading,
       billCreationModal,
       funderEditionModal,
       courseFeeEditionModal,
+      courseFeeAdditionModal,
       newBill,
+      newBillingItem,
+      billingItemList,
       editedBill,
       payerList,
       courseBills,
@@ -277,20 +352,27 @@ export default {
       course,
       newBillErrorMessages,
       editedBillErrorMessages,
+      newBillingItemErrorMessages,
       areDetailsVisible,
       // Methods
       refreshCourseFundingOrganisations,
       resetBillCreationModal,
       resetEditedBillEditionModal,
+      resetCourseFeeAdditionModal,
       addBill,
       editBill,
+      addBillingItem,
       getBillErrorMessages,
       openBillCreationModal,
       openFunderEditionmodal,
       openCourseFeeEditionModal,
+      openCourseFeeAdditionModal,
       refreshCourseBills,
+      refreshBillingItems,
       showDetails,
       get,
+      omit,
+      pickBy,
       formatPrice,
     };
   },
