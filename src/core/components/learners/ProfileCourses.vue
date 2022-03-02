@@ -52,11 +52,11 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-if="getStepsByType(props.row.subProgram.steps, [ON_SITE, REMOTE]).length"
+              <div v-if="props.row.subProgram.liveSteps.length"
                 class="text-weight-bold q-mb-sm">
                 Présences
               </div>
-              <div v-for="step in getStepsByType(props.row.subProgram.steps, [ON_SITE, REMOTE])" :key="step._id"
+              <div v-for="step in props.row.subProgram.liveSteps" :key="step._id"
                 :props="props" class="q-mb-xs">
                 <div v-for="slot in step.slots" :key="slot._id" class="q-ml-md row">
                   <q-icon :name="getStepTypeIcon(step.type)" />
@@ -76,10 +76,10 @@
                   </div>
                 </div>
               </div>
-              <div v-if="getStepsByType(props.row.subProgram.steps, [E_LEARNING])" class="text-weight-bold q-my-sm">
+              <div v-if="props.row.subProgram.elearningSteps.length" class="text-weight-bold q-my-sm">
                 Complétion eLearning
               </div>
-              <div v-for="step in getStepsByType(props.row.subProgram.steps, [E_LEARNING])" :key="step._id"
+              <div v-for="step in props.row.subProgram.elearningSteps" :key="step._id"
                 :props="props" class="q-mb-xs q-ml-md row">
                 <q-icon name="stay_current_portrait" />
                 <div class="col-9">{{ step.name }}</div>
@@ -192,8 +192,6 @@ export default {
         { name: 'expand', label: '', field: '' },
       ],
       E_LEARNING,
-      ON_SITE,
-      REMOTE,
       unsubscribedAttendances: [],
     };
   },
@@ -260,7 +258,16 @@ export default {
     async getUserCourses () {
       try {
         this.loading = true;
-        this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+        const userCourses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+
+        this.courses = userCourses.map(course => ({
+          ...course,
+          subProgram: {
+            ...course.subProgram,
+            elearningSteps: course.subProgram.steps.filter(step => step.type === E_LEARNING),
+            liveSteps: course.subProgram.steps.filter(step => [ON_SITE, REMOTE].includes(step.type)),
+          },
+        }));
       } catch (e) {
         NotifyNegative('Erreur lors de la récupération des formations');
         console.error(e);
@@ -321,9 +328,6 @@ export default {
         this.unsubscribedAttendances = [];
         NotifyNegative('Erreur lors de la récupération des émargements non prévus.');
       }
-    },
-    getStepsByType (steps, types) {
-      return steps.filter(step => types.includes(step.type));
     },
     formatDate,
     formatIntervalHourly,
