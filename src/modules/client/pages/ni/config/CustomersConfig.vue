@@ -1180,7 +1180,7 @@ export default {
         this.thirdPartyPayerCreationModal = false;
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative('Tiers payeur déjà existant.');
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la création du tiers payeur.');
       } finally {
         this.loading = false;
