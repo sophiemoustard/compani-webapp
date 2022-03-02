@@ -61,14 +61,14 @@
                   <div class="col-6">{{ step.name }}</div>
                   <div class="dates col-2">{{ formatDate(slot.startDate) }}</div>
                   <div class="hours col-2">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
-                  <div v-if="slot.attendances.length">
+                  <div v-if="slot.attendances.length" class="col-1">
                     <q-icon size="12px" name="check_circle" color="green-600" />
                     <span class="text-green-600">Présent(e)</span>
                   </div>
-                  <div v-else-if="isBefore(new Date(), slot.endDate)">
+                  <div v-else-if="isBefore(new Date(), slot.endDate)" class="col-1">
                     <span class="q-mx-sm text-italic text-copper-grey-800">à venir</span>
                   </div>
-                  <div v-else>
+                  <div v-else class="col-1">
                     <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
                     <span class="text-orange-700">Absent(e)</span>
                   </div>
@@ -81,7 +81,7 @@
                 :props="props">
                 <q-icon name="stay_current_portrait" />
                 <div class="col-9">{{ step.name }}</div>
-                <ni-progress class="expanding-table-sub-progress" :value="step.progress.eLearning" />
+                <ni-progress class="expanding-table-sub-progress col-2" :value="step.progress.eLearning" />
               </div>
             </q-td>
           </template>
