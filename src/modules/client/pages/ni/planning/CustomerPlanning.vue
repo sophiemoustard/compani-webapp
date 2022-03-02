@@ -23,7 +23,7 @@
     <ni-customer-absence-edition-modal v-model:edited-customer-absence="editedCustomerAbsence"
       :customer-absence-edition-modal="customerAbsenceModal" :validations="eventValidation.editedCustomerAbsence"
       @close="closeCustomerAbsenceModal" @hide="resetCustomerAbsenceEditionForm"
-      @submit="updateCustomerAbsence" />
+      @submit="validateCustomerAbsenceEdition" />
   </q-page>
 </template>
 
@@ -268,7 +268,18 @@ export default {
       const { absenceType, dates } = this.editedCustomerAbsence;
       return { absenceType, startDate: dates.startDate, endDate: dates.endDate };
     },
-    async updateCustomerAbsence (value) {
+    validateCustomerAbsenceEdition () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: `Êtes-vous sûr(e) de vouloir modifier l'absence bénéficiaire ?<br />
+          Les interventions prévues sur la période d'absence seront supprimées.`,
+        html: true,
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(this.updateCustomerAbsence)
+        .onCancel(() => NotifyPositive('Modification annulée.'));
+    },
+    async updateCustomerAbsence () {
       try {
         this.eventValidation.editedCustomerAbsence.$touch();
         if (this.eventValidation.editedCustomerAbsence.$error) return NotifyWarning('Champ(s) invalide(s)');
