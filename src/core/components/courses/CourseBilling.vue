@@ -14,34 +14,30 @@
                 </div>
               </q-item-section>
             </q-card-section>
-            <div class="bg-peach-200" v-if="areDetailsVisible[bill._id]">
-              <q-card-section>
-                <q-card flat>
-                  <q-card-section class="cursor-pointer" @click="openCourseFeeEditionModal(bill._id)">
-                    <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
-                    <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
-                    <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
-                    <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
-                      Description : {{ bill.mainFee.description }}
+            <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
+              <q-card flat class="q-mx-lg q-mb-sm">
+                <q-card-section class="cursor-pointer" @click="openCourseFeeEditionModal(bill._id)">
+                  <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
+                  <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
+                  <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
+                  <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
+                    Description : {{ bill.mainFee.description }}
+                  </div>
+                </q-card-section>
+              </q-card>
+              <div v-for="billingItem of bill.billingItemList" :key="billingItem._id">
+                <q-card flat class="q-mx-lg q-mb-sm">
+                  <q-card-section class="cursor-pointer">
+                    <div class="text-copper-500">
+                      {{ getBillingItemName(billingItem.billingItem) }}
+                    </div>
+                    <div>Prix unitaire : {{ formatPrice(billingItem.price) }}</div>
+                    <div>Quantité : {{ billingItem.count }}</div>
+                    <div v-if="billingItem.description" class="ellipsis">
+                      Description : {{ billingItem.description }}
                     </div>
                   </q-card-section>
                 </q-card>
-              </q-card-section>
-              <div v-for="billingItem of bill.billingItemList" :key="billingItem._id">
-                <q-card-section>
-                  <q-card flat>
-                    <q-card-section class="cursor-pointer">
-                      <div class="text-copper-500">
-                        {{ getBillingItemName(billingItem.billingItem) }}
-                      </div>
-                      <div>Prix unitaire : {{ formatPrice(billingItem.price) }}</div>
-                      <div>Quantité : {{ billingItem.count }}</div>
-                      <div v-if="billingItem.description" class="ellipsis">
-                        Description : {{ billingItem.description }}
-                      </div>
-                    </q-card-section>
-                  </q-card>
-                </q-card-section>
               </div>
               <div class="row justify-end">
                 <ni-button color="primary" icon="add" label="Ajouter un article"
