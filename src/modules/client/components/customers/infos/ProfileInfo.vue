@@ -654,9 +654,12 @@ export default {
     },
     numberErrorMessage (field) {
       if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
-      if (get(field, 'minValue.$response') === false || get(field, 'integer.$response') === false) {
-        return INVALID_NUMBER;
-      }
+
+      const isInvalidNumber = !get(field, 'minValue.$response') ||
+        !get(field, 'integer.$response') ||
+        !get(field, 'checkValue.$response');
+      if (isInvalidNumber) return INVALID_NUMBER;
+
       return '';
     },
     weeklyHoursErrorMessage (validations) {
