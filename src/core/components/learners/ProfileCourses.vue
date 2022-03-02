@@ -52,9 +52,7 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-if="props.row.subProgram.liveSteps.length" class="text-weight-bold q-mb-sm">
-                Présences
-              </div>
+              <div v-if="props.row.subProgram.liveSteps.length" class="text-weight-bold q-mb-sm">Présences</div>
               <div v-for="step in props.row.subProgram.liveSteps" :key="step._id" :props="props" class="q-mb-xs">
                 <div v-for="slot in step.slots" :key="slot._id" class="q-ml-md row">
                   <q-icon :name="getStepTypeIcon(step.type)" />
