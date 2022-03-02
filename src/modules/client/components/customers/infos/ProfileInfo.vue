@@ -520,11 +520,11 @@ export default {
     },
     getSubscriptionValidation () {
       return {
-        unitTTCRate: { required, minValue: minValue(0) },
-        weeklyHours: { required: requiredIf(this.isHourlySubscription), minValue: minValue(0) },
+        unitTTCRate: { required, minValue: value => value > 0 },
+        weeklyHours: { ...(this.isHourlySubscription && { required, minValue: value => value > 0 }) },
         weeklyCount: {
-          required: requiredIf(!this.isHourlySubscription || this.serviceHasBillingItems),
-          minValue: minValue(0),
+          ...((!this.isHourlySubscription || this.serviceHasBillingItems) &&
+            { required, minValue: value => value > 0 }),
           integer: integerNumber,
         },
         saturdays: { minValue: minValue(0) },
@@ -646,9 +646,10 @@ export default {
     },
     numberErrorMessage (field) {
       if (get(field, 'required.$response') === false) return REQUIRED_LABEL;
-      if (get(field, 'minValue.$response') === false || get(field, 'integer.$response') === false) {
-        return INVALID_NUMBER;
-      }
+
+      const isInvalidNumber = !get(field, 'minValue.$response') || !get(field, 'integer.$response');
+      if (isInvalidNumber) return INVALID_NUMBER;
+
       return '';
     },
     weeklyHoursErrorMessage (validations) {
