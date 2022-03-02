@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import has from 'lodash/has';
 import { MONTHLY, FIXED, HOURLY, WEEKS_PER_MONTH } from '@data/constants';
-import { getLastVersion } from '@helpers/utils';
+import { getLastVersion, formatPrice } from '@helpers/utils';
 import moment from '@helpers/moment';
 
 export const subscriptionMixin = {
@@ -22,7 +22,7 @@ export const subscriptionMixin = {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
+          field: row => `${this.formatPrice(row.unitTTCRate)}`,
         },
         {
           name: 'weeklyVolume',
@@ -54,6 +54,7 @@ export const subscriptionMixin = {
     };
   },
   methods: {
+    formatPrice,
     computeWeeklyRate (subscription, funding) {
       let weeklyRate = subscription.weeklyHours
         ? subscription.unitTTCRate * subscription.weeklyHours

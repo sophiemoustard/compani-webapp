@@ -465,6 +465,10 @@ export default {
   .nota-bene
     font-size: 0.8em
     margin-bottom: 20px
+  .contract-cell
+    background: white
+    width: 100%
+    margin-bottom: 10px
   .q-header
     position: sticky
   .iframe-normal
