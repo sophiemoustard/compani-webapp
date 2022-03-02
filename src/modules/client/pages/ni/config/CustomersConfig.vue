@@ -1122,8 +1122,7 @@ export default {
         await this.refreshBillingItems();
       } catch (e) {
         console.error(e);
-        if (e.status === 403) return NotifyNegative(e.data.message);
-        if (e.status === 409) return NotifyNegative('Article de facturation déjà existant.');
+        if ([403, 409].includes(e.status)) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la suppression de l\'article de facturation.');
       }
     },
@@ -1205,7 +1204,7 @@ export default {
         NotifyPositive('Tiers payeur modifié.');
         this.thirdPartyPayerEditionModal = false;
       } catch (e) {
-        if (e.status === 409) return NotifyNegative('Tiers payeur déjà existant.');
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification du tiers payeur.');
         console.error(e);
       } finally {

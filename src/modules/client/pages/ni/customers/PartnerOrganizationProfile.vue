@@ -209,7 +209,7 @@ export default {
         await this.refreshPartnerOrganization();
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyWarning(e.data.message);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
@@ -259,7 +259,6 @@ export default {
         await this.refreshPartnerOrganization();
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative('Structure partenaire déjà existante.');
         NotifyNegative('Erreur lors de la modification du/de la partenaire.');
       } finally {
         this.modalLoading = false;
