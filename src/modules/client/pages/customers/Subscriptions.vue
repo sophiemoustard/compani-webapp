@@ -4,6 +4,10 @@
       <div class="q-mb-lg">
         <ni-title-header title="Abonnement" class="q-mb-xl" />
         <p class="title">Souscriptions</p>
+        <div v-for="subscription of subscriptions" :key="subscription._id">
+          <ni-subscription-cell :subscription="subscription" @show-history="showHistory"
+            :fundings="getSubscriptionFundings(subscription._id)" />
+        </div>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-cell">
           <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading"
@@ -146,6 +150,7 @@ import Input from '@components/form/Input';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
+import SubscriptionCell from 'src/modules/client/components/customers/SubscriptionCell';
 import Modal from '@components/modal/Modal';
 import HtmlModal from '@components/modal/HtmlModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -173,6 +178,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
     'ni-bi-color-button': BiColorButton,
+    'ni-subscription-cell': SubscriptionCell,
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
@@ -480,10 +486,6 @@ export default {
   .nota-bene
     font-size: 0.8em
     margin-bottom: 20px
-  .contract-cell
-    background: white
-    width: 100%
-    margin-bottom: 10px
   .q-header
     position: sticky
   .iframe-normal

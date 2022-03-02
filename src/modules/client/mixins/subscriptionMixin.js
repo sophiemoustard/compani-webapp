@@ -45,7 +45,7 @@ export const subscriptionMixin = {
           name: 'weeklyRate',
           label: 'Coût hebdomadaire TTC *',
           align: 'center',
-          field: row => `${this.formatNumber(this.computeWeeklyRate(row, this.getMatchingFunding(row)))}€`,
+          field: row => `${this.formatNumber(this.computeWeeklyRate(row, this.getMatchingFunding(row)).total)}€`,
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
@@ -100,18 +100,23 @@ export const subscriptionMixin = {
       let weeklyRate = subscription.weeklyHours
         ? subscription.unitTTCRate * subscription.weeklyHours
         : subscription.unitTTCRate * subscription.weeklyCount;
+      let totalSurcharge = 0;
 
       if (get(subscription, 'service.surcharge')) {
         if (subscription.saturdays && subscription.service.surcharge.saturday) {
-          weeklyRate += subscription.saturdays * subscription.unitTTCRate * subscription.service.surcharge.saturday
+          totalSurcharge += subscription.saturdays * subscription.unitTTCRate * subscription.service.surcharge.saturday
             / 100;
         }
         if (subscription.sundays && subscription.service.surcharge.sunday) {
-          weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
+          totalSurcharge += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday
+            / 100;
         }
         if (subscription.evenings && subscription.service.surcharge.evening) {
-          weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening / 100;
+          totalSurcharge += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening
+            / 100;
         }
+
+        weeklyRate += totalSurcharge;
       }
 
       if (get(subscription, 'service.billingItems.length')) {
@@ -133,7 +138,7 @@ export const subscriptionMixin = {
         fundingReduction *= (1 - funding.customerParticipationRate / 100);
       }
 
-      return Math.max(weeklyRate - fundingReduction, 0);
+      return { total: Math.max(weeklyRate - fundingReduction, 0), fundingReduction, totalSurcharge };
     },
     isCompleteFunding (funding) {
       if (!funding || funding === {}) return false;

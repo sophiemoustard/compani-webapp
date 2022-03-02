@@ -929,7 +929,7 @@ export default {
 
         const subscriptions = quote.subscriptions.map(subscription => ({
           ...subscription,
-          estimatedWeeklyRate: this.computeWeeklyRate(subscription),
+          estimatedWeeklyRate: this.computeWeeklyRate(subscription).total,
         }));
 
         const data = getTagsToDownloadQuote(this.customer, this.company, { ...quote, subscriptions });
