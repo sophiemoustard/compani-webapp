@@ -59,8 +59,7 @@
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
 
     <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
-      @submit="editBill" :validations="validations.editedBill.funder" @hide="resetEditedBillEditionModal"
-      :loading="billEditionLoading" :payer-options="payerList" />
+      @submit="editBill" @hide="resetEditedBillEditionModal" :loading="billEditionLoading" :payer-options="payerList" />
 
     <ni-course-fee-edition-modal v-model="courseFeeEditionModal" v-model:edited-bill="editedBill"
       @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
@@ -128,25 +127,21 @@ export default {
 
     const rules = {
       newBill: {
-        funder: {},
         mainFee: {
           price: { required, strictPositiveNumber },
           count: { required, strictPositiveNumber, integerNumber },
         },
       },
       editedBill: {
-        funder: {},
         mainFee: {
           price: { required, strictPositiveNumber },
           count: { required, strictPositiveNumber, integerNumber },
-          description: {},
         },
       },
       newBillingItem: {
         billingItem: { required },
         price: { required, strictPositiveNumber },
         count: { required, strictPositiveNumber, integerNumber },
-        description: {},
       },
     };
     const validations = useVuelidate(rules, { newBill, editedBill, newBillingItem });

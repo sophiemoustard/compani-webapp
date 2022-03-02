@@ -4,7 +4,6 @@
       Éditer le <span class="text-weight-bold">payeur</span>
     </template>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="editedFunder" required-field
-      @blur="validations.$touch" :error="validations.$error"
       @update:model-value="update" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Éditer le payeur" icon-right="add" color="white"
@@ -24,7 +23,6 @@ export default {
     modelValue: { type: Boolean, default: false },
     editedFunder: { type: String, default: () => '' },
     payerOptions: { type: Array, default: () => [] },
-    validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {

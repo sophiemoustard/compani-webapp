@@ -4,8 +4,7 @@
       Ajouter un article <span class="text-weight-bold">à facturer</span>
     </template>
     <ni-select in-modal caption="Article" :options="billingItemOptions" :model-value="newBillingItem.billingItem"
-      required-field
-      @blur="validations.billingItem.$touch" :error="validations.billingItem.$error"
+      required-field @blur="validations.billingItem.$touch" :error="validations.billingItem.$error"
       @update:model-value="update($event, 'billingItem')" />
     <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number"
       :model-value="newBillingItem.price" @blur="validations.price.$touch" suffix="€" required-field
@@ -13,8 +12,7 @@
     <ni-input in-modal caption="Quantité" :error="validations.count.$error" type="number"
       :model-value="newBillingItem.count" @blur="validations.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'count')" />
-    <ni-input in-modal caption="Description" :error="validations.description.$error" type="textarea"
-      :model-value="newBillingItem.description" @blur="validations.description.$touch"
+    <ni-input in-modal caption="Description" type="textarea" :model-value="newBillingItem.description"
       @update:model-value="update($event, 'description')" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter l'article" icon-right="add" color="white"
