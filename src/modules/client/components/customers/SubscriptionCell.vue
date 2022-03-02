@@ -74,15 +74,10 @@ export default {
     },
   },
   setup (props, context) {
-    const getBillingItemsPrice = () => {
-      if (!get(props.subscription, 'service.billingItems.length')) return 'sku';
-
-      return props.subscription.service.billingItems.reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
-    };
+    const getBillingItemsPrice = () => props.subscription.service.billingItems
+      .reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
 
     const getBillingItemsNames = () => {
-      if (!get(props.subscription, 'service.billingItems.length')) return 'sku';
-
       const billingItemsName = props.subscription.service.billingItems.reduce((acc, bi) => (acc += `${bi.name}, `), '');
       return billingItemsName.slice(0, -2);
     };
