@@ -4,34 +4,13 @@
       <div class="q-mb-lg">
         <ni-title-header title="Abonnement" class="q-mb-xl" />
         <p class="title">Souscriptions</p>
-        <div v-for="subscription of subscriptions" :key="subscription._id">
-          <ni-subscription-cell :subscription="subscription" @show-history="showHistory"
-            :fundings="getSubscriptionFundings(subscription._id)" />
-        </div>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
-        <q-card v-if="subscriptions.length > 0" class="contract-cell">
-          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading"
-            data-cy="subscriptions-table">
-            <template #body="{ props }">
-              <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style" :data-cy="`col-${col.name}`">
-                  <template v-if="col.name === 'actions'">
-                    <div class="row no-wrap table-actions">
-                      <ni-button icon="history" @click="showHistory(col.value)" data-cy="show-subscription-history" />
-                      <ni-button :disable="!getSubscriptionFundings(col.value).length" icon="mdi-calculator"
-                        @click="showSubscriptionFundings(col.value)" data-cy="show-fundings-history" />
-                    </div>
-                  </template>
-                  <template v-else>{{ col.value }}</template>
-                </q-td>
-              </q-tr>
-            </template>
-          </ni-responsive-table>
-        </q-card>
-        <p v-if="subscriptions.length > 0" class="nota-bene">
-          * intègre les éventuelles majorations soir / dimanche
-        </p>
+        <div v-if="subscriptions && subscriptions.length > 0">
+          <div v-for="subscription of subscriptions" :key="subscription._id" class="q-mb-md">
+            <ni-subscription-cell :subscription="subscription" @show-subscription-fundings="showSubscriptionFundings"
+              @show-history="showHistory" :fundings="getSubscriptionFundings(subscription._id)" />
+          </div>
+        </div>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @update:model-value="confirmAgreement"

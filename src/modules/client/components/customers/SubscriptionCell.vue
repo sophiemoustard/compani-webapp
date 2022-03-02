@@ -2,30 +2,30 @@
   <q-card class="cell-container text-copper-grey-500">
     <div class="row cell-header q-mb-md">
       <div class="text-weight-bold">{{ subscription.service.name }}</div>
-      <div>
-        <ni-button icon="history" @click="showHistory(subscription._id)" data-cy="show-subscription-history" />
-        <ni-button icon="mdi-calculator" :disable="!fundings.length" @click="showSubscriptionFundings"
-          data-cy="show-fundings-history" />
-      </div>
+      <ni-button icon="history" @click="showHistory(subscription._id)" data-cy="show-subscription-history" />
     </div>
     <div v-if="subscription.service.nature === HOURLY" class="q-mb-md">
       Prix horaire (TTC) :
-      <span class="text-weight-bold text-copper-grey-700">{{ subscription.unitTTCRate }} € / heure</span>
+      <span class="text-weight-bold text-copper-grey-700">{{ formatPrice(subscription.unitTTCRate) }} / heure</span>
     </div>
     <div v-else class="q-mb-md">
       Prix forfaitaire (TTC) :
-      <span class="text-weight-bold text-copper-grey-700">{{ subscription.unitTTCRate }} € / intervention</span>
+      <span class="text-weight-bold text-copper-grey-700">
+        {{ formatPrice(subscription.unitTTCRate) }} / intervention
+      </span>
     </div>
     <div v-if="get(subscription, 'service.billingItems.length')">
       Prix par intervention (TTC) :
-      <span class="text-weight-bold text-copper-grey-700">{{ getBillingItemsPrice() }} € / intervention</span>
+      <span class="text-weight-bold text-copper-grey-700">
+        {{ formatPrice(getBillingItemsPrice()) }} / intervention
+      </span>
       <div class="text-italic q-mb-md" style="font-size: 12px">Ce prix correspond à : {{ getBillingItemsNames() }}</div>
     </div>
     <div class="bg-copper-grey-100 text-copper-grey-700 weekly-infos">
       <div>
         Coût estimé pour une semaine :
-        <span class="text-weight-bold">{{ formatNumber(weeklyRate.total) }} € / semaine</span>
-        <span v-if="weeklyRate.totalSurcharge"> (dont {{ weeklyRate.totalSurcharge }} € de majoration)</span>
+        <span class="text-weight-bold">{{ formatPrice(weeklyRate.total) }} / semaine</span>
+        <span v-if="weeklyRate.totalSurcharge"> (dont {{ formatPrice(weeklyRate.totalSurcharge) }} de majoration)</span>
       </div>
       <div class="text-italic" style="font-size: 14px">
         <div>Estimation sur base de : </div>
@@ -37,6 +37,13 @@
           <li v-if="subscription.weeklyCount">
             {{ formatQuantity('intervention', subscription.weeklyCount) }} par semaine
           </li>
+          <li v-if="fundings.length">
+            Prise en charge par {{ fundings[0].thirdPartyPayer.name }} : {{ formatPrice(weeklyRate.fundingReduction) }}
+            <span class="cursor-pointer text-copper-400 funding-details"
+              @click="showSubscriptionFundings(subscription._id)">
+              (voir détails)
+            </span>
+          </li>
         </ul>
       </div>
     </div>
@@ -47,7 +54,7 @@
 import get from 'lodash/get';
 import Button from '@components/Button';
 import { HOURLY } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatPrice } from '@helpers/utils';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
 
 export default {
@@ -89,15 +96,12 @@ export default {
       return surchargesHours.slice(0, -2);
     };
 
-    const getSubscriptionFundings = subscriptionId => this.fundings
-      .filter(fund => fund.subscription._id === subscriptionId);
-
     const showHistory = (id) => {
       context.emit('showHistory', id);
     };
 
-    const showSubscriptionFundings = () => {
-      context.emit('showSubscriptionFundings', props.subscription);
+    const showSubscriptionFundings = (id) => {
+      context.emit('showSubscriptionFundings', id);
     };
 
     return {
@@ -106,12 +110,12 @@ export default {
       // Methods
       getBillingItemsPrice,
       getBillingItemsNames,
-      getSubscriptionFundings,
       showHistory,
       showSubscriptionFundings,
       getSurchargesHours,
       get,
       formatQuantity,
+      formatPrice,
     };
   },
 };
@@ -132,4 +136,6 @@ export default {
     > div > ul
       margin: 0
       padding-inline-start: 24px
+  .funding-details
+    text-decoration: underline
 </style>
