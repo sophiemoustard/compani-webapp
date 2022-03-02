@@ -14,10 +14,10 @@
                 </div>
               </q-item-section>
             </q-card-section>
-            <div class="bg-peach-200" v-if="areDetailsVisible[bill._id]" @click="openCourseFeeEditionModal(bill._id)">
+            <div class="bg-peach-200" v-if="areDetailsVisible[bill._id]">
               <q-card-section>
                 <q-card flat>
-                  <q-card-section class="cursor-pointer">
+                  <q-card-section class="cursor-pointer" @click="openCourseFeeEditionModal(bill._id)">
                     <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                     <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
                     <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
@@ -27,6 +27,22 @@
                   </q-card-section>
                 </q-card>
               </q-card-section>
+              <div v-for="billingItem of bill.billingItemList" :key="billingItem._id">
+                <q-card-section>
+                  <q-card flat>
+                    <q-card-section class="cursor-pointer">
+                      <div class="text-copper-500">
+                        {{ getBillingItemName(billingItem.billingItem) }}
+                      </div>
+                      <div>Prix unitaire : {{ formatPrice(billingItem.price) }}</div>
+                      <div>Quantité : {{ billingItem.count }}</div>
+                      <div v-if="billingItem.description" class="ellipsis">
+                        Description : {{ billingItem.description }}
+                      </div>
+                    </q-card-section>
+                  </q-card>
+                </q-card-section>
+              </div>
               <div class="row justify-end">
                 <ni-button color="primary" icon="add" label="Ajouter un article"
                   :disable="billingItemCreationLoading" @click="openCourseFeeAdditionModal(bill._id)" />
@@ -313,6 +329,7 @@ export default {
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de l\'article.');
       } finally {
         billingItemCreationLoading.value = false;
@@ -322,6 +339,8 @@ export default {
     const showDetails = (billId) => {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
     };
+
+    const getBillingItemName = billingItem => billingItemList.value.find(item => item.value === billingItem).label;
 
     const created = async () => {
       refreshCourseBills();
@@ -370,6 +389,7 @@ export default {
       refreshCourseBills,
       refreshBillingItems,
       showDetails,
+      getBillingItemName,
       get,
       omit,
       pickBy,
