@@ -52,25 +52,23 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-if="props.row.subProgram.liveSteps.length"
-                class="text-weight-bold q-mb-sm">
+              <div v-if="props.row.subProgram.liveSteps.length" class="text-weight-bold q-mb-sm">
                 Présences
               </div>
-              <div v-for="step in props.row.subProgram.liveSteps" :key="step._id"
-                :props="props" class="q-mb-xs">
+              <div v-for="step in props.row.subProgram.liveSteps" :key="step._id" :props="props" class="q-mb-xs">
                 <div v-for="slot in step.slots" :key="slot._id" class="q-ml-md row">
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   <div class="col-6">{{ step.name }}</div>
                   <div class="dates col-2">{{ formatDate(slot.startDate) }}</div>
-                  <div class="hours  col-2">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
-                  <div v-if="slot.attendances.length" class="attendance">
+                  <div class="hours col-2">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                  <div v-if="slot.attendances.length">
                     <q-icon size="12px" name="check_circle" color="green-600" />
                     <span class="text-green-600">Présent(e)</span>
                   </div>
-                  <div v-else-if="isBefore(new Date(), slot.endDate)" class="attendance">
+                  <div v-else-if="isBefore(new Date(), slot.endDate)">
                     <span class="q-mx-sm text-italic text-copper-grey-800">à venir</span>
                   </div>
-                  <div v-else class="attendance">
+                  <div v-else>
                     <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
                     <span class="text-orange-700">Absent(e)</span>
                   </div>
@@ -79,8 +77,8 @@
               <div v-if="props.row.subProgram.elearningSteps.length" class="text-weight-bold q-my-sm">
                 Complétion eLearning
               </div>
-              <div v-for="step in props.row.subProgram.elearningSteps" :key="step._id"
-                :props="props" class="q-mb-xs q-ml-md row">
+              <div v-for="step in props.row.subProgram.elearningSteps" :key="step._id" class="q-mb-xs q-ml-md row"
+                :props="props">
                 <q-icon name="stay_current_portrait" />
                 <div class="col-9">{{ step.name }}</div>
                 <ni-progress class="expanding-table-sub-progress" :value="step.progress.eLearning" />
