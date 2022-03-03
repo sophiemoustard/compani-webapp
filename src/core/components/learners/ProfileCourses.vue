@@ -52,36 +52,34 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props">
-                <div class="q-ma-sm row">
+              <div v-if="props.row.subProgram.liveSteps.length" class="text-weight-bold q-mb-sm">Présences</div>
+              <div v-for="step in props.row.subProgram.liveSteps" :key="step._id" :props="props" class="q-mb-sm">
+                <div v-for="slot in step.slots" :key="slot._id" class="q-ml-md slots">
                   <q-icon :name="getStepTypeIcon(step.type)" />
-                  {{ stepIndex + 1 }} - {{ step.name }}
-                  <div class="step-progress">
-                    <div v-if="has(step, 'progress.presence')">
-                      {{ formatDuration(get(step, 'progress.presence.attendanceDuration')) }}
-                      / {{ formatDuration(get(step, 'progress.presence.maxDuration')) }}
-                    </div>
-                    <ni-progress v-if="has(step, 'progress.eLearning')" class="expanding-table-sub-progress"
-                      :value="step.progress.eLearning" />
+                  <div class="step-name">{{ step.name }}</div>
+                  <div class="dates">{{ formatDate(slot.startDate) }}</div>
+                  <div class="hours">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                  <div v-if="slot.attendances.length">
+                    <q-icon size="12px" name="check_circle" color="green-600 attendance" />
+                    <span class="text-green-600">Présent(e)</span>
+                  </div>
+                  <div v-else-if="isBefore(new Date(), slot.endDate)" class="attendance">
+                    <span class="q-mx-sm text-italic text-copper-grey-800">à venir</span>
+                  </div>
+                  <div v-else>
+                    <q-icon size="12px" name="fas fa-times-circle" color="orange-700 attendance" />
+                    <span class="text-orange-700">Absent(e)</span>
                   </div>
                 </div>
-                <div v-if="step.slots.length">
-                  <div v-for="slot in step.slots" :key="slot._id" class="slot row">
-                    <div class="dates">{{ formatDate(slot.startDate) }}</div>
-                    <div class="hours">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
-                    <div v-if="slot.attendances.length" class="attendance">
-                      <q-icon size="12px" name="check_circle" color="green-600" />
-                      <span class="text-green-600">Présent(e)</span>
-                    </div>
-                    <div v-else-if="isBefore(new Date(), slot.endDate)" class="attendance">
-                      <span class="q-mx-sm text-italic text-copper-grey-800">à venir</span>
-                    </div>
-                    <div v-else class="attendance">
-                      <q-icon size="12px" name="fas fa-times-circle" color="orange-700" />
-                      <span class="text-orange-700">Absent(e)</span>
-                    </div>
-                  </div>
-                </div>
+              </div>
+              <div v-if="props.row.subProgram.elearningSteps.length" class="text-weight-bold q-my-sm">
+                Complétion eLearning
+              </div>
+              <div v-for="step in props.row.subProgram.elearningSteps" :key="step._id" class="q-mb-xs q-ml-md row"
+                :props="props">
+                <q-icon name="stay_current_portrait" />
+                <div class="col-9">{{ step.name }}</div>
+                <ni-progress class="expanding-table-sub-progress col-2" :value="step.progress.eLearning" />
               </div>
             </q-td>
           </template>
@@ -118,7 +116,7 @@ import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
-import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
+import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import {
   isBetween,
@@ -256,7 +254,16 @@ export default {
     async getUserCourses () {
       try {
         this.loading = true;
-        this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+        const userCourses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+
+        this.courses = userCourses.map(course => ({
+          ...course,
+          subProgram: {
+            ...course.subProgram,
+            elearningSteps: course.subProgram.steps.filter(step => step.type === E_LEARNING),
+            liveSteps: course.subProgram.steps.filter(step => [ON_SITE, REMOTE].includes(step.type)),
+          },
+        }));
       } catch (e) {
         NotifyNegative('Erreur lors de la récupération des formations');
         console.error(e);
@@ -358,6 +365,14 @@ export default {
   display: flex
   color: $primary
 
+.slots
+  @media screen and (min-width: 767px)
+    display: flex
+
+.step-name
+  @media screen and (min-width: 767px)
+    width: 50%
+
 .dates
   @media screen and (min-width: 767px)
     width: 10%
@@ -366,17 +381,13 @@ export default {
   @media screen and (min-width: 767px)
     width: 15%
 
+.attendance
+  @media screen and (min-width: 767px)
+    width: 15%
+
 .trainer
   width: 50%
 
 .misc
   width: 15%
-.attendance
-  @media screen and (min-width: 767px)
-    width: 15%
-
-.slot
-  margin: 0px 40px
-  @media screen and (max-width: 767px)
-    justify-content: space-between
 </style>
