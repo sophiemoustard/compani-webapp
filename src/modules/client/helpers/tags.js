@@ -100,13 +100,17 @@ export const getTagsToDownloadQuote = (customer, company, quote) => ({
   quoteNumber: quote.quoteNumber,
   subscriptions: quote.subscriptions.map(subscription => ({
     serviceName: subscription.service.name,
-    sundays: subscription.sundays ? subscription.sundays : '',
-    evenings: subscription.evenings ? subscription.evenings : '',
-    weeklyVolume: subscription.weeklyHours || subscription.weeklyCount,
+    sundays: subscription.sundays || '',
+    saturdays: subscription.saturdays || '',
+    evenings: subscription.evenings || '',
+    weeklyVolume: subscription.weeklyCount || '',
+    weeklyHours: subscription.weeklyHours || '',
     serviceNature: subscription.service.nature
       ? NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature).label
       : '',
     weeklyRate: subscription.estimatedWeeklyRate ? formatPrice(subscription.estimatedWeeklyRate) : '',
     unitTTCRate: subscription.unitTTCRate ? formatPrice(subscription.unitTTCRate) : '',
+    billingItemsTTCRate: subscription.billingItemsTTCRate ? formatPrice(subscription.billingItemsTTCRate) : '',
+    serviceBillingItems: subscription.serviceBillingItems || '',
   })),
 });
