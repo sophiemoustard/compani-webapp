@@ -287,6 +287,7 @@ import { required, requiredIf, email, minValue } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
+import capitalize from 'lodash/capitalize';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import GoogleDrive from '@api/GoogleDrive';
@@ -309,10 +310,11 @@ import {
   CIVILITY_OPTIONS,
   DOC_EXTENSIONS,
   ONCE,
+  NATURE_OPTIONS,
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate, isSameOrBefore } from '@helpers/date';
-import { getLastVersion } from '@helpers/utils';
+import { getLastVersion, formatPrice } from '@helpers/utils';
 import { frPhoneNumber, iban, bic, frAddress, minDate, integerNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getTagsToGenerateQuote, getTagsToDownloadQuote, getMandateTags } from 'src/modules/client/helpers/tags';
@@ -377,6 +379,44 @@ export default {
       isLoaded: false,
       tmpInput: '',
       subscriptions: [],
+      subscriptionsColumns: [
+        { name: 'service', label: 'Service', align: 'left', field: row => get(row, 'service.name') },
+        {
+          name: 'nature',
+          label: 'Nature',
+          align: 'left',
+          format: (value) => {
+            const nature = NATURE_OPTIONS.find(option => option.value === value);
+            return nature ? capitalize(nature.label) : '';
+          },
+          field: row => get(row, 'service.nature'),
+        },
+        {
+          name: 'unitTTCRate',
+          label: 'Prix unitaire TTC',
+          align: 'center',
+          field: row => row.unitTTCRate && `${this.formatPrice(row.unitTTCRate)}`,
+        },
+        {
+          name: 'weeklyHours',
+          label: 'Volume horaire hebdomadaire estimatif',
+          align: 'center',
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : ''),
+        },
+        {
+          name: 'weeklyCount',
+          label: 'Nombre d\'interventions hebdomadaire estimatif',
+          align: 'center',
+          field: row => (row.weeklyCount || ''),
+        },
+        {
+          name: 'weeklyRate',
+          label: 'Coût hebdomadaire TTC *',
+          align: 'center',
+          field: row => `${this.formatPrice(this.computeWeeklyRate(row, this.getMatchingFunding(row)).total)}`,
+        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
+      ],
       services: [],
       quotesColumns: [
         { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
@@ -614,6 +654,7 @@ export default {
   },
   methods: {
     get,
+    formatPrice,
     disableSubscriptionDeletion (sub) {
       const hasFunding = this.fundings.some(f => f.subscription._id === sub._id);
 
@@ -928,10 +969,10 @@ export default {
         const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);
         if (!quoteDriveId) return NotifyWarning('Template manquant');
 
-        const subscriptions = quote.subscriptions.map(subscription => ({
-          ...subscription,
-          estimatedWeeklyRate: this.computeWeeklyRate(subscription),
-        }));
+        const subscriptions = quote.subscriptions.map((subscription) => {
+          const { total } = this.computeWeeklyRate(subscription);
+          return { ...subscription, estimatedWeeklyRate: total };
+        });
 
         const data = getTagsToDownloadQuote(this.customer, this.company, { ...quote, subscriptions });
         const params = { driveId: quoteDriveId };
