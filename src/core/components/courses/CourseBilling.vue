@@ -5,7 +5,7 @@
         <p class="text-weight-bold">Infos de facturation</p>
         <div v-for="bill of courseBills" :key="bill._id">
           <q-card flat class="q-mb-sm">
-            <q-card-section class="cursor-pointer row" :id="bill._id" @click="showDetails(bill._id)">
+            <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
               <q-item-section>
                 <div class="text-weight-bold">A facturer - {{ formatPrice(bill.netInclTaxes) }}</div>
                 <div @click.stop="openFunderEditionmodal(bill._id)" class="payer">
@@ -13,6 +13,7 @@
                   <q-icon size="16px" name="edit" color="copper-grey-500" />
                 </div>
               </q-item-section>
+              <q-icon size="24px" :name="areDetailsVisible[bill._id] ? 'expand_less' : 'expand_more'" />
             </q-card-section>
             <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
               <q-card flat class="q-mx-lg q-mb-sm">
