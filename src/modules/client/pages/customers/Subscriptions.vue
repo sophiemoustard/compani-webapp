@@ -3,9 +3,9 @@
     <template v-if="customer">
       <div class="q-mb-lg">
         <ni-title-header title="Abonnement" class="q-mb-xl" />
-        <p class="title">Souscriptions</p>
+        <p class="title">Souscription(s)</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
-        <div v-if="subscriptions && subscriptions.length > 0 && !subscriptionsLoading">
+        <div v-if="subscriptions.length > 0 && !subscriptionsLoading">
           <div v-for="subscription of subscriptions" :key="subscription._id" class="q-mb-md">
             <ni-subscription-cell :subscription="subscription" @show-subscription-fundings="showSubscriptionFundings"
               @show-history="showHistory" :fundings="getSubscriptionFundings(subscription._id)" />

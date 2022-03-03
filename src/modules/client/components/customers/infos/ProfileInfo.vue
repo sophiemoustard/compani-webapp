@@ -968,10 +968,10 @@ export default {
         const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);
         if (!quoteDriveId) return NotifyWarning('Template manquant');
 
-        const subscriptions = quote.subscriptions.map(subscription => ({
-          ...subscription,
-          estimatedWeeklyRate: this.computeWeeklyRate(subscription).total,
-        }));
+        const subscriptions = quote.subscriptions.map((subscription) => {
+          const { total } = this.computeWeeklyRate(subscription);
+          return { ...subscription, estimatedWeeklyRate: total };
+        });
 
         const data = getTagsToDownloadQuote(this.customer, this.company, { ...quote, subscriptions });
         const params = { driveId: quoteDriveId };

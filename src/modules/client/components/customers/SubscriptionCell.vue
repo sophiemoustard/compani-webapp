@@ -2,14 +2,15 @@
   <q-card class="cell-container text-copper-grey-500">
     <div class="row cell-header q-mb-md">
       <div class="text-weight-bold">{{ subscription.service.name }}</div>
-      <ni-button icon="history" @click="showHistory(subscription._id)" data-cy="show-subscription-history" />
+      <ni-button icon="history" @click="showHistory(subscription._id)" data-cy="show-subscription-history"
+        color="copper-grey-500" />
     </div>
     <div v-if="subscription.service.nature === HOURLY" class="q-mb-md">
       Prix horaire (TTC) :
       <span class="text-weight-bold text-copper-grey-700">{{ formatPrice(subscription.unitTTCRate) }} / heure</span>
     </div>
     <div v-else class="q-mb-md">
-      Prix forfaitaire (TTC) :
+      Coût forfaitaire (TTC) :
       <span class="text-weight-bold text-copper-grey-700">
         {{ formatPrice(subscription.unitTTCRate) }} / intervention
       </span>
@@ -19,7 +20,7 @@
       <span class="text-weight-bold text-copper-grey-700">
         {{ formatPrice(getBillingItemsPrice()) }} / intervention
       </span>
-      <div class="text-italic q-mb-md" style="font-size: 12px">Ce prix correspond à : {{ getBillingItemsNames() }}</div>
+      <div class="text-italic q-mb-md" style="font-size: 12px">Ce prix correspond à : {{ getBillingItemsName() }}</div>
     </div>
     <div class="bg-copper-grey-100 text-copper-grey-700 weekly-infos">
       <div>
@@ -31,8 +32,8 @@
         <div>Estimation sur base de : </div>
         <ul>
           <li v-if="subscription.weeklyHours">
-            {{ subscription.weeklyHours }} h d'intervention par semaine
-            <span v-if="getSurchargesHours()">(dont majorées : {{ getSurchargesHours() }})</span>
+            {{ subscription.weeklyHours }}h d'intervention par semaine
+            <span v-if="getSurchargedHours()">(dont majorées : {{ getSurchargedHours() }})</span>
           </li>
           <li v-if="subscription.weeklyCount">
             {{ formatQuantity('intervention', subscription.weeklyCount) }} par semaine
@@ -77,37 +78,33 @@ export default {
     const getBillingItemsPrice = () => props.subscription.service.billingItems
       .reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
 
-    const getBillingItemsNames = () => {
+    const getBillingItemsName = () => {
       const billingItemsName = props.subscription.service.billingItems.reduce((acc, bi) => (acc += `${bi.name}, `), '');
       return billingItemsName.slice(0, -2);
     };
 
-    const getSurchargesHours = () => {
-      let surchargesHours = '';
-      if (props.subscription.saturdays) surchargesHours += `${props.subscription.saturdays} h le samedi, `;
-      if (props.subscription.sundays) surchargesHours += `${props.subscription.sundays} h le dimanche, `;
-      if (props.subscription.evenings) surchargesHours += `${props.subscription.evenings} h en soirée, `;
+    const getSurchargedHours = () => {
+      let surchargedHours = '';
+      if (props.subscription.saturdays) surchargedHours += `${props.subscription.saturdays}h le samedi, `;
+      if (props.subscription.sundays) surchargedHours += `${props.subscription.sundays}h le dimanche, `;
+      if (props.subscription.evenings) surchargedHours += `${props.subscription.evenings}h en soirée, `;
 
-      return surchargesHours.slice(0, -2);
+      return surchargedHours.slice(0, -2);
     };
 
-    const showHistory = (id) => {
-      context.emit('showHistory', id);
-    };
+    const showHistory = (id) => { context.emit('showHistory', id); };
 
-    const showSubscriptionFundings = (id) => {
-      context.emit('showSubscriptionFundings', id);
-    };
+    const showSubscriptionFundings = (id) => { context.emit('showSubscriptionFundings', id); };
 
     return {
       // Data
       HOURLY,
       // Methods
       getBillingItemsPrice,
-      getBillingItemsNames,
+      getBillingItemsName,
       showHistory,
       showSubscriptionFundings,
-      getSurchargesHours,
+      getSurchargedHours,
       get,
       formatQuantity,
       formatPrice,
