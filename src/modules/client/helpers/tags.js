@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import { CIVILITY_OPTIONS, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import nationalities from '@data/nationalities';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, getBillingItemName, getBillingItemsPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 
 const getMonthlyHours = contract => Number.parseFloat(contract.weeklyHours * WEEKS_PER_MONTH).toFixed(1);
@@ -67,23 +67,33 @@ export const getMandateTags = (customer, company, mandate) => ({
   rum: mandate.rum,
 });
 
-export const getTagsToGenerateQuote = data => ({
-  service: {
-    name: get(data, 'service.name'),
-    nature: get(data, 'service.nature'),
-    ...(get(data, 'service.surcharge.evening') || get(data, 'service.surcharge.sunday')) && {
-      surcharge: {
-        ...get(data, 'service.surcharge.evening') && { evening: data.service.surcharge.evening },
-        ...get(data, 'service.surcharge.sunday') && { sunday: data.service.surcharge.sunday },
+export const getTagsToGenerateQuote = (data) => {
+  const billingItemsName = [];
+  if (getBillingItemName(data.service)) billingItemsName.push(getBillingItemName(data.service));
+
+  return {
+    service: {
+      name: get(data, 'service.name'),
+      nature: get(data, 'service.nature'),
+      ...(get(data, 'service.surcharge.evening') || get(data, 'service.surcharge.sunday') ||
+        get(data, 'service.surcharge.saturdays')) && {
+        surcharge: {
+          ...get(data, 'service.surcharge.evening') && { evening: data.service.surcharge.evening },
+          ...get(data, 'service.surcharge.sunday') && { sunday: data.service.surcharge.sunday },
+          ...get(data, 'service.surcharge.saturdays') && { saturdays: data.service.surcharge.saturdays },
+        },
       },
     },
-  },
-  unitTTCRate: data.unitTTCRate,
-  weeklyCount: data.weeklyCount,
-  weeklyHours: data.weeklyHours,
-  ...data.sundays && { sundays: data.sundays },
-  ...data.evenings && { evenings: data.evenings },
-});
+    unitTTCRate: data.unitTTCRate,
+    billingItemsTTCRate: getBillingItemsPrice(data.service),
+    serviceBillingItems: billingItemsName,
+    weeklyCount: data.weeklyCount,
+    weeklyHours: data.weeklyHours,
+    ...data.saturdays && { saturdays: data.saturdays },
+    ...data.sundays && { sundays: data.sundays },
+    ...data.evenings && { evenings: data.evenings },
+  };
+};
 
 export const getTagsToDownloadQuote = (customer, company, quote) => ({
   ...getCustomerDocumentTags({ customer, company }),
