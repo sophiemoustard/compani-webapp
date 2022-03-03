@@ -4,7 +4,7 @@
       Créer un <span class="text-weight-bold">article</span>
     </template>
     <ni-input in-modal caption="Nom" :model-value="newBillingItem.name" :error="validations.name.$error"
-      @blur="validations.name.$touch" required-field @update:model-value="update($event, 'name')" />
+      @blur="validations.name.$touch" required-field @update:model-value="update($event.trim(), 'name')" />
     <ni-select in-modal caption="Type" :model-value="newBillingItem.type" :error="validations.type.$error"
       @blur="validations.type.$touch" :options="typeOptions" @update:model-value="update($event, 'type')"
       required-field />

@@ -4,7 +4,7 @@
         Ajouter un <span class="text-weight-bold">tiers payeur</span>
       </template>
       <ni-input in-modal caption="Nom" :model-value="newThirdPartyPayer.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field @update:model-value="update($event, 'name')" />
+        @blur="validations.name.$touch" required-field @update:model-value="update($event.trim(), 'name')" />
       <ni-search-address :model-value="newThirdPartyPayer.address" error-message="Adresse invalide" in-modal
         @blur="validations.address.$touch" @update:model-value="update($event, 'address')"
         :error="validations.address.$error" />
