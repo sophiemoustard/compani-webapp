@@ -143,7 +143,9 @@ export const readAPIResponseWithTypeArrayBuffer = (response) => {
 export const getBillingItemsPrice = service => service.billingItems
   .reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
 
-export const getBillingItemName = (service) => {
+export const getBillingItemsName = (service) => {
+  if (!service.billingItems.length) return [];
+
   const billingItemsName = service.billingItems.reduce((acc, bi) => (acc += `${bi.name}, `), '');
-  return billingItemsName.slice(0, -2);
+  return [billingItemsName.slice(0, -2)];
 };
