@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import { CIVILITY_OPTIONS, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 import nationalities from '@data/nationalities';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, getBillingItemsName, getBillingItemsPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 
 const getMonthlyHours = contract => Number.parseFloat(contract.weeklyHours * WEEKS_PER_MONTH).toFixed(1);
@@ -67,35 +67,45 @@ export const getMandateTags = (customer, company, mandate) => ({
   rum: mandate.rum,
 });
 
-export const getSubscriptionQuoteTags = data => ({
+export const getTagsToGenerateQuote = data => ({
   service: {
     name: get(data, 'service.name'),
     nature: get(data, 'service.nature'),
-    ...(get(data, 'service.surcharge.evening') || get(data, 'service.surcharge.sunday')) && {
+    ...(get(data, 'service.surcharge.evening') || get(data, 'service.surcharge.sunday') ||
+      get(data, 'service.surcharge.saturdays')) && {
       surcharge: {
         ...get(data, 'service.surcharge.evening') && { evening: data.service.surcharge.evening },
         ...get(data, 'service.surcharge.sunday') && { sunday: data.service.surcharge.sunday },
+        ...get(data, 'service.surcharge.saturdays') && { saturdays: data.service.surcharge.saturdays },
       },
     },
   },
   unitTTCRate: data.unitTTCRate,
-  estimatedWeeklyVolume: data.estimatedWeeklyVolume,
+  billingItemsTTCRate: getBillingItemsPrice(data.service),
+  serviceBillingItems: getBillingItemsName(data.service),
+  weeklyCount: data.weeklyCount,
+  weeklyHours: data.weeklyHours,
+  ...data.saturdays && { saturdays: data.saturdays },
   ...data.sundays && { sundays: data.sundays },
   ...data.evenings && { evenings: data.evenings },
 });
 
-export const getQuoteTags = (customer, company, quote) => ({
+export const getTagsToDownloadQuote = (customer, company, quote) => ({
   ...getCustomerDocumentTags({ customer, company }),
   quoteNumber: quote.quoteNumber,
   subscriptions: quote.subscriptions.map(subscription => ({
     serviceName: subscription.service.name,
-    sundays: subscription.sundays ? subscription.sundays : '',
-    evenings: subscription.evenings ? subscription.evenings : '',
-    weeklyVolume: subscription.estimatedWeeklyVolume,
+    sundays: subscription.sundays || '',
+    saturdays: subscription.saturdays || '',
+    evenings: subscription.evenings || '',
+    weeklyVolume: subscription.weeklyCount || '',
+    weeklyHours: subscription.weeklyHours || '',
     serviceNature: subscription.service.nature
       ? NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature).label
       : '',
     weeklyRate: subscription.estimatedWeeklyRate ? formatPrice(subscription.estimatedWeeklyRate) : '',
     unitTTCRate: subscription.unitTTCRate ? formatPrice(subscription.unitTTCRate) : '',
+    billingItemsTTCRate: subscription.billingItemsTTCRate ? formatPrice(subscription.billingItemsTTCRate) : '',
+    serviceBillingItems: subscription.serviceBillingItems || '',
   })),
 });

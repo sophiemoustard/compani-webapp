@@ -262,6 +262,7 @@ export const EVENT_TRANSPORT_OPTIONS = [
 ];
 
 export const REQUIRED_LABEL = 'Champ requis';
+export const INVALID_NUMBER = 'Nombre invalide';
 
 // BILLING
 

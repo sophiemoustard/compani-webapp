@@ -23,6 +23,10 @@
           <slot name="expanding-row" :props="props" />
         </q-tr>
       </template>
+      <template #bottom="props">
+        <ni-pagination :props="props" :pagination="pagination" :data="data" :options="paginationOptions"
+          @update:pagination="update($event)" />
+      </template>
     </q-table>
     <div v-else class="loading-container" />
     <q-inner-loading :showing="loading">
@@ -32,13 +36,13 @@
 </template>
 
 <script>
+import Pagination from '@components/table/Pagination';
+
 export default {
   name: 'ExpandingTable',
   emits: ['update:pagination'],
-  computed: {
-    formattedVisibleColumns () {
-      return this.visibleColumns.length ? this.visibleColumns : this.columns.map(c => c.name);
-    },
+  components: {
+    'ni-pagination': Pagination,
   },
   props: {
     data: { type: Array, default: () => [] },
@@ -46,8 +50,22 @@ export default {
     loading: { type: Boolean, default: false },
     pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
     rowKey: { type: String, default: '_id' },
-    hideBottom: { type: Boolean, default: true },
+    hideBottom: { type: Boolean, default: false },
     visibleColumns: { type: Array, default: () => [] },
+    rowsPerPage: { type: Array, default: () => [15, 50, 100, 200, 300] },
+  },
+  computed: {
+    formattedVisibleColumns () {
+      return this.visibleColumns.length ? this.visibleColumns : this.columns.map(c => c.name);
+    },
+    paginationOptions () {
+      return this.rowsPerPage.filter(o => o <= this.data.length);
+    },
+  },
+  methods: {
+    update (event) {
+      this.$emit('update:pagination', event);
+    },
   },
 };
 </script>

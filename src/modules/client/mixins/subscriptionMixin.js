@@ -1,7 +1,7 @@
 import get from 'lodash/get';
-import capitalize from 'lodash/capitalize';
-import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
-import { getLastVersion } from '@helpers/utils';
+import has from 'lodash/has';
+import { MONTHLY, FIXED, HOURLY, WEEKS_PER_MONTH } from '@data/constants';
+import { getLastVersion, formatPrice } from '@helpers/utils';
 import moment from '@helpers/moment';
 
 export const subscriptionMixin = {
@@ -10,50 +10,6 @@ export const subscriptionMixin = {
       subscriptions: [],
       selectedSubscription: {},
       subscriptionHistoryModal: false,
-      subscriptionsColumns: [
-        {
-          name: 'service',
-          label: 'Service',
-          align: 'left',
-          field: row => get(row, 'service.name'),
-        },
-        {
-          name: 'nature',
-          label: 'Nature',
-          align: 'left',
-          format: (value) => {
-            const nature = NATURE_OPTIONS.find(option => option.value === value);
-            return nature ? capitalize(nature.label) : '';
-          },
-          field: row => get(row, 'service.nature'),
-        },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'center',
-          field: row => row.unitTTCRate && `${this.formatNumber(row.unitTTCRate)}€`,
-        },
-        {
-          name: 'estimatedWeeklyVolume',
-          label: 'Volume hebdomadaire estimatif',
-          align: 'center',
-          field: row => (get(row, 'service.nature') === HOURLY
-            ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h`
-            : row.estimatedWeeklyVolume),
-        },
-        {
-          name: 'weeklyRate',
-          label: 'Coût hebdomadaire TTC *',
-          align: 'center',
-          field: row => `${this.formatNumber(this.computeWeeklyRate(row, this.getMatchingFunding(row)))}€`,
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
-      ],
       subscriptionHistoryColumns: [
         {
           name: 'createdAt',
@@ -66,15 +22,13 @@ export const subscriptionMixin = {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'center',
-          field: row => `${this.formatNumber(row.unitTTCRate)}€`,
+          field: row => `${this.formatPrice(row.unitTTCRate)}`,
         },
         {
-          name: 'estimatedWeeklyVolume',
+          name: 'weeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => (get(this.selectedSubscription, 'service.nature') === HOURLY
-            ? `${row.estimatedWeeklyVolume}h`
-            : row.estimatedWeeklyVolume),
+          field: row => (row.weeklyHours ? `${row.weeklyHours}h` : row.weeklyCount),
         },
         {
           name: 'evenings',
@@ -83,62 +37,77 @@ export const subscriptionMixin = {
           field: row => (row.evenings ? `${row.evenings}h` : ''),
         },
         {
+          name: 'saturdays',
+          label: 'dont samedis',
+          align: 'center',
+          field: row => (row.saturdays ? `${row.saturdays}h` : ''),
+        },
+        {
           name: 'sundays',
-          label: 'dont dimanche',
+          label: 'dont dimanches',
           align: 'center',
           field: row => (row.sundays ? `${row.sundays}h` : ''),
         },
       ],
-      paginationHistory: {
-        rowsPerPage: 0,
-        sortBy: 'createdAt',
-        descending: true,
-      },
+      paginationHistory: { rowsPerPage: 0, sortBy: 'createdAt', descending: true },
       subscriptionsLoading: false,
     };
   },
   methods: {
-    formatNumber (number) {
-      return parseFloat(Math.round(number * 100) / 100).toFixed(2);
-    },
+    formatPrice,
     computeWeeklyRate (subscription, funding) {
-      let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (get(subscription, 'service.surcharge', null)) {
+      let weeklyRate = subscription.weeklyHours
+        ? subscription.unitTTCRate * subscription.weeklyHours
+        : subscription.unitTTCRate * subscription.weeklyCount;
+      let totalSurcharge = 0;
+
+      if (get(subscription, 'service.surcharge')) {
+        if (subscription.saturdays && subscription.service.surcharge.saturday) {
+          totalSurcharge += subscription.saturdays * subscription.unitTTCRate * subscription.service.surcharge.saturday
+            / 100;
+        }
         if (subscription.sundays && subscription.service.surcharge.sunday) {
-          weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
+          totalSurcharge += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday
+            / 100;
         }
         if (subscription.evenings && subscription.service.surcharge.evening) {
-          weeklyRate += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening / 100;
+          totalSurcharge += subscription.evenings * subscription.unitTTCRate * subscription.service.surcharge.evening
+            / 100;
         }
+
+        weeklyRate += totalSurcharge;
       }
+
+      if (get(subscription, 'service.billingItems.length')) {
+        const totalBillingItemsAmount = subscription.service.billingItems
+          .reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
+        weeklyRate += totalBillingItemsAmount * subscription.weeklyCount;
+      }
+
       let fundingReduction = 0;
-      if (this.isCompleteFunding(funding)) {
-        if (funding.frequency !== ONCE) {
-          if (funding.nature === FIXED) {
-            fundingReduction = funding.frequency === MONTHLY ? funding.amountTTC / WEEKS_PER_MONTH : funding.amountTTC;
-          } else {
-            const refundedHours = Math.min(
-              funding.frequency === MONTHLY ? funding.careHours / WEEKS_PER_MONTH : funding.careHours,
-              subscription.estimatedWeeklyVolume
-            );
-            fundingReduction = refundedHours * funding.unitTTCRate;
-          }
-
-          fundingReduction *= (1 - funding.customerParticipationRate / 100);
+      if (this.isCompleteFunding(funding) && funding.frequency === MONTHLY) {
+        if (funding.nature === FIXED) {
+          fundingReduction = funding.amountTTC / WEEKS_PER_MONTH;
         }
+        if (funding.nature === HOURLY) {
+          const refundedHours = Math.min(funding.careHours / WEEKS_PER_MONTH, subscription.weeklyHours);
+          fundingReduction = refundedHours * funding.unitTTCRate;
+        }
+
+        fundingReduction *= (1 - funding.customerParticipationRate / 100);
       }
 
-      return Math.max(weeklyRate - fundingReduction, 0);
+      return { total: Math.max(weeklyRate - fundingReduction, 0), fundingReduction, totalSurcharge };
     },
     isCompleteFunding (funding) {
       if (!funding || funding === {}) return false;
-      if (!(funding.frequency && funding.nature && funding.customerParticipationRate)) return false;
+      if (!(funding.frequency && funding.nature && has(funding, 'customerParticipationRate'))) return false;
       if (funding.nature === FIXED && !funding.amountTTC) return false;
       if (funding.nature === HOURLY && (!funding.unitTTCRate || !funding.careHours)) return false;
       return true;
     },
     getMatchingFunding (subscription) {
-      return this.fundings.find(fd => fd.subscription === subscription._id &&
+      return this.fundings.find(fd => fd.subscription._id === subscription._id &&
         (fd.endDate ? moment().isBetween(fd.startDate, fd.endDate) : moment().isSameOrAfter(fd.startDate)));
     },
     showHistory (id) {
@@ -152,12 +121,8 @@ export const subscriptionMixin = {
     refreshSubscriptions (customer) {
       try {
         this.subscriptionsLoading = true;
-        const { subscriptions } = customer;
-        this.subscriptions = subscriptions
-          ? subscriptions.map(sub => ({
-            ...getLastVersion(sub.versions, 'createdAt'),
-            ...sub,
-          }))
+        this.subscriptions = customer.subscriptions
+          ? customer.subscriptions.map(sub => ({ ...getLastVersion(sub.versions, 'createdAt'), ...sub }))
           : [];
       } catch (e) {
         console.error(e);

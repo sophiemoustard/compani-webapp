@@ -15,8 +15,10 @@ import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
+import CourseBilling from '@components/courses/CourseBilling';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
 const metaInfo = { title: 'Fiche formation' };
@@ -41,20 +43,31 @@ export default {
       return !!this.course.slots.length || !!this.course.trainees.length || !!this.course.slotsToPlan.length;
     },
     tabsContent () {
-      return [
-        {
-          label: 'Organisation',
-          name: 'organization',
-          default: this.defaultTab === 'organization',
-          component: ProfileOrganization,
-        },
-        {
-          label: 'Suivi des stagiaires',
-          name: 'traineeFollowUp',
-          default: this.defaultTab === 'traineeFollowUp',
-          component: ProfileTraineeFollowUp,
-        },
-      ];
+      const organizationTab = {
+        label: 'Organisation',
+        name: 'organization',
+        default: this.defaultTab === 'organization',
+        component: ProfileOrganization,
+      };
+      const followUpTab = {
+        label: 'Suivi des stagiaires',
+        name: 'traineeFollowUp',
+        default: this.defaultTab === 'traineeFollowUp',
+        component: ProfileTraineeFollowUp,
+      };
+      const billingTab = {
+        label: 'Facturation',
+        name: 'billing',
+        default: this.defaultTab === 'billing',
+        component: CourseBilling,
+      };
+
+      const vendorRole = this.$store.getters['main/getVendorRole'];
+      const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
+
+      return isAdmin && this.isIntraCourse
+        ? [organizationTab, followUpTab, billingTab]
+        : [organizationTab, followUpTab];
     },
   },
   async created () {

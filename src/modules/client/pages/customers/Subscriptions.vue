@@ -3,31 +3,14 @@
     <template v-if="customer">
       <div class="q-mb-lg">
         <ni-title-header title="Abonnement" class="q-mb-xl" />
-        <p class="title">Souscriptions</p>
+        <p class="title">Souscription(s)</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
-        <q-card v-if="subscriptions.length > 0" class="contract-cell">
-          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading"
-            data-cy="subscriptions-table">
-            <template #body="{ props }">
-              <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style" :data-cy="`col-${col.name}`">
-                  <template v-if="col.name === 'actions'">
-                    <div class="row no-wrap table-actions">
-                      <ni-button icon="history" @click="showHistory(col.value)" data-cy="show-subscription-history" />
-                      <ni-button :disable="!getSubscriptionFundings(col.value).length" icon="mdi-calculator"
-                        @click="showSubscriptionFundings(col.value)" data-cy="show-fundings-history" />
-                    </div>
-                  </template>
-                  <template v-else>{{ col.value }}</template>
-                </q-td>
-              </q-tr>
-            </template>
-          </ni-responsive-table>
-        </q-card>
-        <p v-if="subscriptions.length > 0" class="nota-bene">
-          * intègre les éventuelles majorations soir / dimanche
-        </p>
+        <div v-if="subscriptions.length > 0 && !subscriptionsLoading">
+          <div v-for="subscription of subscriptions" :key="subscription._id" class="q-mb-md">
+            <ni-subscription-cell :subscription="subscription" @show-subscription-fundings="showSubscriptionFundings"
+              @show-history="showHistory" :fundings="getSubscriptionFundings(subscription._id)" />
+          </div>
+        </div>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @update:model-value="confirmAgreement"
@@ -146,6 +129,7 @@ import Input from '@components/form/Input';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
+import SubscriptionCell from 'src/modules/client/components/customers/SubscriptionCell';
 import Modal from '@components/modal/Modal';
 import HtmlModal from '@components/modal/HtmlModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -173,6 +157,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
     'ni-bi-color-button': BiColorButton,
+    'ni-subscription-cell': SubscriptionCell,
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
@@ -335,22 +320,25 @@ export default {
       }
     },
     // Subscriptions
+    formatSubscriptionForAgreement (subscription) {
+      const lastVersion = getLastVersion(subscription.versions, 'createdAt');
+
+      return {
+        subscriptionId: subscription._id,
+        service: subscription.service.name,
+        unitTTCRate: lastVersion.unitTTCRate,
+        weeklyCount: lastVersion.weeklyCount,
+        startDate: lastVersion.startDate,
+        ...(lastVersion.weeklyHours && { weeklyHours: lastVersion.weeklyHours }),
+        ...(lastVersion.evenings && { evenings: lastVersion.evenings }),
+        ...(lastVersion.saturdays && { saturdays: lastVersion.saturdays }),
+        ...(lastVersion.sundays && { sundays: lastVersion.sundays }),
+      };
+    },
     async confirmAgreement () {
       try {
         if (this.customer.subscriptionsAccepted) {
-          const subscriptions = this.customer.subscriptions.map((subscription) => {
-            const lastVersion = getLastVersion(subscription.versions, 'createdAt');
-            const obj = {
-              subscriptionId: subscription._id,
-              service: subscription.service.name,
-              unitTTCRate: lastVersion.unitTTCRate,
-              estimatedWeeklyVolume: lastVersion.estimatedWeeklyVolume,
-              startDate: lastVersion.startDate,
-            };
-            if (lastVersion.evenings) obj.evenings = lastVersion.evenings;
-            if (lastVersion.sundays) obj.sundays = lastVersion.sundays;
-            return obj;
-          });
+          const subscriptions = this.customer.subscriptions.map(this.formatSubscriptionForAgreement);
           const payload = {
             subscriptions,
             helper: {
@@ -359,7 +347,9 @@ export default {
               title: this.helper.identity ? this.helper.identity.title : '',
             },
           };
+
           await Customers.addSubscriptionHistory(this.customer._id, payload);
+
           await this.refreshCustomer();
           NotifyPositive('Abonnement validé');
         }
