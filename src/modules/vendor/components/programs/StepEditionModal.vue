@@ -5,6 +5,9 @@
     </template>
     <ni-input in-modal :model-value="editedStep.name" :error="validations.name.$error" caption="Nom"
       @update:model-value="update($event.trim(), 'name')" @blur="validations.name.$touch" required-field />
+    <ni-input in-modal caption="Durée théorique" type="number" :model-value="editedStep.estimatedHours"
+      :error="validations.estimatedHours.$error" :error-message="estimatedHoursErrorMsg" suffix="h" required-field
+      @blur="validations.estimatedHours.$touch" @update:model-value="update($event, 'estimatedHours')" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -23,6 +26,7 @@ export default {
     editedStep: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    estimatedHoursErrorMsg: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
