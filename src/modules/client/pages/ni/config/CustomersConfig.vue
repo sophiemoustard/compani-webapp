@@ -194,7 +194,8 @@
 
     <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" :validations="v$.editedThirdPartyPayer"
       :edited-third-party-payer="editedThirdPartyPayer" @submit="updateThirdPartyPayer" @update="setThirdPartyPayer"
-      @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions" />
+      @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions"
+      :third-party-payer-type-options="THIRD_PARTY_PAYER_TYPE_OPTIONS" />
   </q-page>
 </template>
 
@@ -234,6 +235,7 @@ import {
   HTML_EXTENSIONS,
   BILLING_ITEMS_TYPE_OPTIONS,
   PER_INTERVENTION,
+  THIRD_PARTY_PAYER_TYPE_OPTIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { roundFrenchPercentage, formatPrice, formatAndSortOptions, sortStrings, getLastVersion } from '@helpers/utils';
@@ -597,6 +599,7 @@ export default {
         descending: true,
       },
       HTML_EXTENSIONS,
+      THIRD_PARTY_PAYER_TYPE_OPTIONS,
     };
   },
   validations () {
@@ -679,6 +682,8 @@ export default {
         billingMode: { required },
         unitTTCRate: { positiveNumber, twoFractionDigits },
         isApa: { required },
+        teletransmissionType: { required: requiredIf(get(this.editedThirdPartyPayer, 'teletransmissionId')) },
+        companyCode: { required: requiredIf(get(this.editedThirdPartyPayer, 'teletransmissionId')) },
       },
     };
   },
@@ -1130,7 +1135,17 @@ export default {
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
       const selectedTpp = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
-      const { _id, name, address, email: tppEmail, unitTTCRate, billingMode, isApa, teletransmissionId } = selectedTpp;
+      const {
+        _id,
+        name, address,
+        email: tppEmail,
+        unitTTCRate,
+        billingMode,
+        isApa,
+        teletransmissionId,
+        teletransmissionType,
+        companyCode,
+      } = selectedTpp;
 
       this.editedThirdPartyPayer = {
         _id,
@@ -1141,6 +1156,8 @@ export default {
         billingMode: billingMode || '',
         isApa: isApa || false,
         teletransmissionId: teletransmissionId || '',
+        teletransmissionType: teletransmissionType || '',
+        companyCode: companyCode || '',
       };
     },
     resetThirdPartyPayerCreation () {

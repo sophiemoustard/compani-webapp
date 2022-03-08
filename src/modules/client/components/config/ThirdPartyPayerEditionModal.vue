@@ -19,6 +19,11 @@
         @blur="validations.billingMode.$touch" @update:model-value="update($event, 'billingMode')" />
       <ni-input in-modal caption="ID de télétransmission" :model-value="editedThirdPartyPayer.teletransmissionId"
         @update:model-value="update($event, 'teletransmissionId')" />
+      <ni-select in-modal caption="Type d'aide" :model-value="editedThirdPartyPayer.teletransmissionType"
+        :options="thirdPartyPayerTypeOptions" :error="validations.teletransmissionType.$error"
+        @blur="validations.teletransmissionType.$touch" @update:model-value="update($event, 'teletransmissionType')" />
+      <ni-input in-modal caption="Identifiant structure" @update:model-value="update($event, 'companyCode')"
+        :model-value="editedThirdPartyPayer.companyCode" :error="validations.companyCode.$error" />
       <div class="row q-mb-md light-checkbox">
         <q-checkbox :model-value="editedThirdPartyPayer.isApa" label="Financement APA" dense
           @update:model-value="update($event, 'isApa')" />
@@ -44,6 +49,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     editedThirdPartyPayer: { type: Object, default: () => ({}) },
     billingModeOptions: { type: Array, default: () => [] },
+    thirdPartyPayerTypeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
