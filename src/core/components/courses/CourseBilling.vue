@@ -7,11 +7,14 @@
           <q-card flat class="q-mb-sm">
             <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
               <q-item-section>
-                <div class="text-weight-bold">A facturer - {{ formatPrice(bill.netInclTaxes) }}</div>
+                <div class="text-weight-bold">
+                  {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
+                </div>
                 <div @click.stop="openFunderEditionmodal(bill._id)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
                   <q-icon size="16px" name="edit" color="copper-grey-500" />
                 </div>
+                {{ bill.billedAt ? `Date : ${formatDate(bill.billedAt)}` : '' }}
               </q-item-section>
               <q-icon size="24px" :name="areDetailsVisible[bill._id] ? 'expand_less' : 'expand_more'" />
             </q-card-section>
@@ -46,6 +49,10 @@
               </div>
             </div>
           </q-card>
+          <div v-if="!isBilled(bill)" class="row justify-end q-mt-xl">
+            <ni-button label="Facturer" color="white" class="bg-primary" icon="payment"
+              @click="openCourseBillValidationModal(bill._id)" :disable="billValidationLoading" />
+          </div>
         </div>
       </div>
       <div v-else class="row justify-end">
@@ -70,6 +77,10 @@
       @submit="addBillingItem" :validations="validations.newBillingItem" @hide="resetCourseFeeAdditionModal"
       :loading="billingItemCreationLoading" :billing-item-options="billingItemList"
       :error-messages="newBillingItemErrorMessages" />
+
+     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
+      @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
+      :validations="validations.billToValidate" @cancel="cancelBillValidation" />
   </div>
 </template>
 
@@ -84,6 +95,7 @@ import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
@@ -94,6 +106,7 @@ import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillC
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
 import CourseFeeAdditionModal from 'src/modules/vendor/components/billing/CourseFeeAdditionModal';
+import CourseBillValidationModal from 'src/modules/vendor/components/billing/CourseBillValidationModal';
 
 export default {
   name: 'BillingConfig',
@@ -102,6 +115,7 @@ export default {
     'ni-funder-edition-modal': FunderEditionModal,
     'ni-course-fee-edition-modal': CourseFeeEditionModal,
     'ni-course-fee-addition-modal': CourseFeeAdditionModal,
+    'ni-course-bill-validation-modal': CourseBillValidationModal,
     'ni-button': Button,
   },
   setup () {
@@ -112,6 +126,7 @@ export default {
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingItemCreationLoading = ref(false);
+    const billValidationLoading = ref(false);
     const billsLoading = ref(false);
     const payerList = ref([]);
     const courseBills = ref([]);
@@ -120,11 +135,12 @@ export default {
     const funderEditionModal = ref(false);
     const courseFeeEditionModal = ref(false);
     const courseFeeAdditionModal = ref(false);
+    const courseBillValidationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
     const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingItem = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
-    const areDetailsVisible = ref(Object
-      .fromEntries(courseBills.value.map(bill => [bill._id, false])));
+    const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
+    const billToValidate = ref({ _id: '', billedAt: '' });
 
     const rules = {
       newBill: {
@@ -144,8 +160,11 @@ export default {
         price: { required, strictPositiveNumber },
         count: { required, strictPositiveNumber, integerNumber },
       },
+      billToValidate: {
+        billedAt: { required },
+      },
     };
-    const validations = useVuelidate(rules, { newBill, editedBill, newBillingItem });
+    const validations = useVuelidate(rules, { newBill, editedBill, newBillingItem, billToValidate });
 
     const course = computed(() => $store.state.course.course);
 
@@ -245,6 +264,11 @@ export default {
       courseFeeAdditionModal.value = true;
     };
 
+    const openCourseBillValidationModal = (billId) => {
+      billToValidate.value._id = billId;
+      courseBillValidationModal.value = true;
+    };
+
     const resetBillCreationModal = () => {
       newBill.value = { funder: '', mainFee: { price: 0, count: 1 } };
       validations.value.newBill.$reset();
@@ -258,6 +282,11 @@ export default {
     const resetCourseFeeAdditionModal = () => {
       newBillingItem.value = { billId: '', billingItem: '', price: 0, count: 1, description: '' };
       validations.value.newBillingItem.$reset();
+    };
+
+    const resetCourseBillValidationModal = () => {
+      billToValidate.value = { _id: '', billedAt: '' };
+      validations.value.billToValidate.$reset();
     };
 
     const addBill = async () => {
@@ -328,6 +357,34 @@ export default {
       }
     };
 
+    const validateBill = async () => {
+      try {
+        validations.value.billToValidate.$touch();
+        if (validations.value.billToValidate.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        billValidationLoading.value = true;
+
+        await CourseBills.update(billToValidate.value._id, { billedAt: billToValidate.value.billedAt });
+        NotifyPositive('Facture validée.');
+
+        courseBillValidationModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la validation de la facture.');
+      } finally {
+        billValidationLoading.value = false;
+      }
+    };
+
+    const cancelBillValidation = () => {
+      resetBillCreationModal();
+      courseBillValidationModal.value = false;
+      NotifyPositive('Validation de la facture annulée.');
+    };
+
+    const isBilled = bill => !!bill.billedAt;
+
     const showDetails = (billId) => {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
     };
@@ -348,14 +405,17 @@ export default {
       billEditionLoading,
       billsLoading,
       billingItemCreationLoading,
+      billValidationLoading,
       billCreationModal,
       funderEditionModal,
       courseFeeEditionModal,
       courseFeeAdditionModal,
+      courseBillValidationModal,
       newBill,
       newBillingItem,
       billingItemList,
       editedBill,
+      billToValidate,
       payerList,
       courseBills,
       // Computed
@@ -370,14 +430,19 @@ export default {
       resetBillCreationModal,
       resetEditedBillEditionModal,
       resetCourseFeeAdditionModal,
+      resetCourseBillValidationModal,
       addBill,
       editBill,
       addBillingItem,
+      validateBill,
+      cancelBillValidation,
+      isBilled,
       getBillErrorMessages,
       openBillCreationModal,
       openFunderEditionmodal,
       openCourseFeeEditionModal,
       openCourseFeeAdditionModal,
+      openCourseBillValidationModal,
       refreshCourseBills,
       refreshBillingItems,
       showDetails,
@@ -386,6 +451,7 @@ export default {
       omit,
       pickBy,
       formatPrice,
+      formatDate,
     };
   },
 };
