@@ -29,7 +29,7 @@
                   </div>
                   <div class="step-subtitle">
                     {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
-                     - {{ formatDurationFromFloat(step.estimatedHours) }}
+                     - {{ formatDurationFromFloat(step.theoreticalHours) }}
                   </div>
                 </q-item-section>
               </div>
@@ -97,7 +97,7 @@
       :program="program" :validations="v$" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="v$.editedStep"
-      :estimated-hours-error-msg="estimatedHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
+      :estimated-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
       :loading="modalLoading" />
 
     <activity-creation-modal v-model="activityCreationModal" v-model:new-activity="newActivity" :loading="modalLoading"
@@ -187,7 +187,7 @@ export default {
       newStep: { name: '', type: E_LEARNING },
       reusedStep: { _id: '', program: '' },
       stepEditionModal: false,
-      editedStep: { name: '', type: E_LEARNING, estimatedHours: 0 },
+      editedStep: { name: '', type: E_LEARNING, theoreticalHours: 0 },
       activityCreationModal: false,
       newActivity: { name: '' },
       activityReuseModal: false,
@@ -216,17 +216,17 @@ export default {
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
       reusedStep: { _id: { required }, program: { required } },
-      editedStep: { name: { required }, estimatedHours: { required, strictPositiveNumber } },
+      editedStep: { name: { required }, theoreticalHours: { required, strictPositiveNumber } },
       newActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     };
   },
   computed: {
     ...mapState('program', ['program', 'openedStep']),
-    estimatedHoursErrorMsg () {
+    theoreticalHoursErrorMsg () {
       const validation = this.v$.editedStep;
-      if (validation.estimatedHours.required.$response === false) return REQUIRED_LABEL;
-      if (validation.estimatedHours.strictPositiveNumber.$response === false) return 'Durée non valide';
+      if (validation.theoreticalHours.required.$response === false) return REQUIRED_LABEL;
+      if (validation.theoreticalHours.strictPositiveNumber.$response === false) return 'Durée non valide';
 
       return '';
     },
@@ -389,7 +389,7 @@ export default {
         this.openNextModalAfterUnlocking = () => this.openStepEditionModal(step);
         this.openValidateUnlockingEditionModal(step);
       } else {
-        this.editedStep = pick(step, ['_id', 'name', 'type', 'estimatedHours']);
+        this.editedStep = pick(step, ['_id', 'name', 'type', 'theoreticalHours']);
         this.stepEditionModal = true;
       }
     },
@@ -399,7 +399,7 @@ export default {
         this.v$.editedStep.$touch();
         if (this.v$.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['name', 'estimatedHours']));
+        await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['name', 'theoreticalHours']));
         this.stepEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Étape modifiée.');
@@ -411,7 +411,7 @@ export default {
       }
     },
     resetStepEditionModal () {
-      this.editedStep = { name: '', estimatedHours: 0 };
+      this.editedStep = { name: '', theoreticalHours: 0 };
       this.v$.editedStep.$reset();
     },
     // ACTIVITY
@@ -666,7 +666,7 @@ export default {
     },
     formatDurationFromFloat,
     isStepValid (step) {
-      return step.areActivitiesValid && !!step.estimatedHours ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING;
+      return step.areActivitiesValid && !!step.theoreticalHours ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING;
     },
   },
 };
