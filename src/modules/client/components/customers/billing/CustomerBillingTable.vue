@@ -37,6 +37,7 @@
             </template>
             <div v-else>{{ getPaymentTitle(props.row) }}</div>
           </template>
+          <template v-else-if="col.name === 'misc' && col.value">Motif: {{ col.value }}</template>
           <template v-else-if="col.name === 'balance'">
             <q-item class="row no-wrap items-center">
               <q-item-section side>
@@ -123,6 +124,7 @@ export default {
       columns: [
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         { name: 'document', label: '', align: 'left' },
+        { name: 'misc', label: '', field: 'misc', align: 'left' },
         {
           name: 'inclTaxes',
           label: 'Montant TTC',
