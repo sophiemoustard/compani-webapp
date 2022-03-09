@@ -142,7 +142,7 @@ import {
 } from '@data/constants';
 import { formatQuantity, formatAndSortOptions, sortStrings } from '@helpers/utils';
 import { formatDurationFromFloat } from '@helpers/date';
-import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
@@ -216,7 +216,7 @@ export default {
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
       reusedStep: { _id: { required }, program: { required } },
-      editedStep: { name: { required }, estimatedHours: { required, positiveNumber } },
+      editedStep: { name: { required }, estimatedHours: { required, strictPositiveNumber } },
       newActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     };
@@ -226,7 +226,7 @@ export default {
     estimatedHoursErrorMsg () {
       const validation = this.v$.editedStep;
       if (validation.estimatedHours.required.$response === false) return REQUIRED_LABEL;
-      if (validation.estimatedHours.positiveNumber.$response === false) return 'Durée non valide';
+      if (validation.estimatedHours.strictPositiveNumber.$response === false) return 'Durée non valide';
 
       return '';
     },
