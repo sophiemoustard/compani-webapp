@@ -150,7 +150,7 @@ export const BILLING_DIRECT = 'direct';
 export const APA = 'APA';
 export const PCH = 'PCH';
 export const AM = 'AM';
-export const THIRD_PARTY_PAYER_TYPE_OPTIONS = [
+export const TPP_TYPE_OPTIONS = [
   { label: 'APA', value: APA },
   { label: 'Aide ménagère', value: AM },
   { label: 'PCH', value: PCH },

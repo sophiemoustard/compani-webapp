@@ -196,10 +196,10 @@
     <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" :validations="v$.editedThirdPartyPayer"
       :edited-third-party-payer="editedThirdPartyPayer" @submit="updateThirdPartyPayer" @update="setThirdPartyPayer"
       @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions"
-      :third-party-payer-type-options="THIRD_PARTY_PAYER_TYPE_OPTIONS" />
+      :third-party-payer-type-options="TPP_TYPE_OPTIONS" />
 
     <third-party-payer-details-modal v-model="thirdPartyPayerDetailsModal" :third-party-payer="thirdPartyPayerDetail"
-      :columns="thirdPartyPayersColumns" :visible-columns="thirdPartyPayersVisibleColumns" />
+      :columns="thirdPartyPayersColumns" :visible-columns="thirdPartyPayerDetailsVisibleColumns" />
   </q-page>
 </template>
 
@@ -239,7 +239,7 @@ import {
   HTML_EXTENSIONS,
   BILLING_ITEMS_TYPE_OPTIONS,
   PER_INTERVENTION,
-  THIRD_PARTY_PAYER_TYPE_OPTIONS,
+  TPP_TYPE_OPTIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { roundFrenchPercentage, formatPrice, formatAndSortOptions, sortStrings, getLastVersion } from '@helpers/utils';
@@ -588,10 +588,18 @@ export default {
         {
           name: 'actions',
           label: '',
-          align: 'center',
+          align: 'right',
           field: '_id',
-          style: !this.$q.platform.is.mobile && 'width: 100px',
         },
+      ],
+      thirdPartyPayersVisibleColumns: [
+        'name',
+        'address',
+        'unitTTCRate',
+        'billingMode',
+        'teletransmissionId',
+        'isApa',
+        'actions',
       ],
       tppsLoading: false,
       thirdPartyPayerCreationModal: false,
@@ -613,6 +621,17 @@ export default {
         address: {},
       },
       thirdPartyPayerDetailsModal: false,
+      thirdPartyPayerDetailsVisibleColumns: [
+        'name',
+        'address',
+        'email',
+        'unitTTCRate',
+        'billingMode',
+        'teletransmissionId',
+        'teletransmissionType',
+        'companyCode',
+        'isApa',
+      ],
       thirdPartyPayerDetail: {
         address: {},
       },
@@ -623,7 +642,7 @@ export default {
         descending: true,
       },
       HTML_EXTENSIONS,
-      THIRD_PARTY_PAYER_TYPE_OPTIONS,
+      TPP_TYPE_OPTIONS,
     };
   },
   validations () {
@@ -730,21 +749,6 @@ export default {
       }
 
       return '';
-    },
-    thirdPartyPayersVisibleColumns () {
-      return this.thirdPartyPayerDetailsModal
-        ? [
-          'name',
-          'address',
-          'email',
-          'unitTTCRate',
-          'billingMode',
-          'teletransmissionId',
-          'teletransmissionType',
-          'companyCode',
-          'isApa',
-        ]
-        : ['name', 'address', 'unitTTCRate', 'billingMode', 'teletransmissionId', 'isApa', 'actions'];
     },
   },
   async mounted () {
@@ -1175,7 +1179,8 @@ export default {
       const selectedTpp = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
       const {
         _id,
-        name, address,
+        name,
+        address,
         email: tppEmail,
         unitTTCRate,
         billingMode,

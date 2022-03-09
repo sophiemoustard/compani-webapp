@@ -23,7 +23,8 @@
         :options="thirdPartyPayerTypeOptions" :error="validations.teletransmissionType.$error"
         @blur="validations.teletransmissionType.$touch" @update:model-value="update($event, 'teletransmissionType')" />
       <ni-input in-modal caption="Identifiant structure" @update:model-value="update($event, 'companyCode')"
-        :model-value="editedThirdPartyPayer.companyCode" :error="validations.companyCode.$error" />
+        :model-value="editedThirdPartyPayer.companyCode" :error="validations.companyCode.$error"
+        @blur="validations.companyCode.$touch" />
       <div class="row q-mb-md light-checkbox">
         <q-checkbox :model-value="editedThirdPartyPayer.isApa" label="Financement APA" dense
           @update:model-value="update($event, 'isApa')" />
