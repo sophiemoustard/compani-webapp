@@ -97,7 +97,7 @@
       :program="program" :validations="v$" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="v$.editedStep"
-      :estimated-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
+      :theoretical-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
       :loading="modalLoading" />
 
     <activity-creation-modal v-model="activityCreationModal" v-model:new-activity="newActivity" :loading="modalLoading"
