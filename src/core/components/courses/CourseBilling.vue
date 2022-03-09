@@ -10,7 +10,7 @@
                 <div class="text-weight-bold">
                   {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
-                <div @click.stop="openFunderEditionmodal(bill._id)" class="payer">
+                <div @click.stop="openFunderEditionModal(bill._id)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
                   <q-icon size="16px" name="edit" color="copper-grey-500" />
                 </div>
@@ -249,7 +249,7 @@ export default {
       };
     };
 
-    const openFunderEditionmodal = (billId) => {
+    const openFunderEditionModal = (billId) => {
       setEditedBill(billId);
       funderEditionModal.value = true;
     };
@@ -439,7 +439,7 @@ export default {
       isBilled,
       getBillErrorMessages,
       openBillCreationModal,
-      openFunderEditionmodal,
+      openFunderEditionModal,
       openCourseFeeEditionModal,
       openCourseFeeAdditionModal,
       openCourseBillValidationModal,
