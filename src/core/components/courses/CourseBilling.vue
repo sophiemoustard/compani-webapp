@@ -45,7 +45,7 @@
               </div>
               <div class="row justify-end">
                 <ni-button color="primary" icon="add" label="Ajouter un article"
-                  :disable="billingPurchaseCreationLoading" @click="openCourseFeeAdditionModal(bill._id)" />
+                  :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
               </div>
             </div>
           </q-card>
@@ -73,10 +73,10 @@
       @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
       :loading="billEditionLoading" :error-messages="editedBillErrorMessages" />
 
-    <ni-course-fee-addition-modal v-model="courseFeeAdditionModal" v-model:new-billing-purchase="newBillingPurchase"
-      @submit="addBillingPurchase" :validations="validations.newBillingPurchase" @hide="resetCourseFeeAdditionModal"
-      :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
-      :error-messages="newBillingPurchaseErrorMessages" />
+    <ni-billing-purchase-modal v-model="billingPurchaseAdditionModal" v-model:new-billing-purchase="newBillingPurchase"
+      @submit="addBillingPurchase" :validations="validations.newBillingPurchase"
+      @hide="resetBillingPurchaseAdditionModal" :loading="billingPurchaseCreationLoading"
+      :billing-item-options="billingItemList" :error-messages="newBillingPurchaseErrorMessages" />
 
      <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
@@ -105,7 +105,7 @@ import { REQUIRED_LABEL } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
-import CourseFeeAdditionModal from 'src/modules/vendor/components/billing/CourseFeeAdditionModal';
+import BillingPurchaseAdditionModal from 'src/modules/vendor/components/billing/BillingPurchaseAdditionModal';
 import CourseBillValidationModal from 'src/modules/vendor/components/billing/CourseBillValidationModal';
 
 export default {
@@ -114,7 +114,7 @@ export default {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
     'ni-course-fee-edition-modal': CourseFeeEditionModal,
-    'ni-course-fee-addition-modal': CourseFeeAdditionModal,
+    'ni-billing-purchase-modal': BillingPurchaseAdditionModal,
     'ni-course-bill-validation-modal': CourseBillValidationModal,
     'ni-button': Button,
   },
@@ -134,7 +134,7 @@ export default {
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
     const courseFeeEditionModal = ref(false);
-    const courseFeeAdditionModal = ref(false);
+    const billingPurchaseAdditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
     const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
@@ -259,9 +259,9 @@ export default {
       courseFeeEditionModal.value = true;
     };
 
-    const openCourseFeeAdditionModal = (billId) => {
+    const openBillingPurchaseAdditionModal = (billId) => {
       newBillingPurchase.value.billId = billId;
-      courseFeeAdditionModal.value = true;
+      billingPurchaseAdditionModal.value = true;
     };
 
     const openCourseBillValidationModal = (billId) => {
@@ -279,7 +279,7 @@ export default {
       validations.value.editedBill.$reset();
     };
 
-    const resetCourseFeeAdditionModal = () => {
+    const resetBillingPurchaseAdditionModal = () => {
       newBillingPurchase.value = { billId: '', billingItem: '', price: 0, count: 1, description: '' };
       validations.value.newBillingPurchase.$reset();
     };
@@ -347,7 +347,7 @@ export default {
           .addBillingPurchase(newBillingPurchase.value.billId, pickBy(omit(newBillingPurchase.value, 'billId')));
         NotifyPositive('Article ajouté.');
 
-        courseFeeAdditionModal.value = false;
+        billingPurchaseAdditionModal.value = false;
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
@@ -410,7 +410,7 @@ export default {
       billCreationModal,
       funderEditionModal,
       courseFeeEditionModal,
-      courseFeeAdditionModal,
+      billingPurchaseAdditionModal,
       courseBillValidationModal,
       newBill,
       newBillingPurchase,
@@ -430,7 +430,7 @@ export default {
       refreshCourseFundingOrganisations,
       resetBillCreationModal,
       resetEditedBillEditionModal,
-      resetCourseFeeAdditionModal,
+      resetBillingPurchaseAdditionModal,
       resetCourseBillValidationModal,
       addBill,
       editBill,
@@ -442,7 +442,7 @@ export default {
       openBillCreationModal,
       openFunderEditionModal,
       openCourseFeeEditionModal,
-      openCourseFeeAdditionModal,
+      openBillingPurchaseAdditionModal,
       openCourseBillValidationModal,
       refreshCourseBills,
       refreshBillingItems,

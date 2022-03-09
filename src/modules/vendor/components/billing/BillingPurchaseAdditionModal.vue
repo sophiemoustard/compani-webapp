@@ -29,7 +29,7 @@ import Select from '@components/form/Select';
 import set from 'lodash/set';
 
 export default {
-  name: 'CourseBillCreationModal',
+  name: 'BillingPurchaseAdditionModal',
   props: {
     modelValue: { type: Boolean, default: false },
     newBillingPurchase: { type: Object, default: () => ({}) },
