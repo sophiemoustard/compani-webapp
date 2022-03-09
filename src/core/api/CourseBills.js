@@ -11,7 +11,7 @@ export default {
   async update (billId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/coursebills/${billId}`, payload);
   },
-  async addBillingItem (billId, payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/coursebills/${billId}/billing-item`, payload);
+  async addBillingPurchase (billId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases`, payload);
   },
 };
