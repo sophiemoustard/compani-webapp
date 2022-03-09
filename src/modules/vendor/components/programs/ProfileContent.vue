@@ -25,11 +25,11 @@
                       <ni-button v-if="isLocked(step)" icon="lock" class="q-ml-sm q-px-xs" size="sm"
                         @click="openValidateUnlockingEditionModal(step)" />
                     </div>
-                    <published-dot :is-published="isPublished(step)"
-                      :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
+                    <published-dot :is-published="isPublished(step)" :status="isStepValid(step)" />
                   </div>
                   <div class="step-subtitle">
                     {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
+                     - {{ formatDurationFromFloat(step.theoreticalHours) }}
                   </div>
                 </q-item-section>
               </div>
@@ -97,7 +97,8 @@
       :program="program" :validations="v$" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="v$.editedStep"
-      @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
+      :theoretical-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
+      :loading="modalLoading" />
 
     <activity-creation-modal v-model="activityCreationModal" v-model:new-activity="newActivity" :loading="modalLoading"
       @hide="resetActivityCreationModal" @submit="createActivity" :validations="v$.newActivity" />
@@ -137,8 +138,11 @@ import {
   PUBLISHED_DOT_ACTIVE,
   PUBLISHED_DOT_WARNING,
   CREATE_STEP,
+  REQUIRED_LABEL,
 } from '@data/constants';
 import { formatQuantity, formatAndSortOptions, sortStrings } from '@helpers/utils';
+import { formatDurationFromFloat } from '@helpers/date';
+import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
@@ -183,7 +187,7 @@ export default {
       newStep: { name: '', type: E_LEARNING },
       reusedStep: { _id: '', program: '' },
       stepEditionModal: false,
-      editedStep: { name: '', type: E_LEARNING },
+      editedStep: { name: '', type: E_LEARNING, theoreticalHours: 0 },
       activityCreationModal: false,
       newActivity: { name: '' },
       activityReuseModal: false,
@@ -212,13 +216,20 @@ export default {
       newSubProgram: { name: { required } },
       newStep: { name: { required }, type: { required } },
       reusedStep: { _id: { required }, program: { required } },
-      editedStep: { name: { required } },
+      editedStep: { name: { required }, theoreticalHours: { required, strictPositiveNumber } },
       newActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     };
   },
   computed: {
     ...mapState('program', ['program', 'openedStep']),
+    theoreticalHoursErrorMsg () {
+      const validation = this.v$.editedStep;
+      if (validation.theoreticalHours.required.$response === false) return REQUIRED_LABEL;
+      if (validation.theoreticalHours.strictPositiveNumber.$response === false) return 'Durée non valide';
+
+      return '';
+    },
   },
   async created () {
     if (!this.program) await this.refreshProgram();
@@ -378,7 +389,7 @@ export default {
         this.openNextModalAfterUnlocking = () => this.openStepEditionModal(step);
         this.openValidateUnlockingEditionModal(step);
       } else {
-        this.editedStep = pick(step, ['_id', 'name', 'type']);
+        this.editedStep = pick(step, ['_id', 'name', 'type', 'theoreticalHours']);
         this.stepEditionModal = true;
       }
     },
@@ -388,7 +399,7 @@ export default {
         this.v$.editedStep.$touch();
         if (this.v$.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['name']));
+        await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['name', 'theoreticalHours']));
         this.stepEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Étape modifiée.');
@@ -400,7 +411,7 @@ export default {
       }
     },
     resetStepEditionModal () {
-      this.editedStep = { name: '' };
+      this.editedStep = { name: '', theoreticalHours: 0 };
       this.v$.editedStep.$reset();
     },
     // ACTIVITY
@@ -652,6 +663,10 @@ export default {
     cancelUnlocking () {
       this.validateUnlockingEditionModal = false;
       NotifyPositive('Déverrouillage annulé.');
+    },
+    formatDurationFromFloat,
+    isStepValid (step) {
+      return step.areActivitiesValid && !!step.theoreticalHours ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING;
     },
   },
 };

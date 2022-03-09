@@ -102,5 +102,14 @@ export const getDuration = (timePeriod) => {
   return formatDuration(duration);
 };
 
+export const formatDurationFromFloat = (durationHours = 0) => {
+  const hours = Math.floor(durationHours);
+  const minutes = Math.round(durationHours % 1 * 60);
+  if (!hours) return `${minutes}min`;
+  if (!minutes) return `${hours}h`;
+
+  return `${hours}h ${minutes}min`;
+};
+
 export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
   + `${moment(timePeriod.endDate).format('HH:mm')}`;
