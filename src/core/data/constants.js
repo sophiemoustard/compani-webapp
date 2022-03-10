@@ -147,6 +147,14 @@ export const EVENT_TYPES = [
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
+export const APA = 'APA';
+export const PCH = 'PCH';
+export const AM = 'AM';
+export const TPP_TYPE_OPTIONS = [
+  { label: 'APA', value: APA },
+  { label: 'Aide ménagère', value: AM },
+  { label: 'PCH', value: PCH },
+];
 
 // AVATAR
 export const DEFAULT_AVATAR = 'https://storage.googleapis.com/compani-main/default_avatar.png';
