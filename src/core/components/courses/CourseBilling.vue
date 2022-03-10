@@ -31,7 +31,8 @@
               </q-card>
               <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
                 <q-card flat class="q-mx-lg q-mb-sm">
-                  <q-card-section class="cursor-pointer">
+                  <q-card-section @click="openBillingPurchaseEditionModal(bill._id, billingPurchase)"
+                    class="cursor-pointer">
                     <div class="text-copper-500">
                       {{ getBillingItemName(billingPurchase.billingItem) }}
                     </div>
@@ -79,6 +80,12 @@
       :validations="validations.newBillingPurchase" @hide="resetBillingPurchaseAdditionModal"
       :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
       :error-messages="newBillingPurchaseErrorMessages" />
+
+    <!-- billing purchase edition modal -->
+    <ni-course-fee-edition-modal v-model="billingPurchaseEditionModal" :validations="validations.editedBillingPurchase"
+      v-model:course-fee="editedBillingPurchase" @hide="resetBillingPurchaseEditionModal"
+      @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" :title="courseFeeEditionModalTitle"
+      :error-messages="editedBillingPurchaseErrorMessages" />
 
      <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
@@ -128,6 +135,7 @@ export default {
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingPurchaseCreationLoading = ref(false);
+    const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
     const billsLoading = ref(false);
     const payerList = ref([]);
@@ -137,10 +145,12 @@ export default {
     const funderEditionModal = ref(false);
     const mainFeeEditionModal = ref(false);
     const billingPurchaseAdditionModal = ref(false);
+    const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
     const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
+    const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalTitle = ref('');
@@ -163,11 +173,21 @@ export default {
         price: { required, strictPositiveNumber },
         count: { required, strictPositiveNumber, integerNumber },
       },
+      editedBillingPurchase: {
+        price: { required, strictPositiveNumber },
+        count: { required, strictPositiveNumber, integerNumber },
+      },
       billToValidate: {
         billedAt: { required },
       },
     };
-    const validations = useVuelidate(rules, { newBill, editedBill, newBillingPurchase, billToValidate });
+    const validations = useVuelidate(rules, {
+      newBill,
+      editedBill,
+      newBillingPurchase,
+      editedBillingPurchase,
+      billToValidate,
+    });
 
     const course = computed(() => $store.state.course.course);
 
@@ -176,6 +196,8 @@ export default {
     const mainFeeErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
 
     const newBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('newBillingPurchase'));
+
+    const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
     const getBillErrorMessages = (parent) => {
       let price = '';
@@ -266,6 +288,18 @@ export default {
       billingPurchaseAdditionModal.value = true;
     };
 
+    const openBillingPurchaseEditionModal = (billId, billingPurchase) => {
+      editedBillingPurchase.value = {
+        _id: billingPurchase._id,
+        billId,
+        price: billingPurchase.price,
+        count: billingPurchase.count,
+        description: billingPurchase.description,
+      };
+      courseFeeEditionModalTitle.value = getBillingItemName(billingPurchase.billingItem);
+      billingPurchaseEditionModal.value = true;
+    };
+
     const openCourseBillValidationModal = (billId) => {
       billToValidate.value._id = billId;
       courseBillValidationModal.value = true;
@@ -289,6 +323,12 @@ export default {
     const resetBillingPurchaseAdditionModal = () => {
       newBillingPurchase.value = { billId: '', billingItem: '', price: 0, count: 1, description: '' };
       validations.value.newBillingPurchase.$reset();
+    };
+
+    const resetBillingPurchaseEditionModal = () => {
+      editedBillingPurchase.value = { billId: '', price: 0, count: 1, description: '' };
+      validations.value.editedBillingPurchase.$reset();
+      courseFeeEditionModalTitle.value = '';
     };
 
     const resetCourseBillValidationModal = () => {
@@ -365,6 +405,27 @@ export default {
       }
     };
 
+    const editBillingPurchase = async () => {
+      try {
+        validations.value.editedBillingPurchase.$touch();
+        if (validations.value.editedBillingPurchase.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        billingPurchaseEditionLoading.value = true;
+
+        const { _id: purchaseId, billId, price, count, description } = editedBillingPurchase.value;
+        await CourseBills.updateBillingPurchase(billId, purchaseId, { price, count, description });
+        NotifyPositive('Facture modifiée.');
+
+        billingPurchaseEditionModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification de la facture.');
+      } finally {
+        billingPurchaseEditionLoading.value = false;
+      }
+    };
+
     const validateBill = async () => {
       try {
         validations.value.billToValidate.$touch();
@@ -413,14 +474,17 @@ export default {
       billEditionLoading,
       billsLoading,
       billingPurchaseCreationLoading,
+      billingPurchaseEditionLoading,
       billValidationLoading,
       billCreationModal,
       funderEditionModal,
       mainFeeEditionModal,
       billingPurchaseAdditionModal,
+      billingPurchaseEditionModal,
       courseBillValidationModal,
       newBill,
       newBillingPurchase,
+      editedBillingPurchase,
       billingItemList,
       editedBill,
       billToValidate,
@@ -433,6 +497,7 @@ export default {
       newBillErrorMessages,
       mainFeeErrorMessages,
       newBillingPurchaseErrorMessages,
+      editedBillingPurchaseErrorMessages,
       areDetailsVisible,
       // Methods
       refreshCourseFundingOrganisations,
@@ -440,10 +505,12 @@ export default {
       resetEditedBill,
       resetMainFeeEditionModal,
       resetBillingPurchaseAdditionModal,
+      resetBillingPurchaseEditionModal,
       resetCourseBillValidationModal,
       addBill,
       editBill,
       addBillingPurchase,
+      editBillingPurchase,
       validateBill,
       cancelBillValidation,
       isBilled,
@@ -452,6 +519,7 @@ export default {
       openFunderEditionModal,
       openMainFeeEditionModal,
       openBillingPurchaseAdditionModal,
+      openBillingPurchaseEditionModal,
       openCourseBillValidationModal,
       refreshCourseBills,
       refreshBillingItems,
