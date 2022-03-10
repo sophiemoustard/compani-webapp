@@ -20,7 +20,7 @@
             </q-card-section>
             <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
               <q-card flat class="q-mx-lg q-mb-sm">
-                <q-card-section class="cursor-pointer" @click="openCourseFeeEditionModal(bill)">
+                <q-card-section class="cursor-pointer" @click="openMainFeeEditionModal(bill)">
                   <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                   <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
                   <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
@@ -67,10 +67,11 @@
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
 
     <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
-      @submit="editBill" @hide="resetEditedBillEditionModal" :loading="billEditionLoading" :payer-options="payerList" />
+      @submit="editBill" @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" />
 
-    <ni-course-fee-edition-modal v-model="courseFeeEditionModal" v-model:edited-bill="editedBill"
-      @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
+    <!-- main fee edition modal -->
+    <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:edited-bill="editedBill"
+      @submit="editBill" :validations="validations.editedBill" @hide="resetMainFeeEditionModal"
       :loading="billEditionLoading" :error-messages="editedBillErrorMessages" :title="courseFeeEditionModalTitle" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
@@ -134,7 +135,7 @@ export default {
     const billingItemList = ref([]);
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
-    const courseFeeEditionModal = ref(false);
+    const mainFeeEditionModal = ref(false);
     const billingPurchaseAdditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
@@ -254,10 +255,10 @@ export default {
       funderEditionModal.value = true;
     };
 
-    const openCourseFeeEditionModal = (bill) => {
+    const openMainFeeEditionModal = (bill) => {
       setEditedBill(bill);
       courseFeeEditionModalTitle.value = get(course, 'value.subProgram.program.name');
-      courseFeeEditionModal.value = true;
+      mainFeeEditionModal.value = true;
     };
 
     const openBillingPurchaseAdditionModal = (billId) => {
@@ -275,10 +276,14 @@ export default {
       validations.value.newBill.$reset();
     };
 
-    const resetEditedBillEditionModal = () => {
+    const resetEditedBill = () => {
       editedBill.value = { _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } };
-      courseFeeEditionModalTitle.value = '';
       validations.value.editedBill.$reset();
+    };
+
+    const resetMainFeeEditionModal = () => {
+      resetEditedBill();
+      courseFeeEditionModalTitle.value = '';
     };
 
     const resetBillingPurchaseAdditionModal = () => {
@@ -328,7 +333,7 @@ export default {
         NotifyPositive('Facture modifiée.');
 
         funderEditionModal.value = false;
-        courseFeeEditionModal.value = false;
+        mainFeeEditionModal.value = false;
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
@@ -411,7 +416,7 @@ export default {
       billValidationLoading,
       billCreationModal,
       funderEditionModal,
-      courseFeeEditionModal,
+      mainFeeEditionModal,
       billingPurchaseAdditionModal,
       courseBillValidationModal,
       newBill,
@@ -432,7 +437,8 @@ export default {
       // Methods
       refreshCourseFundingOrganisations,
       resetBillCreationModal,
-      resetEditedBillEditionModal,
+      resetEditedBill,
+      resetMainFeeEditionModal,
       resetBillingPurchaseAdditionModal,
       resetCourseBillValidationModal,
       addBill,
@@ -444,7 +450,7 @@ export default {
       getBillErrorMessages,
       openBillCreationModal,
       openFunderEditionModal,
-      openCourseFeeEditionModal,
+      openMainFeeEditionModal,
       openBillingPurchaseAdditionModal,
       openCourseBillValidationModal,
       refreshCourseBills,
