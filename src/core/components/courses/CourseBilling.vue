@@ -148,7 +148,7 @@ export default {
     const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
-    const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
+    const editedBill = ref({ _id: '', funder: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
@@ -311,7 +311,7 @@ export default {
     };
 
     const resetEditedBill = () => {
-      editedBill.value = { _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } };
+      editedBill.value = { _id: '', funder: '', mainFee: { price: '', description: '', count: '' } };
       validations.value.editedBill.$reset();
     };
 
