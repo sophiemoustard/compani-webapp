@@ -29,23 +29,23 @@
                   </div>
                 </q-card-section>
               </q-card>
-              <div v-for="billingItem of bill.billingItemList" :key="billingItem._id">
+              <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
                 <q-card flat class="q-mx-lg q-mb-sm">
                   <q-card-section class="cursor-pointer">
                     <div class="text-copper-500">
-                      {{ getBillingItemName(billingItem.billingItem) }}
+                      {{ getBillingItemName(billingPurchase.billingItem) }}
                     </div>
-                    <div>Prix unitaire : {{ formatPrice(billingItem.price) }}</div>
-                    <div>Quantité : {{ billingItem.count }}</div>
-                    <div v-if="billingItem.description" class="ellipsis">
-                      Description : {{ billingItem.description }}
+                    <div>Prix unitaire : {{ formatPrice(billingPurchase.price) }}</div>
+                    <div>Quantité : {{ billingPurchase.count }}</div>
+                    <div v-if="billingPurchase.description" class="ellipsis">
+                      Description : {{ billingPurchase.description }}
                     </div>
                   </q-card-section>
                 </q-card>
               </div>
               <div class="row justify-end">
                 <ni-button color="primary" icon="add" label="Ajouter un article"
-                  :disable="billingItemCreationLoading" @click="openCourseFeeAdditionModal(bill._id)" />
+                  :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
               </div>
             </div>
           </q-card>
@@ -73,10 +73,11 @@
       @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
       :loading="billEditionLoading" :error-messages="editedBillErrorMessages" />
 
-    <ni-course-fee-addition-modal v-model="courseFeeAdditionModal" v-model:new-billing-item="newBillingItem"
-      @submit="addBillingItem" :validations="validations.newBillingItem" @hide="resetCourseFeeAdditionModal"
-      :loading="billingItemCreationLoading" :billing-item-options="billingItemList"
-      :error-messages="newBillingItemErrorMessages" />
+    <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
+      v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
+      :validations="validations.newBillingPurchase" @hide="resetBillingPurchaseAdditionModal"
+      :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
+      :error-messages="newBillingPurchaseErrorMessages" />
 
      <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
@@ -105,7 +106,7 @@ import { REQUIRED_LABEL } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
-import CourseFeeAdditionModal from 'src/modules/vendor/components/billing/CourseFeeAdditionModal';
+import BillingPurchaseAdditionModal from 'src/modules/vendor/components/billing/BillingPurchaseAdditionModal';
 import CourseBillValidationModal from 'src/modules/vendor/components/billing/CourseBillValidationModal';
 
 export default {
@@ -114,7 +115,7 @@ export default {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
     'ni-course-fee-edition-modal': CourseFeeEditionModal,
-    'ni-course-fee-addition-modal': CourseFeeAdditionModal,
+    'ni-billing-purchase-addition-modal': BillingPurchaseAdditionModal,
     'ni-course-bill-validation-modal': CourseBillValidationModal,
     'ni-button': Button,
   },
@@ -125,7 +126,7 @@ export default {
 
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
-    const billingItemCreationLoading = ref(false);
+    const billingPurchaseCreationLoading = ref(false);
     const billValidationLoading = ref(false);
     const billsLoading = ref(false);
     const payerList = ref([]);
@@ -134,11 +135,11 @@ export default {
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
     const courseFeeEditionModal = ref(false);
-    const courseFeeAdditionModal = ref(false);
+    const billingPurchaseAdditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
     const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
-    const newBillingItem = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
+    const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
 
@@ -155,7 +156,7 @@ export default {
           count: { required, strictPositiveNumber, integerNumber },
         },
       },
-      newBillingItem: {
+      newBillingPurchase: {
         billingItem: { required },
         price: { required, strictPositiveNumber },
         count: { required, strictPositiveNumber, integerNumber },
@@ -164,7 +165,7 @@ export default {
         billedAt: { required },
       },
     };
-    const validations = useVuelidate(rules, { newBill, editedBill, newBillingItem, billToValidate });
+    const validations = useVuelidate(rules, { newBill, editedBill, newBillingPurchase, billToValidate });
 
     const course = computed(() => $store.state.course.course);
 
@@ -172,7 +173,7 @@ export default {
 
     const editedBillErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
 
-    const newBillingItemErrorMessages = computed(() => getBillErrorMessages('newBillingItem'));
+    const newBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('newBillingPurchase'));
 
     const getBillErrorMessages = (parent) => {
       let price = '';
@@ -259,9 +260,9 @@ export default {
       courseFeeEditionModal.value = true;
     };
 
-    const openCourseFeeAdditionModal = (billId) => {
-      newBillingItem.value.billId = billId;
-      courseFeeAdditionModal.value = true;
+    const openBillingPurchaseAdditionModal = (billId) => {
+      newBillingPurchase.value.billId = billId;
+      billingPurchaseAdditionModal.value = true;
     };
 
     const openCourseBillValidationModal = (billId) => {
@@ -279,9 +280,9 @@ export default {
       validations.value.editedBill.$reset();
     };
 
-    const resetCourseFeeAdditionModal = () => {
-      newBillingItem.value = { billId: '', billingItem: '', price: 0, count: 1, description: '' };
-      validations.value.newBillingItem.$reset();
+    const resetBillingPurchaseAdditionModal = () => {
+      newBillingPurchase.value = { billId: '', billingItem: '', price: 0, count: 1, description: '' };
+      validations.value.newBillingPurchase.$reset();
     };
 
     const resetCourseBillValidationModal = () => {
@@ -336,24 +337,25 @@ export default {
       }
     };
 
-    const addBillingItem = async () => {
+    const addBillingPurchase = async () => {
       try {
-        validations.value.newBillingItem.$touch();
-        if (validations.value.newBillingItem.$error) return NotifyWarning('Champ(s) invalide(s)');
+        validations.value.newBillingPurchase.$touch();
+        if (validations.value.newBillingPurchase.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        billingItemCreationLoading.value = true;
+        billingPurchaseCreationLoading.value = true;
 
-        await CourseBills.addBillingItem(newBillingItem.value.billId, pickBy(omit(newBillingItem.value, 'billId')));
+        await CourseBills
+          .addBillingPurchase(newBillingPurchase.value.billId, pickBy(omit(newBillingPurchase.value, 'billId')));
         NotifyPositive('Article ajouté.');
 
-        courseFeeAdditionModal.value = false;
+        billingPurchaseAdditionModal.value = false;
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de l\'article.');
       } finally {
-        billingItemCreationLoading.value = false;
+        billingPurchaseCreationLoading.value = false;
       }
     };
 
@@ -404,15 +406,15 @@ export default {
       billCreationLoading,
       billEditionLoading,
       billsLoading,
-      billingItemCreationLoading,
+      billingPurchaseCreationLoading,
       billValidationLoading,
       billCreationModal,
       funderEditionModal,
       courseFeeEditionModal,
-      courseFeeAdditionModal,
+      billingPurchaseAdditionModal,
       courseBillValidationModal,
       newBill,
-      newBillingItem,
+      newBillingPurchase,
       billingItemList,
       editedBill,
       billToValidate,
@@ -423,17 +425,17 @@ export default {
       course,
       newBillErrorMessages,
       editedBillErrorMessages,
-      newBillingItemErrorMessages,
+      newBillingPurchaseErrorMessages,
       areDetailsVisible,
       // Methods
       refreshCourseFundingOrganisations,
       resetBillCreationModal,
       resetEditedBillEditionModal,
-      resetCourseFeeAdditionModal,
+      resetBillingPurchaseAdditionModal,
       resetCourseBillValidationModal,
       addBill,
       editBill,
-      addBillingItem,
+      addBillingPurchase,
       validateBill,
       cancelBillValidation,
       isBilled,
@@ -441,7 +443,7 @@ export default {
       openBillCreationModal,
       openFunderEditionModal,
       openCourseFeeEditionModal,
-      openCourseFeeAdditionModal,
+      openBillingPurchaseAdditionModal,
       openCourseBillValidationModal,
       refreshCourseBills,
       refreshBillingItems,
