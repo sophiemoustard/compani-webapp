@@ -1,7 +1,7 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
-      <span class="text-weight-bold">{{ editedBill.title }}</span>
+      <span class="text-weight-bold">{{ title }}</span>
     </template>
     <ni-input in-modal caption="Prix unitaire" :error="validations.mainFee.price.$error" type="number"
       :model-value="editedBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
@@ -32,6 +32,7 @@ export default {
     errorMessages: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    title: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,

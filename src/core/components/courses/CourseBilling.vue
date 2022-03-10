@@ -71,7 +71,7 @@
 
     <ni-course-fee-edition-modal v-model="courseFeeEditionModal" v-model:edited-bill="editedBill"
       @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
-      :loading="billEditionLoading" :error-messages="editedBillErrorMessages" />
+      :loading="billEditionLoading" :error-messages="editedBillErrorMessages" :title="courseFeeEditionModalTitle" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -142,6 +142,7 @@ export default {
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
+    const courseFeeEditionModalTitle = ref('');
 
     const rules = {
       newBill: {
@@ -245,7 +246,6 @@ export default {
           count: bill.mainFee.count,
           description: bill.mainFee.description,
         },
-        title: get(course, 'value.subProgram.program.name'),
       };
     };
 
@@ -256,6 +256,7 @@ export default {
 
     const openCourseFeeEditionModal = (bill) => {
       setEditedBill(bill);
+      courseFeeEditionModalTitle.value = get(course, 'value.subProgram.program.name');
       courseFeeEditionModal.value = true;
     };
 
@@ -276,6 +277,7 @@ export default {
 
     const resetEditedBillEditionModal = () => {
       editedBill.value = { _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } };
+      courseFeeEditionModalTitle.value = '';
       validations.value.editedBill.$reset();
     };
 
@@ -419,6 +421,7 @@ export default {
       billToValidate,
       payerList,
       courseBills,
+      courseFeeEditionModalTitle,
       // Computed
       validations,
       course,
