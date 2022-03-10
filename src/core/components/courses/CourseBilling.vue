@@ -73,10 +73,11 @@
       @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
       :loading="billEditionLoading" :error-messages="editedBillErrorMessages" />
 
-    <ni-billing-purchase-modal v-model="billingPurchaseAdditionModal" v-model:new-billing-purchase="newBillingPurchase"
-      @submit="addBillingPurchase" :validations="validations.newBillingPurchase"
-      @hide="resetBillingPurchaseAdditionModal" :loading="billingPurchaseCreationLoading"
-      :billing-item-options="billingItemList" :error-messages="newBillingPurchaseErrorMessages" />
+    <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
+      v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
+      :validations="validations.newBillingPurchase" @hide="resetBillingPurchaseAdditionModal"
+      :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
+      :error-messages="newBillingPurchaseErrorMessages" />
 
      <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
@@ -114,7 +115,7 @@ export default {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
     'ni-course-fee-edition-modal': CourseFeeEditionModal,
-    'ni-billing-purchase-modal': BillingPurchaseAdditionModal,
+    'ni-billing-purchase-addition-modal': BillingPurchaseAdditionModal,
     'ni-course-bill-validation-modal': CourseBillValidationModal,
     'ni-button': Button,
   },
