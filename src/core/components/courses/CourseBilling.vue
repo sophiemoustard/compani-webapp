@@ -10,7 +10,7 @@
                 <div class="text-weight-bold">
                   {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
-                <div @click.stop="openFunderEditionModal(bill._id)" class="payer">
+                <div @click.stop="openFunderEditionModal(bill)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
                   <q-icon size="16px" name="edit" color="copper-grey-500" />
                 </div>
@@ -20,7 +20,7 @@
             </q-card-section>
             <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
               <q-card flat class="q-mx-lg q-mb-sm">
-                <q-card-section class="cursor-pointer" @click="openCourseFeeEditionModal(bill._id)">
+                <q-card-section class="cursor-pointer" @click="openCourseFeeEditionModal(bill)">
                   <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                   <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
                   <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
@@ -235,28 +235,27 @@ export default {
 
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
-    const setEditedBill = (billId) => {
-      const courseBill = courseBills.value.find(bill => bill._id === billId);
-      const funder = get(courseBill, 'courseFundingOrganisation._id') || '';
+    const setEditedBill = (bill) => {
+      const funder = get(bill, 'courseFundingOrganisation._id') || '';
       editedBill.value = {
-        _id: billId,
+        _id: bill._id,
         funder,
         mainFee: {
-          price: courseBill.mainFee.price,
-          count: courseBill.mainFee.count,
-          description: courseBill.mainFee.description,
+          price: bill.mainFee.price,
+          count: bill.mainFee.count,
+          description: bill.mainFee.description,
         },
         title: get(course, 'value.subProgram.program.name'),
       };
     };
 
-    const openFunderEditionModal = (billId) => {
-      setEditedBill(billId);
+    const openFunderEditionModal = (bill) => {
+      setEditedBill(bill);
       funderEditionModal.value = true;
     };
 
-    const openCourseFeeEditionModal = (billId) => {
-      setEditedBill(billId);
+    const openCourseFeeEditionModal = (bill) => {
+      setEditedBill(bill);
       courseFeeEditionModal.value = true;
     };
 
