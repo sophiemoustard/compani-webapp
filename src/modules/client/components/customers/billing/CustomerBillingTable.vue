@@ -5,6 +5,7 @@
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
         <q-td class="bold">Début de période</q-td>
         <q-td />
+        <q-td />
         <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
         <q-td />
       </q-tr>
@@ -62,6 +63,7 @@
         <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
         <q-td class="bold">Fin de période</q-td>
         <q-td />
+        <q-td />
         <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
         <q-td />
       </q-tr>
@@ -92,7 +94,7 @@ import {
   COMPANI,
   MANUAL,
 } from '@data/constants';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, truncate } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { openPdf } from '@helpers/file';
 
@@ -124,7 +126,7 @@ export default {
       columns: [
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         { name: 'document', label: '', align: 'left' },
-        { name: 'misc', label: '', field: 'misc', align: 'left' },
+        { name: 'misc', label: '', field: row => (row.misc ? truncate(row.misc, 60) : ''), align: 'left' },
         {
           name: 'inclTaxes',
           label: 'Montant TTC',
