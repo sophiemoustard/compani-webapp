@@ -70,9 +70,9 @@
       @submit="editBill" @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" />
 
     <!-- main fee edition modal -->
-    <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:edited-bill="editedBill"
-      @submit="editBill" :validations="validations.editedBill" @hide="resetMainFeeEditionModal"
-      :loading="billEditionLoading" :error-messages="editedBillErrorMessages" :title="courseFeeEditionModalTitle" />
+    <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:course-fee="editedBill.mainFee"
+      @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
+      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :title="courseFeeEditionModalTitle" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -111,7 +111,7 @@ import BillingPurchaseAdditionModal from 'src/modules/vendor/components/billing/
 import CourseBillValidationModal from 'src/modules/vendor/components/billing/CourseBillValidationModal';
 
 export default {
-  name: 'BillingConfig',
+  name: 'CourseBilling',
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
@@ -173,7 +173,7 @@ export default {
 
     const newBillErrorMessages = computed(() => getBillErrorMessages('newBill.mainFee'));
 
-    const editedBillErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
+    const mainFeeErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
 
     const newBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('newBillingPurchase'));
 
@@ -431,7 +431,7 @@ export default {
       validations,
       course,
       newBillErrorMessages,
-      editedBillErrorMessages,
+      mainFeeErrorMessages,
       newBillingPurchaseErrorMessages,
       areDetailsVisible,
       // Methods
