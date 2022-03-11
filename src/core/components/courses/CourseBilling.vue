@@ -87,7 +87,7 @@
       @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" :title="courseFeeEditionModalTitle"
       :error-messages="editedBillingPurchaseErrorMessages" />
 
-     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
+    <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
       :validations="validations.billToValidate" @cancel="cancelBillValidation" />
   </div>
@@ -264,11 +264,7 @@ export default {
       editedBill.value = {
         _id: bill._id,
         funder,
-        mainFee: {
-          price: bill.mainFee.price,
-          count: bill.mainFee.count,
-          description: bill.mainFee.description,
-        },
+        mainFee: { price: bill.mainFee.price, count: bill.mainFee.count, description: bill.mainFee.description },
       };
     };
 
