@@ -10,7 +10,7 @@
                 <div class="text-weight-bold">
                   {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
-                <div @click.stop="openFunderEditionModal(bill._id)" class="payer">
+                <div @click.stop="openFunderEditionModal(bill)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
                   <q-icon size="16px" name="edit" color="copper-grey-500" />
                 </div>
@@ -20,7 +20,7 @@
             </q-card-section>
             <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
               <q-card flat class="q-mx-lg q-mb-sm">
-                <q-card-section class="cursor-pointer" @click="openCourseFeeEditionModal(bill._id)">
+                <q-card-section class="cursor-pointer" @click="openMainFeeEditionModal(bill)">
                   <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                   <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
                   <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
@@ -31,7 +31,8 @@
               </q-card>
               <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
                 <q-card flat class="q-mx-lg q-mb-sm">
-                  <q-card-section class="cursor-pointer">
+                  <q-card-section @click="openBillingPurchaseEditionModal(bill._id, billingPurchase)"
+                    class="cursor-pointer">
                     <div class="text-copper-500">
                       {{ getBillingItemName(billingPurchase.billingItem) }}
                     </div>
@@ -67,11 +68,12 @@
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
 
     <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
-      @submit="editBill" @hide="resetEditedBillEditionModal" :loading="billEditionLoading" :payer-options="payerList" />
+      @submit="editBill" @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" />
 
-    <ni-course-fee-edition-modal v-model="courseFeeEditionModal" v-model:edited-bill="editedBill"
-      @submit="editBill" :validations="validations.editedBill" @hide="resetEditedBillEditionModal"
-      :loading="billEditionLoading" :error-messages="editedBillErrorMessages" />
+    <!-- main fee edition modal -->
+    <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:course-fee="editedBill.mainFee"
+      @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
+      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :title="courseFeeEditionModalTitle" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -79,7 +81,13 @@
       :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
       :error-messages="newBillingPurchaseErrorMessages" />
 
-     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
+    <!-- billing purchase edition modal -->
+    <ni-course-fee-edition-modal v-model="billingPurchaseEditionModal" :validations="validations.editedBillingPurchase"
+      v-model:course-fee="editedBillingPurchase" @hide="resetBillingPurchaseEditionModal"
+      @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" :title="courseFeeEditionModalTitle"
+      :error-messages="editedBillingPurchaseErrorMessages" />
+
+    <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
       :validations="validations.billToValidate" @cancel="cancelBillValidation" />
   </div>
@@ -110,7 +118,7 @@ import BillingPurchaseAdditionModal from 'src/modules/vendor/components/billing/
 import CourseBillValidationModal from 'src/modules/vendor/components/billing/CourseBillValidationModal';
 
 export default {
-  name: 'BillingConfig',
+  name: 'CourseBilling',
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
@@ -127,6 +135,7 @@ export default {
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingPurchaseCreationLoading = ref(false);
+    const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
     const billsLoading = ref(false);
     const payerList = ref([]);
@@ -134,14 +143,17 @@ export default {
     const billingItemList = ref([]);
     const billCreationModal = ref(false);
     const funderEditionModal = ref(false);
-    const courseFeeEditionModal = ref(false);
+    const mainFeeEditionModal = ref(false);
     const billingPurchaseAdditionModal = ref(false);
+    const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
-    const editedBill = ref({ _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } });
+    const editedBill = ref({ _id: '', funder: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
+    const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
+    const courseFeeEditionModalTitle = ref('');
 
     const rules = {
       newBill: {
@@ -161,19 +173,31 @@ export default {
         price: { required, strictPositiveNumber },
         count: { required, strictPositiveNumber, integerNumber },
       },
+      editedBillingPurchase: {
+        price: { required, strictPositiveNumber },
+        count: { required, strictPositiveNumber, integerNumber },
+      },
       billToValidate: {
         billedAt: { required },
       },
     };
-    const validations = useVuelidate(rules, { newBill, editedBill, newBillingPurchase, billToValidate });
+    const validations = useVuelidate(rules, {
+      newBill,
+      editedBill,
+      newBillingPurchase,
+      editedBillingPurchase,
+      billToValidate,
+    });
 
     const course = computed(() => $store.state.course.course);
 
     const newBillErrorMessages = computed(() => getBillErrorMessages('newBill.mainFee'));
 
-    const editedBillErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
+    const mainFeeErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
 
     const newBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('newBillingPurchase'));
+
+    const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
     const getBillErrorMessages = (parent) => {
       let price = '';
@@ -235,34 +259,41 @@ export default {
 
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
-    const setEditedBill = (billId) => {
-      const courseBill = courseBills.value.find(bill => bill._id === billId);
-      const funder = get(courseBill, 'courseFundingOrganisation._id') || '';
+    const setEditedBill = (bill) => {
+      const funder = get(bill, 'courseFundingOrganisation._id') || '';
       editedBill.value = {
-        _id: billId,
+        _id: bill._id,
         funder,
-        mainFee: {
-          price: courseBill.mainFee.price,
-          count: courseBill.mainFee.count,
-          description: courseBill.mainFee.description,
-        },
-        title: get(course, 'value.subProgram.program.name'),
+        mainFee: { price: bill.mainFee.price, count: bill.mainFee.count, description: bill.mainFee.description },
       };
     };
 
-    const openFunderEditionModal = (billId) => {
-      setEditedBill(billId);
+    const openFunderEditionModal = (bill) => {
+      setEditedBill(bill);
       funderEditionModal.value = true;
     };
 
-    const openCourseFeeEditionModal = (billId) => {
-      setEditedBill(billId);
-      courseFeeEditionModal.value = true;
+    const openMainFeeEditionModal = (bill) => {
+      setEditedBill(bill);
+      courseFeeEditionModalTitle.value = get(course, 'value.subProgram.program.name');
+      mainFeeEditionModal.value = true;
     };
 
     const openBillingPurchaseAdditionModal = (billId) => {
       newBillingPurchase.value.billId = billId;
       billingPurchaseAdditionModal.value = true;
+    };
+
+    const openBillingPurchaseEditionModal = (billId, billingPurchase) => {
+      editedBillingPurchase.value = {
+        _id: billingPurchase._id,
+        billId,
+        price: billingPurchase.price,
+        count: billingPurchase.count,
+        description: billingPurchase.description,
+      };
+      courseFeeEditionModalTitle.value = getBillingItemName(billingPurchase.billingItem);
+      billingPurchaseEditionModal.value = true;
     };
 
     const openCourseBillValidationModal = (billId) => {
@@ -275,14 +306,25 @@ export default {
       validations.value.newBill.$reset();
     };
 
-    const resetEditedBillEditionModal = () => {
-      editedBill.value = { _id: '', title: '', funder: '', mainFee: { price: '', description: '', count: '' } };
+    const resetEditedBill = () => {
+      editedBill.value = { _id: '', funder: '', mainFee: { price: '', description: '', count: '' } };
       validations.value.editedBill.$reset();
+    };
+
+    const resetMainFeeEditionModal = () => {
+      resetEditedBill();
+      courseFeeEditionModalTitle.value = '';
     };
 
     const resetBillingPurchaseAdditionModal = () => {
       newBillingPurchase.value = { billId: '', billingItem: '', price: 0, count: 1, description: '' };
       validations.value.newBillingPurchase.$reset();
+    };
+
+    const resetBillingPurchaseEditionModal = () => {
+      editedBillingPurchase.value = { billId: '', price: 0, count: 1, description: '' };
+      validations.value.editedBillingPurchase.$reset();
+      courseFeeEditionModalTitle.value = '';
     };
 
     const resetCourseBillValidationModal = () => {
@@ -327,7 +369,7 @@ export default {
         NotifyPositive('Facture modifiée.');
 
         funderEditionModal.value = false;
-        courseFeeEditionModal.value = false;
+        mainFeeEditionModal.value = false;
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
@@ -356,6 +398,27 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout de l\'article.');
       } finally {
         billingPurchaseCreationLoading.value = false;
+      }
+    };
+
+    const editBillingPurchase = async () => {
+      try {
+        validations.value.editedBillingPurchase.$touch();
+        if (validations.value.editedBillingPurchase.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        billingPurchaseEditionLoading.value = true;
+
+        const { _id: purchaseId, billId, price, count, description } = editedBillingPurchase.value;
+        await CourseBills.updateBillingPurchase(billId, purchaseId, { price, count, description });
+        NotifyPositive('Facture modifiée.');
+
+        billingPurchaseEditionModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification de la facture.');
+      } finally {
+        billingPurchaseEditionLoading.value = false;
       }
     };
 
@@ -407,43 +470,52 @@ export default {
       billEditionLoading,
       billsLoading,
       billingPurchaseCreationLoading,
+      billingPurchaseEditionLoading,
       billValidationLoading,
       billCreationModal,
       funderEditionModal,
-      courseFeeEditionModal,
+      mainFeeEditionModal,
       billingPurchaseAdditionModal,
+      billingPurchaseEditionModal,
       courseBillValidationModal,
       newBill,
       newBillingPurchase,
+      editedBillingPurchase,
       billingItemList,
       editedBill,
       billToValidate,
       payerList,
       courseBills,
+      courseFeeEditionModalTitle,
       // Computed
       validations,
       course,
       newBillErrorMessages,
-      editedBillErrorMessages,
+      mainFeeErrorMessages,
       newBillingPurchaseErrorMessages,
+      editedBillingPurchaseErrorMessages,
       areDetailsVisible,
       // Methods
       refreshCourseFundingOrganisations,
       resetBillCreationModal,
-      resetEditedBillEditionModal,
+      resetEditedBill,
+      resetMainFeeEditionModal,
       resetBillingPurchaseAdditionModal,
+      resetBillingPurchaseEditionModal,
       resetCourseBillValidationModal,
       addBill,
       editBill,
       addBillingPurchase,
+      editBillingPurchase,
       validateBill,
       cancelBillValidation,
       isBilled,
       getBillErrorMessages,
       openBillCreationModal,
       openFunderEditionModal,
-      openCourseFeeEditionModal,
+      openMainFeeEditionModal,
       openBillingPurchaseAdditionModal,
+      openBillingPurchaseEditionModal,
       openCourseBillValidationModal,
       refreshCourseBills,
       refreshBillingItems,

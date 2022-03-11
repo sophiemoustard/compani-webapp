@@ -14,4 +14,8 @@ export default {
   async addBillingPurchase (billId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases`, payload);
   },
+  async updateBillingPurchase (billId, billingPurchaseId, payload) {
+    const url = `${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases/${billingPurchaseId}`;
+    await alenviAxios.put(url, payload);
+  },
 };
