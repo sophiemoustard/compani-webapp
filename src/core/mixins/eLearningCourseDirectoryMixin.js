@@ -1,4 +1,6 @@
 import escapeRegExp from 'lodash/escapeRegExp';
+import Courses from '@api/Courses';
+import { NotifyNegative } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 
@@ -39,6 +41,25 @@ export const eLearningCourseDirectoryMixin = {
   methods: {
     updateSearch (value) {
       this.searchStr = value;
+    },
+    async refreshCourse (query) {
+      try {
+        this.tableLoading = true;
+        const courseList = await Courses.list(query);
+
+        this.courses = courseList.map(c => ({
+          name: c.subProgram.program.name,
+          noDiacriticsName: removeDiacritics(c.subProgram.program.name),
+          createdAt: c.createdAt,
+          _id: c._id,
+          traineesCount: c.trainees.length || '0',
+        }));
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des formations.');
+      } finally {
+        this.tableLoading = false;
+      }
     },
   },
 };
