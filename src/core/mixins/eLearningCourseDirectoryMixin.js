@@ -2,7 +2,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
-import { formatDate, ascendingSort } from '@helpers/date';
+import { formatDate, ascendingSort, formatDurationFromFloat } from '@helpers/date';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
@@ -10,13 +10,23 @@ export const eLearningCourseDirectoryMixin = {
       courses: [],
       tableLoading: false,
       columns: [
-        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
+        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true, style: 'width: 60%' },
+        {
+          name: 'totalTheoreticalHours',
+          label: 'Durée',
+          field: 'totalTheoreticalHours',
+          format: formatDurationFromFloat,
+          align: 'center',
+          sortable: true,
+          style: 'width: 10%',
+        },
         {
           name: 'traineesCount',
           label: 'Nombre d\'apprenants',
           field: 'traineesCount',
           align: 'center',
           sortable: true,
+          style: 'width: 20%',
         },
         {
           name: 'createdAt',
@@ -26,6 +36,7 @@ export const eLearningCourseDirectoryMixin = {
           sortable: true,
           format: formatDate,
           sort: ascendingSort,
+          style: 'width: 10%',
         },
       ],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
@@ -53,6 +64,7 @@ export const eLearningCourseDirectoryMixin = {
           createdAt: c.createdAt,
           _id: c._id,
           traineesCount: c.trainees.length || '0',
+          totalTheoreticalHours: c.totalTheoreticalHours,
         }));
       } catch (e) {
         console.error(e);
