@@ -5,8 +5,7 @@
         <div class="header-selects">
           <div class="row header-selects-container">
             <div class="col-xs-12 col-sm-4">
-              <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp"
-                />
+              <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
             <div class="col-xs-12 col-sm-8">
               <ni-date-range v-model="billingDates" @blur="getDraftBills" v-model:error="billingDatesHasError"
@@ -224,6 +223,7 @@ export default {
         this.v$.deliveryFile.$touch();
         if (this.v$.deliveryFile.$error) return NotifyWarning('Champ(s) invalide(s).');
 
+        this.modalLoading = true;
         const file = await Teletransmission.downloadDeliveryFile(this.deliveryFile);
         await downloadFile(file, this.getFileName());
 
@@ -231,6 +231,8 @@ export default {
       } catch (e) {
         NotifyNegative('Erreur lors du téléchargement du fichier.');
         console.error(e);
+      } finally {
+        this.modalLoading = false;
       }
     },
     formatPrice (value) {
