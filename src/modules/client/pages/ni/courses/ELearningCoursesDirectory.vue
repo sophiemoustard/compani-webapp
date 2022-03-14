@@ -28,7 +28,7 @@ export default {
     ...mapGetters({ company: 'main/getCompany' }),
   },
   async created () {
-    await this.refreshCourse({ format: STRICTLY_E_LEARNING, company: this.company._id });
+    await this.refreshCourseList({ format: STRICTLY_E_LEARNING, company: this.company._id });
   },
   methods: {
     goToELearningCourseProfile (row) {

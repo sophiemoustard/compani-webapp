@@ -24,7 +24,7 @@ export default {
     'ni-table-list': TableList,
   },
   async created () {
-    await this.refreshCourse({ format: STRICTLY_E_LEARNING });
+    await this.refreshCourseList({ format: STRICTLY_E_LEARNING });
   },
   methods: {
     goToCourseProfile (row) {

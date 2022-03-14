@@ -53,7 +53,7 @@ export const eLearningCourseDirectoryMixin = {
     updateSearch (value) {
       this.searchStr = value;
     },
-    async refreshCourse (query) {
+    async refreshCourseList (query) {
       try {
         this.tableLoading = true;
         const courseList = await Courses.list(query);
