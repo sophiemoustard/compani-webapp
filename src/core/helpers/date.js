@@ -113,3 +113,13 @@ export const formatDurationFromFloat = (durationHours = 0) => {
 
 export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
   + `${moment(timePeriod.endDate).format('HH:mm')}`;
+
+export const getHoursAndMinutes = (value) => {
+  if (!value) return { hours: '', minutes: '' };
+  const hours = Math.floor(value);
+  const minutes = Math.round(value % 1 * 60);
+
+  return { hours, minutes };
+};
+
+export const computeHours = ({ hours, minutes }) => Number(hours) + Number(minutes) / 60;
