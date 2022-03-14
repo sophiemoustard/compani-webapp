@@ -70,8 +70,8 @@ export default {
   },
   methods: {
     input (date) {
-      this.min = moment(date.endDate).subtract(1, 'year').add(1, 'day').toISOString();
-      this.max = moment(date.startDate).add(1, 'year').subtract(1, 'day').toISOString();
+      this.min = moment(date.endDate).subtract(1, 'year').toISOString();
+      this.max = moment(date.startDate).add(1, 'year').toISOString();
     },
     async exportCsv () {
       try {
