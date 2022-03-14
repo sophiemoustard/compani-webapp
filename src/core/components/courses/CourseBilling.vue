@@ -20,7 +20,7 @@
             </q-card-section>
             <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
               <q-card flat class="q-mx-lg q-mb-sm">
-                <q-card-section class="cursor-pointer row justify-between content-start">
+                <q-card-section class="cursor-pointer fee">
                   <div class="fee-info">
                     <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                     <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
@@ -34,7 +34,7 @@
               </q-card>
               <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
                 <q-card flat class="q-mx-lg q-mb-sm">
-                  <q-card-section class="cursor-pointer row justify-between content-start">
+                  <q-card-section class="cursor-pointer fee">
                     <div class="fee-info">
                       <div class="text-copper-500">
                         {{ getBillingItemName(billingPurchase.billingItem) }}
@@ -47,6 +47,8 @@
                     </div>
                     <div>
                       <ni-button icon="edit" @click="openBillingPurchaseEditionModal(bill._id, billingPurchase)" />
+                      <ni-button v-if="!isBilled(bill)" icon="delete"
+                        @click="validatePurchaseDeletion(bill._id, billingPurchase._id)" />
                     </div>
                   </q-card-section>
                 </q-card>
@@ -106,7 +108,7 @@
 
 <script>
 import { useStore } from 'vuex';
-import { useMeta } from 'quasar';
+import { useMeta, useQuasar } from 'quasar';
 import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -145,6 +147,7 @@ export default {
     const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
     const $store = useStore();
+    const $q = useQuasar();
 
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
@@ -425,16 +428,38 @@ export default {
 
         const { _id: purchaseId, billId, price, count, description } = editedBillingPurchase.value;
         await CourseBills.updateBillingPurchase(billId, purchaseId, { price, count, description });
-        NotifyPositive('Facture modifiée.');
+        NotifyPositive('Article modifié.');
 
         billingPurchaseEditionModal.value = false;
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de la facture.');
+        NotifyNegative('Erreur lors de la modification de l\'article.');
       } finally {
         billingPurchaseEditionLoading.value = false;
       }
+    };
+
+    const deleteBillingPurchase = async (billId, purchaseId) => {
+      try {
+        await CourseBills.deleteBillingPurchase(billId, purchaseId);
+
+        NotifyPositive('Article supprimé.');
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de l\'article.');
+      }
+    };
+
+    const validatePurchaseDeletion = (billId, purchaseId) => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet article ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => deleteBillingPurchase(billId, purchaseId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     };
 
     const validateBill = async () => {
@@ -549,6 +574,7 @@ export default {
       openBillingPurchaseAdditionModal,
       openBillingPurchaseEditionModal,
       openCourseBillValidationModal,
+      validatePurchaseDeletion,
       refreshCourseBills,
       refreshBillingItems,
       showDetails,
@@ -568,6 +594,10 @@ export default {
 .payer
   width: fit-content
 
-.fee-info
-  max-width: 90%
+.fee
+  display: flex
+  justify-content: space-between
+  align-items: flex-start
+  &-info
+    max-width: 90%
 </style>
