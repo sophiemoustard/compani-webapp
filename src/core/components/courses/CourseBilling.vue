@@ -54,6 +54,10 @@
             <ni-button label="Facturer" color="white" class="bg-primary" icon="payment"
               @click="openCourseBillValidationModal(bill._id)" :disable="billValidationLoading" />
           </div>
+          <div v-else>
+            <ni-bi-color-button label="Télécharger la facture" icon="file_download" size="16px"
+              @click="downloadBill(bill._id)" />
+          </div>
         </div>
       </div>
       <div v-else class="row justify-end">
@@ -103,13 +107,15 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
-import { formatAndSortOptions, formatPrice } from '@helpers/utils';
+import { formatAndSortOptions, formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
+import { downloadFile } from '@helpers/file';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
+import BiColorButton from '@components/BiColorButton';
 import { REQUIRED_LABEL } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
@@ -126,6 +132,7 @@ export default {
     'ni-billing-purchase-addition-modal': BillingPurchaseAdditionModal,
     'ni-course-bill-validation-modal': CourseBillValidationModal,
     'ni-button': Button,
+    'ni-bi-color-button': BiColorButton,
   },
   setup () {
     const metaInfo = { title: 'Configuration facturation' };
@@ -138,6 +145,7 @@ export default {
     const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
     const billsLoading = ref(false);
+    const pdfLoading = ref(false);
     const payerList = ref([]);
     const courseBills = ref([]);
     const billingItemList = ref([]);
@@ -456,6 +464,23 @@ export default {
 
     const getBillingItemName = billingItem => billingItemList.value.find(item => item.value === billingItem).label;
 
+    const downloadBill = async (billId) => {
+      try {
+        pdfLoading.value = true;
+        const pdf = await CourseBills.getPdf(billId);
+        downloadFile(pdf, 'facture.pdf');
+      } catch (e) {
+        console.error(e);
+        if (e.status === 404) {
+          const { message } = readAPIResponseWithTypeArrayBuffer(e);
+          return NotifyNegative(message);
+        }
+        NotifyNegative('Erreur lors du téléchargement de la facture.');
+      } finally {
+        pdfLoading.value = false;
+      }
+    };
+
     const created = async () => {
       refreshCourseBills();
       refreshCourseFundingOrganisations();
@@ -521,6 +546,7 @@ export default {
       refreshBillingItems,
       showDetails,
       getBillingItemName,
+      downloadBill,
       get,
       omit,
       pickBy,

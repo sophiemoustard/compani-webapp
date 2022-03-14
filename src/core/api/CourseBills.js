@@ -18,4 +18,10 @@ export default {
     const url = `${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases/${billingPurchaseId}`;
     await alenviAxios.put(url, payload);
   },
+  async getPdf (id) {
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/coursebills/${id}/pdfs`,
+      { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
+    );
+  },
 };
