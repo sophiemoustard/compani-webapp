@@ -115,6 +115,7 @@ export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate
   + `${moment(timePeriod.endDate).format('HH:mm')}`;
 
 export const getHoursAndMinutes = (value) => {
+  if (!value) return { hours: '', minutes: '' };
   const hours = Math.floor(value);
   const minutes = Math.round(value % 1 * 60);
 

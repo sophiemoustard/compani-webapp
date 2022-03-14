@@ -121,7 +121,7 @@
 import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import useVuelidate from '@vuelidate/core';
-import { required, helpers } from '@vuelidate/validators';
+import { required, helpers, maxValue } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
@@ -220,7 +220,7 @@ export default {
         name: { required },
         theoreticalHours: {
           hours: { required, integerNumber, positiveNumber },
-          minutes: { required, integerNumber, positiveNumber },
+          minutes: { required, integerNumber, positiveNumber, maxValue: maxValue(59) },
         },
       },
       newActivity: { name: { required }, type: { required } },
@@ -231,17 +231,18 @@ export default {
     ...mapState('program', ['program', 'openedStep']),
     theoreticalHoursErrorMsg () {
       const validation = this.v$.editedStep;
-      if (validation.theoreticalHours.hours.required.$response === false) return REQUIRED_LABEL;
-      if (validation.theoreticalHours.hours.integerNumber.$response === false ||
-        validation.theoreticalHours.hours.positiveNumber.$response === false) return 'Durée non valide';
+      if (!validation.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
+      if (!validation.theoreticalHours.hours.integerNumber.$response ||
+        !validation.theoreticalHours.hours.positiveNumber.$response) return 'Durée non valide';
 
       return '';
     },
     theoreticalMinutesErrorMsg () {
       const validation = this.v$.editedStep;
-      if (validation.theoreticalHours.minutes.required.$response === false) return REQUIRED_LABEL;
-      if (validation.theoreticalHours.minutes.integerNumber.$response === false ||
-       validation.theoreticalHours.minutes.positiveNumber.$response === false) return 'Durée non valide';
+      if (!validation.theoreticalHours.minutes.required.$response) return REQUIRED_LABEL;
+      if (!validation.theoreticalHours.minutes.integerNumber.$response ||
+       !validation.theoreticalHours.minutes.positiveNumber.$response ||
+       !validation.theoreticalHours.minutes.maxValue.$response) return 'Durée non valide';
 
       return '';
     },
