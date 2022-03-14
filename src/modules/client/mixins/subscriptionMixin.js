@@ -82,6 +82,8 @@ export const subscriptionMixin = {
         const totalBillingItemsAmount = subscription.service.billingItems
           .reduce((acc, bi) => (acc += bi.defaultUnitAmount), 0);
         weeklyRate += totalBillingItemsAmount * subscription.weeklyCount;
+      } else if (get(subscription, 'billingItemsTTCRate') && get(subscription, 'weeklyCount')) {
+        weeklyRate += subscription.weeklyCount * subscription.billingItemsTTCRate;
       }
 
       let fundingReduction = 0;
