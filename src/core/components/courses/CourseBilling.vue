@@ -20,26 +20,33 @@
             </q-card-section>
             <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
               <q-card flat class="q-mx-lg q-mb-sm">
-                <q-card-section class="cursor-pointer" @click="openMainFeeEditionModal(bill)">
-                  <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
-                  <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
-                  <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
-                  <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
-                    Description : {{ bill.mainFee.description }}
+                <q-card-section class="cursor-pointer row justify-between content-start">
+                  <div class="fee-info">
+                    <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
+                    <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
+                    <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
+                    <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
+                      Description : {{ bill.mainFee.description }}
+                    </div>
                   </div>
+                  <ni-button icon="edit" @click="openMainFeeEditionModal(bill)" />
                 </q-card-section>
               </q-card>
               <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
                 <q-card flat class="q-mx-lg q-mb-sm">
-                  <q-card-section @click="openBillingPurchaseEditionModal(bill._id, billingPurchase)"
-                    class="cursor-pointer">
-                    <div class="text-copper-500">
-                      {{ getBillingItemName(billingPurchase.billingItem) }}
+                  <q-card-section class="cursor-pointer row justify-between content-start">
+                    <div class="fee-info">
+                      <div class="text-copper-500">
+                        {{ getBillingItemName(billingPurchase.billingItem) }}
+                      </div>
+                      <div>Prix unitaire : {{ formatPrice(billingPurchase.price) }}</div>
+                      <div>Quantité : {{ billingPurchase.count }}</div>
+                      <div v-if="billingPurchase.description" class="ellipsis">
+                        Description : {{ billingPurchase.description }}
+                      </div>
                     </div>
-                    <div>Prix unitaire : {{ formatPrice(billingPurchase.price) }}</div>
-                    <div>Quantité : {{ billingPurchase.count }}</div>
-                    <div v-if="billingPurchase.description" class="ellipsis">
-                      Description : {{ billingPurchase.description }}
+                    <div>
+                      <ni-button icon="edit" @click="openBillingPurchaseEditionModal(bill._id, billingPurchase)" />
                     </div>
                   </q-card-section>
                 </q-card>
@@ -560,4 +567,7 @@ export default {
 <style lang="sass" scoped>
 .payer
   width: fit-content
+
+.fee-info
+  max-width: 90%
 </style>
