@@ -24,4 +24,7 @@ export default {
       { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
     );
   },
+  async deleteBillingPurchase (billId, billingPurchaseId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases/${billingPurchaseId}`);
+  },
 };
