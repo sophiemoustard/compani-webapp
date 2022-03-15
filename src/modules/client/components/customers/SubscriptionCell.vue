@@ -38,12 +38,16 @@
           <li v-if="subscription.weeklyCount">
             {{ formatQuantity('intervention', subscription.weeklyCount) }} par semaine
           </li>
-          <li v-if="fundings.length">
+          <li v-if="fundings.length && fundings[0].nature !== FIXED">
             Prise en charge par {{ fundings[0].thirdPartyPayer.name }} : {{ formatPrice(weeklyRate.fundingReduction) }}
+            / semaine
             <span class="cursor-pointer text-copper-400 funding-details"
               @click="showSubscriptionFundings(subscription._id)">
               (voir détails)
             </span>
+            <div style="font-size: 12px">
+              (cette estimation peut varier selon l’évolution du plan d’aide et du volume horaire)
+            </div>
           </li>
         </ul>
       </div>
@@ -54,7 +58,7 @@
 <script>
 import get from 'lodash/get';
 import Button from '@components/Button';
-import { HOURLY } from '@data/constants';
+import { HOURLY, FIXED } from '@data/constants';
 import { formatQuantity, formatPrice } from '@helpers/utils';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
 
@@ -99,6 +103,7 @@ export default {
     return {
       // Data
       HOURLY,
+      FIXED,
       // Methods
       getBillingItemsPrice,
       getBillingItemsName,
