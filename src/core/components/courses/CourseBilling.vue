@@ -20,7 +20,7 @@
             </q-card-section>
             <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
               <q-card flat class="q-mx-lg q-mb-sm">
-                <q-card-section class="cursor-pointer fee">
+                <q-card-section class="fee">
                   <div class="fee-info">
                     <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                     <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
@@ -34,7 +34,7 @@
               </q-card>
               <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
                 <q-card flat class="q-mx-lg q-mb-sm">
-                  <q-card-section class="cursor-pointer fee">
+                  <q-card-section class="fee">
                     <div class="fee-info">
                       <div class="text-copper-500">
                         {{ getBillingItemName(billingPurchase.billingItem) }}
