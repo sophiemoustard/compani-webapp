@@ -121,7 +121,7 @@
 import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import useVuelidate from '@vuelidate/core';
-import { required, helpers, maxValue } from '@vuelidate/validators';
+import { required, requiredIf, helpers, maxValue } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
@@ -219,8 +219,13 @@ export default {
       editedStep: {
         name: { required },
         theoreticalHours: {
-          hours: { required, integerNumber, positiveNumber },
-          minutes: { required, integerNumber, positiveNumber, maxValue: maxValue(59) },
+          hours: { required: requiredIf(!this.editedStep.theoreticalHours.minutes), integerNumber, positiveNumber },
+          minutes: {
+            required: requiredIf(!this.editedStep.theoreticalHours.hours),
+            integerNumber,
+            positiveNumber,
+            maxValue: maxValue(59),
+          },
         },
       },
       newActivity: { name: { required }, type: { required } },

@@ -105,10 +105,10 @@ export const getDuration = (timePeriod) => {
 export const formatDurationFromFloat = (durationHours = 0) => {
   const hours = Math.floor(durationHours);
   const minutes = Math.round(durationHours % 1 * 60);
-  if (!hours) return `${minutes}min`;
+  if (!hours) return `${minutes.toString().padStart(2, '0')}min`;
   if (!minutes) return `${hours}h`;
 
-  return `${hours}h ${minutes}min`;
+  return `${hours}h ${minutes.toString().padStart(2, '0')}min`;
 };
 
 export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
