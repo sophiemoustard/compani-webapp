@@ -36,6 +36,13 @@
             :model-value="editedEvent.subscription" :error="validations.subscription.$error" caption="Service" in-modal
             @blur="validations.subscription.$touch" :disable="!canUpdateIntervention || historiesLoading"
             required-field />
+          <ni-select in-modal caption="Répétition de l'évènement" :model-value="editedEvent.repetition.frequency"
+            :options="getRepetitionOptions(editedEvent.dates.startDate)" disable />
+          <div class="repetition-infos-text q-mb-md">
+            L'annulation de l'évènement ou les modifications de notes, déplacement véhiculé ou transport spécifique ne
+            s'appliqueront pas à la répétition
+            {{ editedEvent.repetition }}
+          </div>
         </template>
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :model-value="editedEvent.internalHour"
@@ -45,12 +52,12 @@
             :error="validations.address.$error" @update:model-value="updateEvent('address', $event)"
             :disable="historiesLoading" :error-message="addressError" />
         </template>
-        <template v-if="isRepetition(editedEvent) && canUpdateIntervention && !editedEvent.isCancelled">
+        <!-- <template v-if="isRepetition(editedEvent) && canUpdateIntervention && !editedEvent.isCancelled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox :model-value="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
               @update:model-value="toggleRepetition" dense :disable="historiesLoading" />
           </div>
-        </template>
+        </template> -->
         <template v-if="editedEvent.type === ABSENCE">
           <div v-if="!!editedEvent.extension"><div class="q-mb-md infos">{{ extensionInfos }}</div></div>
           <ni-select in-modal caption="Nature" :model-value="editedEvent.absenceNature" :options="absenceNatureOptions"
@@ -286,11 +293,11 @@ export default {
         this.validations.cancel.$touch();
       }
     },
-    toggleRepetition () {
-      this.updateEvent('cancel', {});
-      this.updateEvent('isCancelled', false);
-      this.updateEvent('shouldUpdateRepetition', !this.editedEvent.shouldUpdateRepetition);
-    },
+    // toggleRepetition () {
+    //   this.updateEvent('cancel', {});
+    //   this.updateEvent('isCancelled', false);
+    //   this.updateEvent('shouldUpdateRepetition', !this.editedEvent.shouldUpdateRepetition);
+    // },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
@@ -386,4 +393,8 @@ export default {
 
 .history-list-title
   font-size: 14px
+
+.repetition-infos-text
+  color: $copper-grey-600
+  font-size: 12px
 </style>

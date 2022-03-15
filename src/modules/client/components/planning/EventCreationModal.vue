@@ -55,9 +55,9 @@
         </template>
         <template v-if="newEvent.type !== ABSENCE && newEvent.repetition">
           <ni-select in-modal caption="Répétition de l'évènement" :model-value="newEvent.repetition.frequency"
-            :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch"
-            :disable="!isRepetitionAllowed" @update:model-value="updateEvent('repetition.frequency', $event)"
-            :error="validations.repetition.frequency.$error" />
+            :options="getRepetitionOptions(newEvent.dates.startDate)" required-field :disable="!isRepetitionAllowed"
+            @blur="validations.repetition.frequency.$touch" :error="validations.repetition.frequency.$error"
+            @update:model-value="updateEvent('repetition.frequency', $event)" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-search-address :model-value="newEvent.address" @update:model-value="updateEvent('address', $event)"
