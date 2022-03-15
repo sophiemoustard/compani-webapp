@@ -3,10 +3,10 @@
     <template #title>
       <span class="text-weight-bold">{{ title }}</span>
     </template>
-    <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number"
+    <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number" :disable="isBilled"
       :model-value="courseFee.price" @blur="validations.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'price')" />
-    <ni-input in-modal caption="Quantité" :error="validations.count.$error" type="number"
+    <ni-input in-modal caption="Quantité" :error="validations.count.$error" type="number" :disable="isBilled"
       :model-value="courseFee.count" @blur="validations.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'count')" />
     <ni-input in-modal caption="Description" type="textarea" :model-value="courseFee.description"
@@ -33,6 +33,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     title: { type: String, default: '' },
+    isBilled: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
