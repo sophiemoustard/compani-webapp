@@ -103,6 +103,7 @@ import {
   WORK_ACCIDENT,
   TRANSPORT_ACCIDENT,
   ILLNESS,
+  ABSENCE_TYPES,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
@@ -177,6 +178,14 @@ export default {
     isAbsenceStartHourDisabled () {
       return !this.isIllnessOrWorkAccident(this.newEvent) && !this.isHourlyAbsence(this.newEvent) &&
         !this.isHalfDailyAbsence(this.newEvent);
+    },
+    absenceOptions () {
+      return this.newEvent && this.newEvent.absenceNature === HOURLY
+        ? ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED)
+        : ABSENCE_TYPES;
+    },
+    auxiliariesOptions () {
+      return this.getAuxiliariesOptions(this.newEvent);
     },
   },
   watch: {

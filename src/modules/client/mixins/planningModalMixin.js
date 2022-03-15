@@ -18,7 +18,6 @@ import {
   EVERY_WEEK_DAY,
   EVERY_WEEK,
   EVERY_TWO_WEEKS,
-  ABSENCE_TYPES,
   ABSENCE_NATURES,
   UNJUSTIFIED,
   DAILY,
@@ -81,11 +80,6 @@ export const planningModalMixin = {
     ...mapGetters({
       clientRole: 'main/getClientRole',
     }),
-    absenceOptions () {
-      return this.newEvent && this.newEvent.absenceNature === HOURLY
-        ? ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED)
-        : ABSENCE_TYPES;
-    },
     isCustomerPlanning () {
       return this.personKey === CUSTOMER;
     },
@@ -95,19 +89,6 @@ export const planningModalMixin = {
       }
 
       return EVENT_TYPES;
-    },
-    auxiliariesOptions () {
-      if (this.isCustomerPlanning && this.creationModal) {
-        return formatAndSortIdentityOptions(this.activeAuxiliaries);
-      }
-
-      const sectorId = this.newEvent ? this.newEvent.sector : this.editedEvent.sector;
-      const sector = this.filters.find(f => f.type === SECTOR && f._id === sectorId);
-
-      return [
-        { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
-        ...formatAndSortIdentityOptions(this.activeAuxiliaries),
-      ];
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
@@ -237,6 +218,18 @@ export const planningModalMixin = {
         { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
         { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
         { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
+      ];
+    },
+    getAuxiliariesOptions (event) {
+      if (this.isCustomerPlanning && this.creationModal) {
+        return formatAndSortIdentityOptions(this.activeAuxiliaries);
+      }
+
+      const sector = this.filters.find(f => f.type === SECTOR && f._id === event.sector);
+
+      return [
+        { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
+        ...formatAndSortIdentityOptions(this.activeAuxiliaries),
       ];
     },
   },

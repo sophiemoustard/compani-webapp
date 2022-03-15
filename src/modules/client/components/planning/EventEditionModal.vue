@@ -62,7 +62,7 @@
           <div v-if="!!editedEvent.extension"><div class="q-mb-md infos">{{ extensionInfos }}</div></div>
           <ni-select in-modal caption="Nature" :model-value="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
-          <ni-select in-modal caption="Type d'absence" :model-value="editedEvent.absence" :options="absenceOptions"
+          <ni-select in-modal caption="Type d'absence" :model-value="editedEvent.absence" :options="ABSENCE_TYPES"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
             :disable="isHourlyAbsence(editedEvent) || historiesLoading" @update:model-value="updateAbsence($event)" />
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
@@ -196,6 +196,7 @@ export default {
       historyToCancel: {},
       isStartCancellation: true,
       timeStampCancellationReason: '',
+      ABSENCE_TYPES,
     };
   },
   validations () {
@@ -274,6 +275,9 @@ export default {
     },
     isAbsenceStartHourDisabled () {
       return this.isDailyAbsence(this.editedEvent) && !this.isIllnessOrWorkAccident(this.editedEvent);
+    },
+    auxiliariesOptions () {
+      return this.getAuxiliariesOptions(this.editedEvent);
     },
   },
   methods: {
