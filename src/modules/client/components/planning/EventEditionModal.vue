@@ -75,7 +75,7 @@
             :disable="!selectedAuxiliary._id || historiesLoading" in-modal :extensions="extensions" drive-storage
             @delete="deleteDocument(editedEvent.attachment.driveId)" />
         </template>
-        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" type="textarea" :model-value="editedEvent.misc"
+        <ni-input in-modal type="textarea" :model-value="editedEvent.misc"
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired"
           @update:model-value="updateEvent('misc', $event)" />
@@ -93,7 +93,7 @@
             :error="validations.cancel.reason.$error" @update:model-value="updateEvent('cancel.reason', $event)"
             :disable="!canCancel || historiesLoading" />
         </div>
-        <template v-if="!editedEvent.shouldUpdateRepetition && editedEvent.type === INTERVENTION">
+        <template v-if="editedEvent.type === INTERVENTION">
           <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :model-value="editedEvent.kmDuringEvent"
             suffix="km" type="number" :error="validations.kmDuringEvent.$error" @blur="validations.kmDuringEvent.$touch"
             error-message="Le déplacement doit être positif ou nul" :disable="!canUpdateIntervention"
@@ -227,7 +227,7 @@ export default {
     },
     canCancel () {
       return this.editedEvent.type === INTERVENTION &&
-        !this.editedEvent.shouldUpdateRepetition &&
+        // !this.editedEvent.shouldUpdateRepetition &&
         !this.isBilledIntervention &&
         !this.startDateTimeStamped &&
         !this.endDateTimeStamped &&
