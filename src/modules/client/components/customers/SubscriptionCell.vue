@@ -20,7 +20,7 @@
       <span class="text-weight-bold text-copper-grey-700">
         {{ formatPrice(getBillingItemsPrice()) }} / intervention
       </span>
-      <div class="text-italic q-mb-md" style="font-size: 12px">Ce prix correspond à : {{ getBillingItemsName() }}</div>
+      <div class="text-italic q-mb-md text-12">Ce prix correspond à : {{ getBillingItemsName() }}</div>
     </div>
     <div class="bg-copper-grey-100 text-copper-grey-700 weekly-infos">
       <div>
@@ -28,7 +28,7 @@
         <span class="text-weight-bold">{{ formatPrice(weeklyRate.total) }} / semaine</span>
         <span v-if="weeklyRate.totalSurcharge"> (dont {{ formatPrice(weeklyRate.totalSurcharge) }} de majoration)</span>
       </div>
-      <div class="text-italic" style="font-size: 14px">
+      <div class="text-italic text-14">
         <div>Estimation sur base de : </div>
         <ul>
           <li v-if="subscription.weeklyHours">
@@ -38,12 +38,16 @@
           <li v-if="subscription.weeklyCount">
             {{ formatQuantity('intervention', subscription.weeklyCount) }} par semaine
           </li>
-          <li v-if="fundings.length">
+          <li v-if="fundings.length && fundings[0].nature !== FIXED">
             Prise en charge par {{ fundings[0].thirdPartyPayer.name }} : {{ formatPrice(weeklyRate.fundingReduction) }}
+            / semaine
             <span class="cursor-pointer text-copper-400 funding-details"
               @click="showSubscriptionFundings(subscription._id)">
               (voir détails)
             </span>
+            <div class="text-12">
+              (cette estimation peut varier selon l’évolution du plan d’aide et du volume horaire)
+            </div>
           </li>
         </ul>
       </div>
@@ -54,7 +58,7 @@
 <script>
 import get from 'lodash/get';
 import Button from '@components/Button';
-import { HOURLY } from '@data/constants';
+import { HOURLY, FIXED } from '@data/constants';
 import { formatQuantity, formatPrice } from '@helpers/utils';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
 
@@ -99,6 +103,7 @@ export default {
     return {
       // Data
       HOURLY,
+      FIXED,
       // Methods
       getBillingItemsPrice,
       getBillingItemsName,
@@ -114,20 +119,20 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-  .cell-container
-    background: white
-    width: 100%
-    margin-bottom: 10px
-    padding: 16px
-  .cell-header
-    justify-content: space-between
-    align-items: center
-  .weekly-infos
-    border-radius: 16px !important
-    padding: 16px
-    > div > ul
-      margin: 0
-      padding-inline-start: 24px
-  .funding-details
-    text-decoration: underline
+.cell-container
+  background: white
+  width: 100%
+  margin-bottom: 10px
+  padding: 16px
+.cell-header
+  justify-content: space-between
+  align-items: center
+.weekly-infos
+  border-radius: 16px !important
+  padding: 16px
+  > div > ul
+    margin: 0
+    padding-inline-start: 24px
+.funding-details
+  text-decoration: underline
 </style>
