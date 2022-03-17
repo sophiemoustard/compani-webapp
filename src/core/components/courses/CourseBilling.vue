@@ -12,7 +12,7 @@
                 </div>
                 <div @click.stop="openFunderEditionModal(bill)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
-                  <q-icon size="16px" name="edit" color="copper-grey-500" />
+                  <q-icon v-if="!isBilled(bill)" size="16px" name="edit" color="copper-grey-500" />
                 </div>
                 {{ bill.billedAt ? `Date : ${formatDate(bill.billedAt)}` : '' }}
               </q-item-section>
