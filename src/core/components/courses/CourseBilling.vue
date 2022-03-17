@@ -54,7 +54,7 @@
                 </q-card>
               </div>
               <div class="row justify-end">
-                <ni-button color="primary" icon="add" label="Ajouter un article"
+                <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
                   :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
               </div>
             </div>
