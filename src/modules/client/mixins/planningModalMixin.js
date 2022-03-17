@@ -221,9 +221,7 @@ export const planningModalMixin = {
       ];
     },
     getAuxiliariesOptions (event) {
-      if (this.isCustomerPlanning && this.creationModal) {
-        return formatAndSortIdentityOptions(this.activeAuxiliaries);
-      }
+      if (this.isCustomerPlanning && this.creationModal) return formatAndSortIdentityOptions(this.activeAuxiliaries);
 
       const sector = this.filters.find(f => f.type === SECTOR && f._id === event.sector);
 

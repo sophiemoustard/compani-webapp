@@ -373,6 +373,25 @@ export const planningActionMixin = {
           return 'Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
       }
     },
+    areEditedFieldsApplicableToRepetition () {
+      const auxiliaryEvents = this.getRowEvents(this.editedEvent.auxiliary);
+      const initialEvent = auxiliaryEvents.find(e => e._id === this.editedEvent._id);
+
+      const formattedInitialEvent = {
+        startDate: initialEvent.startDate,
+        endDate: initialEvent.endDate,
+        serviceId: initialEvent.subscription._id,
+        customerId: initialEvent.customer._id,
+      };
+      const formattedEditedEvent = {
+        startDate: this.editedEvent.dates.startDate,
+        endDate: this.editedEvent.dates.endDate,
+        serviceId: this.editedEvent.subscription,
+        customerId: this.editedEvent.customer,
+      };
+
+      return !isEqual(formattedInitialEvent, formattedEditedEvent);
+    },
     async confirmEventEdition (shouldUpdateRepetition) {
       this.editedEvent.shouldUpdateRepetition = shouldUpdateRepetition;
       if (shouldUpdateRepetition) {
@@ -408,23 +427,7 @@ export const planningActionMixin = {
             .onOk(this.updateEvent)
             .onCancel(() => NotifyPositive('Modification annulée.'));
         } else if (this.editedEvent.type === INTERVENTION && this.editedEvent.auxiliary && isRepetition) {
-          const auxiliaryEvents = this.getRowEvents(this.editedEvent.auxiliary);
-          const initialEvent = auxiliaryEvents.find(e => e._id === this.editedEvent._id);
-
-          const formattedInitialEvent = {
-            startDate: initialEvent.startDate,
-            endDate: initialEvent.endDate,
-            serviceId: initialEvent.subscription._id,
-            customerId: initialEvent.customer._id,
-          };
-          const formattedEditedEvent = {
-            startDate: this.editedEvent.dates.startDate,
-            endDate: this.editedEvent.dates.endDate,
-            serviceId: this.editedEvent.subscription,
-            customerId: this.editedEvent.customer,
-          };
-          const editedFieldsAreApplicableToRepetition = !isEqual(formattedInitialEvent, formattedEditedEvent);
-
+          const editedFieldsAreApplicableToRepetition = this.areEditedFieldsApplicableToRepetition();
           if (editedFieldsAreApplicableToRepetition) {
             this.$q.dialog({
               title: 'Confirmation',
