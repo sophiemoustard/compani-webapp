@@ -13,7 +13,7 @@
       @update:model-value="getEvents($event, 'thirdPartyPayer')" />
     <ni-date-input caption="Date de l'avoir" :model-value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @update:model-value="update($event, 'date')" />
-    <ni-input caption="Motif (visible par le client)" in-modal :model-value="newCreditNote.misc" type="textarea"
+    <ni-input caption="Motif (visible par les clients)" in-modal :model-value="newCreditNote.misc" type="textarea"
       :debounce="500" @update:model-value="update($event, 'misc')" />
     <!-- Event -->
     <template v-if="creditNoteType === EVENTS">
