@@ -74,7 +74,7 @@
             :disable="!selectedAuxiliary._id || historiesLoading" in-modal :extensions="extensions" drive-storage
             @delete="deleteDocument(editedEvent.attachment.driveId)" />
         </template>
-        <ni-input in-modal type="textarea" :model-value="editedEvent.misc"
+        <ni-input in-modal type="textarea" :model-value="editedEvent.misc" v-if="!editedEvent.shouldUpdateRepetition"
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired"
           @update:model-value="updateEvent('misc', $event)" />
@@ -105,7 +105,7 @@
           <div class="flex-row items-center justify-between">
             <div class="flex-row items-center">
               <q-icon size="sm" name="history" class="q-mr-sm" color="copper-grey-500" />
-              <div class="history-list-title text-weight-bold">Activité</div>
+              <div class="text-14 text-weight-bold">Activité</div>
             </div>
             <ni-button :label="historyButtonLabel" color="copper-grey-800" class="bg-copper-grey-100"
               @click="toggleHistory" :disable="historiesLoading" />
@@ -393,9 +393,6 @@ export default {
 .infos
   font-style: italic
   color: $copper-grey-400
-
-.history-list-title
-  font-size: 14px
 
 .repetition-infos-text
   color: $copper-grey-600
