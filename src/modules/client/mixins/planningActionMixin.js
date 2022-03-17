@@ -1,5 +1,6 @@
 import { mapState } from 'vuex';
 import omit from 'lodash/omit';
+import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -372,6 +373,22 @@ export const planningActionMixin = {
           return 'Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
       }
     },
+    async confirmEventEdition (shouldUpdateRepetition) {
+      this.editedEvent.shouldUpdateRepetition = shouldUpdateRepetition;
+      if (shouldUpdateRepetition) {
+        this.$q.dialog({
+          title: 'Confirmation',
+          message: this.getEditionConfirmationMessage(),
+          html: true,
+          ok: 'OK',
+          cancel: 'Annuler',
+        })
+          .onOk(this.updateEvent)
+          .onCancel(() => NotifyPositive('Modification annulée.'));
+      } else {
+        await this.updateEvent();
+      }
+    },
     async validateEventEdition () {
       try {
         this.eventValidation.editedEvent.$touch();
@@ -390,6 +407,45 @@ export const planningActionMixin = {
           })
             .onOk(this.updateEvent)
             .onCancel(() => NotifyPositive('Modification annulée.'));
+        } else if (this.editedEvent.type === INTERVENTION && this.editedEvent.auxiliary && isRepetition) {
+          const auxiliaryEvents = this.getRowEvents(this.editedEvent.auxiliary);
+          const initialEvent = auxiliaryEvents.find(e => e._id === this.editedEvent._id);
+
+          const formattedInitialEvent = {
+            startDate: initialEvent.startDate,
+            endDate: initialEvent.endDate,
+            serviceId: initialEvent.subscription._id,
+            customerId: initialEvent.customer._id,
+          };
+          const formattedEditedEvent = {
+            startDate: this.editedEvent.dates.startDate,
+            endDate: this.editedEvent.dates.endDate,
+            serviceId: this.editedEvent.subscription,
+            customerId: this.editedEvent.customer,
+          };
+          const editedFieldsAreApplicableToRepetition = !isEqual(formattedInitialEvent, formattedEditedEvent);
+
+          if (editedFieldsAreApplicableToRepetition) {
+            this.$q.dialog({
+              title: 'Confirmation',
+              message: 'Modifier l\'événement périodique',
+              html: true,
+              options: {
+                type: 'radio',
+                model: false,
+                items: [
+                  { label: 'Modifier uniquement cet événement', value: false },
+                  { label: 'Modifier cet événement et tous les suivants', value: true },
+                ],
+              },
+              ok: 'OK',
+              cancel: 'Annuler',
+            })
+              .onOk(this.confirmEventEdition)
+              .onCancel(() => NotifyPositive('Modification annulée.'));
+          } else {
+            await this.updateEvent();
+          }
         } else if (this.editedEvent.auxiliary && isRepetition && this.editedEvent.shouldUpdateRepetition) {
           this.$q.dialog({
             title: 'Confirmation',
