@@ -46,7 +46,7 @@
                       </div>
                     </div>
                     <div>
-                      <ni-button icon="edit" @click="openBillingPurchaseEditionModal(bill._id, billingPurchase)" />
+                      <ni-button icon="edit" @click="openBillingPurchaseEditionModal(bill, billingPurchase)" />
                       <ni-button v-if="!isBilled(bill)" icon="delete"
                         @click="validatePurchaseDeletion(bill._id, billingPurchase._id)" />
                     </div>
@@ -86,7 +86,8 @@
     <!-- main fee edition modal -->
     <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:course-fee="editedBill.mainFee"
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
-      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :title="courseFeeEditionModalTitle" />
+      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages"
+      :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -96,8 +97,8 @@
 
     <!-- billing purchase edition modal -->
     <ni-course-fee-edition-modal v-model="billingPurchaseEditionModal" :validations="validations.editedBillingPurchase"
-      v-model:course-fee="editedBillingPurchase" @hide="resetBillingPurchaseEditionModal"
-      @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" :title="courseFeeEditionModalTitle"
+      v-model:course-fee="editedBillingPurchase" :title="courseFeeEditionModalMetaInfo.title"
+      @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" @hide="resetBillingPurchaseEditionModal"
       :error-messages="editedBillingPurchaseErrorMessages" />
 
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
@@ -171,7 +172,7 @@ export default {
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
-    const courseFeeEditionModalTitle = ref('');
+    const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
 
     const rules = {
       newBill: {
@@ -293,7 +294,10 @@ export default {
 
     const openMainFeeEditionModal = (bill) => {
       setEditedBill(bill);
-      courseFeeEditionModalTitle.value = get(course, 'value.subProgram.program.name');
+      courseFeeEditionModalMetaInfo.value = {
+        title: get(course, 'value.subProgram.program.name'),
+        isBilled: isBilled(bill),
+      };
       mainFeeEditionModal.value = true;
     };
 
@@ -302,15 +306,18 @@ export default {
       billingPurchaseAdditionModal.value = true;
     };
 
-    const openBillingPurchaseEditionModal = (billId, billingPurchase) => {
+    const openBillingPurchaseEditionModal = (bill, billingPurchase) => {
       editedBillingPurchase.value = {
         _id: billingPurchase._id,
-        billId,
+        billId: bill._id,
         price: billingPurchase.price,
         count: billingPurchase.count,
         description: billingPurchase.description,
       };
-      courseFeeEditionModalTitle.value = getBillingItemName(billingPurchase.billingItem);
+      courseFeeEditionModalMetaInfo.value = {
+        title: getBillingItemName(billingPurchase.billingItem),
+        isBilled: isBilled(bill),
+      };
       billingPurchaseEditionModal.value = true;
     };
 
@@ -331,7 +338,7 @@ export default {
 
     const resetMainFeeEditionModal = () => {
       resetEditedBill();
-      courseFeeEditionModalTitle.value = '';
+      courseFeeEditionModalMetaInfo.value = { title: '', isBilled: false };
     };
 
     const resetBillingPurchaseAdditionModal = () => {
@@ -342,7 +349,7 @@ export default {
     const resetBillingPurchaseEditionModal = () => {
       editedBillingPurchase.value = { billId: '', price: 0, count: 1, description: '' };
       validations.value.editedBillingPurchase.$reset();
-      courseFeeEditionModalTitle.value = '';
+      courseFeeEditionModalMetaInfo.value = { title: '', isBilled: false };
     };
 
     const resetCourseBillValidationModal = () => {
@@ -543,7 +550,7 @@ export default {
       billToValidate,
       payerList,
       courseBills,
-      courseFeeEditionModalTitle,
+      courseFeeEditionModalMetaInfo,
       // Computed
       validations,
       course,
