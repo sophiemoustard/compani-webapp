@@ -53,7 +53,7 @@ export default {
     const courseName = computed(() => get(course.value, 'subProgram.program.name'));
     const headerInfo = computed(() => [{
       icon: 'hourglass_empty',
-      label: `Durée: ${formatDurationFromFloat(course.value.totalTheoreticalHours)}`,
+      label: `Durée : ${formatDurationFromFloat(course.value.totalTheoreticalHours)}`,
     }]);
 
     const refreshCourse = async () => {

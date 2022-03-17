@@ -34,7 +34,7 @@ export default {
     headerInfo () {
       return [{
         icon: 'hourglass_empty',
-        label: `Durée: ${formatDurationFromFloat(this.course.totalTheoreticalHours)}`,
+        label: `Durée : ${formatDurationFromFloat(this.course.totalTheoreticalHours)}`,
       }];
     },
   },
