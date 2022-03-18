@@ -1,6 +1,6 @@
 <template>
-    <q-page class="vendor-background" padding>
-      <ni-profile-header :title="courseName" />
+    <q-page v-if="course" class="vendor-background" padding>
+      <ni-profile-header :title="courseName" :header-info="headerInfo" />
       <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </q-page>
 </template>
@@ -10,6 +10,7 @@ import { useMeta } from 'quasar';
 import { computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
+import { formatDurationFromFloat } from '@helpers/date';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
@@ -50,6 +51,10 @@ export default {
     const $store = useStore();
     const course = computed(() => $store.state.course.course);
     const courseName = computed(() => get(course.value, 'subProgram.program.name'));
+    const headerInfo = computed(() => [{
+      icon: 'hourglass_empty',
+      label: `Durée : ${formatDurationFromFloat(course.value.totalTheoreticalHours)}`,
+    }]);
 
     const refreshCourse = async () => {
       try {
@@ -72,6 +77,7 @@ export default {
       // Computed
       course,
       courseName,
+      headerInfo,
     };
   },
 };
