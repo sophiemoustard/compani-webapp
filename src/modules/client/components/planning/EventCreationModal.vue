@@ -55,9 +55,9 @@
         </template>
         <template v-if="newEvent.type !== ABSENCE && newEvent.repetition">
           <ni-select in-modal caption="Répétition de l'évènement" :model-value="newEvent.repetition.frequency"
-            :options="repetitionOptions" required-field @blur="validations.repetition.frequency.$touch"
-            :disable="!isRepetitionAllowed" @update:model-value="updateEvent('repetition.frequency', $event)"
-            :error="validations.repetition.frequency.$error" />
+            :options="getRepetitionOptions(newEvent.dates.startDate)" required-field :disable="!isRepetitionAllowed"
+            @blur="validations.repetition.frequency.$touch" :error="validations.repetition.frequency.$error"
+            @update:model-value="updateEvent('repetition.frequency', $event)" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-search-address :model-value="newEvent.address" @update:model-value="updateEvent('address', $event)"
@@ -103,6 +103,7 @@ import {
   WORK_ACCIDENT,
   TRANSPORT_ACCIDENT,
   ILLNESS,
+  ABSENCE_TYPES,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
@@ -177,6 +178,14 @@ export default {
     isAbsenceStartHourDisabled () {
       return !this.isIllnessOrWorkAccident(this.newEvent) && !this.isHourlyAbsence(this.newEvent) &&
         !this.isHalfDailyAbsence(this.newEvent);
+    },
+    absenceOptions () {
+      return this.newEvent && this.newEvent.absenceNature === HOURLY
+        ? ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED)
+        : ABSENCE_TYPES;
+    },
+    auxiliariesOptions () {
+      return this.getAuxiliariesOptions(this.newEvent);
     },
   },
   watch: {
