@@ -12,7 +12,7 @@
                 </div>
                 <div @click.stop="openFunderEditionModal(bill)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
-                  <q-icon size="16px" name="edit" color="copper-grey-500" />
+                  <q-icon v-if="!isBilled(bill)" size="16px" name="edit" color="copper-grey-500" />
                 </div>
                 {{ bill.billedAt ? `Date : ${formatDate(bill.billedAt)}` : '' }}
               </q-item-section>
@@ -54,7 +54,7 @@
                 </q-card>
               </div>
               <div class="row justify-end">
-                <ni-button color="primary" icon="add" label="Ajouter un article"
+                <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
                   :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
               </div>
             </div>
@@ -99,7 +99,7 @@
     <ni-course-fee-edition-modal v-model="billingPurchaseEditionModal" :validations="validations.editedBillingPurchase"
       v-model:course-fee="editedBillingPurchase" :title="courseFeeEditionModalMetaInfo.title"
       @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" @hide="resetBillingPurchaseEditionModal"
-      :error-messages="editedBillingPurchaseErrorMessages" />
+      :error-messages="editedBillingPurchaseErrorMessages" :is-billed="courseFeeEditionModalMetaInfo.isBilled" />
 
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
