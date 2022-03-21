@@ -11,7 +11,20 @@ export default {
   async update (billId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/coursebills/${billId}`, payload);
   },
-  async addBillingItem (billId, payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/coursebills/${billId}/billing-item`, payload);
+  async addBillingPurchase (billId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases`, payload);
+  },
+  async updateBillingPurchase (billId, billingPurchaseId, payload) {
+    const url = `${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases/${billingPurchaseId}`;
+    await alenviAxios.put(url, payload);
+  },
+  async getPdf (id) {
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/coursebills/${id}/pdfs`,
+      { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
+    );
+  },
+  async deleteBillingPurchase (billId, billingPurchaseId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases/${billingPurchaseId}`);
   },
 };

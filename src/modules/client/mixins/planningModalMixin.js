@@ -18,7 +18,6 @@ import {
   EVERY_WEEK_DAY,
   EVERY_WEEK,
   EVERY_TWO_WEEKS,
-  ABSENCE_TYPES,
   ABSENCE_NATURES,
   UNJUSTIFIED,
   DAILY,
@@ -81,11 +80,6 @@ export const planningModalMixin = {
     ...mapGetters({
       clientRole: 'main/getClientRole',
     }),
-    absenceOptions () {
-      return this.newEvent && this.newEvent.absenceNature === HOURLY
-        ? ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED)
-        : ABSENCE_TYPES;
-    },
     isCustomerPlanning () {
       return this.personKey === CUSTOMER;
     },
@@ -96,37 +90,8 @@ export const planningModalMixin = {
 
       return EVENT_TYPES;
     },
-    auxiliariesOptions () {
-      if (this.isCustomerPlanning && this.creationModal) {
-        return formatAndSortIdentityOptions(this.activeAuxiliaries);
-      }
-
-      const sectorId = this.newEvent ? this.newEvent.sector : this.editedEvent.sector;
-      const sector = this.filters.find(f => f.type === SECTOR && f._id === sectorId);
-
-      return [
-        { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
-        ...formatAndSortIdentityOptions(this.activeAuxiliaries),
-      ];
-    },
     internalHourOptions () {
       return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
-    },
-    repetitionOptions () {
-      const oneWeekRepetitionLabel = this.creationModal
-        ? `Tous les ${moment(this.newEvent.dates.startDate).format('dddd')}s`
-        : 'Tous les lundis';
-      const twoWeeksRepetitionLabel = this.creationModal
-        ? `Le ${moment(this.newEvent.dates.startDate).format('dddd')} une semaine sur deux`
-        : 'Le lundi une semaine sur deux';
-
-      return [
-        { label: 'Jamais', value: NEVER },
-        { label: 'Tous les jours', value: EVERY_DAY },
-        { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
-        { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
-        { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
-      ];
     },
     customerProfileRedirect () {
       return COACH_ROLES.includes(this.clientRole)
@@ -242,6 +207,28 @@ export const planningModalMixin = {
       if (!get(this.selectedAuxiliary, 'contracts')) return [];
 
       return formatAndSortIdentityOptions(activeCustomers);
+    },
+    getRepetitionOptions (startDate) {
+      const oneWeekRepetitionLabel = `Tous les ${moment(startDate).format('dddd')}s`;
+      const twoWeeksRepetitionLabel = `Le ${moment(startDate).format('dddd')} une semaine sur deux`;
+
+      return [
+        { label: 'Jamais', value: NEVER },
+        { label: 'Tous les jours', value: EVERY_DAY },
+        { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
+        { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
+        { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
+      ];
+    },
+    getAuxiliariesOptions (event) {
+      if (this.isCustomerPlanning && this.creationModal) return formatAndSortIdentityOptions(this.activeAuxiliaries);
+
+      const sector = this.filters.find(f => f.type === SECTOR && f._id === event.sector);
+
+      return [
+        { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
+        ...formatAndSortIdentityOptions(this.activeAuxiliaries),
+      ];
     },
   },
 };

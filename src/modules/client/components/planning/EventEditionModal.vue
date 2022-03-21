@@ -36,6 +36,12 @@
             :model-value="editedEvent.subscription" :error="validations.subscription.$error" caption="Service" in-modal
             @blur="validations.subscription.$touch" :disable="!canUpdateIntervention || historiesLoading"
             required-field />
+          <ni-select in-modal caption="Répétition de l'évènement" :model-value="editedEvent.repetition.frequency"
+            :options="getRepetitionOptions(editedEvent.dates.startDate)" disable />
+          <div v-if="isRepetition(editedEvent)" class="repetition-infos-text q-mb-md">
+            L'annulation de l'évènement ou les modifications de notes, déplacement véhiculé ou transport spécifique ne
+            s'appliqueront pas à la répétition
+          </div>
         </template>
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :model-value="editedEvent.internalHour"
@@ -45,7 +51,7 @@
             :error="validations.address.$error" @update:model-value="updateEvent('address', $event)"
             :disable="historiesLoading" :error-message="addressError" />
         </template>
-        <template v-if="isRepetition(editedEvent) && canUpdateIntervention && !editedEvent.isCancelled">
+        <template v-if="isRepetition(editedEvent) && !editedEvent.isCancelled && editedEvent.type !== INTERVENTION">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox :model-value="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
               @update:model-value="toggleRepetition" dense :disable="historiesLoading" />
@@ -55,7 +61,7 @@
           <div v-if="!!editedEvent.extension"><div class="q-mb-md infos">{{ extensionInfos }}</div></div>
           <ni-select in-modal caption="Nature" :model-value="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
-          <ni-select in-modal caption="Type d'absence" :model-value="editedEvent.absence" :options="absenceOptions"
+          <ni-select in-modal caption="Type d'absence" :model-value="editedEvent.absence" :options="ABSENCE_TYPES"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
             :disable="isHourlyAbsence(editedEvent) || historiesLoading" @update:model-value="updateAbsence($event)" />
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
@@ -68,7 +74,7 @@
             :disable="!selectedAuxiliary._id || historiesLoading" in-modal :extensions="extensions" drive-storage
             @delete="deleteDocument(editedEvent.attachment.driveId)" />
         </template>
-        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" type="textarea" :model-value="editedEvent.misc"
+        <ni-input in-modal type="textarea" :model-value="editedEvent.misc" v-if="!editedEvent.shouldUpdateRepetition"
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired"
           @update:model-value="updateEvent('misc', $event)" />
@@ -86,7 +92,7 @@
             :error="validations.cancel.reason.$error" @update:model-value="updateEvent('cancel.reason', $event)"
             :disable="!canCancel || historiesLoading" />
         </div>
-        <template v-if="!editedEvent.shouldUpdateRepetition && editedEvent.type === INTERVENTION">
+        <template v-if="editedEvent.type === INTERVENTION">
           <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :model-value="editedEvent.kmDuringEvent"
             suffix="km" type="number" :error="validations.kmDuringEvent.$error" @blur="validations.kmDuringEvent.$touch"
             error-message="Le déplacement doit être positif ou nul" :disable="!canUpdateIntervention"
@@ -99,7 +105,7 @@
           <div class="flex-row items-center justify-between">
             <div class="flex-row items-center">
               <q-icon size="sm" name="history" class="q-mr-sm" color="copper-grey-500" />
-              <div class="history-list-title text-weight-bold">Activité</div>
+              <div class="text-14 text-weight-bold">Activité</div>
             </div>
             <ni-button :label="historyButtonLabel" color="copper-grey-800" class="bg-copper-grey-100"
               @click="toggleHistory" :disable="historiesLoading" />
@@ -189,6 +195,7 @@ export default {
       historyToCancel: {},
       isStartCancellation: true,
       timeStampCancellationReason: '',
+      ABSENCE_TYPES,
     };
   },
   validations () {
@@ -267,6 +274,9 @@ export default {
     },
     isAbsenceStartHourDisabled () {
       return this.isDailyAbsence(this.editedEvent) && !this.isIllnessOrWorkAccident(this.editedEvent);
+    },
+    auxiliariesOptions () {
+      return this.getAuxiliariesOptions(this.editedEvent);
     },
   },
   methods: {
@@ -384,6 +394,7 @@ export default {
   font-style: italic
   color: $copper-grey-400
 
-.history-list-title
-  font-size: 14px
+.repetition-infos-text
+  color: $copper-grey-600
+  font-size: 12px
 </style>

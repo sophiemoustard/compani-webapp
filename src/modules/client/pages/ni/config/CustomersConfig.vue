@@ -121,7 +121,7 @@
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card>
           <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" :loading="tppsLoading"
-            v-model:pagination="pagination">
+            v-model:pagination="pagination" :visible-columns="thirdPartyPayersVisibleColumns">
             <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -131,6 +131,7 @@
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
+                      <ni-button icon="remove_red_eye" @click="openThirdPartyPayerDetailsModal(col.value)" />
                       <ni-button icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
                       <ni-button :disable="isTppUsedInFundings(props.row)" icon="delete"
                         @click="validateTppDeletion(col.value, props.row)" />
@@ -194,7 +195,11 @@
 
     <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" :validations="v$.editedThirdPartyPayer"
       :edited-third-party-payer="editedThirdPartyPayer" @submit="updateThirdPartyPayer" @update="setThirdPartyPayer"
-      @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions" />
+      @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions"
+      :third-party-payer-type-options="TPP_TYPE_OPTIONS" />
+
+    <third-party-payer-details-modal v-model="thirdPartyPayerDetailsModal" :third-party-payer="thirdPartyPayerDetail"
+      :columns="thirdPartyPayersColumns" :visible-columns="thirdPartyPayerDetailsVisibleColumns" />
   </q-page>
 </template>
 
@@ -234,6 +239,7 @@ import {
   HTML_EXTENSIONS,
   BILLING_ITEMS_TYPE_OPTIONS,
   PER_INTERVENTION,
+  TPP_TYPE_OPTIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { roundFrenchPercentage, formatPrice, formatAndSortOptions, sortStrings, getLastVersion } from '@helpers/utils';
@@ -247,6 +253,7 @@ import SurchargeCreationModal from 'src/modules/client/components/config/Surchar
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
 import ThirdPartyPayerEditionModal from 'src/modules/client/components/config/ThirdPartyPayerEditionModal';
+import ThirdPartyPayerDetailsModal from 'src/modules/client/components/config/ThirdPartyPayerDetailsModal';
 import ServiceHistoryModal from 'src/modules/client/components/config/ServiceHistoryModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -267,6 +274,7 @@ export default {
     'surcharge-edition-modal': SurchargeEditionModal,
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
     'third-party-payer-edition-modal': ThirdPartyPayerEditionModal,
+    'third-party-payer-details-modal': ThirdPartyPayerDetailsModal,
     'service-history-modal': ServiceHistoryModal,
   },
   setup () {
@@ -556,6 +564,20 @@ export default {
           style: !this.$q.platform.is.mobile && 'word-break: break-word;',
         },
         {
+          name: 'teletransmissionType',
+          label: 'Type d\'aide',
+          field: 'teletransmissionType',
+          align: 'center',
+          style: !this.$q.platform.is.mobile && 'word-break: break-word;',
+        },
+        {
+          name: 'companyCode',
+          label: 'Identifiant structure',
+          field: 'companyCode',
+          align: 'center',
+          style: !this.$q.platform.is.mobile && 'word-break: break-word;',
+        },
+        {
           name: 'isApa',
           label: 'APA',
           field: 'isApa',
@@ -566,10 +588,18 @@ export default {
         {
           name: 'actions',
           label: '',
-          align: 'center',
+          align: 'right',
           field: '_id',
-          style: !this.$q.platform.is.mobile && 'width: 100px',
         },
+      ],
+      thirdPartyPayersVisibleColumns: [
+        'name',
+        'address',
+        'unitTTCRate',
+        'billingMode',
+        'teletransmissionId',
+        'isApa',
+        'actions',
       ],
       tppsLoading: false,
       thirdPartyPayerCreationModal: false,
@@ -590,6 +620,21 @@ export default {
       editedThirdPartyPayer: {
         address: {},
       },
+      thirdPartyPayerDetailsModal: false,
+      thirdPartyPayerDetailsVisibleColumns: [
+        'name',
+        'address',
+        'email',
+        'unitTTCRate',
+        'billingMode',
+        'teletransmissionId',
+        'teletransmissionType',
+        'companyCode',
+        'isApa',
+      ],
+      thirdPartyPayerDetail: {
+        address: {},
+      },
       pagination: { rowsPerPage: 0 },
       paginationHistory: {
         rowsPerPage: 0,
@@ -597,6 +642,7 @@ export default {
         descending: true,
       },
       HTML_EXTENSIONS,
+      TPP_TYPE_OPTIONS,
     };
   },
   validations () {
@@ -679,6 +725,8 @@ export default {
         billingMode: { required },
         unitTTCRate: { positiveNumber, twoFractionDigits },
         isApa: { required },
+        teletransmissionType: { required: requiredIf(get(this.editedThirdPartyPayer, 'teletransmissionId')) },
+        companyCode: { required: requiredIf(get(this.editedThirdPartyPayer, 'teletransmissionId')) },
       },
     };
   },
@@ -1127,12 +1175,22 @@ export default {
       }
     },
     // Third party payers
-    openThirdPartyPayerEditionModal (tppId) {
-      this.thirdPartyPayerEditionModal = true;
+    getFormatedThirdPartyPayer (tppId) {
       const selectedTpp = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
-      const { _id, name, address, email: tppEmail, unitTTCRate, billingMode, isApa, teletransmissionId } = selectedTpp;
+      const {
+        _id,
+        name,
+        address,
+        email: tppEmail,
+        unitTTCRate,
+        billingMode,
+        isApa,
+        teletransmissionId,
+        teletransmissionType,
+        companyCode,
+      } = selectedTpp;
 
-      this.editedThirdPartyPayer = {
+      return {
         _id,
         name: name || '',
         email: tppEmail || '',
@@ -1141,7 +1199,17 @@ export default {
         billingMode: billingMode || '',
         isApa: isApa || false,
         teletransmissionId: teletransmissionId || '',
+        teletransmissionType: teletransmissionType || '',
+        companyCode: companyCode || '',
       };
+    },
+    openThirdPartyPayerDetailsModal (tppId) {
+      this.thirdPartyPayerDetailsModal = true;
+      this.thirdPartyPayerDetail = this.getFormatedThirdPartyPayer(tppId);
+    },
+    openThirdPartyPayerEditionModal (tppId) {
+      this.thirdPartyPayerEditionModal = true;
+      this.editedThirdPartyPayer = this.getFormatedThirdPartyPayer(tppId);
     },
     resetThirdPartyPayerCreation () {
       this.v$.newThirdPartyPayer.$reset();

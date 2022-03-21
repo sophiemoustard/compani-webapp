@@ -291,8 +291,8 @@ export default {
     },
     formatDuration (duration) {
       const durationInHours = duration.minutes / 60;
-      const hours = Math.trunc(durationInHours);
-      const paddedMinutes = (durationInHours - hours) * 60;
+      const hours = Math.floor(durationInHours);
+      const paddedMinutes = Math.round(durationInHours % 1 * 60);
 
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
