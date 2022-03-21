@@ -374,7 +374,8 @@ export const planningActionMixin = {
       }
     },
     areEditedFieldsApplicableToRepetition () {
-      const auxiliaryEvents = this.getRowEvents(this.editedEvent.auxiliary);
+      const eventGroupId = this.editedEvent.auxiliary || this.editedEvent.sector;
+      const auxiliaryEvents = this.getRowEvents(eventGroupId);
       const initialEvent = auxiliaryEvents.find(e => e._id === this.editedEvent._id);
 
       if (!initialEvent) return true;
@@ -396,7 +397,7 @@ export const planningActionMixin = {
     },
     async confirmEventEdition (shouldUpdateRepetition) {
       this.editedEvent.shouldUpdateRepetition = shouldUpdateRepetition;
-      if (shouldUpdateRepetition) {
+      if (shouldUpdateRepetition && this.editedEvent.auxiliary) {
         this.$q.dialog({
           title: 'Confirmation',
           message: this.getEditionConfirmationMessage(),
@@ -428,7 +429,7 @@ export const planningActionMixin = {
           })
             .onOk(this.updateEvent)
             .onCancel(() => NotifyPositive('Modification annulée.'));
-        } else if (this.editedEvent.type === INTERVENTION && this.editedEvent.auxiliary && isRepetition) {
+        } else if (this.editedEvent.type === INTERVENTION && isRepetition) {
           const editedFieldsAreApplicableToRepetition = this.areEditedFieldsApplicableToRepetition();
           if (editedFieldsAreApplicableToRepetition) {
             this.$q.dialog({
