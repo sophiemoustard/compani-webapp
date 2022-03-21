@@ -5,14 +5,14 @@
     </template>
     <ni-input in-modal :model-value="editedStep.name" :error="validations.name.$error" caption="Nom"
       @update:model-value="update($event.trim(), 'name')" @blur="validations.name.$touch" required-field />
-    <div class="row">
+    <div class="row items-end">
       <ni-input in-modal caption="Durée théorique" type="number" :model-value="editedStep.theoreticalHours.hours"
         :error="validations.theoreticalHours.hours.$error" :error-message="theoreticalHoursErrorMsg" suffix="h"
         required-field @blur="validations.theoreticalHours.hours.$touch"
         @update:model-value="updateTheoreticalHours($event, 'hours')" class="flex-1 q-pr-sm" />
       <ni-input in-modal caption="" type="number" :model-value="editedStep.theoreticalHours.minutes"
         :error="validations.theoreticalHours.minutes.$error" :error-message="theoreticalMinutesErrorMsg" suffix="min"
-        required-field @blur="validations.theoreticalHours.hours.$touch"
+        @blur="validations.theoreticalHours.hours.$touch"
         @update:model-value="updateTheoreticalHours($event, 'minutes')" class="flex-1 q-pl-sm" />
     </div>
     <template #footer>

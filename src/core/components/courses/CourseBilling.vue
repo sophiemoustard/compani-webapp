@@ -288,6 +288,8 @@ export default {
     };
 
     const openFunderEditionModal = (bill) => {
+      if (isBilled(bill)) return null;
+
       setEditedBill(bill);
       funderEditionModal.value = true;
     };
