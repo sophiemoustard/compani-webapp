@@ -20,9 +20,9 @@
       <ni-input in-modal caption="ID de télétransmission" :model-value="editedThirdPartyPayer.teletransmissionId"
         @update:model-value="update($event, 'teletransmissionId')" />
       <ni-select in-modal caption="Type d'aide" :model-value="editedThirdPartyPayer.teletransmissionType"
-        :options="thirdPartyPayerTypeOptions" :error="validations.teletransmissionType.$error"
+        :options="thirdPartyPayerTypeOptions" :clearable="!editedThirdPartyPayer.teletransmissionId"
         @blur="validations.teletransmissionType.$touch" @update:model-value="update($event, 'teletransmissionType')"
-        :required-field="!!editedThirdPartyPayer.teletransmissionId" />
+        :required-field="!!editedThirdPartyPayer.teletransmissionId" :error="validations.teletransmissionType.$error" />
       <ni-input in-modal caption="Identifiant structure" @update:model-value="update($event, 'companyCode')"
         :model-value="editedThirdPartyPayer.companyCode" :error="validations.companyCode.$error"
         @blur="validations.companyCode.$touch" :required-field="!!editedThirdPartyPayer.teletransmissionId" />
