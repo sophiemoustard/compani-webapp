@@ -375,8 +375,8 @@ export const planningActionMixin = {
     },
     areEditedFieldsApplicableToRepetition () {
       const eventGroupId = this.editedEvent.auxiliary || this.editedEvent.sector;
-      const auxiliaryEvents = this.getRowEvents(eventGroupId);
-      const initialEvent = auxiliaryEvents.find(e => e._id === this.editedEvent._id);
+      const groupEvents = this.getRowEvents(eventGroupId);
+      const initialEvent = groupEvents.find(e => e._id === this.editedEvent._id);
 
       if (!initialEvent) return true;
 
