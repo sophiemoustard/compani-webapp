@@ -377,6 +377,8 @@ export const planningActionMixin = {
       const auxiliaryEvents = this.getRowEvents(this.editedEvent.auxiliary);
       const initialEvent = auxiliaryEvents.find(e => e._id === this.editedEvent._id);
 
+      if (!initialEvent) return true;
+
       const formattedInitialEvent = {
         startDate: initialEvent.startDate,
         endDate: initialEvent.endDate,
