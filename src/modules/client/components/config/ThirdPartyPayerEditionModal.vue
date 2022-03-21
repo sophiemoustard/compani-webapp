@@ -21,10 +21,11 @@
         @update:model-value="update($event, 'teletransmissionId')" />
       <ni-select in-modal caption="Type d'aide" :model-value="editedThirdPartyPayer.teletransmissionType"
         :options="thirdPartyPayerTypeOptions" :error="validations.teletransmissionType.$error"
-        @blur="validations.teletransmissionType.$touch" @update:model-value="update($event, 'teletransmissionType')" />
+        @blur="validations.teletransmissionType.$touch" @update:model-value="update($event, 'teletransmissionType')"
+        :required-field="!!editedThirdPartyPayer.teletransmissionId" />
       <ni-input in-modal caption="Identifiant structure" @update:model-value="update($event, 'companyCode')"
         :model-value="editedThirdPartyPayer.companyCode" :error="validations.companyCode.$error"
-        @blur="validations.companyCode.$touch" />
+        @blur="validations.companyCode.$touch" :required-field="!!editedThirdPartyPayer.teletransmissionId" />
       <div class="row q-mb-md light-checkbox">
         <q-checkbox :model-value="editedThirdPartyPayer.isApa" label="Financement APA" dense
           @update:model-value="update($event, 'isApa')" />
