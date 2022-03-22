@@ -6,10 +6,10 @@ const parseEnv = env => Object.keys(env).reduce((acc, key) => {
 }, {});
 
 module.exports = (on, config) => {
-  on('before:browser:launch', (browser = {}, args) => {
+  on('before:browser:launch', (browser, launchOptions) => {
     if (browser.name === 'chrome') {
-      args.push('--disable-blink-features=RootLayerScrolling');
-      return args;
+      launchOptions.args.push('--disable-blink-features=RootLayerScrolling');
+      return launchOptions;
     }
     return true;
   });
