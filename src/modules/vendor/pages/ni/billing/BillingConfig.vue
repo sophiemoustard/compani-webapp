@@ -1,7 +1,15 @@
 <template>
   <div>
     <q-page padding class="vendor-background q-pb-xl">
-      <ni-title-header title="Configuration de la facturation" class="q-mb-xl" />
+      <div class="q-mb-xl">
+        <ni-title-header title="Configuration de la facturation" class="q-mb-xl" />
+        <p class="text-weight-bold">Informations de l'organisation</p>
+        <div class="row gutter-profile">
+          <ni-input caption="Raison sociale" v-model="vendorCompany.name" disable />
+          <ni-search-address v-model="vendorCompany.address" disable />
+          <ni-input caption="SIRET" v-model="vendorCompany.siret" disable />
+        </div>
+      </div>
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
         <ni-responsive-table :data="courseFundingOrganisations" :columns="courseFundingOrganisationColumns"
@@ -55,11 +63,14 @@ import get from 'lodash/get';
 import { frAddress } from '@helpers/vuelidateCustomVal';
 import { sortStrings } from '@helpers/utils';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
+import VendorCompany from '@api/VendorCompany';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Button from '@components/Button';
+import Input from '@components/form/Input';
+import SearchAddress from '@components/form/SearchAddress';
 import OrganisationCreationModal from 'src/modules/vendor/components/billing/CourseFundingOrganisationCreationModal';
 import ItemCreationModal from 'src/modules/vendor/components/billing/CourseBillingItemCreationModal';
 
@@ -71,6 +82,8 @@ export default {
     'ni-organisation-creation-modal': OrganisationCreationModal,
     'ni-item-creation-modal': ItemCreationModal,
     'ni-button': Button,
+    'ni-input': Input,
+    'ni-search-address': SearchAddress,
   },
   setup () {
     const metaInfo = { title: 'Configuration facturation' };
@@ -84,6 +97,7 @@ export default {
       { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
       { name: 'actions', label: '', align: 'left', field: '_id' },
     ];
+    const vendorCompany = ref({ name: '', address: {}, siret: '' });
     const courseBillingItems = ref([]);
     const courseBillingItemColumns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name' }];
     const pagination = { rowsPerPage: 0 };
@@ -105,6 +119,16 @@ export default {
       newItem: { name: { required } },
     };
     const validations = useVuelidate(rules, { newOrganisation, newItem });
+
+    const refreshVendorCompany = async () => {
+      try {
+        vendorCompany.value = await VendorCompany.get();
+      } catch (e) {
+        console.error(e);
+        vendorCompany.value = { name: '', address: {}, siret: '' };
+        NotifyNegative('Erreur lors de la récupération de la structure.');
+      }
+    };
 
     const refreshCourseFundingOrganisations = async () => {
       try {
@@ -202,6 +226,7 @@ export default {
     };
 
     const created = async () => {
+      refreshVendorCompany();
       refreshCourseFundingOrganisations();
       refreshCourseBillingItems();
     };
@@ -219,6 +244,7 @@ export default {
       courseBillingItems,
       organisationCreationModal,
       itemCreationModal,
+      vendorCompany,
       newOrganisation,
       newItem,
       // Computed
