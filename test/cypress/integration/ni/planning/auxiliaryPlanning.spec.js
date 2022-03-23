@@ -15,16 +15,19 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
 
-    cy.get('[data-cy=event-title]').eq(0).should('contain', 'R. BARDET');
-    cy.get('[data-cy=event-hours]').eq(0).should('contain', '10:00 - 12:30');
+    cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '10:00');
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
 
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'week').subtract(1, 'day').week());
     cy.get('.event-intervention').should('have.length', 2);
-    cy.get('[data-cy=event-title]').eq(0).should('contain', 'R. BARDET');
-    cy.get('[data-cy=event-hours]').eq(0).should('contain', '11:15 - 12:30');
-    cy.get('[data-cy=event-title]').eq(1).should('contain', 'R. BARDET');
-    cy.get('[data-cy=event-hours]').eq(1).should('contain', '18:15 - 20:30');
+    cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '11:15');
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
+    cy.get('[data-cy=event-title]').eq(1).should('contain', 'R.BARDET');
+    cy.get('[data-cy=event-start-hour]').eq(1).should('contain', '18:15');
+    cy.get('[data-cy=event-end-hour]').eq(1).should('contain', '20:30');
 
     cy.get('[data-cy=planning-search]').eq(1).click();
     cy.get('[data-cy=planning-search]').eq(1).type('Customer referent{downarrow}{enter}');
@@ -69,7 +72,8 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
     cy.get('[data-cy=time-input]').eq(1).clear().type('17:15');
     cy.get('[data-cy=event-edition-button]').click();
 
-    cy.get('[data-cy=event-hours]').eq(0).should('contain', '15:00 - 17:15');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '15:00');
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '17:15');
   });
 
   it('should delete event', () => {
