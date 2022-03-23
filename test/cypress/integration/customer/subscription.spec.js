@@ -41,25 +41,28 @@ describe('customers subscription tests', () => {
 
     cy.dataCy('show-subscription-history').click();
     cy.dataCy('subscriptions-history').within(() => {
-      cy.get('th').should('have.length', 5).and(($th) => {
+      cy.get('th').should('have.length', 6).and(($th) => {
         expect($th.eq(0)).to.have.text('Date de modification');
         expect($th.eq(1)).to.have.text('Prix unitaire TTC');
         expect($th.eq(2)).to.have.text('Volume hebdomadaire estimatif');
         expect($th.eq(3)).to.have.text('dont soirées');
-        expect($th.eq(4)).to.have.text('dont dimanche');
+        expect($th.eq(4)).to.have.text('dont samedis');
+        expect($th.eq(5)).to.have.text('dont dimanches');
       });
 
       cy.dataCy('col-createdAt').eq(0).should('contain', '01/01/2020');
-      cy.dataCy('col-unitTTCRate').eq(0).should('contain', '12.00€');
+      cy.dataCy('col-unitTTCRate').eq(0).should('contain', '12,00\u00A0€');
       cy.dataCy('col-weeklyVolume').eq(0).should('contain', '12h');
       cy.dataCy('col-evenings').eq(0).should('contain', '2');
+      cy.dataCy('col-saturdays').eq(0).should('contain', '1');
       cy.dataCy('col-sundays').eq(0).should('contain', '1');
 
       cy.dataCy('col-createdAt').eq(1).should('contain', '01/06/2019');
-      cy.dataCy('col-unitTTCRate').eq(1).should('contain', '10.00€');
+      cy.dataCy('col-unitTTCRate').eq(1).should('contain', '10,00\u00A0€');
       cy.dataCy('col-weeklyVolume').eq(1).should('contain', '8h');
       cy.dataCy('col-evenings').eq(1).should('contain', '');
       cy.dataCy('col-sundays').eq(1).should('contain', '2');
+      cy.dataCy('col-saturdays').eq(1).should('contain', '');
     });
 
     cy.dataCy('close-modal').click();
