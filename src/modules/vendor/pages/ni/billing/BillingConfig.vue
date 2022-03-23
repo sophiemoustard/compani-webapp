@@ -1,8 +1,8 @@
 <template>
   <div>
     <q-page padding class="vendor-background q-pb-xl">
+      <ni-title-header title="Configuration de la facturation" class="q-mb-xl" />
       <div class="q-mb-xl">
-        <ni-title-header title="Configuration de la facturation" class="q-mb-xl" />
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Raison sociale" v-model="vendorCompany.name" disable />
