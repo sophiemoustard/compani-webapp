@@ -63,7 +63,7 @@ import get from 'lodash/get';
 import { frAddress } from '@helpers/vuelidateCustomVal';
 import { sortStrings } from '@helpers/utils';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
-import VendorCompany from '@api/VendorCompany';
+import VendorCompanies from '@api/VendorCompanies';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
@@ -122,7 +122,7 @@ export default {
 
     const refreshVendorCompany = async () => {
       try {
-        vendorCompany.value = await VendorCompany.get();
+        vendorCompany.value = await VendorCompanies.get();
       } catch (e) {
         console.error(e);
         vendorCompany.value = { name: '', address: {}, siret: '' };
