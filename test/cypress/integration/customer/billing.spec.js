@@ -18,20 +18,22 @@ describe('Customer billing tests', () => {
       expect($tds.eq(0)).to.have.text('30/09/2020');
     });
 
-    cy.get('th').should('have.length', 13).and(($th) => {
+    cy.get('th').should('have.length', 15).and(($th) => {
       expect($th.eq(0)).to.have.text('Date');
       expect($th.eq(1)).to.have.text('');
-      expect($th.eq(2)).to.have.text('Montant TTC');
-      expect($th.eq(3)).to.have.text('Solde');
-      expect($th.eq(4)).to.have.text('');
-      expect($th.eq(5)).to.have.text('Date');
-      expect($th.eq(6)).to.have.text('');
-      expect($th.eq(7)).to.have.text('Montant TTC');
-      expect($th.eq(8)).to.have.text('Solde');
-      expect($th.eq(9)).to.have.text('');
-      expect($th.eq(10)).to.have.text('Attestation');
-      expect($th.eq(11)).to.have.text('Date');
-      expect($th.eq(12)).to.have.text('');
+      expect($th.eq(2)).to.have.text('');
+      expect($th.eq(3)).to.have.text('Montant TTC');
+      expect($th.eq(4)).to.have.text('Solde');
+      expect($th.eq(5)).to.have.text('');
+      expect($th.eq(6)).to.have.text('Date');
+      expect($th.eq(7)).to.have.text('');
+      expect($th.eq(8)).to.have.text('');
+      expect($th.eq(9)).to.have.text('Montant TTC');
+      expect($th.eq(10)).to.have.text('Solde');
+      expect($th.eq(11)).to.have.text('');
+      expect($th.eq(12)).to.have.text('Attestation');
+      expect($th.eq(13)).to.have.text('Date');
+      expect($th.eq(14)).to.have.text('');
     });
   });
 
@@ -46,8 +48,9 @@ describe('Customer billing tests', () => {
       expect($tds.eq(0)).to.have.text('01/05/2020');
       expect($tds.eq(1)).to.have.text('Début de période');
       expect($tds.eq(2)).to.have.text('');
-      expect($tds.eq(3)).to.have.text('0,00\u00A0€');
-      expect($tds.eq(4)).to.have.text('');
+      expect($tds.eq(3)).to.have.text('');
+      expect($tds.eq(4)).to.have.text('0,00\u00A0€');
+      expect($tds.eq(5)).to.have.text('');
     });
 
     cy.dataCy('col-date').eq(0).should('contain', '30/06/2020');
@@ -81,8 +84,9 @@ describe('Customer billing tests', () => {
       expect($tds.eq(0)).to.have.text('30/09/2020');
       expect($tds.eq(1)).to.have.text('Fin de période');
       expect($tds.eq(2)).to.have.text('');
-      expect($tds.eq(3)).to.have.text('-5,00\u00A0€');
-      expect($tds.eq(4)).to.have.text('');
+      expect($tds.eq(3)).to.have.text('');
+      expect($tds.eq(4)).to.have.text('-5,00\u00A0€');
+      expect($tds.eq(5)).to.have.text('');
     });
 
     cy.server();
@@ -99,11 +103,12 @@ describe('Customer billing tests', () => {
 
     cy.dataCy('tpp-identity').should('contain', 'Toto');
     cy.get('[data-cy=start-period] td').and(($tds) => {
-      expect($tds.eq(5)).to.have.text('01/05/2020');
-      expect($tds.eq(6)).to.have.text('Début de période');
-      expect($tds.eq(7)).to.have.text('');
-      expect($tds.eq(8)).to.have.text('0,00\u00A0€');
+      expect($tds.eq(6)).to.have.text('01/05/2020');
+      expect($tds.eq(7)).to.have.text('Début de période');
+      expect($tds.eq(8)).to.have.text('');
       expect($tds.eq(9)).to.have.text('');
+      expect($tds.eq(10)).to.have.text('0,00\u00A0€');
+      expect($tds.eq(11)).to.have.text('');
     });
 
     cy.dataCy('col-date').eq(3).should('contain', '30/06/2020');
@@ -126,11 +131,12 @@ describe('Customer billing tests', () => {
     cy.dataCy('balance-amount').eq(4).should('have.text', '0,00\u00A0€');
 
     cy.get('[data-cy=end-period] td').and(($tds) => {
-      expect($tds.eq(5)).to.have.text('30/09/2020');
-      expect($tds.eq(6)).to.have.text('Fin de période');
-      expect($tds.eq(7)).to.have.text('');
-      expect($tds.eq(8)).to.have.text('0,00\u00A0€');
+      expect($tds.eq(6)).to.have.text('30/09/2020');
+      expect($tds.eq(7)).to.have.text('Fin de période');
+      expect($tds.eq(8)).to.have.text('');
       expect($tds.eq(9)).to.have.text('');
+      expect($tds.eq(10)).to.have.text('0,00\u00A0€');
+      expect($tds.eq(11)).to.have.text('');
     });
 
     cy.server();
