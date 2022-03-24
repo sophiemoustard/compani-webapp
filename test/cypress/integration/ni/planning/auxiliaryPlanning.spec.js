@@ -20,7 +20,7 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
 
     cy.get('[data-cy=planning_before]').click();
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'week').subtract(1, 'day').week());
+    cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().minus({ weeks: 1 }).weekNumber);
     cy.get('.event-intervention').should('have.length', 2);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
     cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '11:15');

@@ -9,17 +9,12 @@ describe('customers agenda tests', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=customer-identity]').should('have.value', 'Romain BARDET');
 
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
+    cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().weekNumber);
     cy.get('[data-cy=days-number]').eq(0).should(
       'contain',
-      Cypress.moment().subtract(1, 'day').startOf('week').add(1, 'day')
-        .format('DD')
+      Cypress.luxon.DateTime.now().startOf('week').toFormat('dd')
     );
-    cy.get('[data-cy=days-number]').eq(6).should(
-      'contain',
-      Cypress.moment().subtract(1, 'day').endOf('week').add(1, 'day')
-        .format('DD')
-    );
+    cy.get('[data-cy=days-number]').eq(6).should('contain', Cypress.luxon.DateTime.now().endOf('week').toFormat('dd'));
   });
 
   it('should go through agenda and display events', () => {
@@ -30,7 +25,7 @@ describe('customers agenda tests', () => {
     cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
 
     cy.get('[data-cy=planning_before]').click();
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'week').subtract(1, 'day').week());
+    cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().minus({ weeks: 1 }).weekNumber);
     cy.get('.event-intervention').should('have.length', 3);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'Auxiliary O.');
     cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '11:15');
@@ -43,11 +38,11 @@ describe('customers agenda tests', () => {
     cy.get('[data-cy=event-end-hour]').eq(2).should('contain', '20:30');
 
     cy.get('[data-cy=planning_after]').click();
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
+    cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().weekNumber);
 
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=planning_today]').click();
-    cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
+    cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().weekNumber);
   });
 });

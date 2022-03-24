@@ -115,7 +115,7 @@ describe('customers subscription tests', () => {
         iban: 'FR3617569000306699167186M11',
         companyName: 'Test SAS',
         companyAddress: '37 rue de Ponthieu 75008 Paris',
-        downloadDate: Cypress.moment().format('DD/MM/YYYY'),
+        downloadDate: Cypress.luxon.DateTime.now().toLocaleString(),
       });
     });
 

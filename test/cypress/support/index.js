@@ -1,5 +1,7 @@
 import './commands';
 
+const luxon = require('luxon');
+
 const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
 
 Cypress.on('uncaught:exception', (err) => {
@@ -8,3 +10,8 @@ Cypress.on('uncaught:exception', (err) => {
     return false;
   }
 });
+
+luxon.Settings.defaultLocale = 'fr';
+luxon.Settings.defaultZone = 'Europe/Paris';
+luxon.Settings.throwOnInvalid = true;
+Cypress.luxon = luxon;
