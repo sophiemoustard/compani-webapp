@@ -335,9 +335,11 @@ export const EXPORT_HISTORY_TYPES = [
 ];
 export const COURSE = 'course';
 export const COURSE_SLOT = 'course_slot';
+export const END_OF_COURSE_QUESTIONNAIRE = 'end_of_course_questionnaire';
 export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Formations', value: COURSE },
   { label: 'Créneaux', value: COURSE_SLOT },
+  { label: 'Questionnaires de satisfaction', value: END_OF_COURSE_QUESTIONNAIRE },
 ];
 
 // ORIGINS
