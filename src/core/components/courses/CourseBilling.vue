@@ -126,7 +126,7 @@ import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, LIST } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
@@ -252,7 +252,7 @@ export default {
     const refreshCourseBills = async () => {
       try {
         billsLoading.value = true;
-        courseBills.value = await CourseBills.list({ course: course.value._id });
+        courseBills.value = await CourseBills.list({ course: course.value._id, action: LIST });
       } catch (e) {
         console.error(e);
         courseBills.value = [];

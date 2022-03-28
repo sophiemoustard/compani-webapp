@@ -1,0 +1,142 @@
+<template>
+  <div>
+    <q-page padding class="vendor-background q-pb-xl">
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Informations de l'organisation</p>
+        <ni-expanding-table :data="courseBills" :columns="columns" v-model:pagination="pagination" :hide-bottom="false"
+          :loading="loading">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'number'">
+                <div class="cliquable-name" @click="downloadBill(props.row._id)" :disable="pdfLoading">
+                  {{ col.value }}
+                </div>
+                <div class="ellipsis">{{ getBillProgramName(props.row) }}</div>
+              </template>
+              <template v-else-if="col.name === 'progress' && col.value >= 0">
+                <ni-progress class="q-ml-lg" :value="col.value" />
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </template>
+        </ni-expanding-table>
+      </div>
+    </q-page>
+  </div>
+</template>
+
+<script>
+import get from 'lodash/get';
+import { ref } from 'vue';
+import CourseBills from '@api/CourseBills';
+import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import { downloadFile } from '@helpers/file';
+import { formatDate } from '@helpers/date';
+import { BALANCE } from '@data/constants.js';
+import { NotifyNegative } from '@components/popup/notify';
+import ExpandingTable from '@components/table/ExpandingTable';
+import Progress from '@components/CourseProgress';
+
+export default {
+  name: 'BillingConfig',
+  props: {
+    profileId: { type: String, required: true },
+  },
+  components: {
+    'ni-expanding-table': ExpandingTable,
+    'ni-progress': Progress,
+  },
+  setup (props) {
+    const companyId = ref(props.profileId);
+    const courseBills = ref([]);
+    const loading = ref(false);
+    const pdfLoading = ref(false);
+    const columns = ref([
+      {
+        name: 'date',
+        label: 'Date',
+        field: 'billedAt',
+        format: value => formatDate(value),
+        align: 'left',
+      },
+      { name: 'number', label: '#', field: 'number', align: 'left' },
+      {
+        name: 'progress',
+        label: 'Avancement formation',
+        field: 'progress',
+        align: 'center',
+        style: 'min-width: 150px; width: 20%',
+      },
+      {
+        name: 'netInclTaxes',
+        label: 'Montant',
+        field: 'netInclTaxes',
+        format: value => formatPrice(value),
+        align: 'center',
+      },
+      { name: 'expand', label: '', field: '' },
+    ]);
+    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+
+    const refreshCourseBills = async () => {
+      try {
+        loading.value = true;
+        courseBills.value = await CourseBills.list({ company: companyId.value, action: BALANCE });
+      } catch (e) {
+        console.error(e);
+        courseBills.value = [];
+        NotifyNegative('Erreur lors de la récupération des factures.');
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const getBillProgramName = bill => `${get(bill, 'course.subProgram.program.name')}
+      ${get(bill, 'course.misc') ? ` - ${get(bill, 'course.misc')}` : ''}`;
+
+    const downloadBill = async (billId) => {
+      try {
+        pdfLoading.value = true;
+        const pdf = await CourseBills.getPdf(billId);
+        downloadFile(pdf, 'facture.pdf');
+      } catch (e) {
+        console.error(e);
+        if (e.status === 404) {
+          const { message } = readAPIResponseWithTypeArrayBuffer(e);
+          return NotifyNegative(message);
+        }
+        NotifyNegative('Erreur lors du téléchargement de la facture.');
+      } finally {
+        pdfLoading.value = false;
+      }
+    };
+    const created = async () => {
+      refreshCourseBills();
+    };
+
+    created();
+
+    return {
+      // Data
+      companyId,
+      courseBills,
+      columns,
+      pagination,
+      loading,
+      pdfLoading,
+      // Methods
+      refreshCourseBills,
+      formatPrice,
+      getBillProgramName,
+      downloadBill,
+    };
+  },
+};
+</script>
+
+<style lang="sass" scoped>
+.cliquable-name
+  text-decoration: underline
+  color: $primary
+  width: fit-content
+</style>

@@ -564,3 +564,7 @@ export const CREDIT_NOTE_TYPE_OPTIONS = [
   { label: 'Intervention', value: EVENTS },
   { label: 'Article manuel', value: BILLING_ITEMS },
 ];
+
+// COURSE_BILLS
+export const LIST = 'list';
+export const BALANCE = 'balance';
