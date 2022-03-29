@@ -1,7 +1,7 @@
 <template>
-  <q-page padding class="vendor-background q-pb-xl">
+  <q-page class="vendor-background q-pb-xl">
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Informations de l'organisation</p>
+      <p class="text-weight-bold">Suivi des factures</p>
       <ni-expanding-table :data="courseBills" :columns="columns" v-model:pagination="pagination" :hide-bottom="false"
         :loading="loading">
         <template #row="{ props }">
@@ -10,7 +10,10 @@
               <div class="cliquable-name" @click="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
-              <div class="ellipsis">{{ getBillProgramName(props.row) }}</div>
+              <div class="flex">
+                <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}</div>
+                <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
+              </div>
             </template>
             <template v-else-if="col.name === 'progress' && col.value >= 0">
               <ni-progress class="q-ml-lg" :value="col.value" />
@@ -57,7 +60,7 @@ export default {
         format: value => formatDate(value),
         align: 'left',
       },
-      { name: 'number', label: '#', field: 'number', align: 'left' },
+      { name: 'number', label: '#', field: 'number', align: 'left', style: 'max-width: 250px' },
       {
         name: 'progress',
         label: 'Avancement formation',
@@ -88,9 +91,6 @@ export default {
         loading.value = false;
       }
     };
-
-    const getBillProgramName = bill => `${get(bill, 'course.subProgram.program.name')}
-      ${get(bill, 'course.misc') ? ` - ${get(bill, 'course.misc')}` : ''}`;
 
     const downloadBill = async (billId) => {
       try {
@@ -125,8 +125,8 @@ export default {
       // Methods
       refreshCourseBills,
       formatPrice,
-      getBillProgramName,
       downloadBill,
+      get,
     };
   },
 };
@@ -137,4 +137,10 @@ export default {
   text-decoration: underline
   color: $primary
   width: fit-content
+.program
+  max-width: fit-content
+  flex: 1
+.misc
+  width: max-content
+  padding-left: 4px
 </style>
