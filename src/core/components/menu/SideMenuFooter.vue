@@ -7,11 +7,7 @@
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
-          <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm"
-            @click="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
-        </q-item-section>
-        <q-item-section v-if="isAuxiliaryWithCompany">
-          <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm" @click="clickHandler" />
+          <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm" @click="openExternalUrl(bulbLink)" />
         </q-item-section>
         <q-item-section>
           <ni-button class="person" icon="person" @click="goToProfile" size="sm" />
@@ -50,6 +46,7 @@ export default {
   data () {
     return {
       interfaceLogo: 'https://storage.googleapis.com/compani-main/icons/blue_icon_small.png',
+      bulbLink: process.env.BULB_LINK,
     };
   },
   computed: {
@@ -57,9 +54,6 @@ export default {
       clientRole: 'main/getClientRole',
       vendorRole: 'main/getVendorRole',
     }),
-    isAuxiliaryWithCompany () {
-      return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
-    },
     userCanFeedback () {
       return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.clientRole) ||
         [TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
@@ -69,10 +63,7 @@ export default {
     },
   },
   methods: {
-    clickHandler () {
-      this.$emit('click');
-    },
-    openExtenalUrl (url) {
+    openExternalUrl (url) {
       window.open(url, '_blank');
     },
     goToProfile () {
