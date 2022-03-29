@@ -25,7 +25,8 @@
                   :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button icon="delete" @click="validateOrganisationDeletion(col.value)" />
+                      <ni-button icon="delete" @click="validateOrganisationDeletion(col.value)"
+                        :disable="!!props.row.courseBillCount" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
