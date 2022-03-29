@@ -1,28 +1,26 @@
 <template>
-  <div>
-    <q-page padding class="vendor-background q-pb-xl">
-      <div class="q-mb-xl">
-        <p class="text-weight-bold">Informations de l'organisation</p>
-        <ni-expanding-table :data="courseBills" :columns="columns" v-model:pagination="pagination" :hide-bottom="false"
-          :loading="loading">
-          <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <template v-if="col.name === 'number'">
-                <div class="cliquable-name" @click="downloadBill(props.row._id)" :disable="pdfLoading">
-                  {{ col.value }}
-                </div>
-                <div class="ellipsis">{{ getBillProgramName(props.row) }}</div>
-              </template>
-              <template v-else-if="col.name === 'progress' && col.value >= 0">
-                <ni-progress class="q-ml-lg" :value="col.value" />
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </template>
-        </ni-expanding-table>
-      </div>
-    </q-page>
-  </div>
+  <q-page padding class="vendor-background q-pb-xl">
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Informations de l'organisation</p>
+      <ni-expanding-table :data="courseBills" :columns="columns" v-model:pagination="pagination" :hide-bottom="false"
+        :loading="loading">
+        <template #row="{ props }">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <template v-if="col.name === 'number'">
+              <div class="cliquable-name" @click="downloadBill(props.row._id)" :disable="pdfLoading">
+                {{ col.value }}
+              </div>
+              <div class="ellipsis">{{ getBillProgramName(props.row) }}</div>
+            </template>
+            <template v-else-if="col.name === 'progress' && col.value >= 0">
+              <ni-progress class="q-ml-lg" :value="col.value" />
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </template>
+      </ni-expanding-table>
+    </div>
+  </q-page>
 </template>
 
 <script>
