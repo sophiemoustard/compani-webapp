@@ -33,7 +33,7 @@ export default {
 
     const tabsContent = [
       { label: 'Infos', name: 'infos', default: props.defaultTab === 'infos', component: ProfileInfo },
-      { label: 'Facture', name: 'bills', default: props.defaultTab === 'bills', component: ProfileBilling },
+      { label: 'Factures', name: 'bills', default: props.defaultTab === 'bills', component: ProfileBilling },
     ];
     const companyName = ref('');
 

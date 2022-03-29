@@ -39,7 +39,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 
 export default {
-  name: 'BillingConfig',
+  name: 'ProfileBilling',
   props: {
     profileId: { type: String, required: true },
   },
@@ -77,7 +77,7 @@ export default {
       },
       { name: 'expand', label: '', field: '' },
     ]);
-    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+    const pagination = ref({ sortBy: 'date', ascending: true, page: 1, rowsPerPage: 15 });
 
     const refreshCourseBills = async () => {
       try {
@@ -96,7 +96,7 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await CourseBills.getPdf(billId);
-        downloadFile(pdf, 'facture.pdf');
+        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         if (e.status === 404) {
