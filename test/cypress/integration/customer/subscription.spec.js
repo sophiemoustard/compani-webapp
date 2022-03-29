@@ -19,7 +19,7 @@ describe('customers subscription tests', () => {
       'contain',
       '12h d\'intervention par semaine (dont majorées : 3h le samedi, 1h le dimanche, 2h en soirée'
     );
-    cy.dataCy('funding-participation').should('contain', 'Prise en charge par Toto : 45,69\u00A0€ / semaine');
+    cy.dataCy('funding-reduction').should('contain', 'Prise en charge par Toto : 45,69\u00A0€ / semaine');
   });
 
   it('should interact correctly with the subscriptions part of the page', () => {
@@ -62,7 +62,7 @@ describe('customers subscription tests', () => {
 
     cy.dataCy('close-modal').click();
 
-    cy.dataCy('show-fundings-history').click();
+    cy.dataCy('show-funding-detail').click();
     cy.dataCy('fundings-history').within(() => {
       cy.dataCy('col-startDate').should('contain', 'Date de début de prise en charge');
       cy.dataCy('col-thirdPartyPayer').should('contain', 'Tiers payeur');

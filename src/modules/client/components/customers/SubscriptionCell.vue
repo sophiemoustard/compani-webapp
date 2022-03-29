@@ -38,10 +38,10 @@
           <li v-if="subscription.weeklyCount">
             {{ formatQuantity('intervention', subscription.weeklyCount) }} par semaine
           </li>
-          <li v-if="fundings.length && fundings[0].nature !== FIXED" data-cy="funding-participation">
+          <li v-if="fundings.length && fundings[0].nature !== FIXED" data-cy="funding-reduction">
             Prise en charge par {{ fundings[0].thirdPartyPayer.name }} : {{ formatPrice(weeklyRate.fundingReduction) }}
             / semaine
-            <span class="cursor-pointer text-copper-400 funding-details" data-cy="show-fundings-history"
+            <span class="cursor-pointer text-copper-400 funding-details" data-cy="show-funding-detail"
               @click="showSubscriptionFundings(subscription._id)">
               (voir détails)
             </span>
