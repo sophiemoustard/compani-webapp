@@ -8,7 +8,7 @@
       @click="companyCreationModal = true" :disable="tableLoading" />
 
     <company-creation-modal v-model="companyCreationModal" v-model:new-company="newCompany" :validations="v$.newCompany"
-      :loading="modalLoading" :company-type-options="companyTypeOptions" @hide="resetCreationModal"
+      :loading="modalLoading" @hide="resetCreationModal"
       @submit="createCompany" />
   </q-page>
 </template>
@@ -23,7 +23,6 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import CompanyCreationModal from 'src/modules/vendor/components/companies/CompanyCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANY_TYPES } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
 import { companyMixin } from '@mixins/companyMixin';
 
@@ -49,14 +48,13 @@ export default {
       columns: [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
-      companyTypeOptions: COMPANY_TYPES,
       companyCreationModal: false,
-      newCompany: { name: '', type: '' },
+      newCompany: { name: '' },
       modalLoading: false,
     };
   },
   validations () {
-    return { newCompany: { name: { required }, type: { required } } };
+    return { newCompany: { name: { required } } };
   },
   async created () {
     await this.refreshCompanies();
@@ -89,7 +87,7 @@ export default {
       }
     },
     resetCreationModal () {
-      this.newCompany = { name: '', type: '' };
+      this.newCompany = { name: '' };
       this.v$.newCompany.$reset();
     },
     async createCompany () {
