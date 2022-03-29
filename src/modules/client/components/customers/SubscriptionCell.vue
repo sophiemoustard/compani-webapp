@@ -5,7 +5,7 @@
       <ni-button icon="history" @click="showHistory(subscription._id)" data-cy="show-subscription-history"
         color="copper-grey-500" />
     </div>
-    <div v-if="subscription.service.nature === HOURLY" class="q-mb-md">
+    <div v-if="subscription.service.nature === HOURLY" class="q-mb-md" data-cy="hourly-price">
       Prix horaire (TTC) :
       <span class="text-weight-bold text-copper-grey-700">{{ formatPrice(subscription.unitTTCRate) }} / heure</span>
     </div>
@@ -22,7 +22,7 @@
       </span>
       <div class="text-italic q-mb-md text-12">Ce prix correspond à : {{ getBillingItemsName() }}</div>
     </div>
-    <div class="bg-copper-grey-100 text-copper-grey-700 weekly-infos">
+    <div class="bg-copper-grey-100 text-copper-grey-700 weekly-infos" data-cy="week-infos">
       <div>
         Coût estimé pour une semaine :
         <span class="text-weight-bold">{{ formatPrice(weeklyRate.total) }} / semaine</span>
@@ -31,14 +31,14 @@
       <div class="text-italic text-14">
         <div>Estimation sur base de : </div>
         <ul>
-          <li v-if="subscription.weeklyHours">
+          <li v-if="subscription.weeklyHours" data-cy="intervention-hours">
             {{ subscription.weeklyHours }}h d'intervention par semaine
             <span v-if="getSurchargedHours()">(dont majorées : {{ getSurchargedHours() }})</span>
           </li>
           <li v-if="subscription.weeklyCount">
             {{ formatQuantity('intervention', subscription.weeklyCount) }} par semaine
           </li>
-          <li v-if="fundings.length && fundings[0].nature !== FIXED">
+          <li v-if="fundings.length && fundings[0].nature !== FIXED" data-cy="funding-participation">
             Prise en charge par {{ fundings[0].thirdPartyPayer.name }} : {{ formatPrice(weeklyRate.fundingReduction) }}
             / semaine
             <span class="cursor-pointer text-copper-400 funding-details" data-cy="show-fundings-history"
