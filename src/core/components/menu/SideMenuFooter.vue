@@ -7,7 +7,7 @@
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
-          <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm" @click="openExtenalUrl(bulbLink)" />
+          <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm" @click="openExternalUrl(bulbLink)" />
         </q-item-section>
         <q-item-section>
           <ni-button class="person" icon="person" @click="goToProfile" size="sm" />
@@ -63,7 +63,7 @@ export default {
     },
   },
   methods: {
-    openExtenalUrl (url) {
+    openExternalUrl (url) {
       window.open(url, '_blank');
     },
     goToProfile () {
