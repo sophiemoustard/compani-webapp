@@ -73,13 +73,19 @@ describe('customers subscription tests', () => {
       cy.dataCy('col-thirdPartyPayer').should('contain', 'Tiers payeur');
       cy.dataCy('col-folderNumber').should('contain', 'Numéro de dossier');
       cy.dataCy('col-frequency').should('contain', 'Fréquence');
-      cy.dataCy('col-amountTTC').should('contain', 'Montant forfaitaire TTC');
+      cy.dataCy('col-unitTTCRate').should('contain', 'Prix unitaire TTC');
+      cy.dataCy('col-customerParticipationRate').should('contain', 'Tx. participation bénéficiaire');
+      cy.dataCy('col-careHours').should('contain', 'Nb. heures de prise en charge');
+      cy.dataCy('col-careDays').should('contain', 'Jours de prise en charge');
 
       cy.dataCy('col-side-startDate').should('contain', '02/02/2020');
       cy.dataCy('col-side-thirdPartyPayer').should('contain', 'Toto');
       cy.dataCy('col-side-folderNumber').should('contain', 'D123456');
       cy.dataCy('col-side-frequency').should('contain', 'Une seule fois');
-      cy.dataCy('col-side-amountTTC').should('contain', '160,00\u00A0€');
+      cy.dataCy('col-side-unitTTCRate').should('contain', '24,00\u00A0€');
+      cy.dataCy('col-side-customerParticipationRate').should('contain', '10%');
+      cy.dataCy('col-side-careHours').should('contain', '10h');
+      cy.dataCy('col-side-careDays').should('contain', 'Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi');
     });
   });
 

@@ -41,7 +41,7 @@
           <li v-if="fundings.length && fundings[0].nature !== FIXED">
             Prise en charge par {{ fundings[0].thirdPartyPayer.name }} : {{ formatPrice(weeklyRate.fundingReduction) }}
             / semaine
-            <span class="cursor-pointer text-copper-400 funding-details"
+            <span class="cursor-pointer text-copper-400 funding-details" data-cy="show-fundings-history"
               @click="showSubscriptionFundings(subscription._id)">
               (voir détails)
             </span>
