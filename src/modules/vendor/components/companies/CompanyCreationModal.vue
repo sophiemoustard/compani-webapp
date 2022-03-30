@@ -5,8 +5,6 @@
     </template>
     <ni-input in-modal :model-value="newCompany.name" @update:model-value="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Raison sociale" :error="validations.name.$error" />
-    <ni-option-group :model-value="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
-      :error="validations.type.$error" required-field @update:model-value="update($event, 'type')" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -17,7 +15,6 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import OptionGroup from '@components/form/OptionGroup';
 
 export default {
   name: 'CompanyCreationModal',
@@ -25,13 +22,11 @@ export default {
     modelValue: { type: Boolean, default: false },
     newCompany: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
-    companyTypeOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
-    'ni-option-group': OptionGroup,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-company'],
   methods: {
