@@ -485,6 +485,7 @@ export default {
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
+        if (e.status === 403) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la validation de la facture.');
       } finally {
         billValidationLoading.value = false;
