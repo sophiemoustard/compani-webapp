@@ -510,7 +510,7 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await CourseBills.getPdf(billId);
-        downloadFile(pdf, 'facture.pdf');
+        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         if (e.status === 404) {
