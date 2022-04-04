@@ -126,7 +126,7 @@ import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, LIST } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
@@ -252,7 +252,7 @@ export default {
     const refreshCourseBills = async () => {
       try {
         billsLoading.value = true;
-        courseBills.value = await CourseBills.list({ course: course.value._id });
+        courseBills.value = await CourseBills.list({ course: course.value._id, action: LIST });
       } catch (e) {
         console.error(e);
         courseBills.value = [];
@@ -485,6 +485,7 @@ export default {
         await refreshCourseBills();
       } catch (e) {
         console.error(e);
+        if (e.status === 403) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la validation de la facture.');
       } finally {
         billValidationLoading.value = false;
@@ -509,7 +510,7 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await CourseBills.getPdf(billId);
-        downloadFile(pdf, 'facture.pdf');
+        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         if (e.status === 404) {

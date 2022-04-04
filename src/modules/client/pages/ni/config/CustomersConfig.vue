@@ -133,7 +133,7 @@
                     <div class="row no-wrap table-actions">
                       <ni-button icon="remove_red_eye" @click="openThirdPartyPayerDetailsModal(col.value)" />
                       <ni-button icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
-                      <ni-button :disable="isTppUsedInFundings(props.row)" icon="delete"
+                      <ni-button :disable="props.row.isUsedInFundings" icon="delete"
                         @click="validateTppDeletion(col.value, props.row)" />
                     </div>
                   </template>
@@ -1298,10 +1298,6 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    isTppUsedInFundings (tpp) {
-      const index = this.getRowIndex(this.thirdPartyPayers, tpp);
-      return this.thirdPartyPayers[index].isUsedInFundings;
     },
   },
 };

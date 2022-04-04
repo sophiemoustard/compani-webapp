@@ -122,6 +122,7 @@ module.exports = configure(ctx => ({
       TOKEN_SECRET: process.env.TOKEN_SECRET,
       ALENVI_BOT_ID: process.env.ALENVI_BOT_ID,
       GA_TRACKING_ID: process.env.GA_TRACKING_ID,
+      BULB_LINK: process.env.BULB_LINK,
     },
   },
   devServer: { open: true },

@@ -14,8 +14,9 @@
             @focus="saveTmp('address.fullAddress')" :error="v$.company.address.$error" />
           <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
             @blur="updateCompany('rcs')" :error="v$.company.rcs.$error" :error-message="rcsError" />
-          <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
-            @blur="updateCompany('rna')" :error="v$.company.rna.$error" :error-message="rcsError" />
+          <ni-input v-else-if="company.type === ASSOCIATION" caption="Numéro RNA" v-model="company.rna"
+            @focus="saveTmp('rna')" @blur="updateCompany('rna')" :error="v$.company.rna.$error"
+            :error-message="rcsError" />
         </div>
       </div>
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
@@ -156,6 +157,7 @@ export default {
     return {
       documents: null,
       COMPANY,
+      ASSOCIATION,
       loading: false,
       establishmentsLoading: false,
       // Establishment

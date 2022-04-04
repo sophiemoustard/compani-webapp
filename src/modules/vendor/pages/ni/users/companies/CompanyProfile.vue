@@ -14,6 +14,7 @@ import { COMPANY_TYPES } from '@data/constants';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
+import ProfileBilling from 'src/modules/vendor/components/companies/ProfileBilling';
 
 export default {
   name: 'CompanyProfile',
@@ -32,6 +33,7 @@ export default {
 
     const tabsContent = [
       { label: 'Infos', name: 'infos', default: props.defaultTab === 'infos', component: ProfileInfo },
+      { label: 'Factures', name: 'bills', default: props.defaultTab === 'bills', component: ProfileBilling },
     ];
     const companyName = ref('');
 

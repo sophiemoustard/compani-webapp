@@ -2,6 +2,19 @@
   <div>
     <q-page padding class="vendor-background q-pb-xl">
       <ni-title-header title="Configuration de la facturation" class="q-mb-xl" />
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Informations de l'organisation</p>
+        <div class="row gutter-profile">
+          <ni-input caption="Raison sociale" v-model="vendorCompany.name" @focus="saveTmp('name')"
+            @blur="updateVendorCompany('name')" :error="validations.vendorCompany.name.$error" />
+          <ni-search-address v-model="vendorCompany.address" :error-message="addressErrorMessage"
+            @blur="updateVendorCompany('address')" @focus="saveTmp('address.fullAddress')"
+            :error="validations.vendorCompany.address.$error" />
+          <ni-input caption="SIRET" v-model="vendorCompany.siret" @focus="saveTmp('siret')"
+            @blur="updateVendorCompany('siret')" :error="validations.vendorCompany.siret.$error"
+            :error-message="siretErrorMessage" />
+        </div>
+      </div>
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
         <ni-responsive-table :data="courseFundingOrganisations" :columns="courseFundingOrganisationColumns"
@@ -12,7 +25,8 @@
                   :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-button icon="delete" @click="validateOrganisationDeletion(col.value)" />
+                      <ni-button icon="delete" @click="validateOrganisationDeletion(col.value)"
+                        :disable="!!props.row.courseBillCount" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -48,20 +62,26 @@
 
 <script>
 import { useMeta, Dialog } from 'quasar';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
-import { frAddress } from '@helpers/vuelidateCustomVal';
+import set from 'lodash/set';
+import { frAddress, validSiret } from '@helpers/vuelidateCustomVal';
 import { sortStrings } from '@helpers/utils';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
+import VendorCompanies from '@api/VendorCompanies';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Button from '@components/Button';
+import Input from '@components/form/Input';
+import SearchAddress from '@components/form/SearchAddress';
+import { REQUIRED_LABEL } from '@data/constants';
 import OrganisationCreationModal from 'src/modules/vendor/components/billing/CourseFundingOrganisationCreationModal';
 import ItemCreationModal from 'src/modules/vendor/components/billing/CourseBillingItemCreationModal';
+import { useValidations } from '@composables/validations';
 
 export default {
   name: 'BillingConfig',
@@ -71,6 +91,8 @@ export default {
     'ni-organisation-creation-modal': OrganisationCreationModal,
     'ni-item-creation-modal': ItemCreationModal,
     'ni-button': Button,
+    'ni-input': Input,
+    'ni-search-address': SearchAddress,
   },
   setup () {
     const metaInfo = { title: 'Configuration facturation' };
@@ -84,6 +106,7 @@ export default {
       { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
       { name: 'actions', label: '', align: 'left', field: '_id' },
     ];
+    const vendorCompany = ref({ name: '', address: { fullAddress: '' }, siret: '' });
     const courseBillingItems = ref([]);
     const courseBillingItemColumns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name' }];
     const pagination = { rowsPerPage: 0 };
@@ -91,6 +114,7 @@ export default {
     const itemCreationModal = ref(false);
     const newOrganisation = ref({ name: '', address: {} });
     const newItem = ref({ name: '' });
+    const tmpInput = ref('');
 
     const rules = {
       newOrganisation: {
@@ -103,8 +127,70 @@ export default {
         name: { required },
       },
       newItem: { name: { required } },
+      vendorCompany: {
+        name: { required },
+        siret: { required, validSiret },
+        address: { fullAddress: { required, frAddress } },
+      },
     };
-    const validations = useVuelidate(rules, { newOrganisation, newItem });
+    const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany });
+    const { waitForValidation } = useValidations();
+
+    const siretErrorMessage = computed(() => {
+      const validation = get(validations, 'value.vendorCompany.siret');
+
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'validSiret.$response') === false) return 'SIRET non valide';
+
+      return '';
+    });
+
+    const addressErrorMessage = computed(() => {
+      const validation = get(validations, 'value.vendorCompany.address.fullAddress');
+
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'frAddress.$response') === false) return 'Adresse non valide';
+
+      return '';
+    });
+
+    const refreshVendorCompany = async () => {
+      try {
+        vendorCompany.value = await VendorCompanies.get();
+        validations.value.vendorCompany.$touch();
+      } catch (e) {
+        console.error(e);
+        vendorCompany.value = { name: '', address: { fullAddress: '' }, siret: '' };
+        NotifyNegative('Erreur lors de la récupération de la structure.');
+      }
+    };
+
+    const saveTmp = (path) => {
+      tmpInput.value = get(vendorCompany.value, path);
+    };
+
+    const updateVendorCompany = async (path) => {
+      try {
+        if (path === 'address' && tmpInput.value === get(vendorCompany.value, 'address.fullAddress')) return;
+        if (tmpInput.value === get(vendorCompany.value, path)) return;
+
+        if (get(validations.value.vendorCompany, path)) {
+          const isValid = await waitForValidation(validations.value.vendorCompany, path);
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        }
+
+        const payload = set({}, path, get(vendorCompany.value, path));
+        await VendorCompanies.update(payload);
+        NotifyPositive('Modification enregistrée.');
+
+        await refreshVendorCompany();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification.');
+      } finally {
+        tmpInput.value = '';
+      }
+    };
 
     const refreshCourseFundingOrganisations = async () => {
       try {
@@ -202,6 +288,7 @@ export default {
     };
 
     const created = async () => {
+      refreshVendorCompany();
       refreshCourseFundingOrganisations();
       refreshCourseBillingItems();
     };
@@ -219,10 +306,13 @@ export default {
       courseBillingItems,
       organisationCreationModal,
       itemCreationModal,
+      vendorCompany,
       newOrganisation,
       newItem,
       // Computed
       validations,
+      siretErrorMessage,
+      addressErrorMessage,
       // Methods
       refreshCourseFundingOrganisations,
       resetOrganisationAdditionForm,
@@ -233,6 +323,8 @@ export default {
       resetItemAdditionForm,
       addItem,
       openItemCreationModal,
+      saveTmp,
+      updateVendorCompany,
     };
   },
 };

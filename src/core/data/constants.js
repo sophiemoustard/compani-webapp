@@ -305,41 +305,6 @@ export const THIRD_PARTY_PAYER = 'thirdPartyPayer';
 // PAY
 export const PAY = 'pay';
 
-// EXPORTS
-export const SERVICE = 'service';
-export const SUBSCRIPTION = 'subscription';
-export const FUNDING = 'funding';
-export const RUP = 'rup';
-export const REFERENT = 'referent';
-export const WORKING_EVENT = 'working_event';
-export const TRANSPORT = 'transport';
-export const EXPORT_TYPES = [
-  { label: 'Services', value: SERVICE },
-  { label: 'Souscriptions', value: SUBSCRIPTION },
-  { label: 'Financements', value: FUNDING },
-  { label: 'Auxiliaires', value: AUXILIARY },
-  { label: 'Bénéficiaires', value: CUSTOMER },
-  { label: 'Aidants', value: HELPER },
-  { label: 'Equipes', value: SECTOR },
-  { label: 'Registre unique du personnel', value: RUP },
-  { label: 'Référents bénéficiaire', value: REFERENT },
-];
-export const EXPORT_HISTORY_TYPES = [
-  { label: 'Interventions et heures internes', value: WORKING_EVENT },
-  { label: 'Factures et avoirs', value: BILL },
-  { label: 'Paiements et remboursements', value: PAYMENT },
-  { label: 'Absences', value: ABSENCE },
-  { label: 'Paies et soldes tout compte', value: PAY },
-  { label: 'Contrats', value: CONTRACT },
-  { label: 'Transports', value: TRANSPORT },
-];
-export const COURSE = 'course';
-export const COURSE_SLOT = 'course_slot';
-export const VENDOR_EXPORT_HISTORY_TYPES = [
-  { label: 'Formations', value: COURSE },
-  { label: 'Créneaux', value: COURSE_SLOT },
-];
-
 // ORIGINS
 export const COMPANI = 'compani';
 export const THIRD_PARTY = 'third_party';
@@ -502,6 +467,42 @@ export const END_OF_COURSE = 'end_of_course';
 export const DRAFT = 'draft';
 export const QUESTIONNAIRE_TYPES = { [EXPECTATIONS]: 'Recueil des attentes', [END_OF_COURSE]: 'Fin de formation' };
 
+// EXPORTS
+export const SERVICE = 'service';
+export const SUBSCRIPTION = 'subscription';
+export const FUNDING = 'funding';
+export const RUP = 'rup';
+export const REFERENT = 'referent';
+export const WORKING_EVENT = 'working_event';
+export const TRANSPORT = 'transport';
+export const EXPORT_TYPES = [
+  { label: 'Services', value: SERVICE },
+  { label: 'Souscriptions', value: SUBSCRIPTION },
+  { label: 'Financements', value: FUNDING },
+  { label: 'Auxiliaires', value: AUXILIARY },
+  { label: 'Bénéficiaires', value: CUSTOMER },
+  { label: 'Aidants', value: HELPER },
+  { label: 'Equipes', value: SECTOR },
+  { label: 'Registre unique du personnel', value: RUP },
+  { label: 'Référents bénéficiaire', value: REFERENT },
+];
+export const EXPORT_HISTORY_TYPES = [
+  { label: 'Interventions et heures internes', value: WORKING_EVENT },
+  { label: 'Factures et avoirs', value: BILL },
+  { label: 'Paiements et remboursements', value: PAYMENT },
+  { label: 'Absences', value: ABSENCE },
+  { label: 'Paies et soldes tout compte', value: PAY },
+  { label: 'Contrats', value: CONTRACT },
+  { label: 'Transports', value: TRANSPORT },
+];
+export const COURSE = 'course';
+export const COURSE_SLOT = 'course_slot';
+export const VENDOR_EXPORT_HISTORY_TYPES = [
+  { label: 'Formations', value: COURSE },
+  { label: 'Créneaux', value: COURSE_SLOT },
+  { label: 'Questionnaires de satisfaction', value: END_OF_COURSE },
+];
+
 // PARTNER
 export const JOB_OPTIONS = [
   { label: 'Assistante sociale', value: 'social_worker' },
@@ -564,3 +565,7 @@ export const CREDIT_NOTE_TYPE_OPTIONS = [
   { label: 'Intervention', value: EVENTS },
   { label: 'Article manuel', value: BILLING_ITEMS },
 ];
+
+// COURSE_BILLS
+export const LIST = 'list';
+export const BALANCE = 'balance';

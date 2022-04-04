@@ -9,6 +9,8 @@
           :error-message="tradeNameError(v$.company)" />
         <ni-search-address v-model="company.address" :error-message="addressError" @blur="updateCompany('address')"
             @focus="saveTmp('address.fullAddress')" :error="v$.company.address.$error" />
+        <ni-select v-model="company.type" caption="Type" :options="companyTypeOptions" @focus="saveTmp('type')"
+          @blur="trimAndUpdateCompany('type')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -29,11 +31,13 @@ import set from 'lodash/set';
 import Companies from '@api/Companies';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
+import Select from '@components/form/Select';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { validTradeName, frAddress } from '@helpers/vuelidateCustomVal';
 import { companyMixin } from '@mixins/companyMixin';
 import { validationMixin } from '@mixins/validationMixin';
+import { COMPANY_TYPES } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -42,18 +46,21 @@ export default {
   },
   setup () {
     const tmpInput = '';
+    const companyTypeOptions = COMPANY_TYPES;
 
-    return { tmpInput, v$: useVuelidate() };
+    return { tmpInput, companyTypeOptions, v$: useVuelidate() };
   },
   components: {
     'ni-input': Input,
     'ni-coach-list': CoachList,
     'ni-search-address': SearchAddress,
+    'ni-select': Select,
   },
   mixins: [companyMixin, validationMixin],
   validations () {
     return { company: {
       name: { required },
+      type: { required },
       tradeName: { validTradeName },
       address: {
         zipCode: { required },
@@ -83,7 +90,7 @@ export default {
     },
     async trimAndUpdateCompany (path) {
       const value = get(this.company, path);
-      set(this.company, path, value.trim());
+      set(this.company, path, value ? value.trim() : '');
 
       this.updateCompany(path);
     },
