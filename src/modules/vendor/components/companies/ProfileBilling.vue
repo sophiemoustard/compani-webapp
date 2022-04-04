@@ -140,7 +140,9 @@ export default {
 .program
   max-width: fit-content
   flex: 1
+  color: $copper-grey-600
 .misc
   width: max-content
   padding-left: 4px
+  color: $copper-grey-600
 </style>
