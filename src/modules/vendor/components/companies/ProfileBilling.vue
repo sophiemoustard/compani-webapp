@@ -20,7 +20,7 @@
             </template>
             <template v-else-if="col.name === 'payment'">
               <div class="row justify-center table-actions">
-                <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="test"
+                <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
                   @click="openCoursePaymentCreationModal(props.row)" />
               </div>
             </template>
@@ -31,18 +31,18 @@
           </q-td>
         </template>
         <template #expanding-row="{ props }">
-        <q-td colspan="100%">
-          <div v-for="coursePayment in props.row.coursePayments" :key="coursePayment._id" :props="props"
-            class="q-ma-sm expanding-table-expanded-row">
-            <div>
-              {{ formatDate(coursePayment.date) }}
-              {{ coursePayment.number }}
-              ({{ getPaymentType(coursePayment.type) }})
+          <q-td colspan="100%">
+            <div v-for="coursePayment in props.row.coursePayments" :key="coursePayment._id" :props="props"
+              class="q-ma-sm expanding-table-expanded-row">
+              <div>
+                {{ formatDate(coursePayment.date) }}
+                {{ coursePayment.number }}
+                ({{ getPaymentType(coursePayment.type) }})
+              </div>
+              <div>{{ formatPrice(coursePayment.netInclTaxes) }}</div>
             </div>
-            <div>{{ formatPrice(coursePayment.netInclTaxes) }}</div>
-          </div>
-        </q-td>
-      </template>
+          </q-td>
+        </template>
       </ni-expanding-table>
 
       <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
@@ -54,7 +54,8 @@
 
 <script>
 import get from 'lodash/get';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -72,24 +73,21 @@ import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal.vu
 
 export default {
   name: 'ProfileBilling',
-  props: {
-    profileId: { type: String, required: true },
-  },
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
     'ni-button': Button,
     'ni-course-payment-creation-modal': CoursePaymentCreationModal,
   },
-  setup (props) {
-    const companyId = ref(props.profileId);
+  setup () {
+    const $store = useStore();
     const courseBills = ref([]);
     const loading = ref(false);
     const pdfLoading = ref(false);
     const paymentCreationLoading = ref(false);
     const coursePaymentMetaInfo = ref({ number: '', courseName: '', netInclTaxes: '' });
     const coursePaymentCreationModal = ref(false);
-    const newCoursePayment = ref({ nature: PAYMENT, type: '', netInclTaxes: '', date: '' });
+    const newCoursePayment = ref({ nature: PAYMENT, type: '', netInclTaxes: '', date: '', courseBill: '' });
     const columns = ref([
       {
         name: 'date',
@@ -134,10 +132,12 @@ export default {
 
     const validations = useVuelidate(rules, { newCoursePayment });
 
+    const company = computed(() => $store.state.company.company);
+
     const refreshCourseBills = async () => {
       try {
         loading.value = true;
-        courseBills.value = await CourseBills.list({ company: companyId.value, action: BALANCE });
+        courseBills.value = await CourseBills.list({ company: company.value._id, action: BALANCE });
       } catch (e) {
         console.error(e);
         courseBills.value = [];
@@ -166,13 +166,12 @@ export default {
 
     const openCoursePaymentCreationModal = (courseBill) => {
       coursePaymentMetaInfo.value = {
-        courseBill: courseBill._id,
-        company: courseBill.company._id,
         number: courseBill.number,
         netInclTaxes: courseBill.netInclTaxes,
-        courseName: `${courseBill.company.name} - ${courseBill.course.subProgram.program.name} -
+        courseName: `${company.value.name} - ${courseBill.course.subProgram.program.name} -
         ${courseBill.course.misc}`,
       };
+      newCoursePayment.value.courseBill = courseBill._id;
       coursePaymentCreationModal.value = true;
     };
 
@@ -183,8 +182,7 @@ export default {
         paymentCreationLoading.value = true;
         await CoursePayments.create({
           ...newCoursePayment.value,
-          courseBill: coursePaymentMetaInfo.value.courseBill,
-          company: coursePaymentMetaInfo.value.company,
+          company: company.value._id,
         });
         NotifyPositive('Règlement créé.');
 
@@ -199,12 +197,12 @@ export default {
     };
 
     const resetCoursePaymentCreationModal = () => {
-      newCoursePayment.value = { nature: PAYMENT, type: '', netInclTaxes: '', date: '' };
+      newCoursePayment.value = { nature: PAYMENT, type: '', netInclTaxes: '', date: '', courseBill: '' };
       coursePaymentMetaInfo.value = { number: '', courseName: '', netInclTaxes: '' };
       validations.value.newCoursePayment.$reset();
     };
 
-    const getPaymentType = type => PAYMENT_OPTIONS.find(option => option.value !== type).label;
+    const getPaymentType = type => PAYMENT_OPTIONS.find(option => option.value === type).label;
 
     const created = async () => {
       refreshCourseBills();
@@ -214,7 +212,6 @@ export default {
 
     return {
       // Data
-      companyId,
       courseBills,
       columns,
       pagination,
@@ -255,7 +252,7 @@ export default {
   width: max-content
   padding-left: 4px
   color: $copper-grey-600
-.test
+.add-payment
   background-color: $copper-grey-500
   width: 20px
   height: 20px
