@@ -32,8 +32,8 @@
         </template>
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
-            <div v-for="coursePayment in props.row.coursePayments" :key="coursePayment._id" :props="props"
-              class="q-ma-sm expanding-table-expanded-row">
+            <div v-for="coursePayment in getSortedPayments(props.row.coursePayments)" :key="coursePayment._id"
+              :props="props" class="q-ma-sm expanding-table-expanded-row">
               <div>
                 {{ formatDate(coursePayment.date) }}
                 {{ coursePayment.number }}
@@ -63,7 +63,7 @@ import CourseBills from '@api/CourseBills';
 import CoursePayments from '@api/CoursePayments';
 import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
-import { formatDate } from '@helpers/date';
+import { formatDate, ascendingSort } from '@helpers/date';
 import { BALANCE, PAYMENT, PAYMENT_OPTIONS } from '@data/constants.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -204,6 +204,8 @@ export default {
 
     const getPaymentType = type => PAYMENT_OPTIONS.find(option => option.value === type).label;
 
+    const getSortedPayments = payments => payments.sort((a, b) => ascendingSort(a.date, b.date));
+
     const created = async () => {
       refreshCourseBills();
     };
@@ -232,6 +234,7 @@ export default {
       createPayment,
       resetCoursePaymentCreationModal,
       getPaymentType,
+      getSortedPayments,
       get,
       formatDate,
     };

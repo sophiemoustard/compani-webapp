@@ -21,7 +21,7 @@
     <ni-date-input :model-value="newCoursePayment.date" @update:model-value="update($event, 'date')" in-modal
       required-field :error="validations.date.$error" @blur="validations.date.$touch" caption="Date" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" :label="`créer le ${ creationModalNature.toLowerCase() }`"
+      <ni-button class="full-width modal-btn bg-primary" :label="`Créer le ${ creationModalNature.toLowerCase() }`"
         icon-right="add" color="white" :loading="loading" @click="submit" />
     </template>
   </ni-modal>
