@@ -7,8 +7,16 @@
           <q-card flat class="q-mb-sm">
             <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
               <q-item-section>
-                <div class="text-weight-bold">
-                  {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
+                <div class="flex">
+                  <div class="text-weight-bold">
+                    {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
+                  </div>
+                  <div class="q-ml-lg bill-cancel" v-if="isCancelledByCreditNote(bill)">
+                    <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
+                    <div class="q-ml-xs text-orange-500">
+                      Annulée par avoir - {{ bill.courseCreditNotes[0].number }}
+                    </div>
+                  </div>
                 </div>
                 <div @click.stop="openFunderEditionModal(bill)" class="payer">
                   Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
@@ -56,6 +64,9 @@
               <div class="row justify-end">
                 <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
                   :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
+                <ni-button v-else-if="!isCancelledByCreditNote(bill)" color="primary"
+                  @click="openCreditNoteCreationModal(bill._id)" label="Faire un avoir" icon="mdi-credit-card-refund"
+                  :disable="creditNoteCreationLoading" />
               </div>
             </div>
           </q-card>
@@ -69,7 +80,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="row justify-end">
+      <div v-if="canAddBill" class="row justify-end">
         <ni-button label="Démarrer la facturation" color="white" class="bg-primary" icon="payment"
           @click="openBillCreationModal" :disable="billCreationLoading" />
       </div>
@@ -104,6 +115,10 @@
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
       :validations="validations.billToValidate" @cancel="cancelBillValidation" />
+
+    <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
+      @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
+      :validations="validations.newCreditNote" />
   </div>
 </template>
 
@@ -123,6 +138,7 @@ import { downloadFile } from '@helpers/file';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
+import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
@@ -132,15 +148,17 @@ import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEdit
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
 import BillingPurchaseAdditionModal from 'src/modules/vendor/components/billing/BillingPurchaseAdditionModal';
 import CourseBillValidationModal from 'src/modules/vendor/components/billing/CourseBillValidationModal';
+import CourseCreditNoteCreationModal from 'src/modules/vendor/components/billing/CourseCreditNoteCreationModal';
 
 export default {
-  name: 'CourseBilling',
+  name: 'ProfileBilling',
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-funder-edition-modal': FunderEditionModal,
     'ni-course-fee-edition-modal': CourseFeeEditionModal,
     'ni-billing-purchase-addition-modal': BillingPurchaseAdditionModal,
     'ni-course-bill-validation-modal': CourseBillValidationModal,
+    'ni-course-credit-note-creation-modal': CourseCreditNoteCreationModal,
     'ni-button': Button,
     'ni-bi-color-button': BiColorButton,
   },
@@ -155,6 +173,7 @@ export default {
     const billingPurchaseCreationLoading = ref(false);
     const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
+    const creditNoteCreationLoading = ref(false);
     const billsLoading = ref(false);
     const pdfLoading = ref(false);
     const payerList = ref([]);
@@ -166,10 +185,12 @@ export default {
     const billingPurchaseAdditionModal = ref(false);
     const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
+    const creditNoteCreationModal = ref(false);
     const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
     const editedBill = ref({ _id: '', funder: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
+    const newCreditNote = ref({ courseBill: '', misc: '', date: '', company: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
@@ -199,6 +220,11 @@ export default {
       billToValidate: {
         billedAt: { required },
       },
+      newCreditNote: {
+        courseBill: { required },
+        date: { required },
+        company: { required },
+      },
     };
     const validations = useVuelidate(rules, {
       newBill,
@@ -206,6 +232,7 @@ export default {
       newBillingPurchase,
       editedBillingPurchase,
       billToValidate,
+      newCreditNote,
     });
 
     const course = computed(() => $store.state.course.course);
@@ -471,6 +498,41 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     };
 
+    const openCreditNoteCreationModal = (billId) => {
+      newCreditNote.value = {
+        courseBill: billId,
+        date: '',
+        misc: '',
+        company: course.value.company._id,
+      };
+      creditNoteCreationModal.value = true;
+    };
+
+    const addCreditNote = async () => {
+      try {
+        validations.value.newCreditNote.$touch();
+        if (validations.value.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        creditNoteCreationLoading.value = true;
+
+        await CourseCreditNotes.create(newCreditNote.value);
+        NotifyPositive('Avoir créé.');
+
+        creditNoteCreationModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de l\'avoir.');
+      } finally {
+        creditNoteCreationLoading.value = false;
+      }
+    };
+
+    const resetCreditNoteCreationModal = () => {
+      newCreditNote.value = { courseBill: '', date: '', misc: '', company: '' };
+      validations.value.newCreditNote.$reset();
+    };
+
     const validateBill = async () => {
       try {
         validations.value.billToValidate.$touch();
@@ -499,6 +561,10 @@ export default {
     };
 
     const isBilled = bill => !!bill.billedAt;
+
+    const isCancelledByCreditNote = bill => !!bill.courseCreditNotes.length;
+
+    const canAddBill = computed(() => courseBills.value.every(bill => isCancelledByCreditNote(bill)));
 
     const showDetails = (billId) => {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
@@ -538,22 +604,26 @@ export default {
       billsLoading,
       billingPurchaseCreationLoading,
       billingPurchaseEditionLoading,
+      creditNoteCreationLoading,
       billValidationLoading,
       billCreationModal,
       funderEditionModal,
       mainFeeEditionModal,
       billingPurchaseAdditionModal,
       billingPurchaseEditionModal,
+      creditNoteCreationModal,
       courseBillValidationModal,
       newBill,
       newBillingPurchase,
       editedBillingPurchase,
       billingItemList,
       editedBill,
+      newCreditNote,
       billToValidate,
       payerList,
       courseBills,
       courseFeeEditionModalMetaInfo,
+      areDetailsVisible,
       // Computed
       validations,
       course,
@@ -561,7 +631,7 @@ export default {
       mainFeeErrorMessages,
       newBillingPurchaseErrorMessages,
       editedBillingPurchaseErrorMessages,
-      areDetailsVisible,
+      canAddBill,
       // Methods
       refreshCourseFundingOrganisations,
       resetBillCreationModal,
@@ -569,11 +639,13 @@ export default {
       resetMainFeeEditionModal,
       resetBillingPurchaseAdditionModal,
       resetBillingPurchaseEditionModal,
+      resetCreditNoteCreationModal,
       resetCourseBillValidationModal,
       addBill,
       editBill,
       addBillingPurchase,
       editBillingPurchase,
+      addCreditNote,
       validateBill,
       cancelBillValidation,
       isBilled,
@@ -583,6 +655,7 @@ export default {
       openMainFeeEditionModal,
       openBillingPurchaseAdditionModal,
       openBillingPurchaseEditionModal,
+      openCreditNoteCreationModal,
       openCourseBillValidationModal,
       validatePurchaseDeletion,
       refreshCourseBills,
@@ -595,6 +668,7 @@ export default {
       pickBy,
       formatPrice,
       formatDate,
+      isCancelledByCreditNote,
     };
   },
 };
@@ -610,4 +684,8 @@ export default {
   align-items: flex-start
   &-info
     max-width: 90%
+
+.bill-cancel
+  display: flex
+  align-items: center
 </style>
