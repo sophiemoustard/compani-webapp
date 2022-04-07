@@ -32,7 +32,10 @@
         </template>
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
-            <div v-for="coursePayment in getSortedPayments(props.row.coursePayments)" :key="coursePayment._id"
+            <div v-if="!props.row.coursePayments.length" class="text-italic text-center">
+              Aucun règlement renseigné.
+            </div>
+            <div v-else v-for="coursePayment in getSortedPayments(props.row.coursePayments)" :key="coursePayment._id"
               :props="props" class="q-ma-sm expanding-table-expanded-row">
               <div>
                 {{ formatDate(coursePayment.date) }}
@@ -104,19 +107,8 @@ export default {
         align: 'center',
         style: 'min-width: 150px; width: 20%',
       },
-      {
-        name: 'netInclTaxes',
-        label: 'Montant',
-        field: 'netInclTaxes',
-        format: value => formatPrice(value),
-        align: 'center',
-      },
-      {
-        name: 'payment',
-        label: '',
-        align: 'center',
-        field: val => val.coursePayments || '',
-      },
+      { name: 'netInclTaxes', label: 'Montant', field: 'netInclTaxes', format: formatPrice, align: 'center' },
+      { name: 'payment', label: '', align: 'center', field: val => val.coursePayments || '' },
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'date', ascending: true, page: 1, rowsPerPage: 15 });
@@ -179,11 +171,9 @@ export default {
       try {
         validations.value.newCoursePayment.$touch();
         if (validations.value.newCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         paymentCreationLoading.value = true;
-        await CoursePayments.create({
-          ...newCoursePayment.value,
-          company: company.value._id,
-        });
+        await CoursePayments.create({ ...newCoursePayment.value, company: company.value._id });
         NotifyPositive('Règlement créé.');
 
         coursePaymentCreationModal.value = false;

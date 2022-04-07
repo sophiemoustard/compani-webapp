@@ -29,6 +29,7 @@
 
 <script>
 import get from 'lodash/get';
+import { ref, computed } from 'vue';
 import set from 'lodash/set';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
@@ -57,37 +58,47 @@ export default {
     validations: { type: Object, default: () => ({}) },
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-course-payment'],
-  data () {
-    return {
-      paymentOptions: PAYMENT_OPTIONS.filter(option => option.value !== CESU),
-      paymentNatureOptions: PAYMENT_NATURE_OPTIONS,
-    };
-  },
-  computed: {
-    netInclTaxesError () {
-      if (get(this.validations, 'netInclTaxes.required.$response') === false) return REQUIRED_LABEL;
+  setup (props, { emit }) {
+    const paymentOptions = ref(PAYMENT_OPTIONS.filter(option => option.value !== CESU));
+    const paymentNatureOptions = ref(PAYMENT_NATURE_OPTIONS);
+
+    const netInclTaxesError = computed(() => {
+      if (get(props.validations, 'netInclTaxes.required.$response') === false) return REQUIRED_LABEL;
       return 'Montant TTC non valide';
-    },
-    creationModalNature () {
-      if (!this.newCoursePayment.nature) return '';
-      return this.paymentNatureOptions
-        .find(option => option.value === this.newCoursePayment.nature).label;
-    },
-  },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:new-course-payment', set({ ...this.newCoursePayment }, path, event));
-    },
-    formatPrice,
+    });
+    const creationModalNature = computed(() => {
+      if (!props.newCoursePayment.nature) return '';
+
+      return paymentNatureOptions.value.find(option => option.value === props.newCoursePayment.nature).label;
+    });
+
+    const hide = () => {
+      emit('hide');
+    };
+    const input = (event) => {
+      emit('update:model-value', event);
+    };
+    const submit = () => {
+      emit('submit');
+    };
+    const update = (event, path) => {
+      emit('update:new-course-payment', set({ ...props.newCoursePayment }, path, event));
+    };
+
+    return {
+      // Data
+      paymentOptions,
+      paymentNatureOptions,
+      // Computed
+      netInclTaxesError,
+      creationModalNature,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+      formatPrice,
+    };
   },
 };
 </script>
