@@ -59,6 +59,8 @@
 import get from 'lodash/get';
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import CourseBills from '@api/CourseBills';
 import CoursePayments from '@api/CoursePayments';
 import Button from '@components/Button';
@@ -70,8 +72,6 @@ import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 
 export default {

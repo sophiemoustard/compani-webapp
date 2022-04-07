@@ -3,7 +3,7 @@
     <template #title>
       Ajouter un <span class="text-weight-bold">{{ paymentNature.toLowerCase() }}</span>
     </template>
-    <ni-btn-toggle :model-value="newCoursePayment.nature" :options="paymentNatureOptions"
+    <ni-btn-toggle :model-value="newCoursePayment.nature" :options="PAYMENT_NATURE_OPTIONS"
       @update:model-value="update($event, 'nature')" />
     <div>
       {{ paymentNature }} pour la facture
@@ -59,7 +59,6 @@ export default {
   emits: ['hide', 'update:model-value', 'submit', 'update:new-course-payment'],
   setup (props, { emit }) {
     const paymentOptions = PAYMENT_OPTIONS.filter(option => option.value !== CESU);
-    const paymentNatureOptions = PAYMENT_NATURE_OPTIONS;
 
     const netInclTaxesError = computed(() => (
       get(props.validations, 'netInclTaxes.required.$response') === false ? REQUIRED_LABEL : 'Montant TTC non valide'
@@ -67,7 +66,7 @@ export default {
     const paymentNature = computed(() => (
       !props.newCoursePayment.nature
         ? ''
-        : paymentNatureOptions.find(option => option.value === props.newCoursePayment.nature).label
+        : PAYMENT_NATURE_OPTIONS.find(option => option.value === props.newCoursePayment.nature).label
     ));
 
     const hide = () => { emit('hide'); };
@@ -80,7 +79,7 @@ export default {
     return {
       // Data
       paymentOptions,
-      paymentNatureOptions,
+      PAYMENT_NATURE_OPTIONS,
       // Computed
       netInclTaxesError,
       paymentNature,
