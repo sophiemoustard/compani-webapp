@@ -59,20 +59,20 @@
 import get from 'lodash/get';
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
-import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import CourseBills from '@api/CourseBills';
 import CoursePayments from '@api/CoursePayments';
-import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
-import { downloadFile } from '@helpers/file';
-import { formatDate, ascendingSort } from '@helpers/date';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS } from '@data/constants.js';
+import Button from '@components/Button';
+import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import Progress from '@components/CourseProgress';
-import Button from '@components/Button';
-import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal.vue';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS } from '@data/constants.js';
+import { formatDate, ascendingSort } from '@helpers/date';
+import { downloadFile } from '@helpers/file';
+import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 
 export default {
   name: 'ProfileBilling',

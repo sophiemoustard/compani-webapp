@@ -1,27 +1,26 @@
 <template>
   <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
-      Ajouter un <span class="text-weight-bold">{{ creationModalNature.toLowerCase() }}</span>
+      Ajouter un <span class="text-weight-bold">{{ paymentNature.toLowerCase() }}</span>
     </template>
     <ni-btn-toggle :model-value="newCoursePayment.nature" :options="paymentNatureOptions"
       @update:model-value="update($event, 'nature')" />
     <div>
-      {{ creationModalNature }} pour la facture
+      {{ paymentNature }} pour la facture
       <span class="text-weight-bold">
           {{ coursePaymentMetaInfo.number }} - {{ formatPrice(coursePaymentMetaInfo.netInclTaxes) }}
       </span>
     </div>
     <div class="name">{{ coursePaymentMetaInfo.courseName }}</div>
-    <ni-input in-modal caption="Montant" suffix="€" type="number" required-field
+    <ni-input in-modal caption="Montant" suffix="€" type="number" required-field :error-message="netInclTaxesError"
       :model-value="newCoursePayment.netInclTaxes" @update:model-value="update($event, 'netInclTaxes')"
-      :error="validations.netInclTaxes.$error" @blur="validations.netInclTaxes.$touch"
-      :error-message="netInclTaxesError" />
+      :error="validations.netInclTaxes.$error" @blur="validations.netInclTaxes.$touch" />
     <ni-select in-modal caption="Type" :model-value="newCoursePayment.type" required-field :options="paymentOptions"
       @update:model-value="update($event, 'type')" @blur="validations.type.$touch" :error="validations.type.$error" />
     <ni-date-input :model-value="newCoursePayment.date" @update:model-value="update($event, 'date')" in-modal
       required-field :error="validations.date.$error" @blur="validations.date.$touch" caption="Date" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" :label="`Créer le ${ creationModalNature.toLowerCase() }`"
+      <ni-button class="full-width modal-btn bg-primary" :label="`Créer le ${ paymentNature.toLowerCase() }`"
         icon-right="add" color="white" :loading="loading" @click="submit" />
     </template>
   </ni-modal>
@@ -29,7 +28,7 @@
 
 <script>
 import get from 'lodash/get';
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import set from 'lodash/set';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
@@ -41,7 +40,7 @@ import { formatPrice } from '@helpers/utils';
 import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS, CESU } from '@data/constants';
 
 export default {
-  name: 'PaymentCreationModal',
+  name: 'CoursePaymentCreationModal',
   components: {
     'ni-select': Select,
     'ni-input': Input,
@@ -59,28 +58,21 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-course-payment'],
   setup (props, { emit }) {
-    const paymentOptions = ref(PAYMENT_OPTIONS.filter(option => option.value !== CESU));
-    const paymentNatureOptions = ref(PAYMENT_NATURE_OPTIONS);
+    const paymentOptions = PAYMENT_OPTIONS.filter(option => option.value !== CESU);
+    const paymentNatureOptions = PAYMENT_NATURE_OPTIONS;
 
-    const netInclTaxesError = computed(() => {
-      if (get(props.validations, 'netInclTaxes.required.$response') === false) return REQUIRED_LABEL;
-      return 'Montant TTC non valide';
-    });
-    const creationModalNature = computed(() => {
-      if (!props.newCoursePayment.nature) return '';
+    const netInclTaxesError = computed(() => (
+      get(props.validations, 'netInclTaxes.required.$response') === false ? REQUIRED_LABEL : 'Montant TTC non valide'
+    ));
+    const paymentNature = computed(() => (
+      !props.newCoursePayment.nature
+        ? ''
+        : paymentNatureOptions.find(option => option.value === props.newCoursePayment.nature).label
+    ));
 
-      return paymentNatureOptions.value.find(option => option.value === props.newCoursePayment.nature).label;
-    });
-
-    const hide = () => {
-      emit('hide');
-    };
-    const input = (event) => {
-      emit('update:model-value', event);
-    };
-    const submit = () => {
-      emit('submit');
-    };
+    const hide = () => { emit('hide'); };
+    const input = (event) => { emit('update:model-value', event); };
+    const submit = () => { emit('submit'); };
     const update = (event, path) => {
       emit('update:new-course-payment', set({ ...props.newCoursePayment }, path, event));
     };
@@ -91,7 +83,7 @@ export default {
       paymentNatureOptions,
       // Computed
       netInclTaxesError,
-      creationModalNature,
+      paymentNature,
       // Methods
       hide,
       input,
