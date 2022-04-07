@@ -201,7 +201,7 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        downloadFile(pdf, 'emargement.pdf');
+        downloadFile(pdf, 'emargement.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         if (e.status === 404) {

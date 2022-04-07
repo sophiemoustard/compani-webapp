@@ -1,5 +1,5 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
-import { downloadFile } from '@helpers/file';
+import { downloadFile, getExtension } from '@helpers/file';
 
 export default {
   async getFileById (params) {
@@ -34,6 +34,8 @@ export default {
     });
 
     if (getHtmlFile) return file;
-    return downloadFile(file, `download-${Date.now()}`, file.headers['content-type']);
+    const extension = getExtension(file.data.type);
+
+    return downloadFile(file, `download-${Date.now()}.${extension}`, 'application/octet-stream');
   },
 };
