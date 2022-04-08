@@ -12,7 +12,7 @@
       :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'mainFee.count')" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" label="Créer la facturation" icon-right="add" color="white"
+      <ni-button class="full-width modal-btn bg-primary" label="Créer la facture" icon-right="add" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
