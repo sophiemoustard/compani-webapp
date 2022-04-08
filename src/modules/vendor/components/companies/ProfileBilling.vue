@@ -18,40 +18,79 @@
             <template v-else-if="col.name === 'progress' && col.value >= 0">
               <ni-progress class="q-ml-lg" :value="col.value" />
             </template>
+            <template v-else-if="col.name === 'payment'">
+              <div class="row justify-center table-actions">
+                <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
+                  @click="openCoursePaymentCreationModal(props.row)" />
+              </div>
+            </template>
+            <template v-else-if="col.name === 'expand'">
+              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+            </template>
             <template v-else>{{ col.value }}</template>
           </q-td>
         </template>
+        <template #expanding-row="{ props }">
+          <q-td colspan="100%">
+            <div v-if="!props.row.coursePayments.length" class="text-italic text-center">
+              Aucun règlement renseigné.
+            </div>
+            <div v-else v-for="coursePayment in getSortedPayments(props.row.coursePayments)" :key="coursePayment._id"
+              :props="props" class="q-ma-sm expanding-table-expanded-row">
+              <div>
+                {{ formatDate(coursePayment.date) }}
+                {{ coursePayment.number }}
+                ({{ getPaymentType(coursePayment.type) }})
+              </div>
+              <div>{{ formatPrice(coursePayment.netInclTaxes) }}</div>
+            </div>
+          </q-td>
+        </template>
       </ni-expanding-table>
+
+      <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
+        v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
+        :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
     </div>
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import CourseBills from '@api/CourseBills';
-import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
-import { downloadFile } from '@helpers/file';
-import { formatDate } from '@helpers/date';
-import { BALANCE } from '@data/constants.js';
-import { NotifyNegative } from '@components/popup/notify';
-import ExpandingTable from '@components/table/ExpandingTable';
+import CoursePayments from '@api/CoursePayments';
+import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import ExpandingTable from '@components/table/ExpandingTable';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS } from '@data/constants.js';
+import { formatDate, ascendingSort } from '@helpers/date';
+import { downloadFile } from '@helpers/file';
+import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 
 export default {
   name: 'ProfileBilling',
-  props: {
-    profileId: { type: String, required: true },
-  },
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
+    'ni-button': Button,
+    'ni-course-payment-creation-modal': CoursePaymentCreationModal,
   },
-  setup (props) {
-    const companyId = ref(props.profileId);
+  setup () {
+    const $store = useStore();
     const courseBills = ref([]);
     const loading = ref(false);
     const pdfLoading = ref(false);
+    const paymentCreationLoading = ref(false);
+    const coursePaymentMetaInfo = ref({ number: '', courseName: '', netInclTaxes: '' });
+    const coursePaymentCreationModal = ref(false);
+    const newCoursePayment = ref({ nature: PAYMENT, type: '', netInclTaxes: '', date: '', courseBill: '' });
     const columns = ref([
       {
         name: 'date',
@@ -68,21 +107,29 @@ export default {
         align: 'center',
         style: 'min-width: 150px; width: 20%',
       },
-      {
-        name: 'netInclTaxes',
-        label: 'Montant',
-        field: 'netInclTaxes',
-        format: value => formatPrice(value),
-        align: 'center',
-      },
+      { name: 'netInclTaxes', label: 'Montant', field: 'netInclTaxes', format: formatPrice, align: 'center' },
+      { name: 'payment', label: '', align: 'center', field: val => val.coursePayments || '' },
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'date', ascending: true, page: 1, rowsPerPage: 15 });
 
+    const rules = {
+      newCoursePayment: {
+        nature: { required },
+        netInclTaxes: { required, positiveNumber },
+        type: { required },
+        date: { required },
+      },
+    };
+
+    const validations = useVuelidate(rules, { newCoursePayment });
+
+    const company = computed(() => $store.state.company.company);
+
     const refreshCourseBills = async () => {
       try {
         loading.value = true;
-        courseBills.value = await CourseBills.list({ company: companyId.value, action: BALANCE });
+        courseBills.value = await CourseBills.list({ company: company.value._id, action: BALANCE });
       } catch (e) {
         console.error(e);
         courseBills.value = [];
@@ -108,6 +155,47 @@ export default {
         pdfLoading.value = false;
       }
     };
+
+    const openCoursePaymentCreationModal = (courseBill) => {
+      coursePaymentMetaInfo.value = {
+        number: courseBill.number,
+        netInclTaxes: courseBill.netInclTaxes,
+        courseName: `${company.value.name} - ${courseBill.course.subProgram.program.name} -
+        ${courseBill.course.misc}`,
+      };
+      newCoursePayment.value.courseBill = courseBill._id;
+      coursePaymentCreationModal.value = true;
+    };
+
+    const createPayment = async () => {
+      try {
+        validations.value.newCoursePayment.$touch();
+        if (validations.value.newCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        paymentCreationLoading.value = true;
+        await CoursePayments.create({ ...newCoursePayment.value, company: company.value._id });
+        NotifyPositive('Règlement créé.');
+
+        coursePaymentCreationModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du règlement.');
+      } finally {
+        paymentCreationLoading.value = false;
+      }
+    };
+
+    const resetCoursePaymentCreationModal = () => {
+      newCoursePayment.value = { nature: PAYMENT, type: '', netInclTaxes: '', date: '', courseBill: '' };
+      coursePaymentMetaInfo.value = { number: '', courseName: '', netInclTaxes: '' };
+      validations.value.newCoursePayment.$reset();
+    };
+
+    const getPaymentType = type => PAYMENT_OPTIONS.find(option => option.value === type).label;
+
+    const getSortedPayments = payments => payments.sort((a, b) => ascendingSort(a.date, b.date));
+
     const created = async () => {
       refreshCourseBills();
     };
@@ -116,17 +204,29 @@ export default {
 
     return {
       // Data
-      companyId,
       courseBills,
       columns,
       pagination,
       loading,
       pdfLoading,
+      coursePaymentMetaInfo,
+      coursePaymentCreationModal,
+      newCoursePayment,
+      paymentCreationLoading,
+      PAYMENT_OPTIONS,
+      // Computed
+      validations,
       // Methods
       refreshCourseBills,
       formatPrice,
       downloadBill,
+      openCoursePaymentCreationModal,
+      createPayment,
+      resetCoursePaymentCreationModal,
+      getPaymentType,
+      getSortedPayments,
       get,
+      formatDate,
     };
   },
 };
@@ -145,4 +245,9 @@ export default {
   width: max-content
   padding-left: 4px
   color: $copper-grey-600
+.add-payment
+  background-color: $copper-grey-500
+  width: 20px
+  height: 20px
+  justify-content: center
 </style>
