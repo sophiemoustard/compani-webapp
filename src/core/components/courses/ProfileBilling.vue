@@ -11,10 +11,10 @@
                   <div class="text-weight-bold">
                     {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
                   </div>
-                  <div class="q-ml-lg bill-cancel" v-if="isCancelledByCreditNote(bill)">
+                  <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
                     <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
                     <div class="q-ml-xs text-orange-500">
-                      Annulée par avoir - {{ bill.courseCreditNotes[0].number }}
+                      Annulée par avoir - {{ bill.courseCreditNote.number }}
                     </div>
                   </div>
                 </div>
@@ -64,7 +64,7 @@
               <div class="row justify-end">
                 <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
                   :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
-                <ni-button v-else-if="!isCancelledByCreditNote(bill)" color="primary"
+                <ni-button v-else-if="!bill.courseCreditNote" color="primary"
                   @click="openCreditNoteCreationModal(bill._id)" label="Faire un avoir" icon="mdi-credit-card-refund"
                   :disable="creditNoteCreationLoading" />
               </div>
@@ -562,9 +562,7 @@ export default {
 
     const isBilled = bill => !!bill.billedAt;
 
-    const isCancelledByCreditNote = bill => !!bill.courseCreditNotes.length;
-
-    const canAddBill = computed(() => courseBills.value.every(bill => isCancelledByCreditNote(bill)));
+    const canAddBill = computed(() => courseBills.value.every(bill => bill.courseCreditNote));
 
     const showDetails = (billId) => {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
@@ -668,7 +666,6 @@ export default {
       pickBy,
       formatPrice,
       formatDate,
-      isCancelledByCreditNote,
     };
   },
 };

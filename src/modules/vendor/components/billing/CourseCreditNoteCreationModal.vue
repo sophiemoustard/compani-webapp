@@ -35,19 +35,21 @@ export default {
     'ni-date-input': DateInput,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-credit-note'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:new-credit-note', set({ ...this.newCreditNote }, path, event));
-    },
+  setup (props, { emit }) {
+    const hide = () => { emit('hide'); };
+    const input = (event) => { emit('update:model-value', event); };
+    const submit = () => { emit('submit'); };
+    const update = (event, path) => {
+      emit('update:new-credit-note', set({ ...props.newCreditNote }, path, event));
+    };
+
+    return {
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>
