@@ -1,7 +1,7 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
-      Démarrer la <span class="text-weight-bold">facturation</span>
+      Nouvelle <span class="text-weight-bold">facture</span>
     </template>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.funder" required-field
       @update:model-value="update($event, 'funder')" />
@@ -12,7 +12,7 @@
       :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'mainFee.count')" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" label="Démarrer la facturation" icon-right="add" color="white"
+      <ni-button class="full-width modal-btn bg-primary" label="Créer la facturation" icon-right="add" color="white"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
