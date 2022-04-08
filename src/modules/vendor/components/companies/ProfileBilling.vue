@@ -7,7 +7,7 @@
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'number'">
-              <div class="cliquable-name" @click="downloadBill(props.row._id)" :disable="pdfLoading">
+              <div class="cliquable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
               <div class="flex">
@@ -233,10 +233,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.cliquable-name
-  text-decoration: underline
-  color: $primary
-  width: fit-content
 .program
   max-width: fit-content
   flex: 1
