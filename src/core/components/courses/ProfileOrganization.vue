@@ -456,7 +456,7 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        downloadFile(pdf, 'convocation.pdf');
+        downloadFile(pdf, 'convocation.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la convocation.');

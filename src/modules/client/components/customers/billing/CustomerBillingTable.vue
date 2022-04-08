@@ -96,7 +96,7 @@ import {
 } from '@data/constants';
 import { formatPrice, truncate } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-import { openPdf } from '@helpers/file';
+import { downloadFile } from '@helpers/file';
 
 export default {
   name: 'CustomerBillingTable',
@@ -221,7 +221,7 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Bills.getPdf(bill._id);
-        openPdf(pdf);
+        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture');
@@ -236,7 +236,7 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await CreditNotes.getPdf(cn._id);
-        openPdf(pdf);
+        downloadFile(pdf, 'avoir.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');

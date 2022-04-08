@@ -41,3 +41,19 @@ export const openPdf = (pdf) => {
   link.click();
   document.body.removeChild(link);
 };
+
+export const getExtension = (type) => {
+  const mimeType = type.substring(type.indexOf('/') + 1);
+  switch (mimeType) {
+    case 'vnd.openxmlformats-officedocument.wordprocessingml.document':
+      return 'docx';
+    case 'msword':
+      return 'doc';
+    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      return 'xlsx';
+    case 'plain':
+      return 'txt';
+    default:
+      return mimeType;
+  }
+};
