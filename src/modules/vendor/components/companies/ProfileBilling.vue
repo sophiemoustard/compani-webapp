@@ -36,13 +36,15 @@
               Aucun règlement renseigné.
             </div>
             <div v-else v-for="coursePayment in getSortedPayments(props.row.coursePayments)" :key="coursePayment._id"
-              :props="props" class="q-ma-sm expanding-table-expanded-row">
+              :props="props" class="q-my-sm expanding-table-expanded-row">
               <div>
                 {{ formatDate(coursePayment.date) }}
                 {{ coursePayment.number }}
                 ({{ getPaymentType(coursePayment.type) }})
               </div>
               <div>{{ formatPrice(coursePayment.netInclTaxes) }}</div>
+              <q-icon size="16px" name="edit" color="copper-grey-500"
+                @click="openCoursePaymentEditionModal(props.row, coursePayment)" />
             </div>
           </q-td>
         </template>
@@ -51,12 +53,18 @@
       <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
         v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
         :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+
+       <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
+        v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
+        :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
     </div>
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
+import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
@@ -73,6 +81,7 @@ import { downloadFile } from '@helpers/file';
 import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
+import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
 
 export default {
   name: 'ProfileBilling',
@@ -81,6 +90,7 @@ export default {
     'ni-progress': Progress,
     'ni-button': Button,
     'ni-course-payment-creation-modal': CoursePaymentCreationModal,
+    'ni-course-payment-edition-modal': CoursePaymentEditionModal,
   },
   setup () {
     const $store = useStore();
@@ -88,9 +98,12 @@ export default {
     const loading = ref(false);
     const pdfLoading = ref(false);
     const paymentCreationLoading = ref(false);
+    const paymentEditionLoading = ref(false);
     const coursePaymentMetaInfo = ref({ number: '', courseName: '', netInclTaxes: '' });
     const coursePaymentCreationModal = ref(false);
+    const coursePaymentEditionModal = ref(false);
     const newCoursePayment = ref({ nature: PAYMENT, type: '', netInclTaxes: '', date: '', courseBill: '' });
+    const editedCoursePayment = ref({ _id: '', nature: '', type: '', netInclTaxes: '', date: '' });
     const columns = ref([
       {
         name: 'date',
@@ -120,9 +133,14 @@ export default {
         type: { required },
         date: { required },
       },
+      editedCoursePayment: {
+        netInclTaxes: { required, positiveNumber },
+        type: { required },
+        date: { required },
+      },
     };
 
-    const validations = useVuelidate(rules, { newCoursePayment });
+    const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment });
 
     const company = computed(() => $store.state.company.company);
 
@@ -160,11 +178,20 @@ export default {
       coursePaymentMetaInfo.value = {
         number: courseBill.number,
         netInclTaxes: courseBill.netInclTaxes,
-        courseName: `${company.value.name} - ${courseBill.course.subProgram.program.name} -
-        ${courseBill.course.misc}`,
+        courseName: `${company.value.name} - ${courseBill.course.subProgram.program.name} - ${courseBill.course.misc}`,
       };
       newCoursePayment.value.courseBill = courseBill._id;
       coursePaymentCreationModal.value = true;
+    };
+
+    const openCoursePaymentEditionModal = (courseBill, coursePayment) => {
+      coursePaymentMetaInfo.value = {
+        number: courseBill.number,
+        netInclTaxes: courseBill.netInclTaxes,
+        courseName: `${company.value.name} - ${courseBill.course.subProgram.program.name} - ${courseBill.course.misc}`,
+      };
+      editedCoursePayment.value = pick(coursePayment, ['_id', 'nature', 'netInclTaxes', 'type', 'date']);
+      coursePaymentEditionModal.value = true;
     };
 
     const createPayment = async () => {
@@ -186,10 +213,38 @@ export default {
       }
     };
 
+    const editPayment = async () => {
+      try {
+        validations.value.editedCoursePayment.$touch();
+        if (validations.value.editedCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        paymentEditionLoading.value = true;
+        await CoursePayments.update(
+          editedCoursePayment.value._id,
+          { ...omit(editedCoursePayment.value, ['_id', 'nature']) }
+        );
+        NotifyPositive('Règlement modifié.');
+
+        coursePaymentEditionModal.value = false;
+        await refreshCourseBills();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification du règlement.');
+      } finally {
+        paymentEditionLoading.value = false;
+      }
+    };
+
     const resetCoursePaymentCreationModal = () => {
       newCoursePayment.value = { nature: PAYMENT, type: '', netInclTaxes: '', date: '', courseBill: '' };
       coursePaymentMetaInfo.value = { number: '', courseName: '', netInclTaxes: '' };
       validations.value.newCoursePayment.$reset();
+    };
+
+    const resetCoursePaymentEditionModal = () => {
+      editedCoursePayment.value = { _id: '', nature: '', type: '', netInclTaxes: '', date: '' };
+      coursePaymentMetaInfo.value = { number: '', courseName: '', netInclTaxes: '' };
+      validations.value.editedCoursePayment.$reset();
     };
 
     const getPaymentType = type => PAYMENT_OPTIONS.find(option => option.value === type).label;
@@ -211,8 +266,11 @@ export default {
       pdfLoading,
       coursePaymentMetaInfo,
       coursePaymentCreationModal,
+      coursePaymentEditionModal,
       newCoursePayment,
+      editedCoursePayment,
       paymentCreationLoading,
+      paymentEditionLoading,
       PAYMENT_OPTIONS,
       // Computed
       validations,
@@ -221,8 +279,11 @@ export default {
       formatPrice,
       downloadBill,
       openCoursePaymentCreationModal,
+      openCoursePaymentEditionModal,
       createPayment,
+      editPayment,
       resetCoursePaymentCreationModal,
+      resetCoursePaymentEditionModal,
       getPaymentType,
       getSortedPayments,
       get,
