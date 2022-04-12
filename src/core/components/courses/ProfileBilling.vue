@@ -64,13 +64,13 @@
                 </q-card-section>
               </q-card>
             </div>
-            <div class="row justify-end">
+            <div class="row justify-end q-py-sm q-px-md">
               <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
                 :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
               <ni-button v-else-if="!bill.courseCreditNote" color="primary" :disable="creditNoteCreationLoading"
                 @click="openCreditNoteCreationModal(bill._id)" label="Faire un avoir" icon="mdi-credit-card-refund" />
             </div>
-            <div v-if="!isBilled(bill)" class="row justify-end q-pa-md">
+            <div v-if="!isBilled(bill)" class="row justify-end q-px-lg q-py-sm">
               <ni-button label="Facturer" color="white" class="bg-primary" icon="payment"
                 @click="openCourseBillValidationModal(bill._id)" :disable="billValidationLoading" />
             </div>
@@ -599,6 +599,7 @@ export default {
       billCreationLoading,
       billEditionLoading,
       billsLoading,
+      pdfLoading,
       billingPurchaseCreationLoading,
       billingPurchaseEditionLoading,
       creditNoteCreationLoading,
