@@ -36,7 +36,7 @@
               Aucun règlement renseigné.
             </div>
             <div v-else v-for="coursePayment in getSortedPayments(props.row.coursePayments)" :key="coursePayment._id"
-              :props="props" class="q-ma-sm expanding-table-expanded-row">
+              :props="props" class="q-my-sm expanding-table-expanded-row">
               <div>
                 {{ formatDate(coursePayment.date) }}
                 {{ coursePayment.number }}
@@ -64,6 +64,7 @@
 <script>
 import get from 'lodash/get';
 import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
@@ -189,8 +190,7 @@ export default {
         netInclTaxes: courseBill.netInclTaxes,
         courseName: `${company.value.name} - ${courseBill.course.subProgram.program.name} - ${courseBill.course.misc}`,
       };
-      const { _id, nature, netInclTaxes, type, date } = coursePayment;
-      editedCoursePayment.value = { _id, nature, netInclTaxes, type, date };
+      editedCoursePayment.value = pick(coursePayment, ['_id', 'nature', 'netInclTaxes', 'type', 'date']);
       coursePaymentEditionModal.value = true;
     };
 
