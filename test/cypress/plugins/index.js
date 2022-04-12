@@ -22,11 +22,15 @@ module.exports = (on, config) => {
       return null;
     },
     async seedDb (seedType) {
-      await axios.get(`http://localhost:3001/end-to-end/seed/${seedType}`);
+      await axios.get(`${process.env.API_HOSTNAME}/end-to-end/seed/${seedType}`);
       return null;
     },
     async login (credentials) {
-      const auth = await axios.post('http://localhost:3001/users/authenticate', credentials, { withCredentials: true });
+      const auth = await axios.post(
+        `${process.env.API_HOSTNAME}/users/authenticate`,
+        credentials,
+        { withCredentials: true }
+      );
       return auth.data.data;
     },
   });
