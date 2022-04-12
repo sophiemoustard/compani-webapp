@@ -1,9 +1,8 @@
-import { CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT } from '../../../../../src/core/data/constants';
+import { CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT, PLANNING } from '../../../../../src/core/data/constants';
 
 describe('Auxiliary planning - display', () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
-    cy.login({ email: 'auxiliary@alenvi.io', password: '123456!eR' });
+    cy.initiateTest({ seeds: PLANNING, credentials: { email: 'auxiliary@alenvi.io', password: '123456!eR' } });
     cy.visit('/ni/planning/auxiliaries');
   });
 
@@ -44,7 +43,7 @@ const loggedUsers = [
 
 loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role}`, () => {
   beforeEach(() => {
-    cy.initiateTest({ email: user.email, password: user.password });
+    cy.initiateTest({ seeds: PLANNING, credentials: { email: user.email, password: user.password } });
     cy.visit('/ni/planning/auxiliaries');
   });
 

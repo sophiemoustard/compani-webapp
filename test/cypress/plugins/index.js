@@ -25,6 +25,14 @@ module.exports = (on, config) => {
       await axios.get('http://localhost:3001/end-to-end/seed/planning');
       return null;
     },
+    async seedBilling () {
+      await axios.get('http://localhost:3001/end-to-end/seed/billing');
+      return null;
+    },
+    async seedAuthentication () {
+      await axios.get('http://localhost:3001/end-to-end/seed/authentication');
+      return null;
+    },
     async login (credentials) {
       const auth = await axios.post('http://localhost:3001/users/authenticate', credentials, { withCredentials: true });
       return auth.data.data;

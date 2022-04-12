@@ -1,6 +1,8 @@
+const { AUTHENTICATION } = require('../../../src/core/data/constants');
+
 describe('Login page tests', () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/authentication`);
+    cy.initiateTest({ seeds: AUTHENTICATION });
     cy.visit('/login');
   });
 

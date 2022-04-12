@@ -1,9 +1,9 @@
 const moment = require('moment');
+const { BILLING } = require('../../../../src/core/data/constants');
 
 describe('customers subscription tests', () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/billing`);
-    cy.login({ email: 'helper@alenvi.io', password: '123456!eR' });
+    cy.initiateTest({ seeds: BILLING, credentials: { email: 'helper@alenvi.io', password: '123456!eR' } });
     cy.visit('/customers/subscriptions');
   });
 

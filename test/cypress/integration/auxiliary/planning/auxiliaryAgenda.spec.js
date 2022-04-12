@@ -1,7 +1,8 @@
+const { PLANNING } = require('../../../../../src/core/data/constants');
+
 describe('Auxiliary agenda - display', () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
-    cy.login({ email: 'auxiliary@alenvi.io', password: '123456!eR' });
+    cy.initiateTest({ seeds: PLANNING, credentials: { email: 'auxiliary@alenvi.io', password: '123456!eR' } });
     cy.visit('/auxiliaries/agenda');
   });
 
