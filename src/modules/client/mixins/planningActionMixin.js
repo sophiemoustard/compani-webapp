@@ -349,7 +349,6 @@ export const planningActionMixin = {
 
       if (event.cancel && Object.keys(event.cancel).length === 0) fieldsToOmit.push('cancel');
       if (event.attachment && Object.keys(event.attachment).length === 0) fieldsToOmit.push('attachment');
-      if (event.shouldUpdateRepetition) fieldsToOmit.push('misc', 'transportMode', 'kmDuringEvent');
       if (event.auxiliary) fieldsToOmit.push('sector');
       if (event.address && !event.address.fullAddress) payload.address = {};
       if (event.kmDuringEvent === '') payload.kmDuringEvent = 0;
