@@ -384,12 +384,14 @@ export const planningActionMixin = {
         endDate: initialEvent.endDate,
         serviceId: initialEvent.subscription._id,
         customerId: initialEvent.customer._id,
+        address: initialEvent.address,
       };
       const formattedEditedEvent = {
         startDate: this.editedEvent.dates.startDate,
         endDate: this.editedEvent.dates.endDate,
         serviceId: this.editedEvent.subscription,
         customerId: this.editedEvent.customer,
+        address: this.editedEvent.address,
       };
 
       return !isEqual(formattedInitialEvent, formattedEditedEvent);
