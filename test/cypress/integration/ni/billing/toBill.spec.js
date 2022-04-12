@@ -2,7 +2,7 @@ const { BILLING } = require('../../../../../src/core/data/constants');
 
 describe('ToBill', () => {
   beforeEach(() => {
-    cy.initiateTest({ seeds: BILLING, credentials: { email: 'client-admin@alenvi.io', password: '123456!eR' } });
+    cy.initiateTest({ seedType: BILLING, credentials: { email: 'client-admin@alenvi.io', password: '123456!eR' } });
     cy.visit('/ni/billing/to-bill');
     cy.get('#q-app').click(500, 500);
   });

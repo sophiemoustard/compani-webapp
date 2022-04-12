@@ -21,16 +21,8 @@ module.exports = (on, config) => {
       console.warn(message);
       return null;
     },
-    async seedPlanning () {
-      await axios.get('http://localhost:3001/end-to-end/seed/planning');
-      return null;
-    },
-    async seedBilling () {
-      await axios.get('http://localhost:3001/end-to-end/seed/billing');
-      return null;
-    },
-    async seedAuthentication () {
-      await axios.get('http://localhost:3001/end-to-end/seed/authentication');
+    async seedDb (seedType) {
+      await axios.get(`http://localhost:3001/end-to-end/seed/${seedType}`);
       return null;
     },
     async login (credentials) {

@@ -2,7 +2,7 @@ import { CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT, PLANNING } from '../
 
 describe('Auxiliary planning - display', () => {
   beforeEach(() => {
-    cy.initiateTest({ seeds: PLANNING, credentials: { email: 'auxiliary@alenvi.io', password: '123456!eR' } });
+    cy.initiateTest({ seedType: PLANNING, credentials: { email: 'auxiliary@alenvi.io', password: '123456!eR' } });
     cy.visit('/ni/planning/auxiliaries');
   });
 
@@ -43,7 +43,7 @@ const loggedUsers = [
 
 loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role}`, () => {
   beforeEach(() => {
-    cy.initiateTest({ seeds: PLANNING, credentials: { email: user.email, password: user.password } });
+    cy.initiateTest({ seedType: PLANNING, credentials: { email: user.email, password: user.password } });
     cy.visit('/ni/planning/auxiliaries');
   });
 

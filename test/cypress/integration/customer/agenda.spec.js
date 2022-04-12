@@ -2,7 +2,7 @@ const { PLANNING } = require('../../../../src/core/data/constants');
 
 describe('customers agenda tests', () => {
   beforeEach(() => {
-    cy.initiateTest({ seeds: PLANNING, credentials: { email: 'helper@alenvi.io', password: '123456!eR' } });
+    cy.initiateTest({ seedType: PLANNING, credentials: { email: 'helper@alenvi.io', password: '123456!eR' } });
     cy.visit('/customers/agenda');
   });
 

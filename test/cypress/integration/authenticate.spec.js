@@ -2,7 +2,7 @@ const { AUTHENTICATION } = require('../../../src/core/data/constants');
 
 describe('Login page tests', () => {
   beforeEach(() => {
-    cy.initiateTest({ seeds: AUTHENTICATION });
+    cy.initiateTest({ seedType: AUTHENTICATION });
     cy.visit('/login');
   });
 
