@@ -64,7 +64,7 @@ export default {
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     autofocus: { type: Boolean, default: false },
-    debounce: { type: Number, default: undefined },
+    debounce: { type: Number, default: 500 },
     placeholder: { type: String, default: '' },
     icon: { type: String, default: '' },
     mask: { type: String, default: '' },
