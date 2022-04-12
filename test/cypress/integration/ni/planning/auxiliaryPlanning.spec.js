@@ -36,16 +36,15 @@ describe('Auxiliary planning - display', () => {
 });
 
 const loggedUsers = [
-  { login: 'planning-referent@alenvi.io', password: '123456!eR', role: PLANNING_REFERENT },
-  { login: 'auxiliary@alenvi.io', password: '123456!eR', role: AUXILIARY },
-  { login: 'client-admin@alenvi.io', password: '123456!eR', role: CLIENT_ADMIN },
-  { login: 'coach@alenvi.io', password: '123456!eR', role: COACH },
+  { email: 'planning-referent@alenvi.io', password: '123456!eR', role: PLANNING_REFERENT },
+  { email: 'auxiliary@alenvi.io', password: '123456!eR', role: AUXILIARY },
+  { email: 'client-admin@alenvi.io', password: '123456!eR', role: CLIENT_ADMIN },
+  { email: 'coach@alenvi.io', password: '123456!eR', role: COACH },
 ];
 
 loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role}`, () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
-    cy.login({ email: user.login, password: user.password });
+    cy.initiateTest({ email: user.email, password: user.password });
     cy.visit('/ni/planning/auxiliaries');
   });
 
