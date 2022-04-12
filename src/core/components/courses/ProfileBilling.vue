@@ -3,85 +3,82 @@
     <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
       <div v-if="courseBills.length">
         <p class="text-weight-bold">Infos de facturation</p>
-        <div v-for="bill of courseBills" :key="bill._id">
-          <q-card flat class="q-mb-sm">
-            <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
-              <q-item-section>
-                <div class="flex">
-                  <div class="text-weight-bold">
-                    {{ bill.number || 'A facturer' }} - {{ formatPrice(bill.netInclTaxes) }}
-                  </div>
-                  <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
-                    <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
-                    <div class="q-ml-xs text-orange-500">
-                      Annulée par avoir - {{ bill.courseCreditNote.number }}
-                    </div>
+        <q-card v-for="bill of courseBills" :key="bill._id" flat class="q-mb-md">
+          <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
+            <q-item-section>
+              <div class="flex">
+                <div v-if="bill.number" class="text-weight-bold cliquable-name" @click.stop="downloadBill(bill._id)"
+                  :disable="pdfLoading">
+                  {{ bill.number }} - {{ formatPrice(bill.netInclTaxes) }}
+                </div>
+                <div v-else class="text-weight-bold">
+                  A facturer - {{ formatPrice(bill.netInclTaxes) }}
+                </div>
+                <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
+                  <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
+                  <div class="q-ml-xs text-orange-500">
+                    Annulée par avoir - {{ bill.courseCreditNote.number }}
                   </div>
                 </div>
-                <div @click.stop="openFunderEditionModal(bill)" class="payer">
-                  Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
-                  <q-icon v-if="!isBilled(bill)" size="16px" name="edit" color="copper-grey-500" />
+              </div>
+              <div v-if="isFunderVisible(bill)" @click.stop="openFunderEditionModal(bill)" class="payer">
+                Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
+                <q-icon v-if="!isBilled(bill)" size="16px" name="edit" color="copper-grey-500" />
+              </div>
+              {{ isDateVisible(bill) ? `Date : ${formatDate(bill.billedAt)}` : '' }}
+            </q-item-section>
+            <q-icon size="24px" :name="areDetailsVisible[bill._id] ? 'expand_less' : 'expand_more'" />
+          </q-card-section>
+          <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
+            <q-card flat class="q-mx-lg q-mb-sm">
+              <q-card-section class="fee">
+                <div class="fee-info">
+                  <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
+                  <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
+                  <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
+                  <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
+                    Description : {{ bill.mainFee.description }}
+                  </div>
                 </div>
-                {{ bill.billedAt ? `Date : ${formatDate(bill.billedAt)}` : '' }}
-              </q-item-section>
-              <q-icon size="24px" :name="areDetailsVisible[bill._id] ? 'expand_less' : 'expand_more'" />
-            </q-card-section>
-            <div class="bg-peach-200 q-pt-sm" v-if="areDetailsVisible[bill._id]">
+                <ni-button icon="edit" @click="openMainFeeEditionModal(bill)" />
+              </q-card-section>
+            </q-card>
+            <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
               <q-card flat class="q-mx-lg q-mb-sm">
                 <q-card-section class="fee">
                   <div class="fee-info">
-                    <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
-                    <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
-                    <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
-                    <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
-                      Description : {{ bill.mainFee.description }}
+                    <div class="text-copper-500">
+                      {{ getBillingItemName(billingPurchase.billingItem) }}
+                    </div>
+                    <div>Prix unitaire : {{ formatPrice(billingPurchase.price) }}</div>
+                    <div>Quantité : {{ billingPurchase.count }}</div>
+                    <div v-if="billingPurchase.description" class="ellipsis">
+                      Description : {{ billingPurchase.description }}
                     </div>
                   </div>
-                  <ni-button icon="edit" @click="openMainFeeEditionModal(bill)" />
+                  <div>
+                    <ni-button icon="edit" @click="openBillingPurchaseEditionModal(bill, billingPurchase)" />
+                    <ni-button v-if="!isBilled(bill)" icon="delete"
+                      @click="validatePurchaseDeletion(bill._id, billingPurchase._id)" />
+                  </div>
                 </q-card-section>
               </q-card>
-              <div v-for="billingPurchase of bill.billingPurchaseList" :key="billingPurchase._id">
-                <q-card flat class="q-mx-lg q-mb-sm">
-                  <q-card-section class="fee">
-                    <div class="fee-info">
-                      <div class="text-copper-500">
-                        {{ getBillingItemName(billingPurchase.billingItem) }}
-                      </div>
-                      <div>Prix unitaire : {{ formatPrice(billingPurchase.price) }}</div>
-                      <div>Quantité : {{ billingPurchase.count }}</div>
-                      <div v-if="billingPurchase.description" class="ellipsis">
-                        Description : {{ billingPurchase.description }}
-                      </div>
-                    </div>
-                    <div>
-                      <ni-button icon="edit" @click="openBillingPurchaseEditionModal(bill, billingPurchase)" />
-                      <ni-button v-if="!isBilled(bill)" icon="delete"
-                        @click="validatePurchaseDeletion(bill._id, billingPurchase._id)" />
-                    </div>
-                  </q-card-section>
-                </q-card>
-              </div>
-              <div class="row justify-end">
-                <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
-                  :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
-                <ni-button v-else-if="!bill.courseCreditNote" color="primary"
-                  @click="openCreditNoteCreationModal(bill._id)" label="Faire un avoir" icon="mdi-credit-card-refund"
-                  :disable="creditNoteCreationLoading" />
-              </div>
             </div>
-          </q-card>
-          <div v-if="!isBilled(bill)" class="row justify-end q-mt-xl">
-            <ni-button label="Facturer" color="white" class="bg-primary" icon="payment"
-              @click="openCourseBillValidationModal(bill._id)" :disable="billValidationLoading" />
+            <div class="row justify-end q-py-sm q-px-md">
+              <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
+                :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
+              <ni-button v-else-if="!bill.courseCreditNote" color="primary" :disable="creditNoteCreationLoading"
+                @click="openCreditNoteCreationModal(bill._id)" label="Faire un avoir" icon="mdi-credit-card-refund" />
+            </div>
+            <div v-if="!isBilled(bill)" class="row justify-end q-px-lg q-py-sm">
+              <ni-button label="Facturer" color="white" class="bg-primary" icon="payment"
+                @click="openCourseBillValidationModal(bill._id)" :disable="billValidationLoading" />
+            </div>
           </div>
-          <div v-else>
-            <ni-bi-color-button label="Télécharger la facture" icon="file_download" size="16px"
-              @click="downloadBill(bill._id)" />
-          </div>
-        </div>
+        </q-card>
       </div>
       <div v-if="canAddBill" class="row justify-end">
-        <ni-button label="Démarrer la facturation" color="white" class="bg-primary" icon="payment"
+        <ni-button label="Créer une facture" color="white" class="bg-primary" icon="payment"
           @click="openBillCreationModal" :disable="billCreationLoading" />
       </div>
     </div>
@@ -141,7 +138,6 @@ import CourseBillingItems from '@api/CourseBillingItems';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import BiColorButton from '@components/BiColorButton';
 import { REQUIRED_LABEL, LIST } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
@@ -160,7 +156,6 @@ export default {
     'ni-course-bill-validation-modal': CourseBillValidationModal,
     'ni-course-credit-note-creation-modal': CourseCreditNoteCreationModal,
     'ni-button': Button,
-    'ni-bi-color-button': BiColorButton,
   },
   setup () {
     const metaInfo = { title: 'Configuration facturation' };
@@ -568,6 +563,10 @@ export default {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
     };
 
+    const isFunderVisible = bill => !bill.courseCreditNote || areDetailsVisible.value[bill._id];
+
+    const isDateVisible = bill => isFunderVisible(bill) && bill.billedAt;
+
     const getBillingItemName = billingItem => billingItemList.value.find(item => item.value === billingItem).label;
 
     const downloadBill = async (billId) => {
@@ -600,6 +599,7 @@ export default {
       billCreationLoading,
       billEditionLoading,
       billsLoading,
+      pdfLoading,
       billingPurchaseCreationLoading,
       billingPurchaseEditionLoading,
       creditNoteCreationLoading,
@@ -658,6 +658,8 @@ export default {
       validatePurchaseDeletion,
       refreshCourseBills,
       refreshBillingItems,
+      isDateVisible,
+      isFunderVisible,
       showDetails,
       getBillingItemName,
       downloadBill,
