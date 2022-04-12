@@ -38,10 +38,6 @@
             required-field />
           <ni-select in-modal caption="Répétition de l'évènement" :model-value="editedEvent.repetition.frequency"
             :options="getRepetitionOptions(editedEvent.dates.startDate)" disable />
-          <div v-if="isRepetition(editedEvent)" class="repetition-infos-text q-mb-md">
-            L'annulation de l'évènement ou les modifications de notes, déplacement véhiculé ou transport spécifique ne
-            s'appliqueront pas à la répétition
-          </div>
         </template>
         <template v-if="editedEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :model-value="editedEvent.internalHour"
@@ -393,8 +389,4 @@ export default {
 .infos
   font-style: italic
   color: $copper-grey-400
-
-.repetition-infos-text
-  color: $copper-grey-600
-  font-size: 12px
 </style>

@@ -422,8 +422,8 @@ export const planningActionMixin = {
         if (this.editedEvent.type === ABSENCE) {
           this.$q.dialog({
             title: 'Confirmation',
-            message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes '
-            + 'et indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette absence ?',
+            message: `Les interventions en conflit avec l'absence seront passées en à affecter et les heures internes et
+             indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette absence ?`,
             html: true,
             ok: 'OK',
             cancel: 'Annuler',
@@ -435,7 +435,11 @@ export const planningActionMixin = {
           if (editedFieldsAreApplicableToRepetition) {
             this.$q.dialog({
               title: 'Confirmation',
-              message: 'Modifier l\'événement périodique',
+              message: `Modifier l'événement périodique <br />
+              <div class="text-copper-grey-600 q-mt-sm" style="font-size: 12px">
+                L'annulation de l'évènement ou les modifications de notes, déplacement véhiculé ou transport spécifique
+                ne s'appliqueront pas à la répétition
+              </div>`,
               html: true,
               options: {
                 type: 'radio',
