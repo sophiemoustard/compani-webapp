@@ -569,3 +569,7 @@ export const CREDIT_NOTE_TYPE_OPTIONS = [
 // COURSE_BILLS
 export const LIST = 'list';
 export const BALANCE = 'balance';
+
+// END_TO_END TESTS
+export const BILLING = 'billing';
+export const AUTHENTICATION = 'authentication';
