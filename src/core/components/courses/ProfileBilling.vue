@@ -64,7 +64,7 @@
                 </q-card-section>
               </q-card>
             </div>
-            <div class="row justify-end q-py-sm q-px-md">
+            <div class="row justify-end q-pa-sm">
               <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
                 :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
               <ni-button v-else-if="!bill.courseCreditNote" color="primary" :disable="creditNoteCreationLoading"
