@@ -285,6 +285,8 @@ export const BANK_TRANSFER = 'bank_transfer';
 export const CHECK = 'check';
 export const CESU = 'cesu';
 export const CASH = 'cash';
+export const CREDIT = 'credit';
+export const CREDIT_OPTION = { label: 'Crédit', value: CREDIT };
 export const PAYMENT_OPTIONS = [
   { label: 'Prélèvement', value: DIRECT_DEBIT },
   { label: 'Virement', value: BANK_TRANSFER },

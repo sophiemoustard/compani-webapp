@@ -93,10 +93,10 @@ import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS, REFUND } from '@data/constants.js';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
-import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import { formatPrice, formatPriceWithSign, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
@@ -132,19 +132,13 @@ export default {
         style: 'width: 10%',
       },
       { name: 'number', label: '#', field: 'number', align: 'left', style: 'width: 30%' },
-      {
-        name: 'progress',
-        label: 'Avancement formation',
-        field: 'progress',
-        align: 'center',
-        style: 'width: 15%',
-      },
+      { name: 'progress', label: 'Avancement formation', field: 'progress', align: 'center', style: 'width: 15%' },
       {
         name: 'netInclTaxes',
         label: 'Montant',
         field: 'netInclTaxes',
         format: formatPrice,
-        align: 'right',
+        align: 'center',
         style: 'width: 10%',
       },
       {
@@ -152,15 +146,15 @@ export default {
         label: 'Réglé/crédité',
         field: 'paid',
         format: formatPrice,
-        align: 'right',
+        align: 'center',
         style: 'width: 10%',
       },
       {
         name: 'total',
         label: 'Solde',
         field: 'total',
-        format: value => (value >= 0 ? `+${formatPrice(value)}` : formatPrice(value)),
-        align: 'right',
+        format: formatPriceWithSign,
+        align: 'center',
         style: 'font-weight: 700; width: 10%',
       },
       { name: 'payment', label: '', align: 'center', field: val => val.coursePayments || '', style: 'width: 10%' },
@@ -291,17 +285,16 @@ export default {
 
     const getItemType = item => (item.type
       ? PAYMENT_OPTIONS.find(option => option.value === item.type).label
-      : 'crédit');
+      : CREDIT_OPTION.label);
 
     const getSortedItems = bill => (bill.courseCreditNote
-      ? [...bill.coursePayments, bill.courseCreditNote]
-        .sort((a, b) => ascendingSort(a.date, b.date))
+      ? [...bill.coursePayments, bill.courseCreditNote].sort((a, b) => ascendingSort(a.date, b.date))
       : bill.coursePayments.sort((a, b) => ascendingSort(a.date, b.date)));
 
     const getTotal = (bills) => {
-      const total = bills.map(bill => bill.total).reduce((acc, val) => acc + val, 0);
+      const total = bills.reduce((acc, val) => acc + val.total, 0);
 
-      return total >= 0 ? `+${formatPrice(total)}` : formatPrice(total);
+      return formatPriceWithSign(total);
     };
 
     const created = async () => {
@@ -374,7 +367,7 @@ export default {
 .paid
   min-width: 10%
   padding: 4px
-  justify-content: flex-end
+  justify-content: center
   display: flex
 .area
   @media screen and (max-width: 767px)
@@ -382,8 +375,6 @@ export default {
   @media screen and (min-width: 768px)
     width: 25%
   padding: 4px 8px
-  justify-content: flex-end
-  display: flex
 .edit
   @media screen and (max-width: 767px)
     width: 20%
