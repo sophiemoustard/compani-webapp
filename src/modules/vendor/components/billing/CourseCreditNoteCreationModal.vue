@@ -4,7 +4,7 @@
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
     <ni-date-input in-modal caption="Date" :model-value="newCreditNote.date" @blur="validations.date.$touch"
-      required-field :error="validations.date.$error" @update:model-value="update($event, 'date')" />
+      required-field :error="validations.date.$error" @update:model-value="update($event, 'date')" :min="minDate" />
     <ni-input in-modal caption="Motif" :model-value="newCreditNote.misc" @update:model-value="update($event, 'misc')" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Créer l'avoir" icon-right="add" color="white"
@@ -27,6 +27,7 @@ export default {
     newCreditNote: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    minDate: { type: String, required: true },
   },
   components: {
     'ni-modal': Modal,

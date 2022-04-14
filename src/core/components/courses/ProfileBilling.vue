@@ -68,7 +68,7 @@
               <ni-button v-if="!isBilled(bill)" color="primary" icon="add" label="Ajouter un article"
                 :disable="billingPurchaseCreationLoading" @click="openBillingPurchaseAdditionModal(bill._id)" />
               <ni-button v-else-if="!bill.courseCreditNote" color="primary" :disable="creditNoteCreationLoading"
-                @click="openCreditNoteCreationModal(bill._id)" label="Faire un avoir" icon="mdi-credit-card-refund" />
+                @click="openCreditNoteCreationModal(bill)" label="Faire un avoir" icon="mdi-credit-card-refund" />
             </div>
             <div v-if="!isBilled(bill)" class="row justify-end q-px-lg q-py-sm">
               <ni-button label="Facturer" color="white" class="bg-primary" icon="payment"
@@ -115,7 +115,7 @@
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
-      :validations="validations.newCreditNote" />
+      :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate" />
   </div>
 </template>
 
@@ -189,6 +189,7 @@ export default {
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
+    const minCourseCreditNoteDate = ref('');
 
     const rules = {
       newBill: {
@@ -493,14 +494,15 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     };
 
-    const openCreditNoteCreationModal = (billId) => {
+    const openCreditNoteCreationModal = (bill) => {
       newCreditNote.value = {
-        courseBill: billId,
+        courseBill: bill._id,
         date: '',
         misc: '',
         company: course.value.company._id,
       };
       creditNoteCreationModal.value = true;
+      minCourseCreditNoteDate.value = bill.billedAt;
     };
 
     const addCreditNote = async () => {
@@ -525,6 +527,7 @@ export default {
 
     const resetCreditNoteCreationModal = () => {
       newCreditNote.value = { courseBill: '', date: '', misc: '', company: '' };
+      minCourseCreditNoteDate.value = '';
       validations.value.newCreditNote.$reset();
     };
 
@@ -622,6 +625,7 @@ export default {
       courseBills,
       courseFeeEditionModalMetaInfo,
       areDetailsVisible,
+      minCourseCreditNoteDate,
       // Computed
       validations,
       course,
