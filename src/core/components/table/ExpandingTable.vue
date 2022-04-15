@@ -27,6 +27,9 @@
         <ni-pagination :props="props" :pagination="pagination" :data="data" :options="paginationOptions"
           @update:pagination="update($event)" />
       </template>
+      <template #bottom-row="props">
+        <slot name="bottom-row" :props="props" />
+      </template>
     </q-table>
     <div v-else class="loading-container" />
     <q-inner-loading :showing="loading">

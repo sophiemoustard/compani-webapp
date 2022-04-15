@@ -14,6 +14,10 @@
                 <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}</div>
                 <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
               </div>
+              <div class="row items-center" v-if="props.row.courseCreditNote">
+                <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
+                <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
+              </div>
             </template>
             <template v-else-if="col.name === 'progress' && col.value >= 0">
               <ni-progress class="q-ml-lg" :value="col.value" />
@@ -31,23 +35,40 @@
           </q-td>
         </template>
         <template #expanding-row="{ props }">
-          <q-td colspan="100%">
-            <div v-if="!props.row.coursePayments.length" class="text-italic text-center">
+          <q-td colspan="100%" class="cell">
+            <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote" class="text-italic text-center">
               Aucun règlement renseigné.
             </div>
-            <div v-else v-for="coursePayment in getSortedPayments(props.row.coursePayments)" :key="coursePayment._id"
-              :props="props" class="q-my-sm expanding-table-expanded-row">
-              <div>
-                {{ formatDate(coursePayment.date) }}
-                {{ coursePayment.number }}
-                ({{ getPaymentType(coursePayment.type) }})
+            <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
+              <div class="date">{{ formatDate(item.date) }}</div>
+              <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
+              <div class="progress" />
+              <div class="formatted-price" />
+              <div v-if="item.netInclTaxes" class="formatted-price">
+                {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
               </div>
-              <div>{{ formatPrice(coursePayment.netInclTaxes) }}</div>
-              <q-icon size="16px" name="edit" color="copper-grey-500"
-                @click="openCoursePaymentEditionModal(props.row, coursePayment)" />
+              <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
+              <div class="formatted-price" />
+              <div class="formatted-price" />
+              <div v-if="item.netInclTaxes" class="edit">
+                <q-icon size="20px" name="edit" color="copper-grey-500"
+                  @click="openCoursePaymentEditionModal(props.row, item)" />
+              </div>
             </div>
           </q-td>
         </template>
+        <template #bottom-row="{ props }">
+      <q-tr class="text-weight-bold" :props="props">
+        <q-td />
+        <q-td />
+        <q-td />
+        <q-td />
+        <q-td><div class="flex justify-end items-center">Total</div></q-td>
+        <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills) }}</div></q-td>
+        <q-td />
+        <q-td />
+      </q-tr>
+    </template>
       </ni-expanding-table>
 
       <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
@@ -75,10 +96,10 @@ import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS } from '@data/constants.js';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
-import { formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import { formatPrice, formatPriceWithSign, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
@@ -111,18 +132,36 @@ export default {
         field: 'billedAt',
         format: value => formatDate(value),
         align: 'left',
+        classes: 'date',
       },
-      { name: 'number', label: '#', field: 'number', align: 'left', style: 'max-width: 250px' },
+      { name: 'number', label: '#', field: 'number', align: 'left', classes: 'payment' },
+      { name: 'progress', label: 'Avancement formation', field: 'progress', align: 'center', classes: 'progress' },
       {
-        name: 'progress',
-        label: 'Avancement formation',
-        field: 'progress',
-        align: 'center',
-        style: 'min-width: 150px; width: 20%',
+        name: 'netInclTaxes',
+        label: 'Montant',
+        field: 'netInclTaxes',
+        format: formatPrice,
+        align: 'right',
+        classes: 'formatted-price',
       },
-      { name: 'netInclTaxes', label: 'Montant', field: 'netInclTaxes', format: formatPrice, align: 'center' },
-      { name: 'payment', label: '', align: 'center', field: val => val.coursePayments || '' },
-      { name: 'expand', label: '', field: '' },
+      {
+        name: 'paid',
+        label: 'Réglé / crédité',
+        field: 'paid',
+        format: formatPrice,
+        align: 'right',
+        classes: 'formatted-price',
+      },
+      {
+        name: 'total',
+        label: 'Solde',
+        field: 'total',
+        format: formatPriceWithSign,
+        align: 'right',
+        classes: 'text-weight-bold formatted-price',
+      },
+      { name: 'payment', align: 'center', field: val => val.coursePayments || '', classes: 'formatted-price' },
+      { name: 'expand', classes: 'expand' },
     ]);
     const pagination = ref({ sortBy: 'date', ascending: true, page: 1, rowsPerPage: 15 });
 
@@ -247,9 +286,19 @@ export default {
       validations.value.editedCoursePayment.$reset();
     };
 
-    const getPaymentType = type => PAYMENT_OPTIONS.find(option => option.value === type).label;
+    const getItemType = item => (item.type
+      ? PAYMENT_OPTIONS.find(option => option.value === item.type).label
+      : CREDIT_OPTION.label);
 
-    const getSortedPayments = payments => payments.sort((a, b) => ascendingSort(a.date, b.date));
+    const getSortedItems = bill => (bill.courseCreditNote
+      ? [...bill.coursePayments, bill.courseCreditNote].sort((a, b) => ascendingSort(a.date, b.date))
+      : bill.coursePayments.sort((a, b) => ascendingSort(a.date, b.date)));
+
+    const getTotal = (bills) => {
+      const total = bills.reduce((acc, val) => acc + val.total, 0);
+
+      return formatPriceWithSign(total);
+    };
 
     const created = async () => {
       refreshCourseBills();
@@ -272,6 +321,7 @@ export default {
       paymentCreationLoading,
       paymentEditionLoading,
       PAYMENT_OPTIONS,
+      REFUND,
       // Computed
       validations,
       // Methods
@@ -284,8 +334,9 @@ export default {
       editPayment,
       resetCoursePaymentCreationModal,
       resetCoursePaymentEditionModal,
-      getPaymentType,
-      getSortedPayments,
+      getItemType,
+      getSortedItems,
+      getTotal,
       get,
       formatDate,
     };
@@ -294,6 +345,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.q-td
+  @media screen and (max-width: 767px)
+    font-size: 9px
 .program
   max-width: fit-content
   flex: 1
@@ -307,4 +361,28 @@ export default {
   width: 20px
   height: 20px
   justify-content: center
+.cell
+  padding: 0
+  width: 100%
+.date
+  width: 10%
+  padding: 4px
+.payment
+  width: 30%
+  padding: 4px
+.progress
+  width: 15%
+  padding: 4px
+.formatted-price
+  width: 10%
+  padding: 4px
+  text-align: right
+.edit
+  display: flex
+  justify-content: flex-end
+  width: 5%
+  padding-right: 4px
+.expand
+  width: 5%
+  padding: 4px
 </style>
