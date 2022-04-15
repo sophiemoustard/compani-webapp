@@ -349,7 +349,6 @@ export const planningActionMixin = {
 
       if (event.cancel && Object.keys(event.cancel).length === 0) fieldsToOmit.push('cancel');
       if (event.attachment && Object.keys(event.attachment).length === 0) fieldsToOmit.push('attachment');
-      if (event.shouldUpdateRepetition) fieldsToOmit.push('misc', 'transportMode', 'kmDuringEvent');
       if (event.auxiliary) fieldsToOmit.push('sector');
       if (event.address && !event.address.fullAddress) payload.address = {};
       if (event.kmDuringEvent === '') payload.kmDuringEvent = 0;
@@ -385,12 +384,14 @@ export const planningActionMixin = {
         endDate: initialEvent.endDate,
         serviceId: initialEvent.subscription._id,
         customerId: initialEvent.customer._id,
+        address: initialEvent.address,
       };
       const formattedEditedEvent = {
         startDate: this.editedEvent.dates.startDate,
         endDate: this.editedEvent.dates.endDate,
         serviceId: this.editedEvent.subscription,
         customerId: this.editedEvent.customer,
+        address: this.editedEvent.address,
       };
 
       return !isEqual(formattedInitialEvent, formattedEditedEvent);
@@ -421,8 +422,8 @@ export const planningActionMixin = {
         if (this.editedEvent.type === ABSENCE) {
           this.$q.dialog({
             title: 'Confirmation',
-            message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes '
-            + 'et indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette absence ?',
+            message: `Les interventions en conflit avec l'absence seront passées en à affecter et les heures internes et
+             indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette absence ?`,
             html: true,
             ok: 'OK',
             cancel: 'Annuler',
@@ -434,7 +435,11 @@ export const planningActionMixin = {
           if (editedFieldsAreApplicableToRepetition) {
             this.$q.dialog({
               title: 'Confirmation',
-              message: 'Modifier l\'événement périodique',
+              message: `Modifier l'événement périodique <br />
+              <div class="text-copper-grey-600 q-mt-sm" style="font-size: 12px">
+                L'annulation de l'évènement ou les modifications de notes, déplacement véhiculé ou transport spécifique
+                ne s'appliqueront pas à la répétition
+              </div>`,
               html: true,
               options: {
                 type: 'radio',
