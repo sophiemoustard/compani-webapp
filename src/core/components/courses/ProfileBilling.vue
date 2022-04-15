@@ -128,7 +128,7 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
-import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
+import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatAndSortOptions, formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
@@ -191,7 +191,7 @@ export default {
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
     const minCourseCreditNoteDate = ref('');
 
-    const rules = {
+    const rules = computed(() => ({
       newBill: {
         mainFee: {
           price: { required, strictPositiveNumber },
@@ -218,10 +218,10 @@ export default {
       },
       newCreditNote: {
         courseBill: { required },
-        date: { required },
+        date: { required, minDate: minDate(minCourseCreditNoteDate.value) },
         company: { required },
       },
-    };
+    }));
     const validations = useVuelidate(rules, {
       newBill,
       editedBill,

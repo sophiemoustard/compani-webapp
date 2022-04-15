@@ -43,13 +43,13 @@
               <div class="date">{{ formatDate(item.date) }}</div>
               <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
               <div class="progress" />
-              <div class="netInclTaxes" />
-              <div v-if="item.netInclTaxes" class="paid">
-                {{ item.nature === REFUND ? '-' : '' }} {{ formatPrice(item.netInclTaxes) }}
+              <div class="formatted-price" />
+              <div v-if="item.netInclTaxes" class="formatted-price">
+                {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
               </div>
-              <div v-else class="paid">{{ formatPrice(props.row.netInclTaxes) }}</div>
-              <div class="netInclTaxes" />
-              <div class="netInclTaxes" />
+              <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
+              <div class="formatted-price" />
+              <div class="formatted-price" />
               <div v-if="item.netInclTaxes" class="edit">
                 <q-icon size="20px" name="edit" color="copper-grey-500"
                   @click="openCoursePaymentEditionModal(props.row, item)" />
@@ -141,27 +141,27 @@ export default {
         label: 'Montant',
         field: 'netInclTaxes',
         format: formatPrice,
-        align: 'center',
-        classes: 'netInclTaxes',
+        align: 'right',
+        classes: 'formatted-price',
       },
       {
         name: 'paid',
-        label: 'Réglé/crédité',
+        label: 'Réglé / crédité',
         field: 'paid',
         format: formatPrice,
         align: 'right',
-        classes: 'paid',
+        classes: 'formatted-price',
       },
       {
         name: 'total',
         label: 'Solde',
         field: 'total',
         format: formatPriceWithSign,
-        align: 'center',
-        classes: 'text-weight-bold netInclTaxes',
+        align: 'right',
+        classes: 'text-weight-bold formatted-price',
       },
-      { name: 'payment', label: '', align: 'center', field: val => val.coursePayments || '', classes: 'netInclTaxes' },
-      { name: 'expand', label: '', field: '' },
+      { name: 'payment', align: 'center', field: val => val.coursePayments || '', classes: 'formatted-price' },
+      { name: 'expand', classes: 'expand' },
     ]);
     const pagination = ref({ sortBy: 'date', ascending: true, page: 1, rowsPerPage: 15 });
 
@@ -373,10 +373,7 @@ export default {
 .progress
   width: 15%
   padding: 4px
-.netInclTaxes
-  width: 10%
-  padding: 4px
-.paid
+.formatted-price
   width: 10%
   padding: 4px
   text-align: right
@@ -385,4 +382,7 @@ export default {
   justify-content: flex-end
   width: 5%
   padding-right: 4px
+.expand
+  width: 5%
+  padding: 4px
 </style>
