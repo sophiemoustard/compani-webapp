@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const ctx = require('../../../quasar.conf');
 
 const parseEnv = env => Object.keys(env).reduce((acc, key) => {
@@ -19,6 +20,18 @@ module.exports = (on, config) => {
       // eslint-disable-next-line no-console
       console.warn(message);
       return null;
+    },
+    async seedDb (seedType) {
+      await axios.get(`${process.env.API_HOSTNAME}/end-to-end/seed/${seedType}`);
+      return null;
+    },
+    async login (credentials) {
+      const auth = await axios.post(
+        `${process.env.API_HOSTNAME}/users/authenticate`,
+        credentials,
+        { withCredentials: true }
+      );
+      return auth.data.data;
     },
   });
 

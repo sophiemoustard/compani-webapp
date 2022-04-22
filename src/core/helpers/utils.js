@@ -76,6 +76,8 @@ export const roundFrenchPercentage = (number, digits = 2) => (number
 
 export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPrice(0));
 
+export const formatPriceWithSign = value => (value >= 0 ? `+${formatPrice(value)}` : formatPrice(value));
+
 export const formatIdentity = (identity, format) => {
   if (!identity) return '';
 

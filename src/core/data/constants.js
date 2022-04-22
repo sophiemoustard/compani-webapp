@@ -285,6 +285,8 @@ export const BANK_TRANSFER = 'bank_transfer';
 export const CHECK = 'check';
 export const CESU = 'cesu';
 export const CASH = 'cash';
+export const CREDIT = 'credit';
+export const CREDIT_OPTION = { label: 'Crédit', value: CREDIT };
 export const PAYMENT_OPTIONS = [
   { label: 'Prélèvement', value: DIRECT_DEBIT },
   { label: 'Virement', value: BANK_TRANSFER },
@@ -569,3 +571,7 @@ export const CREDIT_NOTE_TYPE_OPTIONS = [
 // COURSE_BILLS
 export const LIST = 'list';
 export const BALANCE = 'balance';
+
+// END_TO_END TESTS
+export const BILLING = 'billing';
+export const AUTHENTICATION = 'authentication';

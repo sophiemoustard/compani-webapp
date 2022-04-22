@@ -3,7 +3,7 @@ import set from 'lodash/set';
 import Customers from '@api/Customers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
-import { openPdf } from '@helpers/file';
+import { downloadFile } from '@helpers/file';
 import { ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 
 export const customerMixin = {
@@ -66,7 +66,7 @@ export const customerMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Customers.getQRCode(this.customer._id);
-        openPdf(pdf);
+        downloadFile(pdf, 'qr_code.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du QR code.');

@@ -9,7 +9,7 @@
           color="white" disable />
         <ni-search-address v-if="isAuxiliary && hasSecondaryAddress" caption="Adresse secondaire"
           v-model="customer.contact.secondaryAddress" color="white" disable />
-        <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes"
+        <ni-input caption="Accès / Codes / Étage" v-model="customer.contact.accessCodes" type="textarea"
           @focus="saveTmp('contact.accessCodes')" @blur="updateCustomer('contact.accessCodes')" />
         <ni-input v-if="isAuxiliary" type="tel" :error="v$.customer.contact.phone.$error"
           error-message="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"

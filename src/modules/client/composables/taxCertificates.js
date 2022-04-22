@@ -8,7 +8,7 @@ import TaxCertificates from '@api/TaxCertificates';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { REQUIRED_LABEL } from '@data/constants';
-import { openPdf } from '@helpers/file';
+import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { formatIdentity } from '@helpers/utils';
 import { validYear } from '@helpers/vuelidateCustomVal';
@@ -113,7 +113,7 @@ export const useTaxCertificates = (customer) => {
     try {
       pdfLoading.value = true;
       const pdf = await TaxCertificates.getPdf(tc._id);
-      openPdf(pdf);
+      downloadFile(pdf, 'attestation_fiscale.pdf', 'application/octet-stream');
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors du téléchargement de l\'attestation fiscale');
