@@ -10,7 +10,7 @@
           <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
         </q-item-section>
       </q-item>
-      <div v-if="!course.slots.length" class="row gutter-profile">
+      <div v-if="!course.slots.length && isVendorInterface && isAdmin" class="row gutter-profile">
         <ni-date-input caption="Date de démarrage souhaitée" :model-value="course.estimatedStartDate"
           @update:model-value="updateEstimatedStartDate($event)" class="col-4" />
       </div>
@@ -91,6 +91,7 @@ export default {
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
   },
   components: {
     'slot-edition-modal': SlotEditionModal,
