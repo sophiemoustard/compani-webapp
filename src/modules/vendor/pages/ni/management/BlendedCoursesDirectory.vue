@@ -67,6 +67,7 @@ export default {
         misc: '',
         type: INTRA,
         salesRepresentative: '',
+        estimatedStartDate: '',
       },
       programs: [],
       courseCreationModal: false,
@@ -139,7 +140,14 @@ export default {
     },
     resetCreationModal () {
       this.v$.newCourse.$reset();
-      this.newCourse = { program: '', company: '', misc: '', type: INTRA, salesRepresentative: '' };
+      this.newCourse = {
+        program: '',
+        company: '',
+        misc: '',
+        type: INTRA,
+        salesRepresentative: '',
+        estimatedStartDate: '',
+      };
     },
     async createCourse () {
       try {

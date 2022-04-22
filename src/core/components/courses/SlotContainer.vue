@@ -10,6 +10,10 @@
           <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
         </q-item-section>
       </q-item>
+      <div v-if="!course.slots.length" class="row gutter-profile">
+        <ni-date-input caption="Date de démarrage souhaitée" :model-value="course.estimatedStartDate"
+          @update:model-value="updateEstimatedStartDate($event)" class="col-4" />
+      </div>
       <div class="slots-cells-container row">
         <q-card class="slots-cells" v-for="(value, key, index) in courseSlots" :key="index" flat>
           <div class="slots-cells-title">
@@ -67,9 +71,11 @@ import pick from 'lodash/pick';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
+import Courses from '@api/Courses';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
+import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
@@ -90,6 +96,7 @@ export default {
     'slot-edition-modal': SlotEditionModal,
     'slot-creation-modal': SlotCreationModal,
     'ni-button': Button,
+    'ni-date-input': DateInput,
   },
   emits: ['refresh'],
   setup () {
@@ -367,6 +374,16 @@ export default {
       const { path, value } = payload;
       if (this.creationModal) set(this.newCourseSlot, path, value);
       else if (this.editionModal) set(this.editedCourseSlot, path, value);
+    },
+    async updateEstimatedStartDate (value) {
+      try {
+        await Courses.update(this.course._id, { estimatedStartDate: value });
+        NotifyPositive('Date de démarrage souhaitée mise à jour.');
+        this.$emit('refresh');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la date de démarrage.');
+      }
     },
   },
 

@@ -17,6 +17,8 @@
       <ni-select v-if="isIntraCourse" in-modal :model-value="newCourse.company"
         @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions"
         :error="validations.company.$error" @update:model-value="update($event, 'company')" />
+      <ni-date-input caption="Date de démarrage souhaitée" :model-value="newCourse.estimatedStartDate" in-modal
+        @update:model-value="update($event, 'estimatedStartDate')" />
       <ni-input in-modal :model-value="newCourse.misc" @update:model-value="update($event.trim(), 'misc')"
         caption="Informations Complémentaires" />
       <template #footer>
@@ -31,6 +33,7 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import { COURSE_TYPES } from '@data/constants';
@@ -53,6 +56,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-input': Input,
+    'ni-date-input': DateInput,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-course'],
   data () {
