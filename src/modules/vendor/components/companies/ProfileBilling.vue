@@ -10,7 +10,7 @@
               <div class="cliquable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
-              <div class="flex">
+              <div class="course" @click="goToCourse(get(props.row, 'course._id'))">
                 <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}</div>
                 <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
               </div>
@@ -88,6 +88,7 @@ import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import CourseBills from '@api/CourseBills';
@@ -115,6 +116,7 @@ export default {
   },
   setup () {
     const $store = useStore();
+    const $router = useRouter();
     const courseBills = ref([]);
     const loading = ref(false);
     const pdfLoading = ref(false);
@@ -300,6 +302,11 @@ export default {
       return formatPriceWithSign(total);
     };
 
+    const goToCourse = courseId => $router.push({
+      name: 'ni management blended courses info',
+      params: { courseId, defaultTab: 'billing' },
+    });
+
     const created = async () => {
       refreshCourseBills();
     };
@@ -339,6 +346,7 @@ export default {
       getTotal,
       get,
       formatDate,
+      goToCourse,
     };
   },
 };
@@ -356,6 +364,12 @@ export default {
   width: max-content
   padding-left: 4px
   color: $copper-grey-600
+.course
+  display: flex
+  &:hover
+    border-bottom: 1px solid
+    border-bottom-color: $copper-grey-600
+    max-width: fit-content
 .add-payment
   background-color: $copper-grey-500
   width: 20px
