@@ -7,7 +7,7 @@
           <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
             <q-item-section>
               <div class="flex">
-                <div v-if="bill.number" class="text-weight-bold cliquable-name" @click.stop="downloadBill(bill._id)"
+                <div v-if="bill.number" class="text-weight-bold clickable-name" @click.stop="downloadBill(bill._id)"
                   :disable="pdfLoading">
                   {{ bill.number }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
@@ -17,7 +17,11 @@
                 <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
                   <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
                   <div class="q-ml-xs text-orange-500">
-                    Annulée par avoir - {{ bill.courseCreditNote.number }}
+                    Annulée par avoir -
+                    <span class="clickable-name text-orange-500" :disable="pdfLoading"
+                      @click.stop="downloadCreditNote(bill.courseCreditNote._id)">
+                      {{ bill.courseCreditNote.number }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -589,6 +593,23 @@ export default {
       }
     };
 
+    const downloadCreditNote = async (creditNoteId) => {
+      try {
+        pdfLoading.value = true;
+        const pdf = await CourseCreditNotes.getPdf(creditNoteId);
+        downloadFile(pdf, 'avoir.pdf', 'application/octet-stream');
+      } catch (e) {
+        console.error(e);
+        if (e.status === 404) {
+          const { message } = readAPIResponseWithTypeArrayBuffer(e);
+          return NotifyNegative(message);
+        }
+        NotifyNegative('Erreur lors du téléchargement de l\'avoir.');
+      } finally {
+        pdfLoading.value = false;
+      }
+    };
+
     const created = async () => {
       refreshCourseBills();
       refreshCourseFundingOrganisations();
@@ -667,6 +688,7 @@ export default {
       showDetails,
       getBillingItemName,
       downloadBill,
+      downloadCreditNote,
       get,
       omit,
       pickBy,

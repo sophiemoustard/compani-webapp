@@ -7,7 +7,7 @@
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'number'">
-              <div class="cliquable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
+              <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
               <div class="flex">
