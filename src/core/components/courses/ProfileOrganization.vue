@@ -23,7 +23,8 @@
         </div>
       </div>
     </div>
-    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin" />
+    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
+      @update-estimated-start-date="updateEstimatedStartDate" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
@@ -462,6 +463,16 @@ export default {
         NotifyNegative('Erreur lors du téléchargement de la convocation.');
       } finally {
         this.pdfLoading = false;
+      }
+    },
+    async updateEstimatedStartDate (value) {
+      try {
+        await Courses.update(this.course._id, { estimatedStartDate: value });
+        NotifyPositive('Date de démarrage souhaitée mise à jour.');
+        this.refreshCourse();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la date de démarrage.');
       }
     },
   },
