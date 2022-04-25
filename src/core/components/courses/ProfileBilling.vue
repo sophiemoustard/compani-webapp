@@ -133,7 +133,7 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatAndSortOptions, formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import { formatAndSortOptions, formatPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
@@ -583,10 +583,6 @@ export default {
         downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
-        if (e.status === 404) {
-          const { message } = readAPIResponseWithTypeArrayBuffer(e);
-          return NotifyNegative(message);
-        }
         NotifyNegative('Erreur lors du téléchargement de la facture.');
       } finally {
         pdfLoading.value = false;
@@ -600,10 +596,6 @@ export default {
         downloadFile(pdf, 'avoir.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
-        if (e.status === 404) {
-          const { message } = readAPIResponseWithTypeArrayBuffer(e);
-          return NotifyNegative(message);
-        }
         NotifyNegative('Erreur lors du téléchargement de l\'avoir.');
       } finally {
         pdfLoading.value = false;
