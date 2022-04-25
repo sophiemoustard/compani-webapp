@@ -44,13 +44,13 @@
               <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
               <div class="progress" />
               <div class="formatted-price" />
-              <div v-if="item.netInclTaxes" class="formatted-price">
+              <div v-if="item.netInclTaxes >=0" class="formatted-price">
                 {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
               </div>
               <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
               <div class="formatted-price" />
               <div class="formatted-price" />
-              <div v-if="item.netInclTaxes" class="edit">
+              <div v-if="item.netInclTaxes >=0" class="edit">
                 <q-icon size="20px" name="edit" color="copper-grey-500"
                   @click="openCoursePaymentEditionModal(props.row, item)" />
               </div>
