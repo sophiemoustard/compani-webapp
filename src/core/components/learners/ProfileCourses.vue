@@ -45,7 +45,7 @@
                 <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
               </template>
               <template v-else-if="col.name === 'name'">
-                <div @click.stop="goToCourseProfile(props)" class="cliquable-name">{{ col.value }}</div>
+                <div @click.stop="goToCourseProfile(props)" class="clickable-name">{{ col.value }}</div>
               </template>
               <template v-else>{{ col.value }}</template>
             </q-td>

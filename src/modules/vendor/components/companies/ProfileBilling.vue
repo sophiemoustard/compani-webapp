@@ -7,7 +7,7 @@
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'number'">
-              <div class="cliquable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
+              <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
               <div class="flex">
@@ -99,7 +99,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
-import { formatPrice, formatPriceWithSign, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import { formatPrice, formatPriceWithSign } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
@@ -203,10 +203,6 @@ export default {
         downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
-        if (e.status === 404) {
-          const { message } = readAPIResponseWithTypeArrayBuffer(e);
-          return NotifyNegative(message);
-        }
         NotifyNegative('Erreur lors du téléchargement de la facture.');
       } finally {
         pdfLoading.value = false;

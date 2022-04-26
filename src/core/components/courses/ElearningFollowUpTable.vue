@@ -15,7 +15,7 @@
             <connected-dot v-if="col.value" />
           </template>
           <template v-else>
-            <div :class="['name', canReadLearnerInfo && 'cliquable-name']"
+            <div :class="['name', canReadLearnerInfo && 'clickable-name']"
               @click="goToLearnerProfile(props.row, $event)">
               {{ col.value }}
             </div>
