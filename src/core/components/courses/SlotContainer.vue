@@ -10,6 +10,10 @@
           <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
         </q-item-section>
       </q-item>
+      <div v-if="!course.slots.length && isVendorInterface && isAdmin" class="row gutter-profile">
+        <ni-date-input caption="Date de démarrage souhaitée" :model-value="course.estimatedStartDate"
+          @update:model-value="updateEstimatedStartDate($event)" class="col-xs-12 col-md-6" />
+      </div>
       <div class="slots-cells-container row">
         <q-card class="slots-cells" v-for="(value, key, index) in courseSlots" :key="index" flat>
           <div class="slots-cells-title">
@@ -70,6 +74,7 @@ import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
+import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
@@ -85,13 +90,15 @@ export default {
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
   },
   components: {
     'slot-edition-modal': SlotEditionModal,
     'slot-creation-modal': SlotCreationModal,
     'ni-button': Button,
+    'ni-date-input': DateInput,
   },
-  emits: ['refresh'],
+  emits: ['refresh', 'update'],
   setup () {
     return { v$: useVuelidate() };
   },
@@ -367,6 +374,9 @@ export default {
       const { path, value } = payload;
       if (this.creationModal) set(this.newCourseSlot, path, value);
       else if (this.editionModal) set(this.editedCourseSlot, path, value);
+    },
+    async updateEstimatedStartDate (event) {
+      this.$emit('update', set(this.course, 'estimatedStartDate', event));
     },
   },
 

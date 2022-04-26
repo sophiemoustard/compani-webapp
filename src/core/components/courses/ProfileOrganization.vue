@@ -23,7 +23,8 @@
         </div>
       </div>
     </div>
-    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
+      @update="updateCourse('estimatedStartDate')" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
