@@ -3,6 +3,13 @@
     <template #title>
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
+    <div>
+      Cet avoir annule la facture
+      <span class="text-weight-bold">
+          {{ creditNoteMetaInfo.number }} - {{ formatPrice(creditNoteMetaInfo.netInclTaxes) }}
+      </span>
+    </div>
+    <div class="name">{{ creditNoteMetaInfo.courseName }}</div>
     <ni-date-input in-modal caption="Date" :model-value="newCreditNote.date" @blur="validations.date.$touch"
       required-field :error="validations.date.$error" @update:model-value="update($event, 'date')" :min="minDate"
       :error-message="dateErrorMessage(validations)" />
@@ -21,6 +28,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
+import { formatPrice } from '@helpers/utils';
 
 export default {
   name: 'CourseCreditNoteCreationModal',
@@ -30,6 +38,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     minDate: { type: String, required: true },
+    creditNoteMetaInfo: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -59,7 +68,15 @@ export default {
       input,
       submit,
       update,
+      formatPrice,
     };
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.name
+  color: $copper-grey-500
+  font-size: 14px
+  margin-bottom: 16px
+</style>
