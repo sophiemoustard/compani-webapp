@@ -76,6 +76,13 @@ export const roundFrenchPercentage = (number, digits = 2) => (number
 
 export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPrice(0));
 
+export const formatStringToPrice = (str) => {
+  const slicedStr = str.slice(0, 6);
+  const price = formatPrice(parseFloat(slicedStr));
+
+  return price;
+};
+
 export const formatPriceWithSign = value => (value >= 0 ? `+${formatPrice(value)}` : formatPrice(value));
 
 export const formatIdentity = (identity, format) => {
@@ -155,3 +162,7 @@ export const getBillingItemsName = (service) => {
 export const formatDownloadName = name => name.replaceAll(/ - | |'/g, '_');
 
 export const formatIdentityAndDocType = (identity, type) => `${identity.lastname} ${identity.firstname} ${type}`;
+
+export const toCents = value => parseFloat(value).toFixed(2) * 100;
+
+export const toEuros = value => value / 100;
