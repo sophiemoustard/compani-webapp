@@ -105,6 +105,15 @@ export default {
           ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${this.slotsDurationTitle}`;
     },
     formatNearestDate () {
+      if (!this.courseSlotsCount && this.course.estimatedStartDate) {
+        const rangeToEstimatedStartDate = moment(this.course.estimatedStartDate).diff(moment().startOf('day'), 'd');
+
+        return rangeToEstimatedStartDate < 0
+          ? `Début souhaité il y a ${formatQuantity('jour', Math.abs(rangeToEstimatedStartDate))}`
+          : `Début souhaité ${rangeToEstimatedStartDate
+            ? `dans ${formatQuantity('jour', rangeToEstimatedStartDate)}`
+            : 'aujourd\'hui'}`;
+      }
       if (!this.courseSlotsCount && !this.course.slotsToPlan.length) return 'Pas de date prévue';
       if (!this.courseSlotsCount) return 'Prochaine date à planifier';
 

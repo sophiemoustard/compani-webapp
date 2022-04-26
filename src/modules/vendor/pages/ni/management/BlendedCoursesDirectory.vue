@@ -33,6 +33,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import { mapState } from 'vuex';
 import omit from 'lodash/omit';
+import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -161,7 +162,7 @@ export default {
         if (this.v$.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
-        await Courses.create(omit(this.newCourse, 'program'));
+        await Courses.create(pickBy(omit(this.newCourse, 'program')));
 
         this.courseCreationModal = false;
         NotifyPositive('Formation créée.');
