@@ -113,9 +113,9 @@ export default {
     },
     getNetExclTaxes (bill) {
       const exclTaxes = toCents(parseFloat(bill.exclTaxes));
-      const res = exclTaxes - toCents(this.getExclTaxesDiscount(bill));
+      const exclTaxesDiscount = toCents(this.getExclTaxesDiscount(bill));
 
-      return toEuros(res);
+      return toEuros(exclTaxes - exclTaxesDiscount);
     },
     getNetInclTaxes (bill) {
       const inclTaxes = toCents(parseFloat(bill.inclTaxes));
