@@ -11,7 +11,7 @@
                 {{ col.value }}
               </div>
               <div class="course" @click="goToCourse(get(props.row, 'course._id'))">
-                <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}</div>
+                <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}&nbsp;</div>
                 <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
               </div>
               <div class="row items-center" v-if="props.row.courseCreditNote">
@@ -362,14 +362,12 @@ export default {
   color: $copper-grey-600
 .misc
   width: max-content
-  padding-left: 4px
   color: $copper-grey-600
 .course
   display: flex
   &:hover
-    border-bottom: 1px solid
-    border-bottom-color: $copper-grey-600
-    max-width: fit-content
+    text-decoration: underline
+    text-decoration-color: $copper-grey-600
 .add-payment
   background-color: $copper-grey-500
   width: 20px
