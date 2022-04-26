@@ -13,7 +13,8 @@
     <ni-date-input in-modal caption="Date" :model-value="newCreditNote.date" @blur="validations.date.$touch"
       required-field :error="validations.date.$error" @update:model-value="update($event, 'date')" :min="minDate"
       :error-message="dateErrorMessage(validations)" />
-    <ni-input in-modal caption="Motif" :model-value="newCreditNote.misc" @update:model-value="update($event, 'misc')" />
+    <ni-input in-modal caption="Motif" :model-value="newCreditNote.misc" @update:model-value="update($event, 'misc')"
+      type="textarea" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Créer l'avoir" icon-right="add" color="white"
         :loading="loading" @click="submit" />
