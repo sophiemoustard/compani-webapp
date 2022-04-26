@@ -34,7 +34,7 @@
         <template v-if="!bill.subscription">{{ bill.eventsList.length }}</template>
         <template v-else>{{ formatHours(bill) }}</template>
       </template>
-      <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
+      <template v-else-if="col.name === 'unitExclTaxes'">{{ formatStringToPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
         <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
           :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)" :ref-name="bill._id"
@@ -53,7 +53,15 @@
 
 <script>
 import EditableTd from '@components/table/EditableTd';
-import { formatPrice, getLastVersion, formatIdentity, truncate } from '@helpers/utils';
+import {
+  formatPrice,
+  getLastVersion,
+  formatIdentity,
+  truncate,
+  formatStringToPrice,
+  toCents,
+  toEuros,
+} from '@helpers/utils';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
 
@@ -74,6 +82,15 @@ export default {
     formatPrice (value) {
       return formatPrice(value);
     },
+    toCents (value) {
+      return toCents(value);
+    },
+    toEuros (value) {
+      return toEuros(value);
+    },
+    formatStringToPrice (value) {
+      return formatStringToPrice(value);
+    },
     getLastVersion (value) {
       return getLastVersion(value, 'createdAt');
     },
@@ -90,13 +107,21 @@ export default {
       return truncate(bill.thirdPartyPayer.name, 35);
     },
     getExclTaxesDiscount (bill) {
-      return bill.discount / (1 + bill.vat / 100);
+      const discount = toCents(bill.discount);
+
+      return toEuros(discount / (1 + bill.vat / 100));
     },
     getNetExclTaxes (bill) {
-      return bill.exclTaxes - this.getExclTaxesDiscount(bill);
+      const exclTaxes = toCents(parseFloat(bill.exclTaxes));
+      const res = exclTaxes - toCents(this.getExclTaxesDiscount(bill));
+
+      return toEuros(res);
     },
     getNetInclTaxes (bill) {
-      return bill.inclTaxes - bill.discount;
+      const inclTaxes = toCents(parseFloat(bill.inclTaxes));
+      const discount = toCents(bill.discount);
+
+      return toEuros(inclTaxes - discount);
     },
     setDiscount ({ value, obj, path }) {
       obj[path] = !value || isNaN(value) ? 0 : value;
