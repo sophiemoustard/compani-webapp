@@ -78,7 +78,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { MONTH } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { formatPrice, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { formatPrice, formatIdentity, formatAndSortOptions, toEuros, toCents } from '@helpers/utils';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
@@ -165,14 +165,14 @@ export default {
       if (this.hasSelectedRows) {
         let total = 0;
         for (const row of this.selected) {
-          if (row.customerBills) total += row.customerBills.total;
+          if (row.customerBills) total += toCents(row.customerBills.total);
           if (row.thirdPartyPayerBills) {
             for (const bill of row.thirdPartyPayerBills) {
-              total += bill.total;
+              total += toCents(bill.total);
             }
           }
         }
-        return `Facturer ${formatPrice(total)}`;
+        return `Facturer ${formatPrice(toEuros(total))}`;
       }
       return 'Facturer';
     },
@@ -238,10 +238,17 @@ export default {
     formatPrice (value) {
       return formatPrice(value);
     },
+    toCents (value) {
+      return toCents(value);
+    },
+    toEuros (value) {
+      return toEuros(value);
+    },
     computeTotalAmount (data) {
-      const total = data.bills.reduce((prev, next) => prev + (next.inclTaxes - next.discount), 0);
-      data.total = total;
-      return total;
+      const total = data.bills.reduce((prev, next) => prev + (toCents(next.inclTaxes) - toCents(next.discount)), 0);
+      data.total = toEuros(total);
+
+      return toEuros(total);
     },
     discountEdit ({ ref }, bill) {
       bill.discountEdition = true;
