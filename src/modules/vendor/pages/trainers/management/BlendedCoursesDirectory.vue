@@ -9,6 +9,10 @@
         @update:model-value="updateSelectedProgram" />
       <ni-select :options="salesRepresentativesFilterOptions" clearable
         :model-value="selectedSalesRepresentative" @update:model-value="updateSelectedSalesRepresentative" />
+      <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
+        placeholder="Début de période" />
+      <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
+        placeholder="Fin de période" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -20,6 +24,7 @@ import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
+import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED } from '@data/constants';
@@ -34,6 +39,7 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
     'ni-select': Select,
+    'ni-date-input': DateInput,
   },
   data () {
     return {

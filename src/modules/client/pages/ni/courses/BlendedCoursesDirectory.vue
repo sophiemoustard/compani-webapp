@@ -7,6 +7,10 @@
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
+      <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
+        placeholder="Début de période" />
+      <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
+        placeholder="Fin de période" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -18,6 +22,7 @@ import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
+import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
@@ -33,6 +38,7 @@ export default {
     'ni-select': Select,
     'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
+    'ni-date-input': DateInput,
   },
   data () {
     return {

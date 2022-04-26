@@ -11,6 +11,10 @@
         @update:model-value="updateSelectedProgram" />
       <ni-select :options="salesRepresentativesFilterOptions" :model-value="selectedSalesRepresentative"
         @update:model-value="updateSelectedSalesRepresentative" />
+      <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
+        placeholder="Début de période" />
+      <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
+        placeholder="Fin de période" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -34,6 +38,7 @@ import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
+import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
@@ -50,6 +55,7 @@ export default {
     'ni-select': Select,
     'course-creation-modal': CourseCreationModal,
     'ni-trello': Trello,
+    'ni-date-input': DateInput,
   },
   setup () {
     const metaInfo = { title: 'Catalogue' };

@@ -3,7 +3,7 @@ import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, isSameOrAfter, isSameOrBefore, isBetween } from '@helpers/date';
 
 export const courseFiltersMixin = {
   data () {
@@ -13,7 +13,17 @@ export const courseFiltersMixin = {
     };
   },
   computed: {
-    ...mapState('course', ['selectedTrainer', 'selectedProgram', 'selectedCompany', 'selectedSalesRepresentative']),
+    ...mapState(
+      'course',
+      [
+        'selectedTrainer',
+        'selectedProgram',
+        'selectedCompany',
+        'selectedSalesRepresentative',
+        'selectedStartDate',
+        'selectedEndDate',
+      ]
+    ),
     coursesFiltered () {
       let courses = this.coursesWithGroupedSlot;
       if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
@@ -25,6 +35,12 @@ export const courseFiltersMixin = {
       if (this.selectedSalesRepresentative) courses = this.filterCoursesBySalesRepresentative(courses);
 
       if (!this.displayArchived) courses = this.filterArchivedCourses(courses);
+
+      if (this.selectedStartDate && !this.selectedEndDate) courses = this.filterCoursesByStartDate(courses);
+
+      if (this.selectedEndDate && !this.selectedStartDate) courses = this.filterCoursesByEndDate(courses);
+
+      if (this.selectedEndDate && this.selectedStartDate) courses = this.filterCoursesByStartDateAndEndDate(courses);
 
       return courses;
     },
@@ -88,6 +104,12 @@ export const courseFiltersMixin = {
     updateSelectedSalesRepresentative (salesRepresentativeId) {
       this.$store.dispatch('course/setSelectedSalesRepresentative', { salesRepresentativeId });
     },
+    updateSelectedStartDate (startDate) {
+      this.$store.dispatch('course/setSelectedStartDate', { startDate });
+    },
+    updateSelectedEndDate (endDate) {
+      this.$store.dispatch('course/setSelectedEndDate', { endDate });
+    },
     resetFilters () {
       this.$store.dispatch('course/resetFilters');
     },
@@ -110,6 +132,27 @@ export const courseFiltersMixin = {
     },
     filterArchivedCourses (courses) {
       return courses.filter(course => !course.archivedAt);
+    },
+    filterCoursesByStartDate (courses) {
+      return courses
+        .filter(course => (!course.slots.length && isSameOrAfter(course.estimatedStartDate, this.selectedStartDate)) ||
+        (course.slots.some(slot => slot.some(s => isSameOrAfter(s.startDate, this.selectedStartDate)))));
+    },
+    filterCoursesByEndDate (courses) {
+      return courses
+        .filter(course => (!course.slots.length && isSameOrBefore(course.estimatedStartDate, this.selectedEndDate)) ||
+        (course.slots.some(slot => slot.some(s => isSameOrBefore(s.endDate, this.selectedEndDate)))));
+    },
+    filterCoursesByStartDateAndEndDate (courses) {
+      return courses
+        .filter((course) => {
+          const hasEstimatedStartDate = !course.slots.length &&
+            isBetween(course.estimatedStartDate, this.selectedStartDate, this.selectedEndDate);
+          const hasSlots = course.slots
+            .some(slot => slot.some(s => isBetween(s.endDate, this.selectedStartDate, this.selectedEndDate)));
+
+          return hasEstimatedStartDate || hasSlots;
+        });
     },
     groupByCourses (courses) {
       return courses.map(course => ({
