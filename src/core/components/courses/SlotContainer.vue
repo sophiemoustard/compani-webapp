@@ -98,7 +98,7 @@ export default {
     'ni-button': Button,
     'ni-date-input': DateInput,
   },
-  emits: ['refresh', 'update-estimated-start-date'],
+  emits: ['refresh', 'update'],
   setup () {
     return { v$: useVuelidate() };
   },
@@ -375,8 +375,8 @@ export default {
       if (this.creationModal) set(this.newCourseSlot, path, value);
       else if (this.editionModal) set(this.editedCourseSlot, path, value);
     },
-    async updateEstimatedStartDate (value) {
-      this.$emit('update-estimated-start-date', value);
+    async updateEstimatedStartDate (event) {
+      this.$emit('update', set(this.course, 'estimatedStartDate', event));
     },
   },
 
