@@ -86,7 +86,7 @@
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
@@ -107,9 +107,6 @@ import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
 
 export default {
   name: 'ProfileBilling',
-  props: {
-    profileId: { type: String, required: true },
-  },
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
@@ -117,7 +114,7 @@ export default {
     'ni-course-payment-creation-modal': CoursePaymentCreationModal,
     'ni-course-payment-edition-modal': CoursePaymentEditionModal,
   },
-  setup (props) {
+  setup () {
     const $store = useStore();
     const $router = useRouter();
     const courseBills = ref([]);
@@ -187,14 +184,6 @@ export default {
     const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment });
 
     const company = computed(() => $store.state.company.company);
-
-    const refreshCompany = async () => {
-      try {
-        await $store.dispatch('company/fetchCompany', { companyId: props.profileId });
-      } catch (e) {
-        console.error(e);
-      }
-    };
 
     const refreshCourseBills = async () => {
       try {
@@ -318,9 +307,10 @@ export default {
       params: { courseId, defaultTab: 'billing' },
     });
 
+    watch(company, async () => { if (!courseBills.value.length) refreshCourseBills(); });
+
     const created = async () => {
-      if (!company.value) await refreshCompany();
-      refreshCourseBills();
+      if (company.value) refreshCourseBills();
     };
 
     created();
