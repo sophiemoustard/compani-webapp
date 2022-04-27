@@ -163,16 +163,16 @@ export default {
     },
     totalToBillLabel () {
       if (this.hasSelectedRows) {
-        let total = 0;
+        let totalCents = 0;
         for (const row of this.selected) {
-          if (row.customerBills) total += toCents(row.customerBills.total);
+          if (row.customerBills) totalCents += toCents(row.customerBills.total);
           if (row.thirdPartyPayerBills) {
             for (const bill of row.thirdPartyPayerBills) {
-              total += toCents(bill.total);
+              totalCents += toCents(bill.total);
             }
           }
         }
-        return `Facturer ${formatPrice(toEuros(total))}`;
+        return `Facturer ${formatPrice(toEuros(totalCents))}`;
       }
       return 'Facturer';
     },
@@ -203,8 +203,6 @@ export default {
     await Promise.all([this.getDraftBills(), this.getThirdPartyPayers()]);
   },
   methods: {
-    toCents,
-    toEuros,
     formatPrice,
     openDeliveryDownloadModal () {
       this.deliveryDownloadModal = true;
@@ -239,10 +237,11 @@ export default {
       }
     },
     computeTotalAmount (data) {
-      const total = data.bills.reduce((prev, next) => prev + (toCents(next.inclTaxes) - toCents(next.discount)), 0);
-      data.total = toEuros(total);
+      const totalCents = data.bills
+        .reduce((prev, next) => prev + (toCents(next.inclTaxes) - toCents(next.discount)), 0);
+      data.total = toEuros(totalCents);
 
-      return toEuros(total);
+      return toEuros(totalCents);
     },
     discountEdit ({ ref }, bill) {
       bill.discountEdition = true;
