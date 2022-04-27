@@ -78,9 +78,8 @@ export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPric
 
 export const formatStringToPrice = (str) => {
   const slicedStr = str.slice(0, 6);
-  const price = formatPrice(parseFloat(slicedStr));
 
-  return price;
+  return formatPrice(parseFloat(slicedStr));
 };
 
 export const formatPriceWithSign = value => (value >= 0 ? `+${formatPrice(value)}` : formatPrice(value));
