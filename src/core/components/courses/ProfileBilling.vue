@@ -119,7 +119,8 @@
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
-      :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate" />
+      :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate"
+      :credit-note-meta-info="creditNoteMetaInfo" />
   </div>
 </template>
 
@@ -190,6 +191,7 @@ export default {
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const newCreditNote = ref({ courseBill: '', misc: '', date: '', company: '' });
+    const creditNoteMetaInfo = ref({ number: '', netInclTaxes: '', courseName: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
@@ -499,14 +501,21 @@ export default {
     };
 
     const openCreditNoteCreationModal = (bill) => {
+      const { _id: billId, number, netInclTaxes } = bill;
       newCreditNote.value = {
-        courseBill: bill._id,
+        courseBill: billId,
         date: '',
         misc: '',
         company: course.value.company._id,
       };
       creditNoteCreationModal.value = true;
       minCourseCreditNoteDate.value = bill.billedAt;
+      creditNoteMetaInfo.value = {
+        number,
+        netInclTaxes,
+        courseName: `${get(course, 'value.company.name')} - ${get(course, 'value.subProgram.program.name')}
+          ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`,
+      };
     };
 
     const addCreditNote = async () => {
@@ -532,6 +541,7 @@ export default {
     const resetCreditNoteCreationModal = () => {
       newCreditNote.value = { courseBill: '', date: '', misc: '', company: '' };
       minCourseCreditNoteDate.value = '';
+      creditNoteMetaInfo.value = { number: '', netInclTaxes: '', courseName: '' };
       validations.value.newCreditNote.$reset();
     };
 
@@ -639,6 +649,7 @@ export default {
       courseFeeEditionModalMetaInfo,
       areDetailsVisible,
       minCourseCreditNoteDate,
+      creditNoteMetaInfo,
       // Computed
       validations,
       course,
