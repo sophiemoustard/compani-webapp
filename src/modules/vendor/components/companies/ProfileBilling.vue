@@ -10,8 +10,8 @@
               <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
-              <div class="flex">
-                <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}</div>
+              <div class="course" @click="goToCourse(get(props.row, 'course._id'))">
+                <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}&nbsp;</div>
                 <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
               </div>
               <div class="row items-center" v-if="props.row.courseCreditNote">
@@ -86,8 +86,9 @@
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import CourseBills from '@api/CourseBills';
@@ -115,6 +116,7 @@ export default {
   },
   setup () {
     const $store = useStore();
+    const $router = useRouter();
     const courseBills = ref([]);
     const loading = ref(false);
     const pdfLoading = ref(false);
@@ -296,8 +298,15 @@ export default {
       return formatPriceWithSign(total);
     };
 
+    const goToCourse = courseId => $router.push({
+      name: 'ni management blended courses info',
+      params: { courseId, defaultTab: 'billing' },
+    });
+
+    watch(company, async () => { if (!courseBills.value.length) refreshCourseBills(); });
+
     const created = async () => {
-      refreshCourseBills();
+      if (company.value) refreshCourseBills();
     };
 
     created();
@@ -335,6 +344,7 @@ export default {
       getTotal,
       get,
       formatDate,
+      goToCourse,
     };
   },
 };
@@ -350,8 +360,12 @@ export default {
   color: $copper-grey-600
 .misc
   width: max-content
-  padding-left: 4px
   color: $copper-grey-600
+.course
+  display: flex
+  &:hover
+    text-decoration: underline
+    text-decoration-color: $copper-grey-600
 .add-payment
   background-color: $copper-grey-500
   width: 20px
