@@ -658,7 +658,7 @@ export default {
     disableSubscriptionDeletion (sub) {
       const hasFunding = this.fundings.some(f => f.subscription._id === sub._id);
 
-      return sub.eventCount > 0 || sub.repetitionCount > 0 || hasFunding;
+      return sub.isUsedInEvents > 0 || sub.isUsedInRepetitions > 0 || hasFunding;
     },
     getFundingValidation (funding) {
       return {
