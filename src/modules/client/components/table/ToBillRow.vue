@@ -80,8 +80,6 @@ export default {
   emits: ['discount-click', 'update:selected', 'discount-input', 'update:bill', 'datetime-input'],
   methods: {
     formatPrice,
-    toCents,
-    toEuros,
     formatDate,
     formatStringToPrice,
     getLastVersion (value) {
@@ -97,22 +95,22 @@ export default {
       return truncate(bill.thirdPartyPayer.name, 35);
     },
     getExclTaxesDiscount (bill) {
-      const discount = toCents(bill.discount);
-      const vat = bill.vat * 100;
+      const discountCents = toCents(bill.discount);
+      const vatInt = bill.vat * 100;
 
-      return toEuros((discount * 10000) / (10000 + vat));
+      return toEuros((discountCents * 10000) / (10000 + vatInt));
     },
     getNetExclTaxes (bill) {
-      const exclTaxes = toCents(bill.exclTaxes);
-      const exclTaxesDiscount = toCents(this.getExclTaxesDiscount(bill));
+      const exclTaxesCents = toCents(bill.exclTaxes);
+      const exclTaxesDiscountCents = toCents(this.getExclTaxesDiscount(bill));
 
-      return toEuros(exclTaxes - exclTaxesDiscount);
+      return toEuros(exclTaxesCents - exclTaxesDiscountCents);
     },
     getNetInclTaxes (bill) {
-      const inclTaxes = toCents(parseFloat(bill.inclTaxes));
-      const discount = toCents(bill.discount);
+      const inclTaxesCents = toCents(bill.inclTaxes);
+      const discountCents = toCents(bill.discount);
 
-      return toEuros(inclTaxes - discount);
+      return toEuros(inclTaxesCents - discountCents);
     },
     setDiscount ({ value, obj, path }) {
       obj[path] = !value || isNaN(value) ? 0 : value;
