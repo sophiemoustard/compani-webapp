@@ -509,7 +509,8 @@ export default {
       creditNoteMetaInfo.value = {
         number,
         netInclTaxes,
-        courseName: `${get(course, 'value.company.name')} - ${get(course, 'value.subProgram.program.name')}`,
+        courseName: `${get(course, 'value.company.name')} - ${get(course, 'value.subProgram.program.name')}
+          ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`,
       };
     };
 
