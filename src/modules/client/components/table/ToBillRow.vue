@@ -79,18 +79,11 @@ export default {
   },
   emits: ['discount-click', 'update:selected', 'discount-input', 'update:bill', 'datetime-input'],
   methods: {
-    formatPrice (value) {
-      return formatPrice(value);
-    },
-    toCents (value) {
-      return toCents(value);
-    },
-    toEuros (value) {
-      return toEuros(value);
-    },
-    formatStringToPrice (value) {
-      return formatStringToPrice(value);
-    },
+    formatPrice,
+    toCents,
+    toEuros,
+    formatDate,
+    formatStringToPrice,
     getLastVersion (value) {
       return getLastVersion(value, 'createdAt');
     },
@@ -99,20 +92,18 @@ export default {
 
       return bill.hours ? `${parseFloat(bill.hours).toFixed(2)}h` : '';
     },
-    formatDate (value) {
-      return formatDate(value);
-    },
     getClientName (customer, bill) {
       if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
       return truncate(bill.thirdPartyPayer.name, 35);
     },
     getExclTaxesDiscount (bill) {
       const discount = toCents(bill.discount);
+      const vat = bill.vat * 100;
 
-      return toEuros(discount / (1 + bill.vat / 100));
+      return toEuros((discount * 10000) / (10000 + vat));
     },
     getNetExclTaxes (bill) {
-      const exclTaxes = toCents(parseFloat(bill.exclTaxes));
+      const exclTaxes = toCents(bill.exclTaxes);
       const exclTaxesDiscount = toCents(this.getExclTaxesDiscount(bill));
 
       return toEuros(exclTaxes - exclTaxesDiscount);

@@ -203,6 +203,9 @@ export default {
     await Promise.all([this.getDraftBills(), this.getThirdPartyPayers()]);
   },
   methods: {
+    toCents,
+    toEuros,
+    formatPrice,
     openDeliveryDownloadModal () {
       this.deliveryDownloadModal = true;
     },
@@ -234,15 +237,6 @@ export default {
       } finally {
         this.modalLoading = false;
       }
-    },
-    formatPrice (value) {
-      return formatPrice(value);
-    },
-    toCents (value) {
-      return toCents(value);
-    },
-    toEuros (value) {
-      return toEuros(value);
     },
     computeTotalAmount (data) {
       const total = data.bills.reduce((prev, next) => prev + (toCents(next.inclTaxes) - toCents(next.discount)), 0);
