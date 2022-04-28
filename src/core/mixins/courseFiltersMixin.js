@@ -137,22 +137,22 @@ export const courseFiltersMixin = {
     filterCoursesByStartDate (courses) {
       return courses
         .filter(course => (!course.slots.length && isSameOrAfter(course.estimatedStartDate, this.selectedStartDate)) ||
-          (course.slots.some(slot => slot.some(s => isSameOrAfter(s.startDate, this.selectedStartDate)))));
+          (course.slots.some(slotGroup => slotGroup.some(s => isSameOrAfter(s.startDate, this.selectedStartDate)))));
     },
     filterCoursesByEndDate (courses) {
       return courses
         .filter(course => (!course.slots.length && isSameOrBefore(course.estimatedStartDate, this.selectedEndDate)) ||
-          (course.slots.some(slot => slot.some(s => isSameOrBefore(s.endDate, this.selectedEndDate)))));
+          (course.slots.some(slotGroup => slotGroup.some(s => isSameOrBefore(s.endDate, this.selectedEndDate)))));
     },
     filterCoursesByStartDateAndEndDate (courses) {
       return courses
         .filter((course) => {
-          const hasEstimatedStartDate = !course.slots.length &&
+          const hasEstimationInRange = !course.slots.length &&
             isBetween(course.estimatedStartDate, this.selectedStartDate, this.selectedEndDate);
-          const hasSlots = course.slots
-            .some(slot => slot.some(s => isBetween(s.endDate, this.selectedStartDate, this.selectedEndDate)));
+          const hasSlotsInRange = course.slots
+            .some(slotGroup => slotGroup.some(s => isBetween(s.endDate, this.selectedStartDate, this.selectedEndDate)));
 
-          return hasEstimatedStartDate || hasSlots;
+          return hasEstimationInRange || hasSlotsInRange;
         });
     },
     groupByCourses (courses) {
