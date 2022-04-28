@@ -12,9 +12,11 @@
       <ni-select :options="salesRepresentativesFilterOptions" :model-value="selectedSalesRepresentative"
         @update:model-value="updateSelectedSalesRepresentative" />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
-        placeholder="Début de période" />
+        placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
+        error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
       <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
-        placeholder="Fin de période" />
+        placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
+        error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -47,6 +49,7 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
+import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -93,6 +96,8 @@ export default {
         type: { required },
         salesRepresentative: { required },
       },
+      selectedStartDate: { maxDate: this.selectedEndDate ? maxDate(this.selectedEndDate) : '' },
+      selectedEndDate: { minDate: this.selectedStartDate ? minDate(this.selectedStartDate) : '' },
     };
   },
   computed: {

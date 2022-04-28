@@ -107,12 +107,14 @@ export default {
     formatNearestDate () {
       if (!this.courseSlotsCount && this.course.estimatedStartDate) {
         const rangeToEstimatedStartDate = moment(this.course.estimatedStartDate).diff(moment().startOf('day'), 'd');
+        if (rangeToEstimatedStartDate < 0) {
+          return `Début souhaité il y a ${formatQuantity('jour', Math.abs(rangeToEstimatedStartDate))}`;
+        }
+        if (rangeToEstimatedStartDate) {
+          return `Début souhaité dans ${formatQuantity('jour', rangeToEstimatedStartDate)}`;
+        }
 
-        return rangeToEstimatedStartDate < 0
-          ? `Début souhaité il y a ${formatQuantity('jour', Math.abs(rangeToEstimatedStartDate))}`
-          : `Début souhaité ${rangeToEstimatedStartDate
-            ? `dans ${formatQuantity('jour', rangeToEstimatedStartDate)}`
-            : 'aujourd\'hui'}`;
+        return 'Début souhaité aujourd\'hui';
       }
       if (!this.courseSlotsCount && !this.course.slotsToPlan.length) return 'Pas de date prévue';
       if (!this.courseSlotsCount) return 'Prochaine date à planifier';
