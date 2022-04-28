@@ -237,8 +237,7 @@ export default {
       }
     },
     computeTotalAmount (data) {
-      const totalCents = data.bills
-        .reduce((prev, next) => prev + (toCents(next.inclTaxes) - toCents(next.discount)), 0);
+      const totalCents = data.bills.reduce((acc, bill) => acc + (toCents(bill.inclTaxes) - toCents(bill.discount)), 0);
       data.total = toEuros(totalCents);
 
       return toEuros(totalCents);
