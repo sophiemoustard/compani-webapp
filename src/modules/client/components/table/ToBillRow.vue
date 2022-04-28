@@ -62,6 +62,7 @@ import {
   toCents,
   toEuros,
 } from '@helpers/utils';
+import { divide, add } from '@helpers/numbers';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
 
@@ -95,10 +96,9 @@ export default {
       return truncate(bill.thirdPartyPayer.name, 35);
     },
     getExclTaxesDiscount (bill) {
-      const discountCents = toCents(bill.discount);
-      const vatInt = bill.vat * 100;
+      const vat = divide(bill.vat, 100);
 
-      return toEuros((discountCents * 10000) / (10000 + vatInt));
+      return divide(bill.discount, add(1, vat));
     },
     getNetExclTaxes (bill) {
       const exclTaxesCents = toCents(bill.exclTaxes);
