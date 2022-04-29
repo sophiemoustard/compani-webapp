@@ -5,7 +5,7 @@
     </template>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.funder" required-field
       @update:model-value="update($event, 'funder')" />
-    <ni-input in-modal caption="Prix" :error="validations.mainFee.price.$error" type="number"
+    <ni-input in-modal caption="Prix du programme" :error="validations.mainFee.price.$error" type="number"
       :model-value="newBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'mainFee.price')" />
     <ni-input in-modal caption="Quantité" :error="validations.mainFee.count.$error" type="number"
