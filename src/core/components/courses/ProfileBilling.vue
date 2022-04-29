@@ -404,6 +404,9 @@ export default {
 
         billCreationModal.value = false;
         await refreshCourseBills();
+
+        const bill = courseBills.value.reduce((a, b) => (a.createdAt > b.createdAt ? a : b));
+        showDetails(bill._id);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la facture.');
