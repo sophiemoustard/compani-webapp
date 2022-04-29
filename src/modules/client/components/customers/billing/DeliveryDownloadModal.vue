@@ -11,6 +11,11 @@
     <ni-select caption="Mois" :model-value="deliveryFile.month" required-field @blur="validations.month.$touch"
       :error="validations.month.$error" @update:model-value="update($event, 'month')" :options="monthOptions"
       in-modal />
+    <div class="row q-pb-md q-pt-md">
+      <q-checkbox class="checkbox" :model-value="deliveryFile.onlyPastEvents"
+        @update:model-value="update($event, 'onlyPastEvents')" dense
+        label="Ne prendre en compte que les évènement passés jusqu’à hier (inclus)" />
+    </div>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Télécharger le fichier" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -56,3 +61,8 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+  .checkbox
+    font-size: 14px !important
+</style>
