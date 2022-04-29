@@ -135,7 +135,7 @@ import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
@@ -405,7 +405,7 @@ export default {
         billCreationModal.value = false;
         await refreshCourseBills();
 
-        const bill = courseBills.value.reduce((a, b) => (a.createdAt > b.createdAt ? a : b));
+        const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
         showDetails(bill._id);
       } catch (e) {
         console.error(e);
