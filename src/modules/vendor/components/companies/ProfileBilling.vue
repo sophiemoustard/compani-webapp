@@ -363,6 +363,7 @@ export default {
   color: $copper-grey-600
 .course
   display: flex
+  max-width: fit-content
   &:hover
     text-decoration: underline
     text-decoration-color: $copper-grey-600
