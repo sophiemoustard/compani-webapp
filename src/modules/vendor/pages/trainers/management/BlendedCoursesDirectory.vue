@@ -9,6 +9,12 @@
         @update:model-value="updateSelectedProgram" />
       <ni-select :options="salesRepresentativesFilterOptions" clearable
         :model-value="selectedSalesRepresentative" @update:model-value="updateSelectedSalesRepresentative" />
+      <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
+        placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
+        error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
+      <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
+        placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
+        error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -17,13 +23,16 @@
 
 <script>
 import { mapState } from 'vuex';
+import useVuelidate from '@vuelidate/core';
 import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
+import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED } from '@data/constants';
 import { createMetaMixin } from 'quasar';
+import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 
 const metaInfo = { title: 'Catalogue' };
 
@@ -34,11 +43,21 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
     'ni-select': Select,
+    'ni-date-input': DateInput,
+  },
+  setup () {
+    return { v$: useVuelidate() };
   },
   data () {
     return {
       coursesWithGroupedSlot: [],
       displayArchived: false,
+    };
+  },
+  validations () {
+    return {
+      selectedStartDate: { maxDate: this.selectedEndDate ? maxDate(this.selectedEndDate) : '' },
+      selectedEndDate: { minDate: this.selectedStartDate ? minDate(this.selectedStartDate) : '' },
     };
   },
   computed: {

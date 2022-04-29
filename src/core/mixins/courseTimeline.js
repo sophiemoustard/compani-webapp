@@ -7,11 +7,7 @@ export const courseTimelineMixin = {
       return this.courses
         .filter(this.isForthcoming)
         .map(course => ({ ...course, status: FORTHCOMING }))
-        .sort((a, b) => {
-          if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
-          if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
-          return this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b);
-        });
+        .sort((a, b) => this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b));
     },
     courseListInProgress () {
       return this.courses
@@ -47,7 +43,10 @@ export const courseTimelineMixin = {
       return !this.isForthcoming(course) && !this.isInProgress(course);
     },
     getRangeNowToStartCourse (course) {
-      if (!course.slots.length && course.slotsToPlan.length) return 0;
+      if (!course.slots.length && course.estimatedStartDate) {
+        return moment(course.estimatedStartDate).diff(moment(), 'd', true);
+      }
+      if (!course.slots.length && course.slotsToPlan.length) return Number.MAX_SAFE_INTEGER - 1;
       if (!course.slots.length) return Number.MAX_SAFE_INTEGER;
 
       const firstSlot = course.slots[0];

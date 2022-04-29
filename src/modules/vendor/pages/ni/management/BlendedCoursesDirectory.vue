@@ -11,6 +11,12 @@
         @update:model-value="updateSelectedProgram" />
       <ni-select :options="salesRepresentativesFilterOptions" :model-value="selectedSalesRepresentative"
         @update:model-value="updateSelectedSalesRepresentative" />
+      <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
+        placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
+        error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
+      <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
+        placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
+        error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -29,11 +35,13 @@ import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import { mapState } from 'vuex';
 import omit from 'lodash/omit';
+import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
+import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
@@ -41,6 +49,7 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
+import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -50,6 +59,7 @@ export default {
     'ni-select': Select,
     'course-creation-modal': CourseCreationModal,
     'ni-trello': Trello,
+    'ni-date-input': DateInput,
   },
   setup () {
     const metaInfo = { title: 'Catalogue' };
@@ -86,6 +96,8 @@ export default {
         type: { required },
         salesRepresentative: { required },
       },
+      selectedStartDate: { maxDate: this.selectedEndDate ? maxDate(this.selectedEndDate) : '' },
+      selectedEndDate: { minDate: this.selectedStartDate ? minDate(this.selectedStartDate) : '' },
     };
   },
   computed: {
@@ -155,7 +167,7 @@ export default {
         if (this.v$.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
-        await Courses.create(omit(this.newCourse, 'program'));
+        await Courses.create(pickBy(omit(this.newCourse, 'program')));
 
         this.courseCreationModal = false;
         NotifyPositive('Formation créée.');
