@@ -7,7 +7,7 @@
           <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
             <q-item-section>
               <div class="flex">
-                <div v-if="bill.number" class="text-weight-bold cliquable-name" @click.stop="downloadBill(bill._id)"
+                <div v-if="bill.number" class="text-weight-bold clickable-name" @click.stop="downloadBill(bill._id)"
                   :disable="pdfLoading">
                   {{ bill.number }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
@@ -17,7 +17,11 @@
                 <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
                   <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
                   <div class="q-ml-xs text-orange-500">
-                    Annulée par avoir - {{ bill.courseCreditNote.number }}
+                    Annulée par avoir -
+                    <span class="clickable-name text-orange-500" :disable="pdfLoading"
+                      @click.stop="downloadCreditNote(bill.courseCreditNote._id)">
+                      {{ bill.courseCreditNote.number }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -115,7 +119,8 @@
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
-      :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate" />
+      :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate"
+      :credit-note-meta-info="creditNoteMetaInfo" />
   </div>
 </template>
 
@@ -129,8 +134,8 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatAndSortOptions, formatPrice, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatAndSortOptions, formatPrice } from '@helpers/utils';
+import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
@@ -186,6 +191,7 @@ export default {
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const newCreditNote = ref({ courseBill: '', misc: '', date: '', company: '' });
+    const creditNoteMetaInfo = ref({ number: '', netInclTaxes: '', courseName: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
@@ -398,6 +404,9 @@ export default {
 
         billCreationModal.value = false;
         await refreshCourseBills();
+
+        const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
+        showDetails(bill._id);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la facture.');
@@ -495,14 +504,21 @@ export default {
     };
 
     const openCreditNoteCreationModal = (bill) => {
+      const { _id: billId, number, netInclTaxes } = bill;
       newCreditNote.value = {
-        courseBill: bill._id,
+        courseBill: billId,
         date: '',
         misc: '',
         company: course.value.company._id,
       };
       creditNoteCreationModal.value = true;
       minCourseCreditNoteDate.value = bill.billedAt;
+      creditNoteMetaInfo.value = {
+        number,
+        netInclTaxes,
+        courseName: `${get(course, 'value.company.name')} - ${get(course, 'value.subProgram.program.name')}
+          ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`,
+      };
     };
 
     const addCreditNote = async () => {
@@ -528,6 +544,7 @@ export default {
     const resetCreditNoteCreationModal = () => {
       newCreditNote.value = { courseBill: '', date: '', misc: '', company: '' };
       minCourseCreditNoteDate.value = '';
+      creditNoteMetaInfo.value = { number: '', netInclTaxes: '', courseName: '' };
       validations.value.newCreditNote.$reset();
     };
 
@@ -579,11 +596,20 @@ export default {
         downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
-        if (e.status === 404) {
-          const { message } = readAPIResponseWithTypeArrayBuffer(e);
-          return NotifyNegative(message);
-        }
         NotifyNegative('Erreur lors du téléchargement de la facture.');
+      } finally {
+        pdfLoading.value = false;
+      }
+    };
+
+    const downloadCreditNote = async (creditNoteId) => {
+      try {
+        pdfLoading.value = true;
+        const pdf = await CourseCreditNotes.getPdf(creditNoteId);
+        downloadFile(pdf, 'avoir.pdf', 'application/octet-stream');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de l\'avoir.');
       } finally {
         pdfLoading.value = false;
       }
@@ -626,6 +652,7 @@ export default {
       courseFeeEditionModalMetaInfo,
       areDetailsVisible,
       minCourseCreditNoteDate,
+      creditNoteMetaInfo,
       // Computed
       validations,
       course,
@@ -667,6 +694,7 @@ export default {
       showDetails,
       getBillingItemName,
       downloadBill,
+      downloadCreditNote,
       get,
       omit,
       pickBy,

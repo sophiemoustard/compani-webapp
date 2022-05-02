@@ -38,6 +38,15 @@ const routes = [
         name: 'ni users companies info',
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompanyProfile'),
         props: true,
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni management blended courses info') to.params.defaultTab = 'bills';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'users',

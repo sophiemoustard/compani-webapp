@@ -658,7 +658,7 @@ export default {
     disableSubscriptionDeletion (sub) {
       const hasFunding = this.fundings.some(f => f.subscription._id === sub._id);
 
-      return sub.eventCount > 0 || sub.repetitionCount > 0 || hasFunding;
+      return sub.isUsedInEvents > 0 || sub.isUsedInRepetitions > 0 || hasFunding;
     },
     getFundingValidation (funding) {
       return {
@@ -1075,6 +1075,10 @@ export default {
         NotifyPositive('Financement supprimé');
       } catch (e) {
         console.error(e);
+        if (e.status === 403) {
+          return NotifyNegative('Suppression impossible : ce financement est rattaché à une facture.');
+        }
+        return NotifyNegative('Erreur lors de la suppression du financement.');
       }
     },
     validateFundingDeletion (fundingId) {

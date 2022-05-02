@@ -5,7 +5,7 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input borderless dense :model-value="inputDate" bg-color="white" @update:model-value="input" :error="error"
-      placeholder="jj/mm/yyyy" :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage"
+      :placeholder="placeholder" :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage"
       @blur="blur" ref="dateInput" @focus="focus">
       <template #append>
         <q-icon name="event" class="cursor-pointer" @click="focus" color="copper-grey-500">
@@ -37,6 +37,7 @@ export default {
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
     contentClass: { type: String, default: '' },
+    placeholder: { type: String, default: 'jj/mm/yyyy' },
   },
   emits: ['blur', 'focus', 'update:model-value'],
   computed: {

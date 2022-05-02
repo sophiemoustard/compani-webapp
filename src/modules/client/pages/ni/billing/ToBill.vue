@@ -138,7 +138,7 @@ export default {
       ],
       toBillOption: 0,
       deliveryDownloadModal: false,
-      deliveryFile: { thirdPartyPayers: [], month: moment().format('MM-YYYY') },
+      deliveryFile: { thirdPartyPayers: [], month: moment().format('MM-YYYY'), onlyPastEvents: false },
       thirdPartyPayerOptions: [],
       thirdPartyPayers: [],
       monthOptions: [
@@ -208,7 +208,7 @@ export default {
     },
     resetDeliveryDownloadModal () {
       this.v$.deliveryFile.$reset();
-      this.deliveryFile = { thirdPartyPayers: [], month: moment().format('MM-YYYY') };
+      this.deliveryFile = { thirdPartyPayers: [], month: moment().format('MM-YYYY'), onlyPastEvents: false };
     },
     getFileName () {
       const tpp = this.thirdPartyPayers.find(t => this.deliveryFile.thirdPartyPayers.includes(t._id));
