@@ -10,7 +10,7 @@
     </div>
     <ni-select caption="Mois" :model-value="deliveryFile.month" required-field @blur="validations.month.$touch"
       :error="validations.month.$error" @update:model-value="update($event, 'month')" :options="monthOptions"
-      in-modal />
+      in-modal :disable="deliveryFile.onlyPastEvents" />
     <div v-if="deliveryFile.month === moment().format('MM-YYYY')" class="row q-pb-md q-pt-md">
       <q-checkbox class="checkbox" :model-value="deliveryFile.onlyPastEvents" dense
         @update:model-value="update($event, 'onlyPastEvents')"
