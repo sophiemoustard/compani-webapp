@@ -11,10 +11,10 @@
     <ni-select caption="Mois" :model-value="deliveryFile.month" required-field @blur="validations.month.$touch"
       :error="validations.month.$error" @update:model-value="update($event, 'month')" :options="monthOptions"
       in-modal />
-    <div class="row q-pb-md q-pt-md">
+    <div v-if="deliveryFile.month === moment().format('MM-YYYY')" class="row q-pb-md q-pt-md">
       <q-checkbox class="checkbox" :model-value="deliveryFile.onlyPastEvents" dense
         @update:model-value="update($event, 'onlyPastEvents')"
-        label="Ne prendre en compte que les évènements passés (jusqu’à hier inclus)" />
+        label="Inclure uniquement les évènements antérieurs à aujourd'hui" />
     </div>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Télécharger le fichier" icon-right="add" color="primary"
@@ -25,6 +25,7 @@
 
 <script>
 import set from 'lodash/set';
+import moment from '@helpers/moment';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
@@ -58,6 +59,7 @@ export default {
     update (event, prop) {
       this.$emit('update:delivery-file', set(this.deliveryFile, prop, event));
     },
+    moment,
   },
 };
 </script>
