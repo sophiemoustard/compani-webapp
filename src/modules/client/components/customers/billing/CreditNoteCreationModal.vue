@@ -34,10 +34,10 @@
       <div class="row justify-between items-baseline">
         <div class="col-6 light">
           <p v-if="newCreditNote.exclTaxesCustomer">
-            Montant HT bénéficiaire : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}
+            Montant HT bénéficiaire : {{ formatStringToPrice(newCreditNote.exclTaxesCustomer) }}
           </p>
           <p v-if="newCreditNote.exclTaxesTpp">
-            Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}
+            Montant HT tiers-payeur : {{ formatStringToPrice(newCreditNote.exclTaxesTpp) }}
           </p>
         </div>
         <div class="col-6 light">
@@ -89,7 +89,7 @@
       <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
         label-color="primary" />
       <div class="row q-mb-md">
-        <div class="col-6 total-text">Total HT : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}</div>
+        <div class="col-6 total-text">Total HT : {{ formatStringToPrice(newCreditNote.exclTaxesCustomer) }}</div>
         <div class="col-6 total-text">Total TTC : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}</div>
       </div>
     </template>
@@ -111,7 +111,7 @@ import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import ButtonToggle from '@components/ButtonToggle';
 import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS, BILLING_ITEMS } from '@data/constants';
-import { formatPrice, formatIdentity } from '@helpers/utils';
+import { formatPrice, formatStringToPrice, formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'CreditNoteCreationModal',
@@ -172,6 +172,7 @@ export default {
   },
   methods: {
     formatPrice,
+    formatStringToPrice,
     formatIdentity,
     hide () {
       this.$emit('hide');
