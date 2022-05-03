@@ -4,7 +4,7 @@
       Editer un <span class="text-weight-bold">créneau</span>
     </template>
     <div class="modal-icon">
-      <ni-button icon="delete" @click="validateDeletion(editedCourseSlot._id)" />
+      <ni-button v-if="isAdmin && isVendorInterface" icon="delete" @click="validateDeletion(editedCourseSlot._id)" />
     </div>
     <ni-select in-modal caption="Etape" :options="stepOptions" :model-value="editedCourseSlot.step" required-field
       @blur="validations.step.$touch" :error="validations.step.$error" @update:model-value="updateStep" />
@@ -43,6 +43,8 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     linkErrorMessage: { type: String, default: '' },
+    isAdmin: { type: Boolean, default: false },
+    isVendorInterface: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
