@@ -12,8 +12,10 @@ exports.add = (...nums) => nums.reduce((acc, n) => BigNumber(acc).plus(n).toStri
 
 exports.subtract = (a, b) => BigNumber(a).minus(b).toString();
 
-exports.isGreaterThan = (a, b) => BigNumber(a).isGreaterThan(b);
+exports.isEqualTo = (a, b) => BigNumber(a).isEqualTo(b);
 
 exports.isLessThan = (a, b) => BigNumber(a).isLessThan(b);
 
-exports.isEqualTo = (a, b) => BigNumber(a).isEqualTo(b);
+exports.isGreaterThan = (a, b) => BigNumber(a).isGreaterThan(b);
+
+exports.isGreaterThanOrEqual = (a, b) => this.isGreaterThan(a, b) || this.isEqualTo(a, b);
