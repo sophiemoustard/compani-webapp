@@ -1,7 +1,7 @@
 <template>
   <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
     <template #title v-if="!isClientInterface">
-      <ni-button icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
+      <ni-button icon="delete" @click="deleteCourse" />
       <ni-button :flat="false" v-if="displayArchiveButton" class="q-ml-sm"
         label="Archiver" @click="validateCourseArchive" />
     </template>
@@ -21,7 +21,6 @@ export default {
   name: 'BlendedCourseProfileHeader',
   props: {
     title: { type: String, required: true },
-    disableCourseDeletion: { type: Boolean, default: true },
     headerInfo: { type: Array, required: true },
   },
   components: {

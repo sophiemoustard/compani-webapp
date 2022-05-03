@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background">
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" @delete="validateCourseDeletion" @refresh="refreshCourse"
-        :disable-course-deletion="disableCourseDeletion" :header-info="headerInfo" />
+        :header-info="headerInfo" />
       <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>
@@ -39,9 +39,6 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    disableCourseDeletion () {
-      return !!this.course.slots.length || !!this.course.trainees.length || !!this.course.slotsToPlan.length;
-    },
     tabsContent () {
       const organizationTab = {
         label: 'Organisation',
@@ -91,21 +88,17 @@ export default {
       try {
         await Courses.delete(this.course._id);
         NotifyPositive('Formation supprimée.');
+
         this.$router.push({ name: 'ni management blended courses' });
       } catch (e) {
         console.error(e);
-        if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer cette formation.');
-        if (e.msg) NotifyNegative('Erreur lors de la suppression de la formation.');
+        if (e.status === 403) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la suppression de la formation.');
       }
     },
     validateCourseDeletion () {
-      if (this.disableCourseDeletion) return;
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Confirmez-vous la suppression ?',
-        ok: 'OK',
-        cancel: 'Annuler',
-      }).onOk(this.deleteCourse)
+      this.$q.dialog({ title: 'Confirmation', message: 'Confirmez-vous la suppression ?', ok: 'OK', cancel: 'Annuler' })
+        .onOk(this.deleteCourse)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
