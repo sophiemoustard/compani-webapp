@@ -99,7 +99,12 @@ export default {
       return { pre: 'Nouveau', type: 'créneau', post: 'le', infos };
     },
     getSlotCreationDetails () {
-      return get(this.courseHistory, 'slot.address.fullAddress', 'Pas d\'adresse renseignée.');
+      if (get(this.courseHistory, 'slot.address.fullAddress')) {
+        return get(this.courseHistory, 'slot.address.fullAddress');
+      }
+      if (get(this.courseHistory, 'slot.meetingLink')) return get(this.courseHistory, 'slot.meetingLink');
+
+      return 'Pas d\'adresse renseignée.';
     },
     getSlotDeletionTitle () {
       const date = moment(this.courseHistory.slot.startDate).format('DD/MM');
@@ -107,11 +112,15 @@ export default {
       return { pre: 'Suppression du', type: 'créneau', post: 'du', infos: `${date}` };
     },
     getSlotDeletionDetails () {
-      const address = get(this.courseHistory, 'slot.address.fullAddress', '');
+      let address = '.\r\nPas d\'adresse renseignée.';
+      if (get(this.courseHistory, 'slot.address.fullAddress')) {
+        address = ` au ${get(this.courseHistory, 'slot.address.fullAddress')}`;
+      } else if (get(this.courseHistory, 'slot.meetingLink')) {
+        address = ` sur ${get(this.courseHistory, 'slot.meetingLink')}`;
+      }
 
       return `Créneau initialement prévu de ${formatHoursWithMinutes(this.courseHistory.slot.startDate)}`
-        + ` à ${formatHoursWithMinutes(this.courseHistory.slot.endDate)}`
-        + `${address ? `, au ${address}.` : '.\r\nPas d\'adresse renseignée.'}`;
+        + ` à ${formatHoursWithMinutes(this.courseHistory.slot.endDate)}${address}`;
     },
     getSlotEditionTitle () {
       if (this.courseHistory.update.startDate) {
