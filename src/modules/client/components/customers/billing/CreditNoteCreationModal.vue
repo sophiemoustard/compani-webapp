@@ -33,10 +33,10 @@
       </div>
       <div class="row justify-between items-baseline">
         <div class="col-6 light">
-          <p v-if="newCreditNote.exclTaxesCustomer">
+          <p v-if="!isEqualTo(newCreditNote.exclTaxesCustomer, 0)">
             Montant HT bénéficiaire : {{ formatStringToPrice(newCreditNote.exclTaxesCustomer) }}
           </p>
-          <p v-if="newCreditNote.exclTaxesTpp">
+          <p v-if="!isEqualTo(newCreditNote.exclTaxesTpp, 0)">
             Montant HT tiers-payeur : {{ formatStringToPrice(newCreditNote.exclTaxesTpp) }}
           </p>
         </div>
@@ -112,6 +112,7 @@ import Modal from '@components/modal/Modal';
 import ButtonToggle from '@components/ButtonToggle';
 import { REQUIRED_LABEL, CREDIT_NOTE_TYPE_OPTIONS, SUBSCRIPTION, EVENTS, BILLING_ITEMS } from '@data/constants';
 import { formatPrice, formatStringToPrice, formatIdentity } from '@helpers/utils';
+import { isEqualTo } from '@helpers/numbers';
 
 export default {
   name: 'CreditNoteCreationModal',
@@ -174,6 +175,7 @@ export default {
     formatPrice,
     formatStringToPrice,
     formatIdentity,
+    isEqualTo,
     hide () {
       this.$emit('hide');
     },
