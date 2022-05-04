@@ -68,11 +68,11 @@ import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL, BILLING_ITEMS } from '@data/constants';
-import { formatPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { formatPrice, formatStringToPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import { strictPositiveNumber, minDate, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
-import { divide, add, multiply, toFixed, isEqualTo, toString } from '@helpers/numbers';
+import { divide, add, multiply, isEqualTo, toString } from '@helpers/numbers';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
 
@@ -148,7 +148,7 @@ export default {
           label: 'HT',
           align: 'left',
           field: row => (row.thirdPartyPayer ? row.exclTaxesTpp : row.exclTaxesCustomer),
-          format: formatPrice,
+          format: formatStringToPrice,
         },
         {
           name: 'inclTaxes',
@@ -524,12 +524,10 @@ export default {
 
       if (creditNote.inclTaxesCustomer) {
         payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
-        const exactExclTaxesCustomer = divide(creditNote.inclTaxesCustomer, add(1, percentVat));
-        payload.exclTaxesCustomer = toFixed(exactExclTaxesCustomer);
+        payload.exclTaxesCustomer = divide(creditNote.inclTaxesCustomer, add(1, percentVat));
       } else {
         payload.inclTaxesTpp = creditNote.inclTaxesTpp;
-        const exactExclTaxesTpp = divide(creditNote.inclTaxesTpp, add(1, percentVat));
-        payload.exclTaxesTpp = toFixed(exactExclTaxesTpp);
+        payload.exclTaxesTpp = divide(creditNote.inclTaxesTpp, add(1, percentVat));
         payload.thirdPartyPayer = creditNote.thirdPartyPayer;
       }
 
