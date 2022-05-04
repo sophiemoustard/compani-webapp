@@ -99,12 +99,8 @@ export default {
       return { pre: 'Nouveau', type: 'créneau', post: 'le', infos };
     },
     getSlotCreationDetails () {
-      if (get(this.courseHistory, 'slot.address.fullAddress')) {
-        return get(this.courseHistory, 'slot.address.fullAddress');
-      }
-      if (get(this.courseHistory, 'slot.meetingLink')) return get(this.courseHistory, 'slot.meetingLink');
-
-      return 'Pas d\'adresse renseignée.';
+      return get(this.courseHistory, 'slot.address.fullAddress') || get(this.courseHistory, 'slot.meetingLink') ||
+        'Pas d\'adresse renseignée.';
     },
     getSlotDeletionTitle () {
       const date = moment(this.courseHistory.slot.startDate).format('DD/MM');
