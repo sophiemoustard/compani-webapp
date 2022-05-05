@@ -61,6 +61,8 @@ export const integerNumber = (value) => {
 
 export const twoFractionDigits = value => /^\d*(\.\d{0,2})?$/.test(value);
 
+export const fourFractionDigits = value => /^\d*(\.\d{0,4})?$/.test(value);
+
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
 export const minDate = min => helpers.withParams({ value: min }, value => !value || new Date(min) <= new Date(value));
