@@ -537,8 +537,8 @@ export default {
         service: { serviceId: service._id, nature: service.nature, name: service.name },
         vat,
         unitInclTaxes: versions && versions.length > 0
-          ? toString(getLastVersion(versions, 'createdAt').unitTTCRate)
-          : toString(0),
+          ? getLastVersion(versions, 'createdAt').unitTTCRate
+          : 0,
       };
 
       return payload;
@@ -551,6 +551,7 @@ export default {
           ...pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'serviceName']),
           bills: {
             ...omit(cnEvent.bills, '_id'),
+            ...(cnEvent.bills.careHours && { careHours: cnEvent.bills.careHours.toString() }),
             ...(cnEvent.bills.surcharges && { surcharges: cnEvent.bills.surcharges.map(sur => omit(sur, '_id')) }),
           },
         };
