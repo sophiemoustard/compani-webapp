@@ -116,8 +116,7 @@ export default {
       if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
       if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
         get(validation, `${path}.0.$validator`) === 'strictPositiveNumber' ||
-        get(validation, `${path}.0.$validator`) === 'twoFractionDigits' ||
-        get(validation, `${path}.0.$validator`) === 'fourFractionDigits') return 'Nombre non valide';
+        get(validation, `${path}.0.$validator`) === 'fractionDigits') return 'Nombre non valide';
 
       return '';
     },
