@@ -244,7 +244,7 @@ import {
 import moment from '@helpers/moment';
 import { roundFrenchPercentage, formatPrice, formatAndSortOptions, sortStrings, getLastVersion } from '@helpers/utils';
 import { formatHoursWithMinutes } from '@helpers/date';
-import { frAddress, positiveNumber, minDate, twoFractionDigits } from '@helpers/vuelidateCustomVal';
+import { frAddress, positiveNumber, minDate, fractionDigits } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
@@ -585,12 +585,7 @@ export default {
           format: val => (val ? 'Oui' : 'Non'),
           style: !this.$q.platform.is.mobile && 'width: 100px',
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'right',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'right', field: '_id' },
       ],
       thirdPartyPayersVisibleColumns: [
         'name',
@@ -680,19 +675,19 @@ export default {
       newService: {
         name: { required },
         nature: { required },
-        defaultUnitAmount: { required, positiveNumber, twoFractionDigits },
+        defaultUnitAmount: { required, positiveNumber, fractionDigits: fractionDigits(2) },
         vat: { positiveNumber },
       },
       editedService: {
         name: { required },
         startDate: { required, minDate: this.minStartDate ? minDate(this.minStartDate) : '' },
-        defaultUnitAmount: { required, positiveNumber, twoFractionDigits },
+        defaultUnitAmount: { required, positiveNumber, fractionDigits: fractionDigits(2) },
         vat: { positiveNumber },
       },
       newBillingItem: {
         name: { required },
         type: { required },
-        defaultUnitAmount: { required, positiveNumber, twoFractionDigits },
+        defaultUnitAmount: { required, positiveNumber, fractionDigits: fractionDigits(2) },
         vat: { required, positiveNumber },
       },
       company: {
@@ -710,7 +705,7 @@ export default {
         },
         email: { email },
         billingMode: { required },
-        unitTTCRate: { positiveNumber, twoFractionDigits },
+        unitTTCRate: { positiveNumber, fractionDigits: fractionDigits(2) },
         isApa: { required },
       },
       editedThirdPartyPayer: {
@@ -723,7 +718,7 @@ export default {
         },
         email: { email },
         billingMode: { required },
-        unitTTCRate: { positiveNumber, twoFractionDigits },
+        unitTTCRate: { positiveNumber, fractionDigits: fractionDigits(2) },
         isApa: { required },
         teletransmissionType: { required: requiredIf(get(this.editedThirdPartyPayer, 'teletransmissionId')) },
         companyCode: { required: requiredIf(get(this.editedThirdPartyPayer, 'teletransmissionId')) },
