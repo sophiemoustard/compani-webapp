@@ -318,9 +318,9 @@ export default {
         subscription: null,
         startDate: '',
         endDate: '',
-        exclTaxesCustomer: '0',
+        exclTaxesCustomer: toString(0),
         inclTaxesCustomer: 0,
-        exclTaxesTpp: '0',
+        exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
         billingItemList: [{ billingItem: '', unitInclTaxes: toString(0), count: 1 }],
       };
