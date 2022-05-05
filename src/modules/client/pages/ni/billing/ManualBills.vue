@@ -37,7 +37,7 @@
 
 <script>
 import { useMeta, useQuasar } from 'quasar';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
@@ -63,6 +63,10 @@ export default {
     'ni-simple-table': SimpleTable,
   },
   setup () {
+    const $q = useQuasar();
+    const metaInfo = { title: 'Factures manuelles' };
+    useMeta(metaInfo);
+
     const modalLoading = ref(false);
     const tableLoading = ref(false);
     const manualBills = ref([]);
@@ -74,13 +78,44 @@ export default {
       netInclTaxes: 0,
       shouldBeSent: false,
     });
-    const metaInfo = { title: 'Factures manuelles' };
+    const rowsPerPage = ref([1, 5, 15, 50, 100, 200, 300]);
+    const pagination = ref({ rowsPerPage: 0, sortBy: 'date', descending: true });
+    const billingItems = ref([]);
+    const customers = ref([]);
+    const columns = ref([
+      { name: 'number', label: '#', align: 'left', field: 'number' },
+      { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
+      {
+        name: 'customer',
+        label: 'Bénéficiaire',
+        align: 'left',
+        field: row => formatIdentity(row.customer.identity, 'Lf'),
+      },
+      { name: 'billingItem', label: 'Article', align: 'center' },
+      { name: 'unitInclTaxes', label: 'PU TTC', align: 'center' },
+      { name: 'count', label: 'Quantité', align: 'center' },
+      { name: 'exclTaxes', label: 'HT', align: 'center' },
+      { name: 'inclTaxes', label: 'TTC', align: 'center' },
+    ]);
 
-    useMeta(metaInfo);
+    const rules = {
+      newManualBill: {
+        date: { required },
+        customer: { required },
+        billingItemList: {
+          $each: helpers.forEach({
+            billingItem: { required },
+            unitInclTaxes: { positiveNumber, required },
+            count: { strictPositiveNumber, required },
+          }),
+        },
+      },
+    };
+    const v$ = useVuelidate(rules, { newManualBill });
 
-    const $q = useQuasar();
+    const customersOptions = computed(() => formatAndSortIdentityOptions(customers.value));
 
-    const v$ = useVuelidate();
+    const billingItemsOptions = computed(() => formatAndSortOptions(billingItems.value, 'name'));
 
     const getManualBills = async () => {
       try {
@@ -104,9 +139,6 @@ export default {
 
     const createManualBill = async (shouldBeSent) => {
       try {
-        v$.value.newManualBill.$touch();
-        if (v$.value.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
-
         modalLoading.value = true;
 
         await Bills.create(formatCreationPayload(shouldBeSent));
@@ -123,6 +155,9 @@ export default {
     };
 
     const validateBillCreation = () => {
+      v$.value.newManualBill.$touch();
+      if (v$.value.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
+
       $q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',
@@ -137,6 +172,44 @@ export default {
         .onCancel(() => NotifyPositive('Facturation annulée.'));
     };
 
+    const refresh = async () => {
+      try {
+        modalLoading.value = true;
+        customers.value = Object.freeze(await Customers.list({ archived: false }));
+        billingItems.value = Object.freeze(await BillingItems.list({ type: MANUAL }));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        modalLoading.value = false;
+      }
+    };
+
+    const addBillingItem = () => {
+      newManualBill.value.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
+    };
+
+    const removeBillingItem = (index) => {
+      newManualBill.value.billingItemList.splice(index, 1);
+    };
+
+    const updateBillingItem = (event, index, path) => {
+      set(newManualBill.value.billingItemList[index], path, event);
+      if (path === 'billingItem') {
+        const billingItem = billingItems.value.find(bi => bi._id === event);
+        set(newManualBill.value.billingItemList[index], 'vat', billingItem?.vat || 0);
+        set(newManualBill.value.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
+      }
+    };
+
+    const resetManualBillCreationModal = () => {
+      newManualBill.value = {
+        date: '',
+        customer: '',
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
+      };
+      v$.value.newManualBill.$reset();
+    };
+
     return {
       // Data
       modalLoading,
@@ -144,56 +217,27 @@ export default {
       manualBills,
       manualBillCreationModal,
       newManualBill,
+      rowsPerPage,
+      pagination,
+      customers,
+      billingItems,
+      columns,
+      // Computed
+      customersOptions,
+      billingItemsOptions,
       // Methods
+      formatCreationPayload,
       getManualBills,
       validateBillCreation,
+      refresh,
+      formatPrice,
+      addBillingItem,
+      removeBillingItem,
+      updateBillingItem,
+      resetManualBillCreationModal,
       // Validations
       v$,
     };
-  },
-  data () {
-    return {
-      rowsPerPage: [1, 5, 15, 50, 100, 200, 300],
-      customers: [],
-      billingItems: [],
-      pagination: { rowsPerPage: 0, sortBy: 'date', descending: true },
-      columns: [
-        { name: 'number', label: '#', align: 'left', field: 'number' },
-        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
-        {
-          name: 'customer',
-          label: 'Bénéficiaire',
-          align: 'left',
-          field: row => formatIdentity(row.customer.identity, 'Lf'),
-        },
-        { name: 'billingItem', label: 'Article', align: 'center' },
-        { name: 'unitInclTaxes', label: 'PU TTC', align: 'center' },
-        { name: 'count', label: 'Quantité', align: 'center' },
-        { name: 'exclTaxes', label: 'HT', align: 'center' },
-        { name: 'inclTaxes', label: 'TTC', align: 'center' },
-      ],
-    };
-  },
-  validations: {
-    newManualBill: {
-      date: { required },
-      customer: { required },
-      billingItemList: {
-        $each: helpers.forEach({
-          billingItem: { required },
-          unitInclTaxes: { positiveNumber, required },
-          count: { strictPositiveNumber, required },
-        }),
-      },
-    },
-  },
-  computed: {
-    customersOptions () {
-      return formatAndSortIdentityOptions(this.customers);
-    },
-    billingItemsOptions () {
-      return formatAndSortOptions(this.billingItems, 'name');
-    },
   },
   watch: {
     'newManualBill.billingItemList': {
@@ -206,42 +250,6 @@ export default {
   },
   async created () {
     await Promise.all([this.getManualBills(), this.refresh()]);
-  },
-  methods: {
-    formatPrice,
-    async refresh () {
-      try {
-        this.modalLoading = true;
-        this.customers = Object.freeze(await Customers.list({ archived: false }));
-        this.billingItems = Object.freeze(await BillingItems.list({ type: MANUAL }));
-      } catch (e) {
-        console.error(e);
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    addBillingItem () {
-      this.newManualBill.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
-    },
-    removeBillingItem (index) {
-      this.newManualBill.billingItemList.splice(index, 1);
-    },
-    updateBillingItem (event, index, path) {
-      set(this.newManualBill.billingItemList[index], path, event);
-      if (path === 'billingItem') {
-        const billingItem = this.billingItems.find(bi => bi._id === event);
-        set(this.newManualBill.billingItemList[index], 'vat', billingItem?.vat || 0);
-        set(this.newManualBill.billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
-      }
-    },
-    resetManualBillCreationModal () {
-      this.newManualBill = {
-        date: '',
-        customer: '',
-        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
-      };
-      this.v$.newManualBill.$reset();
-    },
   },
 };
 </script>
