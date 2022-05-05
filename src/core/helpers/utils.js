@@ -74,7 +74,7 @@ export const roundFrenchPercentage = (number, digits = 2) => (number
   : '0%'
 );
 
-export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPrice(0));
+export const formatPrice = val => (val ? roundFrenchPrice(parseFloat(val)) : roundFrenchPrice(0));
 
 export const formatStringToPrice = (str) => {
   const slicedStr = str.slice(0, 6);
