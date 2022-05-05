@@ -52,7 +52,12 @@ import { MANUAL } from '@data/constants';
 import { multiply, add } from '@helpers/numbers';
 import { formatAndSortIdentityOptions, formatAndSortOptions, formatIdentity, formatPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-import { strictPositiveNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
+import {
+  strictPositiveNumber,
+  positiveNumber,
+  twoFractionDigits,
+  fourFractionDigits,
+} from '@helpers/vuelidateCustomVal';
 import ManualBillCreationModal from 'src/modules/client/components/customers/billing/ManualBillCreationModal';
 import SimpleTable from '@components/table/SimpleTable';
 
@@ -107,8 +112,8 @@ export default {
         billingItemList: {
           $each: helpers.forEach({
             billingItem: { required },
-            unitInclTaxes: { positiveNumber, required },
-            count: { strictPositiveNumber, required },
+            unitInclTaxes: { positiveNumber, required, twoFractionDigits },
+            count: { strictPositiveNumber, required, fourFractionDigits },
           }),
         },
       },
