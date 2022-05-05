@@ -43,7 +43,7 @@
           <div class="to-plan-text">Créneau à planifier</div>
         </q-card>
       </div>
-      <div class="q-mt-md" v-if="canEdit" align="right">
+      <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
         <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
           :disable="loading || addDateToPlanloading" @click="openSlotCreationModal" />
         <ni-button v-if="isVendorInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
@@ -57,7 +57,8 @@
 
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
-      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" />
+      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
+      :is-vendor-interface="isVendorInterface" />
 </div>
 </template>
 
@@ -359,7 +360,8 @@ export default {
         this.editionModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyWarning('Créneau émargé : impossible de le supprimer');
+        if (e.data.statusCode === 409) return NotifyWarning('Créneau émargé : impossible de le supprimer.');
+        if (e.data.statusCode === 403) return NotifyWarning('Seul créneau de l\'étape : impossible de le supprimer.');
         NotifyNegative('Erreur lors de la suppression du créneau.');
       } finally {
         this.modalLoading = false;
