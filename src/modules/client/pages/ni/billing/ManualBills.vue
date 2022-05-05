@@ -37,7 +37,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
@@ -49,6 +49,7 @@ import Bills from '@api/Bills';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { MANUAL } from '@data/constants';
+import { multiply, add } from '@helpers/numbers';
 import { formatAndSortIdentityOptions, formatAndSortOptions, formatIdentity, formatPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { strictPositiveNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -113,6 +114,15 @@ export default {
       },
     };
     const validations = useVuelidate(rules, { newManualBill });
+
+    watch(
+      () => newManualBill.value.billingItemList,
+      () => {
+        newManualBill.value.netInclTaxes = newManualBill.value.billingItemList
+          .reduce((acc, bi) => add(acc, multiply(bi.unitInclTaxes, bi.count)), 0);
+      },
+      { deep: true }
+    );
 
     const getManualBills = async () => {
       try {
@@ -219,15 +229,6 @@ export default {
       formatCreationPayload,
       createManualBill,
     };
-  },
-  watch: {
-    'newManualBill.billingItemList': {
-      deep: true,
-      handler () {
-        this.newManualBill.netInclTaxes = this.newManualBill.billingItemList
-          .reduce((acc, bi) => acc + bi.unitInclTaxes * bi.count, 0);
-      },
-    },
   },
   async created () {
     await Promise.all([this.getManualBills(), this.refresh()]);

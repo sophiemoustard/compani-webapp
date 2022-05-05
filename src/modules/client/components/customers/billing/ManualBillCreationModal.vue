@@ -52,6 +52,7 @@ import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
+import { multiply, add, divide } from '@helpers/numbers';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 
 export default {
@@ -94,11 +95,13 @@ export default {
     'newManualBill.billingItemList': {
       deep: true,
       handler () {
-        this.totalExclTaxes = this.newManualBill.billingItemList
-          .reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-            0
-          );
+        this.totalExclTaxes = this.newManualBill.billingItemList.reduce(
+          (acc, bi) => (bi.billingItem
+            ? add(acc, multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count))
+            : acc
+          ),
+          0
+        );
       },
     },
   },
@@ -117,7 +120,7 @@ export default {
       return '';
     },
     getExclTaxes (inclTaxes, vat) {
-      return inclTaxes / (1 + vat / 100);
+      return divide(inclTaxes, add(1, divide(vat, 100)));
     },
     hide () {
       this.totalExclTaxes = 0;
