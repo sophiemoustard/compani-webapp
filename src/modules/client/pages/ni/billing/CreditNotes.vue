@@ -478,11 +478,11 @@ export default {
       if (this.creditNoteEvents) {
         const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
         for (let i = 0, l = selectedEvents.length; i < l; i++) {
-          if (!isEqualTo(selectedEvents[i].bills.exclTaxesCustomer, 0)) {
+          if (selectedEvents[i].bills.exclTaxesCustomer && !isEqualTo(selectedEvents[i].bills.exclTaxesCustomer, 0)) {
             exclTaxesCustomer = add(exclTaxesCustomer, selectedEvents[i].bills.exclTaxesCustomer);
             inclTaxesCustomer = parseFloat(add(inclTaxesCustomer, selectedEvents[i].bills.inclTaxesCustomer));
           }
-          if (!isEqualTo(selectedEvents[i].bills.exclTaxesTpp, 0)) {
+          if (selectedEvents[i].bills.exclTaxesTpp && !isEqualTo(selectedEvents[i].bills.exclTaxesTpp, 0)) {
             exclTaxesTpp = add(exclTaxesTpp, selectedEvents[i].bills.exclTaxesTpp);
             inclTaxesTpp = parseFloat(add(inclTaxesTpp, selectedEvents[i].bills.inclTaxesTpp));
           }
