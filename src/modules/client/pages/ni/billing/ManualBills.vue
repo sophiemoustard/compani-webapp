@@ -55,8 +55,7 @@ import { formatDate } from '@helpers/date';
 import {
   strictPositiveNumber,
   positiveNumber,
-  twoFractionDigits,
-  fourFractionDigits,
+  fractionDigits,
 } from '@helpers/vuelidateCustomVal';
 import ManualBillCreationModal from 'src/modules/client/components/customers/billing/ManualBillCreationModal';
 import SimpleTable from '@components/table/SimpleTable';
@@ -112,8 +111,8 @@ export default {
         billingItemList: {
           $each: helpers.forEach({
             billingItem: { required },
-            unitInclTaxes: { positiveNumber, required, twoFractionDigits },
-            count: { strictPositiveNumber, required, fourFractionDigits },
+            unitInclTaxes: { positiveNumber, required, fractionDigits: fractionDigits(2) },
+            count: { strictPositiveNumber, required, fractionDigits: fractionDigits(4) },
           }),
         },
       },
