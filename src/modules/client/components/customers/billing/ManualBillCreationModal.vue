@@ -52,7 +52,7 @@ import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPrice, formatStringToPrice } from '@helpers/utils';
-import { multiply, add, divide } from '@helpers/numbers';
+import { multiply, add, divide, toString } from '@helpers/numbers';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 
 export default {
@@ -88,7 +88,7 @@ export default {
     return {
       formatPrice,
       selectedBillingItem: null,
-      totalExclTaxes: '0',
+      totalExclTaxes: toString(0),
     };
   },
   watch: {
@@ -100,7 +100,7 @@ export default {
             ? add(acc, multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count))
             : acc
           ),
-          '0'
+          toString(0)
         );
       },
     },
@@ -125,7 +125,7 @@ export default {
       return divide(inclTaxes, add(1, divide(vat, 100)));
     },
     hide () {
-      this.totalExclTaxes = '0';
+      this.totalExclTaxes = toString(0);
       this.selectedBillingItem = null;
       this.$emit('hide');
     },
