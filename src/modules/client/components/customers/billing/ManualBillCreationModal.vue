@@ -32,7 +32,7 @@
     <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
       label-color="primary" />
     <div class="row q-mb-md">
-      <div class="col-6 total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
+      <div class="col-6 total-text">Total HT : {{ formatStringToPrice(totalExclTaxes) }}</div>
       <div class="col-6 total-text">Total TTC : {{ formatPrice(newManualBill.netInclTaxes) }}</div>
     </div>
     <template #footer>
@@ -51,7 +51,7 @@ import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, formatStringToPrice } from '@helpers/utils';
 import { multiply, add, divide } from '@helpers/numbers';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 
@@ -106,6 +106,7 @@ export default {
     },
   },
   methods: {
+    formatStringToPrice,
     getError (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
 
