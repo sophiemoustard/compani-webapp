@@ -33,10 +33,10 @@
       </div>
       <div class="row justify-between items-baseline">
         <div class="col-6 light">
-          <p v-if="!isEqualTo(newCreditNote.exclTaxesCustomer, 0)">
+          <p v-if="newCreditNote.exclTaxesCustomer && !isEqualTo(newCreditNote.exclTaxesCustomer, 0)">
             Montant HT bénéficiaire : {{ formatStringToPrice(newCreditNote.exclTaxesCustomer) }}
           </p>
-          <p v-if="!isEqualTo(newCreditNote.exclTaxesTpp, 0)">
+          <p v-if="newCreditNote.exclTaxesTpp && !isEqualTo(newCreditNote.exclTaxesTpp, 0)">
             Montant HT tiers-payeur : {{ formatStringToPrice(newCreditNote.exclTaxesTpp) }}
           </p>
         </div>
