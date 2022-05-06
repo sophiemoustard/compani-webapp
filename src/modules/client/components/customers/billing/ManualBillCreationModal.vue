@@ -88,7 +88,7 @@ export default {
     return {
       formatPrice,
       selectedBillingItem: null,
-      totalExclTaxes: 0,
+      totalExclTaxes: '0',
     };
   },
   watch: {
@@ -100,7 +100,7 @@ export default {
             ? add(acc, multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count))
             : acc
           ),
-          0
+          '0'
         );
       },
     },
@@ -124,7 +124,7 @@ export default {
       return divide(inclTaxes, add(1, divide(vat, 100)));
     },
     hide () {
-      this.totalExclTaxes = 0;
+      this.totalExclTaxes = '0';
       this.selectedBillingItem = null;
       this.$emit('hide');
     },
