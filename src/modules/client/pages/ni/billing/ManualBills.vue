@@ -11,7 +11,7 @@
               <template v-if="col.name === 'billingItem'">{{ billingItem.name }}</template>
               <template v-if="col.name === 'unitInclTaxes'">{{ formatPrice(billingItem.unitInclTaxes) }}</template>
               <template v-if="col.name === 'count'">{{ billingItem.count }}</template>
-              <template v-if="col.name === 'exclTaxes'">{{ formatPrice(billingItem.exclTaxes) }}</template>
+              <template v-if="col.name === 'exclTaxes'">{{ formatStringToPrice(billingItem.exclTaxes) }}</template>
               <template v-if="col.name === 'inclTaxes'">{{ formatPrice(billingItem.inclTaxes) }}</template>
               <template v-else-if="index === 0">{{ col.value }}</template>
             </q-td>
@@ -50,7 +50,13 @@ import TitleHeader from '@components/TitleHeader';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { MANUAL } from '@data/constants';
 import { multiply, add } from '@helpers/numbers';
-import { formatAndSortIdentityOptions, formatAndSortOptions, formatIdentity, formatPrice } from '@helpers/utils';
+import {
+  formatAndSortIdentityOptions,
+  formatAndSortOptions,
+  formatIdentity,
+  formatPrice,
+  formatStringToPrice,
+} from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { strictPositiveNumber, positiveNumber, fractionDigits } from '@helpers/vuelidateCustomVal';
 import ManualBillCreationModal from 'src/modules/client/components/customers/billing/ManualBillCreationModal';
@@ -118,8 +124,9 @@ export default {
     watch(
       () => newManualBill.value.billingItemList,
       () => {
-        newManualBill.value.netInclTaxes = newManualBill.value.billingItemList
-          .reduce((acc, bi) => add(acc, multiply(bi.unitInclTaxes, bi.count)), 0);
+        newManualBill.value.netInclTaxes = parseFloat(
+          newManualBill.value.billingItemList.reduce((acc, bi) => add(acc, multiply(bi.unitInclTaxes, bi.count)), 0)
+        );
       },
       { deep: true }
     );
@@ -225,6 +232,7 @@ export default {
       removeBillingItem,
       updateBillingItem,
       formatPrice,
+      formatStringToPrice,
       resetManualBillCreationModal,
       formatCreationPayload,
       createManualBill,
