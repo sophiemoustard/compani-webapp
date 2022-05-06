@@ -115,7 +115,7 @@ export default {
         inclTaxesTpp: 0,
         subscription: '',
         misc: '',
-        billingItemList: [{ billingItem: '', unitInclTaxes: toString(0), count: 1 }],
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       },
       editedCreditNote: {},
       creditNotes: [],
@@ -185,15 +185,21 @@ export default {
       deep: true,
       handler () {
         if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
-          this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce((acc, bi) => {
-            const biExclTaxes = multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count);
-            return bi.billingItem ? add(acc, biExclTaxes) : acc;
-          }, 0);
+          this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => {
+              const biExclTaxes = multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count);
+              return bi.billingItem ? add(acc, biExclTaxes) : acc;
+            },
+            toString(0)
+          );
 
-          const inclTaxesCustomerString = this.newCreditNote.billingItemList.reduce((acc, bi) => {
-            const biInclTaxes = multiply(bi.unitInclTaxes, bi.count);
-            return bi.billingItem ? add(acc, biInclTaxes) : acc;
-          }, 0);
+          const inclTaxesCustomerString = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => {
+              const biInclTaxes = multiply(bi.unitInclTaxes, bi.count);
+              return bi.billingItem ? add(acc, biInclTaxes) : acc;
+            },
+            toString(0)
+          );
           this.newCreditNote.inclTaxesCustomer = parseFloat(inclTaxesCustomerString);
         }
       },
@@ -322,7 +328,7 @@ export default {
         inclTaxesCustomer: 0,
         exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
-        billingItemList: [{ billingItem: '', unitInclTaxes: toString(0), count: 1 }],
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
 
       this.v$.newCreditNote.startDate.$reset();
@@ -472,24 +478,29 @@ export default {
     // Compute
     computePrices (eventIds) {
       let exclTaxesCustomer = toString(0);
-      let inclTaxesCustomer = 0;
+      let inclTaxesCustomerString = toString(0);
       let exclTaxesTpp = toString(0);
-      let inclTaxesTpp = 0;
+      let inclTaxesTppString = toString(0);
       if (this.creditNoteEvents) {
         const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
         for (let i = 0, l = selectedEvents.length; i < l; i++) {
           if (selectedEvents[i].bills.exclTaxesCustomer && !isEqualTo(selectedEvents[i].bills.exclTaxesCustomer, 0)) {
             exclTaxesCustomer = add(exclTaxesCustomer, selectedEvents[i].bills.exclTaxesCustomer);
-            inclTaxesCustomer = parseFloat(add(inclTaxesCustomer, selectedEvents[i].bills.inclTaxesCustomer));
+            inclTaxesCustomerString = add(inclTaxesCustomerString, selectedEvents[i].bills.inclTaxesCustomer);
           }
           if (selectedEvents[i].bills.exclTaxesTpp && !isEqualTo(selectedEvents[i].bills.exclTaxesTpp, 0)) {
             exclTaxesTpp = add(exclTaxesTpp, selectedEvents[i].bills.exclTaxesTpp);
-            inclTaxesTpp = parseFloat(add(inclTaxesTpp, selectedEvents[i].bills.inclTaxesTpp));
+            inclTaxesTppString = add(inclTaxesTppString, selectedEvents[i].bills.inclTaxesTpp);
           }
         }
       }
 
-      return { exclTaxesCustomer, inclTaxesCustomer, exclTaxesTpp, inclTaxesTpp };
+      return {
+        exclTaxesCustomer,
+        inclTaxesCustomer: parseFloat(inclTaxesCustomerString),
+        exclTaxesTpp,
+        inclTaxesTpp: parseFloat(inclTaxesTppString),
+      };
     },
     // Creation
     resetCreationCreditNoteData () {
@@ -506,7 +517,7 @@ export default {
         subscription: '',
         thirdPartyPayer: '',
         misc: '',
-        billingItemList: [{ billingItem: '', unitInclTaxes: toString(0), count: 1 }],
+        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
       this.creditNoteEvents = [];
       this.creditNoteType = SUBSCRIPTION;
@@ -629,7 +640,7 @@ export default {
     },
     addBillingItem () {
       if (this.creditNoteCreationModal) {
-        this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: toString(0), count: 1 });
+        this.newCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
       } else if (this.creditNoteEditionModal) {
         this.editedCreditNote.billingItemList.push({ billingItem: '', unitInclTaxes: 0, count: 1 });
       }
@@ -647,7 +658,7 @@ export default {
       if (path === 'billingItem') {
         const billingItem = this.billingItems.find(bi => bi._id === event);
         set(billingItemList[index], 'vat', billingItem?.vat || 0);
-        set(billingItemList[index], 'unitInclTaxes', toString(billingItem?.defaultUnitAmount || 0));
+        set(billingItemList[index], 'unitInclTaxes', billingItem?.defaultUnitAmount || 0);
       }
 
       if (this.creditNoteCreationModal) set(this.newCreditNote.billingItemList, billingItemList);
