@@ -118,7 +118,26 @@ export default {
   },
   validations () {
     return {
-      editedCourseSlot: this.courseSlotValidation(this.editedSlot),
+      editedCourseSlot: {
+        step: { required },
+        address: {
+          zipCode: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          street: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          city: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        meetingLink: { urlAddress },
+        dates: {
+          startDate: { required },
+          endDate: {
+            required,
+            ...(!!get(this.editedSlot, 'dates.startDate') && {
+              maxDate: maxDate(moment(this.editedSlot.dates.startDate).endOf('d').toISOString()),
+              minDate: minDate(this.editedSlot.dates.startDate),
+            }),
+          },
+        },
+      },
     };
   },
   computed: {
@@ -182,28 +201,6 @@ export default {
   methods: {
     getDuration,
     formatIntervalHourly,
-    courseSlotValidation (slot) {
-      return {
-        step: { required },
-        address: {
-          zipCode: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          street: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          city: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          fullAddress: { frAddress },
-        },
-        meetingLink: { urlAddress },
-        dates: {
-          startDate: { required },
-          endDate: {
-            required,
-            ...(!!get(slot, 'dates.startDate') && {
-              maxDate: maxDate(moment(slot.dates.startDate).endOf('d').toISOString()),
-              minDate: minDate(slot.dates.startDate),
-            }),
-          },
-        },
-      };
-    },
     groupByCourses () {
       this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
