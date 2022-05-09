@@ -65,6 +65,7 @@ import {
 import { divide, add } from '@helpers/numbers';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
+import { useMeta } from 'quasar';
 
 export default {
   name: 'ToBillRow',
@@ -79,56 +80,76 @@ export default {
     displayCheckbox: { type: Boolean, default: () => false },
   },
   emits: ['discount-click', 'update:selected', 'discount-input', 'update:bill', 'datetime-input'],
-  methods: {
-    formatPrice,
-    formatDate,
-    formatStringToPrice,
-    getLastVersion (value) {
-      return getLastVersion(value, 'createdAt');
-    },
-    formatHours (bill) {
+  setup (props, { emit }) {
+    const MetaInfo = { title: 'A facturer' };
+    useMeta(MetaInfo);
+
+    const formatHours = (bill) => {
       if (bill.subscription.service && bill.subscription.service.nature === FIXED) return bill.eventsList.length;
 
       return bill.hours ? `${parseFloat(bill.hours).toFixed(2)}h` : '';
-    },
-    getClientName (customer, bill) {
+    };
+
+    const getClientName = (customer, bill) => {
       if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
       return truncate(bill.thirdPartyPayer.name, 35);
-    },
-    getExclTaxesDiscount (bill) {
+    };
+
+    const getExclTaxesDiscount = (bill) => {
       const vat = divide(bill.vat, 100);
 
       return divide(bill.discount, add(1, vat));
-    },
-    getNetExclTaxes (bill) {
+    };
+
+    const getNetExclTaxes = (bill) => {
       const exclTaxesCents = toCents(bill.exclTaxes);
-      const exclTaxesDiscountCents = toCents(this.getExclTaxesDiscount(bill));
+      const exclTaxesDiscountCents = toCents(getExclTaxesDiscount(bill));
 
       return toEuros(exclTaxesCents - exclTaxesDiscountCents);
-    },
-    getNetInclTaxes (bill) {
+    };
+
+    const getNetInclTaxes = (bill) => {
       const inclTaxesCents = toCents(bill.inclTaxes);
       const discountCents = toCents(bill.discount);
 
       return toEuros(inclTaxesCents - discountCents);
-    },
-    setDiscount ({ value, obj, path }) {
+    };
+
+    const setDiscount = ({ value, obj, path }) => {
       obj[path] = !value || isNaN(value) ? 0 : value;
-      this.$emit('discount-input');
-    },
-    disableDiscountEditing (bill) {
-      bill.discountEdition = false;
-    },
-    async update (event, prop) {
-      await this.$emit('update:bill', { ...this.bill, [prop]: event });
-    },
-    async updateDate (event, prop) {
-      await this.update(event, prop);
-      await this.$emit('datetime-input');
-    },
-    startDateOptions (date) {
-      return isSameOrBefore(date, this.bill.endDate);
-    },
+      emit('discount-input');
+    };
+
+    const disableDiscountEditing = bill => (bill.discountEdition = false);
+
+    const update = async (event, prop) => {
+      await emit('update:bill', { ...props.bill, [prop]: event });
+    };
+
+    const updateDate = async (event, prop) => {
+      await update(event, prop);
+      await emit('datetime-input');
+    };
+
+    const startDateOptions = date => isSameOrBefore(date, props.bill.endDate);
+
+    return {
+      // Methods
+      formatPrice,
+      formatDate,
+      formatStringToPrice,
+      getLastVersion,
+      formatHours,
+      getClientName,
+      getExclTaxesDiscount,
+      getNetExclTaxes,
+      getNetInclTaxes,
+      setDiscount,
+      disableDiscountEditing,
+      update,
+      updateDate,
+      startDateOptions,
+    };
   },
 };
 </script>
