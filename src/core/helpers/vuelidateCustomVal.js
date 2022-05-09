@@ -59,7 +59,7 @@ export const integerNumber = (value) => {
   return Number.isInteger(Number(value));
 };
 
-export const twoFractionDigits = value => /^\d*(\.\d{0,2})?$/.test(value);
+export const fractionDigits = digits => value => new RegExp(`^\\d*(\\.\\d{0,${digits}})?$`).test(value);
 
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 

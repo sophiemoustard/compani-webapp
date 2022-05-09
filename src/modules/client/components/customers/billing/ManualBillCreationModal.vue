@@ -32,7 +32,7 @@
     <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
       label-color="primary" />
     <div class="row q-mb-md">
-      <div class="col-6 total-text">Total HT : {{ formatPrice(totalExclTaxes) }}</div>
+      <div class="col-6 total-text">Total HT : {{ formatStringToPrice(totalExclTaxes) }}</div>
       <div class="col-6 total-text">Total TTC : {{ formatPrice(newManualBill.netInclTaxes) }}</div>
     </div>
     <template #footer>
@@ -51,7 +51,8 @@ import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, formatStringToPrice } from '@helpers/utils';
+import { multiply, add, divide, toString } from '@helpers/numbers';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 
 export default {
@@ -87,22 +88,25 @@ export default {
     return {
       formatPrice,
       selectedBillingItem: null,
-      totalExclTaxes: 0,
+      totalExclTaxes: toString(0),
     };
   },
   watch: {
     'newManualBill.billingItemList': {
       deep: true,
       handler () {
-        this.totalExclTaxes = this.newManualBill.billingItemList
-          .reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-            0
-          );
+        this.totalExclTaxes = this.newManualBill.billingItemList.reduce(
+          (acc, bi) => (bi.billingItem
+            ? add(acc, multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count))
+            : acc
+          ),
+          toString(0)
+        );
       },
     },
   },
   methods: {
+    formatStringToPrice,
     getError (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
 
@@ -112,15 +116,16 @@ export default {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
       if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
       if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
-        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
+        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber' ||
+        get(validation, `${path}.0.$validator`) === 'fractionDigits') return 'Nombre non valide';
 
       return '';
     },
     getExclTaxes (inclTaxes, vat) {
-      return inclTaxes / (1 + vat / 100);
+      return divide(inclTaxes, add(1, divide(vat, 100)));
     },
     hide () {
-      this.totalExclTaxes = 0;
+      this.totalExclTaxes = toString(0);
       this.selectedBillingItem = null;
       this.$emit('hide');
     },
