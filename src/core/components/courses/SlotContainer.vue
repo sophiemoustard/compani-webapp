@@ -44,16 +44,10 @@
         </q-card>
       </div>
       <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
-        <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
-          :disable="loading || addDateToPlanloading" @click="openSlotCreationModal" />
-        <ni-button v-if="isVendorInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
+        <ni-button class="add-slot" label="Ajouter une date à planifier" color="white"
           icon="add" @click="addDateToPlan" :disable="addDateToPlanloading" />
       </div>
     </div>
-
-    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="v$.newCourseSlot"
-      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
-      :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
@@ -74,7 +68,6 @@ import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
-import SlotCreationModal from '@components/courses/SlotCreationModal';
 import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
@@ -95,7 +88,6 @@ export default {
   },
   components: {
     'slot-edition-modal': SlotEditionModal,
-    'slot-creation-modal': SlotCreationModal,
     'ni-button': Button,
     'ni-date-input': DateInput,
   },
@@ -110,16 +102,6 @@ export default {
       courseSlots: {},
       addDateToPlanloading: false,
       modalLoading: false,
-      creationModal: false,
-      newCourseSlot: {
-        dates: {
-          startDate: moment().startOf('d').hours(9).toISOString(),
-          endDate: moment().startOf('d').hours(12).toISOString(),
-        },
-        address: {},
-        meetingLink: '',
-        step: '',
-      },
       editedCourseSlot: {},
       editionModal: false,
       courseSlotsColumns: [
@@ -136,7 +118,6 @@ export default {
   },
   validations () {
     return {
-      newCourseSlot: this.courseSlotValidation(this.newCourseSlot),
       editedCourseSlot: this.courseSlotValidation(this.editedSlot),
     };
   },
@@ -230,27 +211,6 @@ export default {
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
     },
-    resetCreationModal () {
-      this.newCourseSlot = {
-        dates: {
-          startDate: moment().startOf('d').hours(9).toISOString(),
-          endDate: moment().startOf('d').hours(12).toISOString(),
-        },
-        address: {},
-        meetingLink: '',
-        step: '',
-      };
-      this.v$.newCourseSlot.$reset();
-    },
-    formatCreationPayload (courseSlot) {
-      return {
-        ...courseSlot.dates,
-        course: this.course._id,
-        ...(get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
-        ...(courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
-        ...(courseSlot.step && { step: courseSlot.step }),
-      };
-    },
     openEditionModal (slot) {
       if (!this.canEdit) return;
       if (this.course.archivedAt) {
@@ -285,33 +245,6 @@ export default {
         step: courseSlot.step,
       };
     },
-    async addCourseSlot () {
-      try {
-        this.v$.newCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.v$.newCourseSlot);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
-
-        this.modalLoading = true;
-        await CourseSlots.create(this.formatCreationPayload(this.newCourseSlot));
-        NotifyPositive('Créneau ajouté.');
-
-        this.creationModal = false;
-        this.$emit('refresh');
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du créneau.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    openSlotCreationModal () {
-      if (this.course.archivedAt) {
-        return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
-      }
-
-      this.creationModal = true;
-    },
     async addDateToPlan () {
       try {
         if (this.course.archivedAt) {
@@ -319,7 +252,7 @@ export default {
         }
 
         this.addDateToPlanloading = true;
-        await CourseSlots.create(this.formatCreationPayload({}));
+        await CourseSlots.create({ course: this.course._id });
         NotifyPositive('Date à planifier ajoutée.');
 
         this.$emit('refresh');
@@ -374,8 +307,7 @@ export default {
     },
     setCourseSlot (payload) {
       const { path, value } = payload;
-      if (this.creationModal) set(this.newCourseSlot, path, value);
-      else if (this.editionModal) set(this.editedCourseSlot, path, value);
+      set(this.editedCourseSlot, path, value);
     },
     async updateEstimatedStartDate (event) {
       this.$emit('update', set(this.course, 'estimatedStartDate', event));
