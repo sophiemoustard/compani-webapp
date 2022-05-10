@@ -44,16 +44,10 @@
         </q-card>
       </div>
       <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
-        <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
-          :disable="loading || addDateToPlanloading" @click="openSlotCreationModal" />
-        <ni-button v-if="isVendorInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
-          icon="add" @click="addDateToPlan" :disable="addDateToPlanloading" />
+        <ni-button class="add-slot" label="Ajouter une date à planifier" color="white"
+          icon="add" @click="addDateToPlan" :disable="addDateToPlanLoading" />
       </div>
     </div>
-
-    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="v$.newCourseSlot"
-      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
-      :link-error-message="linkErrorMessage" @update="setCourseSlot" />
 
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
@@ -74,7 +68,6 @@ import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
-import SlotCreationModal from '@components/courses/SlotCreationModal';
 import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
@@ -95,7 +88,6 @@ export default {
   },
   components: {
     'slot-edition-modal': SlotEditionModal,
-    'slot-creation-modal': SlotCreationModal,
     'ni-button': Button,
     'ni-date-input': DateInput,
   },
@@ -108,27 +100,10 @@ export default {
 
     return {
       courseSlots: {},
-      addDateToPlanloading: false,
+      addDateToPlanLoading: false,
       modalLoading: false,
-      creationModal: false,
-      newCourseSlot: {
-        dates: {
-          startDate: moment().startOf('d').hours(9).toISOString(),
-          endDate: moment().startOf('d').hours(12).toISOString(),
-        },
-        address: {},
-        meetingLink: '',
-        step: '',
-      },
       editedCourseSlot: {},
       editionModal: false,
-      courseSlotsColumns: [
-        { name: 'date', align: 'left', label: 'Dates' },
-        { name: 'hours', align: 'center', label: 'Créneaux' },
-        { name: 'duration', align: 'center', label: 'Durée' },
-        { name: 'address', label: 'Lieu', align: 'left' },
-        { name: 'actions', label: '', align: 'center' },
-      ],
       isVendorInterface,
       ON_SITE,
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
@@ -136,8 +111,26 @@ export default {
   },
   validations () {
     return {
-      newCourseSlot: this.courseSlotValidation(this.newCourseSlot),
-      editedCourseSlot: this.courseSlotValidation(this.editedSlot),
+      editedCourseSlot: {
+        step: { required },
+        address: {
+          zipCode: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          street: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          city: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        meetingLink: { urlAddress },
+        dates: {
+          startDate: { required },
+          endDate: {
+            required,
+            ...(!!get(this.editedSlot, 'dates.startDate') && {
+              maxDate: maxDate(moment(this.editedSlot.dates.startDate).endOf('d').toISOString()),
+              minDate: minDate(this.editedSlot.dates.startDate),
+            }),
+          },
+        },
+      },
     };
   },
   computed: {
@@ -201,55 +194,12 @@ export default {
   methods: {
     getDuration,
     formatIntervalHourly,
-    courseSlotValidation (slot) {
-      return {
-        step: { required },
-        address: {
-          zipCode: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          street: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          city: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          fullAddress: { frAddress },
-        },
-        meetingLink: { urlAddress },
-        dates: {
-          startDate: { required },
-          endDate: {
-            required,
-            ...(!!get(slot, 'dates.startDate') && {
-              maxDate: maxDate(moment(slot.dates.startDate).endOf('d').toISOString()),
-              minDate: minDate(slot.dates.startDate),
-            }),
-          },
-        },
-      };
-    },
     groupByCourses () {
       this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
     },
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
-    },
-    resetCreationModal () {
-      this.newCourseSlot = {
-        dates: {
-          startDate: moment().startOf('d').hours(9).toISOString(),
-          endDate: moment().startOf('d').hours(12).toISOString(),
-        },
-        address: {},
-        meetingLink: '',
-        step: '',
-      };
-      this.v$.newCourseSlot.$reset();
-    },
-    formatCreationPayload (courseSlot) {
-      return {
-        ...courseSlot.dates,
-        course: this.course._id,
-        ...(get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
-        ...(courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
-        ...(courseSlot.step && { step: courseSlot.step }),
-      };
     },
     openEditionModal (slot) {
       if (!this.canEdit) return;
@@ -285,41 +235,14 @@ export default {
         step: courseSlot.step,
       };
     },
-    async addCourseSlot () {
-      try {
-        this.v$.newCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.v$.newCourseSlot);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
-
-        this.modalLoading = true;
-        await CourseSlots.create(this.formatCreationPayload(this.newCourseSlot));
-        NotifyPositive('Créneau ajouté.');
-
-        this.creationModal = false;
-        this.$emit('refresh');
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du créneau.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    openSlotCreationModal () {
-      if (this.course.archivedAt) {
-        return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
-      }
-
-      this.creationModal = true;
-    },
     async addDateToPlan () {
       try {
         if (this.course.archivedAt) {
           return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
         }
 
-        this.addDateToPlanloading = true;
-        await CourseSlots.create(this.formatCreationPayload({}));
+        this.addDateToPlanLoading = true;
+        await CourseSlots.create({ course: this.course._id });
         NotifyPositive('Date à planifier ajoutée.');
 
         this.$emit('refresh');
@@ -327,7 +250,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       } finally {
-        this.addDateToPlanloading = false;
+        this.addDateToPlanLoading = false;
       }
     },
     async updateCourseSlot () {
@@ -374,8 +297,7 @@ export default {
     },
     setCourseSlot (payload) {
       const { path, value } = payload;
-      if (this.creationModal) set(this.newCourseSlot, path, value);
-      else if (this.editionModal) set(this.editedCourseSlot, path, value);
+      set(this.editedCourseSlot, path, value);
     },
     async updateEstimatedStartDate (event) {
       this.$emit('update', set(this.course, 'estimatedStartDate', event));
