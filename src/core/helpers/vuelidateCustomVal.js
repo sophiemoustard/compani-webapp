@@ -4,6 +4,7 @@ import { isValidIBAN, isValidBIC } from 'ibantools';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
+import { isGreaterThan, isGreaterThanOrEqual } from './numbers';
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;
@@ -40,17 +41,19 @@ export const frAddress = async (value) => {
 };
 
 export const positiveNumber = (value) => {
-  if (!value) return true;
-  if (isNaN(parseFloat(value)) || !isFinite(value)) return false;
+  const floatValue = parseFloat(value);
 
-  return value >= 0;
+  if (!floatValue) return true;
+  if (isNaN(floatValue) || !isFinite(floatValue)) return false;
+
+  return isGreaterThanOrEqual(value, 0);
 };
 
 export const strictPositiveNumber = (value) => {
-  if (!value && value !== 0) return true;
-  if (isNaN(parseFloat(value)) || !isFinite(value)) return false;
+  const floatValue = parseFloat(value);
+  if (isNaN(floatValue) || !isFinite(floatValue)) return false;
 
-  return value > 0;
+  return isGreaterThan(value, 0);
 };
 
 export const integerNumber = (value) => {

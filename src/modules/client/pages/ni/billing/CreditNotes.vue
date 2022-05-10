@@ -68,10 +68,11 @@ import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL, BILLING_ITEMS } from '@data/constants';
-import { formatPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { formatPrice, formatStringToPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import { strictPositiveNumber, minDate, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
+import { divide, add, multiply, isEqualTo, toString } from '@helpers/numbers';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
 
@@ -108,9 +109,9 @@ export default {
         events: [],
         startDate: '',
         endDate: '',
-        exclTaxesCustomer: 0,
+        exclTaxesCustomer: toString(0),
         inclTaxesCustomer: 0,
-        exclTaxesTpp: 0,
+        exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
         subscription: '',
         misc: '',
@@ -147,7 +148,7 @@ export default {
           label: 'HT',
           align: 'left',
           field: row => (row.thirdPartyPayer ? row.exclTaxesTpp : row.exclTaxesCustomer),
-          format: formatPrice,
+          format: formatStringToPrice,
         },
         {
           name: 'inclTaxes',
@@ -185,13 +186,21 @@ export default {
       handler () {
         if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
           this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-            0
+            (acc, bi) => {
+              const biExclTaxes = multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count);
+              return bi.billingItem ? add(acc, biExclTaxes) : acc;
+            },
+            toString(0)
           );
-          this.newCreditNote.inclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
-            0
+
+          const inclTaxesCustomerString = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => {
+              const biInclTaxes = multiply(bi.unitInclTaxes, bi.count);
+              return bi.billingItem ? add(acc, biInclTaxes) : acc;
+            },
+            toString(0)
           );
+          this.newCreditNote.inclTaxesCustomer = parseFloat(inclTaxesCustomerString);
         }
       },
     },
@@ -315,9 +324,9 @@ export default {
         subscription: null,
         startDate: '',
         endDate: '',
-        exclTaxesCustomer: 0,
+        exclTaxesCustomer: toString(0),
         inclTaxesCustomer: 0,
-        exclTaxesTpp: 0,
+        exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
         billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
@@ -468,23 +477,30 @@ export default {
     },
     // Compute
     computePrices (eventIds) {
-      let exclTaxesCustomer = 0; let inclTaxesCustomer = 0;
-      let exclTaxesTpp = 0; let inclTaxesTpp = 0;
+      let exclTaxesCustomer = toString(0);
+      let inclTaxesCustomerString = toString(0);
+      let exclTaxesTpp = toString(0);
+      let inclTaxesTppString = toString(0);
       if (this.creditNoteEvents) {
         const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
         for (let i = 0, l = selectedEvents.length; i < l; i++) {
-          if (selectedEvents[i].bills.exclTaxesCustomer) {
-            exclTaxesCustomer += selectedEvents[i].bills.exclTaxesCustomer;
-            inclTaxesCustomer += selectedEvents[i].bills.inclTaxesCustomer;
+          if (selectedEvents[i].bills.exclTaxesCustomer && !isEqualTo(selectedEvents[i].bills.exclTaxesCustomer, 0)) {
+            exclTaxesCustomer = add(exclTaxesCustomer, selectedEvents[i].bills.exclTaxesCustomer);
+            inclTaxesCustomerString = add(inclTaxesCustomerString, selectedEvents[i].bills.inclTaxesCustomer);
           }
-          if (selectedEvents[i].bills.exclTaxesTpp) {
-            exclTaxesTpp += selectedEvents[i].bills.exclTaxesTpp;
-            inclTaxesTpp += selectedEvents[i].bills.inclTaxesTpp;
+          if (selectedEvents[i].bills.exclTaxesTpp && !isEqualTo(selectedEvents[i].bills.exclTaxesTpp, 0)) {
+            exclTaxesTpp = add(exclTaxesTpp, selectedEvents[i].bills.exclTaxesTpp);
+            inclTaxesTppString = add(inclTaxesTppString, selectedEvents[i].bills.inclTaxesTpp);
           }
         }
       }
 
-      return { exclTaxesCustomer, inclTaxesCustomer, exclTaxesTpp, inclTaxesTpp };
+      return {
+        exclTaxesCustomer,
+        inclTaxesCustomer: parseFloat(inclTaxesCustomerString),
+        exclTaxesTpp,
+        inclTaxesTpp: parseFloat(inclTaxesTppString),
+      };
     },
     // Creation
     resetCreationCreditNoteData () {
@@ -494,9 +510,9 @@ export default {
         events: [],
         startDate: '',
         endDate: '',
-        exclTaxesCustomer: 0,
+        exclTaxesCustomer: toString(0),
         inclTaxesCustomer: 0,
-        exclTaxesTpp: 0,
+        exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
         subscription: '',
         thirdPartyPayer: '',
@@ -515,26 +531,24 @@ export default {
         : this.customersOptions.find(cus => cus.value === customer);
       const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
       const { vat } = subscription.service;
+      const percentVat = divide(vat, 100);
 
       if (creditNote.inclTaxesCustomer) {
         payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
-        payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        payload.exclTaxesCustomer = divide(creditNote.inclTaxesCustomer, add(1, percentVat));
       } else {
         payload.inclTaxesTpp = creditNote.inclTaxesTpp;
-        payload.exclTaxesTpp = Number.parseFloat((creditNote.inclTaxesTpp / (1 + (vat / 100))).toFixed(2));
+        payload.exclTaxesTpp = divide(creditNote.inclTaxesTpp, add(1, percentVat));
         payload.thirdPartyPayer = creditNote.thirdPartyPayer;
       }
 
+      const { _id: subId, service, versions } = subscription;
       payload.subscription = {
-        _id: subscription._id,
-        service: {
-          serviceId: subscription.service._id,
-          nature: subscription.service.nature,
-          name: subscription.service.name,
-        },
+        _id: subId,
+        service: { serviceId: service._id, nature: service.nature, name: service.name },
         vat,
-        unitInclTaxes: subscription.versions && subscription.versions.length > 0
-          ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate
+        unitInclTaxes: versions && versions.length > 0
+          ? getLastVersion(versions, 'createdAt').unitTTCRate
           : 0,
       };
 
@@ -548,6 +562,7 @@ export default {
           ...pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'serviceName']),
           bills: {
             ...omit(cnEvent.bills, '_id'),
+            ...(cnEvent.bills.careHours && { careHours: cnEvent.bills.careHours.toString() }),
             ...(cnEvent.bills.surcharges && { surcharges: cnEvent.bills.surcharges.map(sur => omit(sur, '_id')) }),
           },
         };
@@ -650,7 +665,9 @@ export default {
       else if (this.creditNoteEditionModal) set(this.editedCreditNote.billingItemList, billingItemList);
     },
     getExclTaxes (inclTaxes, vat) {
-      return inclTaxes / (1 + vat / 100);
+      const percentVat = divide(vat, 100);
+
+      return divide(inclTaxes, add(1, percentVat));
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
