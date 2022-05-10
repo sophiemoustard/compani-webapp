@@ -38,7 +38,9 @@
       <template v-else-if="col.name === 'discount'">
         <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
           :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)" :ref-name="bill._id"
-          @click="$emit('discount-click', $event)" @change="setDiscount" suffix="€" />
+          @click="$emit('discount-click', $event)" @change="setDiscount" suffix="€"
+          :error="v$.discount.$error" error-message="Nombre invalide" />
+          {{ v$.discount.$error }}
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
@@ -66,6 +68,9 @@ import { divide, add } from '@helpers/numbers';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
 import { useMeta } from 'quasar';
+import { ref, computed } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { positiveNumber, fractionDigits } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'ToBillRow',
@@ -83,6 +88,8 @@ export default {
   setup (props, { emit }) {
     const MetaInfo = { title: 'A facturer' };
     useMeta(MetaInfo);
+
+    const discount = ref(0);
 
     const formatHours = (bill) => {
       if (bill.subscription.service && bill.subscription.service.nature === FIXED) return bill.eventsList.length;
@@ -133,7 +140,12 @@ export default {
 
     const startDateOptions = date => isSameOrBefore(date, props.bill.endDate);
 
+    const rules = computed(() => ({ discount: { positiveNumber, fractionDigits: fractionDigits(2) } }));
+    const validations = useVuelidate(rules, { discount });
+
     return {
+      // Validations
+      v$: validations,
       // Methods
       formatPrice,
       formatDate,
