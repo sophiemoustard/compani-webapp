@@ -25,7 +25,7 @@
               </div>
             </div>
           </div>
-          <div v-else-if="!!Object.keys(courseSlotsByStepAndDate).length &&
+          <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
             Object.keys(courseSlotsByStepAndDate[step.key]).some(key => key === '')">
             <div class="to-plan q-mx-lg">
               <div class="to-plan-header">Créneaux à programmer</div>
@@ -62,7 +62,8 @@
               </div>
             </div>
           </div>
-          <div v-else-if="!!Object.keys(courseSlotsByStepAndDate).length">
+          <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
+            Object.keys(courseSlotsByStepAndDate[step.key]).every(key => key !== '')">
             <div class="defined q-mx-lg">
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
@@ -82,6 +83,22 @@
                       <ni-button icon="edit" @click="openEditionModal(slot)" size="10px" color="copper-grey-500" />
                     </div>
                   </div>
+                </div>
+              </div>
+              <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
+                <ni-button label="Ajouter un créneau" color="primary" icon="add"
+                  @click="addDateToPlan(step.key)" :disable="addDateToPlanLoading" />
+              </div>
+            </div>
+          </div>
+          <div v-else>
+            <div class="to-plan q-mx-lg">
+              <div class="to-plan-header">Créneaux à programmer</div>
+              <div class="row items-center q-pa-md">
+                <div class="index">{{ index + 1 }}</div>
+                <div class="q-mx-md">
+                  <div>{{ step.name }}</div>
+                  <div class="type">{{ step.type }}</div>
                 </div>
               </div>
               <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
