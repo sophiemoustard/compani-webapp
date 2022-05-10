@@ -45,7 +45,7 @@
       </div>
       <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
         <ni-button class="add-slot" label="Ajouter une date à planifier" color="white"
-          icon="add" @click="addDateToPlan" :disable="addDateToPlanloading" />
+          icon="add" @click="addDateToPlan" :disable="addDateToPlanLoading" />
       </div>
     </div>
 
@@ -100,17 +100,10 @@ export default {
 
     return {
       courseSlots: {},
-      addDateToPlanloading: false,
+      addDateToPlanLoading: false,
       modalLoading: false,
       editedCourseSlot: {},
       editionModal: false,
-      courseSlotsColumns: [
-        { name: 'date', align: 'left', label: 'Dates' },
-        { name: 'hours', align: 'center', label: 'Créneaux' },
-        { name: 'duration', align: 'center', label: 'Durée' },
-        { name: 'address', label: 'Lieu', align: 'left' },
-        { name: 'actions', label: '', align: 'center' },
-      ],
       isVendorInterface,
       ON_SITE,
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
@@ -248,7 +241,7 @@ export default {
           return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
         }
 
-        this.addDateToPlanloading = true;
+        this.addDateToPlanLoading = true;
         await CourseSlots.create({ course: this.course._id });
         NotifyPositive('Date à planifier ajoutée.');
 
@@ -257,7 +250,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       } finally {
-        this.addDateToPlanloading = false;
+        this.addDateToPlanLoading = false;
       }
     },
     async updateCourseSlot () {
