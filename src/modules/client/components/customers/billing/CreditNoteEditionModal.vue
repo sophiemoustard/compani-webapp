@@ -193,8 +193,11 @@ export default {
     getBillingItemErrorMessage (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
       if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
-      if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
-        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
+
+      const invalidNumber = get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
+        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber' ||
+        get(validation, `${path}.0.$validator`) === 'fractionDigits';
+      if (invalidNumber) return 'Nombre non valide';
 
       return '';
     },
