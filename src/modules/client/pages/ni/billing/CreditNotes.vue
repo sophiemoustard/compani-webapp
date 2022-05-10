@@ -69,7 +69,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL, BILLING_ITEMS } from '@data/constants';
 import { formatPrice, formatStringToPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { strictPositiveNumber, minDate, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { strictPositiveNumber, minDate, maxDate, positiveNumber, fractionDigits } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
 import { divide, add, multiply, isEqualTo, toString } from '@helpers/numbers';
@@ -247,15 +247,15 @@ export default {
         ...(this.creditNoteType === BILLING_ITEMS && {
           $each: helpers.forEach({
             billingItem: { required },
-            unitInclTaxes: { positiveNumber, required },
-            count: { strictPositiveNumber, required },
+            unitInclTaxes: { positiveNumber, required, fractionDigits: fractionDigits(2) },
+            count: { strictPositiveNumber, required, fractionDigits: fractionDigits(3) },
           }),
         }),
       },
     };
     const newCreditNoteDateValidation = this.datesValidations(this.creationMinAndMaxDates, this.newCreditNote);
     const editedCreditNoteDateValidation = this.datesValidations(this.editionMinAndMaxDates, this.editedCreditNote);
-    const inclTaxesValidation = { required, strictPositiveNumber };
+    const inclTaxesValidation = { required, strictPositiveNumber, fractionDigits: fractionDigits(2) };
     const newCreditNoteInclTaxesValidation = this.newCreditNote.thirdPartyPayer
       ? { inclTaxesTpp: inclTaxesValidation }
       : { inclTaxesCustomer: inclTaxesValidation };
