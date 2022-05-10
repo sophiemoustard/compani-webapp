@@ -36,16 +36,16 @@
                   <div class="type">{{ step.type }}</div>
                 </div>
               </div>
-              <div class="q-mx-xl">
+              <div class="slots-container">
                 <div v-for="slot in Object.values(pick(courseSlotsByStepAndDate[step.key], '')).flat()" :key="slot._id"
-                  class="row q-mx-xl q-mb-md">
+                  class="row q-ml-xl q-mb-md">
                   <div class="clickable-name text-orange-500 cursor-pointer q-mr-md" @click="openEditionModal(slot)">
                     créneau à planifier
                   </div>
                   <ni-button icon="edit" @click="openEditionModal(slot)" size="10px" color="copper-grey-500" />
                 </div>
                 <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], ''))" :key="day"
-                  class="row q-mx-xl q-my-md">
+                  class="row q-ml-xl q-my-md">
                   <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                   <div>
                     <div v-for="slot in day[1]" :key="slot._id" class="row justify-between">
@@ -72,9 +72,9 @@
                   <div class="type">{{ step.type }}</div>
                 </div>
               </div>
-              <div class="q-mx-xl">
+              <div class="slots-container">
                 <div v-for="day in Object.entries(courseSlotsByStepAndDate[step.key])" :key="day"
-                  class="row q-mx-xl q-my-md">
+                  class="row q-ml-xl q-my-md">
                   <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                   <div>
                     <div v-for="slot in day[1]" :key="slot._id" class="row justify-between">
@@ -412,4 +412,8 @@ export default {
   text-align: center
   color: white
   margin: 0px 4px
+
+.slots-container
+   @media screen and (min-width: 767px)
+    margin-left: 32px
 </style>
