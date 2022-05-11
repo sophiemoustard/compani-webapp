@@ -72,7 +72,7 @@ import { formatPrice, formatStringToPrice, getLastVersion, formatIdentity, forma
 import { strictPositiveNumber, minDate, maxDate, positiveNumber, fractionDigits } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
-import { divide, add, multiply, isEqualTo, toString } from '@helpers/numbers';
+import { divide, add, multiply, isEqualTo, toString, toFixed } from '@helpers/numbers';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
 
@@ -200,7 +200,7 @@ export default {
             },
             toString(0)
           );
-          this.newCreditNote.inclTaxesCustomer = parseFloat(inclTaxesCustomerString);
+          this.newCreditNote.inclTaxesCustomer = toFixed(inclTaxesCustomerString);
         }
       },
     },
@@ -336,6 +336,7 @@ export default {
       this.v$.newCreditNote.subscription.$reset();
       this.v$.newCreditNote.inclTaxesCustomer.$reset();
       this.v$.newCreditNote.inclTaxesTpp.$reset();
+      this.v$.newCreditNote.billingItemList.$reset();
     },
     // Refresh data
     async refreshBillingItemsOptions () {
