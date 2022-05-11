@@ -218,11 +218,10 @@ export default {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
       if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
 
-      const invalidNumber = get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
-        get(validation, `${path}.0.$validator`) === 'fractionDigits' ||
-        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber';
+      const validationErrorResponse = ['positiveNumber', 'strictPositiveNumber'];
+      if (validationErrorResponse.includes(get(validation, `${path}.0.$validator`))) return 'Nombre non valide';
 
-      if (invalidNumber) return 'Nombre non valide';
+      if (get(validation, `${path}.0.$validator`) === 'fractionDigits') return 'Décimales non valides';
 
       return '';
     },
