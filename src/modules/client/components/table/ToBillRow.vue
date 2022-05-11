@@ -81,8 +81,8 @@ export default {
   },
   emits: ['discount-click', 'update:selected', 'discount-input', 'update:bill', 'datetime-input'],
   setup (props, { emit }) {
-    const MetaInfo = { title: 'A facturer' };
-    useMeta(MetaInfo);
+    const metaInfo = { title: 'A facturer' };
+    useMeta(metaInfo);
 
     const formatHours = (bill) => {
       if (bill.subscription.service && bill.subscription.service.nature === FIXED) return bill.eventsList.length;
