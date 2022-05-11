@@ -5,8 +5,7 @@
     </div>
     <q-input v-show="props[editionBooleanName]" :ref="refName" :model-value="props[editedField]"
       @update:model-value="setEdition" type="number" @blur="disableEdition" bg-color="white" dense
-      @keyup.esc="disableEdition" no-parent-field @keyup.enter="disableEdition" borderless :suffix="suffix"
-      :error="error" reactive-rules :error-message="errorMessage" />
+      @keyup.esc="disableEdition" no-parent-field @keyup.enter="disableEdition" borderless :suffix="suffix" />
   </div>
 </template>
 
@@ -20,8 +19,6 @@ export default {
     refName: { type: String, default: '' },
     value: { type: String, default: '' },
     suffix: { type: String, default: '' },
-    error: { type: Boolean, default: false },
-    errorMessage: { type: String, default: '' },
   },
   emits: ['disable', 'change', 'click'],
   methods: {
