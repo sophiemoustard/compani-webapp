@@ -24,7 +24,7 @@
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
-      @update="updateCourse('estimatedStartDate')" :course-slots-by-step-and-date="courseSlotsByStepAndDate" />
+      @update="updateCourse('estimatedStartDate')" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
@@ -93,7 +93,6 @@ import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
-import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
@@ -269,16 +268,6 @@ export default {
     },
     isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
-    },
-    courseSlotsByStepAndDate () {
-      if (!this.course.slots.length && !this.course.slotsToPlan.length) return {};
-      const formattedSlots = [...this.course.slots, ...this.course.slotsToPlan]
-        .map(slot => ({ ...slot, step: typeof slot.step === 'object' ? slot.step._id : slot.step }));
-      const slotsByStep = groupBy(formattedSlots, 'step');
-      const slotsByStepAndDateList = Object.keys(slotsByStep)
-        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate)));
-
-      return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
     },
   },
   async created () {

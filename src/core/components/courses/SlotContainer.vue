@@ -14,37 +14,37 @@
         <ni-date-input caption="Date de démarrage souhaitée" :model-value="course.estimatedStartDate"
           @update:model-value="updateEstimatedStartDate($event)" class="col-xs-12 col-md-6" />
       </div>
-      <q-card>
-        <q-card v-for="(step, index) in stepList" :key="step.key" class="q-pa-md">
+      <q-card class="q-pa-md">
+        <q-card v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
           <div v-if="step.type === 'eLearning'">
             <div class="row items-center q-pa-md">
               <div class="index">{{ index + 1 }}</div>
               <div class="q-mx-md">
                 <div>{{ step.name }}</div>
-                <div class="type">{{ step.type }}</div>
+                <div class="type text-capitalize">{{ step.type }}</div>
               </div>
             </div>
           </div>
           <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
-            Object.keys(courseSlotsByStepAndDate[step.key]).some(key => key === '')">
+            Object.keys(courseSlotsByStepAndDate[step.key]).some(date => date === 'toPlan')">
             <div class="to-plan">
               <div class="to-plan-header">Créneaux à programmer</div>
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
                 <div class="q-mx-md">
                   <div>{{ step.name }}</div>
-                  <div class="type">{{ step.type }}</div>
+                  <div class="type text-capitalize">{{ step.type }}</div>
                 </div>
               </div>
               <div class="slots-container">
-                <div v-for="slot in Object.values(pick(courseSlotsByStepAndDate[step.key], '')).flat()" :key="slot._id"
-                  class="row q-ml-xl q-mb-md">
+                <div v-for="slot in Object.values(pick(courseSlotsByStepAndDate[step.key], 'toPlan')).flat()"
+                  :key="slot._id" class="row q-ml-xl q-mb-md">
                   <div class="clickable-name text-orange-500 cursor-pointer q-mr-md" @click="openEditionModal(slot)">
                     créneau à planifier
                   </div>
                   <ni-button icon="edit" @click="openEditionModal(slot)" size="10px" color="copper-grey-500" />
                 </div>
-                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], ''))" :key="day"
+                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], 'toPlan'))" :key="day"
                   class="row q-ml-xl q-my-md">
                   <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                   <div>
@@ -63,13 +63,13 @@
             </div>
           </div>
           <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
-            Object.keys(courseSlotsByStepAndDate[step.key]).every(key => key !== '')">
-            <div class="defined">
+            Object.keys(courseSlotsByStepAndDate[step.key]).every(date => date !== 'toPlan')">
+            <div class="planned">
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
                 <div class="q-mx-md">
                   <div>{{ step.name }}</div>
-                  <div class="type">{{ step.type }}</div>
+                  <div class="type text-capitalize">{{ step.type }}</div>
                 </div>
               </div>
               <div class="slots-container">
@@ -98,7 +98,7 @@
                 <div class="index">{{ index + 1 }}</div>
                 <div class="q-mx-md">
                   <div>{{ step.name }}</div>
-                  <div class="type">{{ step.type }}</div>
+                  <div class="type text-capitalize">{{ step.type }}</div>
                 </div>
               </div>
               <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
@@ -148,7 +148,6 @@ export default {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
-    courseSlotsByStepAndDate: { type: Object, default: () => ({}) },
   },
   components: {
     'slot-edition-modal': SlotEditionModal,
@@ -245,6 +244,15 @@ export default {
         })),
       ];
     },
+    courseSlotsByStepAndDate () {
+      if (!this.course.slots.length && !this.course.slotsToPlan.length) return {};
+      const formattedSlots = [...this.course.slots, ...this.course.slotsToPlan];
+      const slotsByStep = groupBy(formattedSlots, 'step');
+      const slotsByStepAndDateList = Object.keys(slotsByStep)
+        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || 'toPlan'));
+
+      return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
+    },
     stepList () {
       return get(this.course, 'subProgram.steps').map(step => ({
         key: step._id,
@@ -280,7 +288,7 @@ export default {
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
         meetingLink: get(slot, 'meetingLink') || '',
-        step: get(slot, 'step') || '',
+        step: slot.step,
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
@@ -387,7 +395,7 @@ export default {
   padding: 2px 6px
   width: fit-content
 
-.defined
+.planned
   background-color: $copper-100
   border-radius: 15px
   padding-bottom: 16px
@@ -399,7 +407,7 @@ export default {
 
 .to-plan-header
   background-color: $orange-200
-  padding: 16px 8px
+  padding: 8px 16px
   border-radius: 15px 15px 0px 0px
   color: $orange-900
 
@@ -408,10 +416,11 @@ export default {
   border-radius: 50%
   width: 20px
   height: 20px
-  padding: 0px 4px
+  padding: 2px 0px
   text-align: center
   color: white
   margin: 0px 4px
+  font-size: 12px
 
 .slots-container
    @media screen and (min-width: 767px)
