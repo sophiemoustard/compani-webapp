@@ -16,7 +16,7 @@
       </div>
       <q-card>
         <q-card v-for="(step, index) in stepList" :key="step.key" class="q-pa-md">
-          <div v-if="step.type === 'eLearning'" class="q-mx-lg">
+          <div v-if="step.type === 'eLearning'">
             <div class="row items-center q-pa-md">
               <div class="index">{{ index + 1 }}</div>
               <div class="q-mx-md">
@@ -27,7 +27,7 @@
           </div>
           <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
             Object.keys(courseSlotsByStepAndDate[step.key]).some(key => key === '')">
-            <div class="to-plan q-mx-lg">
+            <div class="to-plan">
               <div class="to-plan-header">Créneaux à programmer</div>
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
@@ -64,7 +64,7 @@
           </div>
           <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
             Object.keys(courseSlotsByStepAndDate[step.key]).every(key => key !== '')">
-            <div class="defined q-mx-lg">
+            <div class="defined">
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
                 <div class="q-mx-md">
@@ -92,7 +92,7 @@
             </div>
           </div>
           <div v-else>
-            <div class="to-plan q-mx-lg">
+            <div class="to-plan">
               <div class="to-plan-header">Créneaux à programmer</div>
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
