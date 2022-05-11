@@ -16,42 +16,44 @@
       </div>
       <q-card class="q-pa-md">
         <q-card v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
-          <div v-if="step.type === 'eLearning'">
+          <div v-if="step.type === E_LEARNING">
             <div class="row items-center q-pa-md">
               <div class="index">{{ index + 1 }}</div>
               <div class="q-mx-md">
                 <div>{{ step.name }}</div>
-                <div class="type text-capitalize">{{ step.type }}</div>
+                <div class="type text-capitalize">{{ step.typeLabel }}</div>
               </div>
             </div>
           </div>
           <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
-            Object.keys(courseSlotsByStepAndDate[step.key]).some(date => date === 'toPlan')">
+            Object.keys(courseSlotsByStepAndDate[step.key]).some(date => date === SLOTS_TO_PLAN_KEY)">
             <div class="to-plan">
               <div class="to-plan-header">Créneaux à programmer</div>
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
                 <div class="q-mx-md">
                   <div>{{ step.name }}</div>
-                  <div class="type text-capitalize">{{ step.type }}</div>
+                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
                 </div>
               </div>
               <div class="slots-container">
-                <div v-for="slot in Object.values(pick(courseSlotsByStepAndDate[step.key], 'toPlan')).flat()"
-                  :key="slot._id" class="row q-ml-xl q-mb-md">
-                  <div class="clickable-name text-orange-500 cursor-pointer q-mr-md" @click="openEditionModal(slot)">
+                <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
+                  :key="slot._id" class="row q-ml-xl q-mb-md cursor-pointer hover-orange"
+                  @click="openEditionModal(slot)">
+                  <div class="clickable-name text-orange-500 q-mr-md">
                     créneau à planifier
                   </div>
-                  <ni-button icon="edit" @click="openEditionModal(slot)" size="10px" color="copper-grey-500" />
+                  <ni-button icon="edit" size="10px" color="copper-grey-500" />
                 </div>
-                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], 'toPlan'))" :key="day"
-                  class="row q-ml-xl q-my-md">
+                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
+                  :key="day" class="row q-ml-xl q-my-md">
                   <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                   <div>
-                    <div v-for="slot in day[1]" :key="slot._id" class="row justify-between">
+                    <div v-for="slot in day[1]" :key="slot._id" class="row justify-between cursor-pointer hover-orange"
+                      @click="openEditionModal(slot)">
                       <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
                       <div class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                      <ni-button icon="edit" @click="openEditionModal(slot)" size="10px" color="copper-grey-500" />
+                      <ni-button icon="edit" size="10px" color="copper-grey-500" />
                     </div>
                   </div>
                 </div>
@@ -63,13 +65,13 @@
             </div>
           </div>
           <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
-            Object.keys(courseSlotsByStepAndDate[step.key]).every(date => date !== 'toPlan')">
+            Object.keys(courseSlotsByStepAndDate[step.key]).every(date => date !== SLOTS_TO_PLAN_KEY)">
             <div class="planned">
               <div class="row items-center q-pa-md">
                 <div class="index">{{ index + 1 }}</div>
                 <div class="q-mx-md">
                   <div>{{ step.name }}</div>
-                  <div class="type text-capitalize">{{ step.type }}</div>
+                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
                 </div>
               </div>
               <div class="slots-container">
@@ -77,10 +79,11 @@
                   class="row q-ml-xl q-my-md">
                   <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                   <div>
-                    <div v-for="slot in day[1]" :key="slot._id" class="row justify-between">
+                    <div v-for="slot in day[1]" :key="slot._id" class="row justify-between cursor-pointer hover-blue"
+                      @click="openEditionModal(slot)">
                       <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
                       <div class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                      <ni-button icon="edit" @click="openEditionModal(slot)" size="10px" color="copper-grey-500" />
+                      <ni-button icon="edit" size="10px" color="copper-grey-500" />
                     </div>
                   </div>
                 </div>
@@ -98,7 +101,7 @@
                 <div class="index">{{ index + 1 }}</div>
                 <div class="q-mx-md">
                   <div>{{ step.name }}</div>
-                  <div class="type text-capitalize">{{ step.type }}</div>
+                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
                 </div>
               </div>
               <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
@@ -168,7 +171,9 @@ export default {
       editionModal: false,
       isVendorInterface,
       ON_SITE,
+      E_LEARNING,
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
+      SLOTS_TO_PLAN_KEY: 'toPlan',
     };
   },
   validations () {
@@ -249,7 +254,7 @@ export default {
       const formattedSlots = [...this.course.slots, ...this.course.slotsToPlan];
       const slotsByStep = groupBy(formattedSlots, 'step');
       const slotsByStepAndDateList = Object.keys(slotsByStep)
-        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || 'toPlan'));
+        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || this.SLOTS_TO_PLAN_KEY));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
     },
@@ -257,7 +262,8 @@ export default {
       return get(this.course, 'subProgram.steps').map(step => ({
         key: step._id,
         name: step.name,
-        type: this.getStepTypeLabel(step.type),
+        type: step.type,
+        typeLabel: this.getStepTypeLabel(step.type),
       }));
     },
   },
@@ -268,7 +274,7 @@ export default {
     getDuration,
     formatIntervalHourly,
     formatDate,
-    pick,
+    get,
     omit,
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
@@ -421,6 +427,13 @@ export default {
   color: white
   margin: 0px 4px
   font-size: 12px
+.hover-orange
+  &:hover
+    background-color: rgba(192, 86, 33, 0.1)
+
+.hover-blue
+  &:hover
+    background-color: rgba(69, 165, 173, 0.1)
 
 .slots-container
    @media screen and (min-width: 767px)
