@@ -15,8 +15,9 @@
           @update:model-value="updateEstimatedStartDate($event)" class="col-xs-12 col-md-6" />
       </div>
       <q-card class="q-pa-md">
-        <q-card v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
-          <div v-if="step.type === E_LEARNING">
+        <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
+          <div :class="getStepClass(step)">
+            <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
             <div class="row items-center q-pa-md">
               <div class="index">{{ index + 1 }}</div>
               <div class="q-mx-md">
@@ -24,93 +25,35 @@
                 <div class="type text-capitalize">{{ step.typeLabel }}</div>
               </div>
             </div>
-          </div>
-          <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
-            Object.keys(courseSlotsByStepAndDate[step.key]).some(date => date === SLOTS_TO_PLAN_KEY)">
-            <div class="to-plan">
-              <div class="to-plan-header">Créneaux à programmer</div>
-              <div class="row items-center q-pa-md">
-                <div class="index">{{ index + 1 }}</div>
-                <div class="q-mx-md">
-                  <div>{{ step.name }}</div>
-                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
-                </div>
-              </div>
-              <div class="slots-container">
+            <div v-if="!isElearningStep(step)" class="slots-container">
+              <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
+                class="flex">
                 <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
-                  :key="slot._id" class="row q-ml-xl q-mb-md cursor-pointer hover-orange"
+                  :key="slot._id" class="row items-center q-ml-xl q-mb-md cursor-pointer hover-orange"
                   @click="openEditionModal(slot)">
-                  <div class="clickable-name text-orange-500 q-mr-md">
-                    créneau à planifier
-                  </div>
-                  <ni-button icon="edit" size="10px" color="copper-grey-500" />
+                  <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
+                  <q-icon name="edit" size="12px" color="copper-grey-500" />
                 </div>
-                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
-                  :key="day" class="row q-ml-xl q-my-md">
-                  <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
-                  <div>
-                    <div v-for="slot in day[1]" :key="slot._id" class="row justify-between cursor-pointer hover-orange"
-                      @click="openEditionModal(slot)">
-                      <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
-                      <div class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                      <ni-button icon="edit" size="10px" color="copper-grey-500" />
-                    </div>
+              </div>
+              <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
+                :key="day" class="row q-ml-xl q-my-md">
+                <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
+                <div>
+                  <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
+                    :class="['row items-center cursor-pointer', `hover-${isPlannedStep(step) ? 'blue': 'orange'}`]">
+                    <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                    <div class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                    <q-icon name="edit" size="12px" color="copper-grey-500" />
                   </div>
                 </div>
               </div>
               <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
-                <ni-button label="Ajouter un créneau" color="primary" icon="add"
-                  @click="addDateToPlan(step.key)" :disable="addDateToPlanLoading" />
+                <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
+                  :disable="addDateToPlanLoading" />
               </div>
             </div>
           </div>
-          <div v-else-if="!!courseSlotsByStepAndDate[step.key] &&
-            Object.keys(courseSlotsByStepAndDate[step.key]).every(date => date !== SLOTS_TO_PLAN_KEY)">
-            <div class="planned">
-              <div class="row items-center q-pa-md">
-                <div class="index">{{ index + 1 }}</div>
-                <div class="q-mx-md">
-                  <div>{{ step.name }}</div>
-                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
-                </div>
-              </div>
-              <div class="slots-container">
-                <div v-for="day in Object.entries(courseSlotsByStepAndDate[step.key])" :key="day"
-                  class="row q-ml-xl q-my-md">
-                  <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
-                  <div>
-                    <div v-for="slot in day[1]" :key="slot._id" class="row justify-between cursor-pointer hover-blue"
-                      @click="openEditionModal(slot)">
-                      <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
-                      <div class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                      <ni-button icon="edit" size="10px" color="copper-grey-500" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
-                <ni-button label="Ajouter un créneau" color="primary" icon="add"
-                  @click="addDateToPlan(step.key)" :disable="addDateToPlanLoading" />
-              </div>
-            </div>
-          </div>
-          <div v-else>
-            <div class="to-plan">
-              <div class="to-plan-header">Créneaux à programmer</div>
-              <div class="row items-center q-pa-md">
-                <div class="index">{{ index + 1 }}</div>
-                <div class="q-mx-md">
-                  <div>{{ step.name }}</div>
-                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
-                </div>
-              </div>
-              <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
-                <ni-button label="Ajouter un créneau" color="primary" icon="add"
-                  @click="addDateToPlan(step.key)" :disable="addDateToPlanLoading" />
-              </div>
-            </div>
-          </div>
-        </q-card>
+        </div>
       </q-card>
     </div>
 
@@ -118,7 +61,7 @@
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
       :is-vendor-interface="isVendorInterface" />
-</div>
+  </div>
 </template>
 
 <script>
@@ -171,7 +114,6 @@ export default {
       editionModal: false,
       isVendorInterface,
       ON_SITE,
-      E_LEARNING,
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
       SLOTS_TO_PLAN_KEY: 'toPlan',
     };
@@ -379,6 +321,22 @@ export default {
     },
     async updateEstimatedStartDate (event) {
       this.$emit('update', set(this.course, 'estimatedStartDate', event));
+    },
+    isElearningStep (step) {
+      return step.type === E_LEARNING;
+    },
+    isPlannedStep (step) {
+      return !!this.courseSlotsByStepAndDate[step.key] &&
+            Object.keys(this.courseSlotsByStepAndDate[step.key]).every(date => date !== this.SLOTS_TO_PLAN_KEY);
+    },
+    isStepToPlan (step) {
+      return !(this.isElearningStep(step) || this.isPlannedStep(step));
+    },
+    getStepClass (step) {
+      if (this.isElearningStep(step)) return '';
+      if (this.isPlannedStep(step)) return 'planned';
+
+      return 'to-plan';
     },
   },
 
