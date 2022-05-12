@@ -58,12 +58,12 @@
         @update:model-value="update($event, 'subscription')" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
         :model-value="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
-        @blur="validations.inclTaxesCustomer.$touch" error-message="Montant TTC non valide"
+        @blur="validations.inclTaxesCustomer.$touch" :error-message="getSubscriptionErrorMessage('inclTaxesCustomer')"
         @update:model-value="update($event, 'inclTaxesCustomer')" />
       <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" @update:model-value="update($event, 'inclTaxesTpp')"
         :model-value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error" type="number"
-        @blur="validations.inclTaxesTpp.$touch" error-message="Montant TTC non valide" caption="Montant TTC"
-        suffix="€" />
+        @blur="validations.inclTaxesTpp.$touch" :error-message="getSubscriptionErrorMessage('inclTaxesTpp')"
+        caption="Montant TTC" suffix="€" />
     </template>
     <!-- Billing items -->
     <template v-else>
@@ -222,6 +222,15 @@ export default {
       if (validationErrorResponse.includes(get(validation, `${path}.0.$validator`))) return 'Nombre non valide';
 
       if (get(validation, `${path}.0.$validator`) === 'fractionDigits') return 'Décimales non valides';
+
+      return '';
+    },
+    getSubscriptionErrorMessage (path) {
+      const validationError = get(this.validations, `${path}.$errors.0.$validator`);
+
+      if (validationError === 'strictPositiveNumber') return 'Nombre non valide';
+
+      if (validationError === 'fractionDigits') return 'Décimales non valides';
 
       return '';
     },
