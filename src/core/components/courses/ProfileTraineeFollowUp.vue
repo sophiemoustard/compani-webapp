@@ -69,7 +69,12 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import { upperCaseFirstLetter, formatIdentity, formatQuantity } from '@helpers/utils';
+import {
+  upperCaseFirstLetter,
+  formatIdentity,
+  formatQuantity,
+  readAPIResponseWithTypeArrayBuffer,
+} from '@helpers/utils';
 import { formatDate, ascendingSort, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/date';
 import { downloadZip, downloadFile } from '@helpers/file';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
@@ -199,6 +204,8 @@ export default {
         downloadFile(pdf, 'emargement.pdf', 'application/octet-stream');
       } catch (e) {
         console.error(e);
+        const decodedRep = readAPIResponseWithTypeArrayBuffer(e);
+        if (decodedRep.statusCode === 404 && decodedRep.message) return NotifyNegative(decodedRep.message);
         NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
       } finally {
         this.pdfLoading = false;
