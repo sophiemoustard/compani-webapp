@@ -27,7 +27,7 @@
             </div>
             <div v-if="!isElearningStep(step)" class="slots-container">
               <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
-                class="flex">
+                class="to-plan-slot">
                 <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
                   :key="slot._id" class="row items-center q-ml-xl q-mb-md cursor-pointer hover-orange"
                   @click="openEditionModal(slot)">
@@ -36,7 +36,7 @@
                 </div>
               </div>
               <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
-                :key="day" class="row q-ml-xl q-my-md">
+                :key="day" class="row q-ml-xl q-my-sm">
                 <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                 <div>
                   <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
@@ -47,7 +47,7 @@
                   </div>
                 </div>
               </div>
-              <div class="q-mt-md" v-if="canEdit && isAdmin && isVendorInterface" align="right">
+              <div class="q-mt-sm" v-if="canEdit && isAdmin && isVendorInterface" align="right">
                 <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
                   :disable="addDateToPlanLoading" />
               </div>
@@ -374,6 +374,9 @@ export default {
   padding: 8px 16px
   border-radius: 15px 15px 0px 0px
   color: $orange-900
+
+.to-plan-slot
+  width: fit-content
 
 .index
   background-color: $copper-500
