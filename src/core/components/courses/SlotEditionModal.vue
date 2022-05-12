@@ -6,8 +6,6 @@
     <div class="modal-icon">
       <ni-button v-if="isAdmin && isVendorInterface" icon="delete" @click="validateDeletion(editedCourseSlot._id)" />
     </div>
-    <ni-select in-modal caption="Etape" :options="stepOptions" :model-value="editedCourseSlot.step" required-field
-      @blur="validations.step.$touch" :error="validations.step.$error" @update:model-value="updateStep" />
     <ni-datetime-range caption="Dates et heures" :model-value="editedCourseSlot.dates" disable-end-date
       :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
       required-field />
@@ -27,7 +25,6 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
-import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
@@ -39,7 +36,7 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     editedCourseSlot: { type: Object, default: () => ({}) },
-    stepOptions: { type: Array, default: () => [] },
+    stepTypes: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     linkErrorMessage: { type: String, default: '' },
@@ -51,7 +48,6 @@ export default {
     'ni-datetime-range': DateTimeRange,
     'ni-search-address': SearchAddress,
     'ni-modal': Modal,
-    'ni-select': Select,
     'ni-input': Input,
   },
   emits: ['hide', 'update:model-value', 'submit', 'delete', 'update'],
@@ -87,13 +83,7 @@ export default {
       this.$emit('update', { path, value });
     },
     getType (step) {
-      return step ? this.stepOptions.find(option => option.value === step).type : '';
-    },
-    updateStep (step) {
-      const type = this.getType(step);
-      if (type !== REMOTE) this.update('', 'meetingLink');
-      if (type !== ON_SITE) this.update({}, 'address');
-      this.update(step, 'step');
+      return step ? this.stepTypes.find(item => item.value === step).type : '';
     },
   },
 };

@@ -57,7 +57,7 @@
       </q-card>
     </div>
 
-    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
+    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-types="stepTypes"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
       :is-vendor-interface="isVendorInterface" />
@@ -121,7 +121,6 @@ export default {
   validations () {
     return {
       editedCourseSlot: {
-        step: { required },
         address: {
           zipCode: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
           street: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
@@ -179,17 +178,8 @@ export default {
     stepsLength () {
       return this.course.subProgram.steps.length;
     },
-    stepOptions () {
-      if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
-      return [
-        { label: 'Pas d\'étape spécifiée', value: '' },
-        ...this.course.subProgram.steps.map((step, index) => ({
-          label: `${index + 1} - ${step.name} (${this.getStepTypeLabel(step.type)})`,
-          value: step._id,
-          type: step.type,
-          disable: step.type === E_LEARNING,
-        })),
-      ];
+    stepTypes () {
+      return [...this.course.subProgram.steps.map(step => ({ value: step._id, type: step.type }))];
     },
     courseSlotsByStepAndDate () {
       if (!this.course.slots.length && !this.course.slotsToPlan.length) return {};
@@ -246,13 +236,12 @@ export default {
       this.v$.editedCourseSlot.$reset();
     },
     formatEditionPayload (courseSlot) {
-      const stepType = this.course.subProgram.steps.find(step => step._id === courseSlot.step).type;
+      const stepType = this.stepTypes.find(item => item.value === courseSlot.step).type;
 
       return {
         ...courseSlot.dates,
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
-        step: courseSlot.step,
       };
     },
     async addDateToPlan (stepId) {
@@ -309,11 +298,6 @@ export default {
       } finally {
         this.modalLoading = false;
       }
-    },
-    getStepTitle (slot) {
-      if (!slot.step) return '';
-      const step = this.stepOptions.find(option => option.value === slot.step._id);
-      return step ? step.label : '';
     },
     setCourseSlot (payload) {
       const { path, value } = payload;
