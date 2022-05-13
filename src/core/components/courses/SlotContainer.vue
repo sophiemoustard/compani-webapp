@@ -40,10 +40,7 @@
                 <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                 <div>
                   <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
-                    :class="[
-                    'row items-center',
-                    canEdit && `cursor-pointer hover-${isPlannedStep(step) ? 'blue': 'orange'}`
-                    ]">
+                    :class="getSlotClass(step)">
                     <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
                     <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
                     <div v-else class="q-mr-md">
@@ -336,9 +333,14 @@ export default {
     },
     setIsOnlySlot (step) {
       const days = Object.keys(this.courseSlotsByStepAndDate[step]);
-      if (days.length === 1 && this.courseSlotsByStepAndDate[step][days[0]].length === 1) return true;
 
-      return false;
+      return days.length === 1 && this.courseSlotsByStepAndDate[step][days[0]].length === 1;
+    },
+    getSlotClass (step) {
+      return [
+        'row items-center',
+        this.canEdit && `cursor-pointer hover-${this.isPlannedStep(step) ? 'blue' : 'orange'}`,
+      ];
     },
   },
 
