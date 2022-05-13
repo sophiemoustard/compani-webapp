@@ -18,7 +18,7 @@
         <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
           <div :class="getStepClass(step)">
             <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
-            <div class="row items-center q-pa-md">
+            <div class="row q-pa-md">
               <div class="index">{{ index + 1 }}</div>
               <div class="q-mx-md">
                 <div>{{ step.name }}</div>
@@ -29,10 +29,10 @@
               <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
                 class="to-plan-slot">
                 <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
-                  :key="slot._id" class="row items-center q-ml-xl q-mb-md cursor-pointer hover-orange"
-                  @click="openEditionModal(slot)">
+                  :key="slot._id" @click="openEditionModal(slot)"
+                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
                   <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
-                  <q-icon name="edit" size="12px" color="copper-grey-500" />
+                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                 </div>
               </div>
               <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
@@ -40,10 +40,16 @@
                 <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                 <div>
                   <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
-                    :class="['row items-center cursor-pointer', `hover-${isPlannedStep(step) ? 'blue': 'orange'}`]">
+                    :class="getSlotClass(step)">
                     <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
-                    <div class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                    <q-icon name="edit" size="12px" color="copper-grey-500" />
+                    <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                    <div v-else class="q-mr-md">
+                      <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                        {{ slot.meetingLink }}
+                      </a>
+                      {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+                    </div>
+                    <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                   </div>
                 </div>
               </div>
@@ -57,10 +63,10 @@
       </q-card>
     </div>
 
-    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
+    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-types="stepTypes"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
-      :is-vendor-interface="isVendorInterface" />
+      :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" />
   </div>
 </template>
 
@@ -116,12 +122,12 @@ export default {
       ON_SITE,
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
       SLOTS_TO_PLAN_KEY: 'toPlan',
+      isOnlySlot: false,
     };
   },
   validations () {
     return {
       editedCourseSlot: {
-        step: { required },
         address: {
           zipCode: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
           street: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
@@ -179,17 +185,8 @@ export default {
     stepsLength () {
       return this.course.subProgram.steps.length;
     },
-    stepOptions () {
-      if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
-      return [
-        { label: 'Pas d\'étape spécifiée', value: '' },
-        ...this.course.subProgram.steps.map((step, index) => ({
-          label: `${index + 1} - ${step.name} (${this.getStepTypeLabel(step.type)})`,
-          value: step._id,
-          type: step.type,
-          disable: step.type === E_LEARNING,
-        })),
-      ];
+    stepTypes () {
+      return [...this.course.subProgram.steps.map(step => ({ value: step._id, type: step.type }))];
     },
     courseSlotsByStepAndDate () {
       if (!this.course.slots.length && !this.course.slotsToPlan.length) return {};
@@ -239,20 +236,21 @@ export default {
         step: slot.step,
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
+      this.isOnlySlot = this.setIsOnlySlot(slot.step);
       this.editionModal = true;
     },
     resetEditionModal () {
       this.editedCourseSlot = {};
       this.v$.editedCourseSlot.$reset();
+      this.isOnlySlot = false;
     },
     formatEditionPayload (courseSlot) {
-      const stepType = this.course.subProgram.steps.find(step => step._id === courseSlot.step).type;
+      const stepType = this.stepTypes.find(item => item.value === courseSlot.step).type;
 
       return {
         ...courseSlot.dates,
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
-        step: courseSlot.step,
       };
     },
     async addDateToPlan (stepId) {
@@ -310,11 +308,6 @@ export default {
         this.modalLoading = false;
       }
     },
-    getStepTitle (slot) {
-      if (!slot.step) return '';
-      const step = this.stepOptions.find(option => option.value === slot.step._id);
-      return step ? step.label : '';
-    },
     setCourseSlot (payload) {
       const { path, value } = payload;
       set(this.editedCourseSlot, path, value);
@@ -337,6 +330,17 @@ export default {
       if (this.isPlannedStep(step)) return 'planned';
 
       return 'to-plan';
+    },
+    setIsOnlySlot (step) {
+      const days = Object.keys(this.courseSlotsByStepAndDate[step]);
+
+      return days.length === 1 && this.courseSlotsByStepAndDate[step][days[0]].length === 1;
+    },
+    getSlotClass (step) {
+      return [
+        'row items-center',
+        this.canEdit && `cursor-pointer hover-${this.isPlannedStep(step) ? 'blue' : 'orange'}`,
+      ];
     },
   },
 
