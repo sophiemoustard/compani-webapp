@@ -29,10 +29,10 @@
               <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
                 class="to-plan-slot">
                 <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
-                  :key="slot._id" class="row items-center q-ml-xl q-mb-md cursor-pointer hover-orange"
-                  @click="openEditionModal(slot)">
+                  :key="slot._id" @click="openEditionModal(slot)"
+                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
                   <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
-                  <q-icon name="edit" size="12px" color="copper-grey-500" />
+                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                 </div>
               </div>
               <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
@@ -40,7 +40,10 @@
                 <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
                 <div>
                   <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
-                    :class="['row items-center cursor-pointer', `hover-${isPlannedStep(step) ? 'blue': 'orange'}`]">
+                    :class="[
+                    'row items-center',
+                    canEdit && `cursor-pointer hover-${isPlannedStep(step) ? 'blue': 'orange'}`
+                    ]">
                     <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
                     <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
                     <div v-else class="q-mr-md">
@@ -49,7 +52,7 @@
                       </a>
                       {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
                     </div>
-                    <q-icon name="edit" size="12px" color="copper-grey-500" />
+                    <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                   </div>
                 </div>
               </div>
