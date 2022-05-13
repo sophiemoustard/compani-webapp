@@ -498,9 +498,9 @@ export default {
 
       return {
         exclTaxesCustomer,
-        inclTaxesCustomer: parseFloat(inclTaxesCustomerString),
+        inclTaxesCustomer: toFixed(inclTaxesCustomerString),
         exclTaxesTpp,
-        inclTaxesTpp: parseFloat(inclTaxesTppString),
+        inclTaxesTpp: toFixed(inclTaxesTppString),
       };
     },
     // Creation
