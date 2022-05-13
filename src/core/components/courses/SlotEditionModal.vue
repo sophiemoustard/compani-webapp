@@ -4,7 +4,8 @@
       Editer un <span class="text-weight-bold">créneau</span>
     </template>
     <div class="modal-icon">
-      <ni-button v-if="isAdmin && isVendorInterface" icon="delete" @click="validateDeletion(editedCourseSlot._id)" />
+      <ni-button v-if="isAdmin && isVendorInterface" icon="delete" @click="validateDeletion(editedCourseSlot._id)"
+        :disable="isOnlySlot" />
     </div>
     <ni-datetime-range caption="Dates et heures" :model-value="editedCourseSlot.dates" disable-end-date
       :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
@@ -42,6 +43,7 @@ export default {
     linkErrorMessage: { type: String, default: '' },
     isAdmin: { type: Boolean, default: false },
     isVendorInterface: { type: Boolean, default: false },
+    isOnlySlot: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,

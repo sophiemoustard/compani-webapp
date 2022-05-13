@@ -18,7 +18,7 @@
         <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
           <div :class="getStepClass(step)">
             <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
-            <div class="row items-center q-pa-md">
+            <div class="row q-pa-md">
               <div class="index">{{ index + 1 }}</div>
               <div class="q-mx-md">
                 <div>{{ step.name }}</div>
@@ -42,7 +42,13 @@
                   <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
                     :class="['row items-center cursor-pointer', `hover-${isPlannedStep(step) ? 'blue': 'orange'}`]">
                     <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
-                    <div class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                    <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                    <div v-else class="q-mr-md">
+                      <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                        {{ slot.meetingLink }}
+                      </a>
+                      {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+                    </div>
                     <q-icon name="edit" size="12px" color="copper-grey-500" />
                   </div>
                 </div>
@@ -60,7 +66,7 @@
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-types="stepTypes"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
-      :is-vendor-interface="isVendorInterface" />
+      :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" />
   </div>
 </template>
 
@@ -116,6 +122,7 @@ export default {
       ON_SITE,
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
       SLOTS_TO_PLAN_KEY: 'toPlan',
+      isOnlySlot: false,
     };
   },
   validations () {
@@ -229,11 +236,13 @@ export default {
         step: slot.step,
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
+      this.isOnlySlot = this.setIsOnlySlot(slot.step);
       this.editionModal = true;
     },
     resetEditionModal () {
       this.editedCourseSlot = {};
       this.v$.editedCourseSlot.$reset();
+      this.isOnlySlot = false;
     },
     formatEditionPayload (courseSlot) {
       const stepType = this.stepTypes.find(item => item.value === courseSlot.step).type;
@@ -321,6 +330,12 @@ export default {
       if (this.isPlannedStep(step)) return 'planned';
 
       return 'to-plan';
+    },
+    setIsOnlySlot (step) {
+      const days = Object.keys(this.courseSlotsByStepAndDate[step]);
+      if (days.length === 1 && this.courseSlotsByStepAndDate[step][days[0]].length === 1) return true;
+
+      return false;
     },
   },
 
