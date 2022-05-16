@@ -14,51 +14,60 @@
         <ni-date-input caption="Date de démarrage souhaitée" :model-value="course.estimatedStartDate"
           @update:model-value="updateEstimatedStartDate($event)" class="col-xs-12 col-md-6" />
       </div>
-      <div class="slots-cells-container row">
-        <q-card class="slots-cells" v-for="(value, key, index) in courseSlots" :key="index" flat>
-          <div class="slots-cells-title">
-            <div class="slots-cells-number">{{ index + 1 }}</div>
-            <div class="slots-cells-date text-weight-bold">{{ key }}</div>
+      <q-card class="q-pa-md">
+        <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
+          <div :class="getStepClass(step)">
+            <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
+            <div class="row q-pa-md">
+              <div class="index">{{ index + 1 }}</div>
+              <div class="q-mx-md">
+                <div>{{ step.name }}</div>
+                <div class="type text-capitalize">{{ step.typeLabel }}</div>
+              </div>
+            </div>
+            <div v-if="!isElearningStep(step)" class="slots-container">
+              <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
+                :key="day" class="row q-ml-xl q-my-sm">
+                <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
+                <div>
+                  <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
+                    :class="getSlotClass(step)">
+                    <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                    <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                    <div v-else class="q-mr-md">
+                      <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                        {{ slot.meetingLink }}
+                      </a>
+                      {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+                    </div>
+                    <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                  </div>
+                </div>
+              </div>
+              <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
+                class="to-plan-slot">
+                <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
+                  :key="slot._id" @click="openEditionModal(slot)"
+                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
+                  <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
+                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                </div>
+              </div>
+              <div class="q-mt-sm" v-if="canEdit && isAdmin && isVendorInterface" align="right">
+                <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
+                  :disable="addDateToPlanLoading" />
+              </div>
+            </div>
           </div>
-          <div :class="['slots-cells-content', { 'cursor-pointer': canEdit && !course.archivedAt }]"
-            v-for="slot in value" :key="slot._id" @click="openEditionModal(slot)">
-              <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
-              <q-item>{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</q-item>
-              <q-item v-if="slot.step.type === ON_SITE">{{ getSlotAddress(slot) }}</q-item>
-              <q-item v-else>
-                <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
-                  {{ slot.meetingLink }}
-                </a>
-                {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
-              </q-item>
-          </div>
-        </q-card>
-        <q-card :class="['slots-cells', { 'cursor-pointer': canEdit && !course.archivedAt }]"
-          v-for="(value, index) in courseSlotsToPlan" :key="Object.keys(courseSlots).length + index + 1" flat
-          @click="openEditionModal(value)">
-          <div class="slots-cells-title">
-            <div class="slots-cells-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
-            <div class="slots-cells-date text-weight-bold">Date à planifier</div>
-          </div>
-          <div class="to-plan-text">Créneau à planifier</div>
-        </q-card>
-      </div>
-      <div class="q-mt-md" v-if="canEdit" align="right">
-        <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
-          :disable="loading || addDateToPlanloading" @click="openSlotCreationModal" />
-        <ni-button v-if="isVendorInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
-          icon="add" @click="addDateToPlan" :disable="addDateToPlanloading" />
-      </div>
+        </div>
+      </q-card>
     </div>
 
-    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="v$.newCourseSlot"
-      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot"
-      :link-error-message="linkErrorMessage" @update="setCourseSlot" />
-
-    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
+    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-types="stepTypes"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
-      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" />
-</div>
+      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
+      :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" />
+  </div>
 </template>
 
 <script>
@@ -66,14 +75,14 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import set from 'lodash/set';
-import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
+import groupBy from 'lodash/groupBy';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
-import SlotCreationModal from '@components/courses/SlotCreationModal';
 import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
@@ -94,7 +103,6 @@ export default {
   },
   components: {
     'slot-edition-modal': SlotEditionModal,
-    'slot-creation-modal': SlotCreationModal,
     'ni-button': Button,
     'ni-date-input': DateInput,
   },
@@ -106,37 +114,38 @@ export default {
     const isVendorInterface = /\/ad\//.test(this.$route.path);
 
     return {
-      courseSlots: {},
-      addDateToPlanloading: false,
+      addDateToPlanLoading: false,
       modalLoading: false,
-      creationModal: false,
-      newCourseSlot: {
-        dates: {
-          startDate: moment().startOf('d').hours(9).toISOString(),
-          endDate: moment().startOf('d').hours(12).toISOString(),
-        },
-        address: {},
-        meetingLink: '',
-        step: '',
-      },
       editedCourseSlot: {},
       editionModal: false,
-      courseSlotsColumns: [
-        { name: 'date', align: 'left', label: 'Dates' },
-        { name: 'hours', align: 'center', label: 'Créneaux' },
-        { name: 'duration', align: 'center', label: 'Durée' },
-        { name: 'address', label: 'Lieu', align: 'left' },
-        { name: 'actions', label: '', align: 'center' },
-      ],
       isVendorInterface,
       ON_SITE,
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
+      SLOTS_TO_PLAN_KEY: 'toPlan',
+      isOnlySlot: false,
     };
   },
   validations () {
     return {
-      newCourseSlot: this.courseSlotValidation(this.newCourseSlot),
-      editedCourseSlot: this.courseSlotValidation(this.editedSlot),
+      editedCourseSlot: {
+        address: {
+          zipCode: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          street: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          city: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        meetingLink: { urlAddress },
+        dates: {
+          startDate: { required },
+          endDate: {
+            required,
+            ...(!!get(this.editedSlot, 'dates.startDate') && {
+              maxDate: maxDate(moment(this.editedSlot.dates.startDate).endOf('d').toISOString()),
+              minDate: minDate(this.editedSlot.dates.startDate),
+            }),
+          },
+        },
+      },
     };
   },
   computed: {
@@ -152,8 +161,9 @@ export default {
       return formatDuration(total);
     },
     formatSlotTitle () {
-      const slotsToPlanLength = this.courseSlotsToPlan.length;
-      const slotList = Object.values(this.courseSlots);
+      const slotsToPlanLength = this.course.slotsToPlan.length;
+      const courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
+      const slotList = Object.values(courseSlots);
       const totalDate = slotsToPlanLength + slotList.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
@@ -175,80 +185,38 @@ export default {
     stepsLength () {
       return this.course.subProgram.steps.length;
     },
-    stepOptions () {
-      if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
-      return [
-        { label: 'Pas d\'étape spécifiée', value: '' },
-        ...this.course.subProgram.steps.map((step, index) => ({
-          label: `${index + 1} - ${step.name} (${this.getStepTypeLabel(step.type)})`,
-          value: step._id,
-          type: step.type,
-          disable: step.type === E_LEARNING,
-        })),
-      ];
+    stepTypes () {
+      return [...this.course.subProgram.steps.map(step => ({ value: step._id, type: step.type }))];
     },
-  },
-  watch: {
-    course () {
-      this.groupByCourses();
+    courseSlotsByStepAndDate () {
+      if (!this.course.slots.length && !this.course.slotsToPlan.length) return {};
+      const formattedSlots = [...this.course.slots, ...this.course.slotsToPlan];
+      const slotsByStep = groupBy(formattedSlots, 'step');
+      const slotsByStepAndDateList = Object.keys(slotsByStep)
+        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || this.SLOTS_TO_PLAN_KEY));
+
+      return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
+    },
+    stepList () {
+      return get(this.course, 'subProgram.steps').map(step => ({
+        key: step._id,
+        name: step.name,
+        type: step.type,
+        typeLabel: this.getStepTypeLabel(step.type),
+      }));
     },
   },
   async created () {
     if (!this.course) this.$emit('refresh');
-    else this.groupByCourses();
   },
   methods: {
     getDuration,
     formatIntervalHourly,
-    courseSlotValidation (slot) {
-      return {
-        step: { required },
-        address: {
-          zipCode: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          street: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          city: { required: requiredIf(get(slot, 'address.fullAddress')) },
-          fullAddress: { frAddress },
-        },
-        meetingLink: { urlAddress },
-        dates: {
-          startDate: { required },
-          endDate: {
-            required,
-            ...(!!get(slot, 'dates.startDate') && {
-              maxDate: maxDate(moment(slot.dates.startDate).endOf('d').toISOString()),
-              minDate: minDate(slot.dates.startDate),
-            }),
-          },
-        },
-      };
-    },
-    groupByCourses () {
-      this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
-      this.courseSlotsToPlan = this.course.slotsToPlan || [];
-    },
+    formatDate,
+    get,
+    omit,
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
-    },
-    resetCreationModal () {
-      this.newCourseSlot = {
-        dates: {
-          startDate: moment().startOf('d').hours(9).toISOString(),
-          endDate: moment().startOf('d').hours(12).toISOString(),
-        },
-        address: {},
-        meetingLink: '',
-        step: '',
-      };
-      this.v$.newCourseSlot.$reset();
-    },
-    formatCreationPayload (courseSlot) {
-      return {
-        ...courseSlot.dates,
-        course: this.course._id,
-        ...(get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
-        ...(courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
-        ...(courseSlot.step && { step: courseSlot.step }),
-      };
     },
     openEditionModal (slot) {
       if (!this.canEdit) return;
@@ -265,60 +233,34 @@ export default {
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
         meetingLink: get(slot, 'meetingLink') || '',
-        step: get(slot, 'step._id') || '',
+        step: slot.step,
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
+      this.isOnlySlot = this.setIsOnlySlot(slot.step);
       this.editionModal = true;
     },
     resetEditionModal () {
       this.editedCourseSlot = {};
       this.v$.editedCourseSlot.$reset();
+      this.isOnlySlot = false;
     },
     formatEditionPayload (courseSlot) {
-      const stepType = this.course.subProgram.steps.find(step => step._id === courseSlot.step).type;
+      const stepType = this.stepTypes.find(item => item.value === courseSlot.step).type;
 
       return {
         ...courseSlot.dates,
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
-        step: courseSlot.step,
       };
     },
-    async addCourseSlot () {
-      try {
-        this.v$.newCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.v$.newCourseSlot);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
-
-        this.modalLoading = true;
-        await CourseSlots.create(this.formatCreationPayload(this.newCourseSlot));
-        NotifyPositive('Créneau ajouté.');
-
-        this.creationModal = false;
-        this.$emit('refresh');
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du créneau.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    openSlotCreationModal () {
-      if (this.course.archivedAt) {
-        return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
-      }
-
-      this.creationModal = true;
-    },
-    async addDateToPlan () {
+    async addDateToPlan (stepId) {
       try {
         if (this.course.archivedAt) {
           return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
         }
 
-        this.addDateToPlanloading = true;
-        await CourseSlots.create(this.formatCreationPayload({}));
+        this.addDateToPlanLoading = true;
+        await CourseSlots.create({ course: this.course._id, step: stepId });
         NotifyPositive('Date à planifier ajoutée.');
 
         this.$emit('refresh');
@@ -326,7 +268,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       } finally {
-        this.addDateToPlanloading = false;
+        this.addDateToPlanLoading = false;
       }
     },
     async updateCourseSlot () {
@@ -359,24 +301,46 @@ export default {
         this.editionModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyWarning('Créneau émargé : impossible de le supprimer');
+        if (e.data.statusCode === 409) return NotifyWarning('Créneau émargé : impossible de le supprimer.');
+        if (e.data.statusCode === 403) return NotifyWarning('Seul créneau de l\'étape : impossible de le supprimer.');
         NotifyNegative('Erreur lors de la suppression du créneau.');
       } finally {
         this.modalLoading = false;
       }
     },
-    getStepTitle (slot) {
-      if (!slot.step) return '';
-      const step = this.stepOptions.find(option => option.value === slot.step._id);
-      return step ? step.label : '';
-    },
     setCourseSlot (payload) {
       const { path, value } = payload;
-      if (this.creationModal) set(this.newCourseSlot, path, value);
-      else if (this.editionModal) set(this.editedCourseSlot, path, value);
+      set(this.editedCourseSlot, path, value);
     },
     async updateEstimatedStartDate (event) {
       this.$emit('update', set(this.course, 'estimatedStartDate', event));
+    },
+    isElearningStep (step) {
+      return step.type === E_LEARNING;
+    },
+    isPlannedStep (step) {
+      return !!this.courseSlotsByStepAndDate[step.key] &&
+            Object.keys(this.courseSlotsByStepAndDate[step.key]).every(date => date !== this.SLOTS_TO_PLAN_KEY);
+    },
+    isStepToPlan (step) {
+      return !(this.isElearningStep(step) || this.isPlannedStep(step));
+    },
+    getStepClass (step) {
+      if (this.isElearningStep(step)) return '';
+      if (this.isPlannedStep(step)) return 'planned';
+
+      return 'to-plan';
+    },
+    setIsOnlySlot (step) {
+      const days = Object.keys(this.courseSlotsByStepAndDate[step]);
+
+      return days.length === 1 && this.courseSlotsByStepAndDate[step][days[0]].length === 1;
+    },
+    getSlotClass (step) {
+      return [
+        'row items-center',
+        this.canEdit && `cursor-pointer hover-${this.isPlannedStep(step) ? 'blue' : 'orange'}`,
+      ];
     },
   },
 
@@ -384,48 +348,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.slots-cells
-  padding: 10px
-  &-container
-    grid-auto-rows: 1fr
-    grid-auto-flow: row
-    display: grid
-    grid-gap: 20px 10px
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))
-  &-number
-    font-size: 12px
-    border: solid 1px
-    display: flex
-    height: 20px
-    width: 20px
-    border-radius: 50%
-    align-content: center
-    justify-content: center
-  &-title
-    display: flex
-    justify-content: space-between
-    align-items: center
-    margin: 0 10px 10px 10px
-  &-date
-    color: $primary
-    font-size: 16px
-  &-content
-    margin: 5px 10px
-    display: flex
-    background-color: $copper-100
-    flex-direction: column
-    border-radius: 4px !important
-  &-content > .q-item
-    font-size: 14px
-    padding: 0px
-    min-height: auto
-    margin: 0px 10px
-
-.add-slot
-  background: $primary
-  margin-left: 10px
-  margin-top: 10px
-
 .slot-section-title
   padding: 0
   margin: 10px 0px
@@ -435,8 +357,50 @@ export default {
     @media screen and (max-width: 767px)
       font-size: 13px
 
-.to-plan-text
-  text-decoration: underline
-  color: $secondary
-  font-size: 14px
+.type
+  background-color: $copper-grey-100
+  border-radius: 15px
+  padding: 2px 6px
+  width: fit-content
+
+.planned
+  background-color: $copper-100
+  border-radius: 15px
+  padding-bottom: 16px
+
+.to-plan
+  background-color: $orange-100
+  border-radius: 15px
+  padding-bottom: 16px
+
+.to-plan-header
+  background-color: $orange-200
+  padding: 8px 16px
+  border-radius: 15px 15px 0px 0px
+  color: $orange-900
+
+.to-plan-slot
+  width: fit-content
+
+.index
+  background-color: $copper-500
+  border-radius: 50%
+  width: 20px
+  height: 20px
+  padding: 2px 0px
+  text-align: center
+  color: white
+  margin: 0px 4px
+  font-size: 12px
+.hover-orange
+  &:hover
+    background-color: rgba(192, 86, 33, 0.1)
+
+.hover-blue
+  &:hover
+    background-color: rgba(69, 165, 173, 0.1)
+
+.slots-container
+   @media screen and (min-width: 767px)
+    margin-left: 32px
 </style>
