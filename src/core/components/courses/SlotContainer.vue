@@ -26,15 +26,6 @@
               </div>
             </div>
             <div v-if="!isElearningStep(step)" class="slots-container">
-              <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
-                class="to-plan-slot">
-                <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
-                  :key="slot._id" @click="openEditionModal(slot)"
-                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
-                  <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
-                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
-                </div>
-              </div>
               <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
                 :key="day" class="row q-ml-xl q-my-sm">
                 <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
@@ -51,6 +42,15 @@
                     </div>
                     <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                   </div>
+                </div>
+              </div>
+              <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
+                class="to-plan-slot">
+                <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
+                  :key="slot._id" @click="openEditionModal(slot)"
+                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
+                  <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
+                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                 </div>
               </div>
               <div class="q-mt-sm" v-if="canEdit && isAdmin && isVendorInterface" align="right">
