@@ -3,7 +3,7 @@
     <template #title>
       Éditer le <span class="text-weight-bold">payeur</span>
     </template>
-    <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="editedFunder" required-field
+    <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="editedPayer" required-field
       @update:model-value="update" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Éditer le payeur" icon-right="add" color="white"
@@ -18,10 +18,10 @@ import Button from '@components/Button';
 import Select from '@components/form/Select';
 
 export default {
-  name: 'CourseBillingItemCreationModal',
+  name: 'PayerEditionModal',
   props: {
     modelValue: { type: Boolean, default: false },
-    editedFunder: { type: String, default: () => '' },
+    editedPayer: { type: String, default: () => '' },
     payerOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
   },
@@ -30,7 +30,7 @@ export default {
     'ni-button': Button,
     'ni-select': Select,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:edited-funder'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:edited-payer'],
   methods: {
     hide () {
       this.$emit('hide');
@@ -42,7 +42,7 @@ export default {
       this.$emit('submit');
     },
     update (event) {
-      this.$emit('update:edited-funder', event);
+      this.$emit('update:edited-payer', event);
     },
   },
 };
