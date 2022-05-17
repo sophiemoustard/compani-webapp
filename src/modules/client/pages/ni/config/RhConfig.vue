@@ -28,12 +28,10 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
-          <div class="col-xs-12 col-md-6">
-            <ni-input caption="Taux horaire brut par défaut" :error="v$.company.rhConfig.grossHourlyRate.$error"
-              :error-message="nbrError('company.rhConfig.grossHourlyRate')" type="number"
-              v-model="company.rhConfig.grossHourlyRate" @focus="saveTmp('rhConfig.grossHourlyRate')" suffix="€"
-              @blur="updateCompany('rhConfig.grossHourlyRate')" />
-          </div>
+          <ni-input caption="Taux horaire brut par défaut" :error="v$.company.rhConfig.grossHourlyRate.$error"
+            :error-message="nbrError('company.rhConfig.grossHourlyRate')" type="number"
+            v-model="company.rhConfig.grossHourlyRate" @focus="saveTmp('rhConfig.grossHourlyRate')" suffix="€"
+            @blur="updateCompany('rhConfig.grossHourlyRate')" />
           <div class="col-xs-12 col-md-6">
               <q-checkbox v-model="company.rhConfig.shouldPayHolidays" label="Les jours fériés ne sont pas travaillés"
                 @update:model-value="updateCompany('rhConfig.shouldPayHolidays')" dense class="title" />
