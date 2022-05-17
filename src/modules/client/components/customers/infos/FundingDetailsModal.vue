@@ -23,9 +23,7 @@ export default {
     'ni-modal': Modal,
     'ni-funding-grid-table': FundingGridTable,
   },
-  mixins: [
-    fundingMixin,
-  ],
+  mixins: [fundingMixin],
   emits: ['hide', 'update:model-value'],
   computed: {
     visibleColumns () {

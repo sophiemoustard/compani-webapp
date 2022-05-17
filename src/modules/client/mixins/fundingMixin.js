@@ -48,14 +48,14 @@ export const fundingMixin = {
         { name: 'unitTTCRate', label: 'Prix unitaire TTC', align: 'left', format: formatPrice, field: 'unitTTCRate' },
         {
           name: 'careHours',
-          label: 'Nb. heures de prise en charge',
+          label: 'Nb. heures de prise en charge par mois',
           align: 'left',
           format: formatHours,
           field: 'careHours',
         },
         {
           name: 'customerParticipationRate',
-          label: 'Tx. participation bénéficiaire',
+          label: 'Tx. participation du bénéficiaire',
           align: 'left',
           format: value => (value ? `${value}%` : '0%'),
           field: 'customerParticipationRate',
