@@ -21,11 +21,11 @@
         type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field
         :error-message="amountTtcErrorMessage" @update:model-value="update($event, 'amountTTC')" />
       <ni-input in-modal v-if="!isFixedFunding" :model-value="editedFunding.careHours" required-field suffix="h"
-        caption="Nb. heures prises en charge" :error-message="careHoursErrorMessage" type="number"
+        caption="Nb. heures prises en charge par mois" :error-message="careHoursErrorMessage" type="number"
         :error="validations.careHours.$error" @blur="validations.careHours.$touch"
         @update:model-value="update($event, 'careHours')" />
       <ni-input in-modal v-if="!isFixedFunding" :model-value="editedFunding.customerParticipationRate" type="number"
-        caption="Taux de participation" :error-message="customerParticipationRateErrorMessage"
+        caption="Taux de participation du bénéficiaire" :error-message="customerParticipationRateErrorMessage"
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
         required-field suffix="%" @update:model-value="update($event, 'customerParticipationRate')" />
       <ni-option-group :model-value="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"

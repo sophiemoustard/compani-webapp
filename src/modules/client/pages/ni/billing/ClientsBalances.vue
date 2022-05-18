@@ -188,7 +188,7 @@ export default {
       const csvData = [[
         'Client',
         'Bénéficiaire',
-        'Taux de participation',
+        'Taux de participation du bénéficiaire',
         'Facturé TTC',
         'Payé TTC',
         'Solde',
@@ -274,11 +274,12 @@ export default {
         },
         {
           name: 'participationRate',
-          label: 'Taux de participation',
+          label: 'Taux de participation du bénéficiaire',
           align: 'center',
           field: row => (row.thirdPartyPayer ? '' : row.participationRate),
           format: (value, row) => (row.thirdPartyPayer ? '' : roundFrenchPercentage(value)),
           sortable: true,
+          style: 'width: 15%',
         },
         { name: 'billed', label: 'Facturé TTC', align: 'center', field: 'billed', format: val => formatPrice(val) },
         { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
