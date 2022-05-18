@@ -395,21 +395,26 @@ export default {
       validations.value.billToValidate.$reset();
     };
 
+    const formatPayerForPayload = (payloadPayer) => {
+      const payerType = payerList.value.find(payer => payer.value === payloadPayer).type;
+
+      return payerType === COMPANY ? { company: payloadPayer } : { fundingOrganisation: payloadPayer };
+    };
+
+    const formatCreationPayload = () => ({
+      course: course.value._id,
+      mainFee: newBill.value.mainFee,
+      company: course.value.company._id,
+      payer: formatPayerForPayload(newBill.value.payer),
+    });
+
     const addBill = async () => {
       try {
         validations.value.newBill.$touch();
         if (validations.value.newBill.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         billCreationLoading.value = true;
-        const payerType = payerList.value.find(payer => payer.value === newBill.value.payer).type;
-        await CourseBills.create({
-          course: course.value._id,
-          mainFee: newBill.value.mainFee,
-          company: course.value.company._id,
-          payer: payerType === COMPANY
-            ? { company: newBill.value.payer }
-            : { fundingOrganisation: newBill.value.payer },
-        });
+        await CourseBills.create(formatCreationPayload());
         NotifyPositive('Facture créée.');
 
         billCreationModal.value = false;
@@ -431,15 +436,9 @@ export default {
         if (validations.value.editedBill.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         billEditionLoading.value = true;
-        const payerType = payerList.value.find(payer => payer.value === editedBill.value.payer).type;
         await CourseBills.update(
           editedBill.value._id,
-          {
-            payer: payerType === COMPANY
-              ? { company: editedBill.value.payer }
-              : { fundingOrganisation: editedBill.value.payer },
-            mainFee: editedBill.value.mainFee,
-          }
+          { payer: formatPayerForPayload(editedBill.value.payer), mainFee: editedBill.value.mainFee }
         );
         NotifyPositive('Facture modifiée.');
 
