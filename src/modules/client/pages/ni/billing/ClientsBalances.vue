@@ -279,6 +279,7 @@ export default {
           field: row => (row.thirdPartyPayer ? '' : row.participationRate),
           format: (value, row) => (row.thirdPartyPayer ? '' : roundFrenchPercentage(value)),
           sortable: true,
+          style: 'width: 15%',
         },
         { name: 'billed', label: 'Facturé TTC', align: 'center', field: 'billed', format: val => formatPrice(val) },
         { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
