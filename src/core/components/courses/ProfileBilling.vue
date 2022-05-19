@@ -137,6 +137,7 @@ import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidate
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
 import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
+import Companies from '@api/Companies';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
@@ -265,14 +266,12 @@ export default {
       return { price, count };
     };
 
-    const refreshCourseFundingOrganisations = async () => {
+    const refreshPayers = async () => {
       try {
         const organisations = await CourseFundingOrganisations.list();
+        const companies = await Companies.list();
         const formattedOrganisationList = formatAndSortOptions(organisations, 'name');
-        const formattedCompanyList = formatAndSortOptions(
-          [{ _id: course.value.company._id, name: course.value.company.name }],
-          'name'
-        );
+        const formattedCompanyList = formatAndSortOptions(companies, 'name');
         payerList.value =
           [
             ...formattedOrganisationList.map(payer => ({ ...payer, type: FUNDING_ORGANISATION })),
@@ -632,7 +631,7 @@ export default {
 
     const created = async () => {
       refreshCourseBills();
-      refreshCourseFundingOrganisations();
+      refreshPayers();
       refreshBillingItems();
     };
 
@@ -677,7 +676,7 @@ export default {
       editedBillingPurchaseErrorMessages,
       canAddBill,
       // Methods
-      refreshCourseFundingOrganisations,
+      refreshPayers,
       resetBillCreationModal,
       resetEditedBill,
       resetMainFeeEditionModal,
