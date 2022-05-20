@@ -25,8 +25,8 @@
                   </div>
                 </div>
               </div>
-              <div v-if="isFunderVisible(bill)" @click.stop="openFunderEditionModal(bill)" class="payer">
-                Payeur : {{ get(bill, 'courseFundingOrganisation.name') || get(bill, 'company.name') }}
+              <div v-if="isPayerVisible(bill)" @click.stop="openPayerEditionModal(bill)" class="payer">
+                Payeur : {{ get(bill, 'payer.name') }}
                 <q-icon v-if="!isBilled(bill)" size="16px" name="edit" color="copper-grey-500" />
               </div>
               {{ isDateVisible(bill) ? `Date : ${formatDate(bill.billedAt)}` : '' }}
@@ -92,7 +92,7 @@
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
 
-    <ni-funder-edition-modal v-model="funderEditionModal" v-model:edited-funder="editedBill.funder"
+    <ni-payer-edition-modal v-model="payerEditionModal" v-model:edited-payer="editedBill.payer"
       @submit="editBill" @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" />
 
     <!-- main fee edition modal -->
@@ -143,9 +143,9 @@ import CourseBillingItems from '@api/CourseBillingItems';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import { REQUIRED_LABEL, LIST } from '@data/constants';
+import { REQUIRED_LABEL, LIST, COMPANY } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
-import FunderEditionModal from 'src/modules/vendor/components/billing/FunderEditionModal';
+import PayerEditionModal from 'src/modules/vendor/components/billing/PayerEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
 import BillingPurchaseAdditionModal from 'src/modules/vendor/components/billing/BillingPurchaseAdditionModal';
 import CourseBillValidationModal from 'src/modules/vendor/components/billing/CourseBillValidationModal';
@@ -155,7 +155,7 @@ export default {
   name: 'ProfileBilling',
   components: {
     'ni-bill-creation-modal': BillCreationModal,
-    'ni-funder-edition-modal': FunderEditionModal,
+    'ni-payer-edition-modal': PayerEditionModal,
     'ni-course-fee-edition-modal': CourseFeeEditionModal,
     'ni-billing-purchase-addition-modal': BillingPurchaseAdditionModal,
     'ni-course-bill-validation-modal': CourseBillValidationModal,
@@ -180,14 +180,14 @@ export default {
     const courseBills = ref([]);
     const billingItemList = ref([]);
     const billCreationModal = ref(false);
-    const funderEditionModal = ref(false);
+    const payerEditionModal = ref(false);
     const mainFeeEditionModal = ref(false);
     const billingPurchaseAdditionModal = ref(false);
     const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const creditNoteCreationModal = ref(false);
-    const newBill = ref({ funder: '', mainFee: { price: 0, count: 1 } });
-    const editedBill = ref({ _id: '', funder: '', mainFee: { price: '', description: '', count: '' } });
+    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1 } });
+    const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const newCreditNote = ref({ courseBill: '', misc: '', date: '', company: '' });
@@ -196,6 +196,7 @@ export default {
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
     const minCourseCreditNoteDate = ref('');
+    const FUNDING_ORGANISATION = 'funding_organisation';
 
     const rules = computed(() => ({
       newBill: {
@@ -267,10 +268,16 @@ export default {
     const refreshCourseFundingOrganisations = async () => {
       try {
         const organisations = await CourseFundingOrganisations.list();
-        payerList.value = formatAndSortOptions(
-          [...organisations, { _id: '', name: course.value.company.name }],
+        const formattedOrganisationList = formatAndSortOptions(organisations, 'name');
+        const formattedCompanyList = formatAndSortOptions(
+          [{ _id: course.value.company._id, name: course.value.company.name }],
           'name'
         );
+        payerList.value =
+          [
+            ...formattedOrganisationList.map(payer => ({ ...payer, type: FUNDING_ORGANISATION })),
+            ...formattedCompanyList.map(company => ({ ...company, type: COMPANY })),
+          ];
       } catch (e) {
         console.error(e);
         payerList.value = [];
@@ -308,19 +315,19 @@ export default {
     const openBillCreationModal = () => { billCreationModal.value = true; };
 
     const setEditedBill = (bill) => {
-      const funder = get(bill, 'courseFundingOrganisation._id') || '';
+      const payer = get(bill, 'payer._id');
       editedBill.value = {
         _id: bill._id,
-        funder,
+        payer,
         mainFee: { price: bill.mainFee.price, count: bill.mainFee.count, description: bill.mainFee.description },
       };
     };
 
-    const openFunderEditionModal = (bill) => {
+    const openPayerEditionModal = (bill) => {
       if (isBilled(bill)) return null;
 
       setEditedBill(bill);
-      funderEditionModal.value = true;
+      payerEditionModal.value = true;
     };
 
     const openMainFeeEditionModal = (bill) => {
@@ -358,12 +365,12 @@ export default {
     };
 
     const resetBillCreationModal = () => {
-      newBill.value = { funder: '', mainFee: { price: 0, count: 1 } };
+      newBill.value = { payer: '', mainFee: { price: 0, count: 1 } };
       validations.value.newBill.$reset();
     };
 
     const resetEditedBill = () => {
-      editedBill.value = { _id: '', funder: '', mainFee: { price: '', description: '', count: '' } };
+      editedBill.value = { _id: '', payer: '', mainFee: { price: '', description: '', count: '' } };
       validations.value.editedBill.$reset();
     };
 
@@ -388,18 +395,26 @@ export default {
       validations.value.billToValidate.$reset();
     };
 
+    const formatPayerForPayload = (payloadPayer) => {
+      const payerType = payerList.value.find(payer => payer.value === payloadPayer).type;
+
+      return payerType === COMPANY ? { company: payloadPayer } : { fundingOrganisation: payloadPayer };
+    };
+
+    const formatCreationPayload = () => ({
+      course: course.value._id,
+      mainFee: newBill.value.mainFee,
+      company: course.value.company._id,
+      payer: formatPayerForPayload(newBill.value.payer),
+    });
+
     const addBill = async () => {
       try {
         validations.value.newBill.$touch();
         if (validations.value.newBill.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         billCreationLoading.value = true;
-        await CourseBills.create({
-          course: course.value._id,
-          mainFee: newBill.value.mainFee,
-          company: course.value.company._id,
-          ...(!!newBill.value.funder && { courseFundingOrganisation: newBill.value.funder }),
-        });
+        await CourseBills.create(formatCreationPayload());
         NotifyPositive('Facture créée.');
 
         billCreationModal.value = false;
@@ -423,11 +438,11 @@ export default {
         billEditionLoading.value = true;
         await CourseBills.update(
           editedBill.value._id,
-          { courseFundingOrganisation: editedBill.value.funder, mainFee: editedBill.value.mainFee }
+          { payer: formatPayerForPayload(editedBill.value.payer), mainFee: editedBill.value.mainFee }
         );
         NotifyPositive('Facture modifiée.');
 
-        funderEditionModal.value = false;
+        payerEditionModal.value = false;
         mainFeeEditionModal.value = false;
         await refreshCourseBills();
       } catch (e) {
@@ -583,9 +598,9 @@ export default {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
     };
 
-    const isFunderVisible = bill => !bill.courseCreditNote || areDetailsVisible.value[bill._id];
+    const isPayerVisible = bill => !bill.courseCreditNote || areDetailsVisible.value[bill._id];
 
-    const isDateVisible = bill => isFunderVisible(bill) && bill.billedAt;
+    const isDateVisible = bill => isPayerVisible(bill) && bill.billedAt;
 
     const getBillingItemName = billingItem => billingItemList.value.find(item => item.value === billingItem).label;
 
@@ -634,7 +649,7 @@ export default {
       creditNoteCreationLoading,
       billValidationLoading,
       billCreationModal,
-      funderEditionModal,
+      payerEditionModal,
       mainFeeEditionModal,
       billingPurchaseAdditionModal,
       billingPurchaseEditionModal,
@@ -680,7 +695,7 @@ export default {
       isBilled,
       getBillErrorMessages,
       openBillCreationModal,
-      openFunderEditionModal,
+      openPayerEditionModal,
       openMainFeeEditionModal,
       openBillingPurchaseAdditionModal,
       openBillingPurchaseEditionModal,
@@ -690,7 +705,7 @@ export default {
       refreshCourseBills,
       refreshBillingItems,
       isDateVisible,
-      isFunderVisible,
+      isPayerVisible,
       showDetails,
       getBillingItemName,
       downloadBill,
