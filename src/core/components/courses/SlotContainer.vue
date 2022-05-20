@@ -67,7 +67,7 @@
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
       :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
-      @remove-date="removeDates" />
+      @unplan-slot="unplanSlot" />
   </div>
 </template>
 
@@ -312,7 +312,7 @@ export default {
         this.modalLoading = false;
       }
     },
-    async removeDates (slotId) {
+    async unplanSlot (slotId) {
       try {
         this.modalLoading = true;
         await CourseSlots.update(slotId, { startDate: '', endDate: '' });
