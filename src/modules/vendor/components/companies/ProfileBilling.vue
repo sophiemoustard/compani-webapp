@@ -12,7 +12,8 @@
               <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
-              <div class="course" @click="goToCourse(get(props.row, 'course._id'))">
+              <div :class="['course', displayClass(get(props.row, 'course')) && 'redirection' ]"
+                @click="goToCourse(get(props.row, 'course'))">
                 <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}&nbsp;</div>
                 <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
               </div>
@@ -38,8 +39,7 @@
         </template>
         <template #expanding-row="{ props }">
           <q-td colspan="100%" class="cell">
-            <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote"
-              class="text-italic text-center">
+            <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote" class="text-italic text-center">
               Aucun règlement renseigné.
             </div>
             <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
@@ -330,10 +330,19 @@ export default {
       return formatPriceWithSign(total);
     };
 
-    const goToCourse = courseId => $router.push({
-      name: 'ni management blended courses info',
-      params: { courseId, defaultTab: 'billing' },
-    });
+    const goToCourse = (course) => {
+      if (canUpdateBilling.value) {
+        return $router.push({
+          name: 'ni management blended courses info',
+          params: { courseId: course._id, defaultTab: 'billing' },
+        });
+      }
+      if (loggedUser.value.company._id === course.company) {
+        return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
+      }
+    };
+
+    const displayClass = course => canUpdateBilling.value || (loggedUser.value.company._id === course.company);
 
     watch(company, async () => { if (!courseBills.value.length) refreshCourseBills(); });
 
@@ -378,6 +387,7 @@ export default {
       get,
       formatDate,
       goToCourse,
+      displayClass,
     };
   },
 };
@@ -397,6 +407,7 @@ export default {
 .course
   display: flex
   max-width: fit-content
+.redirection
   &:hover
     text-decoration: underline
     text-decoration-color: $copper-grey-600

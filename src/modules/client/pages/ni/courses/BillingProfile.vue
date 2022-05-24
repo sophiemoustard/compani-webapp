@@ -3,7 +3,7 @@
     <div v-if="loggedUser">
       <profile-billing />
     </div>
-</q-page>
+  </q-page>
 </template>
 
 <script>
@@ -12,13 +12,12 @@ import { useStore } from 'vuex';
 import ProfileBilling from 'src/modules/vendor/components/companies/ProfileBilling';
 
 export default {
-
+  name: 'BillingProfile',
   components: {
     'profile-billing': ProfileBilling,
   },
   setup () {
     const $store = useStore();
-
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     return {
