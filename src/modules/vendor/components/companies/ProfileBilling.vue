@@ -199,7 +199,10 @@ export default {
         const sortedBills = courseBillList.sort((a, b) => a.payer.name.localeCompare(b.payer.name));
         if (sortedBills.length) {
           const billsGroupedByPayer = groupBy(sortedBills, 'payer._id');
-          courseBills.value = { [company.value._id]: billsGroupedByPayer[company.value._id], ...billsGroupedByPayer };
+          courseBills.value = {
+            [company.value._id]: billsGroupedByPayer[company.value._id],
+            ...omit(billsGroupedByPayer, [company.value._id]),
+          };
         } else {
           courseBills.value = {};
         }
