@@ -1,6 +1,6 @@
 <template>
   <q-page class="vendor-background q-pb-xl">
-    <div class="q-mb-xl">
+    <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
       <div v-for="payer of Object.keys(courseBills)" :key="payer">
         <div class="text-weight-bold q-mt-lg q-mb-sm">
           Formations facturées à {{ courseBills[payer][0].payer.name }}
@@ -84,6 +84,7 @@
         v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
         :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
     </div>
+    <div v-else class="text-italic">Pas de factures</div>
   </q-page>
 </template>
 
@@ -195,7 +196,13 @@ export default {
       try {
         loading.value = true;
         const courseBillList = await CourseBills.list({ company: company.value._id, action: BALANCE });
-        courseBills.value = groupBy(courseBillList, 'payer._id');
+        const sortedBills = courseBillList.sort((a, b) => a.payer.name.localeCompare(b.payer.name));
+        if (sortedBills.length) {
+          const billsGroupedByPayer = groupBy(sortedBills, 'payer._id');
+          courseBills.value = { [company.value._id]: billsGroupedByPayer[company.value._id], ...billsGroupedByPayer };
+        } else {
+          courseBills.value = {};
+        }
       } catch (e) {
         console.error(e);
         courseBills.value = [];
