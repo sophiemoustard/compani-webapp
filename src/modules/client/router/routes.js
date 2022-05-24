@@ -379,6 +379,16 @@ const routes = [
           parent: 'courses',
         },
       },
+      {
+        path: 'ni/coursebills',
+        name: 'ni coursebills',
+        component: () => import('src/modules/client/pages/ni/courses/BillingProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
       // Auxiliary view routes
       {
         path: 'auxiliaries/agenda',
