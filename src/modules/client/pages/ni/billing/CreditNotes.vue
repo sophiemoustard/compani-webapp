@@ -218,13 +218,21 @@ export default {
       handler () {
         if (get(this.editedCreditNote, 'billingItemList[0].billingItem')) {
           this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-            0
+            (acc, bi) => {
+              const biExclTaxes = multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count);
+              return bi.billingItem ? add(acc, biExclTaxes) : acc;
+            },
+            toString(0)
           );
-          this.editedCreditNote.inclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
-            0
+
+          const inclTaxesCustomerString = this.editedCreditNote.billingItemList.reduce(
+            (acc, bi) => {
+              const biInclTaxes = multiply(bi.unitInclTaxes, bi.count);
+              return bi.billingItem ? add(acc, biInclTaxes) : acc;
+            },
+            toString(0)
           );
+          this.editedCreditNote.inclTaxesCustomer = toFixedToFloat(inclTaxesCustomerString);
         }
       },
     },
