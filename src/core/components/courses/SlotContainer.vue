@@ -66,7 +66,8 @@
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-types="stepTypes"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
-      :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" />
+      :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
+      @unplan-slot="unplanSlot" />
   </div>
 </template>
 
@@ -123,6 +124,7 @@ export default {
       linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
       SLOTS_TO_PLAN_KEY: 'toPlan',
       isOnlySlot: false,
+      isPlannedSlot: false,
     };
   },
   validations () {
@@ -237,12 +239,14 @@ export default {
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.isOnlySlot = this.setIsOnlySlot(slot.step);
+      this.isPlannedSlot = has(slot, 'startDate');
       this.editionModal = true;
     },
     resetEditionModal () {
       this.editedCourseSlot = {};
       this.v$.editedCourseSlot.$reset();
       this.isOnlySlot = false;
+      this.isPlannedSlot = false;
     },
     formatEditionPayload (courseSlot) {
       const stepType = this.stepTypes.find(item => item.value === courseSlot.step).type;
@@ -304,6 +308,20 @@ export default {
         if (e.data.statusCode === 409) return NotifyWarning('Créneau émargé : impossible de le supprimer.');
         if (e.data.statusCode === 403) return NotifyWarning('Seul créneau de l\'étape : impossible de le supprimer.');
         NotifyNegative('Erreur lors de la suppression du créneau.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    async unplanSlot (slotId) {
+      try {
+        this.modalLoading = true;
+        await CourseSlots.update(slotId, { startDate: '', endDate: '' });
+        this.$emit('refresh');
+        NotifyPositive('Dates supprimées.');
+        this.editionModal = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression des dates.');
       } finally {
         this.modalLoading = false;
       }

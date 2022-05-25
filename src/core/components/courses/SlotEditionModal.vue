@@ -4,8 +4,10 @@
       Editer un <span class="text-weight-bold">créneau</span>
     </template>
     <div class="modal-icon">
-      <ni-button v-if="isAdmin && isVendorInterface" icon="delete" @click="validateDeletion(editedCourseSlot._id)"
-        :disable="isOnlySlot" />
+      <ni-button v-if="isAdmin && isVendorInterface && !isPlannedSlot" icon="delete"
+        @click="validateDeletion(editedCourseSlot._id)" :disable="isOnlySlot" />
+      <ni-button class="bg-copper-grey-100" color="copper-grey-800" v-if="isPlannedSlot" label="Supprimer la date"
+      @click="validateDatesDeletion(editedCourseSlot)" />
     </div>
     <ni-datetime-range caption="Dates et heures" :model-value="editedCourseSlot.dates" disable-end-date
       :error="validations.dates.$error" @blur="validations.dates.$touch" @update:model-value="update($event, 'dates')"
@@ -30,6 +32,7 @@ import Input from '@components/form/Input';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive } from '@components/popup/notify';
+import { formatIntervalHourly, formatDate } from '@helpers/date';
 import { ON_SITE, REMOTE } from '@data/constants';
 
 export default {
@@ -44,6 +47,7 @@ export default {
     isAdmin: { type: Boolean, default: false },
     isVendorInterface: { type: Boolean, default: false },
     isOnlySlot: { type: Boolean, default: false },
+    isPlannedSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
@@ -52,7 +56,7 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'delete', 'update'],
+  emits: ['hide', 'update:model-value', 'submit', 'delete', 'update', 'unplan-slot'],
   data () {
     return {
       ON_SITE,
@@ -60,6 +64,17 @@ export default {
     };
   },
   methods: {
+    validateDatesDeletion (slot) {
+      this.$q.dialog({
+        title: 'Supprimer une date',
+        message: `Êtes-vous sûr(e) de vouloir supprimer la date du  ${formatDate(slot.dates.startDate)}
+          (${formatIntervalHourly(slot.dates)}) ?<br /><br />Le créneau repassera en "à planifier".`,
+        html: true,
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(() => this.unplanSlot(slot._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
     validateDeletion (slotId) {
       this.$q.dialog({
         title: 'Confirmation',
@@ -86,6 +101,9 @@ export default {
     },
     getType (step) {
       return step ? this.stepTypes.find(item => item.value === step).type : '';
+    },
+    unplanSlot (slotId) {
+      this.$emit('unplan-slot', slotId);
     },
   },
 };
