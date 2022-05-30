@@ -1,5 +1,6 @@
 <template>
   <q-page padding class="client-background">
+    <ni-title-header title="Facture" />
     <div v-if="loggedUser">
       <profile-billing />
     </div>
@@ -9,11 +10,13 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import TitleHeader from '@components/TitleHeader';
 import ProfileBilling from 'src/modules/vendor/components/companies/ProfileBilling';
 
 export default {
   name: 'BillingProfile',
   components: {
+    'ni-title-header': TitleHeader,
     'profile-billing': ProfileBilling,
   },
   setup () {

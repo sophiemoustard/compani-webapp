@@ -10,8 +10,7 @@
               <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
-              <div :class="['course', displayClass(get(props.row, 'course')) && 'redirection' ]"
-                @click="goToCourse(get(props.row, 'course'))">
+              <div :class="getCourseNameClass(get(props.row, 'course'))" @click="goToCourse(get(props.row, 'course'))">
                 <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}&nbsp;</div>
                 <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
               </div>
@@ -188,12 +187,6 @@ export default {
 
     const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment });
 
-    const company = computed(() => (
-      canUpdateBilling.value
-        ? $store.state.company.company
-        : $store.state.main.loggedUser.company
-    ));
-
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const canUpdateBilling = computed(() => {
@@ -201,6 +194,8 @@ export default {
 
       return ability.can('update', 'coursebilling');
     });
+
+    const company = computed(() => (canUpdateBilling.value ? $store.state.company.company : loggedUser.value.company));
 
     const refreshCourseBills = async () => {
       try {
@@ -343,7 +338,9 @@ export default {
       }
     };
 
-    const displayClass = course => canUpdateBilling.value || (loggedUser.value.company._id === course.company);
+    const getCourseNameClass = course => (
+      canUpdateBilling.value || (loggedUser.value.company._id === course.company) ? 'course redirection' : 'course'
+    );
 
     const getTableName = (payer) => {
       const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
@@ -353,7 +350,7 @@ export default {
         : 'Mes factures';
     };
 
-    watch(company.value, async () => { if (!courseBills.value.length) refreshCourseBills(); });
+    watch(company, async () => { if (!courseBills.value.length && company.value) refreshCourseBills(); });
 
     const created = async () => {
       if (company.value) refreshCourseBills();
@@ -396,7 +393,7 @@ export default {
       get,
       formatDate,
       goToCourse,
-      displayClass,
+      getCourseNameClass,
       getTableName,
     };
   },

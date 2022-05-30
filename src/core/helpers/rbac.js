@@ -51,7 +51,7 @@ const clientAdminRoutes = [
   { name: 'ni billing debits archive', subscription: ERP },
   { name: 'ni pay to pay', subscription: ERP },
   { name: 'ni pay contract ends', subscription: ERP },
-  { name: 'ni coursebills' },
+  { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [
   { name: 'auxiliaries agenda', subscription: ERP },

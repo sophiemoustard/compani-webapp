@@ -380,8 +380,8 @@ const routes = [
         },
       },
       {
-        path: 'ni/coursebills',
-        name: 'ni coursebills',
+        path: 'ni/courses/bills',
+        name: 'ni courses bills',
         component: () => import('src/modules/client/pages/ni/courses/BillingProfile'),
         props: true,
         meta: {
