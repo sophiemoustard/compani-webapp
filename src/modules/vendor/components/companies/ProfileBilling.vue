@@ -210,7 +210,9 @@ export default {
         if (sortedBills.length) {
           const billsGroupedByPayer = groupBy(sortedBills, 'payer._id');
           courseBills.value = {
-            [company.value._id]: billsGroupedByPayer[company.value._id],
+            ...(!!billsGroupedByPayer[company.value._id] &&
+            { [company.value._id]: billsGroupedByPayer[company.value._id] }
+            ),
             ...omit(billsGroupedByPayer, [company.value._id]),
           };
         } else {
