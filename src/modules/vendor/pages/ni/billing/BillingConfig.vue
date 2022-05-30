@@ -103,7 +103,7 @@ export default {
     const courseFundingOrganisations = ref([]);
     const courseFundingOrganisationColumns = [
       { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-      { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
+      { name: 'address', label: 'Adresse', align: 'left', field: 'address' },
       { name: 'actions', label: '', align: 'left', field: '_id' },
     ];
     const vendorCompany = ref({ name: '', address: { fullAddress: '' }, siret: '' });
@@ -112,20 +112,12 @@ export default {
     const pagination = { rowsPerPage: 0 };
     const organisationCreationModal = ref(false);
     const itemCreationModal = ref(false);
-    const newOrganisation = ref({ name: '', address: {} });
+    const newOrganisation = ref({ name: '', address: '' });
     const newItem = ref({ name: '' });
     const tmpInput = ref('');
 
     const rules = {
-      newOrganisation: {
-        address: {
-          zipCode: { required },
-          street: { required },
-          city: { required },
-          fullAddress: { frAddress },
-        },
-        name: { required },
-      },
+      newOrganisation: { address: { required }, name: { required } },
       newItem: { name: { required } },
       vendorCompany: {
         name: { required },
@@ -216,7 +208,7 @@ export default {
 
     const openOrganisationCreationModal = () => { organisationCreationModal.value = true; };
     const resetOrganisationAdditionForm = () => {
-      newOrganisation.value = { name: '', address: {} };
+      newOrganisation.value = { name: '', address: '' };
       validations.value.newOrganisation.$reset();
     };
     const addOrganisation = async () => {

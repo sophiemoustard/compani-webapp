@@ -5,7 +5,7 @@
     </template>
     <ni-input in-modal caption="Nom" :model-value="newOrganisation.name" :error="validations.name.$error"
       @update:model-value="update($event.trim(), 'name')" required-field />
-    <ni-search-address in-modal last :model-value="newOrganisation.address" :error="validations.address.$error"
+    <ni-input in-modal last caption="Adresse" :model-value="newOrganisation.address" :error="validations.address.$error"
       @update:model-value="update($event, 'address')" @blur="validations.address.$touch"
       :error-message="addressErrorMessage" required-field />
     <template #footer>
@@ -19,7 +19,6 @@
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import SearchAddress from '@components/form/SearchAddress';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import { REQUIRED_LABEL } from '@data/constants';
@@ -33,7 +32,6 @@ export default {
     loading: { type: Boolean, default: false },
   },
   components: {
-    'ni-search-address': SearchAddress,
     'ni-modal': Modal,
     'ni-input': Input,
     'ni-button': Button,
