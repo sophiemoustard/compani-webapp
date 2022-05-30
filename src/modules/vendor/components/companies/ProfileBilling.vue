@@ -1,9 +1,7 @@
 <template>
   <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
     <div v-for="payer of Object.keys(courseBills)" :key="payer">
-      <div class="text-weight-bold q-mt-lg q-mb-sm">
-        Formations facturées à {{ courseBills[payer][0].payer.name }}
-      </div>
+      <div class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</div>
       <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
         :hide-bottom="false" :loading="loading">
         <template #row="{ props }">
@@ -108,6 +106,7 @@ import { downloadFile } from '@helpers/file';
 import { formatPrice, formatPriceWithSign } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
+import router from 'src/router/index';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
 
@@ -344,7 +343,15 @@ export default {
 
     const displayClass = course => canUpdateBilling.value || (loggedUser.value.company._id === course.company);
 
-    watch(company, async () => { if (!courseBills.value.length) refreshCourseBills(); });
+    const getTableName = (payer) => {
+      const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
+
+      return isVendorInterface || payer._id !== company.value._id
+        ? `Formations facturées à ${payer.name}`
+        : 'Mes factures';
+    };
+
+    watch(company.value, async () => { if (!courseBills.value.length) refreshCourseBills(); });
 
     const created = async () => {
       if (company.value) refreshCourseBills();
@@ -388,6 +395,7 @@ export default {
       formatDate,
       goToCourse,
       displayClass,
+      getTableName,
     };
   },
 };
