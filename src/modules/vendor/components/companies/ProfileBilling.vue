@@ -1,91 +1,86 @@
 <template>
-  <q-page class="vendor-background q-pb-xl">
-    <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
-      <div v-for="payer of Object.keys(courseBills)" :key="payer">
-        <div class="text-weight-bold q-mt-lg q-mb-sm">
-          Formations facturées à {{ courseBills[payer][0].payer.name }}
-        </div>
-        <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
-          :hide-bottom="false" :loading="loading">
-          <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <template v-if="col.name === 'number'">
-                <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
-                  {{ col.value }}
-                </div>
-                <div class="course" @click="goToCourse(get(props.row, 'course._id'))">
-                  <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}&nbsp;</div>
-                  <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
-                </div>
-                <div class="row items-center" v-if="props.row.courseCreditNote">
-                  <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
-                  <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
-                </div>
-              </template>
-              <template v-else-if="col.name === 'progress' && col.value >= 0">
-                <ni-progress class="q-ml-lg" :value="col.value" />
-              </template>
-              <template v-else-if="col.name === 'payment'">
-                <div class="row justify-center table-actions">
-                  <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
-                    @click="openCoursePaymentCreationModal(props.row)" />
-                </div>
-              </template>
-              <template v-else-if="col.name === 'expand'">
-                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </template>
-          <template #expanding-row="{ props }">
-            <q-td colspan="100%" class="cell">
-              <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote"
-                class="text-italic text-center">
-                Aucun règlement renseigné.
+  <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
+    <div v-for="payer of Object.keys(courseBills)" :key="payer">
+      <div class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</div>
+      <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
+        :hide-bottom="false" :loading="loading">
+        <template #row="{ props }">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <template v-if="col.name === 'number'">
+              <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
+                {{ col.value }}
               </div>
-              <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
-                <div class="date">{{ formatDate(item.date) }}</div>
-                <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
-                <div class="progress" />
-                <div class="formatted-price" />
-                <div v-if="item.netInclTaxes >=0" class="formatted-price">
-                  {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
-                </div>
-                <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
-                <div class="formatted-price" />
-                <div class="formatted-price" />
-                <div v-if="item.netInclTaxes >=0" class="edit">
-                  <q-icon size="20px" name="edit" color="copper-grey-500"
-                    @click="openCoursePaymentEditionModal(props.row, item)" />
-                </div>
+              <div :class="getCourseNameClass(get(props.row, 'course'))" @click="goToCourse(get(props.row, 'course'))">
+                <div class="program ellipsis">{{ `${get(props.row, 'course.subProgram.program.name')}` }}&nbsp;</div>
+                <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
               </div>
-            </q-td>
-          </template>
-          <template #bottom-row="{ props }">
-            <q-tr class="text-weight-bold" :props="props">
-              <q-td />
-              <q-td />
-              <q-td />
-              <q-td />
-              <q-td><div class="flex justify-end items-center">Total</div></q-td>
-              <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills[payer]) }}</div></q-td>
-              <q-td />
-              <q-td />
-            </q-tr>
-          </template>
-        </ni-expanding-table>
-      </div>
-
-      <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
-        v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
-        :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
-
-       <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
-        v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
-        :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+              <div class="row items-center" v-if="props.row.courseCreditNote">
+                <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
+                <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
+              </div>
+            </template>
+            <template v-else-if="col.name === 'progress' && col.value >= 0">
+              <ni-progress class="q-ml-lg" :value="col.value" />
+            </template>
+            <template v-else-if="col.name === 'payment'">
+              <div v-if="canUpdateBilling" class="row justify-center table-actions">
+                <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
+                  @click="openCoursePaymentCreationModal(props.row)" />
+              </div>
+            </template>
+            <template v-else-if="col.name === 'expand'">
+              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </template>
+        <template #expanding-row="{ props }">
+          <q-td colspan="100%" class="cell">
+            <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote" class="text-italic text-center">
+              Aucun règlement renseigné.
+            </div>
+            <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
+              <div class="date">{{ formatDate(item.date) }}</div>
+              <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
+              <div class="progress" />
+              <div class="formatted-price" />
+              <div v-if="item.netInclTaxes >=0" class="formatted-price">
+                {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
+              </div>
+              <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
+              <div class="formatted-price" />
+              <div class="formatted-price" />
+              <div v-if="item.netInclTaxes >=0 && canUpdateBilling" class="edit">
+                <q-icon size="20px" name="edit" color="copper-grey-500"
+                  @click="openCoursePaymentEditionModal(props.row, item)" />
+              </div>
+            </div>
+          </q-td>
+        </template>
+        <template #bottom-row="{ props }">
+          <q-tr class="text-weight-bold" :props="props">
+            <q-td />
+            <q-td />
+            <q-td />
+            <q-td />
+            <q-td><div class="flex justify-end items-center">Total</div></q-td>
+            <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills[payer]) }}</div></q-td>
+            <q-td />
+            <q-td />
+          </q-tr>
+        </template>
+      </ni-expanding-table>
     </div>
-    <div v-else class="text-italic">Pas de factures</div>
-  </q-page>
+
+    <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
+      v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
+      :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+
+    <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
+      v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
+      :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+  </div>
+  <div v-else class="text-italic">Pas de factures</div>
 </template>
 
 <script>
@@ -109,6 +104,8 @@ import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import { formatPrice, formatPriceWithSign } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import { defineAbilitiesFor } from '@helpers/ability';
+import router from 'src/router/index';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
 
@@ -190,7 +187,15 @@ export default {
 
     const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment });
 
-    const company = computed(() => $store.state.company.company);
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const canUpdateBilling = computed(() => {
+      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', 'coursebilling');
+    });
+
+    const company = computed(() => (canUpdateBilling.value ? $store.state.company.company : loggedUser.value.company));
 
     const refreshCourseBills = async () => {
       try {
@@ -200,7 +205,9 @@ export default {
         if (sortedBills.length) {
           const billsGroupedByPayer = groupBy(sortedBills, 'payer._id');
           courseBills.value = {
-            [company.value._id]: billsGroupedByPayer[company.value._id],
+            ...(!!billsGroupedByPayer[company.value._id] &&
+            { [company.value._id]: billsGroupedByPayer[company.value._id] }
+            ),
             ...omit(billsGroupedByPayer, [company.value._id]),
           };
         } else {
@@ -250,15 +257,17 @@ export default {
 
     const createPayment = async () => {
       try {
-        validations.value.newCoursePayment.$touch();
-        if (validations.value.newCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (canUpdateBilling.value) {
+          validations.value.newCoursePayment.$touch();
+          if (validations.value.newCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        paymentCreationLoading.value = true;
-        await CoursePayments.create({ ...newCoursePayment.value, company: company.value._id });
-        NotifyPositive('Règlement créé.');
+          paymentCreationLoading.value = true;
+          await CoursePayments.create({ ...newCoursePayment.value, company: company.value._id });
+          NotifyPositive('Règlement créé.');
 
-        coursePaymentCreationModal.value = false;
-        await refreshCourseBills();
+          coursePaymentCreationModal.value = false;
+          await refreshCourseBills();
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement.');
@@ -269,18 +278,20 @@ export default {
 
     const editPayment = async () => {
       try {
-        validations.value.editedCoursePayment.$touch();
-        if (validations.value.editedCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (canUpdateBilling.value) {
+          validations.value.editedCoursePayment.$touch();
+          if (validations.value.editedCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        paymentEditionLoading.value = true;
-        await CoursePayments.update(
-          editedCoursePayment.value._id,
-          { ...omit(editedCoursePayment.value, ['_id', 'nature']) }
-        );
-        NotifyPositive('Règlement modifié.');
+          paymentEditionLoading.value = true;
+          await CoursePayments.update(
+            editedCoursePayment.value._id,
+            { ...omit(editedCoursePayment.value, ['_id', 'nature']) }
+          );
+          NotifyPositive('Règlement modifié.');
 
-        coursePaymentEditionModal.value = false;
-        await refreshCourseBills();
+          coursePaymentEditionModal.value = false;
+          await refreshCourseBills();
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification du règlement.');
@@ -315,12 +326,31 @@ export default {
       return formatPriceWithSign(total);
     };
 
-    const goToCourse = courseId => $router.push({
-      name: 'ni management blended courses info',
-      params: { courseId, defaultTab: 'billing' },
-    });
+    const goToCourse = (course) => {
+      if (canUpdateBilling.value) {
+        return $router.push({
+          name: 'ni management blended courses info',
+          params: { courseId: course._id, defaultTab: 'billing' },
+        });
+      }
+      if (loggedUser.value.company._id === course.company) {
+        return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
+      }
+    };
 
-    watch(company, async () => { if (!courseBills.value.length) refreshCourseBills(); });
+    const getCourseNameClass = course => (
+      canUpdateBilling.value || (loggedUser.value.company._id === course.company) ? 'course redirection' : 'course'
+    );
+
+    const getTableName = (payer) => {
+      const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
+
+      return isVendorInterface || payer._id !== company.value._id
+        ? `Formations facturées à ${payer.name}`
+        : 'Mes factures';
+    };
+
+    watch(company, async () => { if (!courseBills.value.length && company.value) refreshCourseBills(); });
 
     const created = async () => {
       if (company.value) refreshCourseBills();
@@ -346,6 +376,7 @@ export default {
       REFUND,
       // Computed
       validations,
+      canUpdateBilling,
       // Methods
       refreshCourseBills,
       formatPrice,
@@ -362,6 +393,8 @@ export default {
       get,
       formatDate,
       goToCourse,
+      getCourseNameClass,
+      getTableName,
     };
   },
 };
@@ -381,6 +414,7 @@ export default {
 .course
   display: flex
   max-width: fit-content
+.redirection
   &:hover
     text-decoration: underline
     text-decoration-color: $copper-grey-600
