@@ -16,7 +16,7 @@
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <q-th auto-width>
-            <q-checkbox @update:model-value="selectRows(selected)" :model-value="selected.length > 0" dense
+            <q-checkbox @update:model-value="selectRows" :model-value="!!selected.length" dense
               :disable="balancesOption === 2" indeterminate-value="some" />
           </q-th>
         </q-tr>
@@ -140,8 +140,8 @@ export default {
 
     const resetSelected = () => { selected.value = []; };
 
-    const selectRows = (oldValue) => {
-      if (oldValue.length) selected.value = [];
+    const selectRows = () => {
+      if (selected.value.length) selected.value = [];
       else selected.value = balances.value.filter(bl => bl.toPay > 0);
     };
 
