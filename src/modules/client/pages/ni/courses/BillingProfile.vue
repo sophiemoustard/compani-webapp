@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="client-background">
-    <ni-title-header title="Facture" />
+    <ni-title-header title="Factures" />
     <div v-if="loggedUser">
       <profile-billing />
     </div>
