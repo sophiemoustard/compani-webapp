@@ -88,6 +88,7 @@ import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
+import { Screen } from 'quasar';
 import { ref, computed, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -353,10 +354,10 @@ export default {
     const getProgramName = (course) => {
       const programName = get(course, 'subProgram.program.name');
       const misc = get(course, 'misc');
-      const screenWidth = window.innerWidth;
       const length = programName.length + misc.length;
-      // table width : 60 % of screen width ; program name column width : 30 % of table width ; letter width : 6px
-      const maxLength = ((30 / 100) * (screenWidth * (60 / 100))) / 6;
+      const tableSize = Screen.width >= 1024 ? Screen.width * (70 / 100) : Screen.width * (90 / 100);
+      // table width : 70(or 90)% of screen width ; program name column width : 30% of table width ; letter width : 6px
+      const maxLength = ((30 / 100) * tableSize) / 6;
       if (length > maxLength) {
         const limit = maxLength - misc.length - 3;
         return `${programName.slice(0, limit)}...`;
