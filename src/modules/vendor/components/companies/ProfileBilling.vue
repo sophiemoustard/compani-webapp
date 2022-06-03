@@ -355,6 +355,7 @@ export default {
       const misc = get(course, 'misc');
       const screenWidth = window.innerWidth;
       const length = programName.length + misc.length;
+      // table width : 60 % of screen width ; program name column width : 30 % of table width ; letter width : 6px
       const maxLength = ((30 / 100) * (screenWidth * (60 / 100))) / 6;
       if (length > maxLength) {
         const limit = maxLength - misc.length - 3;
