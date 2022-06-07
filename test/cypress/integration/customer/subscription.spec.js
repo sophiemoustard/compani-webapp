@@ -69,8 +69,8 @@ describe('customers subscription tests', () => {
       cy.dataCy('col-folderNumber').should('contain', 'Numéro de dossier');
       cy.dataCy('col-frequency').should('contain', 'Fréquence');
       cy.dataCy('col-unitTTCRate').should('contain', 'Prix unitaire TTC');
-      cy.dataCy('col-customerParticipationRate').should('contain', 'Tx. participation bénéficiaire');
-      cy.dataCy('col-careHours').should('contain', 'Nb. heures de prise en charge');
+      cy.dataCy('col-customerParticipationRate').should('contain', 'Tx. participation du bénéficiaire');
+      cy.dataCy('col-careHours').should('contain', 'Nb. heures prises en charge');
       cy.dataCy('col-careDays').should('contain', 'Jours de prise en charge');
 
       cy.dataCy('col-side-startDate').should('contain', '02/02/2020');
