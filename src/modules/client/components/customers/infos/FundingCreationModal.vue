@@ -33,10 +33,10 @@
         type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field
         @update:model-value="update($event, 'amountTTC')" :error-message="amountTtcErrorMessage" />
       <ni-input in-modal v-if="!isFixedFunding" :model-value="newFunding.careHours" @blur="validations.careHours.$touch"
-        caption="Nb. heures prises en charge" type="number" suffix="h" @update:model-value="update($event, 'careHours')"
-        :error="validations.careHours.$error" required-field :error-message="careHoursErrorMessage" />
+        caption="Nb. heures prises en charge par mois" type="number" suffix="h" :error="validations.careHours.$error"
+        @update:model-value="update($event, 'careHours')" required-field :error-message="careHoursErrorMessage" />
       <ni-input in-modal v-if="!isFixedFunding" :model-value="newFunding.customerParticipationRate"
-        caption="Taux de participation" type="number" suffix="%" required-field
+        caption="Taux de participation du bénéficiaire" type="number" suffix="%" required-field
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
         @update:model-value="update($event, 'customerParticipationRate')"
         :error-message="customerParticipationRateErrorMessage" />

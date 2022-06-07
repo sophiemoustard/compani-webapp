@@ -32,6 +32,15 @@
             :error-message="nbrError('company.rhConfig.grossHourlyRate')" type="number"
             v-model="company.rhConfig.grossHourlyRate" @focus="saveTmp('rhConfig.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.grossHourlyRate')" />
+          <div class="col-xs-12 col-md-6">
+              <q-checkbox v-model="company.rhConfig.shouldPayHolidays" dense class="q-mr-sm"
+                @update:model-value="updateCompany('rhConfig.shouldPayHolidays')" />
+              <span>Les jours fériés ne sont pas travaillés</span>
+              <div class="text">
+                Si vous cochez cette option, les jours fériés ne seront pas considérés comme des jours à travailler,
+                cela impactera les compteurs d'heures et la paie
+              </div>
+          </div>
         </div>
       </div>
       <div class="q-mb-xl">
@@ -530,3 +539,10 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.text
+  font-size: 12px
+  padding-left: 32px
+  color: $copper-grey-600
+</style>

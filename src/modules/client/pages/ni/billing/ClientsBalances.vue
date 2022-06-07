@@ -16,7 +16,7 @@
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <q-th auto-width>
-            <q-checkbox @update:model-value="selectRows(props.selected)" v-model="props.selected" dense
+            <q-checkbox @update:model-value="selectRows" :model-value="!!selected.length" dense
               :disable="balancesOption === 2" indeterminate-value="some" />
           </q-th>
         </q-tr>
@@ -140,8 +140,8 @@ export default {
 
     const resetSelected = () => { selected.value = []; };
 
-    const selectRows = (oldValue) => {
-      if (oldValue) selected.value = [];
+    const selectRows = () => {
+      if (selected.value.length) selected.value = [];
       else selected.value = balances.value.filter(bl => bl.toPay > 0);
     };
 
@@ -188,7 +188,7 @@ export default {
       const csvData = [[
         'Client',
         'Bénéficiaire',
-        'Taux de participation',
+        'Taux de participation du bénéficiaire',
         'Facturé TTC',
         'Payé TTC',
         'Solde',
@@ -274,11 +274,12 @@ export default {
         },
         {
           name: 'participationRate',
-          label: 'Taux de participation',
+          label: 'Taux de participation du bénéficiaire',
           align: 'center',
           field: row => (row.thirdPartyPayer ? '' : row.participationRate),
           format: (value, row) => (row.thirdPartyPayer ? '' : roundFrenchPercentage(value)),
           sortable: true,
+          style: 'width: 15%',
         },
         { name: 'billed', label: 'Facturé TTC', align: 'center', field: 'billed', format: val => formatPrice(val) },
         { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },

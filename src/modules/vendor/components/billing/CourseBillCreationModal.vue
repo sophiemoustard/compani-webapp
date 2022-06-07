@@ -3,8 +3,8 @@
     <template #title>
       Nouvelle <span class="text-weight-bold">facture</span>
     </template>
-    <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.funder" required-field
-      @update:model-value="update($event, 'funder')" />
+    <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
+      @update:model-value="update($event, 'payer')" />
     <ni-input in-modal caption="Prix du programme" :error="validations.mainFee.price.$error" type="number"
       :model-value="newBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'mainFee.price')" />
