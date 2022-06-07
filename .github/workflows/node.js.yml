@@ -7,15 +7,31 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mongo:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+
     steps:
       # Check out the repository
+      - uses: actions/checkout@v2
+        with:
+          repository: 'sophiemoustard/compani-api'
+          ref: 'dev'
+          path: 'api'
+      - run: cd api
+      - run: npm ci
+      - run: cd ../
+
       - uses: actions/checkout@v2
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          start: npm run start:workflow
+          start: npm run start:workflow:api, npm run start:workflow:webapp
           wait-on: 'http://localhost:8080'
         env:
           API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
+          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
