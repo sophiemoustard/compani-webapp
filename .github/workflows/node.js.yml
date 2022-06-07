@@ -15,6 +15,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          start: npm start:workflow
+          start: npm run start:workflow
+          wait-on: 'http://localhost:8080'
         env:
           API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
