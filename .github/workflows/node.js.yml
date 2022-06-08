@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: 'sophiemoustard/compani-api'
-          ref: 'dev'
+          ref: 'COM-2888'
           path: 'api'
       - run: cd api && npm ci
 
