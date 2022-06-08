@@ -23,11 +23,15 @@ jobs:
       - run: cd api && npm ci
 
       - uses: actions/checkout@v2
+        with:
+          path: 'webapp'
+      - run: cd webapp && npm ci
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          working-directory: ./webapp
           start: npm run start:workflow:api, npm run start:workflow:webapp
           wait-on: 'http://localhost:8080'
         env:
