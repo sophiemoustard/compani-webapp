@@ -20,9 +20,7 @@ jobs:
           repository: 'sophiemoustard/compani-api'
           ref: 'dev'
           path: 'api'
-      - run: cd api
-      - run: npm ci
-      - run: cd ../
+      - run: cd api && npm ci
 
       - uses: actions/checkout@v2
       # Install NPM dependencies, cache them correctly
