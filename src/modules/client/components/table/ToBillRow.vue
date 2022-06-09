@@ -38,8 +38,7 @@
       <template v-else-if="col.name === 'discount'">
         <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
           :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)" :ref-name="bill._id"
-          @click="$emit('discount-click', $event)" @change="setDiscount" suffix="€" :error="v$.bill.discount.$error"
-          error-message="Nombre décimal non valide" />
+          @click="$emit('discount-click', $event)" @change="setDiscount" suffix="€" />
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
@@ -53,8 +52,6 @@
 </template>
 
 <script>
-import useVuelidate from '@vuelidate/core';
-import { fractionDigits } from '@helpers/vuelidateCustomVal';
 import EditableTd from '@components/table/EditableTd';
 import {
   formatPrice,
@@ -65,7 +62,7 @@ import {
   toCents,
   toEuros,
 } from '@helpers/utils';
-import { divide, add } from '@helpers/numbers';
+import { divide, add, multiply } from '@helpers/numbers';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
 import { useMeta } from 'quasar';
@@ -86,8 +83,6 @@ export default {
   setup (props, { emit }) {
     const metaInfo = { title: 'A facturer' };
     useMeta(metaInfo);
-    const rules = { bill: { discount: { fractionDigits: fractionDigits(2) } } };
-    const v$ = useVuelidate(rules, { bill: props.bill });
 
     const formatHours = (bill) => {
       if (bill.subscription.service && bill.subscription.service.nature === FIXED) return bill.eventsList.length;
@@ -121,8 +116,7 @@ export default {
     };
 
     const setDiscount = ({ value, obj, path }) => {
-      v$.value.bill.discount.$touch();
-      obj[path] = !value || isNaN(value) ? 0 : value;
+      obj[path] = !value || isNaN(value) || value < 0 ? 0 : divide(Math.trunc(multiply(value, 100)), 100);
       emit('discount-input');
     };
 
@@ -140,8 +134,6 @@ export default {
     const startDateOptions = date => isSameOrBefore(date, props.bill.endDate);
 
     return {
-      // Validations
-      v$,
       // Methods
       formatPrice,
       formatDate,
