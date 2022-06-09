@@ -11,9 +11,13 @@
           :disable="!canUpdateAuxiliary || historiesLoading" />
         <div class="modal-subtitle">
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
-          <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
-            color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
-            :disable="historiesLoading" />
+          <div class="modal-subtitle">
+            <ni-button v-if="canCancel" label="Annuler l'intervention" @click="openEventCancellationModal()"
+              color="copper-grey-800" />
+            <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
+              flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
+              :disable="historiesLoading" />
+          </div>
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
@@ -74,10 +78,6 @@
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired"
           @update:model-value="updateEvent('misc', $event)" />
-        <div v-if="canCancel" class="row q-mb-md light-checkbox">
-          <q-checkbox :model-value="editedEvent.isCancelled" label="Annuler l'évènement" :disable="historiesLoading"
-            @update:model-value="toggleCancellationForm($event)" dense />
-        </div>
         <div v-if="editedEvent.isCancelled" class="row justify-between">
           <ni-select in-modal :model-value="editedEvent.cancel.condition" caption="Conditions d'annulation"
             :options="cancellationConditions" @blur="validations.cancel.condition.$touch" required-field
@@ -132,12 +132,15 @@
     </div>
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
-      :validations="v$.timeStampCancellationReason" v-model:reason="timeStampCancellationReason" />
+      :validations="v$.timeStampCancellationReason" :v-model:reason="timeStampCancellationReason" />
+    <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
+      @hide="resetEventCancellationModal" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
+import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import EventHistories from '@api/EventHistories';
@@ -149,6 +152,7 @@ import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
 import NiHistoryCancellationModal from './HistoryCancellationModal';
+import NiEventCancellationModal from './EventCancellationModal';
 
 export default {
   name: 'EventEditionModal',
@@ -166,12 +170,26 @@ export default {
     historiesLoading: { type: Boolean, default: false },
   },
   setup () {
-    return { v$: useVuelidate() };
+    const eventCancellationModal = ref(false);
+
+    const openEventCancellationModal = () => eventCancellationModal.value = true;
+
+    const resetEventCancellationModal = () => eventCancellationModal.value = false;
+    return {
+      // Data
+      eventCancellationModal,
+      // Methods
+      openEventCancellationModal,
+      resetEventCancellationModal,
+      // Validations
+      v$: useVuelidate(),
+    };
   },
   components: {
     'ni-button': Button,
     'ni-event-history': NiEventHistory,
     'ni-history-cancellation-modal': NiHistoryCancellationModal,
+    'ni-event-cancellation-modal': NiEventCancellationModal,
   },
   emits: [
     'refresh-histories',
