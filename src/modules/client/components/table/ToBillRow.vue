@@ -62,7 +62,7 @@ import {
   toCents,
   toEuros,
 } from '@helpers/utils';
-import { divide, add } from '@helpers/numbers';
+import { divide, add, multiply } from '@helpers/numbers';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
 import { useMeta } from 'quasar';
@@ -116,7 +116,7 @@ export default {
     };
 
     const setDiscount = ({ value, obj, path }) => {
-      obj[path] = !value || isNaN(value) ? 0 : value;
+      obj[path] = !value || isNaN(value) || value < 0 ? 0 : divide(Math.trunc(multiply(value, 100)), 100);
       emit('discount-input');
     };
 
