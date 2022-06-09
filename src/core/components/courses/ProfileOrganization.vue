@@ -13,10 +13,11 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
-          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id"
-            @blur="updateCourse('salesRepresentative')" caption="Référent(e) Compani" :disable="!isAdmin || isArchived"
-            :options="salesRepresentativeOptions" @focus="saveTmp('salesRepresentative')"
-            :error="v$.course.salesRepresentative._id.$error" />
+        </div>
+        <p class="text-weight-bold table-title">Interlocuteurs</p>
+        <div class="row justify-between items-center">
+          <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
+            :open-edition-modal="() => salesRepresentativeEditionModal = true" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
             caption="Intervenant(e)" :options="trainerOptions" :error="v$.course.trainer._id.$error"
             @blur="updateCourse('trainer')" :disable="isArchived" />
@@ -85,6 +86,11 @@
 
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
       :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
+
+    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="course.salesRepresentative._id"
+      @submit="updateSalesRepresentatives" :validations="v$.course.salesRepresentative"
+      :loading="interlocutorModalLoading" @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
+      :interlocutors-options="salesRepresentativeOptions" />
   </div>
 </template>
 
@@ -109,6 +115,8 @@ import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
+import InterlocutorCell from '@components/courses/InterlocutorCell';
+import InterlocutorModal from '@components/courses/InterlocutorModal';
 import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
@@ -121,6 +129,7 @@ import {
   COACH,
   CLIENT_ADMIN,
   INTRA,
+  DEFAULT_AVATAR,
 } from '@data/constants';
 import { formatAndSortIdentityOptions, formatQuantity, formatIdentity } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
@@ -149,6 +158,8 @@ export default {
     'sms-details-modal': SmsDetailsModal,
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
+    'interlocutor-cell': InterlocutorCell,
+    'interlocutor-modal': InterlocutorModal,
   },
   setup () {
     return { v$: useVuelidate() };
@@ -189,6 +200,9 @@ export default {
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
       contactOptions: [],
+      salesRepresentativeLabel: { action: 'Modifier le', interlocutor: 'Référent Compani' },
+      salesRepresentativeEditionModal: false,
+      interlocutorModalLoading: false,
     };
   },
   validations () {
@@ -277,7 +291,15 @@ export default {
     this.setDefaultMessageType();
 
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
-    else this.salesRepresentativeOptions = formatAndSortIdentityOptions([this.course.salesRepresentative]);
+    else {
+      this.salesRepresentativeOptions = [{
+        value: this.course.salesRepresentative._id,
+        label: formatIdentity(this.course.salesRepresentative.identity, 'FL'),
+        email: this.course.salesRepresentative.local.email || '',
+        picture: get(this.course.salesRepresentative, 'picture.link') || DEFAULT_AVATAR,
+        additionalFilters: [this.course.salesRepresentative.local.email],
+      }];
+    }
   },
   methods: {
     get,
@@ -335,7 +357,15 @@ export default {
 
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-        this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
+        this.salesRepresentativeOptions = salesRepresentatives
+          .map(sr => ({
+            value: sr._id,
+            label: formatIdentity(sr.identity, 'FL'),
+            email: sr.local.email || '',
+            picture: get(sr, 'picture.link') || DEFAULT_AVATAR,
+            additionalFilters: [sr.local.email],
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         this.trainerOptions = [];
@@ -464,6 +494,26 @@ export default {
       } finally {
         this.pdfLoading = false;
       }
+    },
+    async updateSalesRepresentatives () {
+      try {
+        this.interlocutorModalLoading = true;
+        this.v$.course.salesRepresentative.$touch();
+        if (this.v$.course.salesRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Courses.update(this.profileId, { salesRepresentative: this.course.salesRepresentative._id });
+        this.salesRepresentativeEditionModal = false;
+        await this.refreshCourse();
+        NotifyPositive('Référent Compani mis à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition du référent Compani.');
+      } finally {
+        this.interlocutorModalLoading = false;
+      }
+    },
+    resetSalesRepresentativeEdition () {
+      this.v$.course.salesRepresentative.$reset();
     },
   },
 };
