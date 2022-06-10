@@ -15,7 +15,7 @@
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
         </div>
         <p class="text-weight-bold table-title">Interlocuteurs</p>
-        <div class="row justify-between items-center">
+        <div class="interlocutor-container">
           <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
             :open-edition-modal="() => salesRepresentativeEditionModal = true" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
@@ -292,13 +292,7 @@ export default {
 
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
     else {
-      this.salesRepresentativeOptions = [{
-        value: this.course.salesRepresentative._id,
-        label: formatIdentity(this.course.salesRepresentative.identity, 'FL'),
-        email: this.course.salesRepresentative.local.email || '',
-        picture: get(this.course.salesRepresentative, 'picture.link') || DEFAULT_AVATAR,
-        additionalFilters: [this.course.salesRepresentative.local.email],
-      }];
+      this.salesRepresentativeOptions = [this.formatSalesRepresentativeOption(this.course.salesRepresentative)];
     }
   },
   methods: {
@@ -350,6 +344,16 @@ export default {
         this.courseLoading = false;
       }
     },
+    formatSalesRepresentativeOption (salesRepresentatives) {
+      return {
+        value: salesRepresentatives._id,
+        label: formatIdentity(salesRepresentatives.identity, 'FL'),
+        email: salesRepresentatives.local.email || '',
+        picture: get(salesRepresentatives, 'picture.link') || DEFAULT_AVATAR,
+        additionalFilters: [salesRepresentatives.local.email],
+      };
+    },
+
     async refreshTrainersAndSalesRepresentatives () {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
@@ -358,13 +362,7 @@ export default {
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
         this.salesRepresentativeOptions = salesRepresentatives
-          .map(sr => ({
-            value: sr._id,
-            label: formatIdentity(sr.identity, 'FL'),
-            email: sr.local.email || '',
-            picture: get(sr, 'picture.link') || DEFAULT_AVATAR,
-            additionalFilters: [sr.local.email],
-          }))
+          .map(sr => this.formatSalesRepresentativeOption(sr))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
@@ -523,7 +521,11 @@ export default {
 .profile-container
   display: flex
   flex-direction: column
-
 .button-history
   align-self: flex-end
+.interlocutor-container
+  flex-direction: row
+  grid-auto-flow: row
+  display: grid
+  grid-template-columns: repeat(2, 1fr)
 </style>

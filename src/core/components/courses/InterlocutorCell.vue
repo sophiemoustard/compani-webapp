@@ -1,13 +1,13 @@
 <template>
-  <div class="container">
+  <div class="q-mx-sm">
     <p class="input-caption">{{ caption }}</p>
     <q-card class="interlocutor-cell row justify-between items-start">
       <div class="row">
         <img :src="getAvatar(interlocutor.picture)" class="avatar q-my-sm">
         <div class="q-my-sm q-ml-md">
-          <div class="text-copper-grey-700 text-weight-bold">{{ formatIdentity(interlocutor.identity, 'FL') }}</div>
-          <div class="text-copper-grey-500">{{ interlocutor.local.email }}</div>
-          <div class="text-copper-grey-500">{{ interlocutor.contact.phone }}</div>
+          <div class="text-copper-grey-700">{{ formatIdentity(interlocutor.identity, 'FL') }}</div>
+          <div class="text-copper-grey-500 text-14">{{ interlocutor.local.email }}</div>
+          <div class="text-copper-grey-500 text-14">{{ formatPhone(interlocutor.contact.phone) }}</div>
         </div>
       </div>
       <ni-button v-if="canUpdateSalesRepresentative" icon="edit" @click="openEditionModal()" />
@@ -22,7 +22,7 @@ import { computed } from 'vue';
 import { useStore } from 'vuex';
 import Button from '@components/Button';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatPhone } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
 
 export default {
@@ -54,6 +54,7 @@ export default {
       canUpdateSalesRepresentative,
       // Methods
       formatIdentity,
+      formatPhone,
       getAvatar,
     };
   },
@@ -61,8 +62,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.container
-  width: 40%
 .interlocutor-cell
   border-radius: 4px
   background-color: white
@@ -72,7 +71,4 @@ export default {
   height: 40px
   border-radius: 50%
   vertical-align: middle
-  @media screen and (max-width: $breakpoint-sm-max)
-    height: 60px
-    width: 60px
 </style>
