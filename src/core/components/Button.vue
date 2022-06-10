@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'Button',
+  name: 'NiButton',
   props: {
     color: { type: String, default: 'copper-500' },
     disable: { type: Boolean, default: false },

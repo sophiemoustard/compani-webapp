@@ -197,6 +197,12 @@ export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planning_referent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
+
+// ROLES VENDOR
+export const VENDOR_ADMIN = 'vendor_admin';
+export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
+export const TRAINER = 'trainer';
+
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 export const ROLE_TRANSLATION = {
@@ -210,11 +216,6 @@ export const ROLE_TRANSLATION = {
   [TRAINING_ORGANISATION_MANAGER]: 'Responsable Formation',
   [TRAINER]: 'Formateur(rice)',
 };
-
-// ROLES VENDOR
-export const VENDOR_ADMIN = 'vendor_admin';
-export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
-export const TRAINER = 'trainer';
 
 // ROLE TRANSLATION
 export const ROLES_TRANSLATION = {
