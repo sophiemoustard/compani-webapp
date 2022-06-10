@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <p class="input-caption">{{ caption }}</p>
-    <div class="interlocutor-cell row justify-between items-start">
+    <q-card class="interlocutor-cell row justify-between items-start">
       <div class="row">
         <img :src="getAvatar(interlocutor.picture)" class="avatar q-my-sm">
         <div class="q-my-sm q-ml-md">
@@ -11,7 +11,7 @@
         </div>
       </div>
       <ni-button v-if="canUpdateSalesRepresentative" icon="edit" @click="openEditionModal()" />
-    </div>
+    </q-card>
   </div>
 </template>
 
@@ -46,7 +46,7 @@ export default {
       return ability.can('update', 'interlocutor');
     });
 
-    const getAvatar = picture => (get(picture, 'link')) || DEFAULT_AVATAR;
+    const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
     return {
       // Data
       DEFAULT_AVATAR,
@@ -64,15 +64,13 @@ export default {
 .container
   width: 40%
 .interlocutor-cell
-  border-radius: 8px
-  box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
+  border-radius: 4px
   background-color: white
   padding: 8px
 .avatar
   width: 40px
   height: 40px
   border-radius: 50%
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12)
   vertical-align: middle
   @media screen and (max-width: $breakpoint-sm-max)
     height: 60px

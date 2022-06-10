@@ -49,19 +49,19 @@ export default {
     'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event) {
-      this.$emit('update:interlocutor', event);
-    },
+  setup (_, { emit }) {
+    const hide = () => { emit('hide'); };
+    const input = (event) => { emit('update:model-value', event); };
+    const submit = () => { emit('submit'); };
+    const update = (event) => { emit('update:interlocutor', event); };
+
+    return {
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>
