@@ -22,6 +22,7 @@
 <script>
 import Button from '@components/Button';
 import Input from '@components/form/Input';
+import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
 export default {
   name: 'HistoryCancellationModal',

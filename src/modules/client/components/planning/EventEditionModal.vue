@@ -134,12 +134,15 @@
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
       :validations="v$.timeStampCancellationReason" :v-model:reason="timeStampCancellationReason" />
     <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
-      @hide="resetEventCancellationModal" />
+      @hide="resetEventCancellationModal" @update-event-misc="updateEvent('misc', $event)" :validations="validations"
+      @update-event-reason="updateEvent('cancel.reason', $event)"
+      @update-event-condition="updateEvent('cancel.condition', $event)" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
 import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -172,15 +175,16 @@ export default {
   setup () {
     const eventCancellationModal = ref(false);
 
-    const openEventCancellationModal = () => eventCancellationModal.value = true;
+    const openEventCancellationModal = () => { eventCancellationModal.value = true; };
 
-    const resetEventCancellationModal = () => eventCancellationModal.value = false;
+    const resetEventCancellationModal = () => { eventCancellationModal.value = false; };
     return {
       // Data
       eventCancellationModal,
       // Methods
       openEventCancellationModal,
       resetEventCancellationModal,
+      set,
       // Validations
       v$: useVuelidate(),
     };
@@ -298,6 +302,8 @@ export default {
       this.displayHistory = !this.displayHistory;
     },
     updateEvent (path, value) {
+      console.log('path', path);
+      console.log('value', value);
       this.$emit('update-event', { path, value });
     },
     toggleCancellationForm (value) {

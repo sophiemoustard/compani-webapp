@@ -33,8 +33,8 @@
       :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
       @document-uploaded="documentUploaded" @submit="validateEventEdition" @delete-event="validateEventDeletion"
       @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @close="closeEditionModal"
-      :event-histories="editedEventHistories" :histories-loading="historiesLoading"
-      @refresh-histories="refreshHistories" @update-event="setEvent" />
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading" @update-event="setEvent"
+      @refresh-histories="refreshHistories" />
   </q-page>
 </template>
 
@@ -76,7 +76,15 @@ export default {
     const customers = ref([]);
     const { newEvent, editedEvent, eventValidation } = usePlanningAction(personKey, customers);
 
-    return { personKey, newEvent, editedEvent, customers, eventValidation };
+    return {
+      // Data
+      personKey,
+      newEvent,
+      editedEvent,
+      customers,
+      // Validations
+      eventValidation
+    };
   },
   mixins: [planningTimelineMixin, planningActionMixin],
   data () {
