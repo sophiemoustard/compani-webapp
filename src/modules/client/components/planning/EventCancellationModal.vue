@@ -1,7 +1,10 @@
 <template>
   <q-dialog :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')">
     <div class="modal-container-sm modal-padding in-modal">
-      <div class="title q-mb-md">Annuler l'intervention</div>
+      <div class="row justify-between">
+        <div class="title q-mb-md">Annuler l'intervention</div>
+        <q-icon class="cursor-pointer" name="close" size="1.5rem" @close="resetForm" v-close-popup />
+      </div>
       <ni-option-group caption="Qui est à l'origine de l'annulation ?"
         :model-value="editedEvent.cancel.reason" type="radio" :options="cancellationReasons" required-field
         color="copper-500" @update:model-value="updateEventReason($event)" />
@@ -12,7 +15,7 @@
         @update:model-value="updateEventMisc($event)" @blur="validations.misc.$touch"
         :error="validations.misc.$error" />
       <div class="row justify-end q-mb-md">
-        <ni-button label="RETOUR" @click="hide" />
+        <ni-button label="RETOUR" @click="resetForm" />
         <ni-button label="ANNULER L'INTERVENTION" @click="canCancelEvent" />
       </div>
     </div>
@@ -20,10 +23,9 @@
 </template>
 <script>
 
-import get from 'lodash/get';
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
-import { CANCELLATION_REASONS, CUSTOMER_INITIATIVE, CANCELLATION_OPTIONS } from '@data/constants';
+import { CANCELLATION_REASONS, CANCELLATION_OPTIONS } from '@data/constants';
 import { formatDate, formatHoursWithMinutes } from '@helpers/date';
 import { NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
@@ -55,12 +57,19 @@ export default {
     const $q = useQuasar();
     const cancellationReasons = ref(CANCELLATION_REASONS);
     const cancellationOptions = ref(CANCELLATION_OPTIONS);
-    const reason = get(props.editedEvent, 'cancel.reason') || CUSTOMER_INITIATIVE;
-    const condition = get(props.editedEvent, 'cancel.condition');
 
     const hide = () => { emit('hide'); };
+
+    const resetForm = () => {
+      hide();
+      emit('update-event-reason', '');
+      emit('update-event-condition', '');
+    };
+
     const updateEventMisc = (value) => { emit('update-event-misc', value); };
+
     const updateEventReason = (value) => { emit('update-event-reason', value); };
+
     const updateEventCondition = (value) => { emit('update-event-condition', value); };
 
     const formatDateAndHours = (startDate, endDate) => {
@@ -86,11 +95,12 @@ export default {
     };
 
     return {
+      // Data
       cancellationReasons,
       cancellationOptions,
-      reason,
-      condition,
+      // Methods
       hide,
+      resetForm,
       updateEventMisc,
       updateEventReason,
       updateEventCondition,

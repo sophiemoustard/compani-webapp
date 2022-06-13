@@ -13,7 +13,7 @@
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
           <div class="modal-subtitle">
             <ni-button v-if="canCancel && !editedEvent.isCancelled" label="Annuler l'intervention"
-              @click="openEventCancellationModal()" color="copper-grey-800" />
+              color="copper-grey-800" class="bg-copper-grey-100" @click="openEventCancellationModal()"  />
             <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
               flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
               :disable="historiesLoading" />
