@@ -36,6 +36,7 @@ export const defineAbilitiesFor = (user) => {
   if (isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
     can('set', 'user_company');
     can('update', 'coursebilling');
+    can('update', 'interlocutor');
   }
   if (isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER].includes(vendorRole)) {
     can('update', 'course_trainee_follow_up');
