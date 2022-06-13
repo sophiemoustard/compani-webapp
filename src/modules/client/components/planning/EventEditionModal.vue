@@ -12,8 +12,8 @@
         <div class="modal-subtitle">
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
           <div class="modal-subtitle">
-            <ni-button v-if="canCancel" label="Annuler l'intervention" @click="openEventCancellationModal()"
-              color="copper-grey-800" />
+            <ni-button v-if="canCancel && !editedEvent.isCancelled" label="Annuler l'intervention"
+              @click="openEventCancellationModal()" color="copper-grey-800" />
             <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
               flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
               :disable="historiesLoading" />
@@ -82,11 +82,11 @@
           <ni-select in-modal :model-value="editedEvent.cancel.condition" caption="Conditions d'annulation"
             :options="cancellationConditions" @blur="validations.cancel.condition.$touch" required-field
             :error="validations.cancel.condition.$error" @update:model-value="updateEvent('cancel.condition', $event)"
-            :disable="!canCancel || historiesLoading" />
+            disable />
           <ni-select in-modal :model-value="editedEvent.cancel.reason" caption="Motif d'annulation"
             :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
             :error="validations.cancel.reason.$error" @update:model-value="updateEvent('cancel.reason', $event)"
-            :disable="!canCancel || historiesLoading" />
+            disable />
         </div>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :model-value="editedEvent.kmDuringEvent"
@@ -134,9 +134,9 @@
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
       :validations="v$.timeStampCancellationReason" :v-model:reason="timeStampCancellationReason" />
     <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
-      @hide="resetEventCancellationModal" @update-event-misc="updateEvent('misc', $event)" :validations="validations"
+      @hide="closeEventCancellationModal" @update-event-misc="updateEvent('misc', $event)" :validations="validations"
       @update-event-reason="updateEvent('cancel.reason', $event)"
-      @update-event-condition="updateEvent('cancel.condition', $event)" />
+      @update-event-condition="updateEvent('cancel.condition', $event)" @cancel-event="cancelEvent" />
   </q-dialog>
 </template>
 
@@ -177,13 +177,13 @@ export default {
 
     const openEventCancellationModal = () => { eventCancellationModal.value = true; };
 
-    const resetEventCancellationModal = () => { eventCancellationModal.value = false; };
+    const closeEventCancellationModal = () => { eventCancellationModal.value = false; };
     return {
       // Data
       eventCancellationModal,
       // Methods
       openEventCancellationModal,
-      resetEventCancellationModal,
+      closeEventCancellationModal,
       set,
       // Validations
       v$: useVuelidate(),
@@ -302,19 +302,7 @@ export default {
       this.displayHistory = !this.displayHistory;
     },
     updateEvent (path, value) {
-      console.log('path', path);
-      console.log('value', value);
       this.$emit('update-event', { path, value });
-    },
-    toggleCancellationForm (value) {
-      if (!value) {
-        this.updateEvent('cancel', {});
-        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
-      } else {
-        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
-        this.validations.misc.$touch();
-        this.validations.cancel.$touch();
-      }
     },
     toggleRepetition () {
       this.updateEvent('cancel', {});
@@ -395,6 +383,15 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'annulation de l\'horodatage.');
       }
+    },
+    cancelEvent () {
+      this.updateEvent('isCancelled', true);
+      this.updateEvent(
+        'cancel',
+        { reason: this.editedEvent.cancel.reason, condition: this.editedEvent.cancel.condition }
+      );
+      this.closeEventCancellationModal();
+      this.$emit('submit');
     },
   },
 };

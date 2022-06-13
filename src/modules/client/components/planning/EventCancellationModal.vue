@@ -13,7 +13,7 @@
         :error="validations.misc.$error" />
       <div class="row justify-end q-mb-md">
         <ni-button label="RETOUR" @click="hide" />
-        <ni-button label="ANNULER L'INTERVENTION" @click="validateCancellation" />
+        <ni-button label="ANNULER L'INTERVENTION" @click="canCancelEvent" />
       </div>
     </div>
   </q-dialog>
@@ -22,11 +22,12 @@
 
 import get from 'lodash/get';
 import { ref } from 'vue';
+import { useQuasar } from 'quasar';
+import { CANCELLATION_REASONS, CUSTOMER_INITIATIVE, CANCELLATION_OPTIONS } from '@data/constants';
+import { NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
-import { CANCELLATION_REASONS, CUSTOMER_INITIATIVE, CANCELLATION_OPTIONS } from '@data/constants';
-import { NotifyPositive } from '@components/popup/notify';
-import OptionGroup from '../../../../core/components/form/OptionGroup';
+import OptionGroup from '@components/form/OptionGroup';
 
 export default {
   name: 'EventCancellationModal',
@@ -46,20 +47,10 @@ export default {
     'update-event-misc',
     'update-event-reason',
     'update-event-condition',
-    'update-event',
+    'cancel-event',
   ],
-  methods: {
-    validateCancellation () {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir annuler cette intervention ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => NotifyPositive('Evenement annulé'))
-        .onCancel(() => NotifyPositive('Annulation annulée.'));
-    },
-  },
   setup (props, { emit }) {
+    const $q = useQuasar();
     const cancellationReasons = ref(CANCELLATION_REASONS);
     const cancellationOptions = ref(CANCELLATION_OPTIONS);
     const reason = get(props.editedEvent, 'cancel.reason') || CUSTOMER_INITIATIVE;
@@ -70,6 +61,21 @@ export default {
     const updateEventReason = (value) => { emit('update-event-reason', value); };
     const updateEventCondition = (value) => { emit('update-event-condition', value); };
 
+    const cancelEvent = () => { emit('cancel-event'); };
+
+    const canCancelEvent = () => {
+      props.validations.$touch();
+      if (props.validations.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir annuler l\'intervention  ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => cancelEvent())
+        .onCancel(() => NotifyPositive('Annulation annulée.'));
+    };
+
     return {
       cancellationReasons,
       cancellationOptions,
@@ -79,6 +85,8 @@ export default {
       updateEventMisc,
       updateEventReason,
       updateEventCondition,
+      canCancelEvent,
+      cancelEvent,
     };
   },
 };

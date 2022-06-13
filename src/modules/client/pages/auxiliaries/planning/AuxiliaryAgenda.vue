@@ -83,7 +83,7 @@ export default {
       editedEvent,
       customers,
       // Validations
-      eventValidation
+      eventValidation,
     };
   },
   mixins: [planningTimelineMixin, planningActionMixin],
