@@ -116,7 +116,7 @@ export default {
     };
 
     const setDiscount = ({ value, obj, path }) => {
-      obj[path] = !value || isNaN(value) || value < 0 ? 0 : divide(Math.trunc(multiply(value, 100)), 100);
+      obj[path] = !value || isNaN(value) || value < 0 ? 0 : parseFloat(divide(Math.trunc(multiply(value, 100)), 100));
       emit('discount-input');
     };
 
