@@ -136,7 +136,8 @@
     <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
       @hide="closeEventCancellationModal" @update-event-misc="updateEvent('misc', $event)" :validations="validations"
       @update-event-reason="updateEvent('cancel.reason', $event)"
-      @update-event-condition="updateEvent('cancel.condition', $event)" @cancel-event="cancelEvent" />
+      @update-event-condition="updateEvent('cancel.condition', $event)" @cancel-event="cancelEvent"
+      :customer-name="customerFullName" />
   </q-dialog>
 </template>
 
@@ -266,6 +267,10 @@ export default {
     },
     customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
+    },
+    customerFullName () {
+      return `${get(this.selectedCustomer, 'identity.firstname')} ${get(this.selectedCustomer, 'identity.lastname')}` ||
+        '';
     },
     startDateTimeStamped () {
       return this.eventHistories

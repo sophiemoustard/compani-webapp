@@ -24,6 +24,7 @@ import get from 'lodash/get';
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { CANCELLATION_REASONS, CUSTOMER_INITIATIVE, CANCELLATION_OPTIONS } from '@data/constants';
+import { formatDate, formatHoursWithMinutes } from '@helpers/date';
 import { NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -40,6 +41,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     editedEvent: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
+    customerName: { type: String, default: '' },
   },
   emits: [
     'hide',
@@ -61,6 +63,11 @@ export default {
     const updateEventReason = (value) => { emit('update-event-reason', value); };
     const updateEventCondition = (value) => { emit('update-event-condition', value); };
 
+    const formatDateAndHours = (startDate, endDate) => {
+      const date = formatDate(startDate);
+      return `${date} (${formatHoursWithMinutes(startDate)} - ${formatHoursWithMinutes(endDate)})`;
+    };
+
     const cancelEvent = () => { emit('cancel-event'); };
 
     const canCancelEvent = () => {
@@ -69,7 +76,9 @@ export default {
 
       $q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir annuler l\'intervention  ?',
+        message: `Êtes-vous sûr(e) de vouloir annuler l'intervention du
+          ${formatDateAndHours(props.editedEvent.dates.startDate, props.editedEvent.dates.endDate)}
+          chez ${props.customerName}?`,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => cancelEvent())
