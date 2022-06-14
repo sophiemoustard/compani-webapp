@@ -90,7 +90,7 @@ export default {
       } catch (e) {
         manualBills.value = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des factures manuelles');
+        NotifyNegative('Erreur lors de la récupération des factures manuelles.');
       } finally {
         tableLoading.value = false;
       }
