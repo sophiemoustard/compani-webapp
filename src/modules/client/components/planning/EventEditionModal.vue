@@ -130,9 +130,11 @@
         label="Editer l'évènement" @click="submit" icon-right="check" data-cy="event-edition-button"
         :disable="historiesLoading" />
     </div>
+
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
       :validations="v$.timeStampCancellationReason" v-model:reason="timeStampCancellationReason" />
+
     <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
       :customer-name="customerFullName" @update-event-misc="updateEvent('misc', $event)" :validations="v$.editedEvent"
       @update-cancellation-reason="updateEvent('cancel.reason', $event)" @cancel-event="cancelEvent"
