@@ -11,9 +11,13 @@
           :disable="!canUpdateAuxiliary || historiesLoading" />
         <div class="modal-subtitle">
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
-          <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
-            color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
-            :disable="historiesLoading" />
+          <div class="modal-subtitle">
+            <ni-button v-if="canCancel && !editedEvent.isCancelled" label="Annuler l'intervention"
+              color="copper-grey-800" class="bg-copper-grey-100" @click="openEventCancellationModal()" />
+            <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
+              flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
+              :disable="historiesLoading" />
+          </div>
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
@@ -74,19 +78,15 @@
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired"
           @update:model-value="updateEvent('misc', $event)" />
-        <div v-if="canCancel" class="row q-mb-md light-checkbox">
-          <q-checkbox :model-value="editedEvent.isCancelled" label="Annuler l'évènement" :disable="historiesLoading"
-            @update:model-value="toggleCancellationForm($event)" dense />
-        </div>
         <div v-if="editedEvent.isCancelled" class="row justify-between">
           <ni-select in-modal :model-value="editedEvent.cancel.condition" caption="Conditions d'annulation"
             :options="cancellationConditions" @blur="validations.cancel.condition.$touch" required-field
             :error="validations.cancel.condition.$error" @update:model-value="updateEvent('cancel.condition', $event)"
-            :disable="!canCancel || historiesLoading" />
+            disable />
           <ni-select in-modal :model-value="editedEvent.cancel.reason" caption="Motif d'annulation"
             :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
             :error="validations.cancel.reason.$error" @update:model-value="updateEvent('cancel.reason', $event)"
-            :disable="!canCancel || historiesLoading" />
+            disable />
         </div>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :model-value="editedEvent.kmDuringEvent"
@@ -133,11 +133,17 @@
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
       :validations="v$.timeStampCancellationReason" v-model:reason="timeStampCancellationReason" />
+    <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
+      :validations="validations" :customer-name="customerFullName" @update-event-misc="updateEvent('misc', $event)"
+      @update-cancellation-reason="updateEvent('cancel.reason', $event)" @hide="closeEventCancellationModal"
+      @update-cancellation-condition="updateEvent('cancel.condition', $event)" @cancel-event="cancelEvent" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
+import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import EventHistories from '@api/EventHistories';
@@ -149,6 +155,7 @@ import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
 import NiHistoryCancellationModal from './HistoryCancellationModal';
+import NiEventCancellationModal from './EventCancellationModal';
 
 export default {
   name: 'EventEditionModal',
@@ -166,12 +173,27 @@ export default {
     historiesLoading: { type: Boolean, default: false },
   },
   setup () {
-    return { v$: useVuelidate() };
+    const eventCancellationModal = ref(false);
+
+    const openEventCancellationModal = () => { eventCancellationModal.value = true; };
+
+    const closeEventCancellationModal = () => { eventCancellationModal.value = false; };
+    return {
+      // Data
+      eventCancellationModal,
+      // Methods
+      openEventCancellationModal,
+      closeEventCancellationModal,
+      set,
+      // Validations
+      v$: useVuelidate(),
+    };
   },
   components: {
     'ni-button': Button,
     'ni-event-history': NiEventHistory,
     'ni-history-cancellation-modal': NiHistoryCancellationModal,
+    'ni-event-cancellation-modal': NiEventCancellationModal,
   },
   emits: [
     'refresh-histories',
@@ -245,6 +267,10 @@ export default {
     customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
+    customerFullName () {
+      return `${get(this.selectedCustomer, 'identity.firstname')} ${get(this.selectedCustomer, 'identity.lastname')}` ||
+        '';
+    },
     startDateTimeStamped () {
       return this.eventHistories
         .some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour && !h.isCancelled);
@@ -281,16 +307,6 @@ export default {
     },
     updateEvent (path, value) {
       this.$emit('update-event', { path, value });
-    },
-    toggleCancellationForm (value) {
-      if (!value) {
-        this.updateEvent('cancel', {});
-        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
-      } else {
-        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
-        this.validations.misc.$touch();
-        this.validations.cancel.$touch();
-      }
     },
     toggleRepetition () {
       this.updateEvent('cancel', {});
@@ -371,6 +387,15 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'annulation de l\'horodatage.');
       }
+    },
+    cancelEvent () {
+      this.updateEvent('isCancelled', true);
+      this.updateEvent(
+        'cancel',
+        { reason: this.editedEvent.cancel.reason, condition: this.editedEvent.cancel.condition }
+      );
+      this.closeEventCancellationModal();
+      this.$emit('submit');
     },
   },
 };
