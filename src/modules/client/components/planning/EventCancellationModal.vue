@@ -3,10 +3,12 @@
     title="Annuler l'intervention">
     <ni-option-group caption="Qui est à l'origine de l'annulation ?"
       :model-value="editedEvent.cancel.reason" type="radio" :options="cancellationReasons" required-field
-      color="copper-500" @update:model-value="updateCancellationReason($event)" />
+      color="copper-500" @update:model-value="updateCancellationReason($event)"
+      :error="validations.cancel.reason.$error" />
     <ni-option-group caption="Quelles sont les conditions d'annulation ?"
       :model-value="editedEvent.cancel.condition" type="radio" :options="cancellationOptions" required-field
-      color="copper-500" @update:model-value="updateCancellationCondition($event)" />
+      color="copper-500" @update:model-value="updateCancellationCondition($event)"
+      :error="validations.cancel.condition.$error" />
     <ni-input in-modal type="textarea" :model-value="editedEvent.misc" caption="Notes" required-field last
       @update:model-value="updateEventMisc($event)" @blur="validations.misc.$touch"
       :error="validations.misc.$error" />
