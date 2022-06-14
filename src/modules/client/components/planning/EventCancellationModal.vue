@@ -7,10 +7,10 @@
       </div>
       <ni-option-group caption="Qui est à l'origine de l'annulation ?"
         :model-value="editedEvent.cancel.reason" type="radio" :options="cancellationReasons" required-field
-        color="copper-500" @update:model-value="updateEventReason($event)" />
+        color="copper-500" @update:model-value="updateCancellationReason($event)" />
       <ni-option-group caption="Quelles sont les conditions d'annulation ?"
         :model-value="editedEvent.cancel.condition" type="radio" :options="cancellationOptions" required-field
-        color="copper-500" @update:model-value="updateEventCondition($event)" />
+        color="copper-500" @update:model-value="updateCancellationCondition($event)" />
       <ni-input in-modal type="textarea" :model-value="editedEvent.misc" caption="Notes" required-field last
         @update:model-value="updateEventMisc($event)" @blur="validations.misc.$touch"
         :error="validations.misc.$error" />
@@ -49,8 +49,8 @@ export default {
     'hide',
     'update:model-value',
     'update-event-misc',
-    'update-event-reason',
-    'update-event-condition',
+    'update-cancellation-reason',
+    'update-cancellation-condition',
     'cancel-event',
   ],
   setup (props, { emit }) {
@@ -62,15 +62,15 @@ export default {
 
     const resetForm = () => {
       hide();
-      emit('update-event-reason', '');
-      emit('update-event-condition', '');
+      emit('update-cancellation-reason', '');
+      emit('update-cancellation-condition', '');
     };
 
     const updateEventMisc = (value) => { emit('update-event-misc', value); };
 
-    const updateEventReason = (value) => { emit('update-event-reason', value); };
+    const updateCancellationReason = (value) => { emit('update-cancellation-reason', value); };
 
-    const updateEventCondition = (value) => { emit('update-event-condition', value); };
+    const updateCancellationCondition = (value) => { emit('update-cancellation-condition', value); };
 
     const formatDateAndHours = (startDate, endDate) => {
       const date = formatDate(startDate);
@@ -102,8 +102,8 @@ export default {
       hide,
       resetForm,
       updateEventMisc,
-      updateEventReason,
-      updateEventCondition,
+      updateCancellationReason,
+      updateCancellationCondition,
       canCancelEvent,
       cancelEvent,
     };

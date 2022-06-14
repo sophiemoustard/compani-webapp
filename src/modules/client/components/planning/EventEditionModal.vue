@@ -13,7 +13,7 @@
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
           <div class="modal-subtitle">
             <ni-button v-if="canCancel && !editedEvent.isCancelled" label="Annuler l'intervention"
-              color="copper-grey-800" class="bg-copper-grey-100" @click="openEventCancellationModal()"  />
+              color="copper-grey-800" class="bg-copper-grey-100" @click="openEventCancellationModal()" />
             <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
               flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
               :disable="historiesLoading" />
@@ -132,12 +132,11 @@
     </div>
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
-      :validations="v$.timeStampCancellationReason" :v-model:reason="timeStampCancellationReason" />
+      :validations="v$.timeStampCancellationReason" v-model:reason="timeStampCancellationReason" />
     <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
-      @hide="closeEventCancellationModal" @update-event-misc="updateEvent('misc', $event)" :validations="validations"
-      @update-event-reason="updateEvent('cancel.reason', $event)"
-      @update-event-condition="updateEvent('cancel.condition', $event)" @cancel-event="cancelEvent"
-      :customer-name="customerFullName" />
+      :validations="validations" :customer-name="customerFullName" @update-event-misc="updateEvent('misc', $event)"
+      @update-cancellation-reason="updateEvent('cancel.reason', $event)" @hide="closeEventCancellationModal"
+      @update-cancellation-condition="updateEvent('cancel.condition', $event)" @cancel-event="cancelEvent" />
   </q-dialog>
 </template>
 
