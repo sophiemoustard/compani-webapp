@@ -1,5 +1,5 @@
 <template>
-  <div class="q-mx-sm">
+  <div class="cell-container q-mx-sm">
     <p class="input-caption">{{ caption }}</p>
     <q-card class="interlocutor-cell row justify-between items-start">
       <div class="row">
@@ -64,10 +64,14 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.cell-container
+  display: flex
+  flex-direction: column
 .interlocutor-cell
   border-radius: 4px
   background-color: white
   padding: 8px
+  flex: 1
 .avatar
   width: 40px
   height: 40px
@@ -76,5 +80,4 @@ export default {
 .phone
   color: $copper-grey-500
   font-size: 14px
-  height: 21px
 </style>
