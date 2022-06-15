@@ -7,10 +7,10 @@
         <div class="q-my-sm q-ml-md">
           <div class="text-copper-grey-700">{{ formatIdentity(interlocutor.identity, 'FL') }}</div>
           <div class="text-copper-grey-500 text-14">{{ interlocutor.local.email }}</div>
-          <div class="text-copper-grey-500 text-14">{{ formatPhone(interlocutor.contact.phone) }}</div>
+          <div class="phone">{{ formatPhone(get(interlocutor, 'contact.phone')) }}</div>
         </div>
       </div>
-      <ni-button v-if="canUpdateSalesRepresentative" icon="edit" @click="openEditionModal()" />
+      <ni-button v-if="canUpdateSalesRepresentative" icon="edit" @click="openEditionModal()" :disable="disable" />
     </q-card>
   </div>
 </template>
@@ -31,6 +31,7 @@ export default {
     interlocutor: { type: Object, default: () => ({}) },
     caption: { type: String, default: '' },
     openEditionModal: { type: Function, default: () => {} },
+    disable: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
@@ -56,6 +57,7 @@ export default {
       formatIdentity,
       formatPhone,
       getAvatar,
+      get,
     };
   },
 };
@@ -71,4 +73,8 @@ export default {
   height: 40px
   border-radius: 50%
   vertical-align: middle
+.phone
+  color: $copper-grey-500
+  font-size: 14px
+  height: 21px
 </style>
