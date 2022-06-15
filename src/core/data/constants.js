@@ -173,8 +173,8 @@ export const INVOICED_AND_NOT_PAID = 'invoiced_and_not_paid';
 export const NOT_INVOICED_AND_NOT_PAID = 'not_invoiced_and_not_paid';
 export const CANCELLATION_OPTIONS = [
   { label: 'Facturée au client & payée à l\'auxiliaire', value: INVOICED_AND_PAID },
-  { label: 'Facturée au client & non payée à l\'auxiliaire', value: INVOICED_AND_NOT_PAID },
-  { label: 'Non facturée au clieent & non payée à l\'auxiliaire', value: NOT_INVOICED_AND_NOT_PAID },
+  { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAID },
+  { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAID },
 ];
 
 // CANCELLATION REASONS
