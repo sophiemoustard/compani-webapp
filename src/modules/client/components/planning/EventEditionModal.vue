@@ -130,13 +130,15 @@
         label="Editer l'évènement" @click="submit" icon-right="check" data-cy="event-edition-button"
         :disable="historiesLoading" />
     </div>
+
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
       :validations="v$.timeStampCancellationReason" v-model:reason="timeStampCancellationReason" />
+
     <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
-      :validations="validations" :customer-name="customerFullName" @update-event-misc="updateEvent('misc', $event)"
-      @update-cancellation-reason="updateEvent('cancel.reason', $event)" @hide="closeEventCancellationModal"
-      @update-cancellation-condition="updateEvent('cancel.condition', $event)" @cancel-event="cancelEvent" />
+      :customer-name="customerFullName" @update-event-misc="updateEvent('misc', $event)" :validations="v$.editedEvent"
+      @update-cancellation-reason="updateEvent('cancel.reason', $event)" @cancel-event="cancelEvent"
+      @hide="closeEventCancellationModal" @update-cancellation-condition="updateEvent('cancel.condition', $event)" />
   </q-dialog>
 </template>
 
@@ -174,10 +176,14 @@ export default {
   },
   setup () {
     const eventCancellationModal = ref(false);
+    const v$ = useVuelidate();
 
     const openEventCancellationModal = () => { eventCancellationModal.value = true; };
 
-    const closeEventCancellationModal = () => { eventCancellationModal.value = false; };
+    const closeEventCancellationModal = () => {
+      eventCancellationModal.value = false;
+      v$.value.editedEvent.$reset();
+    };
     return {
       // Data
       eventCancellationModal,
@@ -186,7 +192,7 @@ export default {
       closeEventCancellationModal,
       set,
       // Validations
-      v$: useVuelidate(),
+      v$,
     };
   },
   components: {
@@ -219,6 +225,7 @@ export default {
   validations () {
     return {
       timeStampCancellationReason: { required },
+      editedEvent: { misc: { required }, cancel: { condition: { required }, reason: { required } } },
     };
   },
   computed: {

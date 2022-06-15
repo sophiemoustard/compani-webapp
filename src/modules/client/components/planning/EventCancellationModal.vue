@@ -3,10 +3,12 @@
     title="Annuler l'intervention">
     <ni-option-group caption="Qui est à l'origine de l'annulation ?"
       :model-value="editedEvent.cancel.reason" type="radio" :options="cancellationReasons" required-field
-      color="copper-500" @update:model-value="updateCancellationReason($event)" />
+      color="copper-500" @update:model-value="updateCancellationReason($event)"
+      :error="validations.cancel.reason.$error" />
     <ni-option-group caption="Quelles sont les conditions d'annulation ?"
       :model-value="editedEvent.cancel.condition" type="radio" :options="cancellationOptions" required-field
-      color="copper-500" @update:model-value="updateCancellationCondition($event)" />
+      color="copper-500" @update:model-value="updateCancellationCondition($event)"
+      :error="validations.cancel.condition.$error" />
     <ni-input in-modal type="textarea" :model-value="editedEvent.misc" caption="Notes" required-field last
       @update:model-value="updateEventMisc($event)" @blur="validations.misc.$touch"
       :error="validations.misc.$error" />
@@ -21,7 +23,8 @@
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { CANCELLATION_REASONS, CANCELLATION_OPTIONS } from '@data/constants';
-import { formatDate, formatHoursWithMinutes } from '@helpers/date';
+import moment from '@helpers/moment';
+import { formatHoursWithMinutes } from '@helpers/date';
 import { NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -70,7 +73,7 @@ export default {
     const updateCancellationCondition = (value) => { emit('update-cancellation-condition', value); };
 
     const formatDateAndHours = (startDate, endDate) => {
-      const date = formatDate(startDate);
+      const date = moment(startDate).format('DD MMMM');
       return `${date} (${formatHoursWithMinutes(startDate)} - ${formatHoursWithMinutes(endDate)})`;
     };
 
@@ -84,7 +87,7 @@ export default {
         title: 'Confirmation',
         message: `Êtes-vous sûr(e) de vouloir annuler l'intervention du
           ${formatDateAndHours(props.editedEvent.dates.startDate, props.editedEvent.dates.endDate)}
-          chez ${props.customerName}?`,
+          chez ${props.customerName} ?`,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => cancelEvent())
