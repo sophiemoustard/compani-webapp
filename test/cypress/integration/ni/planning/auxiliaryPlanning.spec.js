@@ -9,16 +9,26 @@ describe('Auxiliary planning - display', () => {
 
   it('should display correctly auxiliary planning', () => {
     cy.get('#q-app').click(500, 500);
+    cy.log('beginning');
     cy.get('[data-cy=planning-search]').eq(1).click();
+    cy.log('planning-search');
     cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary Olait{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 1);
+    cy.log('planning-row');
     cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
+    cy.log('planning-cell');
     cy.get('[data-cy=event-title]').should('have.length', 1);
+    cy.log('planning-title');
 
     const utcOffset = moment().utcOffset();
+    cy.log(utcOffset);
+    cy.log('10:00', `${10 + utcOffset / 60 - 2}:00`);
+    cy.log('12:30', `${12 + utcOffset / 60 - 2}:30`);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
     cy.get('[data-cy=event-start-hour]').eq(0).should('contain', `${10 + utcOffset / 60 - 2}:00`);
     cy.get('[data-cy=event-end-hour]').eq(0).should('contain', `${12 + utcOffset / 60 - 2}:30`);
+
+    cy.log('passé !!');
 
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().minus({ weeks: 1 }).weekNumber);
