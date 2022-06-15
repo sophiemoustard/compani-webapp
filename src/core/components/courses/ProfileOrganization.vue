@@ -18,11 +18,11 @@
         <div class="interlocutor-container">
           <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
             :open-edition-modal="openSalesRepresentativeModal" :disable="isArchived" />
-          <ni-button v-if="canUpdateTrainer && !course.trainer._id" color="primary" icon="add"
-            class="q-mb-sm" label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
-            @click="() => openTrainerModal('Ajouter un(e)')" />
           <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
             :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
+          <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
+            label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
+            @click="() => openTrainerModal('Ajouter un(e)')" />
         </div>
       </div>
     </div>
@@ -543,6 +543,7 @@ export default {
       }
     },
     resetSalesRepresentativeEdition () {
+      this.tempInterlocutorId = '';
       this.v$.tempInterlocutorId.$reset();
     },
     openSalesRepresentativeModal () {
@@ -550,6 +551,7 @@ export default {
       this.salesRepresentativeEditionModal = true;
     },
     resetTrainer () {
+      this.tempInterlocutorId = '';
       this.trainerLabel = { action: '', interlocutor: '' };
       this.v$.tempInterlocutorId.$reset();
     },
@@ -573,4 +575,7 @@ export default {
   grid-auto-flow: row
   display: grid
   grid-template-columns: repeat(2, 1fr)
+.add-trainer
+  justify-self: start
+  align-self: end
 </style>
