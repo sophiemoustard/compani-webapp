@@ -1,3 +1,4 @@
+import moment from '../../../../../src/core/helpers/moment';
 import { CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT, PLANNING } from '../../../../../src/core/data/constants';
 
 describe('Auxiliary planning - display', () => {
@@ -14,9 +15,10 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
 
+    const utcOffset = moment().utcOffset();
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
-    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '10:00');
-    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', `${10 + utcOffset / 60 - 2}:00`);
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', `${12 + utcOffset / 60 - 2}:30`);
 
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().minus({ weeks: 1 }).weekNumber);
