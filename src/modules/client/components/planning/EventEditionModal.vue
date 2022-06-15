@@ -176,10 +176,14 @@ export default {
   },
   setup () {
     const eventCancellationModal = ref(false);
+    const v$ = useVuelidate();
 
     const openEventCancellationModal = () => { eventCancellationModal.value = true; };
 
-    const closeEventCancellationModal = () => { eventCancellationModal.value = false; };
+    const closeEventCancellationModal = () => {
+      eventCancellationModal.value = false;
+      v$.value.editedEvent.$reset();
+    };
     return {
       // Data
       eventCancellationModal,
@@ -188,7 +192,7 @@ export default {
       closeEventCancellationModal,
       set,
       // Validations
-      v$: useVuelidate(),
+      v$,
     };
   },
   components: {
