@@ -22,7 +22,7 @@
             :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
           <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
             label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
-            @click="() => openTrainerModal('Ajouter un(e)')" />
+            @click="() => openTrainerModal('Ajouter un(e) ')" />
         </div>
       </div>
     </div>
@@ -209,7 +209,7 @@ export default {
       urlIos: 'https://apple.co/33kKzcU',
       contactOptions: [],
       tempInterlocutorId: '',
-      salesRepresentativeLabel: { action: 'Modifier le ', interlocutor: 'Référent Compani' },
+      salesRepresentativeLabel: { action: 'Modifier le ', interlocutor: 'référent Compani' },
       salesRepresentativeEditionModal: false,
       interlocutorModalLoading: false,
       trainerLabel: { action: '', interlocutor: '' },
@@ -534,7 +534,7 @@ export default {
         await Courses.update(this.profileId, { trainer: this.tempInterlocutorId });
         this.trainerModal = false;
         await this.refreshCourse();
-        NotifyPositive('Intervenant(e) mis à jour.');
+        NotifyPositive('Intervenant(e) mis(e) à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'édition de l\'intervenant(e).');
