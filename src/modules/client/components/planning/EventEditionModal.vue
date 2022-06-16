@@ -9,11 +9,16 @@
         <ni-planning-modal-header v-else :model-value="editedEvent.auxiliary" :selected-person="selectedAuxiliary"
           @update:model-value="updateEvent('auxiliary', $event)" :options="auxiliariesOptions" @close="close"
           :disable="!canUpdateAuxiliary || historiesLoading" />
+        <ni-banner v-if="editedEvent.isCancelled" icon="info_outline">
+          <template #message>Intervention annulée</template>
+        </ni-banner>
         <div class="modal-subtitle">
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
           <div class="modal-subtitle">
             <ni-button v-if="canCancel && !editedEvent.isCancelled" label="Annuler l'intervention"
               color="copper-grey-800" class="bg-copper-grey-100" @click="openEventCancellationModal()" />
+            <ni-button v-else-if="canCancel" label="Rétablir l'intervention" color="copper-grey-800"
+              class="bg-copper-grey-100" @click="openEventRestorationModal()" />
             <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
               flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
               :disable="historiesLoading" />
@@ -78,15 +83,15 @@
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired"
           @update:model-value="updateEvent('misc', $event)" />
-        <div v-if="editedEvent.isCancelled" class="row justify-between">
-          <ni-select in-modal :model-value="editedEvent.cancel.condition" caption="Conditions d'annulation"
-            :options="cancellationConditions" @blur="validations.cancel.condition.$touch" required-field
-            :error="validations.cancel.condition.$error" @update:model-value="updateEvent('cancel.condition', $event)"
-            disable />
-          <ni-select in-modal :model-value="editedEvent.cancel.reason" caption="Motif d'annulation"
-            :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
-            :error="validations.cancel.reason.$error" @update:model-value="updateEvent('cancel.reason', $event)"
-            disable />
+        <div v-if="editedEvent.isCancelled" class="justify-between">
+          <ni-option-group :model-value="editedEvent.cancel.reason" :error-message="REQUIRED_LABEL" required-field
+            :options="cancellationReasons" :error="validations.cancel.reason.$error" type="radio"
+            caption="Qui est a l’origine de l’annulation ?"
+            @update:model-value="updateEvent('cancel.reason', $event)" />
+          <ni-option-group :model-value="editedEvent.cancel.condition" :error-message="REQUIRED_LABEL" required-field
+            :options="cancellationConditions" :error="validations.cancel.condition.$error" type="radio"
+            caption="Quelles sont les conditions d’annulation ?"
+            @update:model-value="updateEvent('cancel.condition', $event)" />
         </div>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :model-value="editedEvent.kmDuringEvent"
@@ -150,9 +155,12 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
+import Banner from '@components/Banner';
+import OptionGroup from '@components/form/OptionGroup';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES, TIME_STAMPING_ACTIONS } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
+import { formatDateAndHours } from '@helpers/date';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
@@ -200,6 +208,8 @@ export default {
     'ni-event-history': NiEventHistory,
     'ni-history-cancellation-modal': NiHistoryCancellationModal,
     'ni-event-cancellation-modal': NiEventCancellationModal,
+    'ni-banner': Banner,
+    'ni-option-group': OptionGroup,
   },
   emits: [
     'refresh-histories',
@@ -403,6 +413,21 @@ export default {
       );
       this.closeEventCancellationModal();
       this.$emit('submit');
+    },
+    openEventRestorationModal () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: `Êtes vous sûr(e) de vouloir rétablir l’intervention du
+          ${formatDateAndHours(this.editedEvent.dates.startDate, this.editedEvent.dates.endDate)} chez
+          ${this.customerFullName} ?`,
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(async () => {
+        await this.updateEvent('isCancelled', false);
+        await this.updateEvent('cancel', {});
+        this.$emit('submit');
+      })
+        .onCancel(() => NotifyPositive('Rétablissement annulé.'));
     },
   },
 };

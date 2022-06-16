@@ -181,8 +181,8 @@ export const CANCELLATION_OPTIONS = [
 export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 export const CANCELLATION_REASONS = [
-  { label: 'Initiative du/de la client(e)', value: CUSTOMER_INITIATIVE },
-  { label: 'Initiative de l\'intervenant(e)', value: AUXILIARY_INITIATIVE },
+  { label: 'Client', value: CUSTOMER_INITIATIVE },
+  { label: 'Intervenant(e)', value: AUXILIARY_INITIATIVE },
 ];
 
 // INTERFACE
