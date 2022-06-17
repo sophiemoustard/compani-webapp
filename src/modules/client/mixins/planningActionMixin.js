@@ -412,7 +412,7 @@ export const planningActionMixin = {
         await this.updateEvent();
       }
     },
-    async validateEventEdition () {
+    async validateEventEdition (confirmationLabel) {
       try {
         this.eventValidation.editedEvent.$touch();
         const isValid = await this.waitForFormValidation(this.eventValidation.editedEvent);
@@ -468,7 +468,7 @@ export const planningActionMixin = {
             .onOk(this.updateEvent)
             .onCancel(() => NotifyPositive('Modification annulée.'));
         } else {
-          await this.updateEvent();
+          await this.updateEvent(confirmationLabel);
         }
       } catch (e) {
         console.error(e);
@@ -478,7 +478,7 @@ export const planningActionMixin = {
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       }
     },
-    async updateEvent () {
+    async updateEvent (confirmationLabel) {
       try {
         this.eventValidation.editedEvent.$touch();
         const isValid = await this.waitForFormValidation(this.eventValidation.editedEvent);
@@ -496,7 +496,8 @@ export const planningActionMixin = {
 
         await this.refresh();
         this.editionModal = false;
-        NotifyPositive('Évènement modifié.');
+        const message = typeof confirmationLabel === 'string' ? confirmationLabel : 'Évènement modifié.';
+        NotifyPositive(message);
       } catch (e) {
         console.error(e);
         if (e.status === 409) {

@@ -12,16 +12,16 @@
         <ni-banner v-if="editedEvent.isCancelled" icon="info_outline">
           <template #message>Intervention annulée</template>
         </ni-banner>
-        <div class="modal-subtitle">
-          <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
+        <div class="row modal-subtitle">
+          <q-btn rounded unelevated color="primary" :label="eventTypeLabel" class="q-my-sm" />
           <div class="modal-subtitle">
             <ni-button v-if="canCancel && !editedEvent.isCancelled" label="Annuler l'intervention"
-              color="copper-grey-800" class="bg-copper-grey-100" @click="openEventCancellationModal()" />
-            <ni-button v-else-if="canCancel" label="Rétablir l'intervention" color="copper-grey-800"
-              class="bg-copper-grey-100" @click="openEventRestorationModal()" />
-            <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
+              color="copper-grey-800" class="bg-copper-grey-100 q-my-sm" @click="openEventCancellationModal()" />
+              <ni-button v-else-if="canCancel" label="Rétablir l'intervention" color="copper-grey-800"
+              class="bg-copper-grey-100 q-my-sm" @click="openEventRestorationModal()" />
+              <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
               flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
-              :disable="historiesLoading" />
+              :disable="historiesLoading" class="q-my-sm" />
           </div>
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
@@ -158,7 +158,15 @@ import Button from '@components/Button';
 import Banner from '@components/Banner';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES, TIME_STAMPING_ACTIONS } from '@data/constants';
+import {
+  INTERVENTION,
+  ABSENCE,
+  OTHER,
+  NEVER,
+  ABSENCE_TYPES,
+  TIME_STAMPING_ACTIONS,
+  REQUIRED_LABEL,
+} from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import { formatDateAndHours } from '@helpers/date';
 import moment from '@helpers/moment';
@@ -195,6 +203,7 @@ export default {
     return {
       // Data
       eventCancellationModal,
+      REQUIRED_LABEL,
       // Methods
       openEventCancellationModal,
       closeEventCancellationModal,
@@ -412,7 +421,7 @@ export default {
         { reason: this.editedEvent.cancel.reason, condition: this.editedEvent.cancel.condition }
       );
       this.closeEventCancellationModal();
-      this.$emit('submit');
+      this.$emit('submit', 'Intervention annulée.');
     },
     openEventRestorationModal () {
       this.$q.dialog({
