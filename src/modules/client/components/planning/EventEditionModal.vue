@@ -15,9 +15,9 @@
         <div class="row modal-subtitle">
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" class="q-my-sm" />
           <div class="modal-subtitle">
-            <ni-button v-if="canCancel && !editedEvent.isCancelled" label="Annuler l'intervention"
+            <ni-button v-if="canCancelOrRestore && !editedEvent.isCancelled" label="Annuler l'intervention"
               color="copper-grey-800" class="bg-copper-grey-100 q-my-sm" @click="openEventCancellationModal()" />
-              <ni-button v-else-if="canCancel" label="Rétablir l'intervention" color="copper-grey-800"
+              <ni-button v-else-if="canCancelOrRestore" label="Rétablir l'intervention" color="copper-grey-800"
               class="bg-copper-grey-100 q-my-sm" @click="openEventRestorationModal()" />
               <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
               flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
@@ -268,7 +268,7 @@ export default {
     isBilledIntervention () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
-    canCancel () {
+    canCancelOrRestore () {
       return this.editedEvent.type === INTERVENTION &&
         !this.editedEvent.shouldUpdateRepetition &&
         !this.isBilledIntervention &&
