@@ -423,6 +423,11 @@ export default {
       this.closeEventCancellationModal();
       this.$emit('submit', 'Intervention annulée.');
     },
+    async restoreEvent () {
+      await this.updateEvent('isCancelled', false);
+      await this.updateEvent('cancel', {});
+      this.$emit('submit');
+    },
     openEventRestorationModal () {
       this.$q.dialog({
         title: 'Confirmation',
@@ -431,11 +436,7 @@ export default {
           ${this.customerFullName} ?`,
         ok: 'Oui',
         cancel: 'Non',
-      }).onOk(async () => {
-        await this.updateEvent('isCancelled', false);
-        await this.updateEvent('cancel', {});
-        this.$emit('submit');
-      })
+      }).onOk(() => this.restoreEvent())
         .onCancel(() => NotifyPositive('Rétablissement annulé.'));
     },
   },
