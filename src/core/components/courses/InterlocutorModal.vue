@@ -1,7 +1,7 @@
 <template>
   <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
-        {{ label.action }} <span class="text-weight-bold">{{ label.interlocutor }}</span>
+        {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor }}</span>
     </template>
       <ni-select in-modal :model-value="interlocutor" @update:model-value="update" :caption="label.interlocutor"
         :options="interlocutorsOptions" required-field option-slot :error="validations.$error">
@@ -20,7 +20,7 @@
         </template>
       </ni-select>
       <template #footer>
-        <ni-button class="bg-primary full-width modal-btn" :label="`${label.action} ${label.interlocutor}`"
+        <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor}`"
           icon-right="add" color="white" :loading="loading" @click="submit" />
       </template>
     </ni-modal>
