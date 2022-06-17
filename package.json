@@ -32,7 +32,7 @@
     "moment-range": "^4.0.1",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "qs": "^6.10.5",
-    "quasar": "^2.7.1",
+    "quasar": "^2.4.9",
     "vue": "^3.2.37",
     "vue-advanced-cropper": "^2.8.1",
     "vue-analytics": "^5.22.1",
