@@ -166,6 +166,8 @@ import {
   ABSENCE_TYPES,
   TIME_STAMPING_ACTIONS,
   REQUIRED_LABEL,
+  RESTORE_EVENT,
+  CANCEL_EVENT,
 } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import { formatDateAndHours } from '@helpers/date';
@@ -421,13 +423,9 @@ export default {
         { reason: this.editedEvent.cancel.reason, condition: this.editedEvent.cancel.condition }
       );
       this.closeEventCancellationModal();
-      this.$emit('submit', 'Intervention annulée.');
+      this.$emit('submit', CANCEL_EVENT);
     },
-    async restoreEvent () {
-      await this.updateEvent('isCancelled', false);
-      await this.updateEvent('cancel', {});
-      this.$emit('submit', 'Intervention rétablie.');
-    },
+    restoreEvent () { this.$emit('submit', RESTORE_EVENT); },
     openEventRestorationModal () {
       this.$q.dialog({
         title: 'Confirmation',

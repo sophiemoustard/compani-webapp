@@ -144,6 +144,9 @@ export const EVENT_TYPES = [
   { label: 'Indispo', value: UNAVAILABILITY },
 ];
 
+export const CANCEL_EVENT = 'cancel_event';
+export const RESTORE_EVENT = 'restore_event';
+
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
