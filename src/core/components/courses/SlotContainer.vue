@@ -34,8 +34,8 @@
                     :class="getSlotClass(step)">
                     <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
                     <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                    <div v-else class="q-mr-md ellipsis link">
-                      <a class="redirection" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                    <div v-else class="q-mr-md ellipsis link-container">
+                      <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
                         {{ slot.meetingLink }}
                       </a>
                       {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
@@ -413,10 +413,10 @@ export default {
 .slots-container
    @media screen and (min-width: 767px)
     margin-left: 32px
-.redirection
+.link
   &:hover
     text-decoration: underline
     text-decoration-color: $primary
-.link
+.link-container
   max-width: 14em
 </style>
