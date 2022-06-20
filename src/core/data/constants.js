@@ -144,6 +144,9 @@ export const EVENT_TYPES = [
   { label: 'Indispo', value: UNAVAILABILITY },
 ];
 
+export const CANCEL_EVENT = 'cancel_event';
+export const RESTORE_EVENT = 'restore_event';
+
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
@@ -181,8 +184,8 @@ export const CANCELLATION_OPTIONS = [
 export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 export const CANCELLATION_REASONS = [
-  { label: 'Initiative du/de la client(e)', value: CUSTOMER_INITIATIVE },
-  { label: 'Initiative de l\'intervenant(e)', value: AUXILIARY_INITIATIVE },
+  { label: 'Client', value: CUSTOMER_INITIATIVE },
+  { label: 'Intervenant(e)', value: AUXILIARY_INITIATIVE },
 ];
 
 // INTERFACE

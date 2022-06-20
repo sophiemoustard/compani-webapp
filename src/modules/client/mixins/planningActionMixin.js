@@ -27,6 +27,7 @@ import {
 import { defineAbilitiesFor } from '@helpers/ability';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
+import { CANCEL_EVENT, RESTORE_EVENT } from '../../../core/data/constants';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
@@ -412,7 +413,7 @@ export const planningActionMixin = {
         await this.updateEvent();
       }
     },
-    async validateEventEdition () {
+    async validateEventEdition (updateType = '') {
       try {
         this.eventValidation.editedEvent.$touch();
         const isValid = await this.waitForFormValidation(this.eventValidation.editedEvent);
@@ -468,7 +469,7 @@ export const planningActionMixin = {
             .onOk(this.updateEvent)
             .onCancel(() => NotifyPositive('Modification annulée.'));
         } else {
-          await this.updateEvent();
+          await this.updateEvent(updateType);
         }
       } catch (e) {
         console.error(e);
@@ -478,14 +479,17 @@ export const planningActionMixin = {
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       }
     },
-    async updateEvent () {
+    async updateEvent (updateType) {
       try {
         this.eventValidation.editedEvent.$touch();
         const isValid = await this.waitForFormValidation(this.eventValidation.editedEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = this.getEditionPayload(this.editedEvent);
+        let payload;
+        if (updateType === RESTORE_EVENT) {
+          payload = this.getEditionPayload({ ...this.editedEvent, isCancelled: false, cancel: {} });
+        } else payload = this.getEditionPayload(this.editedEvent);
 
         if (!this.isEditionAllowed(payload, this.editedEvent.type)) {
           this.eventValidation.editedEvent.$reset();
@@ -496,7 +500,12 @@ export const planningActionMixin = {
 
         await this.refresh();
         this.editionModal = false;
-        NotifyPositive('Évènement modifié.');
+
+        switch (updateType) {
+          case RESTORE_EVENT: NotifyPositive('Intervention rétablie.'); break;
+          case CANCEL_EVENT: NotifyPositive('Intervention annulée.'); break;
+          default: NotifyPositive('Intervention modifiée.');
+        }
       } catch (e) {
         console.error(e);
         if (e.status === 409) {

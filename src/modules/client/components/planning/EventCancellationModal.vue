@@ -23,8 +23,7 @@
 import { ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { CANCELLATION_REASONS, CANCELLATION_OPTIONS } from '@data/constants';
-import moment from '@helpers/moment';
-import { formatHoursWithMinutes } from '@helpers/date';
+import { formatDateAndHours } from '@helpers/date';
 import { NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -71,11 +70,6 @@ export default {
     const updateCancellationReason = (value) => { emit('update-cancellation-reason', value); };
 
     const updateCancellationCondition = (value) => { emit('update-cancellation-condition', value); };
-
-    const formatDateAndHours = (startDate, endDate) => {
-      const date = moment(startDate).format('DD MMMM');
-      return `${date} (${formatHoursWithMinutes(startDate)} - ${formatHoursWithMinutes(endDate)})`;
-    };
 
     const cancelEvent = () => { emit('cancel-event'); };
 
