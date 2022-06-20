@@ -355,8 +355,8 @@ export default {
     documentUploaded (value) {
       this.$emit('document-uploaded', value);
     },
-    submit (value) {
-      this.$emit('submit', value);
+    submit () {
+      this.$emit('submit');
     },
     deleteEventRepetition (value) {
       this.$emit('delete-event-repetition', value);
@@ -426,7 +426,7 @@ export default {
     async restoreEvent () {
       await this.updateEvent('isCancelled', false);
       await this.updateEvent('cancel', {});
-      this.$emit('submit');
+      this.$emit('submit', 'Intervention rétablie.');
     },
     openEventRestorationModal () {
       this.$q.dialog({

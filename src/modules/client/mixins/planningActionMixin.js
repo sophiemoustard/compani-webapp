@@ -496,7 +496,7 @@ export const planningActionMixin = {
 
         await this.refresh();
         this.editionModal = false;
-        const message = typeof confirmationLabel === 'string' ? confirmationLabel : 'Évènement modifié.';
+        const message = confirmationLabel || 'Évènement modifié.';
         NotifyPositive(message);
       } catch (e) {
         console.error(e);
