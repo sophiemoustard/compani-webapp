@@ -153,7 +153,7 @@ import CourseBillValidationModal from 'src/modules/vendor/components/billing/Cou
 import CourseCreditNoteCreationModal from 'src/modules/vendor/components/billing/CourseCreditNoteCreationModal';
 
 export default {
-  name: 'ProfileBilling',
+  name: 'CourseBillingCard',
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-payer-edition-modal': PayerEditionModal,

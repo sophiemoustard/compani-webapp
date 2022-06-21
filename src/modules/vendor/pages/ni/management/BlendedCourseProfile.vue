@@ -15,7 +15,7 @@ import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
-import ProfileBilling from '@components/courses/ProfileBilling';
+import CourseBillingCard from '@components/courses/CourseBillingCard';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
@@ -56,7 +56,7 @@ export default {
         label: 'Facturation',
         name: 'billing',
         default: this.defaultTab === 'billing',
-        component: ProfileBilling,
+        component: CourseBillingCard,
       };
 
       const vendorRole = this.$store.getters['main/getVendorRole'];
