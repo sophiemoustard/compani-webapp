@@ -1,7 +1,8 @@
 <template>
   <div>
     <div v-for="company of companies" :key="company._id">
-      <ni-course-billing-card :company="company" />
+      <ni-course-billing-card :company="company" :course="course"
+      :payer-list="payerList" :billing-item-list="billingItemList" />
     </div>
   </div>
 </template>
@@ -104,6 +105,7 @@ export default {
       // Data
       payerList,
       billingItemList,
+      courseBills,
       // Computed
       course,
       companies,

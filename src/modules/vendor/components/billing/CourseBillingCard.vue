@@ -126,22 +126,18 @@
 </template>
 
 <script>
-import { useStore } from 'vuex';
 import { useMeta, useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatAndSortOptions, formatPrice } from '@helpers/utils';
+import { formatPrice } from '@helpers/utils';
 import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
-import Companies from '@api/Companies';
-import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
-import CourseBillingItems from '@api/CourseBillingItems';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
@@ -157,6 +153,9 @@ export default {
   name: 'CourseBillingCard',
   props: {
     company: { type: Object, default: () => ({}) },
+    course: { type: Object, default: () => ({}) },
+    payerList: { type: Array, default: () => ([]) },
+    billingItemList: { type: Array, default: () => ([]) },
   },
   components: {
     'ni-bill-creation-modal': BillCreationModal,
@@ -167,10 +166,9 @@ export default {
     'ni-course-credit-note-creation-modal': CourseCreditNoteCreationModal,
     'ni-button': Button,
   },
-  setup () {
+  setup (props) {
     const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
-    const $store = useStore();
     const $q = useQuasar();
 
     const billCreationLoading = ref(false);
@@ -181,9 +179,7 @@ export default {
     const creditNoteCreationLoading = ref(false);
     const billsLoading = ref(false);
     const pdfLoading = ref(false);
-    const payerList = ref([]);
     const courseBills = ref([]);
-    const billingItemList = ref([]);
     const billCreationModal = ref(false);
     const payerEditionModal = ref(false);
     const mainFeeEditionModal = ref(false);
@@ -201,7 +197,6 @@ export default {
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
     const minCourseCreditNoteDate = ref('');
-    const FUNDING_ORGANISATION = 'funding_organisation';
 
     const rules = computed(() => ({
       newBill: {
@@ -243,7 +238,7 @@ export default {
       newCreditNote,
     });
 
-    const course = computed(() => $store.state.course.course);
+    const { course, payerList, billingItemList } = toRefs(props);
 
     const newBillErrorMessages = computed(() => getBillErrorMessages('newBill.mainFee'));
 
@@ -270,24 +265,6 @@ export default {
       return { price, count };
     };
 
-    const refreshPayers = async () => {
-      try {
-        const organisations = await CourseFundingOrganisations.list();
-        const companies = await Companies.list();
-        const formattedOrganisationList = formatAndSortOptions(organisations, 'name');
-        const formattedCompanyList = formatAndSortOptions(companies, 'name');
-        payerList.value =
-          [
-            ...formattedOrganisationList.map(payer => ({ ...payer, type: FUNDING_ORGANISATION })),
-            ...formattedCompanyList.map(company => ({ ...company, type: COMPANY })),
-          ];
-      } catch (e) {
-        console.error(e);
-        payerList.value = [];
-        NotifyNegative('Erreur lors de la récupération des financeurs.');
-      }
-    };
-
     const refreshCourseBills = async () => {
       try {
         billsLoading.value = true;
@@ -296,20 +273,6 @@ export default {
         console.error(e);
         courseBills.value = [];
         NotifyNegative('Erreur lors de la récupération des factures.');
-      } finally {
-        billsLoading.value = false;
-      }
-    };
-
-    const refreshBillingItems = async () => {
-      try {
-        billsLoading.value = true;
-        const billingItems = await CourseBillingItems.list();
-        billingItemList.value = formatAndSortOptions([...billingItems], 'name');
-      } catch (e) {
-        console.error(e);
-        billingItemList.value = [];
-        NotifyNegative('Erreur lors de la récupération des articles de facturation.');
       } finally {
         billsLoading.value = false;
       }
@@ -635,8 +598,6 @@ export default {
 
     const created = async () => {
       refreshCourseBills();
-      refreshPayers();
-      refreshBillingItems();
     };
 
     created();
@@ -661,11 +622,9 @@ export default {
       newBill,
       newBillingPurchase,
       editedBillingPurchase,
-      billingItemList,
       editedBill,
       newCreditNote,
       billToValidate,
-      payerList,
       courseBills,
       courseFeeEditionModalMetaInfo,
       areDetailsVisible,
@@ -674,14 +633,12 @@ export default {
       INTRA,
       // Computed
       validations,
-      course,
       newBillErrorMessages,
       mainFeeErrorMessages,
       newBillingPurchaseErrorMessages,
       editedBillingPurchaseErrorMessages,
       canAddBill,
       // Methods
-      refreshPayers,
       resetBillCreationModal,
       resetEditedBill,
       resetMainFeeEditionModal,
@@ -707,7 +664,6 @@ export default {
       openCourseBillValidationModal,
       validatePurchaseDeletion,
       refreshCourseBills,
-      refreshBillingItems,
       isDateVisible,
       isPayerVisible,
       showDetails,
