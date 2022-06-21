@@ -1,3 +1,4 @@
+const moment = require('../../../../../src/core/helpers/moment');
 const { PLANNING } = require('../../../../../src/core/data/constants');
 
 describe('Auxiliary agenda - display', () => {
@@ -12,19 +13,22 @@ describe('Auxiliary agenda - display', () => {
     cy.get('[data-cy=agenda-event]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
 
+    const utcOffset = moment().utcOffset();
+    cy.log(utcOffset);
+
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
-    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '10:00');
-    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', `${10 + utcOffset / 60 - 2}:00`);
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', `${12 + utcOffset / 60 - 2}:30`);
 
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().minus({ weeks: 1 }).weekNumber);
     cy.get('.event-intervention').should('have.length', 2);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
-    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '11:15');
-    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', `${11 + utcOffset / 60 - 2}:15`);
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', `${12 + utcOffset / 60 - 2}:30`);
     cy.get('[data-cy=event-title]').eq(1).should('contain', 'R.BARDET');
-    cy.get('[data-cy=event-start-hour]').eq(1).should('contain', '18:15');
-    cy.get('[data-cy=event-end-hour]').eq(1).should('contain', '20:30');
+    cy.get('[data-cy=event-start-hour]').eq(1).should('contain', `${18 + utcOffset / 60 - 2}:15`);
+    cy.get('[data-cy=event-end-hour]').eq(1).should('contain', `${20 + utcOffset / 60 - 2}:30`);
 
     cy.get('[data-cy=agenda-search]').eq(1).click();
     cy.get('[data-cy=agenda-search]').eq(1).type('Customer referent{downarrow}{enter}');
