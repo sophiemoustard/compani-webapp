@@ -2,7 +2,8 @@
   <div>
     <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
       <div v-if="courseBills.length">
-        <p class="text-weight-bold">Infos de facturation</p>
+        <p v-if="course.type === INTRA" class="text-weight-bold">Infos de facturation</p>
+        <p v-else class="text-weight-bold">{{ company.name }}</p>
         <q-card v-for="bill of courseBills" :key="bill._id" flat class="q-mb-md">
           <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
             <q-item-section>
@@ -144,7 +145,7 @@ import CourseBillingItems from '@api/CourseBillingItems';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import { REQUIRED_LABEL, LIST, COMPANY } from '@data/constants';
+import { REQUIRED_LABEL, LIST, COMPANY, INTRA } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import PayerEditionModal from 'src/modules/vendor/components/billing/PayerEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
@@ -154,6 +155,9 @@ import CourseCreditNoteCreationModal from 'src/modules/vendor/components/billing
 
 export default {
   name: 'CourseBillingCard',
+  props: {
+    company: { type: Object, default: () => ({}) },
+  },
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-payer-edition-modal': PayerEditionModal,
@@ -667,6 +671,7 @@ export default {
       areDetailsVisible,
       minCourseCreditNoteDate,
       creditNoteMetaInfo,
+      INTRA,
       // Computed
       validations,
       course,
