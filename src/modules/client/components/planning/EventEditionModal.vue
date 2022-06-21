@@ -9,11 +9,20 @@
         <ni-planning-modal-header v-else :model-value="editedEvent.auxiliary" :selected-person="selectedAuxiliary"
           @update:model-value="updateEvent('auxiliary', $event)" :options="auxiliariesOptions" @close="close"
           :disable="!canUpdateAuxiliary || historiesLoading" />
-        <div class="modal-subtitle">
-          <q-btn rounded unelevated color="primary" :label="eventTypeLabel" />
-          <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
-            color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
-            :disable="historiesLoading" />
+        <ni-banner v-if="editedEvent.isCancelled" icon="info_outline">
+          <template #message>Intervention annulée</template>
+        </ni-banner>
+        <div class="row modal-subtitle">
+          <q-btn rounded unelevated color="primary" :label="eventTypeLabel" class="q-my-sm" />
+          <div class="modal-subtitle">
+            <ni-button v-if="canCancelOrRestore && !editedEvent.isCancelled" label="Annuler l'intervention"
+              color="copper-grey-800" class="bg-copper-grey-100 q-my-sm" @click="openEventCancellationModal()" />
+              <ni-button v-else-if="canCancelOrRestore" label="Rétablir l'intervention" color="copper-grey-800"
+              class="bg-copper-grey-100 q-my-sm" @click="openEventRestorationModal()" />
+              <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
+              flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
+              :disable="historiesLoading" class="q-my-sm" />
+          </div>
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
@@ -74,19 +83,15 @@
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="isMiscRequired"
           @update:model-value="updateEvent('misc', $event)" />
-        <div v-if="canCancel" class="row q-mb-md light-checkbox">
-          <q-checkbox :model-value="editedEvent.isCancelled" label="Annuler l'évènement" :disable="historiesLoading"
-            @update:model-value="toggleCancellationForm($event)" dense />
-        </div>
-        <div v-if="editedEvent.isCancelled" class="row justify-between">
-          <ni-select in-modal :model-value="editedEvent.cancel.condition" caption="Conditions d'annulation"
-            :options="cancellationConditions" @blur="validations.cancel.condition.$touch" required-field
-            :error="validations.cancel.condition.$error" @update:model-value="updateEvent('cancel.condition', $event)"
-            :disable="!canCancel || historiesLoading" />
-          <ni-select in-modal :model-value="editedEvent.cancel.reason" caption="Motif d'annulation"
-            :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
-            :error="validations.cancel.reason.$error" @update:model-value="updateEvent('cancel.reason', $event)"
-            :disable="!canCancel || historiesLoading" />
+        <div v-if="editedEvent.isCancelled" class="justify-between">
+          <ni-option-group :model-value="editedEvent.cancel.reason" :error-message="REQUIRED_LABEL" required-field
+            :options="cancellationReasons" :error="validations.cancel.reason.$error" type="radio"
+            caption="Qui est a l’origine de l’annulation ?"
+            @update:model-value="updateEvent('cancel.reason', $event)" />
+          <ni-option-group :model-value="editedEvent.cancel.condition" :error-message="REQUIRED_LABEL" required-field
+            :options="cancellationConditions" :error="validations.cancel.condition.$error" type="radio"
+            caption="Quelles sont les conditions d’annulation ?"
+            @update:model-value="updateEvent('cancel.condition', $event)" />
         </div>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-input in-modal caption="Déplacement véhiculé avec bénéficiaire" :model-value="editedEvent.kmDuringEvent"
@@ -130,25 +135,47 @@
         label="Editer l'évènement" @click="submit" icon-right="check" data-cy="event-edition-button"
         :disable="historiesLoading" />
     </div>
+
     <ni-history-cancellation-modal v-model="historyCancellationModal" @hide="resetHistoryCancellationModal"
       @cancel-time-stamping="cancelTimeStamping" :start="isStartCancellation"
       :validations="v$.timeStampCancellationReason" v-model:reason="timeStampCancellationReason" />
+
+    <ni-event-cancellation-modal v-model="eventCancellationModal" :edited-event="editedEvent"
+      :customer-name="customerFullName" @update-event-misc="updateEvent('misc', $event)" :validations="v$.editedEvent"
+      @update-cancellation-reason="updateEvent('cancel.reason', $event)" @cancel-event="cancelEvent"
+      @hide="closeEventCancellationModal" @update-cancellation-condition="updateEvent('cancel.condition', $event)" />
   </q-dialog>
 </template>
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
+import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import EventHistories from '@api/EventHistories';
 import Button from '@components/Button';
+import Banner from '@components/Banner';
+import OptionGroup from '@components/form/OptionGroup';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES, TIME_STAMPING_ACTIONS } from '@data/constants';
+import {
+  INTERVENTION,
+  ABSENCE,
+  OTHER,
+  NEVER,
+  ABSENCE_TYPES,
+  TIME_STAMPING_ACTIONS,
+  REQUIRED_LABEL,
+  RESTORE_EVENT,
+  CANCEL_EVENT,
+} from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
+import { formatDateAndHours } from '@helpers/date';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
 import NiHistoryCancellationModal from './HistoryCancellationModal';
+import NiEventCancellationModal from './EventCancellationModal';
 
 export default {
   name: 'EventEditionModal',
@@ -166,12 +193,34 @@ export default {
     historiesLoading: { type: Boolean, default: false },
   },
   setup () {
-    return { v$: useVuelidate() };
+    const eventCancellationModal = ref(false);
+    const v$ = useVuelidate();
+
+    const openEventCancellationModal = () => { eventCancellationModal.value = true; };
+
+    const closeEventCancellationModal = () => {
+      eventCancellationModal.value = false;
+      v$.value.editedEvent.$reset();
+    };
+    return {
+      // Data
+      eventCancellationModal,
+      REQUIRED_LABEL,
+      // Methods
+      openEventCancellationModal,
+      closeEventCancellationModal,
+      set,
+      // Validations
+      v$,
+    };
   },
   components: {
     'ni-button': Button,
     'ni-event-history': NiEventHistory,
     'ni-history-cancellation-modal': NiHistoryCancellationModal,
+    'ni-event-cancellation-modal': NiEventCancellationModal,
+    'ni-banner': Banner,
+    'ni-option-group': OptionGroup,
   },
   emits: [
     'refresh-histories',
@@ -197,6 +246,7 @@ export default {
   validations () {
     return {
       timeStampCancellationReason: { required },
+      editedEvent: { misc: { required }, cancel: { condition: { required }, reason: { required } } },
     };
   },
   computed: {
@@ -220,7 +270,7 @@ export default {
     isBilledIntervention () {
       return this.editedEvent.type === INTERVENTION && this.editedEvent.isBilled;
     },
-    canCancel () {
+    canCancelOrRestore () {
       return this.editedEvent.type === INTERVENTION &&
         !this.editedEvent.shouldUpdateRepetition &&
         !this.isBilledIntervention &&
@@ -244,6 +294,10 @@ export default {
     },
     customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
+    },
+    customerFullName () {
+      return `${get(this.selectedCustomer, 'identity.firstname')} ${get(this.selectedCustomer, 'identity.lastname')}` ||
+        '';
     },
     startDateTimeStamped () {
       return this.eventHistories
@@ -282,16 +336,6 @@ export default {
     updateEvent (path, value) {
       this.$emit('update-event', { path, value });
     },
-    toggleCancellationForm (value) {
-      if (!value) {
-        this.updateEvent('cancel', {});
-        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
-      } else {
-        this.updateEvent('isCancelled', !this.editedEvent.isCancelled);
-        this.validations.misc.$touch();
-        this.validations.cancel.$touch();
-      }
-    },
     toggleRepetition () {
       this.updateEvent('cancel', {});
       this.updateEvent('isCancelled', false);
@@ -313,8 +357,8 @@ export default {
     documentUploaded (value) {
       this.$emit('document-uploaded', value);
     },
-    submit (value) {
-      this.$emit('submit', value);
+    submit () {
+      this.$emit('submit');
     },
     deleteEventRepetition (value) {
       this.$emit('delete-event-repetition', value);
@@ -371,6 +415,27 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'annulation de l\'horodatage.');
       }
+    },
+    cancelEvent () {
+      this.updateEvent('isCancelled', true);
+      this.updateEvent(
+        'cancel',
+        { reason: this.editedEvent.cancel.reason, condition: this.editedEvent.cancel.condition }
+      );
+      this.closeEventCancellationModal();
+      this.$emit('submit', CANCEL_EVENT);
+    },
+    restoreEvent () { this.$emit('submit', RESTORE_EVENT); },
+    openEventRestorationModal () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: `Êtes vous sûr(e) de vouloir rétablir l’intervention du
+          ${formatDateAndHours(this.editedEvent.dates.startDate, this.editedEvent.dates.endDate)} chez
+          ${this.customerFullName} ?`,
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(() => this.restoreEvent())
+        .onCancel(() => NotifyPositive('Rétablissement annulé.'));
     },
   },
 };

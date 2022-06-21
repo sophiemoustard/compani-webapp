@@ -144,6 +144,9 @@ export const EVENT_TYPES = [
   { label: 'Indispo', value: UNAVAILABILITY },
 ];
 
+export const CANCEL_EVENT = 'cancel_event';
+export const RESTORE_EVENT = 'restore_event';
+
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
@@ -172,7 +175,7 @@ export const INVOICED_AND_PAID = 'invoiced_and_paid';
 export const INVOICED_AND_NOT_PAID = 'invoiced_and_not_paid';
 export const NOT_INVOICED_AND_NOT_PAID = 'not_invoiced_and_not_paid';
 export const CANCELLATION_OPTIONS = [
-  { label: 'Facturée & payée', value: INVOICED_AND_PAID },
+  { label: 'Facturée au client & payée à l\'auxiliaire', value: INVOICED_AND_PAID },
   { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAID },
   { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAID },
 ];
@@ -181,8 +184,8 @@ export const CANCELLATION_OPTIONS = [
 export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 export const CANCELLATION_REASONS = [
-  { label: 'Initiative du/de la client(e)', value: CUSTOMER_INITIATIVE },
-  { label: 'Initiative de l\'intervenant(e)', value: AUXILIARY_INITIATIVE },
+  { label: 'Client', value: CUSTOMER_INITIATIVE },
+  { label: 'Intervenant(e)', value: AUXILIARY_INITIATIVE },
 ];
 
 // INTERFACE
@@ -197,6 +200,12 @@ export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planning_referent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
+
+// ROLES VENDOR
+export const VENDOR_ADMIN = 'vendor_admin';
+export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
+export const TRAINER = 'trainer';
+
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 export const ROLE_TRANSLATION = {
@@ -210,11 +219,6 @@ export const ROLE_TRANSLATION = {
   [TRAINING_ORGANISATION_MANAGER]: 'Responsable Formation',
   [TRAINER]: 'Formateur(rice)',
 };
-
-// ROLES VENDOR
-export const VENDOR_ADMIN = 'vendor_admin';
-export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
-export const TRAINER = 'trainer';
 
 // ROLE TRANSLATION
 export const ROLES_TRANSLATION = {
@@ -499,10 +503,12 @@ export const EXPORT_HISTORY_TYPES = [
 ];
 export const COURSE = 'course';
 export const COURSE_SLOT = 'course_slot';
+export const COURSE_BILL = 'course_bill';
 export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Formations', value: COURSE },
   { label: 'Créneaux', value: COURSE_SLOT },
   { label: 'Questionnaires de satisfaction', value: END_OF_COURSE },
+  { label: 'Factures et avoirs', value: COURSE_BILL },
 ];
 
 // PARTNER

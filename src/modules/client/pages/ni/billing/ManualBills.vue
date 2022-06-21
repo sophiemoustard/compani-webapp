@@ -29,14 +29,15 @@
 
     <ni-manual-bill-creation-modal v-model="manualBillCreationModal" :validations="v$.newManualBill"
       :loading="modalLoading" v-model:new-manual-bill="newManualBill" :customers-options="customersOptions"
-      :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="createManualBill"
+      :billing-items-options="billingItemsOptions" @hide="resetManualBillCreationModal" @submit="validateBillCreation"
       :billing-items="billingItems" @add-billing-item="addBillingItem" @update-billing-item="updateBillingItem"
       @remove-billing-item="removeBillingItem" />
   </q-page>
 </template>
 
 <script>
-import { useMeta } from 'quasar';
+import { useMeta, useQuasar } from 'quasar';
+import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
@@ -62,27 +63,100 @@ export default {
     'ni-simple-table': SimpleTable,
   },
   setup () {
+    const modalLoading = ref(false);
+    const tableLoading = ref(false);
+    const manualBills = ref([]);
+    const manualBillCreationModal = ref(false);
+    const newManualBill = ref({
+      date: '',
+      customer: '',
+      billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
+      netInclTaxes: 0,
+      shouldBeSent: false,
+    });
     const metaInfo = { title: 'Factures manuelles' };
+
     useMeta(metaInfo);
 
-    return { v$: useVuelidate() };
+    const $q = useQuasar();
+
+    const v$ = useVuelidate();
+
+    const getManualBills = async () => {
+      try {
+        tableLoading.value = true;
+
+        manualBills.value = Object.freeze(await Bills.list({ type: MANUAL }));
+      } catch (e) {
+        manualBills.value = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des factures manuelles.');
+      } finally {
+        tableLoading.value = false;
+      }
+    };
+
+    const formatCreationPayload = shouldBeSent => ({
+      ...pick(newManualBill.value, ['customer', 'date']),
+      shouldBeSent: !!shouldBeSent[0],
+      billingItemList: newManualBill.value.billingItemList.map(bi => omit(bi, 'vat')),
+    });
+
+    const createManualBill = async (shouldBeSent) => {
+      try {
+        v$.value.newManualBill.$touch();
+        if (v$.value.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        modalLoading.value = true;
+
+        await Bills.create(formatCreationPayload(shouldBeSent));
+
+        await getManualBills();
+        manualBillCreationModal.value = false;
+        NotifyPositive('Facture créée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la facture.');
+      } finally {
+        modalLoading.value = false;
+      }
+    };
+
+    const validateBillCreation = () => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
+        ok: 'Oui',
+        cancel: 'Non',
+        options: {
+          type: 'checkbox',
+          model: [true],
+          items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
+        },
+      }).onOk(createManualBill)
+        .onCancel(() => NotifyPositive('Facturation annulée.'));
+    };
+
+    return {
+      // Data
+      modalLoading,
+      tableLoading,
+      manualBills,
+      manualBillCreationModal,
+      newManualBill,
+      // Methods
+      getManualBills,
+      validateBillCreation,
+      // Validations
+      v$,
+    };
   },
   data () {
     return {
       rowsPerPage: [1, 5, 15, 50, 100, 200, 300],
-      manualBillCreationModal: false,
-      modalLoading: false,
-      newManualBill: {
-        date: '',
-        customer: '',
-        billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
-        netInclTaxes: 0,
-      },
       customers: [],
       billingItems: [],
-      manualBills: [],
       pagination: { rowsPerPage: 0, sortBy: 'date', descending: true },
-      tableLoading: false,
       columns: [
         { name: 'number', label: '#', align: 'left', field: 'number' },
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
@@ -135,19 +209,6 @@ export default {
   },
   methods: {
     formatPrice,
-    async getManualBills () {
-      try {
-        this.tableLoading = true;
-
-        this.manualBills = Object.freeze(await Bills.list({ type: MANUAL }));
-      } catch (e) {
-        this.manualBills = [];
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des factures manuelles');
-      } finally {
-        this.tableLoading = false;
-      }
-    },
     async refresh () {
       try {
         this.modalLoading = true;
@@ -180,31 +241,6 @@ export default {
         billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
       this.v$.newManualBill.$reset();
-    },
-    formatCreationPayload () {
-      return {
-        ...pick(this.newManualBill, ['customer', 'date']),
-        billingItemList: this.newManualBill.billingItemList.map(bi => omit(bi, 'vat')),
-      };
-    },
-    async createManualBill () {
-      try {
-        this.v$.newManualBill.$touch();
-        if (this.v$.newManualBill.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.modalLoading = true;
-
-        await Bills.create(this.formatCreationPayload());
-
-        await this.getManualBills();
-        this.manualBillCreationModal = false;
-        NotifyPositive('Facture créée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création de la facture.');
-      } finally {
-        this.modalLoading = false;
-      }
     },
   },
 };

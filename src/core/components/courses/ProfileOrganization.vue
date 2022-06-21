@@ -13,13 +13,16 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
-          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id"
-            @blur="updateCourse('salesRepresentative')" caption="Référent(e) Compani" :disable="!isAdmin || isArchived"
-            :options="salesRepresentativeOptions" @focus="saveTmp('salesRepresentative')"
-            :error="v$.course.salesRepresentative._id.$error" />
-          <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
-            caption="Intervenant(e)" :options="trainerOptions" :error="v$.course.trainer._id.$error"
-            @blur="updateCourse('trainer')" :disable="isArchived" />
+        </div>
+        <p class="text-weight-bold table-title">Interlocuteurs</p>
+        <div class="interlocutor-container">
+          <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
+            :open-edition-modal="openSalesRepresentativeModal" :disable="isArchived" />
+          <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
+            :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
+          <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
+            label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
+            @click="() => openTrainerModal('Ajouter un(e) ')" />
         </div>
       </div>
     </div>
@@ -85,6 +88,15 @@
 
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
       :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
+
+    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutorId"
+      @submit="updateSalesRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
+      @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
+      :interlocutors-options="salesRepresentativeOptions" />
+
+    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutorId" @submit="updateTrainer"
+      :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading" @hide="resetTrainer"
+      :label="trainerLabel" :interlocutors-options="trainerOptions" />
   </div>
 </template>
 
@@ -93,6 +105,7 @@ import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import uniqBy from 'lodash/uniqBy';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
@@ -109,6 +122,8 @@ import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
+import InterlocutorCell from '@components/courses/InterlocutorCell';
+import InterlocutorModal from '@components/courses/InterlocutorModal';
 import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
@@ -121,7 +136,9 @@ import {
   COACH,
   CLIENT_ADMIN,
   INTRA,
+  DEFAULT_AVATAR,
 } from '@data/constants';
+import { defineAbilitiesFor } from '@helpers/ability';
 import { formatAndSortIdentityOptions, formatQuantity, formatIdentity } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
@@ -149,6 +166,8 @@ export default {
     'sms-details-modal': SmsDetailsModal,
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
+    'interlocutor-cell': InterlocutorCell,
+    'interlocutor-modal': InterlocutorModal,
   },
   setup () {
     return { v$: useVuelidate() };
@@ -189,15 +208,18 @@ export default {
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
       contactOptions: [],
+      tempInterlocutorId: '',
+      salesRepresentativeLabel: { action: 'Modifier le ', interlocutor: 'référent Compani' },
+      salesRepresentativeEditionModal: false,
+      interlocutorModalLoading: false,
+      trainerLabel: { action: '', interlocutor: '' },
+      trainerModal: false,
     };
   },
   validations () {
     return {
-      course: {
-        trainer: { _id: { required }, identity: { required } },
-        salesRepresentative: { _id: { required }, identity: { required } },
-        contact: { contact: { phone: { required } } },
-      },
+      tempInterlocutorId: { required },
+      course: { contact: { contact: { phone: { required } } } },
       newSms: { content: { required }, type: { required } },
     };
   },
@@ -209,6 +231,7 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    ...mapState('main', ['loggedUser']),
     isTrainer () {
       return this.vendorRole === TRAINER;
     },
@@ -269,6 +292,11 @@ export default {
     isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
     },
+    canUpdateTrainer () {
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role']));
+
+      return ability.can('update', 'interlocutor');
+    },
   },
   async created () {
     const promises = [this.refreshCourse()];
@@ -277,7 +305,9 @@ export default {
     this.setDefaultMessageType();
 
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
-    else this.salesRepresentativeOptions = formatAndSortIdentityOptions([this.course.salesRepresentative]);
+    else {
+      this.salesRepresentativeOptions = [this.formatInterlocutorOption(this.course.salesRepresentative)];
+    }
   },
   methods: {
     get,
@@ -328,14 +358,27 @@ export default {
         this.courseLoading = false;
       }
     },
+    formatInterlocutorOption (interlocutor) {
+      return {
+        value: interlocutor._id,
+        label: formatIdentity(interlocutor.identity, 'FL'),
+        email: interlocutor.local.email || '',
+        picture: get(interlocutor, 'picture.link') || DEFAULT_AVATAR,
+        additionalFilters: [interlocutor.local.email],
+      };
+    },
+
     async refreshTrainersAndSalesRepresentatives () {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
-
+        this.trainerOptions = Object.freeze(
+          vendorUsers.map(vu => this.formatInterlocutorOption(vu)).sort((a, b) => a.label.localeCompare(b.label))
+        );
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-        this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
+        this.salesRepresentativeOptions = salesRepresentatives
+          .map(sr => this.formatInterlocutorOption(sr))
+          .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         this.trainerOptions = [];
@@ -465,6 +508,58 @@ export default {
         this.pdfLoading = false;
       }
     },
+    async updateSalesRepresentative () {
+      try {
+        this.interlocutorModalLoading = true;
+        this.v$.tempInterlocutorId.$touch();
+        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Courses.update(this.profileId, { salesRepresentative: this.tempInterlocutorId });
+        this.salesRepresentativeEditionModal = false;
+        await this.refreshCourse();
+        NotifyPositive('Référent Compani mis à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition du référent Compani.');
+      } finally {
+        this.interlocutorModalLoading = false;
+      }
+    },
+    async updateTrainer () {
+      try {
+        this.interlocutorModalLoading = true;
+        this.v$.tempInterlocutorId.$touch();
+        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Courses.update(this.profileId, { trainer: this.tempInterlocutorId });
+        this.trainerModal = false;
+        await this.refreshCourse();
+        NotifyPositive('Intervenant(e) mis(e) à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition de l\'intervenant(e).');
+      } finally {
+        this.interlocutorModalLoading = false;
+      }
+    },
+    resetSalesRepresentativeEdition () {
+      this.tempInterlocutorId = '';
+      this.v$.tempInterlocutorId.$reset();
+    },
+    openSalesRepresentativeModal () {
+      this.tempInterlocutorId = this.course.salesRepresentative._id;
+      this.salesRepresentativeEditionModal = true;
+    },
+    resetTrainer () {
+      this.tempInterlocutorId = '';
+      this.trainerLabel = { action: '', interlocutor: '' };
+      this.v$.tempInterlocutorId.$reset();
+    },
+    openTrainerModal (action) {
+      this.tempInterlocutorId = this.course.trainer._id;
+      this.trainerLabel = { action, interlocutor: 'intervenant(e)' };
+      this.trainerModal = true;
+    },
   },
 };
 </script>
@@ -473,7 +568,14 @@ export default {
 .profile-container
   display: flex
   flex-direction: column
-
 .button-history
   align-self: flex-end
+.interlocutor-container
+  flex-direction: row
+  grid-auto-flow: row
+  display: grid
+  grid-template-columns: repeat(2, 1fr)
+.add-trainer
+  justify-self: start
+  align-self: end
 </style>

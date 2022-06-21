@@ -34,8 +34,8 @@
                     :class="getSlotClass(step)">
                     <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
                     <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                    <div v-else class="q-mr-md">
-                      <a class="ellipsis" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                    <div v-else class="q-mr-md ellipsis link-container">
+                      <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
                         {{ slot.meetingLink }}
                       </a>
                       {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
@@ -374,32 +374,26 @@ export default {
     font-size: 16px
     @media screen and (max-width: 767px)
       font-size: 13px
-
 .type
   background-color: $copper-grey-100
   border-radius: 15px
   padding: 2px 6px
   width: fit-content
-
 .planned
   background-color: $copper-100
   border-radius: 15px
   padding-bottom: 16px
-
 .to-plan
   background-color: $orange-100
   border-radius: 15px
   padding-bottom: 16px
-
 .to-plan-header
   background-color: $orange-200
   padding: 8px 16px
   border-radius: 15px 15px 0px 0px
   color: $orange-900
-
 .to-plan-slot
   width: fit-content
-
 .index
   background-color: $copper-500
   border-radius: 50%
@@ -413,12 +407,16 @@ export default {
 .hover-orange
   &:hover
     background-color: rgba(192, 86, 33, 0.1)
-
 .hover-blue
   &:hover
     background-color: rgba(69, 165, 173, 0.1)
-
 .slots-container
    @media screen and (min-width: 767px)
     margin-left: 32px
+.link
+  &:hover
+    text-decoration: underline
+    text-decoration-color: $primary
+.link-container
+  max-width: 14em
 </style>

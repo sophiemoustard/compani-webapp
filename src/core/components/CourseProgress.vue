@@ -9,7 +9,7 @@
 import { roundFrenchPercentage } from '@helpers/utils';
 
 export default {
-  name: 'Progress',
+  name: 'NiProgress',
   props: {
     value: { type: Number, default: 0 },
   },
