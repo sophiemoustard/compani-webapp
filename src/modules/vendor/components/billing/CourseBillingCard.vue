@@ -89,7 +89,7 @@
     </div>
     <div v-else class="row justify-center q-mt-md"><q-spinner size="30px" /></div>
 
-    <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill"
+    <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course="course" :company="company"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
 
