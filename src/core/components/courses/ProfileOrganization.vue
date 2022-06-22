@@ -1,29 +1,21 @@
 <template>
   <div v-if="course">
-    <div class="q-mb-xl">
-      <div v-if="isClientInterface && isCourseInter" class="q-mb-lg">
-        <p class="text-weight-bold">Informations pratiques</p>
-        <ni-banner v-if="followUpDisabled">
-          <template #message>{{ missingInfoMsg }}</template>
-        </ni-banner>
-        <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
+    <div class="profile-container q-mb-xl">
+      <ni-bi-color-button v-if="isIntraOrVendor" class="button-history" icon="history" label="Historique"
+        @click="toggleHistory" />
+      <div v-if="isIntraOrVendor" class="row gutter-profile">
+        <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
+          @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
       </div>
-      <div v-else class="profile-container">
-        <ni-bi-color-button class="button-history" icon="history" label="Historique" @click="toggleHistory" />
-        <div class="row gutter-profile">
-          <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
-            @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
-        </div>
-        <p class="text-weight-bold table-title">Interlocuteurs</p>
-        <div class="interlocutor-container">
-          <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
-            :open-edition-modal="openSalesRepresentativeModal" :disable="isArchived" />
-          <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
-            :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
-          <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
-            label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
-            @click="() => openTrainerModal('Ajouter un(e) ')" />
-        </div>
+      <p class="text-weight-bold table-title">Interlocuteurs</p>
+      <div class="interlocutor-container">
+        <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
+          :open-edition-modal="openSalesRepresentativeModal" :disable="isArchived" />
+        <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
+          :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
+        <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
+          label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
+          @click="() => openTrainerModal('Ajouter un(e) ')" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
@@ -72,21 +64,21 @@
         <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
           label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
       </div>
-      <div class="q-mb-xl">
-        <p class="text-weight-bold">Documents utiles</p>
-        <div class="q-mb-sm">
-          <ni-banner v-if="followUpDisabled">
-            <template #message>
-              Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
-              pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
-            </template>
-          </ni-banner>
-          <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
-        </div>
-        <div v-if="isIntraOrVendor">
-          <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
-            :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
-        </div>
+    </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Documents utiles</p>
+      <div class="q-mb-sm">
+        <ni-banner v-if="followUpDisabled">
+          <template #message>
+            Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
+            pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
+          </template>
+        </ni-banner>
+        <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
+      </div>
+      <div v-if="isIntraOrVendor">
+        <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
+          :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
 
