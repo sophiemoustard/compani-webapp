@@ -26,6 +26,7 @@ const coachRoutes = [
   { name: 'ni customers partner organizations info', subscription: ERP },
   { name: 'ni planning auxiliaries', subscription: ERP },
   { name: 'ni planning customers', subscription: ERP },
+  { name: 'ni planning repetitions', subscription: ERP },
   { name: 'account client' },
   { name: 'ni courses' },
   { name: 'ni courses dashboard' },
@@ -73,7 +74,10 @@ const auxiliaryWithoutCompanyRoutes = [
   { name: 'auxiliaries contracts', subscription: ERP },
   { name: 'account client' },
 ];
-const planningReferentRoutes = [...auxiliaryRoutes];
+const planningReferentRoutes = [
+  ...auxiliaryRoutes,
+  { name: 'ni planning repetitions', subscription: ERP },
+];
 const helperRoutes = [
   { name: 'customers agenda', subscription: ERP },
   { name: 'customers contact', subscription: ERP },
