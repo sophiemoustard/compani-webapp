@@ -45,15 +45,6 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <ni-banner v-if="followUpDisabled">
-          <template #message>
-            Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
-            pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
-          </template>
-        </ni-banner>
-        <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
-      </div>
-      <div class="q-mb-xl">
         <p class="text-weight-bold">Envoi de SMS</p>
         <p>Historique d'envoi </p>
         <ni-responsive-table :data="smsSent" :columns="smsSentColumns" v-model:pagination="pagination" class="q-mb-md"
@@ -80,6 +71,22 @@
         </ni-banner>
         <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
           label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
+      </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Documents utiles</p>
+        <div class="q-mb-sm">
+          <ni-banner v-if="followUpDisabled">
+            <template #message>
+              Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
+              pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
+            </template>
+          </ni-banner>
+          <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
+        </div>
+        <div v-if="isIntraOrVendor">
+          <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
+            :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
+        </div>
       </div>
     </div>
 

@@ -4,8 +4,9 @@ import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
 import moment from '@helpers/moment';
+import { downloadFile } from '@helpers/file';
 
 export const courseMixin = {
   data () {
@@ -118,6 +119,22 @@ export const courseMixin = {
     getStepTypeLabel (value) {
       const type = STEP_TYPES.find(t => t.value === value);
       return type ? type.label : '';
+    },
+    async downloadAttendanceSheet () {
+      if (this.disableDocDownload) return;
+
+      try {
+        this.pdfLoading = true;
+        const pdf = await Courses.downloadAttendanceSheet(this.course._id);
+        downloadFile(pdf, 'emargement.pdf', 'application/octet-stream');
+      } catch (e) {
+        console.error(e);
+        const decodedRep = readAPIResponseWithTypeArrayBuffer(e);
+        if (decodedRep.statusCode === 404 && decodedRep.message) return NotifyNegative(decodedRep.message);
+        NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
+      } finally {
+        this.pdfLoading = false;
+      }
     },
   },
 };
