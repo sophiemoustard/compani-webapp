@@ -42,25 +42,25 @@ export default {
     'ni-date-input': DateInput,
   },
   emits: ['hide', 'update:model-value', 'submit', 'cancel', 'update:bill-to-validate'],
-  data () {
-    return { INTER_B2B };
-  },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    cancel () {
-      this.$emit('cancel');
-    },
-    update (event, path) {
-      this.$emit('update:bill-to-validate', set({ ...this.billToValidate }, path, event));
-    },
+  setup (props, { emit }) {
+    const hide = () => { emit('hide'); };
+    const input = (event) => { emit('update:model-value', event); };
+    const submit = () => { emit('submit'); };
+    const cancel = () => { emit('cancel'); };
+    const update = (event, path) => {
+      emit('update:bill-to-validate', set({ ...props.billToValidate }, path, event));
+    };
+
+    return {
+      // Data
+      INTER_B2B,
+      // Methods
+      hide,
+      input,
+      submit,
+      cancel,
+      update,
+    };
   },
 };
 </script>
