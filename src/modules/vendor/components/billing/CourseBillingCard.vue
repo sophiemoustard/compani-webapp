@@ -1,9 +1,9 @@
 <template>
   <div>
     <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
+      <p v-if="course.type === INTER_B2B" class="text-weight-bold">{{ company.name }}</p>
       <div v-if="courseBills.length">
         <p v-if="course.type === INTRA" class="text-weight-bold">Infos de facturation</p>
-        <p v-else class="text-weight-bold">{{ company.name }}</p>
         <q-card v-for="bill of courseBills" :key="bill._id" flat class="q-mb-md">
           <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
             <q-item-section>
@@ -141,7 +141,7 @@ import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import { REQUIRED_LABEL, LIST, COMPANY, INTRA } from '@data/constants';
+import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import PayerEditionModal from 'src/modules/vendor/components/billing/PayerEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
@@ -156,7 +156,9 @@ export default {
     course: { type: Object, default: () => ({}) },
     payerList: { type: Array, default: () => ([]) },
     billingItemList: { type: Array, default: () => ([]) },
+    courseBills: { type: Array, default: () => ([]) },
   },
+  emits: ['refresh-course-bills'],
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-payer-edition-modal': PayerEditionModal,
@@ -166,11 +168,12 @@ export default {
     'ni-course-credit-note-creation-modal': CourseCreditNoteCreationModal,
     'ni-button': Button,
   },
-  setup (props) {
+  setup (props, { emit }) {
     const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
     const $q = useQuasar();
 
+    const { company, course, payerList, billingItemList, courseBills } = toRefs(props);
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingPurchaseCreationLoading = ref(false);
@@ -179,7 +182,6 @@ export default {
     const creditNoteCreationLoading = ref(false);
     const billsLoading = ref(false);
     const pdfLoading = ref(false);
-    const courseBills = ref([]);
     const billCreationModal = ref(false);
     const payerEditionModal = ref(false);
     const mainFeeEditionModal = ref(false);
@@ -238,8 +240,6 @@ export default {
       newCreditNote,
     });
 
-    const { course, payerList, billingItemList } = toRefs(props);
-
     const newBillErrorMessages = computed(() => getBillErrorMessages('newBill.mainFee'));
 
     const mainFeeErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
@@ -263,19 +263,6 @@ export default {
       }
 
       return { price, count };
-    };
-
-    const refreshCourseBills = async () => {
-      try {
-        billsLoading.value = true;
-        courseBills.value = await CourseBills.list({ course: course.value._id, action: LIST });
-      } catch (e) {
-        console.error(e);
-        courseBills.value = [];
-        NotifyNegative('Erreur lors de la récupération des factures.');
-      } finally {
-        billsLoading.value = false;
-      }
     };
 
     const openBillCreationModal = () => { billCreationModal.value = true; };
@@ -370,7 +357,7 @@ export default {
     const formatCreationPayload = () => ({
       course: course.value._id,
       mainFee: newBill.value.mainFee,
-      company: course.value.company._id,
+      company: company.value._id,
       payer: formatPayerForPayload(newBill.value.payer),
     });
 
@@ -384,10 +371,10 @@ export default {
         NotifyPositive('Facture créée.');
 
         billCreationModal.value = false;
-        await refreshCourseBills();
+        await emit('refresh-course-bills');
 
-        const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
-        showDetails(bill._id);
+        // const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
+        // showDetails(bill._id);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la facture.');
@@ -410,7 +397,7 @@ export default {
 
         payerEditionModal.value = false;
         mainFeeEditionModal.value = false;
-        await refreshCourseBills();
+        await emit('refresh-course-bills');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de la facture.');
@@ -431,7 +418,7 @@ export default {
         NotifyPositive('Article ajouté.');
 
         billingPurchaseAdditionModal.value = false;
-        await refreshCourseBills();
+        await emit('refresh-course-bills');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
@@ -453,7 +440,7 @@ export default {
         NotifyPositive('Article modifié.');
 
         billingPurchaseEditionModal.value = false;
-        await refreshCourseBills();
+        await emit('refresh-course-bills');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'article.');
@@ -467,7 +454,7 @@ export default {
         await CourseBills.deleteBillingPurchase(billId, purchaseId);
 
         NotifyPositive('Article supprimé.');
-        await refreshCourseBills();
+        await emit('refresh-course-bills');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'article.');
@@ -490,14 +477,14 @@ export default {
         courseBill: billId,
         date: '',
         misc: '',
-        company: course.value.company._id,
+        company: company.value._id,
       };
       creditNoteCreationModal.value = true;
       minCourseCreditNoteDate.value = bill.billedAt;
       creditNoteMetaInfo.value = {
         number,
         netInclTaxes,
-        courseName: `${get(course, 'value.company.name')} - ${get(course, 'value.subProgram.program.name')}
+        courseName: `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
           ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`,
       };
     };
@@ -513,7 +500,7 @@ export default {
         NotifyPositive('Avoir créé.');
 
         creditNoteCreationModal.value = false;
-        await refreshCourseBills();
+        await emit('refresh-course-bills');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'avoir.');
@@ -540,7 +527,7 @@ export default {
         NotifyPositive('Facture validée.');
 
         courseBillValidationModal.value = false;
-        await refreshCourseBills();
+        await emit('refresh-course-bills');
       } catch (e) {
         console.error(e);
         if (e.status === 403) return NotifyNegative(e.data.message);
@@ -596,12 +583,6 @@ export default {
       }
     };
 
-    const created = async () => {
-      refreshCourseBills();
-    };
-
-    created();
-
     return {
       // Data
       billCreationLoading,
@@ -625,12 +606,12 @@ export default {
       editedBill,
       newCreditNote,
       billToValidate,
-      courseBills,
       courseFeeEditionModalMetaInfo,
       areDetailsVisible,
       minCourseCreditNoteDate,
       creditNoteMetaInfo,
       INTRA,
+      INTER_B2B,
       // Computed
       validations,
       newBillErrorMessages,
@@ -663,7 +644,6 @@ export default {
       openCreditNoteCreationModal,
       openCourseBillValidationModal,
       validatePurchaseDeletion,
-      refreshCourseBills,
       isDateVisible,
       isPayerVisible,
       showDetails,

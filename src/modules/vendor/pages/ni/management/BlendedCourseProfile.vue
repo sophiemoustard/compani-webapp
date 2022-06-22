@@ -62,9 +62,7 @@ export default {
       const vendorRole = this.$store.getters['main/getVendorRole'];
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
 
-      return isAdmin && this.isIntraCourse
-        ? [organizationTab, followUpTab, billingTab]
-        : [organizationTab, followUpTab];
+      return isAdmin ? [organizationTab, followUpTab, billingTab] : [organizationTab, followUpTab];
     },
   },
   async created () {

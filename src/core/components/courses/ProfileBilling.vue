@@ -1,8 +1,9 @@
 <template>
   <div>
     <div v-for="company of companies" :key="company._id">
-      <ni-course-billing-card :company="company" :course="course"
-      :payer-list="payerList" :billing-item-list="billingItemList" />
+      <ni-course-billing-card :company="company" :course="course" :payer-list="payerList"
+      :billing-item-list="billingItemList" :course-bills="courseBills.filter(bill => bill.company._id === company._id)"
+      @refresh-course-bills="refreshCourseBills" />
     </div>
   </div>
 </template>
@@ -43,10 +44,8 @@ export default {
       const traineesCompanies = course.value.trainees.map(trainee => trainee.company);
       const billsCompanies = courseBills.value.map(bill => bill.company);
 
-      return uniqBy([...traineesCompanies, ...billsCompanies], '_id');
+      return uniqBy([...traineesCompanies, ...billsCompanies], '_id').sort((a, b) => a.name.localeCompare(b.name));
     });
-
-    const getCompanyBills = async company => courseBills.value.filter(bill => bill.company._id === company._id);
 
     const refreshCourseBills = async () => {
       try {
@@ -111,7 +110,6 @@ export default {
       companies,
       // Methods
       refreshCourseBills,
-      getCompanyBills,
       refreshPayers,
       refreshBillingItems,
       get,
