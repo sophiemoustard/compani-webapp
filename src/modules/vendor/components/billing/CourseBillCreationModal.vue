@@ -22,12 +22,13 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
-import get from 'lodash/get';
-import set from 'lodash/set';
 import { INTRA } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 
@@ -50,35 +51,41 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-bill'],
-  data () {
-    return { INTRA };
-  },
-  computed: {
-    getCourseName () {
-      return `${get(this.company, 'name')} - ${get(this.course, 'subProgram.program.name')}
-          ${get(this.course, 'misc') ? ` - ${get(this.course, 'misc')}` : ''}`;
-    },
-    getTraineesQuantity () {
-      const traineesQuantity = get(this.course, 'trainees')
-        .filter(trainee => trainee.company._id === this.company._id).length;
+  setup (props, { emit }) {
+    const { course, company } = toRefs(props);
+    const getCourseName = computed(() => `${get(company, 'value.name')} - 
+      ${get(course, 'value.subProgram.program.name')} ${get(course, 'value.misc')
+  ? ` - 
+      ${get(course, 'value.misc')}`
+  : ''}`);
 
-      return `${formatQuantity('stagiaire', traineesQuantity)} de ${get(this.company, 'name')}
-        sont inscrits à cette formation`;
-    },
-  },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:new-bill', set({ ...this.newBill }, path, event));
-    },
+    const getTraineesQuantity = computed(() => {
+      const traineesQuantity = get(course, 'value.trainees')
+        .filter(trainee => trainee.company._id === company.value._id).length;
+
+      return `${formatQuantity('stagiaire', traineesQuantity)} de ${get(company, 'value.name')}
+        ${traineesQuantity > 1 ? 'inscrits' : 'inscrit'} à cette formation`;
+    });
+
+    const hide = () => { emit('hide'); };
+    const input = (event) => { emit('update:model-value', event); };
+    const submit = () => { emit('submit'); };
+    const update = (event, path) => {
+      emit('update:new-bill', set({ ...props.newBill }, path, event));
+    };
+
+    return {
+      // Data
+      INTRA,
+      // Computed
+      getCourseName,
+      getTraineesQuantity,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

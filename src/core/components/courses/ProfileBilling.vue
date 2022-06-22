@@ -22,7 +22,7 @@ import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative } from '@components/popup/notify';
-import { LIST, COMPANY } from '@data/constants';
+import { LIST, COMPANY, INTRA } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
 
 export default {
@@ -43,8 +43,10 @@ export default {
     const companies = computed(() => {
       const traineesCompanies = course.value.trainees.map(trainee => trainee.company);
       const billsCompanies = courseBills.value.map(bill => bill.company);
+      const intraCourseCompany = course.value.type === INTRA ? [course.value.company] : [];
 
-      return uniqBy([...traineesCompanies, ...billsCompanies], '_id').sort((a, b) => a.name.localeCompare(b.name));
+      return uniqBy([...traineesCompanies, ...billsCompanies, ...intraCourseCompany], '_id')
+        .sort((a, b) => a.name.localeCompare(b.name));
     });
 
     const refreshCourseBills = async () => {

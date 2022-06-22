@@ -116,7 +116,8 @@
 
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
-      :validations="validations.billToValidate" @cancel="cancelBillValidation" />
+      :validations="validations.billToValidate" @cancel="cancelBillValidation" :course-type="course.type"
+      :trainees-length="traineesLength" />
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
@@ -248,6 +249,9 @@ export default {
 
     const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
+    const traineesLength = computed(() => course.value.trainees
+      .filter(trainee => trainee.company._id === company.value._id).length);
+
     const getBillErrorMessages = (parent) => {
       let price = '';
       let count = '';
@@ -265,7 +269,12 @@ export default {
       return { price, count };
     };
 
-    const openBillCreationModal = () => { billCreationModal.value = true; };
+    const openBillCreationModal = () => {
+      if (course.value.type === INTER_B2B && !traineesLength.value) {
+        return NotifyWarning('Aucun stagiaire rattaché à cette structure n\'est inscrit à la formation.');
+      }
+      billCreationModal.value = true;
+    };
 
     const setEditedBill = (bill) => {
       const payer = get(bill, 'payer._id');
@@ -619,6 +628,7 @@ export default {
       newBillingPurchaseErrorMessages,
       editedBillingPurchaseErrorMessages,
       canAddBill,
+      traineesLength,
       // Methods
       resetBillCreationModal,
       resetEditedBill,
