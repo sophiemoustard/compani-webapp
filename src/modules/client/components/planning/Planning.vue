@@ -189,9 +189,6 @@ export default {
     clearTimeout(this.timeout);
   },
   async mounted () {
-    // eslint-disable-next-line no-console
-    console.log('test for end2end WEBAPP', moment());
-
     this.updateTimeline();
     this.getTimelineHours();
   },
