@@ -4,7 +4,7 @@
       <div class="row justify-between items-center cursor-pointer" @click="showDetails">
         <div>
           <div class="text-weight-bold">SMS de {{ getHistoryType }}</div>
-          <div>envoyé {{ getDate }} par {{ formatIdentity(history.sender.identity, 'FL') }}</div>
+          <div>envoyé {{ getDate }} par {{ senderIdentity }}</div>
         </div>
         <q-icon size="24px" :name="isExpanded ? 'expand_less' : 'expand_more'" />
       </div>
@@ -41,11 +41,15 @@ export default {
       return `il y a ${formatDateDiff(dateDifference)}`;
     });
 
+    const senderIdentity = computed(() => formatIdentity(history.value.sender.identity, 'FL'));
+
     const showDetails = () => {
       emit('show-details', history.value._id);
     };
 
     return {
+      // Computed
+      senderIdentity,
       // Methods
       getHistoryType,
       getDate,
