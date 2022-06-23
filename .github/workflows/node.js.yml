@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: 'sophiemoustard/compani-api'
-          ref: 'COM-2888'
+          ref: ${{ github.event.pull_request.head.ref }}
           path: 'api'
       - run: cd api && npm ci
 
