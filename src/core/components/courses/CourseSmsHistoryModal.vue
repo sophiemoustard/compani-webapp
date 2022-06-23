@@ -3,9 +3,11 @@
     <template #title>
       Historique des <span class="text-weight-bold">messages</span>
     </template>
-    <div v-for="history of smsHistoryList" :key="history._id">
-      <sms-cell :history="history" :message-type-options="messageTypeOptions" @show-details="showDetails"
-        :is-expand="areDetailsVisible[history._id]" />
+    <div class="q-mb-lg">
+      <div v-for="history of smsHistoryList" :key="history._id">
+        <sms-cell :history="history" :message-type-options="messageTypeOptions" @show-details="showDetails"
+          :is-expanded="areDetailsVisible[history._id]" />
+      </div>
     </div>
   </ni-modal>
 </template>
@@ -14,10 +16,9 @@
 import { toRefs, ref } from 'vue';
 import Modal from '@components/modal/Modal';
 import SmsCell from '@components/courses/SmsCell';
-import { formatPrice } from '@helpers/utils';
 
 export default {
-  name: 'CourseCreditNoteCreationModal',
+  name: 'CourseSmsHistoryModal',
   props: {
     modelValue: { type: Boolean, default: false },
     smsHistoryList: { type: Array, default: () => ([]) },
@@ -44,7 +45,6 @@ export default {
       showDetails,
       hide,
       input,
-      formatPrice,
     };
   },
 };
