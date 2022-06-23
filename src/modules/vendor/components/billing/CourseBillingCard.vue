@@ -159,7 +159,7 @@ export default {
     billingItemList: { type: Array, default: () => ([]) },
     courseBills: { type: Array, default: () => ([]) },
   },
-  emits: ['refresh-course-bills'],
+  emits: ['refresh-course-bills', 'refresh-and-unroll'],
   components: {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-payer-edition-modal': PayerEditionModal,
@@ -370,6 +370,11 @@ export default {
       payer: formatPayerForPayload(newBill.value.payer),
     });
 
+    const unrollBill = () => {
+      const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
+      showDetails(bill._id);
+    };
+
     const addBill = async () => {
       try {
         validations.value.newBill.$touch();
@@ -380,10 +385,7 @@ export default {
         NotifyPositive('Facture créée.');
 
         billCreationModal.value = false;
-        await emit('refresh-course-bills');
-
-        // const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
-        // showDetails(bill._id);
+        await emit('refresh-and-unroll', () => { unrollBill(); });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la facture.');

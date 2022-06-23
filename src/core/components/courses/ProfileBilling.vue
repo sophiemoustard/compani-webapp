@@ -3,7 +3,7 @@
     <div v-for="company of companies" :key="company._id">
       <ni-course-billing-card :company="company" :course="course" :payer-list="payerList"
       :billing-item-list="billingItemList" :course-bills="courseBills.filter(bill => bill.company._id === company._id)"
-      @refresh-course-bills="refreshCourseBills" />
+      @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll" />
     </div>
     <div v-if="!companies.length" class="text-italic">Aucun stagiaire n'est inscrit à la formation</div>
   </div>
@@ -63,6 +63,11 @@ export default {
       }
     };
 
+    const refreshAndUnroll = async (unrollBill) => {
+      await refreshCourseBills();
+      unrollBill();
+    };
+
     const refreshPayers = async () => {
       try {
         const organisations = await CourseFundingOrganisations.list();
@@ -113,6 +118,7 @@ export default {
       companies,
       // Methods
       refreshCourseBills,
+      refreshAndUnroll,
       refreshPayers,
       refreshBillingItems,
       get,
