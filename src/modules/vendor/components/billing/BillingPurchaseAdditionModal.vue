@@ -3,6 +3,7 @@
     <template #title>
       Ajouter un article <span class="text-weight-bold">à facturer</span>
     </template>
+    <div class="course-name">{{ getCourseName }} </div>
     <ni-select in-modal caption="Article" :options="billingItemOptions" :model-value="newBillingPurchase.billingItem"
       required-field @blur="validations.billingItem.$touch" :error="validations.billingItem.$error"
       @update:model-value="update($event, 'billingItem')" />
@@ -22,11 +23,13 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
-import set from 'lodash/set';
 
 export default {
   name: 'BillingPurchaseAdditionModal',
@@ -37,6 +40,8 @@ export default {
     errorMessages: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    course: { type: Object, default: () => ({}) },
+    company: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -45,19 +50,30 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-billing-purchase'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:new-billing-purchase', set({ ...this.newBillingPurchase }, path, event));
-    },
+  setup (props, { emit }) {
+    const { course, company } = toRefs(props);
+    const getCourseName = computed(() => `${get(company, 'value.name')} - 
+      ${get(course, 'value.subProgram.program.name')} ${get(course, 'value.misc')
+  ? ` - 
+      ${get(course, 'value.misc')}`
+  : ''}`);
+
+    const hide = () => { emit('hide'); };
+    const input = (event) => { emit('update:model-value', event); };
+    const submit = () => { emit('submit'); };
+    const update = (event, path) => {
+      emit('update:new-billing-purchase', set({ ...props.newBillingPurchase }, path, event));
+    };
+
+    return {
+      // Computed
+      getCourseName,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

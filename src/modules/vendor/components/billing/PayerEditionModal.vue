@@ -3,6 +3,7 @@
     <template #title>
       Éditer le <span class="text-weight-bold">payeur</span>
     </template>
+    <div class="course-name">{{ getCourseName }} </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="editedPayer" required-field
       @update:model-value="update" />
     <template #footer>
@@ -13,6 +14,8 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
@@ -24,6 +27,8 @@ export default {
     editedPayer: { type: String, default: () => '' },
     payerOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
+    course: { type: Object, default: () => ({}) },
+    company: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -31,19 +36,28 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:edited-payer'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event) {
-      this.$emit('update:edited-payer', event);
-    },
+  setup (props, { emit }) {
+    const { course, company } = toRefs(props);
+    const getCourseName = computed(() => `${get(company, 'value.name')} - 
+      ${get(course, 'value.subProgram.program.name')} ${get(course, 'value.misc')
+  ? ` - 
+      ${get(course, 'value.misc')}`
+  : ''}`);
+
+    const hide = () => { emit('hide'); };
+    const input = (event) => { emit('update:model-value', event); };
+    const submit = () => { emit('submit'); };
+    const update = (event) => { emit('update:edited-payer', event); };
+
+    return {
+      // Computed
+      getCourseName,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

@@ -3,7 +3,8 @@
     <template #title>
       Confirmation
     </template>
-    <div v-if="!traineesLength && courseType === INTER_B2B" class="banner row q-pa-sm q-mb-md">
+    <div class="course-name">{{ getCourseName }} </div>
+    <div v-if="!traineesLength && course.type === INTER_B2B" class="banner row q-pa-sm q-mb-md">
       <q-icon size="sm" name="info_outline" color="orange-700" class="q-mr-sm" />
       <div>Aucun stagiaire de la structure n'est inscrit à la formation</div>
     </div>
@@ -20,10 +21,12 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
-import set from 'lodash/set';
 import { INTER_B2B } from '@data/constants';
 
 export default {
@@ -34,7 +37,8 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     traineesLength: { type: Number, default: 0 },
-    courseType: { type: String, default: 'test' },
+    course: { type: Object, default: () => ({}) },
+    company: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -43,6 +47,14 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'cancel', 'update:bill-to-validate'],
   setup (props, { emit }) {
+    const { course, company } = toRefs(props);
+
+    const getCourseName = computed(() => `${get(company, 'value.name')} - 
+      ${get(course, 'value.subProgram.program.name')} ${get(course, 'value.misc')
+  ? ` - 
+      ${get(course, 'value.misc')}`
+  : ''}`);
+
     const hide = () => { emit('hide'); };
     const input = (event) => { emit('update:model-value', event); };
     const submit = () => { emit('submit'); };
@@ -54,6 +66,8 @@ export default {
     return {
       // Data
       INTER_B2B,
+      // Computed
+      getCourseName,
       // Methods
       hide,
       input,

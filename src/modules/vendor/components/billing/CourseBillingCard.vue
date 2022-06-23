@@ -93,16 +93,17 @@
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
 
-    <ni-payer-edition-modal v-model="payerEditionModal" v-model:edited-payer="editedBill.payer"
-      @submit="editBill" @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" />
+    <ni-payer-edition-modal v-model="payerEditionModal" v-model:edited-payer="editedBill.payer" :course="course"
+      @submit="editBill" @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList"
+      :company="company" />
 
     <!-- main fee edition modal -->
     <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:course-fee="editedBill.mainFee"
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
-      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages"
+      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :course="course" :company="company"
       :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled" />
 
-    <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
+    <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal" :course="course" :company="company"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
       :validations="validations.newBillingPurchase" @hide="resetBillingPurchaseAdditionModal"
       :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
@@ -110,14 +111,15 @@
 
     <!-- billing purchase edition modal -->
     <ni-course-fee-edition-modal v-model="billingPurchaseEditionModal" :validations="validations.editedBillingPurchase"
-      v-model:course-fee="editedBillingPurchase" :title="courseFeeEditionModalMetaInfo.title"
+      v-model:course-fee="editedBillingPurchase" :title="courseFeeEditionModalMetaInfo.title" :course="course"
       @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" @hide="resetBillingPurchaseEditionModal"
-      :error-messages="editedBillingPurchaseErrorMessages" :is-billed="courseFeeEditionModalMetaInfo.isBilled" />
+      :error-messages="editedBillingPurchaseErrorMessages" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
+      :company="company" />
 
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
-      :validations="validations.billToValidate" @cancel="cancelBillValidation" :course-type="course.type"
-      :trainees-length="traineesLength" />
+      :validations="validations.billToValidate" @cancel="cancelBillValidation" :trainees-length="traineesLength"
+      :course="course" :company="company" />
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
