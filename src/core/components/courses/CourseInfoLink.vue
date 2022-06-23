@@ -2,7 +2,7 @@
   <div class="course-link">
     <ni-bi-color-button icon="file_download" label="Convocation papier" :disable="disableLink" size="16px"
       @click="$emit('download')" />
-    <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
+    <ni-button color="primary" :disable="disableLink" icon="link" label="Lien de partage"
       @click="copy" />
 </div>
 </template>
