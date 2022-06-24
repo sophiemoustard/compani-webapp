@@ -95,5 +95,5 @@ export default {
   padding: 8px 16px
 .cell-title
   font-size: 20px
-  margin: 8px 0px 24px 0px
+  margin: 8px 0px 8px 0px
 </style>

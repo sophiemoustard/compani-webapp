@@ -1,14 +1,14 @@
 <template>
   <q-card class="container">
     <div class="column justify-between flex-start">
-        <div class="text-weight-bold" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName() }}</div>
-        <div class="text-weight-bold" v-else-if="repetition.type === INTERNAL_HOUR">
+        <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName() }}</div>
+        <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
           {{ get(repetition, 'internalHour.name') }}
         </div>
-        <div class="text-weight-bold" v-else>Indisponibilité</div>
-        <div>{{ getRepetitionInfos() }}</div>
-        <div>{{ getRepetitionStartDate() }}</div>
-        <div v-if="repetition.type === INTERVENTION">
+        <div class="infos" v-else>Indisponibilité</div>
+        <div class="bold-infos q-pt-sm">{{ getRepetitionInfos() }}</div>
+        <div class="infos q-pb-sm">{{ getRepetitionStartDate() }}</div>
+        <div v-if="repetition.type === INTERVENTION" class="customer">
           Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
         </div>
     </div>
@@ -54,7 +54,7 @@ export default {
 
     const getRepetitionStartDate = () => {
       const startDate = get(repetition.value, 'startDate');
-      return `A partir du ${moment(startDate).format('DD/MM/YYYY')}`;
+      return `à partir du ${moment(startDate).format('DD/MM/YYYY')}`;
     };
 
     const getLastVersionServiceName = () => {
@@ -83,5 +83,15 @@ export default {
 .container
   background-color: $copper-grey-100
   margin: 0px 0px 16px 0px
-  padding: 8px
+  padding: 16px
+.infos
+  color: $copper-grey-700
+  size: 14px
+.bold-infos
+  color: $copper-grey-900
+  font-weight: bold
+  size: 16px
+.customer
+  color: $copper-grey-700
+  size: 16px
 </style>
