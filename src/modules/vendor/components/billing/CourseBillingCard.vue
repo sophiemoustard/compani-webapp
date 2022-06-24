@@ -82,7 +82,7 @@
           </div>
         </q-card>
       </div>
-      <div v-if="canAddBill" class="row justify-end">
+      <div v-if="canAddBill" class="row justify-start">
         <ni-button label="Créer une facture" color="white" class="bg-primary" icon="payment"
           @click="openBillCreationModal" :disable="billCreationLoading" />
       </div>
