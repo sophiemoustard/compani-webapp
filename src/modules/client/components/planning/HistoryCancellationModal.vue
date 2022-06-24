@@ -2,10 +2,9 @@
     <q-dialog :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')">
       <div class="modal-container-md modal-padding">
         <div class="title q-mb-md">Confirmation</div>
-        <div class="banner row q-pa-sm q-mb-md">
-          <q-icon size="sm" name="info_outline" color="orange-700" class="q-mr-sm" />
-          <div>{{ start ? 'Début d\'intervention horodaté' : 'Fin d\'intervention horodatée' }}</div>
-        </div>
+        <ni-banner icon="info_outline" class="bg-orange-50 text-orange-900" icon-color="orange-700">
+          <template #message>{{ start ? 'Début d\'intervention horodaté' : 'Fin d\'intervention horodatée' }}</template>
+        </ni-banner>
         <div class="q-mb-md">
           Êtes-vous sûr(e) de vouloir annuler l'horodatage ? Vous pourrez ensuite modifier l'évènement.
         </div>
@@ -20,6 +19,7 @@
 </template>
 
 <script>
+import Banner from '@components/Banner';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 
@@ -28,6 +28,7 @@ export default {
   components: {
     'ni-button': Button,
     'ni-input': Input,
+    'ni-banner': Banner,
   },
   props: {
     modelValue: { type: Boolean, default: false },
@@ -53,7 +54,4 @@ export default {
 <style lang="sass" scoped>
 .title
   font-size: 20px
-.banner
-  background-color: $orange-50
-  color: $orange-900
 </style>

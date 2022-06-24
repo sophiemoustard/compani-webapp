@@ -38,31 +38,18 @@
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Envoi de SMS</p>
-        <p>Historique d'envoi </p>
-        <ni-responsive-table :data="smsSent" :columns="smsSentColumns" v-model:pagination="pagination" class="q-mb-md"
-          :loading="smsLoading">
-          <template #body="{ props }">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <ni-button icon="remove_red_eye" @click="openSmsHistoriesModal(col.value)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </template>
-        </ni-responsive-table>
         <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
           <template #message>
             Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
             {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
           </template>
         </ni-banner>
-        <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
-          label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
+        <div class="row">
+          <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
+            label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
+          <ni-button color="primary" :disable="!smsHistoryList.length" icon="history" label="Historique d'envoi"
+            @click="smsHistoriesModal = true" />
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -85,8 +72,8 @@
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
-    <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
-      :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
+    <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList"
+      :message-type-options="messageTypeOptions" />
 
     <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutorId"
       @submit="updateSalesRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
@@ -120,7 +107,7 @@ import TraineeTable from '@components/courses/TraineeTable';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
-import SmsDetailsModal from '@components/courses/SmsDetailsModal';
+import CourseSmsHistoryModal from '@components/courses/CourseSmsHistoryModal';
 import InterlocutorCell from '@components/courses/InterlocutorCell';
 import InterlocutorModal from '@components/courses/InterlocutorModal';
 import Banner from '@components/Banner';
@@ -141,7 +128,7 @@ import { defineAbilitiesFor } from '@helpers/ability';
 import { formatAndSortIdentityOptions, formatQuantity, formatIdentity } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
+import { descendingSort, ascendingSort } from '@helpers/date';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
 import BiColorButton from '@components/BiColorButton';
@@ -162,7 +149,7 @@ export default {
     'course-history-feed': CourseHistoryFeed,
     'ni-bi-color-button': BiColorButton,
     'sms-sending-modal': SmsSendingModal,
-    'sms-details-modal': SmsDetailsModal,
+    'sms-history-modal': CourseSmsHistoryModal,
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
     'interlocutor-cell': InterlocutorCell,
@@ -187,23 +174,10 @@ export default {
       messageTypeOptions: [{ label: 'Convocation', value: CONVOCATION }, { label: 'Rappel', value: REMINDER }],
       newSms: { content: '', type: '' },
       loading: false,
-      smsSent: [],
-      smsSentColumns: [
-        { name: 'type', label: 'Type', align: 'left', field: 'type', format: this.getType },
-        { name: 'date', label: 'Date d\'envoi', align: 'left', field: 'date', format: formatDate },
-        {
-          name: 'sender',
-          label: 'Expéditeur',
-          align: 'left',
-          field: row => get(row, 'sender.identity') || '',
-          format: value => formatIdentity(value, 'FL'),
-        },
-        { name: 'actions', label: '', align: 'center', field: '_id' },
-      ],
+      smsHistoryList: [],
       pagination: { rowsPerPage: 0 },
       smsLoading: false,
       smsHistoriesModal: false,
-      smsHistory: { missingPhones: [] },
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
       contactOptions: [],
@@ -270,11 +244,6 @@ export default {
     missingTraineesPhone () {
       return this.course.trainees.filter(trainee => !get(trainee, 'contact.phone'))
         .map(trainee => formatIdentity(trainee.identity, 'FL'));
-    },
-    missingTraineesPhoneHistory () {
-      if (!this.smsHistory.missingPhones.length) return [];
-
-      return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
     },
     courseName () {
       return this.composeCourseName(this.course);
@@ -394,12 +363,12 @@ export default {
     async refreshSms () {
       try {
         this.smsLoading = true;
-        const smsSent = await Courses.getSMSHistory(this.course._id);
-        this.smsSent = smsSent.sort((a, b) => descendingSort(a.date, b.date));
+        const smsList = await Courses.getSMSHistory(this.course._id);
+        this.smsHistoryList = smsList.sort((a, b) => descendingSort(a.date, b.date));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
-        this.smsSent = [];
+        this.smsHistoryList = [];
       } finally {
         this.smsLoading = false;
       }
@@ -433,13 +402,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-    openSmsHistoriesModal (smsId) {
-      this.smsHistoriesModal = true;
-      this.smsHistory = this.smsSent.find(sms => sms._id === smsId);
-    },
-    resetSmsHistoryModal () {
-      this.smsHistory = { missingPhones: [] };
     },
     updateMessage (newMessageType) {
       if (newMessageType === CONVOCATION) this.setConvocationMessage();
