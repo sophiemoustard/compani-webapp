@@ -12,11 +12,12 @@ export default {
   name: 'Banner',
   props: {
     icon: { type: String, default: 'warning' },
+    customClass: { type: String, default: '' },
   },
   data () {
     const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
     return {
-      backgroundClass: interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
+      backgroundClass: this.customClass || interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
     };
   },
 };
