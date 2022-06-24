@@ -126,7 +126,11 @@ export const courseMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        downloadFile(pdf, 'emargement.pdf', 'application/octet-stream');
+        const courseName = this.composeCourseName(this.course);
+        const pdfName = `feuilles d’emargement_${this.course.type === INTRA
+          ? `${this.course.company.name} - ${courseName}`
+          : courseName}.pdf`;
+        downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         const decodedRep = readAPIResponseWithTypeArrayBuffer(e);
