@@ -170,6 +170,12 @@ export const EVERY_WEEK_DAY = 'every_week_day';
 export const EVERY_WEEK = 'every_week';
 export const EVERY_TWO_WEEKS = 'every_two_weeks';
 
+export const REPETITION_FREQUENCIES = [
+  { label: 'Jamais', value: NEVER },
+  { label: 'Tous les jours', value: EVERY_DAY },
+  { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
+];
+
 // CANCELLATION OPTIONS
 export const INVOICED_AND_PAID = 'invoiced_and_paid';
 export const INVOICED_AND_NOT_PAID = 'invoiced_and_not_paid';
