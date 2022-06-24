@@ -461,9 +461,7 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        const pdfName = `convocation_${this.course.type === INTRA
-          ? `${this.course.company.name} - ${this.courseName}`
-          : this.courseName}.pdf`;
+        const pdfName = `convocation_${this.composeCourseName(this.course, true)}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

@@ -181,8 +181,9 @@ export default {
 
       try {
         this.pdfLoading = true;
+        const zipName = `attestation_${this.composeCourseName(this.course, true)}.zip`;
         const pdf = await Courses.downloadCompletionCertificates(this.course._id);
-        downloadZip(pdf, 'attestations.zip');
+        downloadZip(pdf, zipName);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');

@@ -126,10 +126,7 @@ export const courseMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        const courseName = this.composeCourseName(this.course);
-        const pdfName = `feuilles d’emargement_${this.course.type === INTRA
-          ? `${this.course.company.name} - ${courseName}`
-          : courseName}.pdf`;
+        const pdfName = `feuilles d’emargement_${this.composeCourseName(this.course, true)}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
