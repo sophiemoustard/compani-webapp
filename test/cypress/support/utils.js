@@ -1,7 +1,7 @@
 const moment = require('../../../src/core/helpers/moment');
 
-const currentFranceOffset = 2;
 exports.applyOffset = (hours, minutes) => {
+  const parisOffset = moment.tz('Europe/Paris')._offset;
   const utcOffset = moment().utcOffset();
-  return `${hours + utcOffset / 60 - currentFranceOffset}:${minutes}`;
+  return `${hours + (utcOffset - parisOffset) / 60}:${minutes}`;
 };
