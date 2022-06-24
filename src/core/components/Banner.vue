@@ -1,6 +1,6 @@
 <template>
-  <q-banner :class="`full-width warning q-mb-md ${backgroundClass}`" dense>
-    <q-icon size="sm" :name="icon" />
+  <q-banner :class="`full-width warning q-mb-md ${customClass}`" dense>
+    <q-icon size="sm" :name="icon" :color="iconColor" />
     <div><slot name="message" /></div>
   </q-banner>
 </template>
@@ -12,12 +12,13 @@ export default {
   name: 'Banner',
   props: {
     icon: { type: String, default: 'warning' },
-    customClass: { type: String, default: '' },
+    class: { type: String, default: '' },
+    iconColor: { type: String, default: '' },
   },
   data () {
     const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
     return {
-      backgroundClass: this.customClass || interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
+      customClass: this.class || (interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200'),
     };
   },
 };

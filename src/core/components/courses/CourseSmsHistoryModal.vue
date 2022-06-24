@@ -5,7 +5,8 @@
     </template>
     <div class="q-mb-lg">
       <div v-for="history of smsHistoryList" :key="history._id">
-        <ni-banner v-if="history.missingPhones.length" icon="info_outline" custom-class="bg-copper-grey-200">
+        <ni-banner v-if="history.missingPhones.length" icon="info_outline" icon-color="orange-700"
+          class="bg-orange-50 text-orange-900">
           <template #message>
             Pour cet envoi, il manquait le numéro de téléphone de
             {{ formatQuantity('stagiaire', history.missingPhones.length) }} :
