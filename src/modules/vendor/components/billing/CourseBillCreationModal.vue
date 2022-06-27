@@ -67,9 +67,9 @@ export default {
         ${traineesQuantity > 1 ? 'inscrits' : 'inscrit'} à cette formation`;
     });
 
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:new-bill', set({ ...props.newBill }, path, event));
     };

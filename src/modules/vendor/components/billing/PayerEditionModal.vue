@@ -44,10 +44,10 @@ export default {
       ${get(course, 'value.misc')}`
   : ''}`);
 
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
-    const update = (event) => { emit('update:edited-payer', event); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
+    const update = event => emit('update:edited-payer', event);
 
     return {
       // Computed

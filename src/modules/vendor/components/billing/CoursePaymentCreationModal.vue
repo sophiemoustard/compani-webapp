@@ -69,9 +69,9 @@ export default {
         : PAYMENT_NATURE_OPTIONS.find(option => option.value === props.newCoursePayment.nature).label
     ));
 
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:new-course-payment', set({ ...props.newCoursePayment }, path, event));
     };

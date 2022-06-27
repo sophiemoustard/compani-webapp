@@ -50,8 +50,8 @@ export default {
     const getMissingTraineesPhoneHistory = history => history.missingPhones
       .map(mp => formatIdentity(mp.identity, 'FL'));
 
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
 
     return {
       // Data

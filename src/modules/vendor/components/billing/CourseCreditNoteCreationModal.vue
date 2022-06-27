@@ -56,9 +56,9 @@ export default {
         return 'La date de l\'avoir ne peut être antérieure à la date de facturation';
       }
     };
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:new-credit-note', set({ ...props.newCreditNote }, path, event));
     };

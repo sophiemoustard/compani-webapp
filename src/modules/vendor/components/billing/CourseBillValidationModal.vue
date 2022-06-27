@@ -57,10 +57,10 @@ export default {
       ${get(course, 'value.misc')}`
   : ''}`);
 
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
-    const cancel = () => { emit('cancel'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
+    const cancel = () => emit('cancel');
     const update = (event, path) => {
       emit('update:bill-to-validate', set({ ...props.billToValidate }, path, event));
     };

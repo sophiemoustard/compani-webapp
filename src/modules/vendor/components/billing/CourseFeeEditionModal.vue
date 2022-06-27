@@ -54,9 +54,9 @@ export default {
       ${get(course, 'value.misc')}`
   : ''}`);
 
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:course-fee', set({ ...props.courseFee }, path, event));
     };
