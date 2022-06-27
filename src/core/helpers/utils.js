@@ -151,3 +151,5 @@ export const getBillingItemsName = (service) => {
   const billingItemsName = service.billingItems.reduce((acc, bi) => (acc += `${bi.name}, `), '');
   return [billingItemsName.slice(0, -2)];
 };
+
+export const formatDownloadName = name => name.replaceAll(' - ', '_').replaceAll(' ', '_').replaceAll('\'', '_');

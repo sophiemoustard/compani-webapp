@@ -124,7 +124,7 @@ import {
   DEFAULT_AVATAR,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
-import { formatAndSortIdentityOptions, formatQuantity, formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { descendingSort, ascendingSort } from '@helpers/date';
@@ -459,12 +459,8 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        const formattedName = this.composeCourseName(this.course, true)
-          .replaceAll(' - ', '_')
-          .replaceAll(' ', '_')
-          .replaceAll('\'', '_');
-        const pdfName =
-          `convocation_${formattedName}.pdf`;
+        const formattedName = formatDownloadName(this.composeCourseName(this.course, true));
+        const pdfName = `convocation_${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

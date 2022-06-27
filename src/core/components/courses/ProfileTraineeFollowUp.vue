@@ -69,7 +69,7 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import { upperCaseFirstLetter, formatIdentity, formatQuantity } from '@helpers/utils';
+import { upperCaseFirstLetter, formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { formatDate, ascendingSort, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/date';
 import { downloadZip } from '@helpers/file';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
@@ -181,10 +181,7 @@ export default {
 
       try {
         this.pdfLoading = true;
-        const formattedName = this.composeCourseName(this.course, true)
-          .replaceAll(' - ', '_')
-          .replaceAll(' ', '_')
-          .replaceAll('\'', '_');
+        const formattedName = formatDownloadName(this.composeCourseName(this.course, true));
         const zipName = `attestations_${formattedName}.zip`;
         const pdf = await Courses.downloadCompletionCertificates(this.course._id);
         downloadZip(pdf, zipName);

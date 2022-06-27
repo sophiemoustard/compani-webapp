@@ -135,7 +135,7 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, formatDownloadName } from '@helpers/utils';
 import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import CourseBills from '@api/CourseBills';
@@ -572,7 +572,7 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await CourseBills.getPdf(bill._id);
-        const pdfName = `${bill.payer.name.replaceAll(' ', '_').replaceAll('\'', '_')}_${bill.number}.pdf`;
+        const pdfName = `${formatDownloadName(bill.payer.name)}_${bill.number}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
@@ -587,7 +587,7 @@ export default {
         pdfLoading.value = true;
         const pdf = await CourseCreditNotes.getPdf(creditNote._id);
         const { payer } = courseBills.value.find(bill => bill._id === creditNote.courseBill);
-        const pdfName = `${payer.name.replaceAll(' ', '_').replaceAll('\'', '_')}_${creditNote.number}.pdf`;
+        const pdfName = `${formatDownloadName(payer.name)}_${creditNote.number}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

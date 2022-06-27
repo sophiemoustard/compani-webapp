@@ -103,7 +103,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
-import { formatPrice, formatPriceWithSign } from '@helpers/utils';
+import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import router from 'src/router/index';
@@ -227,7 +227,7 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await CourseBills.getPdf(bill._id);
-        const pdfName = `${bill.payer.name.replaceAll(' ', '_').replaceAll('\'', '_')}_${bill.number}.pdf`;
+        const pdfName = `${formatDownloadName(bill.payer.name)}_${bill.number}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

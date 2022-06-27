@@ -4,7 +4,12 @@ import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import {
+  formatIdentity,
+  formatPhoneForPayload,
+  readAPIResponseWithTypeArrayBuffer,
+  formatDownloadName,
+} from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadFile } from '@helpers/file';
 
@@ -126,10 +131,7 @@ export const courseMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        const formattedName = this.composeCourseName(this.course, true)
-          .replaceAll(' - ', '_')
-          .replaceAll(' ', '_')
-          .replaceAll('\'', '_');
+        const formattedName = formatDownloadName(this.composeCourseName(this.course, true));
         const pdfName = `feuilles_d_emargement_${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
