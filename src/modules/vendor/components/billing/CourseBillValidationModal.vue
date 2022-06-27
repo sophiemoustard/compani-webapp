@@ -3,8 +3,8 @@
     <template #title>
       Confirmation
     </template>
-    <div class="course-name">{{ getCourseName }} </div>
-    <ni-banner v-if="!traineesLength && course.type === INTER_B2B" icon="info_outline" icon-color="orange-700"
+    <div class="course-name">{{ courseName }} </div>
+    <ni-banner v-if="!traineesLength && courseType === INTER_B2B" icon="info_outline" icon-color="orange-700"
       class="bg-orange-50 text-orange-900">
       <template #message>Aucun stagiaire de la structure n'est inscrit à la formation</template>
     </ni-banner>
@@ -21,8 +21,6 @@
 </template>
 
 <script>
-import { toRefs, computed } from 'vue';
-import get from 'lodash/get';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Banner from '@components/Banner';
@@ -38,8 +36,8 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     traineesLength: { type: Number, default: 0 },
-    course: { type: Object, default: () => ({}) },
-    company: { type: Object, default: () => ({}) },
+    courseName: { type: String, default: '' },
+    courseType: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -49,14 +47,6 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'cancel', 'update:bill-to-validate'],
   setup (props, { emit }) {
-    const { course, company } = toRefs(props);
-
-    const getCourseName = computed(() => `${get(company, 'value.name')} - 
-      ${get(course, 'value.subProgram.program.name')} ${get(course, 'value.misc')
-  ? ` - 
-      ${get(course, 'value.misc')}`
-  : ''}`);
-
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
@@ -68,8 +58,6 @@ export default {
     return {
       // Data
       INTER_B2B,
-      // Computed
-      getCourseName,
       // Methods
       hide,
       input,

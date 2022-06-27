@@ -3,7 +3,7 @@
     <template #title>
       Ajouter un article <span class="text-weight-bold">à facturer</span>
     </template>
-    <div class="course-name">{{ getCourseName }} </div>
+    <div class="course-name">{{ courseName }} </div>
     <ni-select in-modal caption="Article" :options="billingItemOptions" :model-value="newBillingPurchase.billingItem"
       required-field @blur="validations.billingItem.$touch" :error="validations.billingItem.$error"
       @update:model-value="update($event, 'billingItem')" />
@@ -23,8 +23,6 @@
 </template>
 
 <script>
-import { toRefs, computed } from 'vue';
-import get from 'lodash/get';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
@@ -40,8 +38,7 @@ export default {
     errorMessages: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    course: { type: Object, default: () => ({}) },
-    company: { type: Object, default: () => ({}) },
+    courseName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -51,13 +48,6 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-billing-purchase'],
   setup (props, { emit }) {
-    const { course, company } = toRefs(props);
-    const getCourseName = computed(() => `${get(company, 'value.name')} - 
-      ${get(course, 'value.subProgram.program.name')} ${get(course, 'value.misc')
-  ? ` - 
-      ${get(course, 'value.misc')}`
-  : ''}`);
-
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
@@ -66,8 +56,6 @@ export default {
     };
 
     return {
-      // Computed
-      getCourseName,
       // Methods
       hide,
       input,
