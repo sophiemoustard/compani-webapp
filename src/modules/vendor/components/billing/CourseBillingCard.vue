@@ -572,7 +572,7 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await CourseBills.getPdf(bill._id);
-        const pdfName = `${formatDownloadName(bill.payer.name)}_${bill.number}.pdf`;
+        const pdfName = `${formatDownloadName(`${bill.payer.name} ${bill.number}`)}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
@@ -587,7 +587,7 @@ export default {
         pdfLoading.value = true;
         const pdf = await CourseCreditNotes.getPdf(creditNote._id);
         const { payer } = courseBills.value.find(bill => bill._id === creditNote.courseBill);
-        const pdfName = `${formatDownloadName(payer.name)}_${creditNote.number}.pdf`;
+        const pdfName = `${formatDownloadName(`${payer.name} ${creditNote.number}`)}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

@@ -459,8 +459,8 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        const formattedName = formatDownloadName(this.composeCourseName(this.course, true));
-        const pdfName = `convocation_${formattedName}.pdf`;
+        const formattedName = formatDownloadName(`convocation ${this.composeCourseName(this.course, true)}`);
+        const pdfName = `${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

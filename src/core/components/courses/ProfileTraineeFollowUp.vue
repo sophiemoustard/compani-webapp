@@ -181,8 +181,8 @@ export default {
 
       try {
         this.pdfLoading = true;
-        const formattedName = formatDownloadName(this.composeCourseName(this.course, true));
-        const zipName = `attestations_${formattedName}.zip`;
+        const formattedName = formatDownloadName(`attestations ${this.composeCourseName(this.course, true)}`);
+        const zipName = `${formattedName}.zip`;
         const pdf = await Courses.downloadCompletionCertificates(this.course._id);
         downloadZip(pdf, zipName);
       } catch (e) {
