@@ -101,7 +101,6 @@ import Courses from '@api/Courses';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
-import ResponsiveTable from '@components/table/ResponsiveTable';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
@@ -151,7 +150,6 @@ export default {
     'sms-sending-modal': SmsSendingModal,
     'sms-history-modal': CourseSmsHistoryModal,
     'ni-button': Button,
-    'ni-responsive-table': ResponsiveTable,
     'interlocutor-cell': InterlocutorCell,
     'interlocutor-modal': InterlocutorModal,
   },
@@ -461,7 +459,12 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        const pdfName = `convocation_${this.composeCourseName(this.course, true)}.pdf`;
+        const formattedName = this.composeCourseName(this.course, true)
+          .replaceAll(' - ', '_')
+          .replaceAll(' ', '_')
+          .replaceAll('\'', '_');
+        const pdfName =
+          `convocation_${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

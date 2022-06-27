@@ -181,7 +181,11 @@ export default {
 
       try {
         this.pdfLoading = true;
-        const zipName = `attestation_${this.composeCourseName(this.course, true)}.zip`;
+        const formattedName = this.composeCourseName(this.course, true)
+          .replaceAll(' - ', '_')
+          .replaceAll(' ', '_')
+          .replaceAll('\'', '_');
+        const zipName = `attestations_${formattedName}.zip`;
         const pdf = await Courses.downloadCompletionCertificates(this.course._id);
         downloadZip(pdf, zipName);
       } catch (e) {

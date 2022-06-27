@@ -69,9 +69,9 @@ export const courseMixin = {
       return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
     },
     composeCourseName (c, attachCompany = false) {
-      const possiblyCompanyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
-      const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
-      return possiblyCompanyName + c.subProgram.program.name + possiblyMisc;
+      const companyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
+      const misc = c.misc ? ` - ${c.misc}` : '';
+      return companyName + c.subProgram.program.name + misc;
     },
     getValue (path) {
       if (path === 'trainer') return get(this.course, 'trainer._id', '');
@@ -126,7 +126,11 @@ export const courseMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        const pdfName = `feuilles d’emargement_${this.composeCourseName(this.course, true)}.pdf`;
+        const formattedName = this.composeCourseName(this.course, true)
+          .replaceAll(' - ', '_')
+          .replaceAll(' ', '_')
+          .replaceAll('\'', '_');
+        const pdfName = `feuilles_d_emargement_${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

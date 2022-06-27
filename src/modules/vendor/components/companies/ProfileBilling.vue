@@ -227,7 +227,7 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await CourseBills.getPdf(bill._id);
-        const pdfName = `${bill.payer.name} - ${bill.number}.pdf`;
+        const pdfName = `${bill.payer.name.replaceAll(' ', '_').replaceAll('\'', '_')}_${bill.number}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
