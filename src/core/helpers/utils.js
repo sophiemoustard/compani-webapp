@@ -152,4 +152,4 @@ export const getBillingItemsName = (service) => {
   return [billingItemsName.slice(0, -2)];
 };
 
-export const formatDownloadName = name => name.replaceAll(' - ', '_').replaceAll(' ', '_').replaceAll('\'', '_');
+export const formatDownloadName = name => name.replaceAll(/ - | |'/g, '_');
