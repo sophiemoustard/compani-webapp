@@ -45,6 +45,12 @@
           </template>
         </ni-banner>
         <div class="row">
+          <ni-banner v-if="followUpDisabled">
+            <template #message>
+              Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
+              pour envoyer des SMS : {{ followUpMissingInfo.join(', ') }}.
+            </template>
+          </ni-banner>
           <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openHistoryModal"
             label="Envoyer un SMS aux stagiaires" size="16px" />
           <ni-button color="primary" :disable="!smsHistoryList.length" icon="history" label="Historique d'envoi"
