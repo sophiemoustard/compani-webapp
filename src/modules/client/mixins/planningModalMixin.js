@@ -14,8 +14,6 @@ import {
   UNAVAILABILITY,
   INTERNAL_HOUR,
   NEVER,
-  EVERY_DAY,
-  EVERY_WEEK_DAY,
   EVERY_WEEK,
   EVERY_TWO_WEEKS,
   ABSENCE_NATURES,
@@ -36,6 +34,7 @@ import {
   SECTOR,
   DOC_EXTENSIONS,
   EVENT_TRANSPORT_OPTIONS,
+  REPETITION_FREQUENCIES,
 } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -209,16 +208,16 @@ export const planningModalMixin = {
       return formatAndSortIdentityOptions(activeCustomers);
     },
     getRepetitionOptions (startDate) {
+      const repetitionOptions = Object.values(REPETITION_FREQUENCIES);
       const oneWeekRepetitionLabel = `Tous les ${moment(startDate).format('dddd')}s`;
       const twoWeeksRepetitionLabel = `Le ${moment(startDate).format('dddd')} une semaine sur deux`;
 
-      return [
-        { label: 'Jamais', value: NEVER },
-        { label: 'Tous les jours', value: EVERY_DAY },
-        { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
+      repetitionOptions.push(
         { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
-        { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS },
-      ];
+        { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS }
+      );
+
+      return repetitionOptions;
     },
     getAuxiliariesOptions (event) {
       if (this.isCustomerPlanning && this.creationModal) return formatAndSortIdentityOptions(this.activeAuxiliaries);
