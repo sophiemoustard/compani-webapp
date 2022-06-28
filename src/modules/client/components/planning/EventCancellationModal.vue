@@ -57,7 +57,7 @@ export default {
     const cancellationReasons = ref(CANCELLATION_REASONS);
     const cancellationOptions = ref(CANCELLATION_OPTIONS);
 
-    const hide = () => { emit('hide'); };
+    const hide = () => emit('hide');
 
     const resetForm = () => {
       hide();

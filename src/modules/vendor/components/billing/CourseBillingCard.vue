@@ -89,20 +89,21 @@
     </div>
     <div v-else class="row justify-center q-mt-md"><q-spinner size="30px" /></div>
 
-    <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course="course" :company="company"
-      @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal"
-      :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages" />
+    <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
+      @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal" :loading="billCreationLoading"
+      :payer-options="payerList" :error-messages="newBillErrorMessages" :trainees-quantity="traineesQuantity"
+      :course-type="course.type" />
 
-    <ni-payer-edition-modal v-model="payerEditionModal" v-model:edited-payer="editedBill.payer"
-      @submit="editBill" @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" />
+    <ni-payer-edition-modal v-model="payerEditionModal" v-model:edited-payer="editedBill.payer" @submit="editBill"
+       @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" :course-name="courseName" />
 
     <!-- main fee edition modal -->
     <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:course-fee="editedBill.mainFee"
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
-      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages"
+      :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :course-name="courseName"
       :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled" />
 
-    <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal"
+    <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal" :course-name="courseName"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
       :validations="validations.newBillingPurchase" @hide="resetBillingPurchaseAdditionModal"
       :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
@@ -112,12 +113,13 @@
     <ni-course-fee-edition-modal v-model="billingPurchaseEditionModal" :validations="validations.editedBillingPurchase"
       v-model:course-fee="editedBillingPurchase" :title="courseFeeEditionModalMetaInfo.title"
       @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" @hide="resetBillingPurchaseEditionModal"
-      :error-messages="editedBillingPurchaseErrorMessages" :is-billed="courseFeeEditionModalMetaInfo.isBilled" />
+      :error-messages="editedBillingPurchaseErrorMessages" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
+      :course-name="courseName" />
 
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
-      :validations="validations.billToValidate" @cancel="cancelBillValidation" :course-type="course.type"
-      :trainees-length="traineesLength" />
+      :validations="validations.billToValidate" @cancel="cancelBillValidation" :trainees-length="traineesLength"
+      :course-name="courseName" :course-type="course.type" />
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
@@ -135,7 +137,7 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatPrice, formatDownloadName } from '@helpers/utils';
+import { formatPrice, formatDownloadName, formatQuantity } from '@helpers/utils';
 import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import CourseBills from '@api/CourseBills';
@@ -251,6 +253,17 @@ export default {
 
     const traineesLength = computed(() => course.value.trainees
       .filter(trainee => trainee.company._id === company.value._id).length);
+
+    const courseName = computed(() => `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
+      ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
+
+    const traineesQuantity = computed(() => {
+      const quantity = get(course, 'value.trainees')
+        .filter(trainee => trainee.company._id === company.value._id).length;
+
+      return `${formatQuantity('stagiaire', quantity)} de ${get(company, 'value.name')}
+        ${quantity > 1 ? 'inscrits' : 'inscrit'} à cette formation`;
+    });
 
     const getBillErrorMessages = (parent) => {
       let price = '';
@@ -634,6 +647,8 @@ export default {
       editedBillingPurchaseErrorMessages,
       canAddBill,
       traineesLength,
+      courseName,
+      traineesQuantity,
       // Methods
       resetBillCreationModal,
       resetEditedBill,

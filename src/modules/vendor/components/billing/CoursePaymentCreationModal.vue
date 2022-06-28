@@ -11,7 +11,7 @@
           {{ coursePaymentMetaInfo.number }} - {{ formatPrice(coursePaymentMetaInfo.netInclTaxes) }}
       </span>
     </div>
-    <div class="name">{{ coursePaymentMetaInfo.courseName }}</div>
+    <div class="course-name">{{ coursePaymentMetaInfo.courseName }}</div>
     <ni-input in-modal caption="Montant" suffix="€" type="number" required-field :error-message="netInclTaxesError"
       :model-value="newCoursePayment.netInclTaxes" @update:model-value="update($event, 'netInclTaxes')"
       :error="validations.netInclTaxes.$error" @blur="validations.netInclTaxes.$touch" />
@@ -69,9 +69,9 @@ export default {
         : PAYMENT_NATURE_OPTIONS.find(option => option.value === props.newCoursePayment.nature).label
     ));
 
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:new-course-payment', set({ ...props.newCoursePayment }, path, event));
     };
@@ -93,10 +93,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.name
-  color: $copper-grey-500
-  font-size: 14px
-  margin-bottom: 16px
-</style>

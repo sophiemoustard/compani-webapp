@@ -3,6 +3,7 @@
     <template #title>
       Ajouter un article <span class="text-weight-bold">à facturer</span>
     </template>
+    <div class="course-name">{{ courseName }} </div>
     <ni-select in-modal caption="Article" :options="billingItemOptions" :model-value="newBillingPurchase.billingItem"
       required-field @blur="validations.billingItem.$touch" :error="validations.billingItem.$error"
       @update:model-value="update($event, 'billingItem')" />
@@ -22,11 +23,11 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
-import set from 'lodash/set';
 
 export default {
   name: 'BillingPurchaseAdditionModal',
@@ -37,6 +38,7 @@ export default {
     errorMessages: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    courseName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -45,19 +47,21 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-billing-purchase'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:new-billing-purchase', set({ ...this.newBillingPurchase }, path, event));
-    },
+  setup (props, { emit }) {
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
+    const update = (event, path) => {
+      emit('update:new-billing-purchase', set({ ...props.newBillingPurchase }, path, event));
+    };
+
+    return {
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

@@ -3,6 +3,7 @@
     <template #title>
       <span class="text-weight-bold">{{ title }}</span>
     </template>
+    <div class="course-name">{{ courseName }} </div>
     <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number" :disable="isBilled"
       :model-value="courseFee.price" @blur="validations.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'price')" />
@@ -19,10 +20,10 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
-import set from 'lodash/set';
 
 export default {
   name: 'CourseFeeEditionModal',
@@ -34,6 +35,7 @@ export default {
     loading: { type: Boolean, default: false },
     title: { type: String, default: '' },
     isBilled: { type: Boolean, default: false },
+    courseName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -41,19 +43,21 @@ export default {
     'ni-input': Input,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:course-fee'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:course-fee', set({ ...this.courseFee }, path, event));
-    },
+  setup (props, { emit }) {
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
+    const update = (event, path) => {
+      emit('update:course-fee', set({ ...props.courseFee }, path, event));
+    };
+
+    return {
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

@@ -3,11 +3,11 @@
     <template #title>
       Nouvelle <span class="text-weight-bold">facture</span>
     </template>
-    <div>{{ getCourseName }} </div>
-    <div class="trainees">{{ getTraineesQuantity }} </div>
+    <div>{{ courseName }} </div>
+    <div class="trainees">{{ traineesQuantity }} </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
       @update:model-value="update($event, 'payer')" />
-    <ni-input in-modal :caption="course.type === INTRA ? 'Prix du programme' : 'Prix par stagiaire'"
+    <ni-input in-modal :caption="courseType === INTRA ? 'Prix du programme' : 'Prix par stagiaire'"
       :error="validations.mainFee.price.$error" type="number" :model-value="newBill.mainFee.price"
       @blur="validations.mainFee.price.$touch" suffix="€" required-field :error-message="errorMessages.price"
       @update:model-value="update($event, 'mainFee.price')" />
@@ -22,15 +22,12 @@
 </template>
 
 <script>
-import { toRefs, computed } from 'vue';
-import get from 'lodash/get';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import { INTRA } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
 
 export default {
   name: 'CourseBillCreationModal',
@@ -41,8 +38,9 @@ export default {
     errorMessages: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    course: { type: Object, default: () => ({}) },
-    company: { type: Object, default: () => ({}) },
+    courseName: { type: String, default: '' },
+    courseType: { type: String, default: '' },
+    traineesQuantity: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -52,24 +50,9 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-bill'],
   setup (props, { emit }) {
-    const { course, company } = toRefs(props);
-    const getCourseName = computed(() => `${get(company, 'value.name')} - 
-      ${get(course, 'value.subProgram.program.name')} ${get(course, 'value.misc')
-  ? ` - 
-      ${get(course, 'value.misc')}`
-  : ''}`);
-
-    const getTraineesQuantity = computed(() => {
-      const traineesQuantity = get(course, 'value.trainees')
-        .filter(trainee => trainee.company._id === company.value._id).length;
-
-      return `${formatQuantity('stagiaire', traineesQuantity)} de ${get(company, 'value.name')}
-        ${traineesQuantity > 1 ? 'inscrits' : 'inscrit'} à cette formation`;
-    });
-
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:new-bill', set({ ...props.newBill }, path, event));
     };
@@ -77,9 +60,6 @@ export default {
     return {
       // Data
       INTRA,
-      // Computed
-      getCourseName,
-      getTraineesQuantity,
       // Methods
       hide,
       input,

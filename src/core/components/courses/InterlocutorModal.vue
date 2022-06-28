@@ -50,10 +50,10 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor'],
   setup (_, { emit }) {
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
-    const update = (event) => { emit('update:interlocutor', event); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
+    const update = event => emit('update:interlocutor', event);
 
     return {
       // Methods
