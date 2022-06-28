@@ -7,7 +7,7 @@
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'number'">
-              <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
+              <div class="clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
               <div :class="getCourseNameClass(get(props.row, 'course'))" @click="goToCourse(get(props.row, 'course'))">
@@ -103,7 +103,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
-import { formatPrice, formatPriceWithSign } from '@helpers/utils';
+import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import router from 'src/router/index';
@@ -223,11 +223,12 @@ export default {
       }
     };
 
-    const downloadBill = async (billId) => {
+    const downloadBill = async (bill) => {
       try {
         pdfLoading.value = true;
-        const pdf = await CourseBills.getPdf(billId);
-        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
+        const pdf = await CourseBills.getPdf(bill._id);
+        const pdfName = `${formatDownloadName(`${bill.payer.name} ${bill.number}`)}.pdf`;
+        downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture.');

@@ -4,7 +4,12 @@ import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload, readAPIResponseWithTypeArrayBuffer } from '@helpers/utils';
+import {
+  formatIdentity,
+  formatPhoneForPayload,
+  readAPIResponseWithTypeArrayBuffer,
+  formatDownloadName,
+} from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadFile } from '@helpers/file';
 
@@ -69,9 +74,9 @@ export const courseMixin = {
       return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
     },
     composeCourseName (c, attachCompany = false) {
-      const possiblyCompanyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
-      const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
-      return possiblyCompanyName + c.subProgram.program.name + possiblyMisc;
+      const companyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
+      const misc = c.misc ? ` - ${c.misc}` : '';
+      return companyName + c.subProgram.program.name + misc;
     },
     getValue (path) {
       if (path === 'trainer') return get(this.course, 'trainer._id', '');
@@ -126,7 +131,9 @@ export const courseMixin = {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        downloadFile(pdf, 'emargement.pdf', 'application/octet-stream');
+        const formattedName = formatDownloadName(`feuilles d'emargement ${this.composeCourseName(this.course, true)}`);
+        const pdfName = `${formattedName}.pdf`;
+        downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         const decodedRep = readAPIResponseWithTypeArrayBuffer(e);

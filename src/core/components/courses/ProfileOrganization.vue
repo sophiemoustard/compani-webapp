@@ -101,7 +101,6 @@ import Courses from '@api/Courses';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
-import ResponsiveTable from '@components/table/ResponsiveTable';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
@@ -125,7 +124,7 @@ import {
   DEFAULT_AVATAR,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
-import { formatAndSortIdentityOptions, formatQuantity, formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { descendingSort, ascendingSort } from '@helpers/date';
@@ -151,7 +150,6 @@ export default {
     'sms-sending-modal': SmsSendingModal,
     'sms-history-modal': CourseSmsHistoryModal,
     'ni-button': Button,
-    'ni-responsive-table': ResponsiveTable,
     'interlocutor-cell': InterlocutorCell,
     'interlocutor-modal': InterlocutorModal,
   },
@@ -461,7 +459,9 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        downloadFile(pdf, 'convocation.pdf', 'application/octet-stream');
+        const formattedName = formatDownloadName(`convocation ${this.composeCourseName(this.course, true)}`);
+        const pdfName = `${formattedName}.pdf`;
+        downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la convocation.');
