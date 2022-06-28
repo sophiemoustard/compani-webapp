@@ -1,6 +1,6 @@
 <template>
   <q-banner :class="`full-width warning q-mb-md ${customClass}`" dense>
-    <q-icon size="sm" :name="icon" :color="iconColor" />
+    <q-icon size="sm" :name="icon" :color="iconColor" class="q-pr-xs" />
     <div><slot name="message" /></div>
   </q-banner>
 </template>
