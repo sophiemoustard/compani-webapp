@@ -45,10 +45,10 @@
           </template>
         </ni-banner>
         <div class="row">
-          <ni-banner v-if="followUpDisabled">
+          <ni-banner v-if="!!smsMissingInfo.length">
             <template #message>
-              Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
-              pour envoyer des SMS : {{ followUpMissingInfo.join(', ') }}.
+              Il manque {{ formatQuantity('information', smsMissingInfo.length ) }}
+              pour envoyer des SMS : {{ smsMissingInfo.join(', ') }}.
             </template>
           </ni-banner>
           <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openHistoryModal"
@@ -260,10 +260,17 @@ export default {
       const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
       return !!this.course.slotsToPlan.length && !futurSlots.length;
     },
+    smsMissingInfo () {
+      const missingInfo = [];
+      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
+
+      return missingInfo;
+    },
     disableSms () {
       const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
 
-      return this.followUpDisabled || noPhoneNumber;
+      return !!this.smsMissingInfo.length || noPhoneNumber;
     },
     isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
@@ -391,10 +398,6 @@ export default {
         return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
       }
       if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
-
-      if (!this.course.trainer._id) {
-        return NotifyWarning('Vous ne pouvez pas envoyer de sms pour une formation sans formateur.');
-      }
 
       if (this.smsHistoryList.length) {
         this.smsHistoriesModal = true;
