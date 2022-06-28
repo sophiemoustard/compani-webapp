@@ -386,8 +386,16 @@ export default {
       }
       if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
 
-      this.smsHistoriesModal = true;
-      this.sendSms = true;
+      if (!this.course.trainer._id) {
+        return NotifyWarning('Vous ne pouvez pas envoyer de sms pour une formation sans formateur.');
+      }
+
+      if (this.smsHistoryList.length) {
+        this.smsHistoriesModal = true;
+        this.sendSms = true;
+      } else {
+        this.openSmsModal();
+      }
     },
     openSmsModal () {
       this.updateMessage(this.newSms.type);
