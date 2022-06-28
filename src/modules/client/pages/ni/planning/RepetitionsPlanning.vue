@@ -65,8 +65,7 @@ export default {
 
     const getAuxiliaryRepetitions = async () => {
       try {
-        const repetitions = await Repetitions.list({ auxiliary: selectedAuxiliary.value });
-        auxiliaryRepetitions.value = repetitions;
+        auxiliaryRepetitions.value = await Repetitions.list({ auxiliary: selectedAuxiliary.value });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des répétitions.');
@@ -78,8 +77,7 @@ export default {
     });
 
     const created = async () => {
-      const aux = await getActiveAuxiliaries();
-      activeAuxiliaries.value = aux;
+      activeAuxiliaries.value = await getActiveAuxiliaries();
     };
 
     created();

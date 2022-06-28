@@ -212,12 +212,10 @@ export const planningModalMixin = {
       const oneWeekRepetitionLabel = `Tous les ${moment(startDate).format('dddd')}s`;
       const twoWeeksRepetitionLabel = `Le ${moment(startDate).format('dddd')} une semaine sur deux`;
 
-      repetitionOptions.push(
+      return repetitionOptions.concat(
         { label: oneWeekRepetitionLabel, value: EVERY_WEEK },
         { label: twoWeeksRepetitionLabel, value: EVERY_TWO_WEEKS }
       );
-
-      return repetitionOptions;
     },
     getAuxiliariesOptions (event) {
       if (this.isCustomerPlanning && this.creationModal) return formatAndSortIdentityOptions(this.activeAuxiliaries);
