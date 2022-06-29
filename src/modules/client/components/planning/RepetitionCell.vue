@@ -1,7 +1,7 @@
 <template>
   <q-card class="container">
     <div class="column justify-between flex-start">
-        <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName() }}</div>
+        <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName }}</div>
         <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
           {{ get(repetition, 'internalHour.name') }}
         </div>
@@ -63,13 +63,13 @@ export default {
       return `à partir du ${moment(startDate).format('DD/MM/YYYY')}`;
     });
 
-    const getLastVersionServiceName = () => {
+    const getLastVersionServiceName = computed(() => {
       const subscriptions = get(repetition.value, 'customer.subscriptions');
       const matchingSubscription = subscriptions.filter(sub => sub._id === get(repetition.value, 'subscription'))[0];
       const versions = get(matchingSubscription, 'service.versions');
 
       return getLastVersion(versions, 'createdAt').name;
-    };
+    });
 
     return {
       // Data
@@ -80,10 +80,10 @@ export default {
       // Computed
       getRepetitionInfos,
       getRepetitionStartDate,
+      getLastVersionServiceName,
       // Methods
       formatIdentity,
       get,
-      getLastVersionServiceName,
     };
   },
 };

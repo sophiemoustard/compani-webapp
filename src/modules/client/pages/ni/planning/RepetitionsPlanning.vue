@@ -1,10 +1,12 @@
 <template>
   <q-page class="client-background" padding>
     <ni-title-header title="Gérer les répétitions" />
-    <ni-select caption="Auxiliaires" :model-value="selectedAuxiliary" :options="activeAuxiliaries"
+    <ni-select caption="Auxiliaire" :model-value="selectedAuxiliary" :options="activeAuxiliaries"
       @update:model-value="setAuxiliary($event)" clearable class="q-mt-xl" />
     <q-card v-if="selectedAuxiliary" class="cell-container">
-      <div class="cell-title">Répétitions de  <span class="text-weight-bold">{{ getAuxiliaryName() }}</span></div>
+      <div class="cell-title">
+        Répétitions de  <span class="text-weight-bold">{{ currentAuxiliaryName }}</span>
+      </div>
       <div v-for="repetition of auxiliaryRepetitions" :key="repetition._id">
         <ni-repetition-cell :repetition="repetition" />
       </div>
@@ -43,6 +45,12 @@ export default {
     const $store = useStore();
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
+    const currentAuxiliaryName = computed(() => {
+      const auxiliaryName = activeAuxiliaries.value.find(aux => get(aux, 'value') === selectedAuxiliary.value);
+
+      return get(auxiliaryName, 'label');
+    });
+
     const getActiveAuxiliaries = async () => {
       try {
         const companyId = get(loggedUser.value, 'company._id');
@@ -56,12 +64,6 @@ export default {
     };
 
     const setAuxiliary = (aux) => { selectedAuxiliary.value = aux; };
-
-    const getAuxiliaryName = () => {
-      const auxiliaryName = activeAuxiliaries.value.find(aux => get(aux, 'value') === selectedAuxiliary.value);
-
-      return get(auxiliaryName, 'label');
-    };
 
     const getAuxiliaryRepetitions = async () => {
       try {
@@ -87,10 +89,11 @@ export default {
       activeAuxiliaries,
       selectedAuxiliary,
       auxiliaryRepetitions,
+      // Computed
+      currentAuxiliaryName,
       // Methods
       getActiveAuxiliaries,
       setAuxiliary,
-      getAuxiliaryName,
       getAuxiliaryRepetitions,
     };
   },
