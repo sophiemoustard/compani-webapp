@@ -154,6 +154,7 @@ const routes = [
         beforeEnter: async (to, from, next) => {
           try {
             if (from.name === 'ni users learners info') to.params.defaultTab = 'traineeFollowUp';
+            if (from.name === 'ni users companies info') to.params.defaultTab = 'billing';
 
             return next();
           } catch (e) {

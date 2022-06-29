@@ -1,9 +1,19 @@
 <template>
   <div>
     <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
-      <p v-if="course.type === INTER_B2B" class="text-weight-bold">{{ company.name }}</p>
+      <p v-if="course.type === INTER_B2B" class="text-weight-bold">
+        {{ company.name }}
+        <span class="text-weight-regular text-copper-500">
+           ( <a class="redirection cursor-pointer" @click="goToCompany">voir la fiche structure</a> )
+        </span>
+      </p>
       <div v-if="courseBills.length">
-        <p v-if="course.type === INTRA" class="text-weight-bold">Infos de facturation</p>
+        <p v-if="course.type === INTRA" class="text-weight-bold">
+          Infos de facturation - {{ company.name }}
+          <span class="text-weight-regular text-copper-500">
+            ( <a class="redirection cursor-pointer" @click="goToCompany">voir la fiche structure</a> )
+          </span>
+        </p>
         <q-card v-for="bill of courseBills" :key="bill._id" flat class="q-mb-md">
           <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
             <q-item-section>
@@ -131,6 +141,7 @@
 <script>
 import { useMeta, useQuasar } from 'quasar';
 import { computed, ref, toRefs } from 'vue';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -175,6 +186,7 @@ export default {
     const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
     const $q = useQuasar();
+    const $router = useRouter();
 
     const { company, course, payerList, billingItemList, courseBills } = toRefs(props);
     const billCreationLoading = ref(false);
@@ -610,6 +622,10 @@ export default {
       }
     };
 
+    const goToCompany = () => {
+      $router.push({ name: 'ni users companies info', params: { companyId: company.value._id, defaultTab: 'bills' } });
+    };
+
     return {
       // Data
       billCreationLoading,
@@ -680,6 +696,7 @@ export default {
       getBillingItemName,
       downloadBill,
       downloadCreditNote,
+      goToCompany,
       get,
       omit,
       pickBy,
@@ -704,4 +721,9 @@ export default {
 .bill-cancel
   display: flex
   align-items: center
+
+.redirection
+  &:hover
+    text-decoration: underline
+    text-decoration-color: $copper-500
 </style>
