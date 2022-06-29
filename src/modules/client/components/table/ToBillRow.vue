@@ -32,16 +32,16 @@
       </template>
       <template v-else-if="col.name === 'hours'">
         <template v-if="!bill.subscription">{{ bill.eventsList.length }}</template>
-        <template v-else>{{ formatHours(bill) }}</template>
+        <template v-else>{{ formatHours }}</template>
       </template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatStringToPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
         <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
-          :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)" :ref-name="bill._id"
+          :value="formatPrice(bill.discount)" @disable="disableDiscountEditing()" :ref-name="bill._id"
           @click="$emit('discount-click', $event)" @change="setDiscount" suffix="€" />
       </template>
-      <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
-      <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
+      <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(netExclTaxes) }}</template>
+      <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(netInclTaxes) }}</template>
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
     <q-td data-cy="col-selected-bill">
@@ -52,6 +52,8 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
+import { computed } from 'vue';
 import EditableTd from '@components/table/EditableTd';
 import {
   formatPrice,
@@ -62,10 +64,9 @@ import {
   toCents,
   toEuros,
 } from '@helpers/utils';
-import { divide, add, multiply } from '@helpers/numbers';
+import { divide, add, multiply, toFixedToFloat } from '@helpers/numbers';
 import { formatDate, isSameOrBefore } from '@helpers/date';
 import { FIXED } from '@data/constants';
-import { useMeta } from 'quasar';
 
 export default {
   name: 'ToBillRow',
@@ -84,43 +85,40 @@ export default {
     const metaInfo = { title: 'A facturer' };
     useMeta(metaInfo);
 
-    const formatHours = (bill) => {
+    const formatHours = computed(() => {
+      const { bill } = props;
       if (bill.subscription.service && bill.subscription.service.nature === FIXED) return bill.eventsList.length;
 
       return bill.hours ? `${parseFloat(bill.hours).toFixed(2)}h` : '';
-    };
+    });
 
-    const getClientName = (customer, bill) => {
+    const getClientName = (customer) => {
+      const { bill } = props;
       if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
       return truncate(bill.thirdPartyPayer.name, 35);
     };
 
-    const getExclTaxesDiscount = (bill) => {
-      const vat = divide(bill.vat, 100);
+    const netExclTaxes = computed(() => {
+      const { bill } = props;
+      const exclTaxes = divide(netInclTaxes.value, add(1, divide(bill.vat, 100)));
 
-      return divide(bill.discount, add(1, vat));
-    };
+      return toFixedToFloat(exclTaxes);
+    });
 
-    const getNetExclTaxes = (bill) => {
-      const exclTaxesCents = toCents(bill.exclTaxes);
-      const exclTaxesDiscountCents = toCents(getExclTaxesDiscount(bill));
-
-      return toEuros(exclTaxesCents - exclTaxesDiscountCents);
-    };
-
-    const getNetInclTaxes = (bill) => {
+    const netInclTaxes = computed(() => {
+      const { bill } = props;
       const inclTaxesCents = toCents(bill.inclTaxes);
       const discountCents = toCents(bill.discount);
 
       return toEuros(inclTaxesCents - discountCents);
-    };
+    });
 
     const setDiscount = ({ value, obj, path }) => {
       obj[path] = !value || isNaN(value) || value < 0 ? 0 : parseFloat(divide(Math.trunc(multiply(value, 100)), 100));
       emit('discount-input');
     };
 
-    const disableDiscountEditing = bill => (bill.discountEdition = false);
+    const disableDiscountEditing = () => update(false, 'discountEdition');
 
     const update = async (event, prop) => {
       await emit('update:bill', { ...props.bill, [prop]: event });
@@ -134,16 +132,16 @@ export default {
     const startDateOptions = date => isSameOrBefore(date, props.bill.endDate);
 
     return {
+      // Computed
+      formatHours,
+      netExclTaxes,
+      netInclTaxes,
       // Methods
       formatPrice,
       formatDate,
       formatStringToPrice,
       getLastVersion,
-      formatHours,
       getClientName,
-      getExclTaxesDiscount,
-      getNetExclTaxes,
-      getNetInclTaxes,
       setDiscount,
       disableDiscountEditing,
       update,
