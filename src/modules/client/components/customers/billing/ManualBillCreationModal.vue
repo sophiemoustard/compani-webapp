@@ -52,7 +52,7 @@ import BiColorButton from '@components/BiColorButton';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPrice, formatStringToPrice } from '@helpers/utils';
-import { multiply, add, divide, toString } from '@helpers/numbers';
+import { multiply, add, divide, toString, toFixedToFloat } from '@helpers/numbers';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 
 export default {
@@ -97,7 +97,7 @@ export default {
       handler () {
         this.totalExclTaxes = this.newManualBill.billingItemList.reduce(
           (acc, bi) => (bi.billingItem
-            ? add(acc, multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count))
+            ? add(acc, this.getExclTaxes(toFixedToFloat(multiply(bi.unitInclTaxes, bi.count)), bi.vat))
             : acc
           ),
           toString(0)
