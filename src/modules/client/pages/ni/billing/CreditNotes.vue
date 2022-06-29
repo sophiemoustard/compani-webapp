@@ -175,7 +175,7 @@ export default {
     'newCreditNote.events': function (previousValue, currentValue) {
       if (isEqual(previousValue, currentValue)) return;
 
-      const prices = this.computePrices(this.newCreditNote.events);
+      const prices = this.computePrices(this.newCreditNote.events, this.newCreditNote.customer);
       this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
       this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
       this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
@@ -187,7 +187,7 @@ export default {
         if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
           this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
             (acc, bi) => {
-              const biExclTaxes = multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count);
+              const biExclTaxes = this.getExclTaxes(multiply(bi.unitInclTaxes, bi.count), bi.vat);
               return bi.billingItem ? add(acc, biExclTaxes) : acc;
             },
             toString(0)
@@ -206,7 +206,7 @@ export default {
     },
     'editedCreditNote.events': function (previousValue, currentValue) {
       if (!isEqual(previousValue, currentValue) && this.creditNoteType === EVENTS) {
-        const prices = this.computePrices(this.editedCreditNote.events);
+        const prices = this.computePrices(this.editedCreditNote.events, this.editedCreditNote.customer);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
         this.editedCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
@@ -219,7 +219,7 @@ export default {
         if (get(this.editedCreditNote, 'billingItemList[0].billingItem')) {
           this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
             (acc, bi) => {
-              const biExclTaxes = multiply(this.getExclTaxes(bi.unitInclTaxes, bi.vat), bi.count);
+              const biExclTaxes = this.getExclTaxes(multiply(bi.unitInclTaxes, bi.count), bi.vat);
               return bi.billingItem ? add(acc, biExclTaxes) : acc;
             },
             toString(0)
@@ -484,31 +484,46 @@ export default {
 
       return REQUIRED_LABEL;
     },
+    getSubscriptionVat (event, customer) {
+      const eventSubscription = event.subscription;
+      const cus = this.customersOptions.find(c => c.value === customer);
+      const customerSubscription = cus.subscriptions.find(sub => sub._id === eventSubscription);
+
+      return customerSubscription.service.vat;
+    },
     // Compute
-    computePrices (eventIds) {
+    computePrices (eventIds, customer) {
       let exclTaxesCustomer = toString(0);
       let inclTaxesCustomerString = toString(0);
+      let inclTaxesCustomer = 0;
       let exclTaxesTpp = toString(0);
       let inclTaxesTppString = toString(0);
+      let inclTaxesTpp = 0;
       if (this.creditNoteEvents) {
         const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
         for (let i = 0, l = selectedEvents.length; i < l; i++) {
           if (selectedEvents[i].bills.exclTaxesCustomer && !isEqualTo(selectedEvents[i].bills.exclTaxesCustomer, 0)) {
-            exclTaxesCustomer = add(exclTaxesCustomer, selectedEvents[i].bills.exclTaxesCustomer);
             inclTaxesCustomerString = add(inclTaxesCustomerString, selectedEvents[i].bills.inclTaxesCustomer);
           }
           if (selectedEvents[i].bills.exclTaxesTpp && !isEqualTo(selectedEvents[i].bills.exclTaxesTpp, 0)) {
-            exclTaxesTpp = add(exclTaxesTpp, selectedEvents[i].bills.exclTaxesTpp);
             inclTaxesTppString = add(inclTaxesTppString, selectedEvents[i].bills.inclTaxesTpp);
           }
+        }
+
+        inclTaxesCustomer = toFixedToFloat(inclTaxesCustomerString);
+        inclTaxesTpp = toFixedToFloat(inclTaxesTppString);
+        if (selectedEvents.length) {
+          const subscriptionVat = this.getSubscriptionVat(this.creditNoteEvents[0], customer);
+          exclTaxesCustomer = this.getExclTaxes(inclTaxesCustomer, subscriptionVat);
+          exclTaxesTpp = this.getExclTaxes(inclTaxesTpp, subscriptionVat);
         }
       }
 
       return {
         exclTaxesCustomer,
-        inclTaxesCustomer: toFixedToFloat(inclTaxesCustomerString),
+        inclTaxesCustomer,
         exclTaxesTpp,
-        inclTaxesTpp: toFixedToFloat(inclTaxesTppString),
+        inclTaxesTpp,
       };
     },
     // Creation
