@@ -3,14 +3,16 @@
     <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
       <p v-if="course.type === INTER_B2B" class="text-weight-bold">
         {{ company.name }}
-        <a class="clickable-name cursor-pointer text-weight-regular" @click="goToCompany">(voir la fiche structure)</a>
-        </p>
+        <span class="text-weight-regular text-copper-500">
+           ( <a class="redirection cursor-pointer" @click="goToCompany">voir la fiche structure</a> )
+        </span>
+      </p>
       <div v-if="courseBills.length">
         <p v-if="course.type === INTRA" class="text-weight-bold">
           Infos de facturation - {{ company.name }}
-          <a class="clickable-name cursor-pointer text-weight-regular" @click="goToCompany">
-            (voir la fiche structure)
-          </a>
+          <span class="text-weight-regular text-copper-500">
+            ( <a class="redirection cursor-pointer" @click="goToCompany">voir la fiche structure</a> )
+          </span>
         </p>
         <q-card v-for="bill of courseBills" :key="bill._id" flat class="q-mb-md">
           <q-card-section class="cursor-pointer row items-center" :id="bill._id" @click="showDetails(bill._id)">
@@ -719,4 +721,9 @@ export default {
 .bill-cancel
   display: flex
   align-items: center
+
+.redirection
+  &:hover
+    text-decoration: underline
+    text-decoration-color: $copper-500
 </style>
