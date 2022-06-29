@@ -283,7 +283,7 @@ export default {
     traineesEmails () {
       if (!this.course.trainees) return '';
 
-      return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc},${value}`, '');
+      return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc}${value},`, '');
     },
   },
   async created () {
