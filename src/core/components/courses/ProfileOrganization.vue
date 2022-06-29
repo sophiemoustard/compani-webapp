@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Envoi de SMS</p>
+        <p class="text-weight-bold">Contacter les stagiaires</p>
         <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
           <template #message>
             Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
@@ -45,11 +45,19 @@
           </template>
         </ni-banner>
         <div class="row">
-          <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
-            label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
+          <ni-banner v-if="!!smsMissingInfo.length">
+            <template #message>
+              Il manque {{ formatQuantity('information', smsMissingInfo.length ) }}
+              pour envoyer des SMS : {{ smsMissingInfo.join(', ') }}.
+            </template>
+          </ni-banner>
+          <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openHistoryModal"
+            label="Envoyer un SMS aux stagiaires" size="16px" />
           <ni-button color="primary" :disable="!smsHistoryList.length" icon="history" label="Historique d'envoi"
             @click="smsHistoriesModal = true" />
         </div>
+        <ni-bi-color-button class="q-my-sm" icon="content_copy" label="Copier les adresses e-mail" @click="copy"
+          size="16px" :disable="!traineesEmails" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -72,8 +80,8 @@
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
-    <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList"
-      :message-type-options="messageTypeOptions" />
+    <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
+      :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
     <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutorId"
       @submit="updateSalesRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
@@ -88,6 +96,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -185,6 +194,7 @@ export default {
       interlocutorModalLoading: false,
       trainerLabel: { action: '', interlocutor: '' },
       trainerModal: false,
+      sendSms: false,
     };
   },
   validations () {
@@ -250,10 +260,17 @@ export default {
       const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
       return !!this.course.slotsToPlan.length && !futurSlots.length;
     },
+    smsMissingInfo () {
+      const missingInfo = [];
+      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
+
+      return missingInfo;
+    },
     disableSms () {
       const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
 
-      return this.followUpDisabled || noPhoneNumber;
+      return !!this.smsMissingInfo.length || noPhoneNumber;
     },
     isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
@@ -262,6 +279,11 @@ export default {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role']));
 
       return ability.can('update', 'interlocutor');
+    },
+    traineesEmails () {
+      if (!this.course.trainees) return '';
+
+      return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc}${value},`, '');
     },
   },
   async created () {
@@ -371,13 +393,23 @@ export default {
         this.smsLoading = false;
       }
     },
-    openSmsModal () {
+    openHistoryModal () {
       if (this.allFuturSlotsAreNotPlanned) {
         return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
       }
       if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
 
+      if (this.smsHistoryList.length) {
+        this.smsHistoriesModal = true;
+        this.sendSms = true;
+      } else {
+        this.openSmsModal();
+      }
+    },
+    openSmsModal () {
       this.updateMessage(this.newSms.type);
+      this.smsHistoriesModal = false;
+      this.sendSms = false;
       this.smsModal = true;
     },
     resetSmsModal () {
@@ -520,6 +552,11 @@ export default {
       this.tempInterlocutorId = this.course.trainer._id;
       this.trainerLabel = { action, interlocutor: 'intervenant(e)' };
       this.trainerModal = true;
+    },
+    copy () {
+      copyToClipboard(this.traineesEmails)
+        .then(() => NotifyPositive('Adresses mail copiées !'))
+        .catch(() => NotifyNegative('Erreur lors de la copie des emails.'));
     },
   },
 };
