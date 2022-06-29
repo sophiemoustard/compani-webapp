@@ -1,16 +1,19 @@
 <template>
   <q-card class="container">
-    <div class="column justify-between flex-start">
-        <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName }}</div>
-        <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
-          {{ get(repetition, 'internalHour.name') }}
-        </div>
-        <div class="infos" v-else>{{ EVENT_TYPES.find(type => type.value === UNAVAILABILITY).label }}</div>
-        <div class="bold-infos q-pt-sm">{{ getRepetitionInfos }}</div>
-        <div class="infos q-pb-sm">{{ getRepetitionStartDate }}</div>
-        <div v-if="repetition.type === INTERVENTION" class="customer">
-          Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
-        </div>
+    <div class="row justify-between items-start">
+      <div class="column justify-between flex-start">
+          <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName }}</div>
+          <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
+            {{ get(repetition, 'internalHour.name') }}
+          </div>
+          <div class="infos" v-else>{{ EVENT_TYPES.find(type => type.value === UNAVAILABILITY).label }}</div>
+          <div class="bold-infos q-pt-sm">{{ getRepetitionInfos }}</div>
+          <div class="infos q-pb-sm">{{ getRepetitionStartDate }}</div>
+          <div v-if="repetition.type === INTERVENTION" class="customer">
+            Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
+          </div>
+      </div>
+      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="$emit('button-click', $event)" />
     </div>
   </q-card>
 </template>
@@ -21,6 +24,7 @@ import { get } from 'lodash';
 import moment from '@helpers/moment';
 import { formatHoursWithMinutes } from '@helpers/date';
 import { formatIdentity, getLastVersion } from '@helpers/utils';
+import Button from '@components/Button';
 import {
   REPETITION_FREQUENCIES,
   EVERY_TWO_WEEKS,
@@ -33,11 +37,17 @@ import {
 
 export default {
   name: 'RepetitionCell',
+  components: {
+    'ni-button': Button,
+  },
   props: {
     repetition: { type: Object, default: () => ({}) },
+    visible: { type: Boolean, default: true },
   },
+  emits: ['button-click'],
   setup (props) {
     const { repetition } = toRefs(props);
+
     const oneWeekRepetitionLabel = computed(() => `Tous les
       ${moment(get(repetition.value, 'startDate')).format('dddd')}s`);
     const twoWeeksRepetitionLabel = computed(() => `Le ${moment(get(repetition.value, 'startDate')).format('dddd')}

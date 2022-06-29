@@ -8,7 +8,7 @@
         Répétitions de  <span class="text-weight-bold">{{ currentAuxiliaryName }}</span>
       </div>
       <div v-for="repetition of auxiliaryRepetitions" :key="repetition._id">
-        <ni-repetition-cell :repetition="repetition" />
+        <ni-repetition-cell :repetition="repetition" @button-click="openRepetitionDeletionModal(repetition)" />
       </div>
       <div v-if="!auxiliaryRepetitions.length">
         <q-card class="card">
@@ -17,6 +17,9 @@
       </div>
     </q-card>
   </q-page>
+
+  <ni-repetition-deletion-modal v-model="repetitionDeletionModal" :current-auxiliary-name="currentAuxiliaryName"
+    :repetition="currentRepetition" @hide="closeRepetitionDeletionModal" />
 </template>
 
 <script>
@@ -30,6 +33,7 @@ import { NotifyNegative } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import RepetitionCell from 'src/modules/client/components/planning/RepetitionCell';
+import RepetitionDeletionModal from 'src/modules/client/components/planning/RepetitionDeletionModal';
 
 export default {
   name: 'RepetitionsPlanning',
@@ -37,12 +41,23 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-select': Select,
     'ni-repetition-cell': RepetitionCell,
+    'ni-repetition-deletion-modal': RepetitionDeletionModal,
   },
   setup () {
     const activeAuxiliaries = ref([]);
     const auxiliaryRepetitions = ref([]);
     const selectedAuxiliary = ref('');
+    const currentRepetition = ref({});
     const $store = useStore();
+    const repetitionDeletionModal = ref(false);
+
+    const openRepetitionDeletionModal = (repetition) => {
+      currentRepetition.value = repetition;
+      repetitionDeletionModal.value = true;
+    };
+
+    const closeRepetitionDeletionModal = () => (repetitionDeletionModal.value = false);
+
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const currentAuxiliaryName = computed(() => {
@@ -89,12 +104,16 @@ export default {
       activeAuxiliaries,
       selectedAuxiliary,
       auxiliaryRepetitions,
+      repetitionDeletionModal,
+      currentRepetition,
       // Computed
       currentAuxiliaryName,
       // Methods
       getActiveAuxiliaries,
       setAuxiliary,
       getAuxiliaryRepetitions,
+      openRepetitionDeletionModal,
+      closeRepetitionDeletionModal,
     };
   },
 };
