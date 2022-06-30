@@ -19,21 +19,30 @@
   </q-page>
 
   <ni-repetition-deletion-modal v-model="repetitionDeletionModal" :current-auxiliary-name="currentAuxiliaryName"
-    :repetition="currentRepetition" @hide="closeRepetitionDeletionModal" />
+    :repetition="currentRepetition" @hide="closeRepetitionDeletionModal" @cancel="cancelDeletion"
+    @confirm-deletion="canDeleteRepetition" @update-deletion-date="updateDeletionDate"
+    :validations="v$.currentRepetition" />
+
+  <ni-repetition-deletion-confirmation-modal v-model="confirmationModal" :repetition="currentRepetition"
+     :loading="loading" @cancel="closeDeletionConfirmationModal" @submit="deleteRepetition" />
 </template>
 
 <script>
 import { ref, watch, computed } from 'vue';
 import { get } from 'lodash';
 import { useStore } from 'vuex';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import Users from '@api/Users';
 import Repetitions from '@api/Repetitions';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import RepetitionCell from 'src/modules/client/components/planning/RepetitionCell';
 import RepetitionDeletionModal from 'src/modules/client/components/planning/RepetitionDeletionModal';
+import RepetitionDeletionConfirmationModal from
+  'src/modules/client/components/planning/RepetitionDeletionConfirmationModal';
 
 export default {
   name: 'RepetitionsPlanning',
@@ -42,6 +51,7 @@ export default {
     'ni-select': Select,
     'ni-repetition-cell': RepetitionCell,
     'ni-repetition-deletion-modal': RepetitionDeletionModal,
+    'ni-repetition-deletion-confirmation-modal': RepetitionDeletionConfirmationModal,
   },
   setup () {
     const activeAuxiliaries = ref([]);
@@ -50,9 +60,11 @@ export default {
     const currentRepetition = ref({});
     const $store = useStore();
     const repetitionDeletionModal = ref(false);
+    const confirmationModal = ref(false);
+    const loading = ref(false);
 
     const openRepetitionDeletionModal = (repetition) => {
-      currentRepetition.value = repetition;
+      currentRepetition.value = { ...repetition, dateDeletion: '' };
       repetitionDeletionModal.value = true;
     };
 
@@ -89,9 +101,47 @@ export default {
       }
     };
 
+    const cancelDeletion = () => {
+      repetitionDeletionModal.value = false;
+      NotifyPositive('Suppression annulée.');
+    };
+
+    const closeDeletionConfirmationModal = () => { confirmationModal.value = false; };
+
+    const updateDeletionDate = (event) => { currentRepetition.value.dateDeletion = event; };
+
+    const canDeleteRepetition = () => {
+      v$.value.currentRepetition.$touch();
+      if (v$.value.currentRepetition.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+      confirmationModal.value = true;
+    };
+
+    const deleteRepetition = async () => {
+      try {
+        loading.value = true;
+        await Repetitions.delete(currentRepetition.value._id, { startDate: currentRepetition.value.dateDeletion });
+        confirmationModal.value = false;
+        repetitionDeletionModal.value = false;
+        NotifyPositive('Répétition supprimée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppressioin de la répétition.');
+      } finally {
+        loading.value = false;
+        refresh();
+      }
+    };
+
+    const refresh = async () => getAuxiliaryRepetitions();
+
     watch(selectedAuxiliary, async () => {
       if (selectedAuxiliary.value) await getAuxiliaryRepetitions();
     });
+
+    const rules = { currentRepetition: { dateDeletion: { required } } };
+
+    const v$ = useVuelidate(rules, { currentRepetition });
 
     const created = async () => {
       activeAuxiliaries.value = await getActiveAuxiliaries();
@@ -106,6 +156,8 @@ export default {
       auxiliaryRepetitions,
       repetitionDeletionModal,
       currentRepetition,
+      confirmationModal,
+      loading,
       // Computed
       currentAuxiliaryName,
       // Methods
@@ -114,6 +166,13 @@ export default {
       getAuxiliaryRepetitions,
       openRepetitionDeletionModal,
       closeRepetitionDeletionModal,
+      cancelDeletion,
+      updateDeletionDate,
+      canDeleteRepetition,
+      deleteRepetition,
+      closeDeletionConfirmationModal,
+      // Validations
+      v$,
     };
   },
 };
