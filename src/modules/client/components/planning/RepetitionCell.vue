@@ -18,6 +18,7 @@
   </q-card>
 </template>
 <script>
+import { useMeta } from 'quasar';
 import { computed } from 'vue';
 import { toRefs } from 'vue-demi';
 import { get } from 'lodash';
@@ -46,6 +47,8 @@ export default {
   },
   emits: ['button-click'],
   setup (props) {
+    const metaInfo = { title: 'Gestion des répétitions' };
+    useMeta(metaInfo);
     const { repetition } = toRefs(props);
 
     const oneWeekRepetitionLabel = computed(() => `Tous les
