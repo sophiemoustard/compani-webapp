@@ -1,7 +1,7 @@
 <template>
   <q-card class="container">
     <div class="row justify-between items-start">
-      <div class="column justify-between flex-start">
+      <div class="column justify-between flex-start" style="max-width: 80%">
         <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName }}</div>
         <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
           {{ get(repetition, 'internalHour.name') }}
@@ -14,7 +14,7 @@
         </div>
       </div>
       <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="$emit('button-click', $event)" />
-    </div>
+      </div>
   </q-card>
 </template>
 <script>
