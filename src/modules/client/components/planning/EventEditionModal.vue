@@ -12,9 +12,9 @@
         <ni-banner v-if="editedEvent.isCancelled" icon="info_outline">
           <template #message>Intervention annulée</template>
         </ni-banner>
-        <div class="row modal-subtitle">
+        <div class="row modal-subtitle items-center">
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" class="q-my-sm" />
-          <div class="modal-subtitle">
+          <div class="modal-subtitle buttons-container q-my-sm">
             <ni-button v-if="canCancelOrRestore && !editedEvent.isCancelled" label="Annuler l'intervention"
               color="copper-grey-800" class="bg-copper-grey-100 q-my-sm" @click="openEventCancellationModal()" />
               <ni-button v-else-if="canCancelOrRestore" label="Rétablir l'intervention" color="copper-grey-800"
@@ -454,4 +454,8 @@ export default {
 .infos
   font-style: italic
   color: $copper-grey-400
+
+.buttons-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    width: 100%
 </style>
