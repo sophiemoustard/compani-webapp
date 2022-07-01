@@ -206,7 +206,7 @@ export default {
     },
     'editedCreditNote.events': function (previousValue, currentValue) {
       if (!isEqual(previousValue, currentValue) && this.creditNoteType === EVENTS) {
-        const prices = this.computePrices(this.editedCreditNote.events, this.editedCreditNote.customer);
+        const prices = this.computePrices(this.editedCreditNote.events, this.editedCreditNote.customer._id);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
         this.editedCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
