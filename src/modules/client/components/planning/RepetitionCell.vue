@@ -1,7 +1,7 @@
 <template>
   <q-card class="container">
     <div class="row justify-between items-start">
-      <div class="column justify-between flex-start" style="max-width: 80%">
+      <div class="infos-container">
         <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName }}</div>
         <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
           {{ get(repetition, 'internalHour.name') }}
@@ -107,6 +107,10 @@ export default {
   background-color: $copper-grey-100
   margin: 0px 0px 16px 0px
   padding: 16px
+.infos-container
+  max-width: 80%
+  justify-content: space-between
+  align-items: flex-start
 .infos
   color: $copper-grey-700
   size: 14px
