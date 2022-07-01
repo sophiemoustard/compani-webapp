@@ -36,7 +36,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Users from '@api/Users';
 import Repetitions from '@api/Repetitions';
-import { minDate } from '@helpers/vuelidateCustomVal';
+import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -68,6 +68,7 @@ export default {
     const confirmationModal = ref(false);
     const loading = ref(false);
     const minStartDate = ref(moment().startOf('d').toISOString());
+    const maxStartDate = ref(moment(minStartDate.value).add(90, 'day').toISOString());
 
     const openDeletionModal = (repetition) => {
       currentRepetition.value = { ...repetition, dateDeletion: '' };
@@ -130,6 +131,10 @@ export default {
         return NotifyWarning('La date ne peut pas être antérieure à la date du jour.');
       }
 
+      if (v$.value.currentRepetition.dateDeletion.maxDate.$response === false) {
+        return NotifyWarning('La date ne peut pas être postérieure à la date du jour + 90 jours.');
+      }
+
       confirmationModal.value = true;
     };
 
@@ -159,7 +164,11 @@ export default {
       if (selectedAuxiliary.value) await getAuxiliaryRepetitions();
     });
 
-    const rules = { currentRepetition: { dateDeletion: { required, minDate: minDate(minStartDate.value) } } };
+    const rules = {
+      currentRepetition: {
+        dateDeletion: { required, minDate: minDate(minStartDate.value), maxDate: maxDate(maxStartDate.value) },
+      },
+    };
 
     const v$ = useVuelidate(rules, { currentRepetition });
 

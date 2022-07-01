@@ -5,7 +5,7 @@
     </template>
     <ni-repetition-cell :repetition="repetition" :visible="false" />
     <ni-date-input caption="À partir du" :model-value="repetition.dateDeletion" in-modal
-      @update:model-value="updateDeletionDate($event)" required-field :min="minStartDate"
+      @update:model-value="updateDeletionDate($event)" required-field :min="minStartDate" :max="maxStartDate"
       :error="validations.dateDeletion.$error" :error-message="dateErrorMessage" />
     <span class="text q-mb-mds">
       Les évènements rattachés à cette répétition et postérieurs à cette date seront supprimés.
@@ -44,10 +44,11 @@ export default {
   setup (props, { emit }) {
     const { validations } = toRefs(props);
     const minStartDate = ref(moment().startOf('d').toISOString());
+    const maxStartDate = ref(moment(minStartDate.value).add(90, 'day').toISOString());
 
-    const dateErrorMessage = computed(() => (get(validations.value, 'dateDeletion.minDate.$response') === false
-      ? 'Date invalide'
-      : REQUIRED_LABEL));
+    const dateErrorMessage = computed(() => (get(validations.value, 'dateDeletion.required.$response') === false
+      ? REQUIRED_LABEL
+      : 'Date invalide'));
 
     const hide = () => emit('hide');
 
@@ -60,6 +61,7 @@ export default {
     return {
       // Data
       minStartDate,
+      maxStartDate,
       // Computeed
       dateErrorMessage,
       // Methods
