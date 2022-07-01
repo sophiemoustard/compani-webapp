@@ -16,12 +16,12 @@
           <q-btn rounded unelevated color="primary" :label="eventTypeLabel" class="q-my-sm" />
           <div class="modal-subtitle buttons-container q-my-sm">
             <ni-button v-if="canCancelOrRestore && !editedEvent.isCancelled" label="Annuler l'intervention"
-              color="copper-grey-800" class="bg-copper-grey-100 q-my-sm" @click="openEventCancellationModal()" />
+              color="copper-grey-800" class="bg-copper-grey-100" @click="openEventCancellationModal()" />
               <ni-button v-else-if="canCancelOrRestore" label="Rétablir l'intervention" color="copper-grey-800"
-              class="bg-copper-grey-100 q-my-sm" @click="openEventRestorationModal()" />
+              class="bg-copper-grey-100" @click="openEventRestorationModal()" />
               <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps
               flat color="copper-grey-400" v-if="canUpdateIntervention" data-cy="event-deletion-button"
-              :disable="historiesLoading" class="q-my-sm" />
+              :disable="historiesLoading" class="q-pr-sm" />
           </div>
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
