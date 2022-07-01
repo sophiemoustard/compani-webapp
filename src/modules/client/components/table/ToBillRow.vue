@@ -92,12 +92,6 @@ export default {
       return bill.hours ? `${parseFloat(bill.hours).toFixed(2)}h` : '';
     });
 
-    const getClientName = (customer) => {
-      const { bill } = props;
-      if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
-      return truncate(bill.thirdPartyPayer.name, 35);
-    };
-
     const netExclTaxes = computed(() => {
       const { bill } = props;
       const exclTaxes = divide(netInclTaxes.value, add(1, divide(bill.vat, 100)));
@@ -112,6 +106,12 @@ export default {
 
       return toEuros(inclTaxesCents - discountCents);
     });
+
+    const getClientName = (customer) => {
+      const { bill } = props;
+      if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
+      return truncate(bill.thirdPartyPayer.name, 35);
+    };
 
     const setDiscount = ({ value, obj, path }) => {
       obj[path] = !value || isNaN(value) || value < 0 ? 0 : parseFloat(divide(Math.trunc(multiply(value, 100)), 100));
