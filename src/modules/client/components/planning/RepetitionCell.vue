@@ -105,8 +105,6 @@ export default {
   padding: 16px
 .infos-container
   max-width: 80%
-  justify-content: space-between
-  align-items: flex-start
 .infos
   color: $copper-grey-700
   size: 14px
