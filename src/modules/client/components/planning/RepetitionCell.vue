@@ -13,7 +13,7 @@
           Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
         </div>
       </div>
-      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="submit" />
+      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
       </div>
   </q-card>
 </template>
@@ -44,7 +44,7 @@ export default {
     repetition: { type: Object, default: () => ({}) },
     visible: { type: Boolean, default: true },
   },
-  emits: ['submit'],
+  emits: ['delete'],
   setup (props, { emit }) {
     const { repetition } = toRefs(props);
 
@@ -81,7 +81,7 @@ export default {
       return getLastVersion(versions, 'createdAt').name;
     });
 
-    const submit = () => emit('submit');
+    const deleteRepetition = () => emit('delete');
 
     return {
       // Data
@@ -96,7 +96,7 @@ export default {
       // Methods
       formatIdentity,
       get,
-      submit,
+      deleteRepetition,
     };
   },
 };

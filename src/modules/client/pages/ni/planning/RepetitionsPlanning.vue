@@ -8,7 +8,7 @@
         Répétitions de  <span class="text-weight-bold">{{ currentAuxiliaryName }}</span>
       </div>
       <div v-for="repetition of auxiliaryRepetitions" :key="repetition._id">
-        <ni-repetition-cell :repetition="repetition" @submit="openDeletionModal(repetition)" />
+        <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)" />
       </div>
       <div v-if="!auxiliaryRepetitions.length">
         <q-card class="card">
