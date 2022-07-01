@@ -37,7 +37,7 @@
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatStringToPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
         <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
-          :value="formatPrice(bill.discount)" @disable="disableDiscountEditing()" :ref-name="bill._id"
+          :value="formatPrice(bill.discount)" @disable="update(false, 'discountEdition')" :ref-name="bill._id"
           @click="$emit('discount-click', $event)" @change="setDiscount" suffix="€" />
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(netExclTaxes) }}</template>
@@ -118,8 +118,6 @@ export default {
       emit('discount-input');
     };
 
-    const disableDiscountEditing = () => update(false, 'discountEdition');
-
     const update = async (event, prop) => {
       await emit('update:bill', { ...props.bill, [prop]: event });
     };
@@ -143,7 +141,6 @@ export default {
       getLastVersion,
       getClientName,
       setDiscount,
-      disableDiscountEditing,
       update,
       updateDate,
       startDateOptions,
