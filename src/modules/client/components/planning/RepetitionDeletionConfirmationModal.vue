@@ -4,7 +4,7 @@
       Êtes-vous sûr(e) de vouloir supprimer cette répétition ?
     </template>
     <ni-repetition-cell :repetition="repetition" :visible="false" />
-    <div>
+    <div class="text">
       Les événements rattachés à cette répétition et postérieurs au {{ formatDate }} seront supprimés.
     </div>
     <div class="row justify-end q-my-md">
@@ -21,7 +21,7 @@ import Button from '@components/Button';
 import RepetitionCell from 'src/modules/client/components/planning/RepetitionCell';
 
 export default {
-  name: 'RepetitionCell',
+  name: 'RepetitionDeletionConfirmationModal',
   components: {
     'ni-button': Button,
     'ni-modal': Modal,
@@ -53,3 +53,8 @@ export default {
   },
 };
 </script>
+<style lang="sass" scoped>
+.text
+  color: $copper-grey-600
+  font-size: 16px
+</style>

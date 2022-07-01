@@ -13,7 +13,7 @@
           Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
         </div>
       </div>
-      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="$emit('button-click', $event)" />
+      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="$emit('submit', $event)" />
       </div>
   </q-card>
 </template>
@@ -45,10 +45,11 @@ export default {
     repetition: { type: Object, default: () => ({}) },
     visible: { type: Boolean, default: true },
   },
-  emits: ['button-click'],
+  emits: ['submit'],
   setup (props) {
     const metaInfo = { title: 'Gestion des répétitions' };
     useMeta(metaInfo);
+
     const { repetition } = toRefs(props);
 
     const oneWeekRepetitionLabel = computed(() => `Tous les

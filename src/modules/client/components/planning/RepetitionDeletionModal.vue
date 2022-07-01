@@ -6,7 +6,7 @@
     <ni-repetition-cell :repetition="repetition" :visible="false" />
     <ni-date-input caption="À partir du" :model-value="repetition.dateDeletion" in-modal
       @update:model-value="updateDeletionDate($event)" required-field :min="minStartDate"
-      :error="validations.dateDeletion.$error" />
+      :error="validations.dateDeletion.$error" :error-message="dateErrorMessage" />
     <span class="text q-mb-mds">
       Les évènements rattachés à cette répétition et postérieurs à cette date seront supprimés.
     </span>
@@ -17,14 +17,17 @@
   </ni-modal>
 </template>
 <script>
+import get from 'lodash/get';
+import { computed, ref, toRefs } from 'vue';
 import moment from '@helpers/moment';
+import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import RepetitionCell from 'src/modules/client/components/planning/RepetitionCell';
 import DateInput from 'src/core/components/form/DateInput';
 
 export default {
-  name: 'RepetitionCell',
+  name: 'RepetitionDeletionModal',
   components: {
     'ni-button': Button,
     'ni-modal': Modal,
@@ -39,7 +42,12 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'cancel', 'update-deletion-date', 'confirm-deletion'],
   setup (props, { emit }) {
-    const minStartDate = moment().startOf('d').toISOString();
+    const { validations } = toRefs(props);
+    const minStartDate = ref(moment().startOf('d').toISOString());
+
+    const dateErrorMessage = computed(() => (get(validations.value, 'dateDeletion.minDate.$response') === false
+      ? 'Date invalide'
+      : REQUIRED_LABEL));
 
     const hide = () => emit('hide');
 
@@ -52,6 +60,8 @@ export default {
     return {
       // Data
       minStartDate,
+      // Computeed
+      dateErrorMessage,
       // Methods
       hide,
       cancel,
@@ -64,5 +74,5 @@ export default {
 <style lang="sass" scoped>
 .text
   color: $copper-grey-600
-  font-size: 12px
+  font-size: 16px
 </style>

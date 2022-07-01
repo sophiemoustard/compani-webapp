@@ -8,7 +8,7 @@
         Répétitions de  <span class="text-weight-bold">{{ currentAuxiliaryName }}</span>
       </div>
       <div v-for="repetition of auxiliaryRepetitions" :key="repetition._id">
-        <ni-repetition-cell :repetition="repetition" @button-click="openRepetitionDeletionModal(repetition)" />
+        <ni-repetition-cell :repetition="repetition" @submit="openDeletionModal(repetition)" />
       </div>
       <div v-if="!auxiliaryRepetitions.length">
         <q-card class="card">
@@ -18,8 +18,8 @@
     </q-card>
   </q-page>
 
-  <ni-repetition-deletion-modal v-model="repetitionDeletionModal" :current-auxiliary-name="currentAuxiliaryName"
-    :repetition="currentRepetition" @hide="closeRepetitionDeletionModal" @cancel="cancelDeletion"
+  <ni-repetition-deletion-modal v-model="deletionModal" :current-auxiliary-name="currentAuxiliaryName"
+    :repetition="currentRepetition" @hide="closeDeletionModal" @cancel="cancelDeletion"
     @confirm-deletion="canDeleteRepetition" @update-deletion-date="updateDeletionDate"
     :validations="v$.currentRepetition" />
 
@@ -35,6 +35,8 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Users from '@api/Users';
 import Repetitions from '@api/Repetitions';
+import { minDate } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
@@ -59,16 +61,17 @@ export default {
     const selectedAuxiliary = ref('');
     const currentRepetition = ref({});
     const $store = useStore();
-    const repetitionDeletionModal = ref(false);
+    const deletionModal = ref(false);
     const confirmationModal = ref(false);
     const loading = ref(false);
+    const minStartDate = ref(moment().startOf('d').toISOString());
 
-    const openRepetitionDeletionModal = (repetition) => {
+    const openDeletionModal = (repetition) => {
       currentRepetition.value = { ...repetition, dateDeletion: '' };
-      repetitionDeletionModal.value = true;
+      deletionModal.value = true;
     };
 
-    const closeRepetitionDeletionModal = () => (repetitionDeletionModal.value = false);
+    const closeDeletionModal = () => (deletionModal.value = false);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -102,17 +105,27 @@ export default {
     };
 
     const cancelDeletion = () => {
-      repetitionDeletionModal.value = false;
+      deletionModal.value = false;
       NotifyPositive('Suppression annulée.');
     };
 
-    const closeDeletionConfirmationModal = () => { confirmationModal.value = false; };
+    const closeDeletionConfirmationModal = () => {
+      v$.value.currentRepetition.$reset();
+      confirmationModal.value = false;
+    };
 
     const updateDeletionDate = (event) => { currentRepetition.value.dateDeletion = event; };
 
     const canDeleteRepetition = () => {
       v$.value.currentRepetition.$touch();
-      if (v$.value.currentRepetition.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+      if (v$.value.currentRepetition.dateDeletion.required.$response === false) {
+        return NotifyWarning('Champ(s) invalide(s).');
+      }
+
+      if (v$.value.currentRepetition.dateDeletion.minDate.$response === false) {
+        return NotifyWarning('La date ne peut pas être antérieure à la date du jour.');
+      }
 
       confirmationModal.value = true;
     };
@@ -120,15 +133,19 @@ export default {
     const deleteRepetition = async () => {
       try {
         loading.value = true;
+
         await Repetitions.delete(currentRepetition.value._id, { startDate: currentRepetition.value.dateDeletion });
+
         confirmationModal.value = false;
-        repetitionDeletionModal.value = false;
+        deletionModal.value = false;
+
         NotifyPositive('Répétition supprimée.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppressioin de la répétition.');
       } finally {
         loading.value = false;
+        v$.value.currentRepetition.$reset();
         refresh();
       }
     };
@@ -139,7 +156,7 @@ export default {
       if (selectedAuxiliary.value) await getAuxiliaryRepetitions();
     });
 
-    const rules = { currentRepetition: { dateDeletion: { required } } };
+    const rules = { currentRepetition: { dateDeletion: { required, minDate: minDate(minStartDate.value) } } };
 
     const v$ = useVuelidate(rules, { currentRepetition });
 
@@ -154,7 +171,7 @@ export default {
       activeAuxiliaries,
       selectedAuxiliary,
       auxiliaryRepetitions,
-      repetitionDeletionModal,
+      deletionModal,
       currentRepetition,
       confirmationModal,
       loading,
@@ -164,8 +181,8 @@ export default {
       getActiveAuxiliaries,
       setAuxiliary,
       getAuxiliaryRepetitions,
-      openRepetitionDeletionModal,
-      closeRepetitionDeletionModal,
+      openDeletionModal,
+      closeDeletionModal,
       cancelDeletion,
       updateDeletionDate,
       canDeleteRepetition,
