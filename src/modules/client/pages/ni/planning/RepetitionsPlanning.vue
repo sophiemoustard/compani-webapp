@@ -29,6 +29,7 @@
 
 <script>
 import { ref, watch, computed } from 'vue';
+import { useMeta } from 'quasar';
 import { get } from 'lodash';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
@@ -56,6 +57,8 @@ export default {
     'ni-repetition-deletion-confirmation-modal': RepetitionDeletionConfirmationModal,
   },
   setup () {
+    const metaInfo = { title: 'Gestion des répétitions' };
+    useMeta(metaInfo);
     const activeAuxiliaries = ref([]);
     const auxiliaryRepetitions = ref([]);
     const selectedAuxiliary = ref('');
