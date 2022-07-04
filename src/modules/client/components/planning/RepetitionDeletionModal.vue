@@ -76,5 +76,5 @@ export default {
 <style lang="sass" scoped>
 .text
   color: $copper-grey-600
-  font-size: 16px
+  font-size: 12px
 </style>

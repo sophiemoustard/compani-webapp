@@ -55,6 +55,6 @@ export default {
 </script>
 <style lang="sass" scoped>
 .text
-  color: $copper-grey-600
+  color: black
   font-size: 16px
 </style>
