@@ -3,7 +3,6 @@
     <div class="q-mb-xl">
       <div class="row">
         <p class="text-weight-bold table-title">{{ tableTitle }}</p>
-        <ni-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail" @click="copy" />
       </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
@@ -48,7 +47,6 @@
 </template>
 
 <script>
-import { copyToClipboard } from 'quasar';
 import { onMounted, computed, ref } from 'vue';
 import { useStore, mapState, mapGetters } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -275,11 +273,6 @@ export default {
 
       return this.isIntraCourse ? visibleColumns : ['company', ...visibleColumns];
     },
-    traineesEmails () {
-      if (!this.course.trainees) return '';
-
-      return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc},${value}`, '');
-    },
     traineesOptions () {
       return this.potentialTrainees
         .map(pt => ({
@@ -368,11 +361,6 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
-    },
-    copy () {
-      copyToClipboard(this.traineesEmails)
-        .then(() => NotifyPositive('Adresses mail copiées !'))
-        .catch(() => NotifyNegative('Erreur lors de la copie des emails.'));
     },
     openTraineeCreationModal () {
       if (this.course.archivedAt) {

@@ -7,7 +7,7 @@
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'number'">
-              <div class="clickable-name" @click.stop="downloadBill(props.row._id)" :disable="pdfLoading">
+              <div class="clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
                 {{ col.value }}
               </div>
               <div :class="getCourseNameClass(get(props.row, 'course'))" @click="goToCourse(get(props.row, 'course'))">
@@ -103,7 +103,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
-import { formatPrice, formatPriceWithSign } from '@helpers/utils';
+import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import router from 'src/router/index';
@@ -223,11 +223,12 @@ export default {
       }
     };
 
-    const downloadBill = async (billId) => {
+    const downloadBill = async (bill) => {
       try {
         pdfLoading.value = true;
-        const pdf = await CourseBills.getPdf(billId);
-        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
+        const pdf = await CourseBills.getPdf(bill._id);
+        const pdfName = `${formatDownloadName(`${bill.payer.name} ${bill.number}`)}.pdf`;
+        downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture.');
@@ -354,12 +355,13 @@ export default {
     const getProgramName = (course) => {
       const programName = get(course, 'subProgram.program.name');
       const misc = get(course, 'misc');
-      const length = programName.length + misc.length;
+      const miscLength = misc ? misc.length : 0;
+      const length = programName.length + miscLength;
       const tableSize = Screen.width >= 1024 ? Screen.width * (70 / 100) : Screen.width * (90 / 100);
-      // table width : 70(or 90)% of screen width ; program name column width : 30% of table width ; letter width : 6px
-      const maxLength = ((30 / 100) * tableSize) / 6;
+      // table width : 70(or 90)% of screen width; program name column width : 30% of table width; letter width : 6.5px
+      const maxLength = ((30 / 100) * tableSize) / 6.5;
       if (length > maxLength) {
-        const limit = maxLength - misc.length - 3;
+        const limit = maxLength - miscLength - 3;
         return `${programName.slice(0, limit)}...`;
       }
       return programName;

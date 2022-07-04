@@ -4,8 +4,14 @@ import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import {
+  formatIdentity,
+  formatPhoneForPayload,
+  readAPIResponseWithTypeArrayBuffer,
+  formatDownloadName,
+} from '@helpers/utils';
 import moment from '@helpers/moment';
+import { downloadFile } from '@helpers/file';
 
 export const courseMixin = {
   data () {
@@ -31,7 +37,7 @@ export const courseMixin = {
     },
     followUpMissingInfo () {
       const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('l\'intervenant(e)');
+      if (!this.course.trainer._id) missingInfo.push('l\'intervenant(e)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
 
@@ -68,9 +74,9 @@ export const courseMixin = {
       return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
     },
     composeCourseName (c, attachCompany = false) {
-      const possiblyCompanyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
-      const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
-      return possiblyCompanyName + c.subProgram.program.name + possiblyMisc;
+      const companyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
+      const misc = c.misc ? ` - ${c.misc}` : '';
+      return companyName + c.subProgram.program.name + misc;
     },
     getValue (path) {
       if (path === 'trainer') return get(this.course, 'trainer._id', '');
@@ -118,6 +124,24 @@ export const courseMixin = {
     getStepTypeLabel (value) {
       const type = STEP_TYPES.find(t => t.value === value);
       return type ? type.label : '';
+    },
+    async downloadAttendanceSheet () {
+      if (this.disableDocDownload) return;
+
+      try {
+        this.pdfLoading = true;
+        const pdf = await Courses.downloadAttendanceSheet(this.course._id);
+        const formattedName = formatDownloadName(`feuilles d'emargement ${this.composeCourseName(this.course, true)}`);
+        const pdfName = `${formattedName}.pdf`;
+        downloadFile(pdf, pdfName, 'application/octet-stream');
+      } catch (e) {
+        console.error(e);
+        const decodedRep = readAPIResponseWithTypeArrayBuffer(e);
+        if (decodedRep.statusCode === 404 && decodedRep.message) return NotifyNegative(decodedRep.message);
+        NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
+      } finally {
+        this.pdfLoading = false;
+      }
     },
   },
 };

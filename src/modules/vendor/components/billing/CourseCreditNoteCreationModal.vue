@@ -9,7 +9,7 @@
           {{ creditNoteMetaInfo.number }} - {{ formatPrice(creditNoteMetaInfo.netInclTaxes) }}
       </span>
     </div>
-    <div class="name">{{ creditNoteMetaInfo.courseName }}</div>
+    <div class="course-name">{{ creditNoteMetaInfo.courseName }}</div>
     <ni-date-input in-modal caption="Date" :model-value="newCreditNote.date" @blur="validations.date.$touch"
       required-field :error="validations.date.$error" @update:model-value="update($event, 'date')" :min="minDate"
       :error-message="dateErrorMessage(validations)" />
@@ -56,9 +56,9 @@ export default {
         return 'La date de l\'avoir ne peut être antérieure à la date de facturation';
       }
     };
-    const hide = () => { emit('hide'); };
-    const input = (event) => { emit('update:model-value', event); };
-    const submit = () => { emit('submit'); };
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:new-credit-note', set({ ...props.newCreditNote }, path, event));
     };
@@ -75,10 +75,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.name
-  color: $copper-grey-500
-  font-size: 14px
-  margin-bottom: 16px
-</style>

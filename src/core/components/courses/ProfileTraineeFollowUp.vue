@@ -9,7 +9,7 @@
             pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
           </template>
         </ni-banner>
-        <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
+        <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
           :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       </div>
       <attendance-table :course="course" />
@@ -69,14 +69,9 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import {
-  upperCaseFirstLetter,
-  formatIdentity,
-  formatQuantity,
-  readAPIResponseWithTypeArrayBuffer,
-} from '@helpers/utils';
+import { upperCaseFirstLetter, formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { formatDate, ascendingSort, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/date';
-import { downloadZip, downloadFile } from '@helpers/file';
+import { downloadZip } from '@helpers/file';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -186,27 +181,13 @@ export default {
 
       try {
         this.pdfLoading = true;
+        const formattedName = formatDownloadName(`attestations ${this.composeCourseName(this.course, true)}`);
+        const zipName = `${formattedName}.zip`;
         const pdf = await Courses.downloadCompletionCertificates(this.course._id);
-        downloadZip(pdf, 'attestations.zip');
+        downloadZip(pdf, zipName);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');
-      } finally {
-        this.pdfLoading = false;
-      }
-    },
-    async downloadAttendanceSheet () {
-      if (this.disableDocDownload) return;
-
-      try {
-        this.pdfLoading = true;
-        const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        downloadFile(pdf, 'emargement.pdf', 'application/octet-stream');
-      } catch (e) {
-        console.error(e);
-        const decodedRep = readAPIResponseWithTypeArrayBuffer(e);
-        if (decodedRep.statusCode === 404 && decodedRep.message) return NotifyNegative(decodedRep.message);
-        NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
       } finally {
         this.pdfLoading = false;
       }

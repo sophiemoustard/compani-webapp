@@ -3,11 +3,14 @@
     <template #title>
       Nouvelle <span class="text-weight-bold">facture</span>
     </template>
+    <div>{{ courseName }} </div>
+    <div class="trainees">{{ traineesQuantity }} </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
       @update:model-value="update($event, 'payer')" />
-    <ni-input in-modal caption="Prix du programme" :error="validations.mainFee.price.$error" type="number"
-      :model-value="newBill.mainFee.price" @blur="validations.mainFee.price.$touch" suffix="€" required-field
-      :error-message="errorMessages.price" @update:model-value="update($event, 'mainFee.price')" />
+    <ni-input in-modal :caption="courseType === INTRA ? 'Prix du programme' : 'Prix par stagiaire'"
+      :error="validations.mainFee.price.$error" type="number" :model-value="newBill.mainFee.price"
+      @blur="validations.mainFee.price.$touch" suffix="€" required-field :error-message="errorMessages.price"
+      @update:model-value="update($event, 'mainFee.price')" />
     <ni-input in-modal caption="Quantité" :error="validations.mainFee.count.$error" type="number"
       :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'mainFee.count')" />
@@ -19,11 +22,12 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
-import set from 'lodash/set';
+import { INTRA } from '@data/constants';
 
 export default {
   name: 'CourseBillCreationModal',
@@ -34,6 +38,9 @@ export default {
     errorMessages: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    courseName: { type: String, default: '' },
+    courseType: { type: String, default: '' },
+    traineesQuantity: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -42,19 +49,30 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-bill'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:new-bill', set({ ...this.newBill }, path, event));
-    },
+  setup (props, { emit }) {
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
+    const update = (event, path) => {
+      emit('update:new-bill', set({ ...props.newBill }, path, event));
+    };
+
+    return {
+      // Data
+      INTRA,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.trainees
+  color: $copper-grey-500
+  font-size: 14px
+  margin-bottom: 16px
+</style>

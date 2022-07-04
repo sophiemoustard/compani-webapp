@@ -3,6 +3,7 @@
     <template #title>
       Éditer le <span class="text-weight-bold">payeur</span>
     </template>
+    <div class="course-name">{{ courseName }} </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="editedPayer" required-field
       @update:model-value="update" />
     <template #footer>
@@ -24,6 +25,7 @@ export default {
     editedPayer: { type: String, default: () => '' },
     payerOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
+    courseName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -31,19 +33,19 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:edited-payer'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event) {
-      this.$emit('update:edited-payer', event);
-    },
+  setup (props, { emit }) {
+    const hide = () => emit('hide');
+    const input = event => emit('update:model-value', event);
+    const submit = () => emit('submit');
+    const update = event => emit('update:edited-payer', event);
+
+    return {
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

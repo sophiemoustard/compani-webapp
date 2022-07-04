@@ -1,29 +1,21 @@
 <template>
   <div v-if="course">
-    <div class="q-mb-xl">
-      <div v-if="isClientInterface && isCourseInter" class="q-mb-lg">
-        <p class="text-weight-bold">Informations pratiques</p>
-        <ni-banner v-if="followUpDisabled">
-          <template #message>{{ missingInfoMsg }}</template>
-        </ni-banner>
-        <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
+    <div class="profile-container q-mb-xl">
+      <ni-bi-color-button v-if="isIntraOrVendor" class="button-history" icon="history" label="Historique"
+        @click="toggleHistory" />
+      <div v-if="isIntraOrVendor" class="row gutter-profile">
+        <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
+          @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
       </div>
-      <div v-else class="profile-container">
-        <ni-bi-color-button class="button-history" icon="history" label="Historique" @click="toggleHistory" />
-        <div class="row gutter-profile">
-          <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
-            @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
-        </div>
-        <p class="text-weight-bold table-title">Interlocuteurs</p>
-        <div class="interlocutor-container">
-          <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
-            :open-edition-modal="openSalesRepresentativeModal" :disable="isArchived" />
-          <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
-            :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
-          <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
-            label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
-            @click="() => openTrainerModal('Ajouter un(e) ')" />
-        </div>
+      <p class="text-weight-bold table-title">Interlocuteurs</p>
+      <div class="interlocutor-container">
+        <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
+          :open-edition-modal="openSalesRepresentativeModal" :disable="isArchived" />
+        <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
+          :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
+        <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
+          label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
+          @click="() => openTrainerModal('Ajouter un(e) ')" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
@@ -45,6 +37,32 @@
         </div>
       </div>
       <div class="q-mb-xl">
+        <p class="text-weight-bold">Contacter les stagiaires</p>
+        <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
+          <template #message>
+            Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
+            {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
+          </template>
+        </ni-banner>
+        <div class="row">
+          <ni-banner v-if="!!smsMissingInfo.length">
+            <template #message>
+              Il manque {{ formatQuantity('information', smsMissingInfo.length ) }}
+              pour envoyer des SMS : {{ smsMissingInfo.join(', ') }}.
+            </template>
+          </ni-banner>
+          <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openHistoryModal"
+            label="Envoyer un SMS aux stagiaires" size="16px" />
+          <ni-button color="primary" :disable="!smsHistoryList.length" icon="history" label="Historique d'envoi"
+            @click="smsHistoriesModal = true" />
+        </div>
+        <ni-bi-color-button class="q-my-sm" icon="content_copy" label="Copier les adresses e-mail" @click="copy"
+          size="16px" :disable="!traineesEmails" />
+      </div>
+    </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Documents utiles</p>
+      <div class="q-mb-sm">
         <ni-banner v-if="followUpDisabled">
           <template #message>
             Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
@@ -53,41 +71,17 @@
         </ni-banner>
         <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       </div>
-      <div class="q-mb-xl">
-        <p class="text-weight-bold">Envoi de SMS</p>
-        <p>Historique d'envoi </p>
-        <ni-responsive-table :data="smsSent" :columns="smsSentColumns" v-model:pagination="pagination" class="q-mb-md"
-          :loading="smsLoading">
-          <template #body="{ props }">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <ni-button icon="remove_red_eye" @click="openSmsHistoriesModal(col.value)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </template>
-        </ni-responsive-table>
-        <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
-          <template #message>
-            Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
-            {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
-          </template>
-        </ni-banner>
-        <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
-          label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
+      <div v-if="isIntraOrVendor">
+        <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
+          :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
-    <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
-      :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
+    <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
+      :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
     <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutorId"
       @submit="updateSalesRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
@@ -102,6 +96,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -115,13 +110,12 @@ import Courses from '@api/Courses';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
-import ResponsiveTable from '@components/table/ResponsiveTable';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
-import SmsDetailsModal from '@components/courses/SmsDetailsModal';
+import CourseSmsHistoryModal from '@components/courses/CourseSmsHistoryModal';
 import InterlocutorCell from '@components/courses/InterlocutorCell';
 import InterlocutorModal from '@components/courses/InterlocutorModal';
 import Banner from '@components/Banner';
@@ -139,10 +133,10 @@ import {
   DEFAULT_AVATAR,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
-import { formatAndSortIdentityOptions, formatQuantity, formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { formatDate, descendingSort, ascendingSort } from '@helpers/date';
+import { descendingSort, ascendingSort } from '@helpers/date';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
 import BiColorButton from '@components/BiColorButton';
@@ -163,9 +157,8 @@ export default {
     'course-history-feed': CourseHistoryFeed,
     'ni-bi-color-button': BiColorButton,
     'sms-sending-modal': SmsSendingModal,
-    'sms-details-modal': SmsDetailsModal,
+    'sms-history-modal': CourseSmsHistoryModal,
     'ni-button': Button,
-    'ni-responsive-table': ResponsiveTable,
     'interlocutor-cell': InterlocutorCell,
     'interlocutor-modal': InterlocutorModal,
   },
@@ -188,23 +181,10 @@ export default {
       messageTypeOptions: [{ label: 'Convocation', value: CONVOCATION }, { label: 'Rappel', value: REMINDER }],
       newSms: { content: '', type: '' },
       loading: false,
-      smsSent: [],
-      smsSentColumns: [
-        { name: 'type', label: 'Type', align: 'left', field: 'type', format: this.getType },
-        { name: 'date', label: 'Date d\'envoi', align: 'left', field: 'date', format: formatDate },
-        {
-          name: 'sender',
-          label: 'Expéditeur',
-          align: 'left',
-          field: row => get(row, 'sender.identity') || '',
-          format: value => formatIdentity(value, 'FL'),
-        },
-        { name: 'actions', label: '', align: 'center', field: '_id' },
-      ],
+      smsHistoryList: [],
       pagination: { rowsPerPage: 0 },
       smsLoading: false,
       smsHistoriesModal: false,
-      smsHistory: { missingPhones: [] },
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
       contactOptions: [],
@@ -214,6 +194,7 @@ export default {
       interlocutorModalLoading: false,
       trainerLabel: { action: '', interlocutor: '' },
       trainerModal: false,
+      sendSms: false,
     };
   },
   validations () {
@@ -272,11 +253,6 @@ export default {
       return this.course.trainees.filter(trainee => !get(trainee, 'contact.phone'))
         .map(trainee => formatIdentity(trainee.identity, 'FL'));
     },
-    missingTraineesPhoneHistory () {
-      if (!this.smsHistory.missingPhones.length) return [];
-
-      return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
-    },
     courseName () {
       return this.composeCourseName(this.course);
     },
@@ -284,10 +260,17 @@ export default {
       const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
       return !!this.course.slotsToPlan.length && !futurSlots.length;
     },
+    smsMissingInfo () {
+      const missingInfo = [];
+      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
+
+      return missingInfo;
+    },
     disableSms () {
       const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
 
-      return this.followUpDisabled || noPhoneNumber;
+      return !!this.smsMissingInfo.length || noPhoneNumber;
     },
     isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
@@ -296,6 +279,11 @@ export default {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role']));
 
       return ability.can('update', 'interlocutor');
+    },
+    traineesEmails () {
+      if (!this.course.trainees) return '';
+
+      return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc}${value},`, '');
     },
   },
   async created () {
@@ -395,23 +383,33 @@ export default {
     async refreshSms () {
       try {
         this.smsLoading = true;
-        const smsSent = await Courses.getSMSHistory(this.course._id);
-        this.smsSent = smsSent.sort((a, b) => descendingSort(a.date, b.date));
+        const smsList = await Courses.getSMSHistory(this.course._id);
+        this.smsHistoryList = smsList.sort((a, b) => descendingSort(a.date, b.date));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
-        this.smsSent = [];
+        this.smsHistoryList = [];
       } finally {
         this.smsLoading = false;
       }
     },
-    openSmsModal () {
+    openHistoryModal () {
       if (this.allFuturSlotsAreNotPlanned) {
         return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
       }
       if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
 
+      if (this.smsHistoryList.length) {
+        this.smsHistoriesModal = true;
+        this.sendSms = true;
+      } else {
+        this.openSmsModal();
+      }
+    },
+    openSmsModal () {
       this.updateMessage(this.newSms.type);
+      this.smsHistoriesModal = false;
+      this.sendSms = false;
       this.smsModal = true;
     },
     resetSmsModal () {
@@ -434,13 +432,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-    openSmsHistoriesModal (smsId) {
-      this.smsHistoriesModal = true;
-      this.smsHistory = this.smsSent.find(sms => sms._id === smsId);
-    },
-    resetSmsHistoryModal () {
-      this.smsHistory = { missingPhones: [] };
     },
     updateMessage (newMessageType) {
       if (newMessageType === CONVOCATION) this.setConvocationMessage();
@@ -500,7 +491,9 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await Courses.downloadConvocation(this.course._id);
-        downloadFile(pdf, 'convocation.pdf', 'application/octet-stream');
+        const formattedName = formatDownloadName(`convocation ${this.composeCourseName(this.course, true)}`);
+        const pdfName = `${formattedName}.pdf`;
+        downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la convocation.');
@@ -559,6 +552,11 @@ export default {
       this.tempInterlocutorId = this.course.trainer._id;
       this.trainerLabel = { action, interlocutor: 'intervenant(e)' };
       this.trainerModal = true;
+    },
+    copy () {
+      copyToClipboard(this.traineesEmails)
+        .then(() => NotifyPositive('Adresses mail copiées !'))
+        .catch(() => NotifyNegative('Erreur lors de la copie des emails.'));
     },
   },
 };
