@@ -1,6 +1,7 @@
 <template>
   <q-card class="container">
-    <div class="column justify-between flex-start">
+    <div class="row justify-between items-start">
+      <div class="infos-container">
         <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName }}</div>
         <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
           {{ get(repetition, 'internalHour.name') }}
@@ -11,7 +12,9 @@
         <div v-if="repetition.type === INTERVENTION" class="customer">
           Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
         </div>
-    </div>
+      </div>
+      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
+      </div>
   </q-card>
 </template>
 <script>
@@ -21,6 +24,7 @@ import { get } from 'lodash';
 import moment from '@helpers/moment';
 import { formatHoursWithMinutes } from '@helpers/date';
 import { formatIdentity, getLastVersion } from '@helpers/utils';
+import Button from '@components/Button';
 import {
   REPETITION_FREQUENCIES,
   EVERY_TWO_WEEKS,
@@ -33,11 +37,17 @@ import {
 
 export default {
   name: 'RepetitionCell',
+  components: {
+    'ni-button': Button,
+  },
   props: {
     repetition: { type: Object, default: () => ({}) },
+    visible: { type: Boolean, default: true },
   },
-  setup (props) {
+  emits: ['delete'],
+  setup (props, { emit }) {
     const { repetition } = toRefs(props);
+
     const oneWeekRepetitionLabel = computed(() => `Tous les
       ${moment(get(repetition.value, 'startDate')).format('dddd')}s`);
     const twoWeeksRepetitionLabel = computed(() => `Le ${moment(get(repetition.value, 'startDate')).format('dddd')}
@@ -71,6 +81,8 @@ export default {
       return getLastVersion(versions, 'createdAt').name;
     });
 
+    const deleteRepetition = () => emit('delete');
+
     return {
       // Data
       INTERVENTION,
@@ -84,6 +96,7 @@ export default {
       // Methods
       formatIdentity,
       get,
+      deleteRepetition,
     };
   },
 };
@@ -93,6 +106,8 @@ export default {
   background-color: $copper-grey-100
   margin: 0px 0px 16px 0px
   padding: 16px
+.infos-container
+  max-width: 80%
 .infos
   color: $copper-grey-700
   size: 14px
