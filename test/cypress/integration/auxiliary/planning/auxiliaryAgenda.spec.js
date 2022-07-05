@@ -34,7 +34,7 @@ describe('Auxiliary agenda - display', () => {
 
   it('should create event', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=agenda-cell]').eq(1).click();
+    cy.get('[data-cy=agenda-cell]').eq(1).click({ position: 'bottom' });
     cy.get('[data-cy=event-creation-customer]').eq(0).type('Romain{downarrow}{enter}');
     cy.get('[data-cy=event-creation-button]').click();
 
