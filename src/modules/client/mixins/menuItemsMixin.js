@@ -112,6 +112,7 @@ export const menuItemsMixin = {
           children: [
             { name: 'ni planning auxiliaries', icon: 'date_range', label: 'Auxiliaires' },
             { name: 'ni planning customers', icon: 'date_range', label: 'Bénéficiaires' },
+            { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },
           ],
         }, {
           ref: 'customers',
@@ -185,6 +186,7 @@ export const menuItemsMixin = {
             { name: 'auxiliaries agenda', icon: 'event', label: 'Le mien' },
             { name: 'ni planning auxiliaries', icon: 'face', label: 'Auxiliaires' },
             { name: 'ni planning customers', icon: 'people', label: 'Bénéficiaires' },
+            { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },
           ],
         }, {
           ref: 'customers',

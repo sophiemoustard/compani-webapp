@@ -304,6 +304,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/planning/repetitions',
+        name: 'ni planning repetitions',
+        component: () => import('src/modules/client/pages/ni/planning/RepetitionsPlanning'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'planning',
+        },
+      },
+      {
         path: 'ni/courses',
         name: 'ni courses',
         component: () => import('src/modules/client/pages/ni/courses/BlendedCoursesDirectory'),
