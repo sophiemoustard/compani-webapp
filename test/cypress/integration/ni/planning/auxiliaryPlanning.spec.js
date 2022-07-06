@@ -1,4 +1,11 @@
-import { CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT, PLANNING } from '../../../../../src/core/data/constants';
+const {
+  CLIENT_ADMIN,
+  COACH,
+  AUXILIARY,
+  PLANNING_REFERENT,
+  PLANNING,
+} = require('../../../../../src/core/data/constants');
+const UtilsHelper = require('../../../support/utils');
 
 describe('Auxiliary planning - display', () => {
   beforeEach(() => {
@@ -15,18 +22,18 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=event-title]').should('have.length', 1);
 
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
-    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '10:00');
-    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', UtilsHelper.applyOffset(10, '00'));
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', UtilsHelper.applyOffset(12, '30'));
 
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=week-number]').should('contain', Cypress.luxon.DateTime.now().minus({ weeks: 1 }).weekNumber);
     cy.get('.event-intervention').should('have.length', 2);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'R.BARDET');
-    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', '11:15');
-    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', '12:30');
+    cy.get('[data-cy=event-start-hour]').eq(0).should('contain', UtilsHelper.applyOffset(11, '15'));
+    cy.get('[data-cy=event-end-hour]').eq(0).should('contain', UtilsHelper.applyOffset(12, '30'));
     cy.get('[data-cy=event-title]').eq(1).should('contain', 'R.BARDET');
-    cy.get('[data-cy=event-start-hour]').eq(1).should('contain', '18:15');
-    cy.get('[data-cy=event-end-hour]').eq(1).should('contain', '20:30');
+    cy.get('[data-cy=event-start-hour]').eq(1).should('contain', UtilsHelper.applyOffset(18, '15'));
+    cy.get('[data-cy=event-end-hour]').eq(1).should('contain', UtilsHelper.applyOffset(20, '30'));
 
     cy.get('[data-cy=planning-search]').eq(1).click();
     cy.get('[data-cy=planning-search]').eq(1).type('Customer referent{downarrow}{enter}');
