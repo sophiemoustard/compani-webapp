@@ -34,8 +34,10 @@ import { get } from 'lodash';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import { AUXILIARY, CUSTOMER } from '@data/constants';
 import Users from '@api/Users';
 import Repetitions from '@api/Repetitions';
+import Customers from '@api/Customers';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
@@ -80,7 +82,7 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const currentPersonName = computed(() => {
-      const name = activePersons.value.find(aux => get(aux, 'value') === selectedPerson.value);
+      const name = activePersons.value.find(person => get(person, 'value') === selectedPerson.value);
 
       return get(name, 'label');
     });
@@ -88,12 +90,18 @@ export default {
     const getActivePersons = async () => {
       try {
         const companyId = get(loggedUser.value, 'company._id');
-        const auxiliaries = await Users.listActive({ company: companyId });
 
-        return formatAndSortIdentityOptions(auxiliaries);
+        const auxiliaries = formatAndSortIdentityOptions(await Users.listActive({ company: companyId }));
+        const customers = formatAndSortIdentityOptions(await Customers.list({ stopped: false }));
+        const formattedPersons = [
+          ...auxiliaries.map(aux => ({ ...aux, type: AUXILIARY })),
+          ...customers.map(cus => ({ ...cus, type: CUSTOMER })),
+        ];
+
+        return formattedPersons;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des auxiliaires.');
+        NotifyNegative('Erreur lors de la récupération des auxiliaires et bénéficiaires.');
       }
     };
 
@@ -101,7 +109,12 @@ export default {
 
     const getRepetitions = async () => {
       try {
-        repetitions.value = await Repetitions.list({ auxiliary: selectedPerson.value });
+        const personType = get(activePersons.value.find(person => person.value === selectedPerson.value), 'type');
+        const query = personType === AUXILIARY
+          ? { auxiliary: selectedPerson.value }
+          : { customer: selectedPerson.value };
+
+        repetitions.value = await Repetitions.list(query);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des répétitions.');
