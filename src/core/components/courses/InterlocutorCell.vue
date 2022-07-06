@@ -10,20 +10,16 @@
           <div class="phone">{{ formatPhone(get(interlocutor, 'contact.phone')) }}</div>
         </div>
       </div>
-      <ni-button v-if="canUpdateSalesRepresentative" icon="edit" @click="openEditionModal()" :disable="disable" />
+      <ni-button v-if="canUpdate" icon="edit" @click="openEditionModal()" :disable="disable" />
     </q-card>
   </div>
 </template>
 
 <script>
 import get from 'lodash/get';
-import pick from 'lodash/pick';
-import { computed } from 'vue';
-import { useStore } from 'vuex';
 import Button from '@components/Button';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity, formatPhone } from '@helpers/utils';
-import { defineAbilitiesFor } from '@helpers/ability';
 
 export default {
   name: 'InterlocutorCell',
@@ -31,28 +27,17 @@ export default {
     interlocutor: { type: Object, default: () => ({}) },
     caption: { type: String, default: '' },
     openEditionModal: { type: Function, default: () => {} },
+    canUpdate: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
   },
   setup () {
-    const $store = useStore();
-
-    const loggedUser = computed(() => $store.state.main.loggedUser);
-
-    const canUpdateSalesRepresentative = computed(() => {
-      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', 'interlocutor');
-    });
-
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
     return {
       // Data
       DEFAULT_AVATAR,
-      // Computed
-      canUpdateSalesRepresentative,
       // Methods
       formatIdentity,
       formatPhone,
