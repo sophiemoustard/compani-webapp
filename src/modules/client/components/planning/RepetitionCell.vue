@@ -9,8 +9,17 @@
         <div class="infos" v-else>{{ EVENT_TYPES.find(type => type.value === UNAVAILABILITY).label }}</div>
         <div class="bold-infos q-pt-sm">{{ getRepetitionInfos }}</div>
         <div class="infos q-pb-sm">{{ getRepetitionStartDate }}</div>
-        <div v-if="repetition.type === INTERVENTION" class="customer">
+        <div v-if="repetition.type === INTERVENTION && get(repetition, 'customer.identity')" class="customer">
           Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
+        </div>
+        <div class="row q-py-xs" v-if="repetition.type === INTERVENTION && get(repetition, 'auxiliary.identity')">
+          <img :src="getAvatar(get(repetition, 'auxiliary.picture'))" class="avatar avatar-size">
+          <div class="auxiliary q-px-sm">
+            {{ formatIdentity(get(repetition, 'auxiliary.identity'), 'FL') }}
+          </div>
+        </div>
+        <div v-if="repetition.type === INTERVENTION && get(repetition, 'sector.name')">
+          À affecter - {{ repetition.sector.name }}
         </div>
       </div>
       <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
@@ -33,6 +42,7 @@ import {
   INTERNAL_HOUR,
   UNAVAILABILITY,
   EVENT_TYPES,
+  DEFAULT_AVATAR,
 } from '@data/constants';
 
 export default {
@@ -83,6 +93,8 @@ export default {
 
     const deleteRepetition = () => emit('delete');
 
+    const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
+
     return {
       // Data
       INTERVENTION,
@@ -97,6 +109,7 @@ export default {
       formatIdentity,
       get,
       deleteRepetition,
+      getAvatar,
     };
   },
 };
@@ -118,4 +131,9 @@ export default {
 .customer
   color: $copper-grey-700
   size: 16px
+.auxiliary
+  size: 16px
+.avatar-size
+  height: 24px
+  width: 24px
 </style>
