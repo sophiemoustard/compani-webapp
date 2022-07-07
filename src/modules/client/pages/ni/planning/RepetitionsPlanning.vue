@@ -8,7 +8,8 @@
         Répétitions de  <span class="text-weight-bold">{{ currentPersonName }}</span>
       </div>
       <div v-for="repetition of repetitions" :key="repetition._id">
-        <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)" />
+        <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)"
+          :person-type="personType" />
       </div>
       <div v-if="!repetitions.length">
         <q-card class="card">
@@ -71,6 +72,7 @@ export default {
     const loading = ref(false);
     const minStartDate = ref(moment().startOf('d').toISOString());
     const maxStartDate = ref(moment(minStartDate.value).add(90, 'day').toISOString());
+    const personType = ref('');
 
     const openDeletionModal = (repetition) => {
       currentRepetition.value = { ...repetition, dateDeletion: '' };
@@ -109,8 +111,8 @@ export default {
 
     const getRepetitions = async () => {
       try {
-        const personType = get(activePersons.value.find(person => person.value === selectedPerson.value), 'type');
-        const query = personType === AUXILIARY
+        personType.value = get(activePersons.value.find(person => person.value === selectedPerson.value), 'type');
+        const query = personType.value === AUXILIARY
           ? { auxiliary: selectedPerson.value }
           : { customer: selectedPerson.value };
 
@@ -200,6 +202,7 @@ export default {
       currentRepetition,
       confirmationModal,
       loading,
+      personType,
       // Computed
       currentPersonName,
       // Methods
