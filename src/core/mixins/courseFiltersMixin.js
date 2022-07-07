@@ -4,7 +4,7 @@ import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
-import { formatDate, isSameOrAfter, isSameOrBefore, isBetween } from '@helpers/date';
+import { formatDate, isSameOrAfter, isSameOrBefore, isBetweenOrEqual } from '@helpers/date';
 
 export const courseFiltersMixin = {
   data () {
@@ -148,9 +148,10 @@ export const courseFiltersMixin = {
       return courses
         .filter((course) => {
           const hasEstimationInRange = !course.slots.length &&
-            isBetween(course.estimatedStartDate, this.selectedStartDate, this.selectedEndDate);
+            isBetweenOrEqual(course.estimatedStartDate, this.selectedStartDate, this.selectedEndDate);
           const hasSlotsInRange = course.slots
-            .some(slotGroup => slotGroup.some(s => isBetween(s.endDate, this.selectedStartDate, this.selectedEndDate)));
+            .some(slotGroup => slotGroup
+              .some(s => isBetweenOrEqual(s.endDate, this.selectedStartDate, this.selectedEndDate)));
 
           return hasEstimationInRange || hasSlotsInRange;
         });
