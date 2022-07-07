@@ -34,11 +34,9 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
-import { userMixin } from '@mixins/userMixin';
 
 export default {
   name: 'TraineeAdditionModal',
-  mixins: [userMixin],
   props: {
     modelValue: { type: Boolean, default: false },
     traineesOptions: { type: Array, default: () => [] },

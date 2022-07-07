@@ -8,6 +8,10 @@
           <div class="text-copper-grey-700">{{ formatIdentity(interlocutor.identity, 'FL') }}</div>
           <div class="text-copper-grey-500 text-14">{{ interlocutor.local.email }}</div>
           <div class="phone">{{ formatPhone(get(interlocutor, 'contact.phone')) }}</div>
+          <div v-if="contact._id === interlocutor._id" class="contact">
+            <q-icon size="xs" name="person" class="q-mr-xs" />
+            <span>Contact donné aux stagiaires</span>
+          </div>
         </div>
       </div>
       <ni-button v-if="canUpdate" icon="edit" @click="openEditionModal()" :disable="disable" />
@@ -25,6 +29,7 @@ export default {
   name: 'InterlocutorCell',
   props: {
     interlocutor: { type: Object, default: () => ({}) },
+    contact: { type: Object, default: () => ({}) },
     caption: { type: String, default: '' },
     openEditionModal: { type: Function, default: () => {} },
     canUpdate: { type: Boolean, default: false },
@@ -65,4 +70,9 @@ export default {
 .phone
   color: $copper-grey-500
   font-size: 14px
+.contact
+  color: $copper-grey-500
+  font-size: 12px
+  margin-top: 4px
+  display: flex
 </style>
