@@ -565,6 +565,7 @@ export const NOTE_UPDATE = 'note_update';
 
 // BILLING ITEMS
 export const MANUAL = 'manual';
+export const AUTOMATIC = 'automatic';
 export const PER_INTERVENTION = 'per_intervention';
 export const BILLING_ITEMS_TYPE_OPTIONS = [
   { label: 'Manuel', value: MANUAL },
