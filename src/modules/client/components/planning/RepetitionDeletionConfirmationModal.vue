@@ -3,7 +3,7 @@
     <template #title>
       Êtes-vous sûr(e) de vouloir supprimer cette répétition ?
     </template>
-    <ni-repetition-cell :repetition="repetition" :visible="false" />
+    <ni-repetition-cell :repetition="repetition" :visible="false" :person-type="personType" />
     <div class="text">
       Les événements rattachés à cette répétition et postérieurs au {{ formatDate }} seront supprimés.
     </div>
@@ -31,6 +31,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     repetition: { type: Object, default: () => ({}) },
+    personType: { type: String, default: '' },
   },
   emits: ['hide', 'update:model-value', 'cancel', 'submit'],
   setup (props, { emit }) {

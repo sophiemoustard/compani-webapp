@@ -22,10 +22,10 @@
   <ni-repetition-deletion-modal v-model="deletionModal" :current-auxiliary-name="currentPersonName"
     :repetition="currentRepetition" @hide="closeDeletionModal" @cancel="cancelDeletion"
     @confirm-deletion="canDeleteRepetition" @update-deletion-date="updateDeletionDate"
-    :validations="v$.currentRepetition" />
+    :validations="v$.currentRepetition" :person-type="personType" />
 
   <ni-repetition-deletion-confirmation-modal v-model="confirmationModal" :repetition="currentRepetition"
-     :loading="loading" @cancel="closeDeletionConfirmationModal" @submit="deleteRepetition" />
+     :loading="loading" @cancel="closeDeletionConfirmationModal" @submit="deleteRepetition" :person-type="personType" />
 </template>
 
 <script>
