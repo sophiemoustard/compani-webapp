@@ -24,9 +24,9 @@
         <ni-button v-else-if="course.type === INTRA" color="primary" icon="add" class="add-interlocutor"
           label="Ajouter un référent structure" :disable="interlocutorModalLoading || isArchived"
           @click="() => openCompanyRepresentativeModal('Ajouter un ')" />
-        <ni-button v-if="!course.contact._id" color="primary" icon="add" class="add-interlocutor"
-          label="Définir un contact pour la formation" :disable="contactModalLoading || isArchived"
-          @click="openContactAdditionModal" />
+        <ni-button v-if="!course.contact._id && canUpdateInterlocutor" color="primary" icon="add"
+          class="add-interlocutor" label="Définir un contact pour la formation"
+          :disable="contactModalLoading || isArchived" @click="openContactAdditionModal" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
