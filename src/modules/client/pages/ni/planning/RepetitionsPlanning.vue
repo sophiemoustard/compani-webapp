@@ -1,30 +1,31 @@
 <template>
   <q-page class="client-background" padding>
     <ni-title-header title="Gérer les répétitions" />
-    <ni-select caption="Auxiliaire" :model-value="selectedAuxiliary" :options="activeAuxiliaries"
-      @update:model-value="setAuxiliary($event)" clearable class="q-mt-xl" />
-    <q-card v-if="selectedAuxiliary" class="cell-container">
+    <ni-select caption="Auxiliaire ou bénéficiaire" :model-value="selectedPerson" :options="activePersons"
+      @update:model-value="setPerson($event)" clearable class="q-mt-xl" />
+    <q-card v-if="selectedPerson" class="cell-container">
       <div class="cell-title">
-        Répétitions de  <span class="text-weight-bold">{{ currentAuxiliaryName }}</span>
+        Répétitions de  <span class="text-weight-bold">{{ currentPersonName }}</span>
       </div>
-      <div v-for="repetition of auxiliaryRepetitions" :key="repetition._id">
-        <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)" />
+      <div v-for="repetition of repetitions" :key="repetition._id">
+        <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)"
+          :person-type="personType" />
       </div>
-      <div v-if="!auxiliaryRepetitions.length">
+      <div v-if="!repetitions.length">
         <q-card class="card">
-          Aucune répétition associée à {{ activeAuxiliaries.find(aux => aux.value === selectedAuxiliary).label }}
+          Aucune répétition associée à {{ activePersons.find(aux => aux.value === selectedPerson).label }}
         </q-card>
       </div>
     </q-card>
   </q-page>
 
-  <ni-repetition-deletion-modal v-model="deletionModal" :current-auxiliary-name="currentAuxiliaryName"
+  <ni-repetition-deletion-modal v-model="deletionModal" :current-auxiliary-name="currentPersonName"
     :repetition="currentRepetition" @hide="closeDeletionModal" @cancel="cancelDeletion"
     @confirm-deletion="canDeleteRepetition" @update-deletion-date="updateDeletionDate"
-    :validations="v$.currentRepetition" />
+    :validations="v$.currentRepetition" :person-type="personType" />
 
   <ni-repetition-deletion-confirmation-modal v-model="confirmationModal" :repetition="currentRepetition"
-     :loading="loading" @cancel="closeDeletionConfirmationModal" @submit="deleteRepetition" />
+     :loading="loading" @cancel="closeDeletionConfirmationModal" @submit="deleteRepetition" :person-type="personType" />
 </template>
 
 <script>
@@ -34,8 +35,10 @@ import { get } from 'lodash';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import { AUXILIARY, CUSTOMER } from '@data/constants';
 import Users from '@api/Users';
 import Repetitions from '@api/Repetitions';
+import Customers from '@api/Customers';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
@@ -59,9 +62,9 @@ export default {
   setup () {
     const metaInfo = { title: 'Gestion des répétitions' };
     useMeta(metaInfo);
-    const activeAuxiliaries = ref([]);
-    const auxiliaryRepetitions = ref([]);
-    const selectedAuxiliary = ref('');
+    const activePersons = ref([]);
+    const repetitions = ref([]);
+    const selectedPerson = ref('');
     const currentRepetition = ref({});
     const $store = useStore();
     const deletionModal = ref(false);
@@ -69,6 +72,7 @@ export default {
     const loading = ref(false);
     const minStartDate = ref(moment().startOf('d').toISOString());
     const maxStartDate = ref(moment(minStartDate.value).add(90, 'day').toISOString());
+    const personType = ref('');
 
     const openDeletionModal = (repetition) => {
       currentRepetition.value = { ...repetition, dateDeletion: '' };
@@ -79,29 +83,40 @@ export default {
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
-    const currentAuxiliaryName = computed(() => {
-      const auxiliaryName = activeAuxiliaries.value.find(aux => get(aux, 'value') === selectedAuxiliary.value);
+    const currentPersonName = computed(() => {
+      const name = activePersons.value.find(person => get(person, 'value') === selectedPerson.value);
 
-      return get(auxiliaryName, 'label');
+      return get(name, 'label');
     });
 
-    const getActiveAuxiliaries = async () => {
+    const getActivePersons = async () => {
       try {
         const companyId = get(loggedUser.value, 'company._id');
-        const auxiliaries = await Users.listActive({ company: companyId });
 
-        return formatAndSortIdentityOptions(auxiliaries);
+        const auxiliaries = formatAndSortIdentityOptions(await Users.listActive({ company: companyId }));
+        const customers = formatAndSortIdentityOptions(await Customers.list({ stopped: false }));
+        const formattedPersons = [
+          ...auxiliaries.map(aux => ({ ...aux, type: AUXILIARY })),
+          ...customers.map(cus => ({ ...cus, type: CUSTOMER })),
+        ];
+
+        return formattedPersons;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des auxiliaires.');
+        NotifyNegative('Erreur lors de la récupération des auxiliaires et bénéficiaires.');
       }
     };
 
-    const setAuxiliary = (aux) => { selectedAuxiliary.value = aux; };
+    const setPerson = (aux) => { selectedPerson.value = aux; };
 
-    const getAuxiliaryRepetitions = async () => {
+    const getRepetitions = async () => {
       try {
-        auxiliaryRepetitions.value = await Repetitions.list({ auxiliary: selectedAuxiliary.value });
+        personType.value = get(activePersons.value.find(person => person.value === selectedPerson.value), 'type');
+        const query = personType.value === AUXILIARY
+          ? { auxiliary: selectedPerson.value }
+          : { customer: selectedPerson.value };
+
+        repetitions.value = await Repetitions.list(query);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des répétitions.');
@@ -158,10 +173,10 @@ export default {
       }
     };
 
-    const refresh = async () => getAuxiliaryRepetitions();
+    const refresh = async () => getRepetitions();
 
-    watch(selectedAuxiliary, async () => {
-      if (selectedAuxiliary.value) await getAuxiliaryRepetitions();
+    watch(selectedPerson, async () => {
+      if (selectedPerson.value) await getRepetitions();
     });
 
     const rules = {
@@ -173,26 +188,27 @@ export default {
     const v$ = useVuelidate(rules, { currentRepetition });
 
     const created = async () => {
-      activeAuxiliaries.value = await getActiveAuxiliaries();
+      activePersons.value = await getActivePersons();
     };
 
     created();
 
     return {
       // Data
-      activeAuxiliaries,
-      selectedAuxiliary,
-      auxiliaryRepetitions,
+      activePersons,
+      selectedPerson,
+      repetitions,
       deletionModal,
       currentRepetition,
       confirmationModal,
       loading,
+      personType,
       // Computed
-      currentAuxiliaryName,
+      currentPersonName,
       // Methods
-      getActiveAuxiliaries,
-      setAuxiliary,
-      getAuxiliaryRepetitions,
+      getActivePersons,
+      setPerson,
+      getRepetitions,
       openDeletionModal,
       closeDeletionModal,
       cancelDeletion,
