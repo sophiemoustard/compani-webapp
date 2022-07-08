@@ -3,7 +3,7 @@
     <ni-title-header title="Factures" padding>
       <template #content>
           <div class="header-selects row header-selects-container">
-            <ni-date-range v-model="billingDates" @blur="getBills" v-model:error="billingDatesHasError"
+            <ni-date-range v-model="billingDates" @blur="getBills" :error-message="billingDatesError"
               borderless class="q-ma-sm" />
           </div>
       </template>
@@ -33,16 +33,20 @@
 <script>
 import { useMeta } from 'quasar';
 import { ref } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+import Bills from '@api/Bills';
+import { minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { formatIdentity, formatPrice, formatDownloadName, truncate } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
-import Bills from '@api/Bills';
-import { AUTOMATIC } from '@data/constants';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
+import { AUTOMATIC, REQUIRED_LABEL } from '@data/constants';
+
 
 export default {
   name: 'Bills',
@@ -59,7 +63,7 @@ export default {
       startDate: moment().subtract(1, 'month').startOf('month').toISOString(),
       endDate: moment().subtract(1, 'month').endOf('month').toISOString(),
     });
-    const billingDatesHasError = ref(false);
+    const billingDatesError = ref('');
     const bills = ref([]);
     const columns = ref([
       { name: 'number', label: '#', align: 'left', field: 'number' },
@@ -80,6 +84,22 @@ export default {
 
     const getBills = async () => {
       try {
+        v$.value.billingDates.$touch();
+
+        if (v$.value.billingDates.endDate.minDate.$response === false) {
+          const error = 'La date de fin ne peut pas être antérieure à la date de début.';
+          billingDatesError.value = error;
+          return NotifyWarning(error);
+        }
+
+        const requiredError = v$.value.billingDates.startDate.required.$response === false ||
+          v$.value.billingDates.endDate.required.$response === false;
+        if (requiredError) {
+          const error = REQUIRED_LABEL;
+          billingDatesError.value = error;
+          return NotifyWarning(error);
+        }
+
         tableLoading.value = true;
 
         bills.value = Object.freeze(await Bills.list({
@@ -116,10 +136,18 @@ export default {
       }
     };
 
+    const rules = {
+      billingDates: { startDate: { required }, endDate: { required, minDate: minDate(billingDates.value.startDate) } },
+    };
+    const v$ = useVuelidate(rules, { billingDates });
+
+    const created = async () => getBills();
+    created();
+
     return {
       // DATA
       billingDates,
-      billingDatesHasError,
+      billingDatesError,
       bills,
       columns,
       pagination,
@@ -133,6 +161,8 @@ export default {
       formatPrice,
       formatDate,
       downloadBill,
+      // Validations
+      v$,
     };
   },
 };
