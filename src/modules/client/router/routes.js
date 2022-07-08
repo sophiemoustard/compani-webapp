@@ -147,7 +147,7 @@ const routes = [
       },
       {
         path: 'ni/billing/bills',
-        name: 'ni billing bills',
+        name: 'ni billing automatic bills',
         component: () => import('src/modules/client/pages/ni/billing/Bills'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

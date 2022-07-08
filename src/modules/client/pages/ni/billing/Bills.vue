@@ -4,7 +4,7 @@
       <template #content>
           <div class="row">
             <ni-date-range v-model="billingDates" @blur="getBills" :error-message="billingDatesError"
-              borderless />
+              :error="v$.billingDates.$error" />
           </div>
       </template>
     </ni-title-header>
@@ -35,21 +35,21 @@
 </template>
 <script>
 import { useMeta } from 'quasar';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Bills from '@api/Bills';
-import { minDate } from '@helpers/vuelidateCustomVal';
+import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { formatIdentity, formatPrice, formatDownloadName, truncate } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, isBefore, dateDiff } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
-import { AUTOMATIC, REQUIRED_LABEL } from '@data/constants';
+import { AUTOMATIC } from '@data/constants';
 
 export default {
   name: 'Bills',
@@ -67,7 +67,6 @@ export default {
       startDate: moment().subtract(1, 'month').startOf('month').toISOString(),
       endDate: moment().subtract(1, 'month').endOf('month').toISOString(),
     });
-    const billingDatesError = ref('');
     const bills = ref([]);
     const columns = ref([
       { name: 'number', label: '#', align: 'left', field: 'number' },
@@ -89,20 +88,7 @@ export default {
     const getBills = async () => {
       try {
         v$.value.billingDates.$touch();
-
-        if (v$.value.billingDates.endDate.minDate.$response === false) {
-          const error = 'La date de fin ne peut pas être antérieure à la date de début.';
-          billingDatesError.value = error;
-          return NotifyWarning(error);
-        }
-
-        const requiredError = v$.value.billingDates.startDate.required.$response === false ||
-          v$.value.billingDates.endDate.required.$response === false;
-        if (requiredError) {
-          const error = REQUIRED_LABEL;
-          billingDatesError.value = error;
-          return NotifyWarning(error);
-        }
+        if (v$.value.billingDates.$error) return NotifyWarning('Date(s) invalide(s)');
 
         tableLoading.value = true;
 
@@ -113,6 +99,7 @@ export default {
         }));
       } catch (e) {
         console.error(e);
+        if (e.status === 403) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la récupération des factures.');
       } finally {
         tableLoading.value = false;
@@ -144,10 +131,28 @@ export default {
       $router.push({ name: 'ni customers info', params: { customerId, defaultTab: 'billing' } });
     };
 
+    const max = computed(() => moment(billingDates.value.startDate).add(1, 'year').subtract(1, 'day').toISOString());
+    const min = computed(() => moment(billingDates.value.endDate).subtract(1, 'year').toISOString());
+
     const rules = {
-      billingDates: { startDate: { required }, endDate: { required, minDate: minDate(billingDates.value.startDate) } },
+      billingDates: {
+        startDate: { required: minDate(min.value) },
+        endDate: { required, minDate: minDate(billingDates.value.startDate), maxDate: maxDate(max.value) },
+      },
     };
     const v$ = useVuelidate(rules, { billingDates });
+
+    const billingDatesError = computed(() => {
+      if (isBefore(billingDates.value.endDate, billingDates.value.startDate)) {
+        return 'La date de fin doit être postérieure à la date de début';
+      }
+
+      const millisecondsToYears = 1000 * 60 * 60 * 24 * 365;
+      if ((dateDiff(billingDates.value.endDate, billingDates.value.startDate) / millisecondsToYears) >= 1) {
+        return 'Date(s) invalide(s) : la période maximale est 1 an';
+      }
+      return '';
+    });
 
     const created = async () => getBills();
     created();
