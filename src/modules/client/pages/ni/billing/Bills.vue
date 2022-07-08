@@ -1,10 +1,10 @@
 <template>
-  <q-page class="client-background q-pb-xl">
+  <q-page class="client-background">
     <ni-title-header title="Factures" padding>
       <template #content>
-          <div class="header-selects row header-selects-container">
+          <div class="row">
             <ni-date-range v-model="billingDates" @blur="getBills" :error-message="billingDatesError"
-              borderless class="q-ma-sm" />
+              borderless />
           </div>
       </template>
     </ni-title-header>
@@ -15,12 +15,15 @@
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">
             <template v-if="col.name === 'number'">
-              <div class="cursor-pointer clickable-name"
-                @click.stop="downloadBill(props.row)" :disable="pdfLoading">
+              <div class="cursor-pointer clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
                   {{ props.row.number }}
               </div>
             </template>
-            <template v-if="col.name === 'customer'">{{ formatIdentity(props.row.customer.identity, 'Lf') }}</template>
+            <template v-if="col.name === 'customer'">
+              <div class="cursor-pointer clickable-name" @click.stop="goToCustomerInfos(props.row.customer._id)">
+                  {{ formatIdentity(props.row.customer.identity, 'Lf') }}
+              </div>
+            </template>
             <template v-if="col.name === 'client'">{{ getClientName(props.row.customer, props.row) }}</template>
             <template v-if="col.name === 'netInclTaxes'">{{ formatPrice(props.row.netInclTaxes) }}</template>
             <template v-else-if="col.name === 'date'">{{ col.value }}</template>
@@ -33,6 +36,7 @@
 <script>
 import { useMeta } from 'quasar';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Bills from '@api/Bills';
@@ -47,7 +51,6 @@ import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
 import { AUTOMATIC, REQUIRED_LABEL } from '@data/constants';
 
-
 export default {
   name: 'Bills',
   components: {
@@ -58,6 +61,7 @@ export default {
   setup () {
     const metaInfo = { title: 'Factures' };
     useMeta(metaInfo);
+    const $router = useRouter();
 
     const billingDates = ref({
       startDate: moment().subtract(1, 'month').startOf('month').toISOString(),
@@ -136,6 +140,10 @@ export default {
       }
     };
 
+    const goToCustomerInfos = (customerId) => {
+      $router.push({ name: 'ni customers info', params: { customerId, defaultTab: 'billing' } });
+    };
+
     const rules = {
       billingDates: { startDate: { required }, endDate: { required, minDate: minDate(billingDates.value.startDate) } },
     };
@@ -161,6 +169,7 @@ export default {
       formatPrice,
       formatDate,
       downloadBill,
+      goToCustomerInfos,
       // Validations
       v$,
     };
