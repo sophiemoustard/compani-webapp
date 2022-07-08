@@ -30,11 +30,9 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
-import { userMixin } from '@mixins/userMixin';
 
 export default {
   name: 'InterlocutorModal',
-  mixins: [userMixin],
   props: {
     modelValue: { type: Boolean, default: false },
     interlocutorsOptions: { type: Array, default: () => [] },

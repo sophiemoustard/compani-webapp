@@ -119,7 +119,7 @@ import Attendances from '@api/Attendances';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import {
-  isBetween,
+  isBetweenOrEqual,
   formatDate,
   ascendingSort,
   getTotalDuration,
@@ -278,7 +278,7 @@ export default {
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const sixMonthsHistories = this.eLearningActivitiesCompleted
-          .filter(ah => isBetween(ah.createdAt, chartStartDate, chartEndDate));
+          .filter(ah => isBetweenOrEqual(ah.createdAt, chartStartDate, chartEndDate));
 
         this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
