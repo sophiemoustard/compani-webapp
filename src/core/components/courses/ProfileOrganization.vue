@@ -537,7 +537,13 @@ export default {
         this.v$.tempInterlocutorId.$touch();
         if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Courses.update(this.profileId, { salesRepresentative: this.tempInterlocutorId });
+        const payload = {
+          salesRepresentative: this.tempInterlocutorId,
+          ...(get(this.course, 'contact._id') === get(this.course, 'salesRepresentative._id') &&
+            { contact: this.tempInterlocutorId }
+          ),
+        };
+        await Courses.update(this.profileId, payload);
         this.salesRepresentativeEditionModal = false;
         await this.refreshCourse();
         NotifyPositive('Référent Compani mis à jour.');
@@ -554,7 +560,14 @@ export default {
         this.v$.tempInterlocutorId.$touch();
         if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Courses.update(this.profileId, { trainer: this.tempInterlocutorId });
+        const payload = {
+          trainer: this.tempInterlocutorId,
+          ...(get(this.course, 'contact._id') &&
+            get(this.course, 'contact._id') === get(this.course, 'trainer._id') &&
+            { contact: this.tempInterlocutorId }
+          ),
+        };
+        await Courses.update(this.profileId, payload);
         this.trainerModal = false;
         await this.refreshCourse();
         NotifyPositive('Intervenant(e) mis(e) à jour.');
@@ -571,7 +584,14 @@ export default {
         this.v$.tempInterlocutorId.$touch();
         if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Courses.update(this.profileId, { companyRepresentative: this.tempInterlocutorId });
+        const payload = {
+          companyRepresentative: this.tempInterlocutorId,
+          ...(get(this.course, 'contact._id') &&
+            get(this.course, 'contact._id') === get(this.course, 'companyRepresentative._id') &&
+            { contact: this.tempInterlocutorId }
+          ),
+        };
+        await Courses.update(this.profileId, payload);
         this.companyRepresentativeModal = false;
         await this.refreshCourse();
         NotifyPositive('Référent structure mis à jour.');
