@@ -146,6 +146,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/billing/bills',
+        name: 'ni billing automatic bills',
+        component: () => import('src/modules/client/pages/ni/billing/Bills'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'billing',
+        },
+      },
+      {
         path: 'ni/pay/to-pay',
         name: 'ni pay to pay',
         component: () => import('src/modules/client/pages/ni/pay/ToPay'),
