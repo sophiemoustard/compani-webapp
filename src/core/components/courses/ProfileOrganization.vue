@@ -37,11 +37,6 @@
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
     <div v-if="isIntraOrVendor">
-      <div class="q-mb-lg">
-        <p class="text-italic">
-          Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
-        </p>
-      </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contacter les stagiaires</p>
         <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
