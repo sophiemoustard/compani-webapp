@@ -43,7 +43,7 @@ import Bills from '@api/Bills';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { formatIdentity, formatPrice, formatDownloadName, truncate } from '@helpers/utils';
-import { formatDate, isBefore, dateDiff } from '@helpers/date';
+import { formatDate, isBefore } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
@@ -134,12 +134,12 @@ export default {
     const max = computed(() => moment(billingDates.value.startDate).add(1, 'year').subtract(1, 'day').toISOString());
     const min = computed(() => moment(billingDates.value.endDate).subtract(1, 'year').toISOString());
 
-    const rules = {
+    const rules = computed(() => ({
       billingDates: {
-        startDate: { required: minDate(min.value) },
+        startDate: { required, minDate: minDate(min.value) },
         endDate: { required, minDate: minDate(billingDates.value.startDate), maxDate: maxDate(max.value) },
       },
-    };
+    }));
     const v$ = useVuelidate(rules, { billingDates });
 
     const billingDatesError = computed(() => {
@@ -147,11 +147,11 @@ export default {
         return 'La date de fin doit être postérieure à la date de début';
       }
 
-      const millisecondsToYears = 1000 * 60 * 60 * 24 * 365;
-      if ((dateDiff(billingDates.value.endDate, billingDates.value.startDate) / millisecondsToYears) >= 1) {
-        return 'Date(s) invalide(s) : la période maximale est 1 an';
-      }
-      return '';
+      const requiredField = v$.value.billingDates.startDate.required.$response === false ||
+        v$.value.billingDates.endDate.required.$response === false;
+      if (requiredField) return 'Champ requis';
+
+      return 'Date(s) invalide(s) : la période maximale est 1 an';
     });
 
     const created = async () => getBills();
