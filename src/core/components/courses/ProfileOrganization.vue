@@ -84,17 +84,17 @@
     <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
-    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutorId"
-      @submit="updateSalesRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
+    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutor"
+      @submit="updateSalesRepresentative" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
       @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
       :interlocutors-options="salesRepresentativeOptions" />
 
-    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutorId" @submit="updateTrainer"
-      :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading" @hide="resetInterlocutor"
+    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutor" @submit="updateTrainer"
+      :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading" @hide="resetInterlocutor"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" />
 
-    <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutorId"
-      @submit="updateCompanyRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
+    <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutor"
+      @submit="updateCompanyRepresentative" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
       @hide="resetInterlocutor" :label="interlocutorLabel" :interlocutors-options="companyRepresentativeOptions" />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tempContactId"
@@ -196,7 +196,7 @@ export default {
       smsHistoriesModal: false,
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
-      tempInterlocutorId: '',
+      tempInterlocutor: { _id: '', isContact: false },
       salesRepresentativeLabel: { action: 'Modifier le ', interlocutor: 'référent Compani' },
       salesRepresentativeEditionModal: false,
       interlocutorModalLoading: false,
@@ -212,7 +212,7 @@ export default {
   },
   validations () {
     return {
-      tempInterlocutorId: { required },
+      tempInterlocutor: { _id: { required } },
       tempContactId: { required },
       course: { contact: { contact: { phone: { required } } } },
       newSms: { content: { required }, type: { required } },
@@ -529,14 +529,12 @@ export default {
     async updateSalesRepresentative () {
       try {
         this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.tempInterlocutor.$touch();
+        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = {
-          salesRepresentative: this.tempInterlocutorId,
-          ...(get(this.course, 'contact._id') === get(this.course, 'salesRepresentative._id') &&
-            { contact: this.tempInterlocutorId }
-          ),
+          salesRepresentative: this.tempInterlocutor._id,
+          contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '',
         };
         await Courses.update(this.profileId, payload);
         this.salesRepresentativeEditionModal = false;
@@ -552,15 +550,12 @@ export default {
     async updateTrainer () {
       try {
         this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.tempInterlocutor.$touch();
+        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = {
-          trainer: this.tempInterlocutorId,
-          ...(get(this.course, 'contact._id') &&
-            get(this.course, 'contact._id') === get(this.course, 'trainer._id') &&
-            { contact: this.tempInterlocutorId }
-          ),
+          trainer: this.tempInterlocutor._id,
+          contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '',
         };
         await Courses.update(this.profileId, payload);
         this.trainerModal = false;
@@ -576,15 +571,12 @@ export default {
     async updateCompanyRepresentative () {
       try {
         this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.tempInterlocutor.$touch();
+        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = {
-          companyRepresentative: this.tempInterlocutorId,
-          ...(get(this.course, 'contact._id') &&
-            get(this.course, 'contact._id') === get(this.course, 'companyRepresentative._id') &&
-            { contact: this.tempInterlocutorId }
-          ),
+          companyRepresentative: this.tempInterlocutor._id,
+          contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '',
         };
         await Courses.update(this.profileId, payload);
         this.companyRepresentativeModal = false;
@@ -619,25 +611,35 @@ export default {
       this.v$.tempContactId.$reset();
     },
     resetSalesRepresentativeEdition () {
-      this.tempInterlocutorId = '';
-      this.v$.tempInterlocutorId.$reset();
+      this.tempInterlocutor = { _id: '', isContact: false };
+      this.v$.tempInterlocutor.$reset();
     },
     openSalesRepresentativeModal () {
-      this.tempInterlocutorId = this.course.salesRepresentative._id;
+      this.tempInterlocutor = {
+        _id: this.course.salesRepresentative._id,
+        isContact: this.course.salesRepresentative._id === this.course.contact._id,
+      };
       this.salesRepresentativeEditionModal = true;
     },
     resetInterlocutor () {
-      this.tempInterlocutorId = '';
+      this.tempInterlocutor = { _id: '', isContact: false };
       this.interlocutorLabel = { action: '', interlocutor: '' };
-      this.v$.tempInterlocutorId.$reset();
+      this.v$.tempInterlocutor.$reset();
     },
     openTrainerModal (action) {
-      this.tempInterlocutorId = this.course.trainer._id;
+      this.tempInterlocutor = {
+        _id: this.course.trainer._id,
+        isContact: this.course.trainer._id && this.course.trainer._id === this.course.contact._id,
+      };
       this.interlocutorLabel = { action, interlocutor: 'intervenant(e)' };
       this.trainerModal = true;
     },
     openCompanyRepresentativeModal (action) {
-      this.tempInterlocutorId = this.course.companyRepresentative._id;
+      this.tempInterlocutor = {
+        _id: this.course.companyRepresentative._id,
+        isContact: this.course.companyRepresentative._id &&
+        this.course.companyRepresentative._id === this.course.contact._id,
+      };
       this.interlocutorLabel = { action, interlocutor: 'Référent structure' };
       this.companyRepresentativeModal = true;
     },
