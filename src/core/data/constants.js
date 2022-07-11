@@ -587,3 +587,21 @@ export const BALANCE = 'balance';
 // END_TO_END TESTS
 export const BILLING = 'billing';
 export const AUTHENTICATION = 'authentication';
+
+// DAYS
+const MONDAY = '0';
+const TUESDAY = '1';
+const WEDNESDAY = '2';
+const THURSDAY = '3';
+const FRIDAY = '4';
+const SATURDAY = '5';
+const SUNDAY = '6';
+export const DAYS = {
+  [MONDAY]: 'Lundi',
+  [TUESDAY]: 'Mardi',
+  [WEDNESDAY]: 'Mercredi',
+  [THURSDAY]: 'Jeudi',
+  [FRIDAY]: 'Vendredi',
+  [SATURDAY]: 'Samedi',
+  [SUNDAY]: 'Dimanche',
+};

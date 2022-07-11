@@ -3,7 +3,9 @@
     <template #title>
       Êtes-vous sûr(e) de vouloir supprimer cette répétition ?
     </template>
-    <ni-repetition-cell :repetition="repetition" :visible="false" :person-type="personType" />
+    <div class="q-mb-md">
+      <ni-repetition-cell :repetition="repetition" :visible="false" :person-type="personType" />
+    </div>
     <div class="text">
       Les événements rattachés à cette répétition et postérieurs au {{ formatDate }} seront supprimés.
     </div>

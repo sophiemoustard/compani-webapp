@@ -124,7 +124,6 @@ export default {
 <style lang="sass" scoped>
 .container
   background-color: $copper-grey-100
-  margin: 0px 0px 16px 0px
   padding: 16px
 .infos-container
   max-width: 80%
