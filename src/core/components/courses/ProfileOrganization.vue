@@ -87,15 +87,16 @@
     <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutor"
       @submit="updateSalesRepresentative" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
       @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
-      :interlocutors-options="salesRepresentativeOptions" />
+      :interlocutors-options="salesRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutor" @submit="updateTrainer"
       :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading" @hide="resetInterlocutor"
-      :label="interlocutorLabel" :interlocutors-options="trainerOptions" />
+      :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutor"
       @submit="updateCompanyRepresentative" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
-      @hide="resetInterlocutor" :label="interlocutorLabel" :interlocutors-options="companyRepresentativeOptions" />
+      @hide="resetInterlocutor" :label="interlocutorLabel" :interlocutors-options="companyRepresentativeOptions"
+      :show-contact="canUpdateInterlocutor" />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tempContactId"
       @submit="updateContact" :validations="v$.tempContactId" :loading="contactModalLoading"
@@ -534,8 +535,12 @@ export default {
 
         const payload = {
           salesRepresentative: this.tempInterlocutor._id,
-          contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '',
+          ...(
+            (this.tempInterlocutor.isContact || this.course.contact._id === this.course.salesRepresentative._id) &&
+            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
+          ),
         };
+
         await Courses.update(this.profileId, payload);
         this.salesRepresentativeEditionModal = false;
         await this.refreshCourse();
@@ -555,8 +560,12 @@ export default {
 
         const payload = {
           trainer: this.tempInterlocutor._id,
-          contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '',
+          ...(
+            (this.tempInterlocutor.isContact || this.course.contact._id === this.course.trainer._id) &&
+            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
+          ),
         };
+
         await Courses.update(this.profileId, payload);
         this.trainerModal = false;
         await this.refreshCourse();
@@ -576,8 +585,12 @@ export default {
 
         const payload = {
           companyRepresentative: this.tempInterlocutor._id,
-          contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '',
+          ...(
+            (this.tempInterlocutor.isContact || this.course.contact._id === this.course.companyRepresentative._id) &&
+            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
+          ),
         };
+
         await Courses.update(this.profileId, payload);
         this.companyRepresentativeModal = false;
         await this.refreshCourse();
@@ -629,7 +642,7 @@ export default {
     openTrainerModal (action) {
       this.tempInterlocutor = {
         _id: this.course.trainer._id,
-        isContact: this.course.trainer._id && this.course.trainer._id === this.course.contact._id,
+        isContact: !!this.course.trainer._id && this.course.trainer._id === this.course.contact._id,
       };
       this.interlocutorLabel = { action, interlocutor: 'intervenant(e)' };
       this.trainerModal = true;
@@ -637,7 +650,7 @@ export default {
     openCompanyRepresentativeModal (action) {
       this.tempInterlocutor = {
         _id: this.course.companyRepresentative._id,
-        isContact: this.course.companyRepresentative._id &&
+        isContact: !!this.course.companyRepresentative._id &&
         this.course.companyRepresentative._id === this.course.contact._id,
       };
       this.interlocutorLabel = { action, interlocutor: 'Référent structure' };

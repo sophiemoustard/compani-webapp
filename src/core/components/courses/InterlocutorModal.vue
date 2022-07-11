@@ -3,7 +3,7 @@
     <template #title>
         {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor.toLowerCase() }}</span>
     </template>
-      <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, _id)" required-field
+      <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')" required-field
         :caption="label.interlocutor" :options="interlocutorsOptions" option-slot :error="validations.$error">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
@@ -19,10 +19,12 @@
           </q-item>
         </template>
       </ni-select>
-      <q-checkbox :model-value="interlocutor.isContact" label="Contact pour la formation" dense :disable="loading"
-        @update:model-value="update($event, 'isContact')" />
-      <div class="explanation">
-        C'est le contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
+      <div v-if="showContact">
+        <q-checkbox :model-value="interlocutor.isContact" label="Contact pour la formation" dense :disable="loading"
+          @update:model-value="update($event, 'isContact')" />
+        <div class="explanation">
+          C'est le contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
+        </div>
       </div>
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor.toLowerCase()}`"
@@ -46,6 +48,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     label: { type: Object, default: () => ({}) },
+    showContact: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
