@@ -15,7 +15,7 @@
             <div class="text-orange-600">numéro manquant</div>
           </div>
           <div v-if="contact._id === interlocutor._id" class="contact">
-            <q-icon size="xs" name="person" class="q-mr-xs" />
+            <q-icon size="xxs" name="person" class="q-mr-xs" />
             <span>Contact donné aux stagiaires</span>
           </div>
         </div>
@@ -81,6 +81,7 @@ export default {
   font-size: 12px
   margin-top: 4px
   display: flex
+  align-items: center
   margin-left: -4px
 .dot-warning
   background: $orange-600
