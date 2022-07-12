@@ -536,7 +536,10 @@ export default {
         const payload = {
           salesRepresentative: this.tempInterlocutor._id,
           ...(
-            (this.tempInterlocutor.isContact || this.course.contact._id === this.course.salesRepresentative._id) &&
+            (
+              this.tempInterlocutor.isContact ||
+              get(this.course, 'contact._id') === this.course.salesRepresentative._id
+            ) &&
             { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
           ),
         };
@@ -561,7 +564,7 @@ export default {
         const payload = {
           trainer: this.tempInterlocutor._id,
           ...(
-            (this.tempInterlocutor.isContact || this.course.contact._id === this.course.trainer._id) &&
+            (this.tempInterlocutor.isContact || get(this.course, 'contact._id') === this.course.trainer._id) &&
             { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
           ),
         };
@@ -586,7 +589,10 @@ export default {
         const payload = {
           companyRepresentative: this.tempInterlocutor._id,
           ...(
-            (this.tempInterlocutor.isContact || this.course.contact._id === this.course.companyRepresentative._id) &&
+            (
+              this.tempInterlocutor.isContact ||
+              get(this.course, 'contact._id') === this.course.companyRepresentative._id
+            ) &&
             { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
           ),
         };
