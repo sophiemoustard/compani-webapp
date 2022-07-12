@@ -81,6 +81,7 @@ export default {
   font-size: 12px
   margin-top: 4px
   display: flex
+  margin-left: -4px
 .dot-warning
   background: $orange-600
   margin: 0px 4px 0px 0px
