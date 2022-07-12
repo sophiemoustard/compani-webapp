@@ -16,9 +16,8 @@
             </div>
             <q-icon :name="areDetailsVisible[index] ? 'expand_less' : 'expand_more'" />
           </q-card-section>
-          <div v-if="areDetailsVisible[index]">
-            <div v-for="repetition of repetitionList" :key="repetition._id"
-              class="repetition-container">
+          <div v-if="areDetailsVisible[index]" class="repetition-container">
+            <div v-for="repetition of repetitionList" :key="repetition._id" class="q-mb-sm">
               <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)"
                 :person-type="personType" />
             </div>
@@ -274,5 +273,5 @@ export default {
   font-size: 16px
 .repetition-container
   background: white
-  padding: 8px 16px 8px 16px
+  padding: 16px 16px 8px 16px
 </style>
