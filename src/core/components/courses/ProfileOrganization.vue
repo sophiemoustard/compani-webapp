@@ -85,18 +85,18 @@
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
     <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutor"
-      @submit="updateSalesRepresentative" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
-      @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
+      @submit="updateInterlocutor('salesRepresentative')" :validations="v$.tempInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
       :interlocutors-options="salesRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
-    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutor" @submit="updateTrainer"
-      :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading" @hide="resetInterlocutor"
+    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutor" @hide="resetInterlocutor"
+      @submit="updateInterlocutor('trainer')" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutor"
-      @submit="updateCompanyRepresentative" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
-      @hide="resetInterlocutor" :label="interlocutorLabel" :interlocutors-options="companyRepresentativeOptions"
-      :show-contact="canUpdateInterlocutor" />
+      @submit="updateInterlocutor('companyRepresentative')" :validations="v$.tempInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
+      :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tempContactId"
       @submit="updateContact" :validations="v$.tempContactId" :loading="contactModalLoading"
@@ -527,83 +527,38 @@ export default {
         this.pdfLoading = false;
       }
     },
-    async updateSalesRepresentative () {
+    async updateInterlocutor (role) {
       try {
         this.interlocutorModalLoading = true;
         this.v$.tempInterlocutor.$touch();
         if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = {
-          salesRepresentative: this.tempInterlocutor._id,
+          [role]: this.tempInterlocutor._id,
           ...(
             (
               this.tempInterlocutor.isContact ||
-              get(this.course, 'contact._id') === this.course.salesRepresentative._id
+              get(this.course, 'contact._id') === this.course[role]._id
             ) &&
             { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
           ),
         };
 
         await Courses.update(this.profileId, payload);
-        this.salesRepresentativeEditionModal = false;
+
+        switch (role) {
+          case 'salesRepresentative': this.salesRepresentativeEditionModal = false;
+            break;
+          case 'trainer': this.trainerModal = false;
+            break;
+          case 'companyRepresentative': this.companyRepresentativeModal = false;
+            break;
+        }
         await this.refreshCourse();
-        NotifyPositive('Référent Compani mis à jour.');
+        NotifyPositive('Interlocuteur mis à jour.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition du référent Compani.');
-      } finally {
-        this.interlocutorModalLoading = false;
-      }
-    },
-    async updateTrainer () {
-      try {
-        this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutor.$touch();
-        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = {
-          trainer: this.tempInterlocutor._id,
-          ...(
-            (this.tempInterlocutor.isContact || get(this.course, 'contact._id') === this.course.trainer._id) &&
-            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
-          ),
-        };
-
-        await Courses.update(this.profileId, payload);
-        this.trainerModal = false;
-        await this.refreshCourse();
-        NotifyPositive('Intervenant(e) mis(e) à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'intervenant(e).');
-      } finally {
-        this.interlocutorModalLoading = false;
-      }
-    },
-    async updateCompanyRepresentative () {
-      try {
-        this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutor.$touch();
-        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = {
-          companyRepresentative: this.tempInterlocutor._id,
-          ...(
-            (
-              this.tempInterlocutor.isContact ||
-              get(this.course, 'contact._id') === this.course.companyRepresentative._id
-            ) &&
-            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
-          ),
-        };
-
-        await Courses.update(this.profileId, payload);
-        this.companyRepresentativeModal = false;
-        await this.refreshCourse();
-        NotifyPositive('Référent structure mis à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'édition du référent structure.');
+        NotifyNegative('Erreur lors de l\'édition de l\'interlocuteur.');
       } finally {
         this.interlocutorModalLoading = false;
       }
