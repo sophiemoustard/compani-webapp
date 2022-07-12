@@ -8,7 +8,8 @@
         Répétitions de  <span class="text-weight-bold">{{ currentPersonName }}</span>
       </div>
       <div v-for="(repetitionList, index) of Object.values(repetitions)" :key="index">
-        <q-card v-if="repetitionList.length" class="repetition-list-container q-mb-lg">
+        <q-card v-if="repetitionList.length"
+          :class="['q-mb-lg', `top-container${areDetailsVisible[index] ? '-open' : ''}`]">
           <q-card-section class="day-container row cursor-pointer" :id="index" @click="showDetails(index)">
             <div>
               <div class="day">{{ DAYS[index] }}</div>
@@ -264,12 +265,6 @@ export default {
   font-style: italic
   margin: 0px 0px 16px 0px
   padding: 16px
-.day-container
-  background: $copper-grey-50
-  padding: 8px
-  justify-content: space-between
-  align-items: center
-  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.125)
 .day
   font-weight: bold
   color: black
@@ -277,6 +272,15 @@ export default {
 .repetition-container
   background: white
   padding: 16px 16px 8px 16px
-.repetition-list-container
-  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.125)
+.day-container
+  background: $copper-grey-50
+  padding: 8px
+  justify-content: space-between
+  align-items: center
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25)
+.top-container
+  box-shadow: none
+  &-open
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25)
+
 </style>
