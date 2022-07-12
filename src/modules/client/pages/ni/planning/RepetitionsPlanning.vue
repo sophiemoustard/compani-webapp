@@ -86,7 +86,7 @@ export default {
     const minStartDate = ref(moment().startOf('d').toISOString());
     const maxStartDate = ref(moment(minStartDate.value).add(90, 'day').toISOString());
     const personType = ref('');
-    const areDetailsVisible = ref(Object.fromEntries(repetitions.value.map(day => [day, false])));
+    const areDetailsVisible = ref(Object.fromEntries((Object.keys(repetitions.value).map(day => [day, false]))));
 
     const openDeletionModal = (repetition) => {
       currentRepetition.value = { ...repetition, dateDeletion: '' };
@@ -134,6 +134,8 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des répétitions.');
+      } finally {
+        areDetailsVisible.value = Object.fromEntries(Object.keys(repetitions.value).map(day => [day, false]));
       }
     };
 
