@@ -1,11 +1,11 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')"
     title="Annuler l'intervention">
-    <ni-option-group caption="Qui est à l'origine de l'annulation ?"
+    <ni-option-group caption="Qui est à l'origine de l'annulation&nbsp;?"
       :model-value="editedEvent.cancel.reason" type="radio" :options="cancellationReasons" required-field
       color="copper-500" @update:model-value="updateCancellationReason($event)"
       :error="validations.cancel.reason.$error" />
-    <ni-option-group caption="Quelles sont les conditions d'annulation ?"
+    <ni-option-group caption="Quelles sont les conditions d'annulation&nbsp;?"
       :model-value="editedEvent.cancel.condition" type="radio" :options="cancellationOptions" required-field
       color="copper-500" @update:model-value="updateCancellationCondition($event)"
       :error="validations.cancel.condition.$error" />
@@ -81,8 +81,9 @@ export default {
         title: 'Confirmation',
         message: `Êtes-vous sûr(e) de vouloir annuler l'intervention du
           ${formatDateAndHours(props.editedEvent.dates.startDate, props.editedEvent.dates.endDate)}
-          chez ${props.customerName} ?`,
+          chez ${props.customerName}&nbsp;?`,
         ok: true,
+        html: true,
         cancel: 'Annuler',
       }).onOk(() => cancelEvent())
         .onCancel(() => NotifyPositive('Annulation annulée.'));

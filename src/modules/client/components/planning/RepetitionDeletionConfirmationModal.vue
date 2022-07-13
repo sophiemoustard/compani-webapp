@@ -1,7 +1,7 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')">
     <template #title>
-      Êtes-vous sûr(e) de vouloir supprimer cette répétition ?
+      Êtes-vous sûr(e) de vouloir supprimer cette répétition&nbsp;?
     </template>
     <ni-repetition-cell :repetition="repetition" :visible="false" :person-type="personType" />
     <div class="text">

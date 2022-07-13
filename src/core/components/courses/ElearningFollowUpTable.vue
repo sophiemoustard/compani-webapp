@@ -82,7 +82,7 @@ export default {
         },
         {
           name: 'isConnected',
-          label: 'Connexion à l\'app ?',
+          label: 'Connexion à l\'app ?',
           field: 'firstMobileConnection',
           format: value => !!value,
           align: 'center',

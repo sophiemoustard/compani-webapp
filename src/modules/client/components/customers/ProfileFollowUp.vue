@@ -508,7 +508,8 @@ export default {
     validatePartnerDeletion (customerPartnerId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir retirer le/la partenaire ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer le/la partenaire&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deletePartner(customerPartnerId))
