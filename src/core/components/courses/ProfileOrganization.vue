@@ -209,6 +209,8 @@ export default {
       contactModalLoading: false,
       contactAdditionModal: false,
       tempContactId: '',
+      SALES_REPRESENTATIVE: 'salesRepresentative',
+      COMPANY_REPRESENTATIVE: 'companyRepresentative',
     };
   },
   validations () {
@@ -538,7 +540,7 @@ export default {
           ...(
             (
               this.tempInterlocutor.isContact ||
-              get(this.course, 'contact._id') === this.course[role]._id
+              get(this.course, 'contact._id') === get(this.course, `${role}._id`)
             ) &&
             { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
           ),
@@ -547,11 +549,11 @@ export default {
         await Courses.update(this.profileId, payload);
 
         switch (role) {
-          case 'salesRepresentative': this.salesRepresentativeEditionModal = false;
+          case this.SALES_REPRESENTATIVE: this.salesRepresentativeEditionModal = false;
             break;
-          case 'trainer': this.trainerModal = false;
+          case TRAINER: this.trainerModal = false;
             break;
-          case 'companyRepresentative': this.companyRepresentativeModal = false;
+          case this.COMPANY_REPRESENTATIVE: this.companyRepresentativeModal = false;
             break;
         }
         await this.refreshCourse();
