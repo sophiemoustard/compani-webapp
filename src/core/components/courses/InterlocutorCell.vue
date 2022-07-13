@@ -7,9 +7,15 @@
         <div class="q-my-sm q-ml-md">
           <div class="text-copper-grey-700">{{ formatIdentity(interlocutor.identity, 'FL') }}</div>
           <div class="text-copper-grey-500 text-14">{{ interlocutor.local.email }}</div>
-          <div class="phone">{{ formatPhone(get(interlocutor, 'contact.phone')) }}</div>
+          <div v-if="get(interlocutor, 'contact.phone')" class="phone">
+            {{ formatPhone(interlocutor.contact.phone) }}
+          </div>
+          <div v-else class="row items-center text-14">
+            <div class="dot dot-error" />
+            <div class="text-orange-500">numéro manquant</div>
+          </div>
           <div v-if="contact._id === interlocutor._id" class="contact">
-            <q-icon size="xs" name="person" class="q-mr-xs" />
+            <q-icon size="xxs" name="person" class="q-mr-xs" />
             <span>Contact donné aux stagiaires</span>
           </div>
         </div>
@@ -75,4 +81,8 @@ export default {
   font-size: 12px
   margin-top: 4px
   display: flex
+  align-items: center
+  margin-left: -2px
+.dot-error
+  margin: 0px 4px 0px 0px
 </style>

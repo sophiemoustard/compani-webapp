@@ -3,8 +3,8 @@
     <template #title>
         {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor.toLowerCase() }}</span>
     </template>
-      <ni-select in-modal :model-value="interlocutor" @update:model-value="update" :caption="label.interlocutor"
-        :options="interlocutorsOptions" required-field option-slot :error="validations.$error">
+      <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')" required-field
+        :caption="label.interlocutor" :options="interlocutorsOptions" option-slot :error="validations.$error">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
             <q-item-section avatar>
@@ -19,6 +19,13 @@
           </q-item>
         </template>
       </ni-select>
+      <div v-if="showContact">
+        <q-checkbox :model-value="interlocutor.isContact" label="Contact pour la formation" dense :disable="loading"
+          @update:model-value="update($event, 'isContact')" />
+        <div class="explanation">
+          C'est le contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
+        </div>
+      </div>
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor.toLowerCase()}`"
           icon-right="add" color="white" :loading="loading" @click="submit" />
@@ -27,6 +34,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
@@ -36,10 +44,11 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     interlocutorsOptions: { type: Array, default: () => [] },
-    interlocutor: { type: String, default: '' },
+    interlocutor: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     label: { type: Object, default: () => ({}) },
+    showContact: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
@@ -47,11 +56,11 @@ export default {
     'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor'],
-  setup (_, { emit }) {
+  setup (props, { emit }) {
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
-    const update = event => emit('update:interlocutor', event);
+    const update = (event, path) => emit('update:interlocutor', set({ ...props.interlocutor }, path, event));
 
     return {
       // Methods
@@ -68,4 +77,8 @@ export default {
 .details
   font-size: 14px
   color: $copper-grey-500
+.explanation
+  font-size: 12px
+  color: $copper-grey-600
+  margin: 0px 0px 24px 28px
 </style>

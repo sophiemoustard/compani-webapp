@@ -37,11 +37,6 @@
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
     <div v-if="isIntraOrVendor">
-      <div class="q-mb-lg">
-        <p class="text-italic">
-          Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
-        </p>
-      </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contacter les stagiaires</p>
         <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
@@ -89,18 +84,19 @@
     <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
-    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutorId"
-      @submit="updateSalesRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
-      @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
-      :interlocutors-options="salesRepresentativeOptions" />
+    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutor"
+      @submit="updateInterlocutor('salesRepresentative')" :validations="v$.tempInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
+      :interlocutors-options="salesRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
-    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutorId" @submit="updateTrainer"
-      :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading" @hide="resetInterlocutor"
-      :label="interlocutorLabel" :interlocutors-options="trainerOptions" />
+    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutor" @hide="resetInterlocutor"
+      @submit="updateInterlocutor('trainer')" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
+      :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
-    <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutorId"
-      @submit="updateCompanyRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
-      @hide="resetInterlocutor" :label="interlocutorLabel" :interlocutors-options="companyRepresentativeOptions" />
+    <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutor"
+      @submit="updateInterlocutor('companyRepresentative')" :validations="v$.tempInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
+      :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tempContactId"
       @submit="updateContact" :validations="v$.tempContactId" :loading="contactModalLoading"
@@ -201,7 +197,7 @@ export default {
       smsHistoriesModal: false,
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
-      tempInterlocutorId: '',
+      tempInterlocutor: { _id: '', isContact: false },
       salesRepresentativeLabel: { action: 'Modifier le ', interlocutor: 'référent Compani' },
       salesRepresentativeEditionModal: false,
       interlocutorModalLoading: false,
@@ -213,11 +209,13 @@ export default {
       contactModalLoading: false,
       contactAdditionModal: false,
       tempContactId: '',
+      SALES_REPRESENTATIVE: 'salesRepresentative',
+      COMPANY_REPRESENTATIVE: 'companyRepresentative',
     };
   },
   validations () {
     return {
-      tempInterlocutorId: { required },
+      tempInterlocutor: { _id: { required } },
       tempContactId: { required },
       course: { contact: { contact: { phone: { required } } } },
       newSms: { content: { required }, type: { required } },
@@ -531,73 +529,38 @@ export default {
         this.pdfLoading = false;
       }
     },
-    async updateSalesRepresentative () {
+    async updateInterlocutor (role) {
       try {
         this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.tempInterlocutor.$touch();
+        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = {
-          salesRepresentative: this.tempInterlocutorId,
-          ...(get(this.course, 'contact._id') === get(this.course, 'salesRepresentative._id') &&
-            { contact: this.tempInterlocutorId }
+          [role]: this.tempInterlocutor._id,
+          ...(
+            (
+              this.tempInterlocutor.isContact ||
+              get(this.course, 'contact._id') === get(this.course, `${role}._id`)
+            ) &&
+            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
           ),
         };
-        await Courses.update(this.profileId, payload);
-        this.salesRepresentativeEditionModal = false;
-        await this.refreshCourse();
-        NotifyPositive('Référent Compani mis à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'édition du référent Compani.');
-      } finally {
-        this.interlocutorModalLoading = false;
-      }
-    },
-    async updateTrainer () {
-      try {
-        this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = {
-          trainer: this.tempInterlocutorId,
-          ...(get(this.course, 'contact._id') &&
-            get(this.course, 'contact._id') === get(this.course, 'trainer._id') &&
-            { contact: this.tempInterlocutorId }
-          ),
-        };
         await Courses.update(this.profileId, payload);
-        this.trainerModal = false;
-        await this.refreshCourse();
-        NotifyPositive('Intervenant(e) mis(e) à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'intervenant(e).');
-      } finally {
-        this.interlocutorModalLoading = false;
-      }
-    },
-    async updateCompanyRepresentative () {
-      try {
-        this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = {
-          companyRepresentative: this.tempInterlocutorId,
-          ...(get(this.course, 'contact._id') &&
-            get(this.course, 'contact._id') === get(this.course, 'companyRepresentative._id') &&
-            { contact: this.tempInterlocutorId }
-          ),
-        };
-        await Courses.update(this.profileId, payload);
-        this.companyRepresentativeModal = false;
+        switch (role) {
+          case this.SALES_REPRESENTATIVE: this.salesRepresentativeEditionModal = false;
+            break;
+          case TRAINER: this.trainerModal = false;
+            break;
+          case this.COMPANY_REPRESENTATIVE: this.companyRepresentativeModal = false;
+            break;
+        }
         await this.refreshCourse();
-        NotifyPositive('Référent structure mis à jour.');
+        NotifyPositive('Interlocuteur mis à jour.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition du référent structure.');
+        NotifyNegative('Erreur lors de l\'édition de l\'interlocuteur.');
       } finally {
         this.interlocutorModalLoading = false;
       }
@@ -624,25 +587,35 @@ export default {
       this.v$.tempContactId.$reset();
     },
     resetSalesRepresentativeEdition () {
-      this.tempInterlocutorId = '';
-      this.v$.tempInterlocutorId.$reset();
+      this.tempInterlocutor = { _id: '', isContact: false };
+      this.v$.tempInterlocutor.$reset();
     },
     openSalesRepresentativeModal () {
-      this.tempInterlocutorId = this.course.salesRepresentative._id;
+      this.tempInterlocutor = {
+        _id: this.course.salesRepresentative._id,
+        isContact: this.course.salesRepresentative._id === this.course.contact._id,
+      };
       this.salesRepresentativeEditionModal = true;
     },
     resetInterlocutor () {
-      this.tempInterlocutorId = '';
+      this.tempInterlocutor = { _id: '', isContact: false };
       this.interlocutorLabel = { action: '', interlocutor: '' };
-      this.v$.tempInterlocutorId.$reset();
+      this.v$.tempInterlocutor.$reset();
     },
     openTrainerModal (action) {
-      this.tempInterlocutorId = this.course.trainer._id;
+      this.tempInterlocutor = {
+        _id: this.course.trainer._id,
+        isContact: !!this.course.trainer._id && this.course.trainer._id === this.course.contact._id,
+      };
       this.interlocutorLabel = { action, interlocutor: 'intervenant(e)' };
       this.trainerModal = true;
     },
     openCompanyRepresentativeModal (action) {
-      this.tempInterlocutorId = this.course.companyRepresentative._id;
+      this.tempInterlocutor = {
+        _id: this.course.companyRepresentative._id,
+        isContact: !!this.course.companyRepresentative._id &&
+        this.course.companyRepresentative._id === this.course.contact._id,
+      };
       this.interlocutorLabel = { action, interlocutor: 'Référent structure' };
       this.companyRepresentativeModal = true;
     },
