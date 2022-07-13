@@ -13,7 +13,7 @@
           <q-card-section class="day-container row cursor-pointer" :id="index" @click="showDetails(index)">
             <div>
               <div class="day">{{ DAYS[index] }}</div>
-              <div>{{ getRepetitionNumber(repetitionList) }}</div>
+              <div>{{ formatQuantity('répétition', repetitionList.length) }}</div>
             </div>
             <q-icon :name="areDetailsVisible[index] ? 'expand_less' : 'expand_more'" />
           </q-card-section>
@@ -55,7 +55,7 @@ import Repetitions from '@api/Repetitions';
 import Customers from '@api/Customers';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatQuantity } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
@@ -194,11 +194,6 @@ export default {
 
     const showDetails = day => (areDetailsVisible.value[day] = !areDetailsVisible.value[day]);
 
-    const getRepetitionNumber = (repetitionList) => {
-      const repetitionNumber = repetitionList.length;
-      return repetitionNumber > 1 ? `${repetitionNumber} répétitions` : `${repetitionNumber} répétition`;
-    };
-
     watch(selectedPerson, async () => {
       if (selectedPerson.value) await getRepetitions();
     });
@@ -243,7 +238,7 @@ export default {
       closeDeletionConfirmationModal,
       areDetailsVisible,
       showDetails,
-      getRepetitionNumber,
+      formatQuantity,
       // Validations
       v$,
     };
