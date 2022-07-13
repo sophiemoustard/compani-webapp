@@ -78,7 +78,8 @@ export default {
     validateDeletion (slotId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce créneau ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce créneau&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.delete(slotId))

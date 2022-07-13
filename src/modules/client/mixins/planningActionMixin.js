@@ -190,7 +190,7 @@ export const planningActionMixin = {
         case UNAVAILABILITY:
           return this.getCreationMessageForInternalOrUnavailability('indisponibilités');
         default:
-          return 'Êtes-vous sûr(e) de vouloir créer cette répétition ?';
+          return 'Êtes-vous sûr(e) de vouloir créer cette répétition&nbsp;?';
       }
     },
     async validateCreationEvent () {
@@ -370,7 +370,7 @@ export const planningActionMixin = {
         case UNAVAILABILITY:
           return this.getEditionMessageForInternalOrUnavailability('indisponibilités');
         default:
-          return 'Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
+          return 'Êtes-vous sûr(e) de vouloir modifier cette répétition&nbsp;?';
       }
     },
     areEditedFieldsApplicableToRepetition () {
@@ -584,7 +584,8 @@ export const planningActionMixin = {
     validateDocumentDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(driveId))
@@ -604,7 +605,8 @@ export const planningActionMixin = {
     validateEventDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet évènement ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet évènement&nbsp;?',
+        html: true,
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteEvent)

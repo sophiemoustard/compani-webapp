@@ -558,7 +558,8 @@ export default {
     validateDocumentDeletion (path) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(path))
@@ -579,7 +580,8 @@ export default {
     validateCertificateDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteCertificate(driveId))

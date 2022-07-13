@@ -539,7 +539,8 @@ export default {
     validateStepDetachment (subProgramId, stepId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir retirer cette étape de ce sous-programme ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer cette étape de ce sous-programme&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.detachStep(subProgramId, stepId))
@@ -565,7 +566,8 @@ export default {
       } else {
         this.$q.dialog({
           title: 'Confirmation',
-          message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape ?',
+          message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape&nbsp;?',
+          html: true,
           ok: true,
           cancel: 'Annuler',
         }).onOk(() => this.detachActivity(step._id, activityId))
@@ -606,7 +608,7 @@ export default {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Une fois le sous-programme publié, vous ne pourrez plus le modifier.<br />'
-          + 'Êtes-vous sûr(e) de vouloir publier ce sous-programme ?',
+          + 'Êtes-vous sûr(e) de vouloir publier ce sous-programme&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',

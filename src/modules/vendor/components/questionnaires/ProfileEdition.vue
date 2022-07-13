@@ -182,7 +182,8 @@ export default {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir publier ce questionnaire ?',
+        message: 'Êtes-vous sûr(e) de vouloir publier ce questionnaire&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.publishQuestionnaire())

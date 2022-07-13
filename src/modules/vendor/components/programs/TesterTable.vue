@@ -179,7 +179,8 @@ export default {
     validateTesterDeletion (testerId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir retirer le/la testeur(euse) du programme ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer le/la testeur(euse) du programme&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteTester(testerId))

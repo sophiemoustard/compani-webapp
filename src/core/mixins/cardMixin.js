@@ -8,7 +8,8 @@ export const cardMixin = {
     validateCardDeletion (cardId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cette carte ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette carte&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteCard(cardId))

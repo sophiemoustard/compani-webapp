@@ -245,7 +245,8 @@ export default {
     const validateOrganisationDeletion = (organisationId) => {
       Dialog.create({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer le financeur ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer le financeur&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => deleteOrganisation(organisationId))
