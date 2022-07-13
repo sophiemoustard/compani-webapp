@@ -125,7 +125,7 @@ export default {
     const validateBillCreation = () => {
       $q.dialog({
         title: 'Confirmation',
-        message: 'Cette opération est définitive. Confirmez-vous ?',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
         ok: 'Oui',
         cancel: 'Non',
         options: {

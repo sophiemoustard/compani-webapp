@@ -125,7 +125,7 @@ export const useTaxCertificates = (customer) => {
   const validateTaxCertificateDeletion = (taxCertificateId, row) => {
     $q.dialog({
       title: 'Confirmation',
-      message: 'Êtes-vous sûr(e) de vouloir supprimer cette attestation ?',
+      message: 'Êtes-vous sûr(e) de vouloir supprimer cette attestation ?',
       ok: 'OK',
       cancel: 'Annuler',
     }).onOk(() => deleteTaxCertificate(taxCertificateId, row))

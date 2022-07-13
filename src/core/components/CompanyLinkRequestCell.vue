@@ -64,7 +64,7 @@ export default {
     },
     validateLinkRequestCreation () {
       this.$q.dialog({
-        title: 'Voulez-vous vraiment rattacher ce compte ?',
+        title: 'Voulez-vous vraiment rattacher ce compte ?',
         message: `<div class="row q-my-md items-center">
             <img class="avatar q-mx-md" src="${this.getAvatar(this.request.user.picture)}"/>
             <div>
@@ -83,7 +83,7 @@ export default {
     },
     validateLinkRequestDeletion () {
       this.$q.dialog({
-        title: 'Voulez-vous vraiment supprimer cette demande de rattachement ?',
+        title: 'Voulez-vous vraiment supprimer cette demande de rattachement ?',
         message: `<div class="row q-my-md items-center">
             <img class="avatar q-mx-md" src="${this.getAvatar(this.request.user.picture)}"/>
             <div>

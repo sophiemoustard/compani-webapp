@@ -162,7 +162,7 @@ export default {
       }
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cette catégorie ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette catégorie ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteCategory(category._id))

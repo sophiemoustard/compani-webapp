@@ -130,7 +130,7 @@ export default {
     validateAccessRuleDeletion (accessRuleId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cette règle d\'accès ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette règle d\'accès ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteAccessRule(accessRuleId))

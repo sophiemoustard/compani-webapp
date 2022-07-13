@@ -185,7 +185,7 @@
       <div class="row gutter-profile">
         <div class="col-xs-12">
           <div v-if="isAuxiliary" class="row justify-between">
-            <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise ?</p>
+            <p class="input-caption">Voulez-vous adhérer à la mutuelle d'entreprise&nbsp;?</p>
             <q-icon v-if="v$.userProfile.administrative.mutualFund.has.$error" name="error_outline"
               color="secondary" />
           </div>
@@ -213,9 +213,9 @@
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary"
             v-model="userProfile.administrative.transportInvoice.transportType" :options="transportOptions"
-            caption="Par quel moyen comptez-vous vous rendre au travail ?" type="radio" :error-message="requiredLabel"
-            :error="v$.userProfile.administrative.transportInvoice.transportType.$error" required-field
-            @update:model-value="updateUser('administrative.transportInvoice.transportType')" />
+            caption="Par quel moyen comptez-vous vous rendre au travail&nbsp;?" type="radio"
+            :error-message="requiredLabel" :error="v$.userProfile.administrative.transportInvoice.transportType.$error"
+            required-field @update:model-value="updateUser('administrative.transportInvoice.transportType')" />
         </div>
         <div v-if="userProfile.administrative.transportInvoice.transportType === 'public'"
           class="col-xs-12 col-md-6">
@@ -558,7 +558,7 @@ export default {
     validateDocumentDeletion (path) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(path))
@@ -579,7 +579,7 @@ export default {
     validateCertificateDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteCertificate(driveId))

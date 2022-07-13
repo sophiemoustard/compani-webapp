@@ -95,7 +95,7 @@ export default {
       }
     },
     validateCourseDeletion () {
-      this.$q.dialog({ title: 'Confirmation', message: 'Confirmez-vous la suppression ?', ok: 'OK', cancel: 'Annuler' })
+      this.$q.dialog({ title: 'Confirmation', message: 'Confirmez-vous la suppression ?', ok: 'OK', cancel: 'Annuler' })
         .onOk(this.deleteCourse)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },

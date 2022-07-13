@@ -908,7 +908,7 @@ export default {
     validateSubscriptionsDeletion (subscriptionId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cette souscription ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette souscription ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteSubscriptions(subscriptionId))
@@ -1084,7 +1084,7 @@ export default {
     validateFundingDeletion (fundingId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce financement ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce financement ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteFunding(fundingId))

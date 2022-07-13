@@ -500,7 +500,7 @@ export default {
     const validatePurchaseDeletion = (billId, purchaseId) => {
       $q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet article ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet article ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => deleteBillingPurchase(billId, purchaseId))

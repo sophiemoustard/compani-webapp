@@ -375,7 +375,7 @@ export default {
     validateEstablishmentDeletion (sectorId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet établissement ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet établissement ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteEstablishment(sectorId))

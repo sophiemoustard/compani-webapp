@@ -66,7 +66,7 @@ export default {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: `Êtes-vous sûr(e) de vouloir arrêter l'accompagnement ?<br /><br />
+        message: `Êtes-vous sûr(e) de vouloir arrêter l'accompagnement&nbsp;?<br /><br />
         Toutes les interventions chez ${this.customerName} à partir du
         ${formatDate(addDays(this.newStatus.stoppedAt, 1))} seront supprimées et vous ne pourrez
         plus créer de nouvelles interventions à partir de cette date.`,

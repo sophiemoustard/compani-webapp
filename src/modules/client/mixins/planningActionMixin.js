@@ -178,19 +178,19 @@ export const planningActionMixin = {
     },
     getCreationMessageForInternalOrUnavailability (type) {
       return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. `
-        + '<br /><br />Êtes-vous sûr(e) de vouloir créer cette répétition ?';
+        + '<br /><br />Êtes-vous sûr(e) de vouloir créer cette répétition&nbsp;?';
     },
     getCreationConfirmationMessage () {
       switch (this.newEvent.type) {
         case INTERVENTION:
           return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en '
-          + 'à affecter. <br /><br />Êtes-vous sûr(e) de vouloir créer cette répétition ?';
+          + 'à affecter. <br /><br />Êtes-vous sûr(e) de vouloir créer cette répétition&nbsp;?';
         case INTERNAL_HOUR:
           return this.getCreationMessageForInternalOrUnavailability('heures internes');
         case UNAVAILABILITY:
           return this.getCreationMessageForInternalOrUnavailability('indisponibilités');
         default:
-          return 'Êtes-vous sûr(e) de vouloir créer cette répétition ?';
+          return 'Êtes-vous sûr(e) de vouloir créer cette répétition ?';
       }
     },
     async validateCreationEvent () {
@@ -203,7 +203,7 @@ export const planningActionMixin = {
           this.$q.dialog({
             title: 'Confirmation',
             message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes '
-            + 'et indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir créer cette absence ?',
+            + 'et indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir créer cette absence&nbsp;?',
             html: true,
             ok: 'OK',
             cancel: 'Annuler',
@@ -358,19 +358,19 @@ export const planningActionMixin = {
     },
     getEditionMessageForInternalOrUnavailability (type) {
       return `Les ${type} de la répétition en conflit avec les évènements existants seront supprimées. `
-        + '<br /><br />Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
+        + '<br /><br />Êtes-vous sûr(e) de vouloir modifier cette répétition&nbsp;?';
     },
     getEditionConfirmationMessage () {
       switch (this.editedEvent.type) {
         case INTERVENTION:
           return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en '
-          + 'à affecter. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
+          + 'à affecter. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette répétition&nbsp;?';
         case INTERNAL_HOUR:
           return this.getEditionMessageForInternalOrUnavailability('heures internes');
         case UNAVAILABILITY:
           return this.getEditionMessageForInternalOrUnavailability('indisponibilités');
         default:
-          return 'Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
+          return 'Êtes-vous sûr(e) de vouloir modifier cette répétition ?';
       }
     },
     areEditedFieldsApplicableToRepetition () {
@@ -424,7 +424,7 @@ export const planningActionMixin = {
           this.$q.dialog({
             title: 'Confirmation',
             message: `Les interventions en conflit avec l'absence seront passées en à affecter et les heures internes et
-             indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette absence ?`,
+             indispo seront supprimées. <br /><br />Êtes-vous sûr(e) de vouloir modifier cette absence&nbsp;?`,
             html: true,
             ok: 'OK',
             cancel: 'Annuler',
@@ -584,7 +584,7 @@ export const planningActionMixin = {
     validateDocumentDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(driveId))
@@ -604,7 +604,7 @@ export const planningActionMixin = {
     validateEventDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet évènement ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet évènement ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteEvent)

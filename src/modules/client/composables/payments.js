@@ -99,7 +99,7 @@ export const usePayments = (refresh) => {
 
     $q.dialog({
       title: 'Confirmation',
-      message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le créer ?',
+      message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le créer ?',
       ok: 'OK',
       cancel: 'Annuler',
     })
@@ -147,7 +147,7 @@ export const usePayments = (refresh) => {
 
     $q.dialog({
       title: 'Confirmation',
-      message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le modifier ?',
+      message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le modifier ?',
       ok: 'OK',
       cancel: 'Annuler',
     })
@@ -175,8 +175,8 @@ export const usePayments = (refresh) => {
 
   const validateRefundDeletion = (refund, taxCertificates) => {
     const message = hasTaxCertificateOnSameYear(refund, taxCertificates)
-      ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le supprimer ?'
-      : 'Êtes-vous sûr(e) de vouloir supprimer ce remboursement ?';
+      ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le supprimer ?'
+      : 'Êtes-vous sûr(e) de vouloir supprimer ce remboursement ?';
 
     $q.dialog({ title: 'Confirmation', message, ok: 'OK', cancel: 'Annuler' })
       .onOk(() => deleteRefund(refund._id))

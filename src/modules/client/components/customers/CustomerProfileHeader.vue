@@ -121,7 +121,7 @@ export default {
       if (this.customer.firstIntervention) return NotifyWarning('Le/la bénéficiaire est lié(e) à des interventions.');
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Confirmez-vous la suppression ?',
+        message: 'Confirmez-vous la suppression ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteCustomer)

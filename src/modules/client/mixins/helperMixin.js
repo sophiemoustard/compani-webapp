@@ -229,7 +229,7 @@ export const helperMixin = {
     validateHelperDeletion (helperId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer l\'aidant(e) ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer l\'aidant(e) ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteHelper(helperId))

@@ -946,7 +946,7 @@ export default {
     validateSurchargeDeletion (surchargeId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce plan de majoration ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce plan de majoration ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteSurcharge(surchargeId, row))
@@ -1072,7 +1072,7 @@ export default {
     validateServiceDeletion (serviceId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce service ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce service ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteService(serviceId, row))
@@ -1091,7 +1091,7 @@ export default {
     validateServiceArchiving (serviceId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir archiver ce service ?',
+        message: 'Êtes-vous sûr(e) de vouloir archiver ce service ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.archiveService(serviceId))
@@ -1155,7 +1155,7 @@ export default {
     validateBillingItemDeletion (billingItemId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet article de facturation ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet article de facturation ?',
         ok: 'OK',
         cancel: 'Annuler',
       })
@@ -1293,7 +1293,7 @@ export default {
     validateTppDeletion (thirdPartyPayerId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce tiers payeur ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce tiers payeur ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))

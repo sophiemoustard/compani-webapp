@@ -65,7 +65,7 @@ export default {
     validateCustomerAbsenceDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cette absence ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette absence ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteCustomerAbsence)

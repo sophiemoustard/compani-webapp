@@ -125,7 +125,7 @@ export default {
     validateImageDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer votre photo ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer votre photo ?',
         ok: true,
         cancel: 'Annuler',
       })
