@@ -9,7 +9,7 @@
       </div>
       <div v-for="(repetitionList, index) of Object.values(repetitions)" :key="index">
         <q-card v-if="repetitionList.length"
-          :class="['q-mb-lg', `top-container${areDetailsVisible[index] ? '-open' : ''}`]">
+          :class="['q-mb-lg', `repetition-list-container${areDetailsVisible[index] ? '-open' : ''}`]">
           <q-card-section class="day-container row cursor-pointer" :id="index" @click="showDetails(index)">
             <div>
               <div class="day">{{ DAYS[index] }}</div>
@@ -269,18 +269,17 @@ export default {
   font-weight: bold
   color: black
   font-size: 16px
-.repetition-container
-  background: white
-  padding: 16px 16px 8px 16px
+.repetition-list-container
+  box-shadow: none
+  &-open
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25)
 .day-container
   background: $copper-grey-50
   padding: 8px
   justify-content: space-between
   align-items: center
   box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25)
-.top-container
-  box-shadow: none
-  &-open
-    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25)
-
+.repetition-container
+  background: white
+  padding: 16px 16px 8px 16px
 </style>
