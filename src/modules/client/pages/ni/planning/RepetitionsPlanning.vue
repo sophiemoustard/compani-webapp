@@ -16,7 +16,7 @@
               <div class="row">
                 <div>{{ formatQuantity('répétition', repetitionList.length) }}</div>
                 <div v-if="getConflictsNumber(repetitionList)">
-                   - {{ getConflictsNumber(repetitionList) }} conflits
+                  &nbsp;- {{ getConflictsNumber(repetitionList) }} conflits
                 </div>
               </div>
             </div>

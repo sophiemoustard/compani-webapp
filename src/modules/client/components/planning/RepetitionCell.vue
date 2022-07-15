@@ -20,7 +20,7 @@
           À affecter - {{ repetition.sector.name }}
         </div>
       </div>
-      <div class="row">
+      <div :class="['row', `${repetition.hasConflicts ? 'button-container' : ''}`, 'flex']">
         <div v-if="repetition.hasConflicts" class="row conflict-container">
           <div class="dot dot-error" />
           <div>Conflit</div>
@@ -159,4 +159,8 @@ export default {
   margin: 0px 16px 0px 0px
 .dot-error
   margin: 0px 4px 0px 0px
+.button-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    width: 100%
+    justify-content: space-between
 </style>
