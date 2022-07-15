@@ -7,11 +7,25 @@
       <div class="cell-title">
         Répétitions de  <span class="text-weight-bold">{{ currentPersonName }}</span>
       </div>
-      <div v-for="repetition of repetitions" :key="repetition._id">
-        <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)"
-          :person-type="personType" />
+      <div v-for="(repetitionList, index) of Object.values(repetitions)" :key="index">
+        <q-card v-if="repetitionList.length"
+          :class="['q-mb-lg', `repetition-list-container${areDetailsVisible[index] ? '-open' : ''}`]">
+          <q-card-section class="day-container row cursor-pointer" :id="index" @click="showDetails(index)">
+            <div>
+              <div class="day">{{ DAYS[index] }}</div>
+              <div>{{ formatQuantity('répétition', repetitionList.length) }}</div>
+            </div>
+            <q-icon :name="areDetailsVisible[index] ? 'expand_less' : 'expand_more'" />
+          </q-card-section>
+          <div v-if="areDetailsVisible[index]" class="repetition-container">
+            <div v-for="repetition of repetitionList" :key="repetition._id" class="q-mb-sm">
+              <ni-repetition-cell :repetition="repetition" @delete="openDeletionModal(repetition)"
+                :person-type="personType" />
+            </div>
+          </div>
+        </q-card>
       </div>
-      <div v-if="!repetitions.length">
+      <div v-if="!Object.values(repetitions).flat().length">
         <q-card class="card">
           Aucune répétition associée à {{ activePersons.find(aux => aux.value === selectedPerson).label }}
         </q-card>
@@ -35,13 +49,13 @@ import { get } from 'lodash';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { AUXILIARY, CUSTOMER } from '@data/constants';
+import { AUXILIARY, CUSTOMER, DAYS } from '@data/constants';
 import Users from '@api/Users';
 import Repetitions from '@api/Repetitions';
 import Customers from '@api/Customers';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatQuantity } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
@@ -73,6 +87,7 @@ export default {
     const minStartDate = ref(moment().startOf('d').toISOString());
     const maxStartDate = ref(moment(minStartDate.value).add(90, 'day').toISOString());
     const personType = ref('');
+    const areDetailsVisible = ref(Object.fromEntries((Object.keys(repetitions.value).map(day => [day, false]))));
 
     const openDeletionModal = (repetition) => {
       currentRepetition.value = { ...repetition, dateDeletion: '' };
@@ -120,6 +135,8 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des répétitions.');
+      } finally {
+        areDetailsVisible.value = Object.fromEntries(Object.keys(repetitions.value).map(day => [day, false]));
       }
     };
 
@@ -175,6 +192,8 @@ export default {
 
     const refresh = async () => getRepetitions();
 
+    const showDetails = day => (areDetailsVisible.value[day] = !areDetailsVisible.value[day]);
+
     watch(selectedPerson, async () => {
       if (selectedPerson.value) await getRepetitions();
     });
@@ -203,6 +222,7 @@ export default {
       confirmationModal,
       loading,
       personType,
+      DAYS,
       // Computed
       currentPersonName,
       // Methods
@@ -216,6 +236,9 @@ export default {
       canDeleteRepetition,
       deleteRepetition,
       closeDeletionConfirmationModal,
+      areDetailsVisible,
+      showDetails,
+      formatQuantity,
       // Validations
       v$,
     };
@@ -226,7 +249,7 @@ export default {
 .cell-container
   display: flex
   flex-direction: column
-  padding: 8px 16px
+  padding: 8px 16px 8px 16px
 .cell-title
   font-size: 20px
   margin: 8px 0px 8px 0px
@@ -237,4 +260,21 @@ export default {
   font-style: italic
   margin: 0px 0px 16px 0px
   padding: 16px
+.day
+  font-weight: bold
+  color: black
+  font-size: 16px
+.repetition-list-container
+  box-shadow: none
+  &-open
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25)
+.day-container
+  background: $copper-grey-50
+  padding: 8px
+  justify-content: space-between
+  align-items: center
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25)
+.repetition-container
+  background: white
+  padding: 16px 16px 8px 16px
 </style>

@@ -588,3 +588,14 @@ export const BALANCE = 'balance';
 // END_TO_END TESTS
 export const BILLING = 'billing';
 export const AUTHENTICATION = 'authentication';
+
+// DAYS
+export const DAYS = {
+  0: 'Lundi',
+  1: 'Mardi',
+  2: 'Mercredi',
+  3: 'Jeudi',
+  4: 'Vendredi',
+  5: 'Samedi',
+  6: 'Dimanche',
+};
