@@ -13,7 +13,12 @@
           <q-card-section class="day-container row cursor-pointer" :id="index" @click="showDetails(index)">
             <div>
               <div class="day">{{ DAYS[index] }}</div>
-              <div>{{ formatQuantity('répétition', repetitionList.length) }}</div>
+              <div class="row">
+                <div>{{ formatQuantity('répétition', repetitionList.length) }}</div>
+                <div v-if="getConflictsNumber(repetitionList)">
+                   - {{ getConflictsNumber(repetitionList) }} conflits
+                </div>
+              </div>
             </div>
             <q-icon :name="areDetailsVisible[index] ? 'expand_less' : 'expand_more'" />
           </q-card-section>
@@ -194,6 +199,8 @@ export default {
 
     const showDetails = day => (areDetailsVisible.value[day] = !areDetailsVisible.value[day]);
 
+    const getConflictsNumber = repetitionList => repetitionList.filter(rep => rep.hasConflicts).length;
+
     watch(selectedPerson, async () => {
       if (selectedPerson.value) await getRepetitions();
     });
@@ -239,6 +246,7 @@ export default {
       areDetailsVisible,
       showDetails,
       formatQuantity,
+      getConflictsNumber,
       // Validations
       v$,
     };

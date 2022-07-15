@@ -1,5 +1,5 @@
 <template>
-  <q-card class="container">
+  <q-card :class="[`${repetition.hasConflicts ? 'container-conflict' : 'container'}`]">
     <div class="row justify-between items-start">
       <div class="infos-container">
         <div class="infos" v-if="isIntervention">{{ getLastVersionServiceName }}</div>
@@ -20,8 +20,14 @@
           À affecter - {{ repetition.sector.name }}
         </div>
       </div>
-      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
+      <div class="row">
+        <div v-if="repetition.hasConflicts" class="row conflict-container">
+          <div class="dot dot-error" />
+          <div>Conflit</div>
+        </div>
+        <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
       </div>
+    </div>
   </q-card>
 </template>
 <script>
@@ -125,6 +131,9 @@ export default {
 .container
   background-color: $copper-grey-100
   padding: 16px
+  &-conflict
+    background-color: $orange-100
+    padding: 16px
 .infos-container
   max-width: 80%
 .infos
@@ -142,4 +151,12 @@ export default {
 .avatar-size
   height: 24px
   width: 24px
+.conflict-container
+  color: $orange-500
+  align-items: center
+  justify-content: space-around
+  font-size: 14px
+  margin: 0px 16px 0px 0px
+.dot-error
+  margin: 0px 4px 0px 0px
 </style>
