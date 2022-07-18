@@ -193,11 +193,11 @@ export default {
       } finally {
         loading.value = false;
         v$.value.currentRepetition.$reset();
-        refresh(false);
+        refresh();
       }
     };
 
-    const refresh = async (resetShowDetails = true) => getRepetitions(resetShowDetails);
+    const refresh = async () => getRepetitions(false);
 
     const showDetails = day => (areDetailsVisible.value[day] = !areDetailsVisible.value[day]);
 
