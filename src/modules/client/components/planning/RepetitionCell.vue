@@ -12,9 +12,7 @@
         </div>
         <div class="row q-py-xs" v-if="isIntervention && isCustomer && !get(repetition, 'sector.name')">
           <img :src="getAvatar(get(repetition, 'auxiliary.picture'))" class="avatar avatar-size">
-          <div class="auxiliary q-px-sm">
-            {{ formatIdentity(get(repetition, 'auxiliary.identity'), 'FL') }}
-          </div>
+          <div class="auxiliary q-px-sm">{{ formatIdentity(get(repetition, 'auxiliary.identity'), 'FL') }}</div>
         </div>
         <div v-if="isIntervention && isCustomer && get(repetition, 'sector.name')">
           À affecter - {{ repetition.sector.name }}
@@ -25,7 +23,7 @@
           <div class="dot dot-error" />
           <div>Conflit</div>
         </div>
-        <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
+        <ni-button v-if="canDelete" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
       </div>
     </div>
   </q-card>
@@ -57,7 +55,7 @@ export default {
   },
   props: {
     repetition: { type: Object, default: () => ({}) },
-    visible: { type: Boolean, default: true },
+    canDelete: { type: Boolean, default: true },
     personType: { type: String, default: '' },
   },
   emits: ['delete'],

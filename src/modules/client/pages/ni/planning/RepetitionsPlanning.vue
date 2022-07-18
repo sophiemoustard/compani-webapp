@@ -129,7 +129,7 @@ export default {
 
     const setPerson = (aux) => { selectedPerson.value = aux; };
 
-    const getRepetitions = async () => {
+    const getRepetitions = async (resetShowDetails = true) => {
       try {
         personType.value = get(activePersons.value.find(person => person.value === selectedPerson.value), 'type');
         const query = personType.value === AUXILIARY
@@ -141,7 +141,9 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des répétitions.');
       } finally {
-        areDetailsVisible.value = Object.fromEntries(Object.keys(repetitions.value).map(day => [day, false]));
+        if (resetShowDetails) {
+          areDetailsVisible.value = Object.fromEntries(Object.keys(repetitions.value).map(day => [day, false]));
+        }
       }
     };
 
@@ -187,15 +189,15 @@ export default {
         NotifyPositive('Répétition supprimée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppressioin de la répétition.');
+        NotifyNegative('Erreur lors de la suppression de la répétition.');
       } finally {
         loading.value = false;
         v$.value.currentRepetition.$reset();
-        refresh();
+        refresh(false);
       }
     };
 
-    const refresh = async () => getRepetitions();
+    const refresh = async (resetShowDetails = true) => getRepetitions(resetShowDetails);
 
     const showDetails = day => (areDetailsVisible.value[day] = !areDetailsVisible.value[day]);
 
