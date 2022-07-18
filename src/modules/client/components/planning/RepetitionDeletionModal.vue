@@ -4,7 +4,7 @@
       Supprimer une répétition de <span class="text-weight-bold">{{ currentAuxiliaryName }}</span>
     </template>
     <div class="q-mb-md">
-      <ni-repetition-cell :repetition="repetition" :visible="false" :person-type="personType" />
+      <ni-repetition-cell :repetition="repetition" :can-delete="false" :person-type="personType" />
     </div>
     <ni-date-input caption="À partir du" :model-value="repetition.dateDeletion" in-modal
       @update:model-value="updateDeletionDate($event)" required-field :min="minStartDate" :max="maxStartDate"

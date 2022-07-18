@@ -13,7 +13,12 @@
           <q-card-section class="day-container row cursor-pointer" :id="index" @click="showDetails(index)">
             <div>
               <div class="day">{{ DAYS[index] }}</div>
-              <div>{{ formatQuantity('répétition', repetitionList.length) }}</div>
+              <div class="row">
+                <div>{{ formatQuantity('répétition', repetitionList.length) }}</div>
+                <div v-if="getConflictsNumber(repetitionList)">
+                  &nbsp;- {{ getConflictsNumber(repetitionList) }} conflits
+                </div>
+              </div>
             </div>
             <q-icon :name="areDetailsVisible[index] ? 'expand_less' : 'expand_more'" />
           </q-card-section>
@@ -124,7 +129,7 @@ export default {
 
     const setPerson = (aux) => { selectedPerson.value = aux; };
 
-    const getRepetitions = async () => {
+    const getRepetitions = async (resetShowDetails = true) => {
       try {
         personType.value = get(activePersons.value.find(person => person.value === selectedPerson.value), 'type');
         const query = personType.value === AUXILIARY
@@ -136,7 +141,9 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des répétitions.');
       } finally {
-        areDetailsVisible.value = Object.fromEntries(Object.keys(repetitions.value).map(day => [day, false]));
+        if (resetShowDetails) {
+          areDetailsVisible.value = Object.fromEntries(Object.keys(repetitions.value).map(day => [day, false]));
+        }
       }
     };
 
@@ -182,7 +189,7 @@ export default {
         NotifyPositive('Répétition supprimée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppressioin de la répétition.');
+        NotifyNegative('Erreur lors de la suppression de la répétition.');
       } finally {
         loading.value = false;
         v$.value.currentRepetition.$reset();
@@ -190,9 +197,11 @@ export default {
       }
     };
 
-    const refresh = async () => getRepetitions();
+    const refresh = async () => getRepetitions(false);
 
     const showDetails = day => (areDetailsVisible.value[day] = !areDetailsVisible.value[day]);
+
+    const getConflictsNumber = repetitionList => repetitionList.filter(rep => rep.hasConflicts).length;
 
     watch(selectedPerson, async () => {
       if (selectedPerson.value) await getRepetitions();
@@ -239,6 +248,7 @@ export default {
       areDetailsVisible,
       showDetails,
       formatQuantity,
+      getConflictsNumber,
       // Validations
       v$,
     };

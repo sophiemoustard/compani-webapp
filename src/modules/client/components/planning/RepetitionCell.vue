@@ -1,5 +1,5 @@
 <template>
-  <q-card class="container">
+  <q-card :class="[`${repetition.hasConflicts ? 'container-conflict' : 'container'}`]">
     <div class="row justify-between items-start">
       <div class="infos-container">
         <div class="infos" v-if="isIntervention">{{ getLastVersionServiceName }}</div>
@@ -12,16 +12,20 @@
         </div>
         <div class="row q-py-xs" v-if="isIntervention && isCustomer && !get(repetition, 'sector.name')">
           <img :src="getAvatar(get(repetition, 'auxiliary.picture'))" class="avatar avatar-size">
-          <div class="auxiliary q-px-sm">
-            {{ formatIdentity(get(repetition, 'auxiliary.identity'), 'FL') }}
-          </div>
+          <div class="auxiliary q-px-sm">{{ formatIdentity(get(repetition, 'auxiliary.identity'), 'FL') }}</div>
         </div>
         <div v-if="isIntervention && isCustomer && get(repetition, 'sector.name')">
           À affecter - {{ repetition.sector.name }}
         </div>
       </div>
-      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
+      <div :class="['row', `${repetition.hasConflicts ? 'button-container' : ''}`, 'flex']">
+        <div v-if="repetition.hasConflicts" class="row conflict-container">
+          <div class="dot dot-error" />
+          <div>Conflit</div>
+        </div>
+        <ni-button v-if="canDelete" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
       </div>
+    </div>
   </q-card>
 </template>
 <script>
@@ -51,7 +55,7 @@ export default {
   },
   props: {
     repetition: { type: Object, default: () => ({}) },
-    visible: { type: Boolean, default: true },
+    canDelete: { type: Boolean, default: true },
     personType: { type: String, default: '' },
   },
   emits: ['delete'],
@@ -125,6 +129,9 @@ export default {
 .container
   background-color: $copper-grey-100
   padding: 16px
+  &-conflict
+    background-color: $orange-100
+    padding: 16px
 .infos-container
   max-width: 80%
 .infos
@@ -142,4 +149,16 @@ export default {
 .avatar-size
   height: 24px
   width: 24px
+.conflict-container
+  color: $orange-500
+  align-items: center
+  justify-content: space-around
+  font-size: 14px
+  margin: 0px 16px 0px 0px
+.dot-error
+  margin: 0px 4px 0px 0px
+.button-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    width: 100%
+    justify-content: space-between
 </style>
