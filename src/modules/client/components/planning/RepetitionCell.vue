@@ -28,7 +28,7 @@
           <div class="dot dot-grey dot-margin" />
           <div>Doublon</div>
         </div>
-        <ni-button v-if="canDelete" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
+        <ni-button v-if="canDelete" icon="delete" @click="deleteRepetition" />
       </div>
     </div>
   </q-card>
