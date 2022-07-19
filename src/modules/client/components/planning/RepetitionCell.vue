@@ -18,7 +18,8 @@
           À affecter - {{ repetition.sector.name }}
         </div>
       </div>
-      <div :class="['row', `${repetition.hasConflicts ? 'button-container' : ''}`, 'flex']">
+      <div
+        :class="['row', `${repetition.hasConflicts || repetition.hasDuplicateKey ? 'button-container' : ''}`, 'flex']">
         <div v-if="repetition.hasConflicts" class="row conflict-container">
           <div class="dot dot-orange dot-margin" />
           <div>Conflit</div>
