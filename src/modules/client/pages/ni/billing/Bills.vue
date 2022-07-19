@@ -19,14 +19,13 @@
                   {{ props.row.number }}
               </div>
             </template>
-            <template v-if="col.name === 'customer'">
-              <div class="cursor-pointer clickable-name" @click.stop="goToCustomerInfos(props.row.customer._id)">
+            <template v-else-if="col.name === 'customer'">
+              <div class="cursor-pointer customer" @click.stop="goToCustomerInfos(props.row.customer._id)">
                   {{ formatIdentity(props.row.customer.identity, 'Lf') }}
               </div>
             </template>
-            <template v-if="col.name === 'client'">{{ getClientName(props.row.customer, props.row) }}</template>
-            <template v-if="col.name === 'netInclTaxes'">{{ formatPrice(props.row.netInclTaxes) }}</template>
-            <template v-else-if="col.name === 'date'">{{ col.value }}</template>
+            <template v-else-if="col.name === 'netInclTaxes'">{{ formatPrice(props.row.netInclTaxes) }}</template>
+            <template v-else>{{ col.value }}</template>
           </q-td>
         </q-tr>
       </template>
@@ -42,7 +41,7 @@ import { required } from '@vuelidate/validators';
 import Bills from '@api/Bills';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { formatIdentity, formatPrice, formatDownloadName, truncate } from '@helpers/utils';
+import { formatIdentity, formatPrice, formatDownloadName, truncate, sortStrings } from '@helpers/utils';
 import { formatDate, isBefore } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import TitleHeader from '@components/TitleHeader';
@@ -70,15 +69,30 @@ export default {
     const bills = ref([]);
     const columns = ref([
       { name: 'number', label: '#', align: 'left', field: 'number' },
-      { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
+      { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate, sortable: true },
       {
         name: 'customer',
         label: 'Bénéficiaire',
         align: 'left',
         field: row => formatIdentity(row.customer.identity, 'Lf'),
+        sortable: true,
+        sort: sortStrings,
       },
-      { name: 'client', label: 'Client', align: 'left' },
-      { name: 'netInclTaxes', label: 'Total TTC', align: 'left', style: 'width: 15%' },
+      {
+        name: 'client',
+        label: 'Client',
+        align: 'left',
+        sortable: true,
+        field: row => getClientName(row),
+        sort: sortStrings,
+      },
+      {
+        name: 'netInclTaxes',
+        label: 'Total TTC',
+        align: 'left',
+        style: 'width: 15%',
+        sortable: true,
+      },
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'date', descending: true });
     const rowsPerPage = ref([1, 5, 15, 50, 100, 200, 300]);
@@ -106,8 +120,8 @@ export default {
       }
     };
 
-    const getClientName = (customer, bill) => {
-      if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');
+    const getClientName = (bill) => {
+      if (!bill.thirdPartyPayer) return formatIdentity(bill.customer.identity, 'Lf');
       return truncate(bill.thirdPartyPayer.name, 50);
     };
 
@@ -181,3 +195,10 @@ export default {
   },
 };
 </script>
+<style lang="sass" scoped>
+.customer
+  &:hover
+    text-decoration: underline
+    text-decoration-color: $primary
+    color: $primary
+</style>
