@@ -18,6 +18,9 @@
                 <div v-if="getConflictsNumber(repetitionList)">
                   &nbsp;- {{ getConflictsNumber(repetitionList) }} conflits
                 </div>
+                <div v-if="getDuplicatesNumber(repetitionList)">
+                  &nbsp;- {{ getDuplicatesNumber(repetitionList) }} doublons
+                </div>
               </div>
             </div>
             <q-icon :name="areDetailsVisible[index] ? 'expand_less' : 'expand_more'" />
@@ -203,6 +206,8 @@ export default {
 
     const getConflictsNumber = repetitionList => repetitionList.filter(rep => rep.hasConflicts).length;
 
+    const getDuplicatesNumber = repetitionList => repetitionList.filter(rep => rep.hasDuplicateKey).length;
+
     watch(selectedPerson, async () => {
       if (selectedPerson.value) await getRepetitions();
     });
@@ -249,6 +254,7 @@ export default {
       showDetails,
       formatQuantity,
       getConflictsNumber,
+      getDuplicatesNumber,
       // Validations
       v$,
     };

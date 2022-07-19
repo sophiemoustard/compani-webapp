@@ -20,8 +20,12 @@
       </div>
       <div :class="['row', `${repetition.hasConflicts ? 'button-container' : ''}`, 'flex']">
         <div v-if="repetition.hasConflicts" class="row conflict-container">
-          <div class="dot dot-error" />
+          <div class="dot dot-error dot-margin" />
           <div>Conflit</div>
+        </div>
+        <div v-if="repetition.hasDuplicateKey" class="row doublon-container">
+          <div class="dot dot-archived dot-margin" />
+          <div>Doublon</div>
         </div>
         <ni-button v-if="canDelete" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
       </div>
@@ -155,7 +159,13 @@ export default {
   justify-content: space-around
   font-size: 14px
   margin: 0px 16px 0px 0px
-.dot-error
+.doublon-container
+  color: $copper-grey-500
+  align-items: center
+  justify-content: space-around
+  font-size: 14px
+  margin: 0px 16px 0px 0px
+.dot-margin
   margin: 0px 4px 0px 0px
 .button-container
   @media screen and (max-width: $breakpoint-sm-max)
