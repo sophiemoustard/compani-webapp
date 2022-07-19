@@ -130,9 +130,9 @@ export default {
     },
     getDotClass (value) {
       return {
-        'dot dot-active': value === ACTIVATED,
-        'dot dot-error': value === STOPPED,
-        'dot dot-archived': value === ARCHIVED,
+        'dot dot-green': value === ACTIVATED,
+        'dot dot-orange': value === STOPPED,
+        'dot dot-grey': value === ARCHIVED,
       };
     },
     getDotTextClass (value) {

@@ -18,7 +18,7 @@
               </div>
               <div>{{ getTemplateName(draggableCard.template) }}</div>
             </div>
-            <div v-if="!isSelected(draggableCard) && !draggableCard.isValid" :class="{ 'dot dot-error': true }" />
+            <div v-if="!isSelected(draggableCard) && !draggableCard.isValid" :class="{ 'dot dot-orange': true }" />
           </div>
         </template>
       </draggable>
@@ -197,7 +197,7 @@ export default {
       overflow: hidden
       text-overflow: ellipsis
 
-.dot-error
+.dot-orange
   align-self: center
 
 .ghost

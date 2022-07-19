@@ -16,7 +16,7 @@
             color="secondary" size="1rem" />
         </template>
         <template v-else-if="col.name === 'active'">
-          <div :class="{ 'dot dot-active': col.value, 'dot dot-error': !col.value }" />
+          <div :class="{ 'dot dot-green': col.value, 'dot dot-orange': !col.value }" />
         </template>
         <template v-else>{{ col.value }}</template>
       </template>

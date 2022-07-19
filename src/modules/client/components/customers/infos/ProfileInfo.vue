@@ -144,7 +144,7 @@
                     @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
-                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-error': !col.value }]" />
+                  <div :class="[{ 'dot dot-green': col.value, 'dot dot-orange': !col.value }]" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -216,7 +216,7 @@
                     :disable="docLoading || !getDriveId(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
-                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-error': !col.value }]" />
+                  <div :class="[{ 'dot dot-green': col.value, 'dot dot-orange': !col.value }]" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>

@@ -13,7 +13,7 @@
     <div class="row profile-info">
       <div class="col-sm-6 col-xs-12 q-pl-lg">
         <div class="flex-row items-center q-ml-sm">
-          <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-error']" />
+          <div :class="['dot', userActivity.active ? 'dot-green' : 'dot-orange']" />
           <div :class="[userActivity.active ? 'text-green-600' : 'text-orange-700']">{{ userActivity.status }}</div>
         </div>
         <div class="flex-row items-center q-ml-sm">

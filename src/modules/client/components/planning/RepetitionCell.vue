@@ -20,11 +20,11 @@
       </div>
       <div :class="['row', `${repetition.hasConflicts ? 'button-container' : ''}`, 'flex']">
         <div v-if="repetition.hasConflicts" class="row conflict-container">
-          <div class="dot dot-error dot-margin" />
+          <div class="dot dot-orange dot-margin" />
           <div>Conflit</div>
         </div>
         <div v-if="repetition.hasDuplicateKey" class="row doublon-container">
-          <div class="dot dot-archived dot-margin" />
+          <div class="dot dot-grey dot-margin" />
           <div>Doublon</div>
         </div>
         <ni-button v-if="canDelete" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
