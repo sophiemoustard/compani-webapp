@@ -92,6 +92,7 @@ export default {
         align: 'left',
         style: 'width: 15%',
         sortable: true,
+        field: row => row.netInclTaxes,
       },
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'date', descending: true });
