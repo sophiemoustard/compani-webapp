@@ -18,12 +18,17 @@
           À affecter - {{ repetition.sector.name }}
         </div>
       </div>
-      <div :class="['row', `${repetition.hasConflicts ? 'button-container' : ''}`, 'flex']">
-        <div v-if="repetition.hasConflicts" class="row conflict-container">
-          <div class="dot dot-error" />
-          <div>Conflit</div>
+      <div
+        :class="['row', `${repetition.hasConflicts || repetition.hasDuplicateKey ? 'button-container' : ''}`, 'flex']">
+        <div v-if="repetition.hasConflicts" class="row warning-container">
+          <div class="dot dot-orange dot-margin" />
+          <div class="text-conflict">Conflit</div>
         </div>
-        <ni-button v-if="canDelete" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
+        <div v-if="repetition.hasDuplicateKey" class="row warning-container">
+          <div class="dot dot-grey dot-margin" />
+          <div class="text-doublon">Doublon</div>
+        </div>
+        <ni-button v-if="canDelete" icon="delete" @click="deleteRepetition" />
       </div>
     </div>
   </q-card>
@@ -149,13 +154,16 @@ export default {
 .avatar-size
   height: 24px
   width: 24px
-.conflict-container
-  color: $orange-500
+.warning-container
   align-items: center
   justify-content: space-around
   font-size: 14px
   margin: 0px 16px 0px 0px
-.dot-error
+  .text-doublon
+    color: $copper-grey-500
+  .text-conflict
+    color: $orange-500
+.dot-margin
   margin: 0px 4px 0px 0px
 .button-container
   @media screen and (max-width: $breakpoint-sm-max)

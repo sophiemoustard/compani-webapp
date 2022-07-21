@@ -11,7 +11,7 @@
             {{ formatPhone(interlocutor.contact.phone) }}
           </div>
           <div v-else class="row items-center text-14">
-            <div class="dot dot-error" />
+            <div class="dot dot-orange" />
             <div class="text-orange-500">numéro manquant</div>
           </div>
           <div v-if="contact._id === interlocutor._id" class="contact">
@@ -83,6 +83,6 @@ export default {
   display: flex
   align-items: center
   margin-left: -2px
-.dot-error
+.dot-orange
   margin: 0px 4px 0px 0px
 </style>
