@@ -20,13 +20,13 @@
       </div>
       <div
         :class="['row', `${repetition.hasConflicts || repetition.hasDuplicateKey ? 'button-container' : ''}`, 'flex']">
-        <div v-if="repetition.hasConflicts" class="row warning-container warning-container-conflict">
+        <div v-if="repetition.hasConflicts" class="row warning-container">
           <div class="dot dot-orange dot-margin" />
-          <div>Conflit</div>
+          <div class="text-conflict">Conflit</div>
         </div>
-        <div v-if="repetition.hasDuplicateKey" class="row warning-container warning-container-doublon">
+        <div v-if="repetition.hasDuplicateKey" class="row warning-container">
           <div class="dot dot-grey dot-margin" />
-          <div>Doublon</div>
+          <div class="text-doublon">Doublon</div>
         </div>
         <ni-button v-if="canDelete" icon="delete" @click="deleteRepetition" />
       </div>
@@ -159,9 +159,9 @@ export default {
   justify-content: space-around
   font-size: 14px
   margin: 0px 16px 0px 0px
-  &-doublon
+  .text-doublon
     color: $copper-grey-500
-  &-conflict
+  .text-conflict
     color: $orange-500
 .dot-margin
   margin: 0px 4px 0px 0px
