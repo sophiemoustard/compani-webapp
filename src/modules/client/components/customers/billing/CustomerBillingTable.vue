@@ -108,6 +108,8 @@ export default {
     startBalance: { type: Number, default: 0 },
     endBalance: { type: Number, default: 0 },
     loading: { type: Boolean, default: false },
+    customerIdentity: { type: Object, default: () => ({}) },
+    tppName: { type: String, default: '' },
   },
   components: {
     'ni-simple-table': SimpleTable,
@@ -147,6 +149,13 @@ export default {
       pagination: { rowsPerPage: 0 },
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
     };
+  },
+  computed: {
+    clientIdentityForDownloadDoc () {
+      const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}`;
+      if (this.type === CUSTOMER) return clientIdentity;
+      return `${this.tppName.replaceAll(' ', '_')}_${clientIdentity}`;
+    },
   },
   methods: {
     balanceIconColor (val) {
@@ -220,8 +229,10 @@ export default {
 
       try {
         this.pdfLoading = true;
+
         const pdf = await Bills.getPdf(bill._id);
-        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
+
+        downloadFile(pdf, `${this.clientIdentityForDownloadDoc}_${bill.number}.pdf`, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture');
@@ -236,7 +247,8 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await CreditNotes.getPdf(cn._id);
-        downloadFile(pdf, 'avoir.pdf', 'application/octet-stream');
+
+        downloadFile(pdf, `${this.clientIdentityForDownloadDoc}_${cn.number}.pdf`, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');
