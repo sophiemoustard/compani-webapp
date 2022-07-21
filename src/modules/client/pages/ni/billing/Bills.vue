@@ -92,7 +92,7 @@ export default {
         align: 'left',
         style: 'width: 15%',
         sortable: true,
-        field: row => row.netInclTaxes,
+        field: 'netInclTaxes',
       },
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'date', descending: true });
@@ -197,9 +197,6 @@ export default {
 };
 </script>
 <style lang="sass" scoped>
-.customer
-  &:hover
-    text-decoration: underline
-    text-decoration-color: $primary
-    color: $primary
+.customer:hover
+  text-decoration: underline
 </style>
