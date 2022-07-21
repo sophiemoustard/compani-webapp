@@ -9,7 +9,7 @@
             :style="col.style" class="text-capitalize">
             <template v-if="col.name === 'document'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" @click="downloadBillSlip(col.value)" icon="file_download" />
+                <q-btn flat round small color="primary" @click="downloadBillSlip(props.row)" icon="file_download" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -102,10 +102,11 @@ export default {
         this.loading = false;
       }
     },
-    async downloadBillSlip (id) {
+    async downloadBillSlip (billSlip) {
       try {
-        const docx = await BillSlip.getDocx(id);
-        downloadDocx(docx, 'bordereau.docx');
+        const docx = await BillSlip.getDocx(billSlip._id);
+        const tppName = billSlip.thirdPartyPayer.name.replaceAll(' ', '_');
+        downloadDocx(docx, `${billSlip.month}_${tppName}_${billSlip.number}.docx`);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des bordereaux.');
