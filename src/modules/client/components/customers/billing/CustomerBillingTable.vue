@@ -90,6 +90,7 @@ import {
   REFUND,
   PAYMENT_OPTIONS,
   CUSTOMER,
+  THIRD_PARTY_PAYER,
   PAYMENT,
   COMPANI,
   MANUAL,
@@ -103,7 +104,8 @@ export default {
   props: {
     documents: { type: Array, default: () => [] },
     billingDates: { type: Object, default: () => ({}) },
-    displayActions: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
+    isArchived: { type: Boolean, default: false },
     type: { type: String, default: CUSTOMER },
     startBalance: { type: Number, default: 0 },
     endBalance: { type: Number, default: 0 },
@@ -151,10 +153,16 @@ export default {
     };
   },
   computed: {
-    clientIdentityForDownloadDoc () {
-      const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}`;
-      if (this.type === CUSTOMER) return clientIdentity;
-      return `${this.tppName.replaceAll(' ', '_')}_${clientIdentity}`;
+    commonDocName () {
+      const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}_`;
+      if (this.type === CUSTOMER && this.isAdmin) return clientIdentity;
+      if (this.type === THIRD_PARTY_PAYER) {
+        return `${this.tppName.replaceAll(' ', '_')}_${this.isAdmin ? clientIdentity : ''}`;
+      }
+      return '';
+    },
+    displayActions () {
+      return this.isAdmin && !this.isArchived;
     },
   },
   methods: {
@@ -232,7 +240,7 @@ export default {
 
         const pdf = await Bills.getPdf(bill._id);
 
-        downloadFile(pdf, `${this.clientIdentityForDownloadDoc}_${bill.number}.pdf`, 'application/octet-stream');
+        downloadFile(pdf, `${this.commonDocName}${bill.number}.pdf`, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture');
@@ -248,7 +256,7 @@ export default {
         this.pdfLoading = true;
         const pdf = await CreditNotes.getPdf(cn._id);
 
-        downloadFile(pdf, `${this.clientIdentityForDownloadDoc}_${cn.number}.pdf`, 'application/octet-stream');
+        downloadFile(pdf, `${this.commonDocName}${cn.number}.pdf`, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');

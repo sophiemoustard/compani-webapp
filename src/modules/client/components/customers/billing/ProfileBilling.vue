@@ -13,7 +13,7 @@
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :type="CUSTOMER"
         @open-edition-modal="openEditionModal" :start-balance="getStartBalance()" :loading="tableLoading"
-        :end-balance="getEndBalance(customerDocuments)" :display-actions="isAdmin && !isArchived"
+        :end-balance="getEndBalance(customerDocuments)" :is-admin="isAdmin" :is-archived="!isArchived"
         @delete="validateRefundDeletion($event, taxCertificates)" :customer-identity="customer.identity" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <ni-button class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
@@ -25,7 +25,7 @@
       <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates"
         @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
         :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" @delete="validateRefundDeletion"
-        :display-actions="isAdmin && !isArchived" :tpp-name="tpp.name" />
+        :is-admin="isAdmin" :is-archived="!isArchived" :tpp-name="tpp.name" :customer-identity="customer.identity" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <ni-button class="add-payment" label="Ajouter un réglement" color="white" icon="add" :disable="isArchived"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
