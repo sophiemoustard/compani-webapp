@@ -187,7 +187,8 @@ export default {
         if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
           this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
             (acc, bi) => {
-              const biExclTaxes = this.getExclTaxes(multiply(bi.unitInclTaxes, bi.count), bi.vat);
+              const inclTaxes = multiply(bi.unitInclTaxes, bi.count);
+              const biExclTaxes = toFixedToFloat(this.getExclTaxes(toFixedToFloat(inclTaxes), bi.vat));
               return bi.billingItem ? add(acc, biExclTaxes) : acc;
             },
             toString(0)
@@ -195,7 +196,7 @@ export default {
 
           const inclTaxesCustomerString = this.newCreditNote.billingItemList.reduce(
             (acc, bi) => {
-              const biInclTaxes = multiply(bi.unitInclTaxes, bi.count);
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
               return bi.billingItem ? add(acc, biInclTaxes) : acc;
             },
             toString(0)
