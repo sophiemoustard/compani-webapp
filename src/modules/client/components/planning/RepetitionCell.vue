@@ -20,11 +20,11 @@
       </div>
       <div
         :class="['row', `${repetition.hasConflicts || repetition.hasDuplicateKey ? 'button-container' : ''}`, 'flex']">
-        <div v-if="repetition.hasConflicts" class="row conflict-container">
+        <div v-if="repetition.hasConflicts" class="row warning-container warning-container-conflict">
           <div class="dot dot-orange dot-margin" />
           <div>Conflit</div>
         </div>
-        <div v-if="repetition.hasDuplicateKey" class="row doublon-container">
+        <div v-if="repetition.hasDuplicateKey" class="row warning-container warning-container-doublon">
           <div class="dot dot-grey dot-margin" />
           <div>Doublon</div>
         </div>
@@ -154,18 +154,15 @@ export default {
 .avatar-size
   height: 24px
   width: 24px
-.conflict-container
-  color: $orange-500
+.warning-container
   align-items: center
   justify-content: space-around
   font-size: 14px
   margin: 0px 16px 0px 0px
-.doublon-container
-  color: $copper-grey-500
-  align-items: center
-  justify-content: space-around
-  font-size: 14px
-  margin: 0px 16px 0px 0px
+  &-doublon
+    color: $copper-grey-500
+  &-conflict
+    color: $orange-500
 .dot-margin
   margin: 0px 4px 0px 0px
 .button-container
