@@ -185,6 +185,7 @@ import FileUploader from '@components/form/FileUploader';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import { formatDownloadName } from '@helpers/utils';
 import { REQUIRED_LABEL } from '@data/constants';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -469,7 +470,9 @@ export default {
     async downloadDriveDoc (doc) {
       try {
         this.disableAdministrativeDocument = true;
-        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+
+        const docName = formatDownloadName(doc.name);
+        await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
         console.error(e);
       } finally {
