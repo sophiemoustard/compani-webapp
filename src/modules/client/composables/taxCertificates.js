@@ -98,8 +98,8 @@ export const useTaxCertificates = (customer) => {
   };
 
   const taxCertificateDocName = (tc, customerIdentity) => {
-    const commonDocName = `attestation_fiscale ${tc.year}`;
-    return formatDownloadName(`${customerIdentity.lastname} ${customerIdentity.firstname} ${commonDocName}`);
+    const fileName = `${tc.year} ${customerIdentity.lastname} ${customerIdentity.firstname} attestation_fiscale`;
+    return formatDownloadName(fileName);
   };
 
   const downloadTaxCertificateFromDrive = async (tc) => {

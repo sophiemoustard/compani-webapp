@@ -152,9 +152,9 @@ export default {
   },
   computed: {
     commonDocName () {
-      const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}`;
+      const clientIdentity = `${this.customerIdentity.lastname} ${this.customerIdentity.firstname}`;
       if (this.type === CUSTOMER) return clientIdentity;
-      return `${this.tppName}${this.isCoach ? ` ${clientIdentity}` : ''}`;
+      return `${this.tppName} ${clientIdentity}`;
     },
   },
   methods: {
@@ -233,7 +233,7 @@ export default {
         const pdf = await Bills.getPdf(bill._id);
 
         const date = formatDate(bill.date, 'DD/MM/YYYY');
-        const fileName = formatDownloadName(`${this.commonDocName} ${bill.number} ${date}.pdf`);
+        const fileName = formatDownloadName(`${date} ${this.commonDocName} ${bill.number}.pdf`);
         downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
@@ -251,7 +251,7 @@ export default {
         const pdf = await CreditNotes.getPdf(cn._id);
 
         const date = formatDate(cn.date, 'DD/MM/YYYY');
-        const fileName = formatDownloadName(`${this.commonDocName} ${cn.number} ${date}.pdf`);
+        const fileName = formatDownloadName(`${date} ${this.commonDocName} ${cn.number}.pdf`);
         downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
         console.error(e);

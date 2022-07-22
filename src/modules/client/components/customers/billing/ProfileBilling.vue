@@ -137,6 +137,7 @@ export default {
     const clientRole = computed(() => $store.getters['main/getClientRole']);
     const isHelper = computed(() => HELPER === clientRole.value);
     const isAdmin = computed(() => CLIENT_ADMIN === clientRole.value);
+    const isCoach = computed(() => COACH_ROLES.includes(clientRole.value));
 
     const {
       billingDates,
@@ -230,7 +231,7 @@ export default {
       taxCertificateYearError,
       isAdmin,
       isHelper,
-      clientRole,
+      isCoach,
       // Validations
       v$,
       taxCertificatesValidation,
