@@ -68,7 +68,7 @@ export default {
     });
     const bills = ref([]);
     const columns = ref([
-      { name: 'number', label: '#', align: 'left', field: 'number' },
+      { name: 'number', label: '#', align: 'left', field: 'number', sortable: true },
       { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate, sortable: true },
       {
         name: 'customer',
