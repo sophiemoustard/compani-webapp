@@ -90,7 +90,6 @@ import {
   REFUND,
   PAYMENT_OPTIONS,
   CUSTOMER,
-  THIRD_PARTY_PAYER,
   PAYMENT,
   COMPANI,
   MANUAL,
@@ -104,9 +103,7 @@ export default {
   props: {
     documents: { type: Array, default: () => [] },
     billingDates: { type: Object, default: () => ({}) },
-    isAdmin: { type: Boolean, default: false },
-    isCoach: { type: Boolean, default: false },
-    isArchived: { type: Boolean, default: false },
+    displayActions: { type: Boolean, default: false },
     type: { type: String, default: CUSTOMER },
     startBalance: { type: Number, default: 0 },
     endBalance: { type: Number, default: 0 },
@@ -156,14 +153,8 @@ export default {
   computed: {
     commonDocName () {
       const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}`;
-      if (this.type === CUSTOMER && this.isCoach) return clientIdentity;
-      if (this.type === THIRD_PARTY_PAYER) {
-        return `${this.tppName}${this.isCoach ? ` ${clientIdentity}` : ''}`;
-      }
-      return '';
-    },
-    displayActions () {
-      return this.isAdmin && !this.isArchived;
+      if (this.type === CUSTOMER) return clientIdentity;
+      return `${this.tppName}${this.isCoach ? ` ${clientIdentity}` : ''}`;
     },
   },
   methods: {

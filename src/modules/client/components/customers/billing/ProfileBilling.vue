@@ -13,9 +13,8 @@
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :type="CUSTOMER"
         @open-edition-modal="openEditionModal" :start-balance="getStartBalance()" :loading="tableLoading"
-        :end-balance="getEndBalance(customerDocuments)" :is-admin="isAdmin" :is-coach="isCoach"
-        :is-archived="!isArchived" @delete="validateRefundDeletion($event, taxCertificates)"
-        :customer-identity="customer.identity" />
+        :end-balance="getEndBalance(customerDocuments)" :display-actions="isAdmin && !isArchived"
+        @delete="validateRefundDeletion($event, taxCertificates)" :customer-identity="customer.identity" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <ni-button class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           color="white" icon="add" :disable="isArchived" />
@@ -26,8 +25,7 @@
       <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates"
         @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
         :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" @delete="validateRefundDeletion"
-        :is-admin="isAdmin" :is-coach="isCoach" :is-archived="!isArchived" :tpp-name="tpp.name"
-        :customer-identity="customer.identity" />
+        :display-actions="isAdmin && !isArchived" :tpp-name="tpp.name" :customer-identity="customer.identity" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <ni-button class="add-payment" label="Ajouter un réglement" color="white" icon="add" :disable="isArchived"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
@@ -137,7 +135,6 @@ export default {
     const $store = useStore();
     const customer = computed(() => $store.state.customer.customer);
     const clientRole = computed(() => $store.getters['main/getClientRole']);
-    const isCoach = computed(() => COACH_ROLES.includes(clientRole.value));
     const isHelper = computed(() => HELPER === clientRole.value);
     const isAdmin = computed(() => CLIENT_ADMIN === clientRole.value);
 
@@ -170,7 +167,7 @@ export default {
       downloadTaxCertificate,
       validateTaxCertificateDeletion,
       taxCertificatesValidation,
-    } = useTaxCertificates(customer, isCoach);
+    } = useTaxCertificates(customer);
 
     const tableLoading = ref(false);
     const refresh = async () => {
@@ -231,7 +228,6 @@ export default {
       customer,
       taxCertificateFileError,
       taxCertificateYearError,
-      isCoach,
       isAdmin,
       isHelper,
       clientRole,

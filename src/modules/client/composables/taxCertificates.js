@@ -13,7 +13,7 @@ import moment from '@helpers/moment';
 import { formatIdentity, formatDownloadName } from '@helpers/utils';
 import { validYear } from '@helpers/vuelidateCustomVal';
 
-export const useTaxCertificates = (customer, isCoach) => {
+export const useTaxCertificates = (customer) => {
   const $q = useQuasar();
   const taxCertificates = ref([]);
   const taxCertificateModal = ref(false);
@@ -99,10 +99,7 @@ export const useTaxCertificates = (customer, isCoach) => {
 
   const taxCertificateDocName = (tc, customerIdentity) => {
     const commonDocName = `attestation_fiscale ${tc.year}`;
-    if (isCoach.value) {
-      return formatDownloadName(`${customerIdentity.lastname} ${customerIdentity.firstname} ${commonDocName}`);
-    }
-    return formatDownloadName(commonDocName);
+    return formatDownloadName(`${customerIdentity.lastname} ${customerIdentity.firstname} ${commonDocName}`);
   };
 
   const downloadTaxCertificateFromDrive = async (tc) => {
