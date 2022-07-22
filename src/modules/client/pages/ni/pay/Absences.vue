@@ -50,6 +50,7 @@ import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
+import { formatDownloadName } from '@helpers/utils';
 import { formatDate, formatHours, formatHoursWithMinutes } from '@helpers/date';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '@data/constants';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
@@ -167,8 +168,11 @@ export default {
     async downloadDriveDoc (doc) {
       if (this.docLoading) return;
       try {
+        const { identity } = doc.auxiliary;
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+
+        const docName = formatDownloadName(`${identity.firstname} ${identity.lastname} absence`);
+        await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
         console.error(e);
       } finally {
