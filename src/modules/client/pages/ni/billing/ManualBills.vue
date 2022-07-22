@@ -129,8 +129,8 @@ export default {
       () => {
         newManualBill.value.netInclTaxes = toFixedToFloat(
           newManualBill.value.billingItemList.reduce((acc, bi) => {
-            const inclTaxes = multiply(bi.unitInclTaxes, bi.count);
-            return add(acc, toFixedToFloat(inclTaxes));
+            const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
+            return add(acc, biInclTaxes);
           }, 0)
         );
       },
