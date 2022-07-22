@@ -4,7 +4,7 @@
       <q-card-section :class="`cell-title text-${cellTitle(contract.endDate).color}`">
         <div>{{ cellTitle(contract.endDate).msg }}</div>
         <ni-button v-if="displayActions" label="DPAE" icon="file_download" color="primary"
-          @click="exportDpae(contract._id)" />
+          @click="exportDpae(contract._id, user)" />
       </q-card-section>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name"
         :loading="contractsLoading" v-model:pagination="pagination" :visible-columns="visibleColumns(contract)">
@@ -85,6 +85,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatDate, descendingSortArray } from '@helpers/date';
+import { formatDownloadName } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { getContractTags } from 'src/modules/client/helpers/tags';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -209,10 +210,12 @@ export default {
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;
     },
-    async exportDpae (contractId) {
+    async exportDpae (contractId, user) {
       try {
         const txt = await Contracts.exportDpae(contractId);
-        await downloadFile(txt, 'dpae.txt');
+        const name = formatDownloadName(`${user.identity.firstname} ${user.identity.lastname} dpae`);
+
+        await downloadFile(txt, `${name}.txt`);
 
         NotifyPositive('Document téléchargé.');
       } catch (e) {
