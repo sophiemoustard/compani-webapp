@@ -158,6 +158,7 @@ export default {
     },
   },
   methods: {
+    formatDate,
     balanceIconColor (val) {
       return this.isZero(val) || !this.isNegative(val) ? 'copper-grey-400' : 'secondary';
     },
@@ -175,9 +176,6 @@ export default {
       const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === payment.type);
       const typeLabel = paymentOption ? ` (${paymentOption.label})` : '';
       return `${titlePrefix}${typeLabel}`;
-    },
-    formatDate (value) {
-      return formatDate(value);
     },
     formatPrice (value) {
       return formatPrice(value);
@@ -232,7 +230,7 @@ export default {
 
         const pdf = await Bills.getPdf(bill._id);
 
-        const date = formatDate(bill.date, 'DD/MM/YYYY');
+        const date = formatDate(bill.date);
         const fileName = formatDownloadName(`${date} ${this.commonDocName} ${bill.number}.pdf`);
         downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
@@ -250,7 +248,7 @@ export default {
         this.pdfLoading = true;
         const pdf = await CreditNotes.getPdf(cn._id);
 
-        const date = formatDate(cn.date, 'DD/MM/YYYY');
+        const date = formatDate(cn.date);
         const fileName = formatDownloadName(`${date} ${this.commonDocName} ${cn.number}.pdf`);
         downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
