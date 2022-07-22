@@ -155,10 +155,10 @@ export default {
   },
   computed: {
     commonDocName () {
-      const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}_`;
+      const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}`;
       if (this.type === CUSTOMER && this.isCoach) return clientIdentity;
       if (this.type === THIRD_PARTY_PAYER) {
-        return formatDownloadName(`${this.tppName}_${this.isCoach ? clientIdentity : ''}`);
+        return `${this.tppName}${this.isCoach ? ` ${clientIdentity}` : ''}`;
       }
       return '';
     },
@@ -241,7 +241,9 @@ export default {
 
         const pdf = await Bills.getPdf(bill._id);
 
-        downloadFile(pdf, `${this.commonDocName}${bill.number}.pdf`, 'application/octet-stream');
+        const date = formatDate(bill.date, 'DD/MM/YYYY');
+        const fileName = formatDownloadName(`${this.commonDocName} ${bill.number} ${date}.pdf`);
+        downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture');
@@ -257,7 +259,9 @@ export default {
         this.pdfLoading = true;
         const pdf = await CreditNotes.getPdf(cn._id);
 
-        downloadFile(pdf, `${this.commonDocName}${cn.number}.pdf`, 'application/octet-stream');
+        const date = formatDate(cn.date, 'DD/MM/YYYY');
+        const fileName = formatDownloadName(`${this.commonDocName} ${cn.number} ${date}.pdf`);
+        downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');

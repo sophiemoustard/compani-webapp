@@ -108,7 +108,7 @@ export default {
 
         const docx = await BillSlip.getDocx(_id);
 
-        downloadDocx(docx, formatDownloadName(`${month}_${thirdPartyPayer.name}_${number}.docx`));
+        downloadDocx(docx, formatDownloadName(`${month} ${thirdPartyPayer.name} ${number}.docx`));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des bordereaux.');
