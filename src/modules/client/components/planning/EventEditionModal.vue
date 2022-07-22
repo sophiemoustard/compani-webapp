@@ -77,7 +77,9 @@
             path="attachment" :entity="editedEvent" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additional-value="additionalValue" :error="validations.attachment.$error"
             :disable="!selectedAuxiliary._id || historiesLoading" in-modal :extensions="extensions" drive-storage
-            @delete="deleteDocument(editedEvent.attachment.driveId)" />
+            @delete="deleteDocument(editedEvent.attachment.driveId)"
+            :doc-name="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname} absence`"
+            />
         </template>
         <ni-input in-modal type="textarea" :model-value="editedEvent.misc" v-if="!editedEvent.shouldUpdateRepetition"
           caption="Notes" :disable="!canUpdateIntervention || historiesLoading" @blur="validations.misc.$touch"
