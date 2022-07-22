@@ -49,7 +49,7 @@ import Bills from '@api/Bills';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { MANUAL } from '@data/constants';
-import { multiply, add } from '@helpers/numbers';
+import { multiply, add, toFixedToFloat } from '@helpers/numbers';
 import {
   formatAndSortIdentityOptions,
   formatAndSortOptions,
@@ -127,8 +127,11 @@ export default {
     watch(
       () => newManualBill.value.billingItemList,
       () => {
-        newManualBill.value.netInclTaxes = parseFloat(
-          newManualBill.value.billingItemList.reduce((acc, bi) => add(acc, multiply(bi.unitInclTaxes, bi.count)), 0)
+        newManualBill.value.netInclTaxes = toFixedToFloat(
+          newManualBill.value.billingItemList.reduce((acc, bi) => {
+            const inclTaxes = multiply(bi.unitInclTaxes, bi.count);
+            return add(acc, toFixedToFloat(inclTaxes));
+          }, 0)
         );
       },
       { deep: true }
