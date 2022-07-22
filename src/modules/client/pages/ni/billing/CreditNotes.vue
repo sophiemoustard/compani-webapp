@@ -187,8 +187,8 @@ export default {
         if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
           this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
             (acc, bi) => {
-              const inclTaxes = multiply(bi.unitInclTaxes, bi.count);
-              const biExclTaxes = this.getExclTaxes(toFixedToFloat(inclTaxes), bi.vat);
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
+              const biExclTaxes = this.getExclTaxes(biInclTaxes, bi.vat);
               return bi.billingItem ? add(acc, biExclTaxes) : acc;
             },
             toString(0)
@@ -220,7 +220,8 @@ export default {
         if (get(this.editedCreditNote, 'billingItemList[0].billingItem')) {
           this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
             (acc, bi) => {
-              const biExclTaxes = this.getExclTaxes(multiply(bi.unitInclTaxes, bi.count), bi.vat);
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
+              const biExclTaxes = this.getExclTaxes(biInclTaxes, bi.vat);
               return bi.billingItem ? add(acc, biExclTaxes) : acc;
             },
             toString(0)
@@ -228,7 +229,7 @@ export default {
 
           const inclTaxesCustomerString = this.editedCreditNote.billingItemList.reduce(
             (acc, bi) => {
-              const biInclTaxes = multiply(bi.unitInclTaxes, bi.count);
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
               return bi.billingItem ? add(acc, biInclTaxes) : acc;
             },
             toString(0)
