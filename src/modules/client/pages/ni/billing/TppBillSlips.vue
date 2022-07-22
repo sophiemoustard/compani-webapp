@@ -27,7 +27,7 @@ import BillSlip from '@api/BillSlips';
 import SimpleTable from '@components/table/SimpleTable';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, formatDownloadName } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadDocx } from '@helpers/file';
 
@@ -104,9 +104,11 @@ export default {
     },
     async downloadBillSlip (billSlip) {
       try {
-        const docx = await BillSlip.getDocx(billSlip._id);
-        const tppName = billSlip.thirdPartyPayer.name.replaceAll(' ', '_');
-        downloadDocx(docx, `${billSlip.month}_${tppName}_${billSlip.number}.docx`);
+        const { _id, month, thirdPartyPayer, number } = billSlip;
+
+        const docx = await BillSlip.getDocx(_id);
+
+        downloadDocx(docx, formatDownloadName(`${month}_${thirdPartyPayer.name}_${number}.docx`));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des bordereaux.');

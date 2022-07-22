@@ -10,7 +10,7 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { REQUIRED_LABEL } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatDownloadName } from '@helpers/utils';
 import { validYear } from '@helpers/vuelidateCustomVal';
 
 export const useTaxCertificates = (customer, isCoach) => {
@@ -99,7 +99,9 @@ export const useTaxCertificates = (customer, isCoach) => {
 
   const taxCertificateDocName = (tc, customerIdentity) => {
     const commonDocName = `attestation_fiscale_${tc.year}`;
-    if (isCoach.value) return `${customerIdentity.lastname}_${customerIdentity.firstname}_${commonDocName}`;
+    if (isCoach.value) {
+      return formatDownloadName(`${customerIdentity.lastname}_${customerIdentity.firstname}_${commonDocName}`);
+    }
     return commonDocName;
   };
 

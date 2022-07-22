@@ -95,7 +95,7 @@ import {
   COMPANI,
   MANUAL,
 } from '@data/constants';
-import { formatPrice, truncate } from '@helpers/utils';
+import { formatPrice, truncate, formatDownloadName } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 
@@ -158,7 +158,7 @@ export default {
       const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}_`;
       if (this.type === CUSTOMER && this.isCoach) return clientIdentity;
       if (this.type === THIRD_PARTY_PAYER) {
-        return `${this.tppName.replaceAll(' ', '_')}_${this.isCoach ? clientIdentity : ''}`;
+        return formatDownloadName(`${this.tppName}_${this.isCoach ? clientIdentity : ''}`);
       }
       return '';
     },
