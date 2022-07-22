@@ -223,9 +223,17 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
+    getContractDocName () {
+      const { identity } = this.user;
+      const formattedName = formatDownloadName(`${identity.firstname} ${identity.lastname} contrat`);
+
+      return `${formattedName}.docx`;
+    },
     async dlTemplate (version, contract, contractIndex) {
       try {
+        const { company } = this.user;
         const data = getContractTags({ user: this.user, version, contract });
+
         if (!this.canDownload(version, contractIndex)) {
           return NotifyNegative('Impossible de télécharger le contrat.');
         }
@@ -233,11 +241,12 @@ export default {
         const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, version);
         const params = {
           driveId: versionIndex === 0
-            ? this.user.company.rhConfig.templates.contract.driveId
-            : this.user.company.rhConfig.templates.contractVersion.driveId,
+            ? company.rhConfig.templates.contract.driveId
+            : company.rhConfig.templates.contractVersion.driveId,
         };
+        const docName = this.getContractDocName();
 
-        await downloadDriveDocx(params, data, 'contrat.docx');
+        await downloadDriveDocx(params, data, docName);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du document.');
@@ -280,7 +289,9 @@ export default {
       if (this.docLoading) return;
       try {
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(this.getContractDriveId(doc));
+
+        const docName = this.getContractDocName();
+        await GoogleDrive.downloadFileById(this.getContractDriveId(doc), docName);
       } catch (e) {
         console.error(e);
       } finally {
