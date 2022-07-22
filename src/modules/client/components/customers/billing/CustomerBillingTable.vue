@@ -105,6 +105,7 @@ export default {
     documents: { type: Array, default: () => [] },
     billingDates: { type: Object, default: () => ({}) },
     isAdmin: { type: Boolean, default: false },
+    isCoach: { type: Boolean, default: false },
     isArchived: { type: Boolean, default: false },
     type: { type: String, default: CUSTOMER },
     startBalance: { type: Number, default: 0 },
@@ -155,9 +156,9 @@ export default {
   computed: {
     commonDocName () {
       const clientIdentity = `${this.customerIdentity.lastname}_${this.customerIdentity.firstname}_`;
-      if (this.type === CUSTOMER && this.isAdmin) return clientIdentity;
+      if (this.type === CUSTOMER && this.isCoach) return clientIdentity;
       if (this.type === THIRD_PARTY_PAYER) {
-        return `${this.tppName.replaceAll(' ', '_')}_${this.isAdmin ? clientIdentity : ''}`;
+        return `${this.tppName.replaceAll(' ', '_')}_${this.isCoach ? clientIdentity : ''}`;
       }
       return '';
     },

@@ -26,7 +26,7 @@ export default {
   getUploadUrl (driveId) {
     return `${process.env.API_HOSTNAME}/gdrive/${driveId}/upload`;
   },
-  async downloadFileById (driveId, getHtmlFile = false) {
+  async downloadFileById (driveId, name, getHtmlFile = false) {
     const file = await alenviAxios({
       url: `${process.env.API_HOSTNAME}/gdrive/file/${driveId}/download`,
       method: 'GET',
@@ -36,6 +36,7 @@ export default {
     if (getHtmlFile) return file;
     const extension = getExtension(file.data.type);
 
-    return downloadFile(file, `download-${Date.now()}.${extension}`, 'application/octet-stream');
+    const fileName = name ? `${name}.${extension}` : `download-${Date.now()}.${extension}`;
+    return downloadFile(file, fileName, 'application/octet-stream');
   },
 };
