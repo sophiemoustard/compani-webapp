@@ -188,7 +188,7 @@ export default {
           this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
             (acc, bi) => {
               const inclTaxes = multiply(bi.unitInclTaxes, bi.count);
-              const biExclTaxes = toFixedToFloat(this.getExclTaxes(toFixedToFloat(inclTaxes), bi.vat));
+              const biExclTaxes = this.getExclTaxes(toFixedToFloat(inclTaxes), bi.vat);
               return bi.billingItem ? add(acc, biExclTaxes) : acc;
             },
             toString(0)
