@@ -94,7 +94,7 @@ import {
   COMPANI,
   MANUAL,
 } from '@data/constants';
-import { formatPrice, truncate } from '@helpers/utils';
+import { formatPrice, truncate, formatDownloadName } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 
@@ -108,6 +108,8 @@ export default {
     startBalance: { type: Number, default: 0 },
     endBalance: { type: Number, default: 0 },
     loading: { type: Boolean, default: false },
+    customerIdentity: { type: Object, default: () => ({}) },
+    tppName: { type: String, default: '' },
   },
   components: {
     'ni-simple-table': SimpleTable,
@@ -148,7 +150,15 @@ export default {
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
     };
   },
+  computed: {
+    commonDocName () {
+      const clientIdentity = `${this.customerIdentity.lastname} ${this.customerIdentity.firstname}`;
+      if (this.type === CUSTOMER) return clientIdentity;
+      return `${this.tppName} ${clientIdentity}`;
+    },
+  },
   methods: {
+    formatDate,
     balanceIconColor (val) {
       return this.isZero(val) || !this.isNegative(val) ? 'copper-grey-400' : 'secondary';
     },
@@ -166,9 +176,6 @@ export default {
       const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === payment.type);
       const typeLabel = paymentOption ? ` (${paymentOption.label})` : '';
       return `${titlePrefix}${typeLabel}`;
-    },
-    formatDate (value) {
-      return formatDate(value);
     },
     formatPrice (value) {
       return formatPrice(value);
@@ -220,8 +227,12 @@ export default {
 
       try {
         this.pdfLoading = true;
+
         const pdf = await Bills.getPdf(bill._id);
-        downloadFile(pdf, 'facture.pdf', 'application/octet-stream');
+
+        const date = formatDate(bill.date);
+        const fileName = formatDownloadName(`${date} ${this.commonDocName} ${bill.number}.pdf`);
+        downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture');
@@ -236,7 +247,10 @@ export default {
       try {
         this.pdfLoading = true;
         const pdf = await CreditNotes.getPdf(cn._id);
-        downloadFile(pdf, 'avoir.pdf', 'application/octet-stream');
+
+        const date = formatDate(cn.date);
+        const fileName = formatDownloadName(`${date} ${this.commonDocName} ${cn.number}.pdf`);
+        downloadFile(pdf, fileName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');

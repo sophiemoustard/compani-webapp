@@ -10,7 +10,7 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { REQUIRED_LABEL } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatDownloadName } from '@helpers/utils';
 import { validYear } from '@helpers/vuelidateCustomVal';
 
 export const useTaxCertificates = (customer) => {
@@ -96,10 +96,20 @@ export const useTaxCertificates = (customer) => {
       modalLoading.value = false;
     }
   };
+
+  const getTaxCertificateDocName = (tc, customerIdentity) => {
+    const fileName = `${tc.year} ${customerIdentity.lastname} ${customerIdentity.firstname} attestation_fiscale`;
+    return formatDownloadName(fileName);
+  };
+
   const downloadTaxCertificateFromDrive = async (tc) => {
     try {
       disableTaxCertificate.value = true;
-      await GoogleDrive.downloadFileById(get(tc, 'driveFile.driveId'));
+
+      await GoogleDrive.downloadFileById(
+        get(tc, 'driveFile.driveId'),
+        getTaxCertificateDocName(tc, customer.value.identity)
+      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -112,8 +122,10 @@ export const useTaxCertificates = (customer) => {
 
     try {
       pdfLoading.value = true;
+
       const pdf = await TaxCertificates.getPdf(tc._id);
-      downloadFile(pdf, 'attestation_fiscale.pdf', 'application/octet-stream');
+
+      downloadFile(pdf, `${getTaxCertificateDocName(tc, customer.value.identity)}.pdf`, 'application/octet-stream');
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors du téléchargement de l\'attestation fiscale');
