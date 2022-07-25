@@ -27,7 +27,7 @@ export const formatDateDiff = (durationInMilliseconds) => {
   return `${durationInMilliseconds < 0 ? 'dans ' : ''}${formatQuantity('an', years)}`;
 };
 
-export const isBetween = (date, min, max) => new Date(date) < new Date(max) && new Date(date) > new Date(min);
+export const isBetweenOrEqual = (date, min, max) => new Date(date) <= new Date(max) && new Date(date) >= new Date(min);
 
 export const getStartOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 

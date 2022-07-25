@@ -7,52 +7,48 @@
         <div class="q-my-sm q-ml-md">
           <div class="text-copper-grey-700">{{ formatIdentity(interlocutor.identity, 'FL') }}</div>
           <div class="text-copper-grey-500 text-14">{{ interlocutor.local.email }}</div>
-          <div class="phone">{{ formatPhone(get(interlocutor, 'contact.phone')) }}</div>
+          <div v-if="get(interlocutor, 'contact.phone')" class="phone">
+            {{ formatPhone(interlocutor.contact.phone) }}
+          </div>
+          <div v-else class="row items-center text-14">
+            <div class="dot dot-orange" />
+            <div class="text-orange-500">numéro manquant</div>
+          </div>
+          <div v-if="contact._id === interlocutor._id" class="contact">
+            <q-icon size="xxs" name="person" class="q-mr-xs" />
+            <span>Contact donné aux stagiaires</span>
+          </div>
         </div>
       </div>
-      <ni-button v-if="canUpdateSalesRepresentative" icon="edit" @click="openEditionModal()" :disable="disable" />
+      <ni-button v-if="canUpdate" icon="edit" @click="openEditionModal()" :disable="disable" />
     </q-card>
   </div>
 </template>
 
 <script>
 import get from 'lodash/get';
-import pick from 'lodash/pick';
-import { computed } from 'vue';
-import { useStore } from 'vuex';
 import Button from '@components/Button';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity, formatPhone } from '@helpers/utils';
-import { defineAbilitiesFor } from '@helpers/ability';
 
 export default {
   name: 'InterlocutorCell',
   props: {
     interlocutor: { type: Object, default: () => ({}) },
+    contact: { type: Object, default: () => ({}) },
     caption: { type: String, default: '' },
     openEditionModal: { type: Function, default: () => {} },
+    canUpdate: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
   },
   setup () {
-    const $store = useStore();
-
-    const loggedUser = computed(() => $store.state.main.loggedUser);
-
-    const canUpdateSalesRepresentative = computed(() => {
-      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', 'interlocutor');
-    });
-
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
     return {
       // Data
       DEFAULT_AVATAR,
-      // Computed
-      canUpdateSalesRepresentative,
       // Methods
       formatIdentity,
       formatPhone,
@@ -80,4 +76,13 @@ export default {
 .phone
   color: $copper-grey-500
   font-size: 14px
+.contact
+  color: $copper-grey-500
+  font-size: 12px
+  margin-top: 4px
+  display: flex
+  align-items: center
+  margin-left: -2px
+.dot-orange
+  margin: 0px 4px 0px 0px
 </style>

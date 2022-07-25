@@ -358,7 +358,8 @@ export default {
     validateVersionDeletion ({ contractId, versionId }) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cet avenant ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cet avenant&nbsp;?',
+        html: true,
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteVersion(contractId, versionId))

@@ -3,7 +3,7 @@
     <div class="modal-container-md">
       <div class="modal-padding">
         <div class="modal-title q-mb-lg">Confirmation</div>
-        <div class="q-mb-lg">Êtes-vous sûr(e) de vouloir déverrouiller cette étape ?</div>
+        <div class="q-mb-lg">Êtes-vous sûr(e) de vouloir déverrouiller cette étape&nbsp;?</div>
         <div class="q-mb-lg" v-if="isStepPublished">
           Cette étape est publiée, vous ne pourrez pas ajouter, supprimer ou changer l'ordre des cartes.
         </div>

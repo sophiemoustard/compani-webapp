@@ -146,6 +146,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/billing/bills',
+        name: 'ni billing automatic bills',
+        component: () => import('src/modules/client/pages/ni/billing/Bills'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'billing',
+        },
+      },
+      {
         path: 'ni/pay/to-pay',
         name: 'ni pay to pay',
         component: () => import('src/modules/client/pages/ni/pay/ToPay'),
@@ -297,6 +306,16 @@ const routes = [
         path: 'ni/planning/customers',
         name: 'ni planning customers',
         component: () => import('src/modules/client/pages/ni/planning/CustomerPlanning'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'planning',
+        },
+      },
+      {
+        path: 'ni/planning/repetitions',
+        name: 'ni planning repetitions',
+        component: () => import('src/modules/client/pages/ni/planning/RepetitionsPlanning'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

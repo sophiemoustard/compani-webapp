@@ -68,7 +68,7 @@ export default {
       this.$q.dialog({
         title: 'Supprimer une date',
         message: `Êtes-vous sûr(e) de vouloir supprimer la date du  ${formatDate(slot.dates.startDate)}
-          (${formatIntervalHourly(slot.dates)}) ?<br /><br />Le créneau repassera en "à planifier".`,
+          (${formatIntervalHourly(slot.dates)})&nbsp;?<br /><br />Le créneau repassera en "à planifier".`,
         html: true,
         ok: 'Oui',
         cancel: 'Non',
@@ -78,7 +78,8 @@ export default {
     validateDeletion (slotId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce créneau ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce créneau&nbsp;?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.delete(slotId))

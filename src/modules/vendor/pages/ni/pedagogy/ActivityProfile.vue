@@ -186,7 +186,7 @@ export default {
       this.$q.dialog({
         title: 'Confirmation',
         message: `${usedInOtherStepMessage} ${isPublishedMessage}`
-          + 'Êtes-vous sûr(e) de vouloir déverrouiller cette activité ?',
+          + 'Êtes-vous sûr(e) de vouloir déverrouiller cette activité&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',

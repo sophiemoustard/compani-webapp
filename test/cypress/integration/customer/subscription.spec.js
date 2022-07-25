@@ -97,30 +97,5 @@ describe('customers subscription tests', () => {
         expect($th.eq(1)).to.have.text('Signature');
       });
     });
-
-    cy.server();
-    cy.route('POST', '/customers/*/mandates/*/esign').as('esign');
-
-    cy.dataCy('open-mandate').click();
-    cy.wait('@esign').should((xhr) => {
-      expect(xhr.request.body.customer).to.deep.equal({
-        name: 'Bardet',
-        email: 'helper@alenvi.io',
-      });
-      expect(xhr.request.body.fields).to.deep.equal({
-        bankAccountOwner: 'David gaudu',
-        customerAddress: '12 rue de ponthieu 75008 Paris',
-        ics: '9876',
-        rum: 'R012345678903456789',
-        bic: 'ABNAFRPP',
-        iban: 'FR3617569000306699167186M11',
-        companyName: 'Test SAS',
-        companyAddress: '37 rue de Ponthieu 75008 Paris',
-        downloadDate: Cypress.luxon.DateTime.now().toLocaleString(),
-      });
-    });
-
-    cy.get('iframe');
-    cy.dataCy('esign-modal').should('be.visible');
   });
 });

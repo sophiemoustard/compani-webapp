@@ -1,9 +1,11 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="$emit('update:model-value')">
     <template #title>
-      Êtes-vous sûr(e) de vouloir supprimer cette répétition ?
+      Êtes-vous sûr(e) de vouloir supprimer cette répétition&nbsp;?
     </template>
-    <ni-repetition-cell :repetition="repetition" :visible="false" />
+    <div class="q-mb-md">
+      <ni-repetition-cell :repetition="repetition" :can-delete="false" :person-type="personType" />
+    </div>
     <div class="text">
       Les événements rattachés à cette répétition et postérieurs au {{ formatDate }} seront supprimés.
     </div>
@@ -31,6 +33,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     repetition: { type: Object, default: () => ({}) },
+    personType: { type: String, default: '' },
   },
   emits: ['hide', 'update:model-value', 'cancel', 'submit'],
   setup (props, { emit }) {

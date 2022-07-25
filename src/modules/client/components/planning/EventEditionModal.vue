@@ -86,11 +86,11 @@
         <div v-if="editedEvent.isCancelled" class="justify-between">
           <ni-option-group :model-value="editedEvent.cancel.reason" :error-message="REQUIRED_LABEL" required-field
             :options="cancellationReasons" :error="validations.cancel.reason.$error" type="radio"
-            caption="Qui est a l’origine de l’annulation ?"
+            caption="Qui est a l’origine de l’annulation&nbsp;?"
             @update:model-value="updateEvent('cancel.reason', $event)" />
           <ni-option-group :model-value="editedEvent.cancel.condition" :error-message="REQUIRED_LABEL" required-field
             :options="cancellationConditions" :error="validations.cancel.condition.$error" type="radio"
-            caption="Quelles sont les conditions d’annulation ?"
+            caption="Quelles sont les conditions d’annulation&nbsp;?"
             @update:model-value="updateEvent('cancel.condition', $event)" />
         </div>
         <template v-if="editedEvent.type === INTERVENTION">
@@ -431,7 +431,8 @@ export default {
         title: 'Confirmation',
         message: `Êtes vous sûr(e) de vouloir rétablir l’intervention du
           ${formatDateAndHours(this.editedEvent.dates.startDate, this.editedEvent.dates.endDate)} chez
-          ${this.customerFullName} ?`,
+          ${this.customerFullName}&nbsp;?`,
+        html: true,
         ok: 'Oui',
         cancel: 'Non',
       }).onOk(() => this.restoreEvent())

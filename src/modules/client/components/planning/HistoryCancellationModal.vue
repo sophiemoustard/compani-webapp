@@ -6,7 +6,7 @@
           <template #message>{{ start ? 'Début d\'intervention horodaté' : 'Fin d\'intervention horodatée' }}</template>
         </ni-banner>
         <div class="q-mb-md">
-          Êtes-vous sûr(e) de vouloir annuler l'horodatage ? Vous pourrez ensuite modifier l'évènement.
+          Êtes-vous sûr(e) de vouloir annuler l'horodatage&nbsp;? Vous pourrez ensuite modifier l'évènement.
         </div>
         <ni-input :model-value="reason" @update:model-value="update" caption="Motif" type="textarea" class="q-mb-md"
           :error="validations.$error" required-field last />

@@ -20,7 +20,7 @@
         <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password"
           @keyup-enter="submit" :error="v$.credentials.password.$error" @blur="v$.credentials.password.$touch" />
         <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
-          <small>Mot de passe oublié ?</small>
+          <small>Mot de passe oublié&nbsp;?</small>
         </router-link>
         <div class="q-my-lg buttons">
           <ni-button @click="$router.push({ name: 'forgotPassword' })" color="primary" class="firstLoginBtn"

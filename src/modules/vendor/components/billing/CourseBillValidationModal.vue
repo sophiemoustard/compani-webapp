@@ -11,7 +11,7 @@
    <ni-date-input caption="Date de facture" :model-value="billToValidate.billedAt" :error="validations.billedAt.$error"
       @blur="validations.billedAt.$touch" in-modal required-field @update:model-value="update($event, 'billedAt')" />
     <template #footer>
-      <div class="q-pl-lg">Cette opération est définitive. Confirmez-vous ?</div>
+      <div class="q-pl-lg">Cette opération est définitive. Confirmez-vous&nbsp;?</div>
       <div class="row justify-end q-ma-md">
         <ni-button label="NON" :loading="loading" @click="cancel" />
         <ni-button label="OUI" :loading="loading" @click="submit" />

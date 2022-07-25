@@ -112,6 +112,7 @@ export const menuItemsMixin = {
           children: [
             { name: 'ni planning auxiliaries', icon: 'date_range', label: 'Auxiliaires' },
             { name: 'ni planning customers', icon: 'date_range', label: 'Bénéficiaires' },
+            { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },
           ],
         }, {
           ref: 'customers',
@@ -139,6 +140,7 @@ export const menuItemsMixin = {
           children: [
             { name: 'ni billing to bill', icon: 'credit_card', label: 'À facturer' },
             { name: 'ni billing manual bills', icon: 'receipt', label: 'Factures manuelles' },
+            { name: 'ni billing automatic bills', icon: 'picture_as_pdf', label: 'Liste des factures' },
             { name: 'ni billing credit note', icon: 'mdi-credit-card-refund', label: 'Avoirs' },
             { name: 'ni billing clients balances', icon: 'mdi-scale-balance', label: 'Balances clients' },
             { name: 'ni billing tpp bill slips', icon: 'view_headline', label: 'Bordereaux tiers payeurs' },
@@ -185,6 +187,7 @@ export const menuItemsMixin = {
             { name: 'auxiliaries agenda', icon: 'event', label: 'Le mien' },
             { name: 'ni planning auxiliaries', icon: 'face', label: 'Auxiliaires' },
             { name: 'ni planning customers', icon: 'people', label: 'Bénéficiaires' },
+            { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },
           ],
         }, {
           ref: 'customers',

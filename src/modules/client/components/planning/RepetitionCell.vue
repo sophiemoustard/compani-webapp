@@ -1,20 +1,36 @@
 <template>
-  <q-card class="container">
+  <q-card :class="[`${repetition.hasConflicts ? 'container-conflict' : 'container'}`]">
     <div class="row justify-between items-start">
       <div class="infos-container">
-        <div class="infos" v-if="repetition.type === INTERVENTION">{{ getLastVersionServiceName }}</div>
-        <div class="infos" v-else-if="repetition.type === INTERNAL_HOUR">
-          {{ get(repetition, 'internalHour.name') }}
-        </div>
+        <div class="infos" v-if="isIntervention">{{ getLastVersionServiceName }}</div>
+        <div class="infos" v-else-if="isInternalHour">{{ get(repetition, 'internalHour.name') }}</div>
         <div class="infos" v-else>{{ EVENT_TYPES.find(type => type.value === UNAVAILABILITY).label }}</div>
         <div class="bold-infos q-pt-sm">{{ getRepetitionInfos }}</div>
         <div class="infos q-pb-sm">{{ getRepetitionStartDate }}</div>
-        <div v-if="repetition.type === INTERVENTION" class="customer">
+        <div v-if="isIntervention && !isCustomer" class="customer">
           Chez {{ formatIdentity(get(repetition, 'customer.identity'), 'FL') }}
         </div>
+        <div class="row q-py-xs" v-if="isIntervention && isCustomer && !get(repetition, 'sector.name')">
+          <img :src="getAvatar(get(repetition, 'auxiliary.picture'))" class="avatar avatar-size">
+          <div class="auxiliary q-px-sm">{{ formatIdentity(get(repetition, 'auxiliary.identity'), 'FL') }}</div>
+        </div>
+        <div v-if="isIntervention && isCustomer && get(repetition, 'sector.name')">
+          À affecter - {{ repetition.sector.name }}
+        </div>
       </div>
-      <ni-button v-if="visible" icon="delete" color="copper-grey-500" @click="deleteRepetition" />
+      <div
+        :class="['row', `${repetition.hasConflicts || repetition.hasDuplicateKey ? 'button-container' : ''}`, 'flex']">
+        <div v-if="repetition.hasConflicts" class="row warning-container">
+          <div class="dot dot-orange dot-margin" />
+          <div class="text-conflict">Conflit</div>
+        </div>
+        <div v-if="repetition.hasDuplicateKey" class="row warning-container">
+          <div class="dot dot-grey dot-margin" />
+          <div class="text-doublon">Doublon</div>
+        </div>
+        <ni-button v-if="canDelete" icon="delete" @click="deleteRepetition" />
       </div>
+    </div>
   </q-card>
 </template>
 <script>
@@ -33,6 +49,8 @@ import {
   INTERNAL_HOUR,
   UNAVAILABILITY,
   EVENT_TYPES,
+  DEFAULT_AVATAR,
+  CUSTOMER,
 } from '@data/constants';
 
 export default {
@@ -42,11 +60,12 @@ export default {
   },
   props: {
     repetition: { type: Object, default: () => ({}) },
-    visible: { type: Boolean, default: true },
+    canDelete: { type: Boolean, default: true },
+    personType: { type: String, default: '' },
   },
   emits: ['delete'],
   setup (props, { emit }) {
-    const { repetition } = toRefs(props);
+    const { repetition, personType } = toRefs(props);
 
     const oneWeekRepetitionLabel = computed(() => `Tous les
       ${moment(get(repetition.value, 'startDate')).format('dddd')}s`);
@@ -83,20 +102,30 @@ export default {
 
     const deleteRepetition = () => emit('delete');
 
+    const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
+
+    const isIntervention = computed(() => get(repetition.value, 'type') === INTERVENTION);
+
+    const isInternalHour = computed(() => get(repetition.value, 'type') === INTERNAL_HOUR);
+
+    const isCustomer = computed(() => personType.value === CUSTOMER);
+
     return {
       // Data
-      INTERVENTION,
-      INTERNAL_HOUR,
       UNAVAILABILITY,
       EVENT_TYPES,
       // Computed
       getRepetitionInfos,
       getRepetitionStartDate,
       getLastVersionServiceName,
+      isIntervention,
+      isInternalHour,
+      isCustomer,
       // Methods
       formatIdentity,
       get,
       deleteRepetition,
+      getAvatar,
     };
   },
 };
@@ -104,8 +133,10 @@ export default {
 <style lang="sass" scoped>
 .container
   background-color: $copper-grey-100
-  margin: 0px 0px 16px 0px
   padding: 16px
+  &-conflict
+    background-color: $orange-100
+    padding: 16px
 .infos-container
   max-width: 80%
 .infos
@@ -118,4 +149,24 @@ export default {
 .customer
   color: $copper-grey-700
   size: 16px
+.auxiliary
+  size: 16px
+.avatar-size
+  height: 24px
+  width: 24px
+.warning-container
+  align-items: center
+  justify-content: space-around
+  font-size: 14px
+  margin: 0px 16px 0px 0px
+  .text-doublon
+    color: $copper-grey-500
+  .text-conflict
+    color: $orange-500
+.dot-margin
+  margin: 0px 4px 0px 0px
+.button-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    width: 100%
+    justify-content: space-between
 </style>

@@ -9,13 +9,24 @@
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div class="interlocutor-container">
-        <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
-          :open-edition-modal="openSalesRepresentativeModal" :disable="isArchived" />
+        <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani" :disable="isArchived"
+          :open-edition-modal="openSalesRepresentativeModal" :can-update="canUpdateInterlocutor"
+          :contact="course.contact" />
         <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
-          :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" />
-        <ni-button v-else-if="canUpdateTrainer" color="primary" icon="add" class="add-trainer"
+          :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" :contact="course.contact"
+          :can-update="canUpdateInterlocutor" />
+        <ni-button v-else-if="canUpdateInterlocutor" color="primary" icon="add" class="add-interlocutor"
           label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
           @click="() => openTrainerModal('Ajouter un(e) ')" />
+        <interlocutor-cell v-if="!!course.companyRepresentative._id" :interlocutor="course.companyRepresentative"
+          caption="Référent structure" :open-edition-modal="() => openCompanyRepresentativeModal('Modifier le ')"
+          :disable="isArchived" class="q-mt-lg" can-update :contact="course.contact" />
+        <ni-button v-else-if="course.type === INTRA" color="primary" icon="add" class="add-interlocutor"
+          label="Ajouter un référent structure" :disable="interlocutorModalLoading || isArchived"
+          @click="() => openCompanyRepresentativeModal('Ajouter un ')" />
+        <ni-button v-if="!course.contact._id && canUpdateInterlocutor" color="primary" icon="add"
+          class="add-interlocutor" label="Définir un contact pour la formation"
+          :disable="contactModalLoading || isArchived" @click="openContactAdditionModal" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
@@ -26,16 +37,6 @@
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
     <div v-if="isIntraOrVendor">
-      <div class="q-mb-lg">
-        <p class="text-italic">
-          Contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
-        </p>
-        <div class="row gutter-profile">
-          <ni-select v-model.trim="course.contact._id" @blur="updateCourse('contact')" :options="contactOptions"
-            @focus="saveTmp('contact')" :error="isMissingContactPhone" :disable="isArchived || !isVendorInterface"
-            clearable error-message="Numéro de téléphone manquant, veuillez le renseigner" />
-        </div>
-      </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contacter les stagiaires</p>
         <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
@@ -83,14 +84,23 @@
     <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
-    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutorId"
-      @submit="updateSalesRepresentative" :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading"
-      @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
-      :interlocutors-options="salesRepresentativeOptions" />
+    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutor"
+      @submit="updateInterlocutor('salesRepresentative')" :validations="v$.tempInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
+      :interlocutors-options="salesRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
-    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutorId" @submit="updateTrainer"
-      :validations="v$.tempInterlocutorId" :loading="interlocutorModalLoading" @hide="resetTrainer"
-      :label="trainerLabel" :interlocutors-options="trainerOptions" />
+    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutor" @hide="resetInterlocutor"
+      @submit="updateInterlocutor('trainer')" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
+      :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
+
+    <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutor"
+      @submit="updateInterlocutor('companyRepresentative')" :validations="v$.tempInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
+      :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
+
+    <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tempContactId"
+      @submit="updateContact" :validations="v$.tempContactId" :loading="contactModalLoading"
+      @hide="resetContactAddition" :contact-options="contactOptions" />
   </div>
 </template>
 
@@ -101,14 +111,12 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
-import uniqBy from 'lodash/uniqBy';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
 import Courses from '@api/Courses';
 import Input from '@components/form/Input';
-import Select from '@components/form/Select';
 import Button from '@components/Button';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
@@ -118,6 +126,7 @@ import SmsSendingModal from '@components/courses/SmsSendingModal';
 import CourseSmsHistoryModal from '@components/courses/CourseSmsHistoryModal';
 import InterlocutorCell from '@components/courses/InterlocutorCell';
 import InterlocutorModal from '@components/courses/InterlocutorModal';
+import CourseContactAdditionModal from '@components/courses/CourseContactAdditionModal';
 import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
@@ -133,7 +142,7 @@ import {
   DEFAULT_AVATAR,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
-import { formatAndSortIdentityOptions, formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
+import { formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { descendingSort, ascendingSort } from '@helpers/date';
@@ -149,7 +158,6 @@ export default {
   },
   components: {
     'ni-input': Input,
-    'ni-select': Select,
     'ni-slot-container': SlotContainer,
     'ni-trainee-table': TraineeTable,
     'ni-course-info-link': CourseInfoLink,
@@ -161,6 +169,7 @@ export default {
     'ni-button': Button,
     'interlocutor-cell': InterlocutorCell,
     'interlocutor-modal': InterlocutorModal,
+    'contact-addition-modal': CourseContactAdditionModal,
   },
   setup () {
     return { v$: useVuelidate() };
@@ -171,6 +180,7 @@ export default {
     return {
       trainerOptions: [],
       salesRepresentativeOptions: [],
+      companyRepresentativeOptions: [],
       courseLoading: false,
       courseSlotsLoading: false,
       tmpInput: '',
@@ -187,19 +197,26 @@ export default {
       smsHistoriesModal: false,
       urlAndroid: 'https://bit.ly/3en5OkF',
       urlIos: 'https://apple.co/33kKzcU',
-      contactOptions: [],
-      tempInterlocutorId: '',
+      tempInterlocutor: { _id: '', isContact: false },
       salesRepresentativeLabel: { action: 'Modifier le ', interlocutor: 'référent Compani' },
       salesRepresentativeEditionModal: false,
       interlocutorModalLoading: false,
-      trainerLabel: { action: '', interlocutor: '' },
+      interlocutorLabel: { action: '', interlocutor: '' },
       trainerModal: false,
       sendSms: false,
+      INTRA,
+      companyRepresentativeModal: false,
+      contactModalLoading: false,
+      contactAdditionModal: false,
+      tempContactId: '',
+      SALES_REPRESENTATIVE: 'salesRepresentative',
+      COMPANY_REPRESENTATIVE: 'companyRepresentative',
     };
   },
   validations () {
     return {
-      tempInterlocutorId: { required },
+      tempInterlocutor: { _id: { required } },
+      tempContactId: { required },
       course: { contact: { contact: { phone: { required } } } },
       newSms: { content: { required }, type: { required } },
     };
@@ -275,7 +292,7 @@ export default {
     isMissingContactPhone () {
       return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
     },
-    canUpdateTrainer () {
+    canUpdateInterlocutor () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role']));
 
       return ability.can('update', 'interlocutor');
@@ -285,10 +302,23 @@ export default {
 
       return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc}${value},`, '');
     },
+    contactOptions () {
+      const interlocutors = [
+        { interlocutor: this.course.salesRepresentative, role: 'Référent(e) Compani' },
+        ...(this.course.trainer._id ? [{ interlocutor: this.course.trainer, role: 'Intervenant(e)' }] : []),
+        ...(this.course.companyRepresentative._id
+          ? [{ interlocutor: this.course.companyRepresentative, role: 'Référent(e) structure' }]
+          : []),
+      ];
+      return Object.freeze(interlocutors.map(interlocutor => this.formatContactOption(interlocutor)));
+    },
   },
+
   async created () {
     const promises = [this.refreshCourse()];
-    if (this.isVendorInterface || this.isIntraCourse) promises.push(this.refreshSms(), this.refreshContacts());
+    if (this.isVendorInterface || this.isIntraCourse) {
+      promises.push(this.refreshSms(), this.refreshCompanyRepresentatives());
+    }
     await Promise.all(promises);
     this.setDefaultMessageType();
 
@@ -355,7 +385,23 @@ export default {
         additionalFilters: [interlocutor.local.email],
       };
     },
-
+    formatContactOption (contact) {
+      return {
+        value: contact.interlocutor._id,
+        label: `${formatIdentity(contact.interlocutor.identity, 'FL')} - ${contact.role}`,
+      };
+    },
+    async refreshCompanyRepresentatives () {
+      try {
+        const clientUsersFromCompany = this.course.type === INTRA
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
+          : [];
+        this.companyRepresentativeOptions = Object.freeze(clientUsersFromCompany
+          .map(user => this.formatInterlocutorOption(user)).sort((a, b) => a.label.localeCompare(b.label)));
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async refreshTrainersAndSalesRepresentatives () {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
@@ -414,24 +460,6 @@ export default {
     },
     resetSmsModal () {
       this.updateMessage(this.newSms.type);
-    },
-    async refreshContacts () {
-      try {
-        if (this.isVendorInterface) {
-          const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-
-          const clientUsersFromCompany = this.course.type === INTRA
-            ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
-            : [];
-
-          const contacts = uniqBy([...clientUsersFromCompany, ...vendorUsers], '_id');
-          this.contactOptions = Object.freeze(formatAndSortIdentityOptions(contacts));
-        } else {
-          this.contactOptions = Object.freeze(formatAndSortIdentityOptions([this.course.contact]));
-        }
-      } catch (e) {
-        console.error(e);
-      }
     },
     updateMessage (newMessageType) {
       if (newMessageType === CONVOCATION) this.setConvocationMessage();
@@ -501,57 +529,99 @@ export default {
         this.pdfLoading = false;
       }
     },
-    async updateSalesRepresentative () {
+    async updateInterlocutor (role) {
       try {
         this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.v$.tempInterlocutor.$touch();
+        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Courses.update(this.profileId, { salesRepresentative: this.tempInterlocutorId });
-        this.salesRepresentativeEditionModal = false;
+        const payload = {
+          [role]: this.tempInterlocutor._id,
+          ...(
+            (
+              this.tempInterlocutor.isContact ||
+              get(this.course, 'contact._id') === get(this.course, `${role}._id`)
+            ) &&
+            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
+          ),
+        };
+
+        await Courses.update(this.profileId, payload);
+
+        switch (role) {
+          case this.SALES_REPRESENTATIVE: this.salesRepresentativeEditionModal = false;
+            break;
+          case TRAINER: this.trainerModal = false;
+            break;
+          case this.COMPANY_REPRESENTATIVE: this.companyRepresentativeModal = false;
+            break;
+        }
         await this.refreshCourse();
-        NotifyPositive('Référent Compani mis à jour.');
+        NotifyPositive('Interlocuteur mis à jour.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition du référent Compani.');
+        NotifyNegative('Erreur lors de l\'édition de l\'interlocuteur.');
       } finally {
         this.interlocutorModalLoading = false;
       }
     },
-    async updateTrainer () {
+    async updateContact () {
       try {
-        this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutorId.$touch();
-        if (this.v$.tempInterlocutorId.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.contactModalLoading = true;
+        this.v$.tempContactId.$touch();
+        if (this.v$.tempContactId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Courses.update(this.profileId, { trainer: this.tempInterlocutorId });
-        this.trainerModal = false;
+        await Courses.update(this.profileId, { contact: this.tempContactId });
+        this.contactAdditionModal = false;
         await this.refreshCourse();
-        NotifyPositive('Intervenant(e) mis(e) à jour.');
+        NotifyPositive('Contact mis à jour.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'intervenant(e).');
+        NotifyNegative('Erreur lors de l\'édition du contact.');
       } finally {
-        this.interlocutorModalLoading = false;
+        this.contactModalLoading = false;
       }
+    },
+    resetContactAddition () {
+      this.tempContactId = '';
+      this.v$.tempContactId.$reset();
     },
     resetSalesRepresentativeEdition () {
-      this.tempInterlocutorId = '';
-      this.v$.tempInterlocutorId.$reset();
+      this.tempInterlocutor = { _id: '', isContact: false };
+      this.v$.tempInterlocutor.$reset();
     },
     openSalesRepresentativeModal () {
-      this.tempInterlocutorId = this.course.salesRepresentative._id;
+      this.tempInterlocutor = {
+        _id: this.course.salesRepresentative._id,
+        isContact: this.course.salesRepresentative._id === this.course.contact._id,
+      };
       this.salesRepresentativeEditionModal = true;
     },
-    resetTrainer () {
-      this.tempInterlocutorId = '';
-      this.trainerLabel = { action: '', interlocutor: '' };
-      this.v$.tempInterlocutorId.$reset();
+    resetInterlocutor () {
+      this.tempInterlocutor = { _id: '', isContact: false };
+      this.interlocutorLabel = { action: '', interlocutor: '' };
+      this.v$.tempInterlocutor.$reset();
     },
     openTrainerModal (action) {
-      this.tempInterlocutorId = this.course.trainer._id;
-      this.trainerLabel = { action, interlocutor: 'intervenant(e)' };
+      this.tempInterlocutor = {
+        _id: this.course.trainer._id,
+        isContact: !!this.course.trainer._id && this.course.trainer._id === this.course.contact._id,
+      };
+      this.interlocutorLabel = { action, interlocutor: 'intervenant(e)' };
       this.trainerModal = true;
+    },
+    openCompanyRepresentativeModal (action) {
+      this.tempInterlocutor = {
+        _id: this.course.companyRepresentative._id,
+        isContact: !!this.course.companyRepresentative._id &&
+        this.course.companyRepresentative._id === this.course.contact._id,
+      };
+      this.interlocutorLabel = { action, interlocutor: 'Référent structure' };
+      this.companyRepresentativeModal = true;
+    },
+    openContactAdditionModal () {
+      this.tempContactId = this.course.contact._id;
+      this.contactAdditionModal = true;
     },
     copy () {
       copyToClipboard(this.traineesEmails)
@@ -573,7 +643,8 @@ export default {
   grid-auto-flow: row
   display: grid
   grid-template-columns: repeat(2, 1fr)
-.add-trainer
+.add-interlocutor
   justify-self: start
   align-self: end
+  margin-top: 24px
 </style>

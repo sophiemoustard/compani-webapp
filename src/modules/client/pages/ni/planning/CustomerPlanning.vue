@@ -271,7 +271,7 @@ export default {
     validateCustomerAbsenceEdition () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: `Êtes-vous sûr(e) de vouloir modifier l'absence bénéficiaire ?<br />
+        message: `Êtes-vous sûr(e) de vouloir modifier l'absence bénéficiaire&nbsp;?<br />
           Les interventions prévues sur la période d'absence seront supprimées.`,
         html: true,
         ok: 'OK',

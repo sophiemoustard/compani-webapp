@@ -510,11 +510,13 @@ export const EXPORT_HISTORY_TYPES = [
 export const COURSE = 'course';
 export const COURSE_SLOT = 'course_slot';
 export const COURSE_BILL = 'course_bill';
+export const COURSE_PAYMENT = 'course_payment';
 export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Formations', value: COURSE },
   { label: 'Créneaux', value: COURSE_SLOT },
   { label: 'Questionnaires de satisfaction', value: END_OF_COURSE },
   { label: 'Factures et avoirs', value: COURSE_BILL },
+  { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
 ];
 
 // PARTNER
@@ -565,6 +567,7 @@ export const NOTE_UPDATE = 'note_update';
 
 // BILLING ITEMS
 export const MANUAL = 'manual';
+export const AUTOMATIC = 'automatic';
 export const PER_INTERVENTION = 'per_intervention';
 export const BILLING_ITEMS_TYPE_OPTIONS = [
   { label: 'Manuel', value: MANUAL },
@@ -587,3 +590,14 @@ export const BALANCE = 'balance';
 // END_TO_END TESTS
 export const BILLING = 'billing';
 export const AUTHENTICATION = 'authentication';
+
+// DAYS
+export const DAYS = {
+  0: 'Lundi',
+  1: 'Mardi',
+  2: 'Mercredi',
+  3: 'Jeudi',
+  4: 'Vendredi',
+  5: 'Samedi',
+  6: 'Dimanche',
+};
