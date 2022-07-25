@@ -133,7 +133,7 @@ export default {
         this.loading = true;
         const { identity } = this.userProfile;
 
-        const docName = formatDownloadName(`${identity.firstname} ${identity.lastname} ${formatDate(doc.date)} paie`);
+        const docName = formatDownloadName(`${formatDate(doc.date)} ${identity.firstname} ${identity.lastname} paie`);
         await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
         console.error(e);
