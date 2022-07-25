@@ -101,7 +101,7 @@ export default {
       try {
         this.loading = true;
 
-        await GoogleDrive.downloadFileById(this.getDocument(doc), formatDownloadName(`${this.docName}`));
+        await GoogleDrive.downloadFileById(this.getDocument(doc), formatDownloadName(this.docName));
       } catch (e) {
         console.error(e);
       } finally {

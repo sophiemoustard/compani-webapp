@@ -225,7 +225,7 @@ export default {
     },
     getContractDocName () {
       const { identity } = this.user;
-      const formattedName = formatDownloadName(`${identity.firstname} ${identity.lastname} contrat`);
+      const formattedName = formatDownloadName(`${identity.lastname} ${identity.firstname} contrat`);
 
       return `${formattedName}.docx`;
     },

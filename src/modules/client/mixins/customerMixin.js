@@ -67,7 +67,7 @@ export const customerMixin = {
         this.pdfLoading = true;
 
         const pdf = await Customers.getQRCode(this.customer._id);
-        const formattedName = formatDownloadName(`${identity.firstname} ${identity.lastname} qr code`);
+        const formattedName = formatDownloadName(`${identity.lastname} ${identity.firstname} qr code`);
         const pdfName = `${formattedName}.pdf`;
 
         downloadFile(pdf, pdfName, 'application/octet-stream');

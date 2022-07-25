@@ -170,7 +170,7 @@ export default {
         const { identity } = doc.auxiliary;
         this.docLoading = true;
 
-        const docName = formatDownloadName(`${identity.firstname} ${identity.lastname} absence`);
+        const docName = formatDownloadName(`${identity.lastname} ${identity.firstname} absence`);
         await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
         console.error(e);

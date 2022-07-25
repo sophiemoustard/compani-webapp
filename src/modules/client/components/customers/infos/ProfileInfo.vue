@@ -931,7 +931,7 @@ export default {
     },
     getDocName (type) {
       const { identity } = this.customer;
-      const formattedName = formatDownloadName(`${identity.firstname} ${identity.lastname} ${type}`);
+      const formattedName = formatDownloadName(`${identity.lastname} ${identity.firstname} ${type}`);
 
       return `${formattedName}.docx`;
     },
