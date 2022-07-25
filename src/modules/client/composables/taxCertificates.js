@@ -97,7 +97,7 @@ export const useTaxCertificates = (customer) => {
     }
   };
 
-  const taxCertificateDocName = (tc, customerIdentity) => {
+  const getTaxCertificateDocName = (tc, customerIdentity) => {
     const fileName = `${tc.year} ${customerIdentity.lastname} ${customerIdentity.firstname} attestation_fiscale`;
     return formatDownloadName(fileName);
   };
@@ -108,7 +108,7 @@ export const useTaxCertificates = (customer) => {
 
       await GoogleDrive.downloadFileById(
         get(tc, 'driveFile.driveId'),
-        taxCertificateDocName(tc, customer.value.identity)
+        getTaxCertificateDocName(tc, customer.value.identity)
       );
     } catch (e) {
       console.error(e);
@@ -125,7 +125,7 @@ export const useTaxCertificates = (customer) => {
 
       const pdf = await TaxCertificates.getPdf(tc._id);
 
-      downloadFile(pdf, `${taxCertificateDocName(tc, customer.value.identity)}.pdf`, 'application/octet-stream');
+      downloadFile(pdf, `${getTaxCertificateDocName(tc, customer.value.identity)}.pdf`, 'application/octet-stream');
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors du téléchargement de l\'attestation fiscale');
