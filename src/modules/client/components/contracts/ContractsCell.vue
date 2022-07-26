@@ -85,7 +85,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatDate, descendingSortArray } from '@helpers/date';
-import { formatDownloadName } from '@helpers/utils';
+import { formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { getContractTags } from 'src/modules/client/helpers/tags';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -223,11 +223,11 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
-    getContractDocName () {
+    getContractDocName (isDriveDoc) {
       const { identity } = this.user;
-      const formattedName = formatDownloadName(`${identity.lastname} ${identity.firstname} contrat`);
+      const docName = formatIdentityAndDocType(identity, 'contrat');
 
-      return `${formattedName}.docx`;
+      return isDriveDoc ? formatDownloadName(docName) : `${formatDownloadName(docName)}.docx`;
     },
     async dlTemplate (version, contract, contractIndex) {
       try {
@@ -244,7 +244,7 @@ export default {
             ? company.rhConfig.templates.contract.driveId
             : company.rhConfig.templates.contractVersion.driveId,
         };
-        const docName = this.getContractDocName();
+        const docName = this.getContractDocName(false);
 
         await downloadDriveDocx(params, data, docName);
       } catch (e) {
@@ -290,7 +290,7 @@ export default {
       try {
         this.docLoading = true;
 
-        const docName = this.getContractDocName();
+        const docName = this.getContractDocName(true);
         await GoogleDrive.downloadFileById(this.getContractDriveId(doc), docName);
       } catch (e) {
         console.error(e);

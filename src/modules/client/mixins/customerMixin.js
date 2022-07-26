@@ -2,7 +2,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Customers from '@api/Customers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { formatIdentity, formatPhoneForPayload, formatDownloadName } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload, formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import { ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 
@@ -67,8 +67,8 @@ export const customerMixin = {
         this.pdfLoading = true;
 
         const pdf = await Customers.getQRCode(this.customer._id);
-        const formattedName = formatDownloadName(`${identity.lastname} ${identity.firstname} qr code`);
-        const pdfName = `${formattedName}.pdf`;
+        const docName = formatIdentityAndDocType(identity, 'qr code');
+        const pdfName = `${formatDownloadName(docName)}.pdf`;
 
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {

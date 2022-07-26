@@ -314,7 +314,7 @@ import {
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate, isSameOrBefore } from '@helpers/date';
-import { getLastVersion, formatPrice, formatDownloadName } from '@helpers/utils';
+import { getLastVersion, formatPrice, formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import { frPhoneNumber, iban, bic, frAddress, minDate, integerNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getTagsToGenerateQuote, getTagsToDownloadQuote, getMandateTags } from 'src/modules/client/helpers/tags';
@@ -929,11 +929,11 @@ export default {
         NotifyNegative('Erreur lors de la modification.');
       }
     },
-    getDocName (type) {
+    getDocName (type, isDriveDoc) {
       const { identity } = this.customer;
-      const formattedName = formatDownloadName(`${identity.lastname} ${identity.firstname} ${type}`);
+      const docName = formatIdentityAndDocType(identity, type);
 
-      return `${formattedName}.docx`;
+      return isDriveDoc ? `${formatDownloadName(docName)}` : `${formatDownloadName(docName)}.docx`;
     },
     async downloadMandate (mandate) {
       try {
@@ -944,7 +944,7 @@ export default {
 
         const data = getMandateTags(this.customer, this.company, mandate);
         const params = { driveId: mandateDriveId };
-        const docName = this.getDocName('mandat');
+        const docName = this.getDocName('mandat', false);
 
         await downloadDriveDocx(params, data, docName);
         NotifyPositive('Mandat téléchargé.');
@@ -964,7 +964,7 @@ export default {
       if (this.docLoading) return;
       try {
         this.docLoading = true;
-        const docName = this.getDocName(type);
+        const docName = this.getDocName(type, true);
 
         await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
@@ -986,7 +986,7 @@ export default {
 
         const data = getTagsToDownloadQuote(this.customer, this.company, { ...quote, subscriptions });
         const params = { driveId: quoteDriveId };
-        const docName = this.getDocName('devis');
+        const docName = this.getDocName('devis', false);
 
         await downloadDriveDocx(params, data, docName);
         NotifyPositive('Devis téléchargé.');

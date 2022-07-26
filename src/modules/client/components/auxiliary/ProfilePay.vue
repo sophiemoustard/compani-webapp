@@ -50,7 +50,7 @@ import Button from '@components/Button';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
 import { formatDate } from '@helpers/date';
-import { formatDownloadName } from '@helpers/utils';
+import { formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import { validationMixin } from '@mixins/validationMixin';
 import PayDocumentCreationModal from 'src/modules/client/components/pay/PayDocumentCreationModal';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -133,7 +133,7 @@ export default {
         this.loading = true;
         const { identity } = this.userProfile;
 
-        const docName = formatDownloadName(`${formatDate(doc.date)} ${identity.lastname} ${identity.firstname} paie`);
+        const docName = formatDownloadName(`${formatDate(doc.date)} ${formatIdentityAndDocType(identity, 'paie')}`);
         await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
         console.error(e);

@@ -78,7 +78,7 @@
             @uploaded="documentUploaded" :additional-value="additionalValue" :error="validations.attachment.$error"
             :disable="!selectedAuxiliary._id || historiesLoading" in-modal :extensions="extensions" drive-storage
             @delete="deleteDocument(editedEvent.attachment.driveId)"
-            :doc-name="`${selectedAuxiliary.identity.firstname} ${selectedAuxiliary.identity.lastname} absence`"
+            :doc-name="formatIdentityAndDocType(selectedAuxiliary.identity, 'absence')"
             />
         </template>
         <ni-input in-modal type="textarea" :model-value="editedEvent.misc" v-if="!editedEvent.shouldUpdateRepetition"
@@ -171,7 +171,7 @@ import {
   RESTORE_EVENT,
   CANCEL_EVENT,
 } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatIdentityAndDocType } from '@helpers/utils';
 import { formatDateAndHours } from '@helpers/date';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
@@ -332,6 +332,7 @@ export default {
     },
   },
   methods: {
+    formatIdentityAndDocType,
     toggleHistory () {
       this.displayHistory = !this.displayHistory;
     },
