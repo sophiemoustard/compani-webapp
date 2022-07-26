@@ -213,9 +213,9 @@ export default {
     async exportDpae (contractId, user) {
       try {
         const txt = await Contracts.exportDpae(contractId);
-        const name = formatDownloadName(`${user.identity.firstname} ${user.identity.lastname} dpae`);
+        const docName = formatIdentityAndDocType(user.identity, 'dpae');
 
-        await downloadFile(txt, `${name}.txt`);
+        await downloadFile(txt, `${formatDownloadName(docName)}.txt`);
 
         NotifyPositive('Document téléchargé.');
       } catch (e) {
