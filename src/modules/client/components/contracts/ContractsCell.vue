@@ -4,7 +4,7 @@
       <q-card-section :class="`cell-title text-${cellTitle(contract.endDate).color}`">
         <div>{{ cellTitle(contract.endDate).msg }}</div>
         <ni-button v-if="displayActions" label="DPAE" icon="file_download" color="primary"
-          @click="exportDpae(contract._id)" />
+          @click="exportDpae(contract._id, user)" />
       </q-card-section>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name"
         :loading="contractsLoading" v-model:pagination="pagination" :visible-columns="visibleColumns(contract)">
@@ -85,6 +85,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatDate, descendingSortArray } from '@helpers/date';
+import { formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { getContractTags } from 'src/modules/client/helpers/tags';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -209,10 +210,12 @@ export default {
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;
     },
-    async exportDpae (contractId) {
+    async exportDpae (contractId, user) {
       try {
         const txt = await Contracts.exportDpae(contractId);
-        await downloadFile(txt, 'dpae.txt');
+        const docName = formatIdentityAndDocType(user.identity, 'dpae');
+
+        await downloadFile(txt, `${formatDownloadName(docName)}.txt`);
 
         NotifyPositive('Document téléchargé.');
       } catch (e) {
@@ -220,9 +223,17 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
+    getContractDocName (isDriveDoc) {
+      const { identity } = this.user;
+      const docName = formatIdentityAndDocType(identity, 'contrat');
+
+      return isDriveDoc ? formatDownloadName(docName) : `${formatDownloadName(docName)}.docx`;
+    },
     async dlTemplate (version, contract, contractIndex) {
       try {
+        const { company } = this.user;
         const data = getContractTags({ user: this.user, version, contract });
+
         if (!this.canDownload(version, contractIndex)) {
           return NotifyNegative('Impossible de télécharger le contrat.');
         }
@@ -230,11 +241,12 @@ export default {
         const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, version);
         const params = {
           driveId: versionIndex === 0
-            ? this.user.company.rhConfig.templates.contract.driveId
-            : this.user.company.rhConfig.templates.contractVersion.driveId,
+            ? company.rhConfig.templates.contract.driveId
+            : company.rhConfig.templates.contractVersion.driveId,
         };
+        const docName = this.getContractDocName(false);
 
-        await downloadDriveDocx(params, data, 'contrat.docx');
+        await downloadDriveDocx(params, data, docName);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du document.');
@@ -277,7 +289,9 @@ export default {
       if (this.docLoading) return;
       try {
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(this.getContractDriveId(doc));
+
+        const docName = this.getContractDocName(true);
+        await GoogleDrive.downloadFileById(this.getContractDriveId(doc), docName);
       } catch (e) {
         console.error(e);
       } finally {

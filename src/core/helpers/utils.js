@@ -153,3 +153,5 @@ export const getBillingItemsName = (service) => {
 };
 
 export const formatDownloadName = name => name.replaceAll(/ - | |'/g, '_');
+
+export const formatIdentityAndDocType = (identity, type) => `${identity.lastname} ${identity.firstname} ${type}`;

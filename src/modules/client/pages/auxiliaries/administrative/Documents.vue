@@ -30,6 +30,7 @@ import GoogleDrive from '@api/GoogleDrive';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 import Button from '@components/Button';
+import { formatDownloadName } from '@helpers/utils';
 
 const metaInfo = { title: 'Documents' };
 
@@ -71,7 +72,9 @@ export default {
       if (this.docLoading) return;
       try {
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+        const docName = formatDownloadName(doc.name);
+
+        await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
         console.error(e);
       } finally {

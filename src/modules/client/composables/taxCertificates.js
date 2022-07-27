@@ -10,7 +10,7 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { REQUIRED_LABEL } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { formatIdentity, formatDownloadName } from '@helpers/utils';
+import { formatIdentity, formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import { validYear } from '@helpers/vuelidateCustomVal';
 
 export const useTaxCertificates = (customer) => {
@@ -98,7 +98,7 @@ export const useTaxCertificates = (customer) => {
   };
 
   const getTaxCertificateDocName = (tc, customerIdentity) => {
-    const fileName = `${tc.year} ${customerIdentity.lastname} ${customerIdentity.firstname} attestation_fiscale`;
+    const fileName = `${tc.year} ${formatIdentityAndDocType(customerIdentity, 'attestation_fiscale')}`;
     return formatDownloadName(fileName);
   };
 
