@@ -132,8 +132,9 @@ export default {
       try {
         this.loading = true;
         const { identity } = this.userProfile;
+        const docNature = PAY_DOCUMENT_NATURES.find(nature => nature.value === doc.nature).label;
+        const docName = formatDownloadName(`${formatDate(doc.date)} ${formatIdentityAndDocType(identity, docNature)}`);
 
-        const docName = formatDownloadName(`${formatDate(doc.date)} ${formatIdentityAndDocType(identity, 'paie')}`);
         await GoogleDrive.downloadFileById(this.getDriveId(doc), docName);
       } catch (e) {
         console.error(e);
