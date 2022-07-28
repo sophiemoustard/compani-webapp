@@ -62,7 +62,7 @@ export const configMixin = {
       if (get(val, 'required.$response') === false) return REQUIRED_LABEL;
       if (get(val, 'positiveNumber.$response') === false || get(val, 'numeric.$response') === false ||
         get(val, 'maxValue.$response') === false) return 'Nombre non valide';
-      if (get(val, 'twoFractionDigits.$response') === false) return 'Décimales non valides';
+      if (get(val, 'fractionDigits.$response') === false) return 'Décimales non valides';
 
       return '';
     },

@@ -46,7 +46,8 @@
           <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
             :entity="newEvent" name="file" :url="docsUploadUrl" @uploaded="documentUploaded" :extensions="extensions"
             :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id" drive-storage
-            :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)" />
+            :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)"
+            :doc-name="formatIdentityAndDocType(selectedAuxiliary.identity, 'absence')" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" :model-value="newEvent.internalHour"
@@ -106,6 +107,7 @@ import {
   ABSENCE_TYPES,
 } from '@data/constants';
 import moment from '@helpers/moment';
+import { formatIdentityAndDocType } from '@helpers/utils';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
 export default {
@@ -207,6 +209,7 @@ export default {
     },
   },
   methods: {
+    formatIdentityAndDocType,
     updateEvent (path, value) {
       this.$emit('update-event', { path, value });
     },

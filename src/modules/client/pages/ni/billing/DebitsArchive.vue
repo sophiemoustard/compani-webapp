@@ -8,7 +8,8 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'download'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="file_download" @click="downloadDriveDoc(col.value)" :disable="docLoading" />
+                  <ni-button icon="file_download" @click="downloadDriveDoc(col.value, props.row.name)"
+                    :disable="docLoading" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -29,6 +30,7 @@ import { NotifyNegative } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
 import Button from '@components/Button';
 import { formatDate } from '@helpers/date';
+import { formatDownloadName } from '@helpers/utils';
 
 const metaInfo = { title: 'Archive prélèvements' };
 
@@ -67,10 +69,12 @@ export default {
     goToUrl (url) {
       openURL(url);
     },
-    async downloadDriveDoc (docId) {
+    async downloadDriveDoc (docId, name) {
       try {
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(docId);
+        const docName = formatDownloadName(name);
+
+        await GoogleDrive.downloadFileById(docId, docName);
       } catch (e) {
         console.error(e);
       } finally {

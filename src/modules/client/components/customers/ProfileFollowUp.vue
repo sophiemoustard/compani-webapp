@@ -18,7 +18,8 @@
           @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" />
         <div class="flex-column col-xs-12 col-md-6">
           <p class="input-caption">Horodatage</p>
-          <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
+          <ni-bi-color-button icon="file_download" label="QR Code" size="16px"
+            @click="downloadQRCode(customer.identity)" />
         </div>
       </div>
     </div>

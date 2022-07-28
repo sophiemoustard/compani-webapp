@@ -9,7 +9,7 @@
             :style="col.style" class="text-capitalize">
             <template v-if="col.name === 'document'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" @click="downloadBillSlip(col.value)" icon="file_download" />
+                <q-btn flat round small color="primary" @click="downloadBillSlip(props.row)" icon="file_download" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -27,7 +27,7 @@ import BillSlip from '@api/BillSlips';
 import SimpleTable from '@components/table/SimpleTable';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { formatPrice } from '@helpers/utils';
+import { formatStringToPrice, formatDownloadName } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadDocx } from '@helpers/file';
 
@@ -65,7 +65,7 @@ export default {
           label: 'Montant TTC',
           align: 'left',
           field: 'netInclTaxes',
-          format: value => formatPrice(value),
+          format: value => formatStringToPrice(value),
         },
         { name: 'document', label: '', align: 'left', field: '_id' },
       ],
@@ -102,10 +102,13 @@ export default {
         this.loading = false;
       }
     },
-    async downloadBillSlip (id) {
+    async downloadBillSlip (billSlip) {
       try {
-        const docx = await BillSlip.getDocx(id);
-        downloadDocx(docx, 'bordereau.docx');
+        const { _id, month, thirdPartyPayer, number } = billSlip;
+
+        const docx = await BillSlip.getDocx(_id);
+
+        downloadDocx(docx, formatDownloadName(`${month} ${thirdPartyPayer.name} ${number}.docx`));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des bordereaux.');

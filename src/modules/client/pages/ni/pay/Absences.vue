@@ -48,7 +48,7 @@ import Button from '@components/Button';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { formatDate, formatHours, formatHoursWithMinutes } from '@helpers/date';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '@data/constants';
@@ -167,8 +167,11 @@ export default {
     async downloadDriveDoc (doc) {
       if (this.docLoading) return;
       try {
+        const { identity } = doc.auxiliary;
         this.docLoading = true;
-        await GoogleDrive.downloadFileById(this.getDriveId(doc));
+
+        const docName = formatIdentityAndDocType(identity, 'absence');
+        await GoogleDrive.downloadFileById(this.getDriveId(doc), formatDownloadName(docName));
       } catch (e) {
         console.error(e);
       } finally {

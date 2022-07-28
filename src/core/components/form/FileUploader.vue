@@ -30,7 +30,7 @@ import GoogleDrive from '@api/GoogleDrive';
 import Button from '@components/Button';
 import CustomImg from '@components/form/CustomImg';
 import { NotifyNegative } from '@components/popup/notify';
-import { removeDiacritics } from '@helpers/utils';
+import { removeDiacritics, formatDownloadName } from '@helpers/utils';
 
 export default {
   props: {
@@ -52,6 +52,7 @@ export default {
     label: { type: String, default: 'Pas de document' },
     driveStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
+    docName: { type: String, default: 'download' },
   },
   components: {
     'ni-button': Button,
@@ -99,7 +100,8 @@ export default {
 
       try {
         this.loading = true;
-        await GoogleDrive.downloadFileById(this.getDocument(doc));
+
+        await GoogleDrive.downloadFileById(this.getDocument(doc), formatDownloadName(this.docName));
       } catch (e) {
         console.error(e);
       } finally {

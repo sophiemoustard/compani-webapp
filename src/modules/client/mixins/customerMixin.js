@@ -2,7 +2,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Customers from '@api/Customers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload, formatDownloadName, formatIdentityAndDocType } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import { ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 
@@ -60,13 +60,17 @@ export const customerMixin = {
 
       return ACTIVATED;
     },
-    async downloadQRCode () {
+    async downloadQRCode (identity) {
       if (this.pdfLoading) return;
 
       try {
         this.pdfLoading = true;
+
         const pdf = await Customers.getQRCode(this.customer._id);
-        downloadFile(pdf, 'qr_code.pdf', 'application/octet-stream');
+        const docName = formatIdentityAndDocType(identity, 'qr code');
+        const pdfName = `${formatDownloadName(docName)}.pdf`;
+
+        downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du QR code.');
