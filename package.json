@@ -30,7 +30,7 @@
     "heroku-ssl-redirect": "^0.1.1",
     "ibantools": "^4.1.5",
     "joi": "^17.6.0",
-    "moment": "^2.29.3",
+    "moment": "^2.29.4",
     "moment-business-days": "^1.2.0",
     "moment-range": "^4.0.1",
     "node-polyfill-webpack-plugin": "^1.1.4",
