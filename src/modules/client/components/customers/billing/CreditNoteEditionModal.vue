@@ -32,11 +32,11 @@
         </div>
         <div class="row justify-between items-baseline">
           <div class="col-6 light">
-            <p v-if="editedCreditNote.exclTaxesCustomer">
-              Montant HT bénéficiaire : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}
+            <p v-if="editedCreditNote.exclTaxesCustomer && !isEqualTo(editedCreditNote.exclTaxesCustomer, 0)">
+              Montant HT bénéficiaire : {{ formatStringToPrice(editedCreditNote.exclTaxesCustomer) }}
             </p>
-            <p v-if="editedCreditNote.exclTaxesTpp">
-              Montant HT tiers-payeur : {{ formatPrice(editedCreditNote.exclTaxesTpp) }}
+            <p v-if="editedCreditNote.exclTaxesTpp && !isEqualTo(editedCreditNote.exclTaxesTpp, 0)">
+              Montant HT tiers-payeur : {{ formatStringToPrice(editedCreditNote.exclTaxesTpp) }}
             </p>
           </div>
           <div class="col-6 light">
@@ -57,12 +57,12 @@
           @update:model-value="update($event, 'subscription')" />
         <ni-input in-modal v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
           :model-value="editedCreditNote.inclTaxesCustomer" :error="validations.inclTaxesCustomer.$error"
-          @blur="validations.inclTaxesCustomer.$touch" error-message="Montant TTC non valide" required-field
-          @update:model-value="update($event, 'inclTaxesCustomer')" />
+          @blur="validations.inclTaxesCustomer.$touch" :error-message="getSubscriptionErrorMessage('inclTaxesCustomer')"
+          @update:model-value="update($event, 'inclTaxesCustomer')" required-field />
         <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€"
           :model-value="editedCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
-          @blur="validations.inclTaxesTpp.$touch" error-message="Montant TTC non valide" type="number"
-          @update:model-value="update($event, 'inclTaxesTpp')" />
+          @blur="validations.inclTaxesTpp.$touch" :error-message="getSubscriptionErrorMessage('inclTaxesTpp')"
+          type="number" @update:model-value="update($event, 'inclTaxesTpp')" />
       </template>
       <!-- Billing items -->
       <template v-else>
@@ -87,7 +87,7 @@
         <ni-bi-color-button label="Ajouter un article" icon="add" class="q-mb-md" @click="addBillingItem"
           label-color="primary" />
         <div class="row q-mb-md">
-          <div class="col-6 total-text">Total HT : {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}</div>
+          <div class="col-6 total-text">Total HT : {{ formatStringToPrice(editedCreditNote.exclTaxesCustomer) }}</div>
           <div class="col-6 total-text">Total TTC : {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}</div>
         </div>
       </template>
@@ -107,7 +107,8 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
-import { formatPrice, formatIdentity } from '@helpers/utils';
+import { formatPrice, formatStringToPrice, formatIdentity } from '@helpers/utils';
+import { isEqualTo } from '@helpers/numbers';
 import { REQUIRED_LABEL, EVENTS, SUBSCRIPTION } from '@data/constants';
 
 export default {
@@ -159,7 +160,9 @@ export default {
   },
   methods: {
     formatPrice,
+    formatStringToPrice,
     formatIdentity,
+    isEqualTo,
     hide () {
       this.$emit('hide');
     },
@@ -193,8 +196,20 @@ export default {
     getBillingItemErrorMessage (path, index) {
       const validation = this.validations.billingItemList.$each.$response.$errors[index];
       if (get(validation, `${path}.0.$validator`) === 'required') return REQUIRED_LABEL;
-      if (get(validation, `${path}.0.$validator`) === 'positiveNumber' ||
-        get(validation, `${path}.0.$validator`) === 'strictPositiveNumber') return 'Nombre non valide';
+
+      const validationErrorResponse = ['positiveNumber', 'strictPositiveNumber'];
+      if (validationErrorResponse.includes(get(validation, `${path}.0.$validator`))) return 'Nombre non valide';
+
+      if (get(validation, `${path}.0.$validator`) === 'fractionDigits') return 'Décimales non valides';
+
+      return '';
+    },
+    getSubscriptionErrorMessage (path) {
+      const validationError = get(this.validations, `${path}.$errors.0.$validator`);
+
+      if (validationError === 'strictPositiveNumber') return 'Nombre non valide';
+
+      if (validationError === 'fractionDigits') return 'Décimales non valides';
 
       return '';
     },

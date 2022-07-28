@@ -78,7 +78,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { MONTH } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { formatPrice, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { formatPrice, formatIdentity, formatAndSortOptions, toEuros, toCents } from '@helpers/utils';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
@@ -163,16 +163,16 @@ export default {
     },
     totalToBillLabel () {
       if (this.hasSelectedRows) {
-        let total = 0;
+        let totalCents = 0;
         for (const row of this.selected) {
-          if (row.customerBills) total += row.customerBills.total;
+          if (row.customerBills) totalCents += toCents(row.customerBills.total);
           if (row.thirdPartyPayerBills) {
             for (const bill of row.thirdPartyPayerBills) {
-              total += bill.total;
+              totalCents += toCents(bill.total);
             }
           }
         }
-        return `Facturer ${formatPrice(total)}`;
+        return `Facturer ${formatPrice(toEuros(totalCents))}`;
       }
       return 'Facturer';
     },
@@ -203,6 +203,7 @@ export default {
     await Promise.all([this.getDraftBills(), this.getThirdPartyPayers()]);
   },
   methods: {
+    formatPrice,
     openDeliveryDownloadModal () {
       this.deliveryDownloadModal = true;
     },
@@ -235,13 +236,11 @@ export default {
         this.modalLoading = false;
       }
     },
-    formatPrice (value) {
-      return formatPrice(value);
-    },
     computeTotalAmount (data) {
-      const total = data.bills.reduce((prev, next) => prev + (next.inclTaxes - next.discount), 0);
-      data.total = total;
-      return total;
+      const totalCents = data.bills.reduce((acc, bill) => acc + (toCents(bill.inclTaxes) - toCents(bill.discount)), 0);
+      data.total = toEuros(totalCents);
+
+      return toEuros(totalCents);
     },
     discountEdit ({ ref }, bill) {
       bill.discountEdition = true;

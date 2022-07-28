@@ -27,7 +27,7 @@ import BillSlip from '@api/BillSlips';
 import SimpleTable from '@components/table/SimpleTable';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { formatPrice, formatDownloadName } from '@helpers/utils';
+import { formatStringToPrice, formatDownloadName } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadDocx } from '@helpers/file';
 
@@ -65,7 +65,7 @@ export default {
           label: 'Montant TTC',
           align: 'left',
           field: 'netInclTaxes',
-          format: value => formatPrice(value),
+          format: value => formatStringToPrice(value),
         },
         { name: 'document', label: '', align: 'left', field: '_id' },
       ],

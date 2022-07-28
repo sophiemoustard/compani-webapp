@@ -3,6 +3,7 @@ import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
 import { descendingSort } from '@helpers/date';
+import { toFixedToFloat } from '@helpers/numbers';
 
 export const extend = (...sources) => {
   const extended = {};
@@ -75,6 +76,8 @@ export const roundFrenchPercentage = (number, digits = 2) => (number
 );
 
 export const formatPrice = val => (val ? roundFrenchPrice(val) : roundFrenchPrice(0));
+
+export const formatStringToPrice = str => formatPrice(toFixedToFloat(str));
 
 export const formatPriceWithSign = value => (value >= 0 ? `+${formatPrice(value)}` : formatPrice(value));
 
@@ -155,3 +158,7 @@ export const getBillingItemsName = (service) => {
 export const formatDownloadName = name => name.replaceAll(/ - | |'/g, '_');
 
 export const formatIdentityAndDocType = (identity, type) => `${identity.lastname} ${identity.firstname} ${type}`;
+
+export const toCents = value => parseFloat(value).toFixed(2) * 100;
+
+export const toEuros = value => value / 100;

@@ -68,10 +68,11 @@ import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANI, REQUIRED_LABEL, SUBSCRIPTION, EVENTS, MANUAL, BILLING_ITEMS } from '@data/constants';
-import { formatPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { strictPositiveNumber, minDate, maxDate, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { formatPrice, formatStringToPrice, getLastVersion, formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { strictPositiveNumber, minDate, maxDate, positiveNumber, fractionDigits } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
+import { divide, add, multiply, isEqualTo, toString, toFixedToFloat } from '@helpers/numbers';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
 
@@ -108,9 +109,9 @@ export default {
         events: [],
         startDate: '',
         endDate: '',
-        exclTaxesCustomer: 0,
+        exclTaxesCustomer: toString(0),
         inclTaxesCustomer: 0,
-        exclTaxesTpp: 0,
+        exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
         subscription: '',
         misc: '',
@@ -147,7 +148,7 @@ export default {
           label: 'HT',
           align: 'left',
           field: row => (row.thirdPartyPayer ? row.exclTaxesTpp : row.exclTaxesCustomer),
-          format: formatPrice,
+          format: formatStringToPrice,
         },
         {
           name: 'inclTaxes',
@@ -174,7 +175,7 @@ export default {
     'newCreditNote.events': function (previousValue, currentValue) {
       if (isEqual(previousValue, currentValue)) return;
 
-      const prices = this.computePrices(this.newCreditNote.events);
+      const prices = this.computePrices(this.newCreditNote.events, this.newCreditNote.customer);
       this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
       this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
       this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
@@ -185,19 +186,28 @@ export default {
       handler () {
         if (get(this.newCreditNote, 'billingItemList[0].billingItem')) {
           this.newCreditNote.exclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-            0
+            (acc, bi) => {
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
+              const biExclTaxes = this.getExclTaxes(biInclTaxes, bi.vat);
+              return bi.billingItem ? add(acc, biExclTaxes) : acc;
+            },
+            toString(0)
           );
-          this.newCreditNote.inclTaxesCustomer = this.newCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
-            0
+
+          const inclTaxesCustomerString = this.newCreditNote.billingItemList.reduce(
+            (acc, bi) => {
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
+              return bi.billingItem ? add(acc, biInclTaxes) : acc;
+            },
+            toString(0)
           );
+          this.newCreditNote.inclTaxesCustomer = toFixedToFloat(inclTaxesCustomerString);
         }
       },
     },
     'editedCreditNote.events': function (previousValue, currentValue) {
       if (!isEqual(previousValue, currentValue) && this.creditNoteType === EVENTS) {
-        const prices = this.computePrices(this.editedCreditNote.events);
+        const prices = this.computePrices(this.editedCreditNote.events, this.editedCreditNote.customer._id);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
         this.editedCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
@@ -209,13 +219,22 @@ export default {
       handler () {
         if (get(this.editedCreditNote, 'billingItemList[0].billingItem')) {
           this.editedCreditNote.exclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + this.getExclTaxes(bi.unitInclTaxes, bi.vat) * bi.count : acc),
-            0
+            (acc, bi) => {
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
+              const biExclTaxes = this.getExclTaxes(biInclTaxes, bi.vat);
+              return bi.billingItem ? add(acc, biExclTaxes) : acc;
+            },
+            toString(0)
           );
-          this.editedCreditNote.inclTaxesCustomer = this.editedCreditNote.billingItemList.reduce(
-            (acc, bi) => (bi.billingItem ? acc + bi.unitInclTaxes * bi.count : acc),
-            0
+
+          const inclTaxesCustomerString = this.editedCreditNote.billingItemList.reduce(
+            (acc, bi) => {
+              const biInclTaxes = toFixedToFloat(multiply(bi.unitInclTaxes, bi.count));
+              return bi.billingItem ? add(acc, biInclTaxes) : acc;
+            },
+            toString(0)
           );
+          this.editedCreditNote.inclTaxesCustomer = toFixedToFloat(inclTaxesCustomerString);
         }
       },
     },
@@ -238,15 +257,15 @@ export default {
         ...(this.creditNoteType === BILLING_ITEMS && {
           $each: helpers.forEach({
             billingItem: { required },
-            unitInclTaxes: { positiveNumber, required },
-            count: { strictPositiveNumber, required },
+            unitInclTaxes: { positiveNumber, required, fractionDigits: fractionDigits(2) },
+            count: { strictPositiveNumber, required, fractionDigits: fractionDigits(3) },
           }),
         }),
       },
     };
     const newCreditNoteDateValidation = this.datesValidations(this.creationMinAndMaxDates, this.newCreditNote);
     const editedCreditNoteDateValidation = this.datesValidations(this.editionMinAndMaxDates, this.editedCreditNote);
-    const inclTaxesValidation = { required, strictPositiveNumber };
+    const inclTaxesValidation = { required, strictPositiveNumber, fractionDigits: fractionDigits(2) };
     const newCreditNoteInclTaxesValidation = this.newCreditNote.thirdPartyPayer
       ? { inclTaxesTpp: inclTaxesValidation }
       : { inclTaxesCustomer: inclTaxesValidation };
@@ -315,9 +334,9 @@ export default {
         subscription: null,
         startDate: '',
         endDate: '',
-        exclTaxesCustomer: 0,
+        exclTaxesCustomer: toString(0),
         inclTaxesCustomer: 0,
-        exclTaxesTpp: 0,
+        exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
         billingItemList: [{ billingItem: '', unitInclTaxes: 0, count: 1 }],
       };
@@ -327,6 +346,7 @@ export default {
       this.v$.newCreditNote.subscription.$reset();
       this.v$.newCreditNote.inclTaxesCustomer.$reset();
       this.v$.newCreditNote.inclTaxesTpp.$reset();
+      this.v$.newCreditNote.billingItemList.$reset();
     },
     // Refresh data
     async refreshBillingItemsOptions () {
@@ -466,25 +486,47 @@ export default {
 
       return REQUIRED_LABEL;
     },
+    getSubscriptionVat (event, customer) {
+      const eventSubscription = event.subscription;
+      const cus = this.customersOptions.find(c => c.value === customer);
+      const customerSubscription = cus.subscriptions.find(sub => sub._id === eventSubscription);
+
+      return customerSubscription.service.vat;
+    },
     // Compute
-    computePrices (eventIds) {
-      let exclTaxesCustomer = 0; let inclTaxesCustomer = 0;
-      let exclTaxesTpp = 0; let inclTaxesTpp = 0;
+    computePrices (eventIds, customer) {
+      let exclTaxesCustomer = toString(0);
+      let inclTaxesCustomerString = toString(0);
+      let inclTaxesCustomer = 0;
+      let exclTaxesTpp = toString(0);
+      let inclTaxesTppString = toString(0);
+      let inclTaxesTpp = 0;
       if (this.creditNoteEvents) {
         const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
         for (let i = 0, l = selectedEvents.length; i < l; i++) {
-          if (selectedEvents[i].bills.exclTaxesCustomer) {
-            exclTaxesCustomer += selectedEvents[i].bills.exclTaxesCustomer;
-            inclTaxesCustomer += selectedEvents[i].bills.inclTaxesCustomer;
+          if (selectedEvents[i].bills.exclTaxesCustomer && !isEqualTo(selectedEvents[i].bills.exclTaxesCustomer, 0)) {
+            inclTaxesCustomerString = add(inclTaxesCustomerString, selectedEvents[i].bills.inclTaxesCustomer);
           }
-          if (selectedEvents[i].bills.exclTaxesTpp) {
-            exclTaxesTpp += selectedEvents[i].bills.exclTaxesTpp;
-            inclTaxesTpp += selectedEvents[i].bills.inclTaxesTpp;
+          if (selectedEvents[i].bills.exclTaxesTpp && !isEqualTo(selectedEvents[i].bills.exclTaxesTpp, 0)) {
+            inclTaxesTppString = add(inclTaxesTppString, selectedEvents[i].bills.inclTaxesTpp);
           }
+        }
+
+        inclTaxesCustomer = toFixedToFloat(inclTaxesCustomerString);
+        inclTaxesTpp = toFixedToFloat(inclTaxesTppString);
+        if (selectedEvents.length) {
+          const subscriptionVat = this.getSubscriptionVat(this.creditNoteEvents[0], customer);
+          exclTaxesCustomer = this.getExclTaxes(inclTaxesCustomer, subscriptionVat);
+          exclTaxesTpp = this.getExclTaxes(inclTaxesTpp, subscriptionVat);
         }
       }
 
-      return { exclTaxesCustomer, inclTaxesCustomer, exclTaxesTpp, inclTaxesTpp };
+      return {
+        exclTaxesCustomer,
+        inclTaxesCustomer,
+        exclTaxesTpp,
+        inclTaxesTpp,
+      };
     },
     // Creation
     resetCreationCreditNoteData () {
@@ -494,9 +536,9 @@ export default {
         events: [],
         startDate: '',
         endDate: '',
-        exclTaxesCustomer: 0,
+        exclTaxesCustomer: toString(0),
         inclTaxesCustomer: 0,
-        exclTaxesTpp: 0,
+        exclTaxesTpp: toString(0),
         inclTaxesTpp: 0,
         subscription: '',
         thirdPartyPayer: '',
@@ -515,26 +557,24 @@ export default {
         : this.customersOptions.find(cus => cus.value === customer);
       const subscription = selectedCustomer.subscriptions.find(sub => sub._id === creditNote.subscription);
       const { vat } = subscription.service;
+      const percentVat = divide(vat, 100);
 
       if (creditNote.inclTaxesCustomer) {
         payload.inclTaxesCustomer = creditNote.inclTaxesCustomer;
-        payload.exclTaxesCustomer = Number.parseFloat((creditNote.inclTaxesCustomer / (1 + (vat / 100))).toFixed(2));
+        payload.exclTaxesCustomer = divide(creditNote.inclTaxesCustomer, add(1, percentVat));
       } else {
         payload.inclTaxesTpp = creditNote.inclTaxesTpp;
-        payload.exclTaxesTpp = Number.parseFloat((creditNote.inclTaxesTpp / (1 + (vat / 100))).toFixed(2));
+        payload.exclTaxesTpp = divide(creditNote.inclTaxesTpp, add(1, percentVat));
         payload.thirdPartyPayer = creditNote.thirdPartyPayer;
       }
 
+      const { _id: subId, service, versions } = subscription;
       payload.subscription = {
-        _id: subscription._id,
-        service: {
-          serviceId: subscription.service._id,
-          nature: subscription.service.nature,
-          name: subscription.service.name,
-        },
+        _id: subId,
+        service: { serviceId: service._id, nature: service.nature, name: service.name },
         vat,
-        unitInclTaxes: subscription.versions && subscription.versions.length > 0
-          ? getLastVersion(subscription.versions, 'createdAt').unitTTCRate
+        unitInclTaxes: versions && versions.length > 0
+          ? getLastVersion(versions, 'createdAt').unitTTCRate
           : 0,
       };
 
@@ -548,6 +588,7 @@ export default {
           ...pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'serviceName']),
           bills: {
             ...omit(cnEvent.bills, '_id'),
+            ...(cnEvent.bills.careHours && { careHours: cnEvent.bills.careHours.toString() }),
             ...(cnEvent.bills.surcharges && { surcharges: cnEvent.bills.surcharges.map(sur => omit(sur, '_id')) }),
           },
         };
@@ -650,7 +691,9 @@ export default {
       else if (this.creditNoteEditionModal) set(this.editedCreditNote.billingItemList, billingItemList);
     },
     getExclTaxes (inclTaxes, vat) {
-      return inclTaxes / (1 + vat / 100);
+      const percentVat = divide(vat, 100);
+
+      return divide(inclTaxes, add(1, percentVat));
     },
     // Edition
     async openCreditNoteEditionModal (creditNote) {
