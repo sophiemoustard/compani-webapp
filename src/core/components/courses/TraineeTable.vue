@@ -141,13 +141,13 @@ export default {
 
     const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
 
-    const tableTitle = computed(() => (canEdit || isTrainer.value
+    const tableTitle = computed(() => (canEdit.value || isTrainer.value
       ? `Stagiaires (${traineesNumber.value})`
       : `Stagiaires de votre structure (${traineesNumber.value})`));
 
     const traineesVisibleColumns = computed(() => {
       const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
-      if (canEdit) visibleColumns.push('actions');
+      if (canEdit.value) visibleColumns.push('actions');
 
       return isIntraCourse.value ? visibleColumns : ['company', ...visibleColumns];
     });

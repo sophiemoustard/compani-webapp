@@ -1,6 +1,6 @@
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
-
+import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Courses from '@api/Courses';
@@ -11,15 +11,14 @@ import {
   readAPIResponseWithTypeArrayBuffer,
   formatPhoneForPayload,
 } from '@helpers/utils';
-import { useRouter } from 'vue-router';
 import { downloadFile } from '@helpers/file';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
 
 export const useCourses = (refreshCourse, course, tmpInput, v$) => {
   const $router = useRouter();
-  const pdfLoading = false;
-  const isVendorInterface = /\/ad\//.test($router.path);
+  const pdfLoading = ref(false);
+  const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
   const $store = useStore();
 
   const clientRole = computed(() => $store.getters['main/getVendorRole']);
@@ -133,6 +132,7 @@ export const useCourses = (refreshCourse, course, tmpInput, v$) => {
       pdfLoading.value = false;
     }
   };
+
   return {
     // Data
     pdfLoading,
