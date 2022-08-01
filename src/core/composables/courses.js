@@ -22,32 +22,32 @@ export const useCourses = (refreshCourse, course, tmpInput, v$) => {
   const $store = useStore();
 
   const clientRole = computed(() => $store.getters['main/getVendorRole']);
-  const isIntraCourse = computed(() => (get(course, 'type') === INTRA));
+  const isIntraCourse = computed(() => (get(course.value, 'type') === INTRA));
   const courseType = computed(() => {
-    const type = COURSE_TYPES.find(t => t.value === get(course, 'type'));
+    const type = COURSE_TYPES.find(t => t.value === get(course.value, 'type'));
     return type ? type.label : '';
   });
-  const trainerName = computed(() => formatIdentity(get(course, 'trainer.identity'), 'FL'));
-  const followUpDisabled = computed(() => this.followUpMissingInfo.length > 0);
+  const trainerName = computed(() => formatIdentity(get(course.value, 'trainer.identity'), 'FL'));
+  const followUpDisabled = computed(() => followUpMissingInfo.value.length > 0);
   const followUpMissingInfo = computed(() => {
     const missingInfo = [];
-    if (!this.course.trainer._id) missingInfo.push('l\'intervenant(e)');
-    if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
-    if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
+    if (!course.value.trainer._id) missingInfo.push('l\'intervenant(e)');
+    if (!course.value.slots || !course.value.slots.length) missingInfo.push('minimum 1 créneau');
+    if (!course.value.trainees || !course.value.trainees.length) missingInfo.push('minimum 1 stagiaire');
 
-    if (!get(this.course, 'contact._id')) missingInfo.push('le contact pour la formation');
-    else if (!get(this.course, 'contact.contact.phone')) missingInfo.push('le numéro du contact pour la formation');
+    if (!get(course.value, 'contact._id')) missingInfo.push('le contact pour la formation');
+    else if (!get(course.value, 'contact.contact.phone')) missingInfo.push('le numéro du contact pour la formation');
 
     return missingInfo;
   });
   const headerInfo = computed(() => [
     { icon: 'bookmark_border', label: courseType.value },
     { icon: 'emoji_people', label: trainerName.value },
-    ...(course.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
+    ...(course.value.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
   ]);
   const disableDocDownload = computed(() => followUpDisabled.value || pdfLoading.value);
-  const isArchived = computed(() => !!course.archivedAt);
-  const isIntraOrVendor = computed(() => this.isIntraCourse || this.isVendorInterface);
+  const isArchived = computed(() => !!course.value.archivedAt);
+  const isIntraOrVendor = computed(() => isIntraCourse.value || isVendorInterface);
 
   const happened = sameDaySlots => moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
 
@@ -63,11 +63,11 @@ export const useCourses = (refreshCourse, course, tmpInput, v$) => {
   };
 
   const getValue = (path) => {
-    if (path === 'trainer') return get(course, 'trainer._id', '');
-    if (path === 'salesRepresentative') return get(course, 'salesRepresentative._id', '');
-    if (path === 'contact') return get(course, 'contact._id', '');
+    if (path === 'trainer') return get(course.value, 'trainer._id', '');
+    if (path === 'salesRepresentative') return get(course.value, 'salesRepresentative._id', '');
+    if (path === 'contact') return get(course.value, 'contact._id', '');
 
-    return get(course, path);
+    return get(course.value, path);
   };
 
   const getVAttribute = (path) => {
@@ -119,8 +119,8 @@ export const useCourses = (refreshCourse, course, tmpInput, v$) => {
 
     try {
       pdfLoading.value = true;
-      const pdf = await Courses.downloadAttendanceSheet(course._id);
-      const formattedName = formatDownloadName(`feuilles d'emargement ${composeCourseName(course, true)}`);
+      const pdf = await Courses.downloadAttendanceSheet(course.value._id);
+      const formattedName = formatDownloadName(`feuilles d'emargement ${composeCourseName(course.value, true)}`);
       const pdfName = `${formattedName}.pdf`;
       downloadFile(pdf, pdfName, 'application/octet-stream');
     } catch (e) {
