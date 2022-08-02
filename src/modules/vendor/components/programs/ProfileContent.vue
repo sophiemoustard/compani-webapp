@@ -406,7 +406,7 @@ export default {
     };
 
     const resetStepAdditionModal = () => {
-      newStep.value.name = '';
+      newStep.value = { name: '', type: E_LEARNING };
       additionType.value = CREATE_STEP;
       reusedStep.value = { _id: '', program: '' };
       v$.value.newStep.$reset();

@@ -49,7 +49,7 @@
 import get from 'lodash/get';
 import { computed, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
-import { FORTHCOMING, COMPLETED, IN_PROGRESS, INTRA } from '@data/constants';
+import { FORTHCOMING, COMPLETED, IN_PROGRESS } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { formatDuration } from '@helpers/date';
 import moment from '@helpers/moment';
@@ -142,11 +142,8 @@ export default {
 
     return {
       // Data
-      INTRA,
       FORTHCOMING,
       IN_PROGRESS,
-      COMPLETED,
-      isVendorInterface,
       // Computed
       courseName,
       traineesCount,
@@ -155,7 +152,6 @@ export default {
       formatNearestDate,
       headerInfo,
       // Methods
-      get,
       happened,
     };
   },

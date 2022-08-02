@@ -49,7 +49,6 @@ import pick from 'lodash/pick';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 import { sortStrings } from '@helpers/utils';
-import { E_LEARNING } from '@data/constants.js';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
 import ConnectedDot from './ConnectedDot';
@@ -121,16 +120,14 @@ export default {
       if (!canReadLearnerInfo.value) return;
 
       $event.stopPropagation();
-      const name = isClientInterface.value ? 'ni courses learners info' : 'ni users learners info';
+      const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
       $router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
     };
 
     return {
       // Data
-      isClientInterface,
       columns,
       pagination,
-      E_LEARNING,
       // Computed
       canReadLearnerInfo,
       visibleColumns,

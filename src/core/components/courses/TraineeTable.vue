@@ -183,7 +183,6 @@ export default {
 
     const refresh = async () => getPotentialTrainees();
     const {
-      searchStr,
       newLearner,
       newTrainee,
       traineeAdditionModal,
@@ -356,15 +355,12 @@ export default {
 
     return {
       // Data
-      searchStr,
       newLearner,
       firstStep,
-      userAlreadyHasCompany,
       tableLoading,
       learnerCreationModalLoading,
       learnerCreationModal,
       learnerAlreadyExists,
-      potentialTrainees,
       traineeAdditionModal,
       newTrainee,
       editedTrainee,
