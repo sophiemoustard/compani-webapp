@@ -29,6 +29,7 @@
 
 <script>
 import get from 'lodash/get';
+import { ref, computed, toRefs, watch } from 'vue';
 import groupBy from 'lodash/groupBy';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
@@ -42,11 +43,10 @@ import { STEP_TYPES, STEP_ATTACHEMENT_OPTIONS, CREATE_STEP, REUSE_STEP } from '@
 import Programs from '@api/Programs';
 import Steps from '@api/Steps';
 import { formatAndSortOptions } from '@helpers/utils';
-import { courseMixin } from '@mixins/courseMixin';
+import { useCourses } from '@composables/courses';
 
 export default {
   name: 'StepAdditionModal',
-  mixins: [courseMixin],
   props: {
     modelValue: { type: Boolean, default: false },
     newStep: { type: Object, default: () => ({}) },
@@ -66,46 +66,39 @@ export default {
     'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-step', 'update:reused-step', 'update:addition-type'],
-  data () {
-    return {
-      STEP_TYPES,
-      STEP_ATTACHEMENT_OPTIONS,
-      CREATE_STEP,
-      REUSE_STEP,
-      stepOptions: [],
-      programOptions: [],
-      stepGroups: [],
-    };
-  },
-  computed: {
-    submitLabel () {
-      return this.additionType === CREATE_STEP ? 'Créer l\'étape' : 'Réutiliser l\'étape';
-    },
-  },
-  watch: {
-    additionType () {
-      if (this.additionType === REUSE_STEP) {
-        if (!this.reusedStep.program) this.updateProgram(this.program._id);
-        if (!this.programOptions.length) this.refreshPrograms();
-        if (!this.stepOptions.length) this.refreshSteps();
+  setup (props, { emit }) {
+    const stepOptions = ref([]);
+    const programOptions = ref([]);
+    const stepGroups = ref([]);
+    const { additionType, reusedStep, program, subProgramId, newStep } = toRefs(props);
+
+    const { getStepTypeLabel, getStepTypeIcon } = useCourses(null, null, null, null);
+
+    const submitLabel = computed(() => (additionType.value === CREATE_STEP ? 'Créer l\'étape' : 'Réutiliser l\'étape'));
+
+    watch(additionType, () => {
+      if (additionType.value === REUSE_STEP) {
+        if (!reusedStep.value.program) updateProgram(program.value._id);
+        if (!programOptions.value.length) refreshPrograms();
+        if (!stepOptions.value.length) refreshSteps();
       }
-    },
-  },
-  methods: {
-    async refreshPrograms () {
+    });
+
+    const refreshPrograms = async () => {
       try {
         const programs = await Programs.list();
 
-        this.programOptions = formatAndSortOptions(programs, 'name');
+        programOptions.value = formatAndSortOptions(programs, 'name');
       } catch (e) {
-        this.programOptions = [];
+        programOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
-    },
-    formatAndSortStepOptions (array) {
-      const stepsInSubProgram = this.program.subPrograms
-        .find(subProgram => subProgram._id === this.subProgramId)
+    };
+
+    const formatAndSortStepOptions = (array) => {
+      const stepsInSubProgram = program.value.subPrograms
+        .find(subProgram => subProgram._id === subProgramId.value)
         .steps.map(step => step._id);
 
       return array
@@ -117,51 +110,76 @@ export default {
           disable: stepsInSubProgram.includes(element._id),
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
-    },
-    async refreshSteps () {
+    };
+
+    const refreshSteps = async () => {
       try {
-        if (!this.reusedStep.program) {
-          this.stepOptions = [];
-          this.stepGroups = [];
+        if (!reusedStep.value.program) {
+          stepOptions.value = [];
+          stepGroups.value = [];
           return;
         }
-        const steps = await Steps.list({ program: this.reusedStep.program });
+        const steps = await Steps.list({ program: reusedStep.value.program });
         const stepsGroupedByType = groupBy(steps, 'type');
-        this.stepOptions = Object.keys(stepsGroupedByType)
-          .map(group => this.formatAndSortStepOptions(stepsGroupedByType[group]));
-        this.stepGroups = Object.keys(stepsGroupedByType)
-          .map(group => ({ label: this.getStepTypeLabel(group), icon: this.getStepTypeIcon(group) }));
+        stepOptions.value = Object.keys(stepsGroupedByType)
+          .map(group => formatAndSortStepOptions(stepsGroupedByType[group]));
+        stepGroups.value = Object.keys(stepsGroupedByType)
+          .map(group => ({ label: getStepTypeLabel(group), icon: getStepTypeIcon(group) }));
       } catch (e) {
-        this.stepOptions = [];
-        this.stepGroups = [];
+        stepOptions.value = [];
+        stepGroups.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des étapes de ce programme.');
       }
-    },
-    hide () {
-      this.$emit('hide');
-      this.stepOptions = [];
-      this.stepGroups = [];
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    updateNewStep (event, prop) {
-      this.$emit('update:new-step', set(this.newStep, prop, event));
-    },
-    async updateProgram (event) {
-      await this.$emit('update:reused-step', { _id: '', program: event });
-      await this.refreshSteps();
-    },
-    updateReusedStep (value) {
-      this.$emit('update:reused-step', set(this.reusedStep, '_id', value));
-    },
-    updateAdditionType (value) {
-      this.$emit('update:addition-type', value);
-    },
+    };
+
+    const hide = () => {
+      emit('hide');
+      stepOptions.value = [];
+      stepGroups.value = [];
+    };
+
+    const input = (event) => {
+      emit('update:model-value', event);
+    };
+
+    const submit = () => {
+      emit('submit');
+    };
+    const updateNewStep = (event, prop) => {
+      emit('update:new-step', set(newStep.value, prop, event));
+    };
+    const updateProgram = async (event) => {
+      await emit('update:reused-step', { _id: '', program: event });
+      await refreshSteps();
+    };
+    const updateReusedStep = (value) => {
+      emit('update:reused-step', set(reusedStep.value, '_id', value));
+    };
+    const updateAdditionType = (value) => {
+      emit('update:addition-type', value);
+    };
+
+    return {
+      // Data
+      STEP_TYPES,
+      STEP_ATTACHEMENT_OPTIONS,
+      CREATE_STEP,
+      REUSE_STEP,
+      stepOptions,
+      programOptions,
+      stepGroups,
+      // Computed
+      submitLabel,
+      // Methods
+      hide,
+      input,
+      submit,
+      updateNewStep,
+      updateProgram,
+      updateReusedStep,
+      updateAdditionType,
+    };
   },
 };
 </script>
