@@ -66,7 +66,7 @@ export default {
     const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
     const { course } = toRefs(props);
 
-    const { headerInfo, composeCourseName, happened } = useCourses(null, course, null, null);
+    const { headerInfo, composeCourseName, happened } = useCourses(course);
 
     const courseName = computed(() => composeCourseName(course.value, isVendorInterface));
 

@@ -102,7 +102,7 @@ export default {
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
 
-    const { getStepTypeIcon } = useCourses(null, null, null, null);
+    const { getStepTypeIcon } = useCourses(null);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 

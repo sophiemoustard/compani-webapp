@@ -208,7 +208,7 @@ export default {
     const openNextModalAfterUnlocking = () => null;
     const { profileId } = toRefs(props);
 
-    const { getStepTypeLabel, getStepTypeIcon } = useCourses(null, null, null, null);
+    const { getStepTypeLabel, getStepTypeIcon } = useCourses(null);
 
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },

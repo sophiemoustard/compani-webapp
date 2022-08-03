@@ -201,7 +201,7 @@ export default {
       resetLearnerCreationModal,
     } = useLearners(refresh, false, company);
 
-    const { isIntraCourse } = useCourses(null, course, null, null);
+    const { isIntraCourse } = useCourses(course);
 
     onMounted(async () => {
       await getLearnerList(company.value._id);

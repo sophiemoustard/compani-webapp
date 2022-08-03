@@ -72,7 +72,7 @@ export default {
     const stepGroups = ref([]);
     const { additionType, reusedStep, program, subProgramId, newStep } = toRefs(props);
 
-    const { getStepTypeLabel, getStepTypeIcon } = useCourses(null, null, null, null);
+    const { getStepTypeLabel, getStepTypeIcon } = useCourses(null);
 
     const submitLabel = computed(() => (additionType.value === CREATE_STEP ? 'Créer l\'étape' : 'Réutiliser l\'étape'));
 
