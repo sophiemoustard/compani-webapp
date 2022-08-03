@@ -50,6 +50,7 @@ import get from 'lodash/get';
 import { computed, toRefs } from 'vue';
 import { useRouter } from 'vue-router';
 import { FORTHCOMING, COMPLETED, IN_PROGRESS } from '@data/constants';
+import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import { formatDuration } from '@helpers/date';
 import moment from '@helpers/moment';
@@ -66,7 +67,7 @@ export default {
     const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
     const { course } = toRefs(props);
 
-    const { headerInfo, composeCourseName, happened } = useCourses(course);
+    const { headerInfo } = useCourses(course);
 
     const courseName = computed(() => composeCourseName(course.value, isVendorInterface));
 

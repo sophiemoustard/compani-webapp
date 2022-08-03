@@ -48,9 +48,9 @@ import { useStore } from 'vuex';
 import pick from 'lodash/pick';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
+import { getStepTypeIcon } from '@helpers/courses';
 import { sortStrings } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
-import { useCourses } from '@composables/courses';
 import ConnectedDot from './ConnectedDot';
 
 export default {
@@ -101,8 +101,6 @@ export default {
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
-
-    const { getStepTypeIcon } = useCourses(null);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 

@@ -143,6 +143,7 @@ import {
   CREATE_STEP,
   REQUIRED_LABEL,
 } from '@data/constants';
+import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity, formatAndSortOptions, sortStrings } from '@helpers/utils';
 import { formatDurationFromFloat, getHoursAndMinutes, computeHours } from '@helpers/date';
 import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -155,7 +156,6 @@ import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityR
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import ValidateUnlockingStepModal from 'src/modules/vendor/components/programs/ValidateUnlockingStepModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
-import { useCourses } from '@composables/courses';
 
 export default {
   name: 'ProfileContent',
@@ -207,8 +207,6 @@ export default {
     const stepToBeUnlocked = ref({ _id: '', status: '' });
     const openNextModalAfterUnlocking = () => null;
     const { profileId } = toRefs(props);
-
-    const { getStepTypeLabel, getStepTypeIcon } = useCourses(null);
 
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },

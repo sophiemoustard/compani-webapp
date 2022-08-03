@@ -42,8 +42,8 @@ import { NotifyNegative } from '@components/popup/notify';
 import { STEP_TYPES, STEP_ATTACHEMENT_OPTIONS, CREATE_STEP, REUSE_STEP } from '@data/constants';
 import Programs from '@api/Programs';
 import Steps from '@api/Steps';
+import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatAndSortOptions } from '@helpers/utils';
-import { useCourses } from '@composables/courses';
 
 export default {
   name: 'StepAdditionModal',
@@ -71,8 +71,6 @@ export default {
     const programOptions = ref([]);
     const stepGroups = ref([]);
     const { additionType, reusedStep, program, subProgramId, newStep } = toRefs(props);
-
-    const { getStepTypeLabel, getStepTypeIcon } = useCourses(null);
 
     const submitLabel = computed(() => (additionType.value === CREATE_STEP ? 'Créer l\'étape' : 'Réutiliser l\'étape'));
 
