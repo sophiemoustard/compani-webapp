@@ -23,8 +23,9 @@ import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative } from '@components/popup/notify';
-import { LIST, COMPANY, INTRA } from '@data/constants';
+import { LIST, COMPANY } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
+import { useCourses } from '@composables/courses';
 
 export default {
   name: 'ProfileBilling',
@@ -41,10 +42,12 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
+    const { isIntraCourse } = useCourses(course);
+
     const companies = computed(() => {
       const traineesCompanies = course.value.trainees.map(trainee => trainee.company);
       const billsCompanies = courseBills.value.map(bill => bill.company);
-      const intraCourseCompany = course.value.type === INTRA ? [course.value.company] : [];
+      const intraCourseCompany = isIntraCourse.value ? [course.value.company] : [];
 
       return uniqBy([...traineesCompanies, ...billsCompanies, ...intraCourseCompany], '_id')
         .sort((a, b) => a.name.localeCompare(b.name));

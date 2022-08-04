@@ -47,16 +47,17 @@
 </template>
 
 <script>
-import { onMounted, computed, ref } from 'vue';
-import { useStore, mapState, mapGetters } from 'vuex';
+import { onMounted, computed, ref, toRefs } from 'vue';
+import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
-import { INTER_B2B, TRAINER, INTRA, DEFAULT_AVATAR } from '@data/constants';
+import { INTER_B2B, TRAINER, DEFAULT_AVATAR } from '@data/constants';
 import {
   formatPhone,
   formatPhoneForPayload,
@@ -69,13 +70,11 @@ import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { userMixin } from '@mixins/userMixin';
-import { courseMixin } from '@mixins/courseMixin';
 import { useLearners } from '@composables/learners';
+import { useCourses } from '@composables/courses';
 
 export default {
   name: 'TraineeTable',
-  mixins: [userMixin, courseMixin],
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -88,21 +87,89 @@ export default {
     'learner-creation-modal': LearnerCreationModal,
   },
   emits: ['refresh'],
-  setup () {
+  setup (props, { emit }) {
     const $store = useStore();
+    const $q = useQuasar();
     const $router = useRouter();
     const potentialTrainees = ref([]);
     const company = computed(() => $store.getters['main/getCompany']);
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
     const course = computed(() => $store.state.course.course);
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
 
+    const traineesColumns = ref([
+      {
+        name: 'company',
+        label: 'Structure',
+        align: 'left',
+        field: row => get(row, 'company.name') || '',
+        classes: 'text-capitalize',
+      },
+      {
+        name: 'firstname',
+        label: 'Prénom',
+        align: 'left',
+        field: row => get(row, 'identity.firstname') || '',
+        classes: 'text-capitalize',
+      },
+      {
+        name: 'lastname',
+        label: 'Nom',
+        align: 'left',
+        field: row => get(row, 'identity.lastname') || '',
+        classes: 'text-capitalize',
+      },
+      { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
+      {
+        name: 'phone',
+        label: 'Téléphone',
+        align: 'left',
+        field: row => get(row, 'contact.phone') || '',
+        format: formatPhone,
+      },
+      { name: 'actions', label: '', align: 'left', field: '_id' },
+    ]);
+    const traineesPagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
+    const traineeEditionModal = ref(false);
+    const traineeModalLoading = ref(false);
+    const companyOptions = ref([]);
+    const { canEdit } = toRefs(props);
+
+    const isTrainer = computed(() => vendorRole.value === TRAINER);
+
+    const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
+
+    const tableTitle = computed(() => (canEdit.value || isTrainer.value
+      ? `Stagiaires (${traineesNumber.value})`
+      : `Stagiaires de votre structure (${traineesNumber.value})`));
+
+    const traineesVisibleColumns = computed(() => {
+      const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
+      if (canEdit.value) visibleColumns.push('actions');
+
+      return isIntraCourse.value ? visibleColumns : ['company', ...visibleColumns];
+    });
+
+    const traineesOptions = computed(() => potentialTrainees.value
+      .map(pt => ({
+        value: pt._id,
+        label: formatIdentity(pt.identity, 'FL'),
+        email: pt.local.email || '',
+        picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
+        ...(!isIntraCourse.value && { company: get(pt, 'company.name') || '' }),
+        additionalFilters: [pt.local.email],
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)));
+
+    const disableCompany = computed(() => isIntraCourse.value || userAlreadyHasCompany.value);
+
     const getPotentialTrainees = async () => {
       try {
         let query;
 
-        if (course.value.type === INTRA) query = { company: get(course.value, 'company._id') };
+        if (isIntraCourse.value) query = { company: get(course.value, 'company._id') };
         if (course.value.type === INTER_B2B) {
           query = isClientInterface ? { company: get(loggedUser.value, 'company._id') } : { hasCompany: true };
         }
@@ -116,7 +183,6 @@ export default {
 
     const refresh = async () => getPotentialTrainees();
     const {
-      searchStr,
       newLearner,
       newTrainee,
       traineeAdditionModal,
@@ -135,6 +201,8 @@ export default {
       resetLearnerCreationModal,
     } = useLearners(refresh, false, company);
 
+    const { isIntraCourse } = useCourses(course);
+
     onMounted(async () => {
       await getLearnerList(company.value._id);
       await getPotentialTrainees();
@@ -149,7 +217,7 @@ export default {
       newLearner.value.contact = { phone: get(user, 'contact.phone') };
 
       if (get(user, 'company._id')) newLearner.value.company = get(user, 'company._id');
-      else if (course.value.type === INTRA) newLearner.value.company = course.value.company._id;
+      else if (isIntraCourse.value) newLearner.value.company = course.value.company._id;
     };
 
     const nextStepLearnerCreationModal = async () => {
@@ -161,7 +229,7 @@ export default {
         const userInfo = await Users.exists({ email: newLearner.value.local.email });
 
         if (!userInfo.exists) {
-          if (course.value.type === INTRA) newLearner.value.company = course.value.company._id;
+          if (isIntraCourse.value) newLearner.value.company = course.value.company._id;
 
           return goToNextStep();
         }
@@ -170,10 +238,10 @@ export default {
 
         const isHelperOrAuxiliaryWithoutCompany = ['helper', 'auxiliary_without_company']
           .includes(get(user, 'role.client.name'));
-        if (isHelperOrAuxiliaryWithoutCompany && course.value.type === INTRA) {
+        if (isHelperOrAuxiliaryWithoutCompany && isIntraCourse.value) {
           return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
         }
-        if (course.value.type === INTRA && get(user, 'company._id') && user.company._id !== course.value.company._id) {
+        if (isIntraCourse.value && get(user, 'company._id') && user.company._id !== course.value.company._id) {
           return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
 
@@ -190,200 +258,139 @@ export default {
       }
     };
 
-    return {
-      // Data
-      searchStr,
-      newLearner,
-      firstStep,
-      userAlreadyHasCompany,
-      tableLoading,
-      learnerCreationModalLoading,
-      learnerCreationModal,
-      learnerAlreadyExists,
-      potentialTrainees,
-      traineeAdditionModal,
-      newTrainee,
-      editedTrainee,
-      // Validations
-      learnerValidation,
-      traineeValidation,
-      // Methods
-      nextStepLearnerCreationModal,
-      submitLearnerCreationModal,
-      resetLearnerCreationModal,
+    const resetTraineeAdditionForm = () => {
+      newTrainee.value = '';
+      traineeValidation.value.newTrainee.$reset();
     };
-  },
-  data () {
-    return {
-      traineesColumns: [
-        {
-          name: 'company',
-          label: 'Structure',
-          align: 'left',
-          field: row => get(row, 'company.name') || '',
-          classes: 'text-capitalize',
-        },
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          align: 'left',
-          field: row => get(row, 'identity.firstname') || '',
-          classes: 'text-capitalize',
-        },
-        {
-          name: 'lastname',
-          label: 'Nom',
-          align: 'left',
-          field: row => get(row, 'identity.lastname') || '',
-          classes: 'text-capitalize',
-        },
-        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
-        {
-          name: 'phone',
-          label: 'Téléphone',
-          align: 'left',
-          field: row => get(row, 'contact.phone') || '',
-          format: formatPhone,
-        },
-        { name: 'actions', label: '', align: 'left', field: '_id' },
-      ],
-      traineesPagination: { rowsPerPage: 0, sortBy: 'lastname' },
-      traineeEditionModal: false,
-      traineeModalLoading: false,
-      companyOptions: [],
-    };
-  },
-  computed: {
-    ...mapState('course', ['course']),
-    ...mapGetters({ vendorRole: 'main/getVendorRole', company: 'main/getCompany' }),
-    isTrainer () {
-      return this.vendorRole === TRAINER;
-    },
-    traineesNumber () {
-      return this.course.trainees ? this.course.trainees.length : 0;
-    },
-    tableTitle () {
-      return this.canEdit || this.isTrainer
-        ? `Stagiaires (${this.traineesNumber})`
-        : `Stagiaires de votre structure (${this.traineesNumber})`;
-    },
-    traineesVisibleColumns () {
-      const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
-      if (this.canEdit) visibleColumns.push('actions');
-
-      return this.isIntraCourse ? visibleColumns : ['company', ...visibleColumns];
-    },
-    traineesOptions () {
-      return this.potentialTrainees
-        .map(pt => ({
-          value: pt._id,
-          label: formatIdentity(pt.identity, 'FL'),
-          email: pt.local.email || '',
-          picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
-          ...(!this.isIntraCourse && { company: get(pt, 'company.name') || '' }),
-          additionalFilters: [pt.local.email],
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label));
-    },
-    disableCompany () {
-      return this.course.type === INTRA || this.userAlreadyHasCompany;
-    },
-  },
-  methods: {
-    resetTraineeAdditionForm () {
-      this.newTrainee = '';
-      this.traineeValidation.newTrainee.$reset();
-    },
-    async addTrainee () {
+    const addTrainee = async () => {
       try {
-        this.traineeModalLoading = true;
-        this.traineeValidation.newTrainee.$touch();
-        if (this.traineeValidation.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        traineeModalLoading.value = true;
+        traineeValidation.value.newTrainee.$touch();
+        if (traineeValidation.value.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Courses.addTrainee(this.course._id, { trainee: this.newTrainee });
-        this.traineeAdditionModal = false;
-        this.$emit('refresh');
+        await Courses.addTrainee(course.value._id, { trainee: newTrainee.value });
+        traineeAdditionModal.value = false;
+        emit('refresh');
         NotifyPositive('Stagiaire ajouté(e).');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du/de la stagiaire.');
       } finally {
-        this.traineeModalLoading = false;
+        traineeModalLoading.value = false;
       }
-    },
-    async openTraineeEditionModal (trainee) {
-      this.editedTrainee = {
-        ...this.editedTrainee,
+    };
+    const openTraineeEditionModal = async (trainee) => {
+      editedTrainee.value = {
+        ...editedTrainee.value,
         ...pick(trainee, ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
       };
-      this.traineeEditionModal = true;
-    },
-    resetTraineeEditionForm () {
-      this.traineeValidation.editedTrainee.$reset();
-      this.editedTrainee = { identity: {}, local: {}, contact: {} };
-    },
-    async updateTrainee () {
+      traineeEditionModal.value = true;
+    };
+    const resetTraineeEditionForm = () => {
+      traineeValidation.value.editedTrainee.$reset();
+      editedTrainee.value = { identity: {}, local: {}, contact: {} };
+    };
+    const updateTrainee = async () => {
       try {
-        this.traineeModalLoading = true;
-        this.traineeValidation.editedTrainee.$touch();
-        if (this.traineeValidation.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (get(this.editedTrainee, 'contact.phone')) {
-          this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
+        traineeModalLoading.value = true;
+        traineeValidation.value.editedTrainee.$touch();
+        if (traineeValidation.value.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (get(editedTrainee.value, 'contact.phone')) {
+          editedTrainee.value.contact.phone = formatPhoneForPayload(editedTrainee.value.contact.phone);
         }
 
-        await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
-        this.traineeEditionModal = false;
-        this.$emit('refresh');
+        await Users.updateById(editedTrainee.value._id, omit(editedTrainee.value, ['_id', 'local']));
+        traineeEditionModal.value = false;
+        emit('refresh');
         NotifyPositive('Stagiaire modifié(e).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification du/de la stagiaire.');
       } finally {
-        this.traineeModalLoading = false;
+        traineeModalLoading.value = false;
       }
-    },
-    validateTraineeDeletion (traineeId) {
-      this.$q.dialog({
+    };
+    const validateTraineeDeletion = (traineeId) => {
+      $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir retirer le/la stagiaire de la formation&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteTrainee(traineeId))
+      }).onOk(() => deleteTrainee(traineeId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async deleteTrainee (traineeId) {
+    };
+    const deleteTrainee = async (traineeId) => {
       try {
-        await Courses.deleteTrainee(this.course._id, traineeId);
-        this.$emit('refresh');
+        await Courses.deleteTrainee(course.value._id, traineeId);
+        emit('refresh');
         NotifyPositive('Stagiaire supprimé(e).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
-    },
-    openTraineeCreationModal () {
-      if (this.course.archivedAt) {
+    };
+    const openTraineeCreationModal = () => {
+      if (course.value.archivedAt) {
         return NotifyWarning('Vous ne pouvez pas ajouter de stagiaire à une formation archivée.');
       }
 
-      this.traineeAdditionModal = true;
-    },
-    async openLearnerCreationModal () {
-      this.traineeAdditionModal = false;
-      this.learnerCreationModal = true;
-      await this.refreshCompanies();
-    },
-    async refreshCompanies () {
+      traineeAdditionModal.value = true;
+    };
+    const openLearnerCreationModal = async () => {
+      traineeAdditionModal.value = false;
+      learnerCreationModal.value = true;
+      await refreshCompanies();
+    };
+    const refreshCompanies = async () => {
       try {
         const companies = await Companies.list();
-        this.companyOptions = formatAndSortOptions(companies, 'name');
+        companyOptions.value = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
-        this.companyOptions = [];
+        companyOptions.value = [];
       }
-    },
+    };
+
+    return {
+      // Data
+      newLearner,
+      firstStep,
+      tableLoading,
+      learnerCreationModalLoading,
+      learnerCreationModal,
+      learnerAlreadyExists,
+      traineeAdditionModal,
+      newTrainee,
+      editedTrainee,
+      traineesColumns,
+      traineesPagination,
+      traineeEditionModal,
+      traineeModalLoading,
+      companyOptions,
+      // Validations
+      learnerValidation,
+      traineeValidation,
+      // Computed
+      tableTitle,
+      traineesVisibleColumns,
+      traineesOptions,
+      disableCompany,
+      course,
+      // Methods
+      nextStepLearnerCreationModal,
+      submitLearnerCreationModal,
+      resetLearnerCreationModal,
+      resetTraineeAdditionForm,
+      addTrainee,
+      openTraineeEditionModal,
+      resetTraineeEditionForm,
+      updateTrainee,
+      validateTraineeDeletion,
+      openTraineeCreationModal,
+      openLearnerCreationModal,
+    };
   },
 };
 </script>
