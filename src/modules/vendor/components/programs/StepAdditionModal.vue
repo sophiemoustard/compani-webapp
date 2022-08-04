@@ -137,26 +137,19 @@ export default {
       stepGroups.value = [];
     };
 
-    const input = (event) => {
-      emit('update:model-value', event);
-    };
+    const input = (event) => { emit('update:model-value', event); };
 
-    const submit = () => {
-      emit('submit');
-    };
-    const updateNewStep = (event, prop) => {
-      emit('update:new-step', set(newStep.value, prop, event));
-    };
+    const submit = () => { emit('submit'); };
+
+    const updateNewStep = (event, prop) => { emit('update:new-step', set(newStep.value, prop, event)); };
+
     const updateProgram = async (event) => {
       await emit('update:reused-step', { _id: '', program: event });
       await refreshSteps();
     };
-    const updateReusedStep = (value) => {
-      emit('update:reused-step', set(reusedStep.value, '_id', value));
-    };
-    const updateAdditionType = (value) => {
-      emit('update:addition-type', value);
-    };
+    const updateReusedStep = (value) => { emit('update:reused-step', set(reusedStep.value, '_id', value)); };
+
+    const updateAdditionType = (value) => { emit('update:addition-type', value); };
 
     return {
       // Data

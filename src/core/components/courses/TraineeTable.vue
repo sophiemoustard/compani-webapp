@@ -57,7 +57,7 @@ import omit from 'lodash/omit';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
-import { INTER_B2B, TRAINER, INTRA, DEFAULT_AVATAR } from '@data/constants';
+import { INTER_B2B, TRAINER, DEFAULT_AVATAR } from '@data/constants';
 import {
   formatPhone,
   formatPhoneForPayload,
@@ -163,13 +163,13 @@ export default {
       }))
       .sort((a, b) => a.label.localeCompare(b.label)));
 
-    const disableCompany = computed(() => course.value.type === INTRA || userAlreadyHasCompany.value);
+    const disableCompany = computed(() => isIntraCourse.value || userAlreadyHasCompany.value);
 
     const getPotentialTrainees = async () => {
       try {
         let query;
 
-        if (course.value.type === INTRA) query = { company: get(course.value, 'company._id') };
+        if (isIntraCourse.value) query = { company: get(course.value, 'company._id') };
         if (course.value.type === INTER_B2B) {
           query = isClientInterface ? { company: get(loggedUser.value, 'company._id') } : { hasCompany: true };
         }
@@ -217,7 +217,7 @@ export default {
       newLearner.value.contact = { phone: get(user, 'contact.phone') };
 
       if (get(user, 'company._id')) newLearner.value.company = get(user, 'company._id');
-      else if (course.value.type === INTRA) newLearner.value.company = course.value.company._id;
+      else if (isIntraCourse.value) newLearner.value.company = course.value.company._id;
     };
 
     const nextStepLearnerCreationModal = async () => {
@@ -229,7 +229,7 @@ export default {
         const userInfo = await Users.exists({ email: newLearner.value.local.email });
 
         if (!userInfo.exists) {
-          if (course.value.type === INTRA) newLearner.value.company = course.value.company._id;
+          if (isIntraCourse.value) newLearner.value.company = course.value.company._id;
 
           return goToNextStep();
         }
@@ -238,10 +238,10 @@ export default {
 
         const isHelperOrAuxiliaryWithoutCompany = ['helper', 'auxiliary_without_company']
           .includes(get(user, 'role.client.name'));
-        if (isHelperOrAuxiliaryWithoutCompany && course.value.type === INTRA) {
+        if (isHelperOrAuxiliaryWithoutCompany && isIntraCourse.value) {
           return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
         }
-        if (course.value.type === INTRA && get(user, 'company._id') && user.company._id !== course.value.company._id) {
+        if (isIntraCourse.value && get(user, 'company._id') && user.company._id !== course.value.company._id) {
           return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
 

@@ -179,6 +179,7 @@ export default {
     const $router = useRouter();
     const $store = useStore();
     const $q = useQuasar();
+
     const tmpInput = ref('');
     const modalLoading = ref(false);
     const subProgramCreationModal = ref(false);
@@ -205,7 +206,7 @@ export default {
     const validateUnlockingEditionModal = ref(false);
     const subProgramsReusingStepToBeUnlocked = ref([]);
     const stepToBeUnlocked = ref({ _id: '', status: '' });
-    const openNextModalAfterUnlocking = () => null;
+    const openNextModalAfterUnlocking = () => ref(null);
     const { profileId } = toRefs(props);
 
     const rules = computed(() => ({
@@ -230,17 +231,13 @@ export default {
     }));
 
     const program = computed(() => $store.state.program.program);
+
     const openedStep = computed(() => $store.state.program.openedStep);
 
-    const v$ = useVuelidate(rules, {
-      program,
-      newSubProgram,
-      newStep,
-      reusedStep,
-      editedStep,
-      newActivity,
-      reusedActivity,
-    });
+    const v$ = useVuelidate(
+      rules,
+      { program, newSubProgram, newStep, reusedStep, editedStep, newActivity, reusedActivity }
+    );
 
     const theoreticalHoursErrorMsg = computed(() => {
       const validation = v$.value.editedStep;
