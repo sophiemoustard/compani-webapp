@@ -105,11 +105,13 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { useStore } from 'vuex';
+import { computed, ref, toRefs, watch } from 'vue';
 import { copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
@@ -142,17 +144,16 @@ import {
   DEFAULT_AVATAR,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
-import { formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
+import { composeCourseName } from '@helpers/courses';
+import { formatQuantity, formatIdentity, formatDownloadName, formatPhoneForPayload } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { descendingSort, ascendingSort } from '@helpers/date';
-import { userMixin } from '@mixins/userMixin';
-import { courseMixin } from '@mixins/courseMixin';
 import BiColorButton from '@components/BiColorButton';
+import { useCourses } from '@composables/courses';
 
 export default {
   name: 'ProfileOrganization',
-  mixins: [userMixin, courseMixin],
   props: {
     profileId: { type: String, required: true },
   },
@@ -171,463 +172,599 @@ export default {
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
   },
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  data () {
-    const isClientInterface = !/\/ad\//.test(this.$route.path);
+  setup (props) {
+    const $store = useStore();
 
-    return {
-      trainerOptions: [],
-      salesRepresentativeOptions: [],
-      companyRepresentativeOptions: [],
-      courseLoading: false,
-      courseSlotsLoading: false,
-      tmpInput: '',
+    const trainerOptions = ref([]);
+    const salesRepresentativeOptions = ref([]);
+    const companyRepresentativeOptions = ref([]);
+    const courseLoading = ref(false);
+    const tmpInput = ref('');
+    const displayHistory = ref(false);
+    const courseHistories = ref([]);
+    const smsModal = ref(false);
+    const messageTypeOptions = ref([
+      { label: 'Convocation', value: CONVOCATION }, { label: 'Rappel', value: REMINDER },
+    ]);
+    const newSms = ref({ content: '', type: '' });
+    const loading = ref(false);
+    const smsHistoryList = ref([]);
+    const smsLoading = ref(false);
+    const smsHistoriesModal = ref(false);
+    const urlAndroid = ref('https://bit.ly/3en5OkF');
+    const urlIos = ref('https://apple.co/33kKzcU');
+    const tempInterlocutor = ref({ _id: '', isContact: false });
+    const salesRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'référent Compani' });
+    const salesRepresentativeEditionModal = ref(false);
+    const interlocutorModalLoading = ref(false);
+    const interlocutorLabel = ref({ action: '', interlocutor: '' });
+    const trainerModal = ref(false);
+    const sendSms = ref(false);
+    const companyRepresentativeModal = ref(false);
+    const contactModalLoading = ref(false);
+    const contactAdditionModal = ref(false);
+    const tempContactId = ref('');
+    const SALES_REPRESENTATIVE = ref('salesRepresentative');
+    const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
+
+    const courseHistoryFeed = ref(null);
+
+    const { profileId } = toRefs(props);
+
+    const course = computed(() => $store.state.course.course);
+
+    const {
+      vendorRole,
+      isIntraCourse,
+      disableDocDownload,
+      pdfLoading,
       isClientInterface,
-      displayHistory: false,
-      courseHistories: [],
-      smsModal: false,
-      messageTypeOptions: [{ label: 'Convocation', value: CONVOCATION }, { label: 'Rappel', value: REMINDER }],
-      newSms: { content: '', type: '' },
-      loading: false,
-      smsHistoryList: [],
-      pagination: { rowsPerPage: 0 },
-      smsLoading: false,
-      smsHistoriesModal: false,
-      urlAndroid: 'https://bit.ly/3en5OkF',
-      urlIos: 'https://apple.co/33kKzcU',
-      tempInterlocutor: { _id: '', isContact: false },
-      salesRepresentativeLabel: { action: 'Modifier le ', interlocutor: 'référent Compani' },
-      salesRepresentativeEditionModal: false,
-      interlocutorModalLoading: false,
-      interlocutorLabel: { action: '', interlocutor: '' },
-      trainerModal: false,
-      sendSms: false,
-      INTRA,
-      companyRepresentativeModal: false,
-      contactModalLoading: false,
-      contactAdditionModal: false,
-      tempContactId: '',
-      SALES_REPRESENTATIVE: 'salesRepresentative',
-      COMPANY_REPRESENTATIVE: 'companyRepresentative',
-    };
-  },
-  validations () {
-    return {
+      isVendorInterface,
+      isIntraOrVendor,
+      followUpDisabled,
+      isArchived,
+      followUpMissingInfo,
+      downloadAttendanceSheet,
+    } = useCourses(course);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const rules = computed(() => ({
       tempInterlocutor: { _id: { required } },
       tempContactId: { required },
       course: { contact: { contact: { phone: { required } } } },
       newSms: { content: { required }, type: { required } },
-    };
-  },
-  watch: {
-    course () {
-      const phoneValidation = get(this.v$, 'course.contact.contact.phone');
+    }));
+
+    const v$ = useVuelidate(rules, { tempInterlocutor, tempContactId, course, newSms });
+
+    watch(course, () => {
+      const phoneValidation = get(v$.value, 'course.contact.contact.phone');
       if (phoneValidation) phoneValidation.$touch();
-    },
-  },
-  computed: {
-    ...mapState('course', ['course']),
-    ...mapState('main', ['loggedUser']),
-    isTrainer () {
-      return this.vendorRole === TRAINER;
-    },
-    isAdmin () {
-      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
-    },
-    isCourseInter () {
-      return this.course.type === INTER_B2B;
-    },
-    canEditSlots () {
-      return !(this.isClientInterface && this.isCourseInter);
-    },
-    canEditTrainees () {
-      return this.isIntraCourse || (!this.isClientInterface && !this.isTrainer);
-    },
-    missingInfoMsg () {
-      return `Le lien vers la page sera disponible dès que l'équipe aura rentré ${
-        this.followUpMissingInfo.length > 1 ? 'les informations manquantes : ' : 'l\'information manquante : '
-      }${this.followUpMissingInfo.join(', ')}`;
-    },
-    isFinished () {
-      const slots = this.course.slots.filter(slot => moment().isBefore(slot.startDate));
-      return !slots.length && !this.course.slotsToPlan.length;
-    },
-    courseNotStartedYet () {
-      const slots = this.course.slots.filter(slot => moment().isAfter(slot.endDate));
+    });
+
+    const isTrainer = computed(() => vendorRole.value === TRAINER);
+    const isAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+
+    const isCourseInter = computed(() => course.value.type === INTER_B2B);
+
+    const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
+
+    const canEditTrainees = computed(() => isIntraCourse.value || (!isClientInterface && !isTrainer.value));
+
+    const isFinished = computed(() => {
+      const slots = course.value.slots.filter(slot => moment().isBefore(slot.startDate));
+      return !slots.length && !course.value.slotsToPlan.length;
+    });
+
+    const courseNotStartedYet = computed(() => {
+      const slots = course.value.slots.filter(slot => moment().isAfter(slot.endDate));
       return !slots.length;
-    },
-    courseLink () {
-      return Courses.getConvocationUrl(this.course._id);
-    },
-    filteredMessageTypeOptions () {
-      return this.courseNotStartedYet
-        ? this.messageTypeOptions
-        : this.messageTypeOptions.filter(t => t.value === REMINDER);
-    },
-    missingTraineesPhone () {
-      return this.course.trainees.filter(trainee => !get(trainee, 'contact.phone'))
-        .map(trainee => formatIdentity(trainee.identity, 'FL'));
-    },
-    courseName () {
-      return this.composeCourseName(this.course);
-    },
-    allFuturSlotsAreNotPlanned () {
-      const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
-      return !!this.course.slotsToPlan.length && !futurSlots.length;
-    },
-    smsMissingInfo () {
+    });
+
+    const filteredMessageTypeOptions = computed(() => (courseNotStartedYet.value
+      ? messageTypeOptions.value
+      : messageTypeOptions.value.filter(t => t.value === REMINDER)));
+
+    const missingTraineesPhone = computed(() => course.value.trainees.filter(trainee => !get(trainee, 'contact.phone'))
+      .map(trainee => formatIdentity(trainee.identity, 'FL')));
+
+    const courseName = computed(() => composeCourseName(course.value));
+
+    const allFuturSlotsAreNotPlanned = computed(() => {
+      const futurSlots = course.value.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
+      return !!course.value.slotsToPlan.length && !futurSlots.length;
+    });
+
+    const smsMissingInfo = computed(() => {
       const missingInfo = [];
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
+      if (!course.value.slots || !course.value.slots.length) missingInfo.push('minimum 1 créneau');
+      if (!course.value.trainees || !course.value.trainees.length) missingInfo.push('minimum 1 stagiaire');
 
       return missingInfo;
-    },
-    disableSms () {
-      const noPhoneNumber = this.missingTraineesPhone.length === this.course.trainees.length;
+    });
 
-      return !!this.smsMissingInfo.length || noPhoneNumber;
-    },
-    isMissingContactPhone () {
-      return !!get(this.course, 'contact._id') && get(this.v$, 'course.contact.contact.phone.$error');
-    },
-    canUpdateInterlocutor () {
-      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role']));
+    const disableSms = computed(() => {
+      const noPhoneNumber = missingTraineesPhone.value.length === course.value.trainees.length;
+
+      return !!smsMissingInfo.value.length || noPhoneNumber;
+    });
+
+    const canUpdateInterlocutor = computed(() => {
+      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role']));
 
       return ability.can('update', 'interlocutor');
-    },
-    traineesEmails () {
-      if (!this.course.trainees) return '';
+    });
 
-      return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc}${value},`, '');
-    },
-    contactOptions () {
+    const traineesEmails = computed(() => {
+      if (!course.value.trainees) return '';
+
+      return course.value.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc}${value},`, '');
+    });
+
+    const contactOptions = computed(() => {
       const interlocutors = [
-        { interlocutor: this.course.salesRepresentative, role: 'Référent(e) Compani' },
-        ...(this.course.trainer._id ? [{ interlocutor: this.course.trainer, role: 'Intervenant(e)' }] : []),
-        ...(this.course.companyRepresentative._id
-          ? [{ interlocutor: this.course.companyRepresentative, role: 'Référent(e) structure' }]
+        { interlocutor: course.value.salesRepresentative, role: 'Référent(e) Compani' },
+        ...(course.value.trainer._id ? [{ interlocutor: course.value.trainer, role: 'Intervenant(e)' }] : []),
+        ...(course.value.companyRepresentative._id
+          ? [{ interlocutor: course.value.companyRepresentative, role: 'Référent(e) structure' }]
           : []),
       ];
-      return Object.freeze(interlocutors.map(interlocutor => this.formatContactOption(interlocutor)));
-    },
-  },
+      return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
+    });
 
-  async created () {
-    const promises = [this.refreshCourse()];
-    if (this.isVendorInterface || this.isIntraCourse) {
-      promises.push(this.refreshSms(), this.refreshCompanyRepresentatives());
-    }
-    await Promise.all(promises);
-    this.setDefaultMessageType();
+    const toggleHistory = async () => {
+      displayHistory.value = !displayHistory.value;
+      if (displayHistory.value) await getCourseHistories();
+      else courseHistories.value = [];
+    };
 
-    if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
-    else {
-      this.salesRepresentativeOptions = [this.formatInterlocutorOption(this.course.salesRepresentative)];
-    }
-  },
-  methods: {
-    get,
-    formatQuantity,
-    async toggleHistory () {
-      this.displayHistory = !this.displayHistory;
-      if (this.displayHistory) await this.getCourseHistories();
-      else this.courseHistories = [];
-    },
-    async getCourseHistories (createdAt = null) {
-      const courseHistoriesTmp = cloneDeep(this.courseHistories);
+    const getCourseHistories = async (createdAt = null) => {
+      const courseHistoriesTmp = cloneDeep(courseHistories.value);
       try {
         let olderCourseHistories;
         if (createdAt) {
-          olderCourseHistories = await CourseHistories.getCourseHistories({ course: this.profileId, createdAt });
-          this.courseHistories.push(...olderCourseHistories);
+          olderCourseHistories = await CourseHistories.getCourseHistories({ course: profileId.value, createdAt });
+          courseHistories.value.push(...olderCourseHistories);
         } else {
-          olderCourseHistories = await CourseHistories.getCourseHistories({ course: this.profileId });
-          this.courseHistories = olderCourseHistories;
+          olderCourseHistories = await CourseHistories.getCourseHistories({ course: profileId.value });
+          courseHistories.value = olderCourseHistories;
         }
 
         return olderCourseHistories;
       } catch (e) {
-        this.courseHistories = courseHistoriesTmp;
+        courseHistories.value = courseHistoriesTmp;
         console.error(e);
         NotifyNegative('Erreur lors de la récupération de l\'historique d\'activité');
       }
-    },
-    async updateCourseHistories (done) {
-      const lastCreatedAt = this.courseHistories.length
-        ? this.courseHistories[this.courseHistories.length - 1].createdAt
+    };
+
+    const updateCourseHistories = async (done) => {
+      const lastCreatedAt = courseHistories.value.length
+        ? courseHistories.value[courseHistories.value.length - 1].createdAt
         : null;
-      const olderCourseHistories = await this.getCourseHistories(lastCreatedAt);
+      const olderCourseHistories = await getCourseHistories(lastCreatedAt);
 
       return done(!olderCourseHistories.length);
-    },
-    async refreshCourse () {
+    };
+
+    const refreshCourse = async () => {
       try {
-        this.courseLoading = true;
-        await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
-        if (this.displayHistory) {
-          await this.getCourseHistories();
-          this.$refs.courseHistoryFeed.resumeScroll();
+        courseLoading.value = true;
+        await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
+        if (displayHistory.value) {
+          await getCourseHistories();
+          courseHistoryFeed.value.resumeScroll();
         }
       } catch (e) {
         console.error(e);
       } finally {
-        this.courseLoading = false;
+        courseLoading.value = false;
       }
-    },
-    formatInterlocutorOption (interlocutor) {
-      return {
-        value: interlocutor._id,
-        label: formatIdentity(interlocutor.identity, 'FL'),
-        email: interlocutor.local.email || '',
-        picture: get(interlocutor, 'picture.link') || DEFAULT_AVATAR,
-        additionalFilters: [interlocutor.local.email],
-      };
-    },
-    formatContactOption (contact) {
-      return {
-        value: contact.interlocutor._id,
-        label: `${formatIdentity(contact.interlocutor.identity, 'FL')} - ${contact.role}`,
-      };
-    },
-    async refreshCompanyRepresentatives () {
+    };
+
+    const formatInterlocutorOption = interlocutor => ({
+      value: interlocutor._id,
+      label: formatIdentity(interlocutor.identity, 'FL'),
+      email: interlocutor.local.email || '',
+      picture: get(interlocutor, 'picture.link') || DEFAULT_AVATAR,
+      additionalFilters: [interlocutor.local.email],
+    });
+
+    const formatContactOption = contact => ({
+      value: contact.interlocutor._id,
+      label: `${formatIdentity(contact.interlocutor.identity, 'FL')} - ${contact.role}`,
+    });
+
+    const refreshCompanyRepresentatives = async () => {
       try {
-        const clientUsersFromCompany = this.course.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: this.course.company._id })
+        const clientUsersFromCompany = course.value.type === INTRA
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: course.value.company._id })
           : [];
-        this.companyRepresentativeOptions = Object.freeze(clientUsersFromCompany
-          .map(user => this.formatInterlocutorOption(user)).sort((a, b) => a.label.localeCompare(b.label)));
+        companyRepresentativeOptions.value = Object.freeze(clientUsersFromCompany
+          .map(user => formatInterlocutorOption(user)).sort((a, b) => a.label.localeCompare(b.label)));
       } catch (e) {
         console.error(e);
       }
-    },
-    async refreshTrainersAndSalesRepresentatives () {
+    };
+
+    const refreshTrainersAndSalesRepresentatives = async () => {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = Object.freeze(
-          vendorUsers.map(vu => this.formatInterlocutorOption(vu)).sort((a, b) => a.label.localeCompare(b.label))
+        trainerOptions.value = Object.freeze(
+          vendorUsers.map(vu => formatInterlocutorOption(vu)).sort((a, b) => a.label.localeCompare(b.label))
         );
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-        this.salesRepresentativeOptions = salesRepresentatives
-          .map(sr => this.formatInterlocutorOption(sr))
+        salesRepresentativeOptions.value = salesRepresentatives
+          .map(sr => formatInterlocutorOption(sr))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
-        this.trainerOptions = [];
-        this.salesRepresentativeOptions = [];
+        trainerOptions.value = [];
+        salesRepresentativeOptions.value = [];
       }
-    },
-    getType (value) {
-      const type = this.messageTypeOptions.find(t => t.value === value);
-      return type ? type.label : '';
-    },
-    setDefaultMessageType () {
-      this.newSms.type = this.courseNotStartedYet ? CONVOCATION : REMINDER;
-    },
-    async refreshSms () {
+    };
+
+    const setDefaultMessageType = () => {
+      newSms.value.type = courseNotStartedYet.value ? CONVOCATION : REMINDER;
+    };
+
+    const refreshSms = async () => {
       try {
-        this.smsLoading = true;
-        const smsList = await Courses.getSMSHistory(this.course._id);
-        this.smsHistoryList = smsList.sort((a, b) => descendingSort(a.date, b.date));
+        smsLoading.value = true;
+        const smsList = await Courses.getSMSHistory(course.value._id);
+        smsHistoryList.value = smsList.sort((a, b) => descendingSort(a.date, b.date));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
-        this.smsHistoryList = [];
+        smsHistoryList.value = [];
       } finally {
-        this.smsLoading = false;
+        smsLoading.value = false;
       }
-    },
-    openHistoryModal () {
-      if (this.allFuturSlotsAreNotPlanned) {
+    };
+
+    const openHistoryModal = async () => {
+      if (allFuturSlotsAreNotPlanned.value) {
         return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
       }
-      if (this.isFinished) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
+      if (isFinished.value) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
 
-      if (this.smsHistoryList.length) {
-        this.smsHistoriesModal = true;
-        this.sendSms = true;
+      if (smsHistoryList.value.length) {
+        smsHistoriesModal.value = true;
+        sendSms.value = true;
       } else {
-        this.openSmsModal();
+        openSmsModal();
       }
-    },
-    openSmsModal () {
-      this.updateMessage(this.newSms.type);
-      this.smsHistoriesModal = false;
-      this.sendSms = false;
-      this.smsModal = true;
-    },
-    resetSmsModal () {
-      this.updateMessage(this.newSms.type);
-    },
-    updateMessage (newMessageType) {
-      if (newMessageType === CONVOCATION) this.setConvocationMessage();
-      else if (newMessageType === REMINDER) this.setReminderMessage();
-    },
-    setConvocationMessage () {
-      const slots = this.course.slots
+    };
+
+    const openSmsModal = () => {
+      updateMessage(newSms.value.type);
+      smsHistoriesModal.value = false;
+      sendSms.value = false;
+      smsModal.value = true;
+    };
+
+    const resetSmsModal = () => {
+      updateMessage(newSms.value.type);
+    };
+
+    const updateMessage = (newMessageType) => {
+      if (newMessageType === CONVOCATION) setConvocationMessage();
+      else if (newMessageType === REMINDER) setReminderMessage();
+    };
+
+    const setConvocationMessage = () => {
+      const slots = course.value.slots
         .filter(s => !!s.startDate)
         .sort((a, b) => ascendingSort(a.startDate, b.startDate));
       const date = moment(slots[0].startDate).format('DD/MM');
       const hour = moment(slots[0].startDate).format('HH:mm');
 
-      this.newSms.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      newSms.value.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `La première session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
       + 'de cette formation, veuillez télécharger notre application Compani :\n'
-      + `Pour android : ${this.urlAndroid} \nPour iPhone : ${this.urlIos}\n`
+      + `Pour android : ${urlAndroid.value} \nPour iPhone : ${urlIos.value}\n`
       + 'Bonne formation,\nCompani';
-    },
-    setReminderMessage () {
-      const slots = this.course.slots
+    };
+
+    const setReminderMessage = () => {
+      const slots = course.value.slots
         .filter(s => !!s.startDate)
         .filter(slot => moment().isBefore(slot.startDate))
         .sort((a, b) => ascendingSort(a.startDate, b.startDate));
       const date = moment(slots[0].startDate).format('DD/MM');
       const hour = moment(slots[0].startDate).format('HH:mm');
 
-      this.newSms.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      newSms.value.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `Votre prochaine session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
       + 'de cette formation, veuillez télécharger notre application Compani :\n'
-      + `Pour android : ${this.urlAndroid} \nPour iPhone : ${this.urlIos} `
+      + `Pour android : ${urlAndroid.value} \nPour iPhone : ${urlIos.value} `
       + '\nBonne formation,\nCompani';
-    },
-    async sendMessage () {
+    };
+
+    const sendMessage = async () => {
       try {
-        this.v$.newSms.$touch();
-        if (this.v$.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
+        v$.value.newSms.$touch();
+        if (v$.value.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        this.loading = true;
-        await Courses.sendSMS(this.course._id, this.newSms);
-        await this.refreshSms();
+        loading.value = true;
+        await Courses.sendSMS(course.value._id, newSms.value);
+        await refreshSms();
 
-        this.smsModal = false;
+        smsModal.value = false;
 
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'envoi des SMS');
       } finally {
-        this.loading = false;
-        this.message = '';
-        this.setDefaultMessageType();
+        loading.value = false;
+        setDefaultMessageType();
       }
-    },
-    async downloadConvocation () {
-      if (this.disableDocDownload) return;
+    };
+
+    const downloadConvocation = async () => {
+      if (disableDocDownload.value) return;
 
       try {
-        this.pdfLoading = true;
-        const pdf = await Courses.downloadConvocation(this.course._id);
-        const formattedName = formatDownloadName(`convocation ${this.composeCourseName(this.course, true)}`);
+        pdfLoading.value = true;
+        const pdf = await Courses.downloadConvocation(course.value._id);
+        const formattedName = formatDownloadName(`convocation ${composeCourseName(course.value, true)}`);
         const pdfName = `${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la convocation.');
       } finally {
-        this.pdfLoading = false;
+        pdfLoading.value = false;
       }
-    },
-    async updateInterlocutor (role) {
+    };
+
+    const updateInterlocutor = async (role) => {
       try {
-        this.interlocutorModalLoading = true;
-        this.v$.tempInterlocutor.$touch();
-        if (this.v$.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+        interlocutorModalLoading.value = true;
+        v$.value.tempInterlocutor.$touch();
+        if (v$.value.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = {
-          [role]: this.tempInterlocutor._id,
+          [role]: tempInterlocutor.value._id,
           ...(
             (
-              this.tempInterlocutor.isContact ||
-              get(this.course, 'contact._id') === get(this.course, `${role}._id`)
+              tempInterlocutor.value.isContact ||
+              get(course.value, 'contact._id') === get(course.value, `${role}._id`)
             ) &&
-            { contact: this.tempInterlocutor.isContact ? this.tempInterlocutor._id : '' }
+            { contact: tempInterlocutor.value.isContact ? tempInterlocutor.value._id : '' }
           ),
         };
 
-        await Courses.update(this.profileId, payload);
+        await Courses.update(profileId.value, payload);
 
         switch (role) {
-          case this.SALES_REPRESENTATIVE: this.salesRepresentativeEditionModal = false;
+          case SALES_REPRESENTATIVE.value: salesRepresentativeEditionModal.value = false;
             break;
-          case TRAINER: this.trainerModal = false;
+          case TRAINER: trainerModal.value = false;
             break;
-          case this.COMPANY_REPRESENTATIVE: this.companyRepresentativeModal = false;
+          case COMPANY_REPRESENTATIVE.value: companyRepresentativeModal.value = false;
             break;
         }
-        await this.refreshCourse();
+        await refreshCourse();
         NotifyPositive('Interlocuteur mis à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'édition de l\'interlocuteur.');
       } finally {
-        this.interlocutorModalLoading = false;
+        interlocutorModalLoading.value = false;
       }
-    },
-    async updateContact () {
-      try {
-        this.contactModalLoading = true;
-        this.v$.tempContactId.$touch();
-        if (this.v$.tempContactId.$error) return NotifyWarning('Champ(s) invalide(s)');
+    };
 
-        await Courses.update(this.profileId, { contact: this.tempContactId });
-        this.contactAdditionModal = false;
-        await this.refreshCourse();
+    const updateContact = async () => {
+      try {
+        contactModalLoading.value = true;
+        v$.value.tempContactId.$touch();
+        if (v$.value.tempContactId.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Courses.update(profileId.value, { contact: tempContactId.value });
+        contactAdditionModal.value = false;
+        await refreshCourse();
         NotifyPositive('Contact mis à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'édition du contact.');
       } finally {
-        this.contactModalLoading = false;
+        contactModalLoading.value = false;
       }
-    },
-    resetContactAddition () {
-      this.tempContactId = '';
-      this.v$.tempContactId.$reset();
-    },
-    resetSalesRepresentativeEdition () {
-      this.tempInterlocutor = { _id: '', isContact: false };
-      this.v$.tempInterlocutor.$reset();
-    },
-    openSalesRepresentativeModal () {
-      this.tempInterlocutor = {
-        _id: this.course.salesRepresentative._id,
-        isContact: this.course.salesRepresentative._id === this.course.contact._id,
+    };
+
+    const resetContactAddition = () => {
+      tempContactId.value = '';
+      v$.value.tempContactId.$reset();
+    };
+
+    const resetSalesRepresentativeEdition = () => {
+      tempInterlocutor.value = { _id: '', isContact: false };
+      v$.value.tempInterlocutor.$reset();
+    };
+
+    const openSalesRepresentativeModal = () => {
+      tempInterlocutor.value = {
+        _id: course.value.salesRepresentative._id,
+        isContact: course.value.salesRepresentative._id === course.value.contact._id,
       };
-      this.salesRepresentativeEditionModal = true;
-    },
-    resetInterlocutor () {
-      this.tempInterlocutor = { _id: '', isContact: false };
-      this.interlocutorLabel = { action: '', interlocutor: '' };
-      this.v$.tempInterlocutor.$reset();
-    },
-    openTrainerModal (action) {
-      this.tempInterlocutor = {
-        _id: this.course.trainer._id,
-        isContact: !!this.course.trainer._id && this.course.trainer._id === this.course.contact._id,
+      salesRepresentativeEditionModal.value = true;
+    };
+
+    const resetInterlocutor = () => {
+      tempInterlocutor.value = { _id: '', isContact: false };
+      interlocutorLabel.value = { action: '', interlocutor: '' };
+      v$.value.tempInterlocutor.$reset();
+    };
+
+    const openTrainerModal = (action) => {
+      tempInterlocutor.value = {
+        _id: course.value.trainer._id,
+        isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
       };
-      this.interlocutorLabel = { action, interlocutor: 'intervenant(e)' };
-      this.trainerModal = true;
-    },
-    openCompanyRepresentativeModal (action) {
-      this.tempInterlocutor = {
-        _id: this.course.companyRepresentative._id,
-        isContact: !!this.course.companyRepresentative._id &&
-        this.course.companyRepresentative._id === this.course.contact._id,
+      interlocutorLabel.value = { action, interlocutor: 'intervenant(e)' };
+      trainerModal.value = true;
+    };
+
+    const openCompanyRepresentativeModal = (action) => {
+      tempInterlocutor.value = {
+        _id: course.value.companyRepresentative._id,
+        isContact: !!course.value.companyRepresentative._id &&
+        course.value.companyRepresentative._id === course.value.contact._id,
       };
-      this.interlocutorLabel = { action, interlocutor: 'Référent structure' };
-      this.companyRepresentativeModal = true;
-    },
-    openContactAdditionModal () {
-      this.tempContactId = this.course.contact._id;
-      this.contactAdditionModal = true;
-    },
-    copy () {
-      copyToClipboard(this.traineesEmails)
+      interlocutorLabel.value = { action, interlocutor: 'Référent structure' };
+      companyRepresentativeModal.value = true;
+    };
+
+    const openContactAdditionModal = () => {
+      tempContactId.value = course.value.contact._id;
+      contactAdditionModal.value = true;
+    };
+
+    const copy = () => {
+      copyToClipboard(traineesEmails.value)
         .then(() => NotifyPositive('Adresses mail copiées !'))
         .catch(() => NotifyNegative('Erreur lors de la copie des emails.'));
-    },
+    };
+
+    const getValue = (path) => {
+      if (path === 'trainer') return get(course.value, 'trainer._id', '');
+      if (path === 'salesRepresentative') return get(course.value, 'salesRepresentative._id', '');
+      if (path === 'contact') return get(course.value, 'contact._id', '');
+
+      return get(course.value, path);
+    };
+
+    const saveTmp = (path) => {
+      tmpInput.value = getValue(path);
+    };
+
+    const getVAttribute = (path) => {
+      if (path === 'trainer') return get(v$.course, 'trainer._id', '');
+      if (path === 'salesRepresentative') return get(v$.course, 'salesRepresentative._id', '');
+      if (path === 'contact') return '';
+
+      return get(v$.course, path);
+    };
+
+    const formatUpdateCourseValue = (path, value) => (path === 'contact.phone' ? formatPhoneForPayload(value) : value);
+
+    const updateCourse = async (path) => {
+      try {
+        const value = getValue(path);
+        if (tmpInput.value === value) return;
+
+        const vAttribute = getVAttribute(path);
+        if (vAttribute) {
+          vAttribute.$touch();
+          if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
+        }
+
+        const payload = set({}, path, formatUpdateCourseValue(path, value));
+        await Courses.update(profileId.value, payload);
+        NotifyPositive('Modification enregistrée.');
+
+        await refreshCourse();
+      } catch (e) {
+        console.error(e);
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
+        NotifyNegative('Erreur lors de la modification.');
+      } finally {
+        tmpInput.value = null;
+      }
+    };
+
+    const created = async () => {
+      const promises = [refreshCourse()];
+      if (isVendorInterface || isIntraCourse.value) {
+        promises.push(refreshSms(), refreshCompanyRepresentatives());
+      }
+      await Promise.all(promises);
+      setDefaultMessageType();
+
+      if (isAdmin.value) await refreshTrainersAndSalesRepresentatives();
+      else {
+        salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
+      }
+    };
+
+    created();
+
+    return {
+      // Data
+      INTRA,
+      trainerOptions,
+      salesRepresentativeOptions,
+      companyRepresentativeOptions,
+      courseLoading,
+      displayHistory,
+      courseHistories,
+      smsModal,
+      messageTypeOptions,
+      newSms,
+      loading,
+      smsHistoryList,
+      smsHistoriesModal,
+      tempInterlocutor,
+      salesRepresentativeLabel,
+      salesRepresentativeEditionModal,
+      interlocutorModalLoading,
+      interlocutorLabel,
+      trainerModal,
+      sendSms,
+      companyRepresentativeModal,
+      contactModalLoading,
+      contactAdditionModal,
+      tempContactId,
+      courseHistoryFeed,
+      // Computed
+      course,
+      v$,
+      isAdmin,
+      canEditSlots,
+      canEditTrainees,
+      filteredMessageTypeOptions,
+      missingTraineesPhone,
+      smsMissingInfo,
+      disableSms,
+      canUpdateInterlocutor,
+      traineesEmails,
+      contactOptions,
+      isIntraOrVendor,
+      disableDocDownload,
+      followUpDisabled,
+      isArchived,
+      followUpMissingInfo,
+      // Methods
+      get,
+      formatQuantity,
+      toggleHistory,
+      updateCourseHistories,
+      refreshCourse,
+      formatContactOption,
+      openHistoryModal,
+      openSmsModal,
+      resetSmsModal,
+      updateMessage,
+      sendMessage,
+      downloadConvocation,
+      updateInterlocutor,
+      updateContact,
+      resetContactAddition,
+      resetSalesRepresentativeEdition,
+      openSalesRepresentativeModal,
+      resetInterlocutor,
+      openTrainerModal,
+      openCompanyRepresentativeModal,
+      openContactAdditionModal,
+      copy,
+      saveTmp,
+      updateCourse,
+      downloadAttendanceSheet,
+    };
   },
 };
 </script>

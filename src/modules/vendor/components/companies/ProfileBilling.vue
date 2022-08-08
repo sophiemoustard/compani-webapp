@@ -106,7 +106,7 @@ import { downloadFile } from '@helpers/file';
 import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
-import router from 'src/router/index';
+import { useCourses } from '@composables/courses';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
 
@@ -185,6 +185,8 @@ export default {
         date: { required },
       },
     };
+
+    const { isVendorInterface } = useCourses();
 
     const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment });
 
@@ -344,13 +346,9 @@ export default {
       canUpdateBilling.value || (loggedUser.value.company._id === course.company) ? 'course redirection' : 'course'
     );
 
-    const getTableName = (payer) => {
-      const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
-
-      return isVendorInterface || payer._id !== company.value._id
-        ? `Formations facturées à ${payer.name}`
-        : 'Mes factures';
-    };
+    const getTableName = payer => (isVendorInterface || payer._id !== company.value._id
+      ? `Formations facturées à ${payer.name}`
+      : 'Mes factures');
 
     const getProgramName = (course) => {
       const programName = get(course, 'subProgram.program.name');
