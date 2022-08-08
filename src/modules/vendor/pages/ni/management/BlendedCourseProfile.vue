@@ -9,8 +9,10 @@
 </template>
 
 <script>
-import { createMetaMixin } from 'quasar';
-import { mapState } from 'vuex';
+import { useMeta, useQuasar } from 'quasar';
+import { onBeforeUnmount, computed, ref, toRefs, watch } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter, useRoute } from 'vue-router';
 import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
@@ -19,13 +21,11 @@ import ProfileBilling from '@components/courses/ProfileBilling';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
-import { courseMixin } from '@mixins/courseMixin';
-
-const metaInfo = { title: 'Fiche formation' };
+import { composeCourseName } from '@helpers/courses';
+import { useCourses } from '@composables/courses';
 
 export default {
   name: 'BlendedCourseProfile',
-  mixins: [courseMixin, createMetaMixin(metaInfo)],
   props: {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },
@@ -34,83 +34,111 @@ export default {
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
     'profile-tabs': ProfileTabs,
   },
-  data () {
-    return { courseName: '' };
-  },
-  computed: {
-    ...mapState('course', ['course']),
-    tabsContent () {
+  setup (props) {
+    const metaInfo = { title: 'Fiche formation' };
+    useMeta(metaInfo);
+
+    const $store = useStore();
+    const $router = useRouter();
+    const $route = useRoute();
+    const $q = useQuasar();
+
+    const courseName = ref('');
+
+    const course = computed(() => $store.state.course.course);
+
+    const { headerInfo } = useCourses(course);
+
+    const { courseId, defaultTab } = toRefs(props);
+
+    const tabsContent = computed(() => {
       const organizationTab = {
         label: 'Organisation',
         name: 'organization',
-        default: this.defaultTab === 'organization',
+        default: defaultTab.value === 'organization',
         component: ProfileOrganization,
       };
       const followUpTab = {
         label: 'Suivi des stagiaires',
         name: 'traineeFollowUp',
-        default: this.defaultTab === 'traineeFollowUp',
+        default: defaultTab.value === 'traineeFollowUp',
         component: ProfileTraineeFollowUp,
       };
       const billingTab = {
         label: 'Facturation',
         name: 'billing',
-        default: this.defaultTab === 'billing',
+        default: defaultTab.value === 'billing',
         component: ProfileBilling,
       };
 
-      const vendorRole = this.$store.getters['main/getVendorRole'];
+      const vendorRole = $store.getters['main/getVendorRole'];
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
 
       return isAdmin ? [organizationTab, followUpTab, billingTab] : [organizationTab, followUpTab];
-    },
-  },
-  async created () {
-    if (!this.course) await this.refreshCourse();
-    this.courseName = this.composeCourseName(this.course, true);
-  },
-  watch: {
-    course () {
-      this.courseName = this.composeCourseName(this.course, true);
-    },
-  },
-  methods: {
-    async refreshCourse () {
+    });
+
+    const refreshCourse = async () => {
       try {
-        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
+        await $store.dispatch('course/fetchCourse', { courseId: courseId.value });
       } catch (e) {
         console.error(e);
       }
-    },
-    async deleteCourse () {
+    };
+
+    const deleteCourse = async () => {
       try {
-        await Courses.delete(this.course._id);
+        await Courses.delete(course.value._id);
         NotifyPositive('Formation supprimée.');
 
-        this.$router.push({ name: 'ni management blended courses' });
+        $router.push({ name: 'ni management blended courses' });
       } catch (e) {
         console.error(e);
         if (e.status === 403) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la suppression de la formation.');
       }
-    },
-    validateCourseDeletion () {
-      this.$q.dialog({
+    };
+
+    const validateCourseDeletion = () => {
+      $q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression&nbsp;?',
         html: true,
         ok: 'OK',
         cancel: 'Annuler',
       })
-        .onOk(this.deleteCourse)
+        .onOk(deleteCourse)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-  },
-  beforeUnmount () {
-    this.$store.dispatch('course/resetCourse');
-    if (!['ni management blended courses', 'trainers courses'].includes(this.$route.name)) {
-      this.$store.dispatch('course/resetFilters');
-    }
+    };
+
+    watch(course, () => {
+      courseName.value = composeCourseName(course.value, true);
+    });
+
+    const created = async () => {
+      if (!course.value) await refreshCourse();
+      courseName.value = composeCourseName(course.value, true);
+    };
+
+    created();
+
+    onBeforeUnmount(() => {
+      $store.dispatch('course/resetCourse');
+      if (!['ni management blended courses', 'trainers courses'].includes($route.name)) {
+        $store.dispatch('course/resetFilters');
+      }
+    });
+
+    return {
+      // Data
+      courseName,
+      tabsContent,
+      // Computed
+      course,
+      headerInfo,
+      // Methods
+      refreshCourse,
+      validateCourseDeletion,
+    };
   },
 };
 </script>
