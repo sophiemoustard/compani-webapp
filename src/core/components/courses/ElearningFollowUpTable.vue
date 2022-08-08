@@ -69,6 +69,7 @@ export default {
   setup (props) {
     const $router = useRouter();
     const $store = useStore();
+
     const { isBlended } = toRefs(props);
 
     const { isClientInterface } = useCourses();

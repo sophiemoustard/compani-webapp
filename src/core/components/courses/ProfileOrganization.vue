@@ -173,6 +173,8 @@ export default {
     'contact-addition-modal': CourseContactAdditionModal,
   },
   setup (props) {
+    const { profileId } = toRefs(props);
+
     const $store = useStore();
 
     const trainerOptions = ref([]);
@@ -184,7 +186,8 @@ export default {
     const courseHistories = ref([]);
     const smsModal = ref(false);
     const messageTypeOptions = ref([
-      { label: 'Convocation', value: CONVOCATION }, { label: 'Rappel', value: REMINDER },
+      { label: 'Convocation', value: CONVOCATION },
+      { label: 'Rappel', value: REMINDER },
     ]);
     const newSms = ref({ content: '', type: '' });
     const loading = ref(false);
@@ -206,10 +209,7 @@ export default {
     const tempContactId = ref('');
     const SALES_REPRESENTATIVE = ref('salesRepresentative');
     const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
-
     const courseHistoryFeed = ref(null);
-
-    const { profileId } = toRefs(props);
 
     const course = computed(() => $store.state.course.course);
 
@@ -237,11 +237,6 @@ export default {
     }));
 
     const v$ = useVuelidate(rules, { tempInterlocutor, tempContactId, course, newSms });
-
-    watch(course, () => {
-      const phoneValidation = get(v$.value, 'course.contact.contact.phone');
-      if (phoneValidation) phoneValidation.$touch();
-    });
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
     const isAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
@@ -311,6 +306,11 @@ export default {
           : []),
       ];
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
+    });
+
+    watch(course, () => {
+      const phoneValidation = get(v$.value, 'course.contact.contact.phone');
+      if (phoneValidation) phoneValidation.$touch();
     });
 
     const toggleHistory = async () => {

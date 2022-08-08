@@ -33,15 +33,12 @@ export default {
     const metaInfo = { title: 'Fiche formation' };
     useMeta(metaInfo);
 
-    const $store = useStore();
-    const $route = useRoute();
-    const course = computed(() => $store.state.course.course);
-    const courseName = ref('');
-
     const { courseId, defaultTab } = toRefs(props);
 
-    const { headerInfo } = useCourses(course);
+    const $store = useStore();
+    const $route = useRoute();
 
+    const courseName = ref('');
     const tabsContent = [
       {
         label: 'Organisation',
@@ -57,6 +54,14 @@ export default {
       },
     ];
 
+    const course = computed(() => $store.state.course.course);
+
+    const { headerInfo } = useCourses(course);
+
+    watch(course, () => {
+      courseName.value = composeCourseName(course.value);
+    });
+
     const refreshCourse = async () => {
       try {
         await $store.dispatch('course/fetchCourse', { courseId: courseId.value });
@@ -64,10 +69,6 @@ export default {
         console.error(e);
       }
     };
-
-    watch(course, () => {
-      courseName.value = composeCourseName(course.value);
-    });
 
     const created = async () => {
       if (!course.value) await refreshCourse();

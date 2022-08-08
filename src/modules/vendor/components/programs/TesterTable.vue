@@ -61,6 +61,8 @@ export default {
   },
   emits: ['refresh'],
   setup (props, { emit }) {
+    const { programId } = toRefs(props);
+
     const $q = useQuasar();
 
     const columns = ref([
@@ -98,8 +100,6 @@ export default {
     });
     const firstStep = ref(true);
     const modalLoading = ref(false);
-
-    const { programId } = toRefs(props);
 
     const rules = computed(() => ({
       newTester: {
@@ -143,7 +143,7 @@ export default {
 
         modalLoading.value = true;
         await Programs.addTester(programId.value, newTester.value);
-        NotifyPositive('Testeu(euse) ajouté(e) avec succès.');
+        NotifyPositive('Testeur(euse) ajouté(e) avec succès.');
 
         await sendWelcome();
         resetTesterCreationModal();

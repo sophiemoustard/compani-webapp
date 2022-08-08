@@ -89,12 +89,10 @@ export default {
   setup (props, { emit }) {
     const $store = useStore();
     const $q = useQuasar();
-    const potentialTrainees = ref([]);
-    const company = computed(() => $store.getters['main/getCompany']);
-    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
-    const course = computed(() => $store.state.course.course);
-    const loggedUser = computed(() => $store.state.main.loggedUser);
 
+    const { canEdit } = toRefs(props);
+
+    const potentialTrainees = ref([]);
     const traineesColumns = ref([
       {
         name: 'company',
@@ -131,7 +129,14 @@ export default {
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
     const companyOptions = ref([]);
-    const { canEdit } = toRefs(props);
+
+    const company = computed(() => $store.getters['main/getCompany']);
+
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+
+    const course = computed(() => $store.state.course.course);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 

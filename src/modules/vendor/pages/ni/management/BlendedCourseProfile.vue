@@ -38,19 +38,14 @@ export default {
     const metaInfo = { title: 'Fiche formation' };
     useMeta(metaInfo);
 
+    const { courseId, defaultTab } = toRefs(props);
+
     const $store = useStore();
     const $router = useRouter();
     const $route = useRoute();
     const $q = useQuasar();
 
     const courseName = ref('');
-
-    const course = computed(() => $store.state.course.course);
-
-    const { headerInfo } = useCourses(course);
-
-    const { courseId, defaultTab } = toRefs(props);
-
     const tabsContent = computed(() => {
       const organizationTab = {
         label: 'Organisation',
@@ -75,6 +70,14 @@ export default {
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
 
       return isAdmin ? [organizationTab, followUpTab, billingTab] : [organizationTab, followUpTab];
+    });
+
+    const course = computed(() => $store.state.course.course);
+
+    const { headerInfo } = useCourses(course);
+
+    watch(course, () => {
+      courseName.value = composeCourseName(course.value, true);
     });
 
     const refreshCourse = async () => {
@@ -109,10 +112,6 @@ export default {
         .onOk(deleteCourse)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     };
-
-    watch(course, () => {
-      courseName.value = composeCourseName(course.value, true);
-    });
 
     const created = async () => {
       if (!course.value) await refreshCourse();
