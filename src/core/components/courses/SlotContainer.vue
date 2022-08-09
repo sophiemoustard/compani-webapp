@@ -72,7 +72,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { useStore } from 'vuex';
+import { computed, ref, toRefs } from 'vue';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import set from 'lodash/set';
@@ -86,17 +87,17 @@ import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { useCourses } from '@composables/courses';
+import { useValidations } from '@composables/validations';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
+import { getStepTypeLabel } from '@helpers/courses';
 import { formatDate, formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
 import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { courseMixin } from '@mixins/courseMixin';
-import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'SlotContainer',
-  mixins: [courseMixin, validationMixin],
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -108,63 +109,39 @@ export default {
     'ni-date-input': DateInput,
   },
   emits: ['refresh', 'update'],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  data () {
-    const isVendorInterface = /\/ad\//.test(this.$route.path);
+  setup (props, { emit }) {
+    const { canEdit } = toRefs(props);
 
-    return {
-      addDateToPlanLoading: false,
-      modalLoading: false,
-      editedCourseSlot: {},
-      editionModal: false,
-      isVendorInterface,
-      ON_SITE,
-      linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
-      SLOTS_TO_PLAN_KEY: 'toPlan',
-      isOnlySlot: false,
-      isPlannedSlot: false,
-    };
-  },
-  validations () {
-    return {
-      editedCourseSlot: {
-        address: {
-          zipCode: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
-          street: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
-          city: { required: requiredIf(get(this.editedSlot, 'address.fullAddress')) },
-          fullAddress: { frAddress },
-        },
-        meetingLink: { urlAddress },
-        dates: {
-          startDate: { required },
-          endDate: {
-            required,
-            ...(!!get(this.editedSlot, 'dates.startDate') && {
-              maxDate: maxDate(moment(this.editedSlot.dates.startDate).endOf('d').toISOString()),
-              minDate: minDate(this.editedSlot.dates.startDate),
-            }),
-          },
-        },
-      },
-    };
-  },
-  computed: {
-    ...mapState('course', ['course']),
-    slotsDurationTitle () {
-      if (!this.course || !this.course.slots) return '0h';
+    const $store = useStore();
 
-      const total = this.course.slots.reduce(
+    const addDateToPlanLoading = ref(false);
+    const modalLoading = ref(false);
+    const editedCourseSlot = ref({});
+    const editionModal = ref(false);
+    const linkErrorMessage = ref('Le lien doit commencer par http:// ou https://');
+    const SLOTS_TO_PLAN_KEY = 'toPlan';
+    const isOnlySlot = ref(false);
+    const isPlannedSlot = ref(false);
+
+    const { isVendorInterface } = useCourses();
+    const { waitForFormValidation } = useValidations();
+
+    const course = computed(() => $store.state.course.course);
+
+    const slotsDurationTitle = computed(() => {
+      if (!course.value || !course.value.slots) return '0h';
+
+      const total = course.value.slots.reduce(
         (acc, slot) => acc.add(moment.duration(moment(slot.endDate).diff(slot.startDate))),
         moment.duration()
       );
 
       return formatDuration(total);
-    },
-    formatSlotTitle () {
-      const slotsToPlanLength = this.course.slotsToPlan.length;
-      const courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
+    });
+
+    const formatSlotTitle = computed(() => {
+      const slotsToPlanLength = course.value.slotsToPlan.length;
+      const courseSlots = groupBy(course.value.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       const slotList = Object.values(courseSlots);
       const totalDate = slotsToPlanLength + slotList.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
@@ -179,50 +156,62 @@ export default {
       }
 
       return {
-        title: `${formatQuantity('date', totalDate)}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
+        title: `${formatQuantity('date', totalDate)}, ${slotsToPlanTitle}${slotsDurationTitle.value}`,
         subtitle,
         icon: 'mdi-calendar-range',
       };
-    },
-    stepsLength () {
-      return this.course.subProgram.steps.length;
-    },
-    stepTypes () {
-      return [...this.course.subProgram.steps.map(step => ({ value: step._id, type: step.type }))];
-    },
-    courseSlotsByStepAndDate () {
-      if (!this.course.slots.length && !this.course.slotsToPlan.length) return {};
-      const formattedSlots = [...this.course.slots, ...this.course.slotsToPlan];
+    });
+
+    const stepTypes = computed(() => [
+      ...course.value.subProgram.steps.map(step => ({ value: step._id, type: step.type })),
+    ]);
+
+    const courseSlotsByStepAndDate = computed(() => {
+      if (!course.value.slots.length && !course.value.slotsToPlan.length) return {};
+      const formattedSlots = [...course.value.slots, ...course.value.slotsToPlan];
       const slotsByStep = groupBy(formattedSlots, 'step');
       const slotsByStepAndDateList = Object.keys(slotsByStep)
-        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || this.SLOTS_TO_PLAN_KEY));
+        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || SLOTS_TO_PLAN_KEY));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
-    },
-    stepList () {
-      return get(this.course, 'subProgram.steps').map(step => ({
-        key: step._id,
-        name: step.name,
-        type: step.type,
-        typeLabel: this.getStepTypeLabel(step.type),
-      }));
-    },
-  },
-  async created () {
-    if (!this.course) this.$emit('refresh');
-  },
-  methods: {
-    getDuration,
-    formatIntervalHourly,
-    formatDate,
-    get,
-    omit,
-    getSlotAddress (slot) {
-      return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
-    },
-    openEditionModal (slot) {
-      if (!this.canEdit) return;
-      if (this.course.archivedAt) {
+    });
+
+    const stepList = computed(() => get(course.value, 'subProgram.steps').map(step => ({
+      key: step._id,
+      name: step.name,
+      type: step.type,
+      typeLabel: getStepTypeLabel(step.type),
+    })));
+
+    const rules = computed(() => ({
+      editedCourseSlot: {
+        address: {
+          zipCode: { required: requiredIf(get(editedCourseSlot.value, 'address.fullAddress')) },
+          street: { required: requiredIf(get(editedCourseSlot.value, 'address.fullAddress')) },
+          city: { required: requiredIf(get(editedCourseSlot.value, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+        meetingLink: { urlAddress },
+        dates: {
+          startDate: { required },
+          endDate: {
+            required,
+            ...(!!get(editedCourseSlot.value, 'dates.startDate') && {
+              maxDate: maxDate(moment(editedCourseSlot.value.dates.startDate).endOf('d').toISOString()),
+              minDate: minDate(editedCourseSlot.value.dates.startDate),
+            }),
+          },
+        },
+      },
+    }));
+
+    const v$ = useVuelidate(rules, { editedCourseSlot });
+
+    const getSlotAddress = slot => get(slot, 'address.fullAddress') || 'Adresse non renseignée';
+
+    const openEditionModal = (slot) => {
+      if (!canEdit.value) return;
+      if (course.value.archivedAt) {
         return NotifyWarning('Vous ne pouvez pas éditer un créneau d\'une formation archivée.');
       }
 
@@ -230,138 +219,189 @@ export default {
         startDate: moment().startOf('d').hours(9).toISOString(),
         endDate: moment().startOf('d').hours(12).toISOString(),
       };
-      this.editedCourseSlot = {
+      editedCourseSlot.value = {
         _id: slot._id,
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
         meetingLink: get(slot, 'meetingLink') || '',
         step: slot.step,
       };
-      if (slot.address) this.editedCourseSlot.address = { ...slot.address };
-      this.isOnlySlot = this.setIsOnlySlot(slot.step);
-      this.isPlannedSlot = has(slot, 'startDate');
-      this.editionModal = true;
-    },
-    resetEditionModal () {
-      this.editedCourseSlot = {};
-      this.v$.editedCourseSlot.$reset();
-      this.isOnlySlot = false;
-      this.isPlannedSlot = false;
-    },
-    formatEditionPayload (courseSlot) {
-      const stepType = this.stepTypes.find(item => item.value === courseSlot.step).type;
+
+      if (slot.address) editedCourseSlot.value.address = { ...slot.address };
+      isOnlySlot.value = setIsOnlySlot(slot.step);
+      isPlannedSlot.value = has(slot, 'startDate');
+      editionModal.value = true;
+    };
+
+    const resetEditionModal = () => {
+      editedCourseSlot.value = {};
+      v$.value.editedCourseSlot.$reset();
+      isOnlySlot.value = false;
+      isPlannedSlot.value = false;
+    };
+
+    const formatEditionPayload = (courseSlot) => {
+      const stepType = stepTypes.value.find(item => item.value === courseSlot.step).type;
 
       return {
         ...courseSlot.dates,
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
       };
-    },
-    async addDateToPlan (stepId) {
+    };
+
+    const addDateToPlan = async (stepId) => {
       try {
-        if (this.course.archivedAt) {
+        if (course.value.archivedAt) {
           return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
         }
 
-        this.addDateToPlanLoading = true;
-        await CourseSlots.create({ course: this.course._id, step: stepId });
+        addDateToPlanLoading.value = true;
+        await CourseSlots.create({ course: course.value._id, step: stepId });
         NotifyPositive('Date à planifier ajoutée.');
 
-        this.$emit('refresh');
+        emit('refresh');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       } finally {
-        this.addDateToPlanLoading = false;
+        addDateToPlanLoading.value = false;
       }
-    },
-    async updateCourseSlot () {
+    };
+
+    const updateCourseSlot = async () => {
       try {
-        this.v$.editedCourseSlot.$touch();
-        const isValid = await this.waitForFormValidation(this.v$.editedCourseSlot);
+        v$.value.editedCourseSlot.$touch();
+        const isValid = await waitForFormValidation(v$.value.editedCourseSlot);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
-        this.modalLoading = true;
-        const payload = this.formatEditionPayload(this.editedCourseSlot);
-        await CourseSlots.update(this.editedCourseSlot._id, payload);
+        modalLoading.value = true;
+        const payload = formatEditionPayload(editedCourseSlot.value);
+        await CourseSlots.update(editedCourseSlot.value._id, payload);
         NotifyPositive('Créneau modifié.');
 
-        this.editionModal = false;
-        this.$emit('refresh');
+        editionModal.value = false;
+        emit('refresh');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification du créneau.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    async deleteCourseSlot (slotId) {
+    };
+    const deleteCourseSlot = async (slotId) => {
       try {
-        this.modalLoading = true;
+        modalLoading.value = true;
         await CourseSlots.delete(slotId);
-        this.$emit('refresh');
+        emit('refresh');
         NotifyPositive('Créneau supprimé');
-        this.editionModal = false;
+        editionModal.value = false;
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyWarning('Créneau émargé : impossible de le supprimer.');
         if (e.data.statusCode === 403) return NotifyWarning('Seul créneau de l\'étape : impossible de le supprimer.');
         NotifyNegative('Erreur lors de la suppression du créneau.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    async unplanSlot (slotId) {
+    };
+
+    const unplanSlot = async (slotId) => {
       try {
-        this.modalLoading = true;
+        modalLoading.value = true;
         await CourseSlots.update(slotId, { startDate: '', endDate: '' });
-        this.$emit('refresh');
+        emit('refresh');
         NotifyPositive('Dates supprimées.');
-        this.editionModal = false;
+        editionModal.value = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression des dates.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    setCourseSlot (payload) {
+    };
+
+    const setCourseSlot = (payload) => {
       const { path, value } = payload;
-      set(this.editedCourseSlot, path, value);
-    },
-    async updateEstimatedStartDate (event) {
-      this.$emit('update', set(this.course, 'estimatedStartDate', event));
-    },
-    isElearningStep (step) {
-      return step.type === E_LEARNING;
-    },
-    isPlannedStep (step) {
-      return !!this.courseSlotsByStepAndDate[step.key] &&
-            Object.keys(this.courseSlotsByStepAndDate[step.key]).every(date => date !== this.SLOTS_TO_PLAN_KEY);
-    },
-    isStepToPlan (step) {
-      return !(this.isElearningStep(step) || this.isPlannedStep(step));
-    },
-    getStepClass (step) {
-      if (this.isElearningStep(step)) return '';
-      if (this.isPlannedStep(step)) return 'planned';
+      set(editedCourseSlot.value, path, value);
+    };
+
+    const updateEstimatedStartDate = async (event) => {
+      emit('update', set(course.value, 'estimatedStartDate', event));
+    };
+
+    const isElearningStep = step => step.type === E_LEARNING;
+
+    const isPlannedStep = step => !!courseSlotsByStepAndDate.value[step.key] &&
+            Object.keys(courseSlotsByStepAndDate.value[step.key]).every(date => date !== SLOTS_TO_PLAN_KEY);
+
+    const isStepToPlan = step => !(isElearningStep(step) || isPlannedStep(step));
+
+    const getStepClass = (step) => {
+      if (isElearningStep(step)) return '';
+      if (isPlannedStep(step)) return 'planned';
 
       return 'to-plan';
-    },
-    setIsOnlySlot (step) {
-      const days = Object.keys(this.courseSlotsByStepAndDate[step]);
+    };
 
-      return days.length === 1 && this.courseSlotsByStepAndDate[step][days[0]].length === 1;
-    },
-    getSlotClass (step) {
-      return [
-        'row items-center',
-        this.canEdit && `cursor-pointer hover-${this.isPlannedStep(step) ? 'blue' : 'orange'}`,
-      ];
-    },
+    const setIsOnlySlot = (step) => {
+      const days = Object.keys(courseSlotsByStepAndDate.value[step]);
+
+      return days.length === 1 && courseSlotsByStepAndDate.value[step][days[0]].length === 1;
+    };
+
+    const getSlotClass = step => [
+      'row items-center',
+      canEdit.value && `cursor-pointer hover-${isPlannedStep(step) ? 'blue' : 'orange'}`,
+    ];
+
+    const created = async () => {
+      if (!course.value) emit('refresh');
+    };
+
+    created();
+
+    return {
+      // Data
+      isVendorInterface,
+      ON_SITE,
+      addDateToPlanLoading,
+      modalLoading,
+      editedCourseSlot,
+      editionModal,
+      linkErrorMessage,
+      SLOTS_TO_PLAN_KEY,
+      isOnlySlot,
+      isPlannedSlot,
+      // Computed
+      v$,
+      course,
+      formatSlotTitle,
+      stepTypes,
+      courseSlotsByStepAndDate,
+      stepList,
+      // Methods
+      getDuration,
+      formatIntervalHourly,
+      formatDate,
+      get,
+      omit,
+      getSlotAddress,
+      openEditionModal,
+      resetEditionModal,
+      addDateToPlan,
+      updateCourseSlot,
+      deleteCourseSlot,
+      unplanSlot,
+      setCourseSlot,
+      updateEstimatedStartDate,
+      isElearningStep,
+      isStepToPlan,
+      getStepClass,
+      getSlotClass,
+    };
   },
-
 };
 </script>
 
