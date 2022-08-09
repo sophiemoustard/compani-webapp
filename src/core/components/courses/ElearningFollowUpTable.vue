@@ -51,6 +51,7 @@ import Progress from '@components/CourseProgress';
 import { getStepTypeIcon } from '@helpers/courses';
 import { sortStrings } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
+import { useCourses } from '@composables/courses';
 import ConnectedDot from './ConnectedDot';
 
 export default {
@@ -68,9 +69,10 @@ export default {
   setup (props) {
     const $router = useRouter();
     const $store = useStore();
+
     const { isBlended } = toRefs(props);
 
-    const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
+    const { isClientInterface } = useCourses();
 
     const columns = ref([
       {

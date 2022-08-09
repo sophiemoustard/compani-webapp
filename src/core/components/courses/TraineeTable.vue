@@ -49,7 +49,6 @@
 <script>
 import { onMounted, computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
@@ -88,17 +87,12 @@ export default {
   },
   emits: ['refresh'],
   setup (props, { emit }) {
+    const { canEdit } = toRefs(props);
+
     const $store = useStore();
     const $q = useQuasar();
-    const $router = useRouter();
+
     const potentialTrainees = ref([]);
-    const company = computed(() => $store.getters['main/getCompany']);
-    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
-    const course = computed(() => $store.state.course.course);
-    const loggedUser = computed(() => $store.state.main.loggedUser);
-
-    const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
-
     const traineesColumns = ref([
       {
         name: 'company',
@@ -135,7 +129,14 @@ export default {
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
     const companyOptions = ref([]);
-    const { canEdit } = toRefs(props);
+
+    const company = computed(() => $store.getters['main/getCompany']);
+
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+
+    const course = computed(() => $store.state.course.course);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
@@ -196,15 +197,13 @@ export default {
       learnerValidation,
       traineeValidation,
       goToNextStep,
-      getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
     } = useLearners(refresh, false, company);
 
-    const { isIntraCourse } = useCourses(course);
+    const { isIntraCourse, isClientInterface } = useCourses(course);
 
     onMounted(async () => {
-      await getLearnerList(company.value._id);
       await getPotentialTrainees();
     });
 

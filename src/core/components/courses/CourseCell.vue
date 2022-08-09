@@ -48,7 +48,6 @@
 <script>
 import get from 'lodash/get';
 import { computed, toRefs } from 'vue';
-import { useRouter } from 'vue-router';
 import { FORTHCOMING, COMPLETED, IN_PROGRESS } from '@data/constants';
 import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
@@ -63,11 +62,9 @@ export default {
   },
   emits: ['click'],
   setup (props) {
-    const $router = useRouter();
-    const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
     const { course } = toRefs(props);
 
-    const { headerInfo } = useCourses(course);
+    const { headerInfo, isVendorInterface } = useCourses(course);
 
     const courseName = computed(() => composeCourseName(course.value, isVendorInterface));
 

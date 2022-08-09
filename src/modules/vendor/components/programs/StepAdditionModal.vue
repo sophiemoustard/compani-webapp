@@ -67,10 +67,11 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-step', 'update:reused-step', 'update:addition-type'],
   setup (props, { emit }) {
+    const { additionType, reusedStep, program, subProgramId, newStep } = toRefs(props);
+
     const stepOptions = ref([]);
     const programOptions = ref([]);
     const stepGroups = ref([]);
-    const { additionType, reusedStep, program, subProgramId, newStep } = toRefs(props);
 
     const submitLabel = computed(() => (additionType.value === CREATE_STEP ? 'Créer l\'étape' : 'Réutiliser l\'étape'));
 
