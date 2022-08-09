@@ -87,10 +87,10 @@ export default {
   },
   emits: ['refresh'],
   setup (props, { emit }) {
+    const { canEdit } = toRefs(props);
+
     const $store = useStore();
     const $q = useQuasar();
-
-    const { canEdit } = toRefs(props);
 
     const potentialTrainees = ref([]);
     const traineesColumns = ref([

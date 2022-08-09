@@ -239,6 +239,7 @@ export default {
     const v$ = useVuelidate(rules, { tempInterlocutor, tempContactId, course, newSms });
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
+
     const isAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
     const isCourseInter = computed(() => course.value.type === INTER_B2B);
