@@ -197,7 +197,6 @@ export default {
       learnerValidation,
       traineeValidation,
       goToNextStep,
-      getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
     } = useLearners(refresh, false, company);
@@ -205,7 +204,6 @@ export default {
     const { isIntraCourse, isClientInterface } = useCourses(course);
 
     onMounted(async () => {
-      await getLearnerList(company.value._id);
       await getPotentialTrainees();
     });
 
