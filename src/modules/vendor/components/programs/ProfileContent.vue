@@ -180,34 +180,50 @@ export default {
     const $store = useStore();
     const $q = useQuasar();
 
+    const areActivitiesVisible = ref({});
     const tmpInput = ref('');
     const modalLoading = ref(false);
-    const subProgramCreationModal = ref(false);
+    const { profileId } = toRefs(props);
+
+    // <sub-program-publication-modal
+    const subProgramToPublish = ref(null);
+    const subProgramPublicationModal = ref(false);
+    const companyOptions = ref([]);
+
+    // <sub-program-creation-modal
     const newSubProgram = ref({ name: '' });
+    const subProgramCreationModal = ref(false);
+    const currentSubProgramId = ref('');
+
+    // <step-addition-modal
     const additionType = ref(CREATE_STEP);
-    const stepAdditionModal = ref(false);
     const newStep = ref({ name: '', type: E_LEARNING });
+    const stepAdditionModal = ref(false);
     const reusedStep = ref({ _id: '', program: '' });
-    const stepEditionModal = ref(false);
+    const areStepsLocked = ref({});
+
+    // <step-edition-modal
     const editedStep = ref({ name: '', type: E_LEARNING, theoreticalHours: { hours: 0, minutes: 0 } });
-    const activityCreationModal = ref(false);
+    const stepEditionModal = ref(false);
+    const validateUnlockingEditionModal = ref(false);
+    const openNextModalAfterUnlocking = () => ref(null);
+
+    // <activity-creation-modal
     const newActivity = ref({ name: '' });
+    const activityCreationModal = ref(false);
+    // const currentStepId = ref('');
+
+    // <activity-reuse-modal
     const activityReuseModal = ref(false);
     const sameStepActivities = ref([]);
     const reusedActivity = ref('');
-    const programOptions = ref([]);
-    const areActivitiesVisible = ref({});
-    const currentSubProgramId = ref('');
     const currentStepId = ref('');
-    const subProgramPublicationModal = ref(false);
-    const companyOptions = ref([]);
-    const subProgramToPublish = ref(null);
-    const areStepsLocked = ref({});
-    const validateUnlockingEditionModal = ref(false);
-    const subProgramsReusingStepToBeUnlocked = ref([]);
+    const programOptions = ref([]);
+
+    // <validate-unlocking-step-modal
     const stepToBeUnlocked = ref({ _id: '', status: '' });
-    const openNextModalAfterUnlocking = () => ref(null);
-    const { profileId } = toRefs(props);
+    const subProgramsReusingStepToBeUnlocked = ref([]);
+    // const openNextModalAfterUnlocking = () => ref(null);
 
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
