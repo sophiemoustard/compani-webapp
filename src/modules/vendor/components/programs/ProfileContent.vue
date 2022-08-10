@@ -97,7 +97,7 @@
       @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" v-model:addition-type="additionType"
       :program="program" :validations="stepValidations" :sub-program-id="currentSubProgramId" />
 
-    <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="v$.editedStep"
+    <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="editedStepValidations"
       :theoretical-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
       :loading="modalLoading" :theoretical-minutes-error-msg="theoreticalMinutesErrorMsg" />
 
@@ -125,7 +125,7 @@ import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import draggable from 'vuedraggable';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf, helpers, maxValue } from '@vuelidate/validators';
+import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
@@ -135,7 +135,6 @@ import Steps from '@api/Steps';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
-  E_LEARNING,
   ACTIVITY_TYPES,
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
@@ -144,8 +143,7 @@ import {
 } from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity, sortStrings } from '@helpers/utils';
-import { formatDurationFromFloat, getHoursAndMinutes, computeHours } from '@helpers/date';
-import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { formatDurationFromFloat } from '@helpers/date';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
@@ -158,6 +156,7 @@ import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 import { useSubProgramCreationModal } from 'src/modules/vendor/composables/SubProgramCreationModal';
 import { useSubProgramPublicationModal } from 'src/modules/vendor/composables/SubProgramPublicationModal';
 import { useStepAdditionModal } from 'src/modules/vendor/composables/StepAdditionModal';
+import { useStepEditionModal } from 'src/modules/vendor/composables/StepEditionModal';
 
 export default {
   name: 'ProfileContent',
@@ -214,6 +213,33 @@ export default {
       resetPublication,
     } = useSubProgramPublicationModal(program, refreshProgram);
 
+    const isLocked = step => areStepsLocked.value[step._id];
+
+    const openValidateUnlockingEditionModal = (step) => {
+      if (!isLocked(step)) return;
+
+      stepToBeUnlocked.value = pick(step, ['_id', 'status']);
+      subProgramsReusingStepToBeUnlocked.value = getSubProgramsReusingStep(step);
+      validateUnlockingEditionModal.value = true;
+    };
+
+    const openNextModalAfterUnlocking = ref(() => ref(null));
+
+    const {
+      editedStep,
+      stepEditionModal,
+      openStepEditionModal,
+      editStep,
+      resetStepEditionModal,
+      v$: editedStepValidations,
+    } = useStepEditionModal(
+      isLocked,
+      openValidateUnlockingEditionModal,
+      refreshProgram,
+      modalLoading,
+      openNextModalAfterUnlocking
+    );
+
     const setStepLocking = (step, value) => {
       Object.assign(areStepsLocked.value, { [step._id]: value });
     };
@@ -230,11 +256,7 @@ export default {
       v$: stepValidations,
     } = useStepAdditionModal(setStepLocking, modalLoading, refreshProgram);
 
-    // <step-edition-modal
-    const editedStep = ref({ name: '', type: E_LEARNING, theoreticalHours: { hours: 0, minutes: 0 } });
-    const stepEditionModal = ref(false);
     const validateUnlockingEditionModal = ref(false);
-    const openNextModalAfterUnlocking = ref(() => ref(null));
 
     // <activity-creation-modal
     const newActivity = ref({ name: '' });
@@ -255,18 +277,6 @@ export default {
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
       newSubProgram: { name: { required } },
-      editedStep: {
-        name: { required },
-        theoreticalHours: {
-          hours: { required: requiredIf(!editedStep.value.theoreticalHours.minutes), integerNumber, positiveNumber },
-          minutes: {
-            required: requiredIf(!editedStep.value.theoreticalHours.hours),
-            integerNumber,
-            positiveNumber,
-            maxValue: maxValue(59),
-          },
-        },
-      },
       newActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     }));
@@ -275,24 +285,22 @@ export default {
 
     const v$ = useVuelidate(
       rules,
-      { program, editedStep, newActivity, reusedActivity }
+      { program, newActivity, reusedActivity }
     );
 
     const theoreticalHoursErrorMsg = computed(() => {
-      const validation = v$.value.editedStep;
-      if (!validation.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
-      if (!validation.theoreticalHours.hours.integerNumber.$response ||
-        !validation.theoreticalHours.hours.positiveNumber.$response) return 'Durée non valide';
+      if (!editedStepValidations.value.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
+      if (!editedStepValidations.value.theoreticalHours.hours.integerNumber.$response ||
+        !editedStepValidations.value.theoreticalHours.hours.positiveNumber.$response) return 'Durée non valide';
 
       return '';
     });
 
     const theoreticalMinutesErrorMsg = computed(() => {
-      const validation = v$.value.editedStep;
-      if (!validation.theoreticalHours.minutes.required.$response) return REQUIRED_LABEL;
-      if (!validation.theoreticalHours.minutes.integerNumber.$response ||
-       !validation.theoreticalHours.minutes.positiveNumber.$response ||
-       !validation.theoreticalHours.minutes.maxValue.$response) return 'Durée non valide';
+      if (!editedStepValidations.value.theoreticalHours.minutes.required.$response) return REQUIRED_LABEL;
+      if (!editedStepValidations.value.theoreticalHours.minutes.integerNumber.$response ||
+       !editedStepValidations.value.theoreticalHours.minutes.positiveNumber.$response ||
+       !editedStepValidations.value.theoreticalHours.minutes.maxValue.$response) return 'Durée non valide';
 
       return '';
     });
@@ -367,48 +375,6 @@ export default {
       } finally {
         tmpInput.value = null;
       }
-    };
-
-    // STEP
-
-    // step edition
-    const openStepEditionModal = async (step) => {
-      if (isLocked(step)) {
-        openNextModalAfterUnlocking.value = () => openStepEditionModal(step);
-        openValidateUnlockingEditionModal(step);
-      } else {
-        editedStep.value = {
-          ...pick(step, ['_id', 'name', 'type']),
-          theoreticalHours: getHoursAndMinutes(step.theoreticalHours),
-        };
-        stepEditionModal.value = true;
-      }
-    };
-
-    const editStep = async () => {
-      try {
-        modalLoading.value = true;
-        v$.value.editedStep.$touch();
-        if (v$.value.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Steps.updateById(
-          editedStep.value._id,
-          { ...pick(editedStep.value, ['name']), theoreticalHours: computeHours(editedStep.value.theoreticalHours) }
-        );
-        stepEditionModal.value = false;
-        await refreshProgram();
-        NotifyPositive('Étape modifiée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'étape.');
-      } finally {
-        modalLoading.value = false;
-      }
-    };
-
-    const resetStepEditionModal = () => {
-      editedStep.value = { name: '', theoreticalHours: { hours: 0, minutes: 0 } };
-      v$.value.editedStep.$reset();
     };
 
     // ACTIVITY
@@ -572,8 +538,6 @@ export default {
 
     const isPublished = element => element.status === PUBLISHED;
 
-    const isLocked = step => areStepsLocked.value[step._id];
-
     const isPublishedOrLocked = step => isPublished(step) || isLocked(step);
 
     const isReused = step => step.subPrograms && step.subPrograms.length > 1;
@@ -597,14 +561,6 @@ export default {
         subProgramsName: groupSp.map(sP => sP.name).sort(sortStrings),
       }))
       .sort((a, b) => sortStrings(a.programName, b.programName));
-
-    const openValidateUnlockingEditionModal = (step) => {
-      if (!isLocked(step)) return;
-
-      stepToBeUnlocked.value = pick(step, ['_id', 'status']);
-      subProgramsReusingStepToBeUnlocked.value = getSubProgramsReusingStep(step);
-      validateUnlockingEditionModal.value = true;
-    };
 
     const confirmUnlocking = () => {
       setStepLocking(stepToBeUnlocked.value, false);
@@ -671,6 +627,7 @@ export default {
       v$,
       stepValidations,
       newSubProgramValidations,
+      editedStepValidations,
       theoreticalHoursErrorMsg,
       theoreticalMinutesErrorMsg,
       program,
