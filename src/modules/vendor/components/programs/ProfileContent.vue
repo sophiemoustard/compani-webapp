@@ -95,7 +95,7 @@
 
     <step-addition-modal v-model="stepAdditionModal" v-model:new-step="newStep" v-model:reused-step="reusedStep"
       @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" v-model:addition-type="additionType"
-      :program="program" :validations="v$" :sub-program-id="currentSubProgramId" />
+      :program="program" :validations="stepValidations" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="v$.editedStep"
       :theoretical-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
@@ -132,7 +132,6 @@ import groupBy from 'lodash/groupBy';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
-import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
@@ -141,11 +140,10 @@ import {
   PUBLISHED,
   PUBLISHED_DOT_ACTIVE,
   PUBLISHED_DOT_WARNING,
-  CREATE_STEP,
   REQUIRED_LABEL,
 } from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
-import { formatQuantity, formatAndSortOptions, sortStrings } from '@helpers/utils';
+import { formatQuantity, sortStrings } from '@helpers/utils';
 import { formatDurationFromFloat, getHoursAndMinutes, computeHours } from '@helpers/date';
 import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
@@ -158,6 +156,8 @@ import SubProgramPublicationModal from 'src/modules/vendor/components/programs/S
 import ValidateUnlockingStepModal from 'src/modules/vendor/components/programs/ValidateUnlockingStepModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 import { useSubProgramCreationModal } from 'src/modules/vendor/composables/SubProgramCreationModal';
+import { useSubProgramPublicationModal } from 'src/modules/vendor/composables/SubProgramPublicationModal';
+import { useStepAdditionModal } from 'src/modules/vendor/composables/StepAdditionModal';
 
 export default {
   name: 'ProfileContent',
@@ -186,11 +186,7 @@ export default {
     const tmpInput = ref('');
     const modalLoading = ref(false);
     const { profileId } = toRefs(props);
-
-    // <sub-program-publication-modal
-    const subProgramToPublish = ref(null);
-    const subProgramPublicationModal = ref(false);
-    const companyOptions = ref([]);
+    const areStepsLocked = ref({});
 
     const refreshProgram = async () => {
       try {
@@ -208,19 +204,37 @@ export default {
       resetSubProgramCreationModal,
     } = useSubProgramCreationModal(profileId, modalLoading, refreshProgram);
 
-    // <step-addition-modal
-    const currentSubProgramId = ref('');
-    const additionType = ref(CREATE_STEP);
-    const newStep = ref({ name: '', type: E_LEARNING });
-    const stepAdditionModal = ref(false);
-    const reusedStep = ref({ _id: '', program: '' });
-    const areStepsLocked = ref({});
+    const program = computed(() => $store.state.program.program);
+
+    const {
+      subProgramPublicationModal,
+      companyOptions,
+      validateSubProgramPublication,
+      checkPublicationAndOpenModal,
+      resetPublication,
+    } = useSubProgramPublicationModal(program, refreshProgram);
+
+    const setStepLocking = (step, value) => {
+      Object.assign(areStepsLocked.value, { [step._id]: value });
+    };
+
+    const {
+      currentSubProgramId,
+      additionType,
+      stepAdditionModal,
+      newStep,
+      reusedStep,
+      openStepAdditionModal,
+      addStep,
+      resetStepAdditionModal,
+      v$: stepValidations,
+    } = useStepAdditionModal(setStepLocking, modalLoading, refreshProgram);
 
     // <step-edition-modal
     const editedStep = ref({ name: '', type: E_LEARNING, theoreticalHours: { hours: 0, minutes: 0 } });
     const stepEditionModal = ref(false);
     const validateUnlockingEditionModal = ref(false);
-    const openNextModalAfterUnlocking = () => ref(null);
+    const openNextModalAfterUnlocking = ref(() => ref(null));
 
     // <activity-creation-modal
     const newActivity = ref({ name: '' });
@@ -237,13 +251,10 @@ export default {
     // <validate-unlocking-step-modal
     const stepToBeUnlocked = ref({ _id: '', status: '' });
     const subProgramsReusingStepToBeUnlocked = ref([]);
-    // const openNextModalAfterUnlocking = () => ref(null);
 
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
       newSubProgram: { name: { required } },
-      newStep: { name: { required }, type: { required } },
-      reusedStep: { _id: { required }, program: { required } },
       editedStep: {
         name: { required },
         theoreticalHours: {
@@ -260,13 +271,11 @@ export default {
       reusedActivity: { required },
     }));
 
-    const program = computed(() => $store.state.program.program);
-
     const openedStep = computed(() => $store.state.program.openedStep);
 
     const v$ = useVuelidate(
       rules,
-      { program, newStep, reusedStep, editedStep, newActivity, reusedActivity }
+      { program, editedStep, newActivity, reusedActivity }
     );
 
     const theoreticalHoursErrorMsg = computed(() => {
@@ -361,51 +370,6 @@ export default {
     };
 
     // STEP
-    const openStepAdditionModal = async (subProgramId) => {
-      stepAdditionModal.value = true;
-      currentSubProgramId.value = subProgramId;
-    };
-
-    const setStepLocking = (step, value) => {
-      Object.assign(areStepsLocked.value, { [step._id]: value });
-    };
-
-    const addStep = async () => {
-      try {
-        modalLoading.value = true;
-
-        if (additionType.value === CREATE_STEP) {
-          v$.value.newStep.$touch();
-          if (v$.value.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-          await SubPrograms.addStep(currentSubProgramId.value, newStep.value);
-          NotifyPositive('Étape créée.');
-        } else {
-          v$.value.reusedStep.$touch();
-          if (v$.value.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-          await SubPrograms.reuseStep(currentSubProgramId.value, { steps: reusedStep.value._id });
-          setStepLocking(reusedStep.value, true);
-          NotifyPositive('Étape réutilisée.');
-        }
-
-        await refreshProgram();
-        stepAdditionModal.value = false;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de l\'étape.');
-      } finally {
-        modalLoading.value = false;
-      }
-    };
-
-    const resetStepAdditionModal = () => {
-      newStep.value = { name: '', type: E_LEARNING };
-      additionType.value = CREATE_STEP;
-      reusedStep.value = { _id: '', program: '' };
-      v$.value.newStep.$reset();
-      v$.value.reusedStep.$reset();
-    };
 
     // step edition
     const openStepEditionModal = async (step) => {
@@ -606,51 +570,6 @@ export default {
       el.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const checkPublicationAndOpenModal = async (subProgram) => {
-      subProgramToPublish.value = subProgram;
-
-      const eLearningSubProgramAlreadyPublished = program.value.subPrograms.some(
-        sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
-      );
-      if (subProgram.isStrictlyELearning && eLearningSubProgramAlreadyPublished) {
-        return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié.');
-      }
-
-      if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide.');
-
-      return subProgram.isStrictlyELearning
-        ? openSubProgramPublicationModal()
-        : validateSubProgramPublication();
-    };
-
-    const validateSubProgramPublication = (accessCompany = null) => {
-      $q.dialog({
-        title: 'Confirmation',
-        message: 'Une fois le sous-programme publié, vous ne pourrez plus le modifier.<br />'
-          + 'Êtes-vous sûr(e) de vouloir publier ce sous-programme&nbsp;?',
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => publishSubProgram(accessCompany))
-        .onCancel(() => NotifyPositive('Publication annulée.'));
-    };
-    const publishSubProgram = async (accessCompany) => {
-      const payload = accessCompany ? { status: PUBLISHED, accessCompany } : { status: PUBLISHED };
-      try {
-        await SubPrograms.update(subProgramToPublish.value._id, payload);
-        NotifyPositive('Sous programme publié');
-        refreshProgram();
-        subProgramPublicationModal.value = false;
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) {
-          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié.');
-        }
-
-        NotifyNegative('Erreur lors de la publication du sous-programme.');
-      }
-    };
-
     const isPublished = element => element.status === PUBLISHED;
 
     const isLocked = step => areStepsLocked.value[step._id];
@@ -664,22 +583,6 @@ export default {
         .map(sp => sp.steps.map(step => ({ [step._id]: isReused(step) })))
         .flat();
       areStepsLocked.value = steps.length ? Object.assign(...steps) : {};
-    };
-
-    const openSubProgramPublicationModal = async () => {
-      try {
-        const companies = await Companies.list();
-        companyOptions.value = formatAndSortOptions(companies, 'name');
-        subProgramPublicationModal.value = true;
-      } catch (e) {
-        console.error(e);
-        subProgramPublicationModal.value = false;
-        companyOptions.value = [];
-      }
-    };
-
-    const resetPublication = () => {
-      subProgramToPublish.value = null;
     };
 
     const resetValidateUnlockingEditionModal = () => {
@@ -766,6 +669,7 @@ export default {
       getStepTypeIcon,
       // Computed
       v$,
+      stepValidations,
       newSubProgramValidations,
       theoreticalHoursErrorMsg,
       theoreticalMinutesErrorMsg,
