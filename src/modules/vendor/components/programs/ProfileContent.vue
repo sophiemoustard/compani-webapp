@@ -90,7 +90,8 @@
       @click="subProgramCreationModal = true" />
 
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
-      :validations="v$.newSubProgram" @hide="resetSubProgramCreationModal" v-model:new-sub-program="newSubProgram" />
+      :validations="newSubProgramValidations" @hide="resetSubProgramCreationModal"
+      v-model:new-sub-program="newSubProgram" />
 
     <step-addition-modal v-model="stepAdditionModal" v-model:new-step="newStep" v-model:reused-step="reusedStep"
       @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" v-model:addition-type="additionType"
@@ -156,6 +157,7 @@ import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityR
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import ValidateUnlockingStepModal from 'src/modules/vendor/components/programs/ValidateUnlockingStepModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
+import { useSubProgramCreationModal } from 'src/modules/vendor/composables/SubProgramCreationModal';
 
 export default {
   name: 'ProfileContent',
@@ -190,12 +192,24 @@ export default {
     const subProgramPublicationModal = ref(false);
     const companyOptions = ref([]);
 
-    // <sub-program-creation-modal
-    const newSubProgram = ref({ name: '' });
-    const subProgramCreationModal = ref(false);
-    const currentSubProgramId = ref('');
+    const refreshProgram = async () => {
+      try {
+        await $store.dispatch('program/fetchProgram', { programId: profileId.value });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const {
+      newSubProgram,
+      subProgramCreationModal,
+      v$: newSubProgramValidations,
+      createSubProgram,
+      resetSubProgramCreationModal,
+    } = useSubProgramCreationModal(profileId, modalLoading, refreshProgram);
 
     // <step-addition-modal
+    const currentSubProgramId = ref('');
     const additionType = ref(CREATE_STEP);
     const newStep = ref({ name: '', type: E_LEARNING });
     const stepAdditionModal = ref(false);
@@ -252,7 +266,7 @@ export default {
 
     const v$ = useVuelidate(
       rules,
-      { program, newSubProgram, newStep, reusedStep, editedStep, newActivity, reusedActivity }
+      { program, newStep, reusedStep, editedStep, newActivity, reusedActivity }
     );
 
     const theoreticalHoursErrorMsg = computed(() => {
@@ -323,13 +337,6 @@ export default {
       areActivitiesVisible.value[stepId] = !areActivitiesVisible.value[stepId];
     };
 
-    const refreshProgram = async () => {
-      try {
-        await $store.dispatch('program/fetchProgram', { programId: profileId.value });
-      } catch (e) {
-        console.error(e);
-      }
-    };
     // SUB-PROGRAM
     const updateSubProgramName = async (index) => {
       try {
@@ -351,30 +358,6 @@ export default {
       } finally {
         tmpInput.value = null;
       }
-    };
-    const createSubProgram = async () => {
-      try {
-        modalLoading.value = true;
-        v$.value.newSubProgram.$touch();
-        if (v$.value.newSubProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Programs.addSubProgram(profileId.value, newSubProgram.value);
-        NotifyPositive('Sous-programme créé.');
-
-        await refreshProgram();
-        subProgramCreationModal.value = false;
-      } catch (e) {
-        console.error(e);
-
-        NotifyNegative('Erreur lors de la création du sous-programme.');
-      } finally {
-        modalLoading.value = false;
-      }
-    };
-
-    const resetSubProgramCreationModal = () => {
-      subProgramCreationModal.value = false;
-      newSubProgram.value.name = '';
-      v$.value.newSubProgram.$reset();
     };
 
     // STEP
@@ -783,6 +766,7 @@ export default {
       getStepTypeIcon,
       // Computed
       v$,
+      newSubProgramValidations,
       theoreticalHoursErrorMsg,
       theoreticalMinutesErrorMsg,
       program,
