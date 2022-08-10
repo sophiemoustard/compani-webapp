@@ -21,7 +21,7 @@
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
     </div>
-    <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="loading" class="q-mb-xl"
+    <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" class="q-mb-xl"
       is-blended />
     <div class="q-mb-sm">
       <p class="text-weight-bold">Attestations de formation</p>
@@ -39,7 +39,7 @@
         Certains stagiaires inscrits à cette formation ont émargé dans d’autres formations du même programme
       </div>
       <ni-expanding-table :data="unsubscribedAttendances" :columns="columns" :pagination="pagination"
-        :hide-bottom="false" :loading="loading">
+        :hide-bottom="false">
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
             <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
@@ -58,7 +58,9 @@
 
 <script>
 import get from 'lodash/get';
-import { mapState } from 'vuex';
+import { computed, ref, toRefs } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
 import { NotifyNegative } from '@components/popup/notify';
@@ -71,13 +73,13 @@ import Banner from '@components/Banner';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
 import { upperCaseFirstLetter, formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { formatDate, ascendingSort, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/date';
+import { composeCourseName } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
-import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
-import { courseMixin } from '@mixins/courseMixin';
+import { useCourses } from '@composables/courses';
+import { useTraineeFollowUps } from '@composables/traineeFollowUps';
 
 export default {
   name: 'ProfileTraineeFollowUp',
-  mixins: [traineeFollowUpTableMixin, courseMixin],
   components: {
     'elearning-follow-up-table': ElearningFollowUpTable,
     'attendance-table': AttendanceTable,
@@ -89,109 +91,143 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  data () {
-    return {
-      modalLoading: false,
-      SURVEY,
-      OPEN_QUESTION,
-      QUESTION_ANSWER,
-      upperCaseFirstLetter,
-      questionnaires: [],
-      unsubscribedAttendances: [],
-      columns: [
-        { name: 'name', label: 'Nom', field: 'trainee', align: 'left' },
-        { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
-        { name: 'duration', label: 'Durée', field: 'duration', align: 'center' },
-        { name: 'expand', label: '', field: '' },
-      ],
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
-    };
-  },
-  async created () {
-    const promises = [this.getLearnersList(), this.getUnsubscribedAttendances()];
-    if (!this.isClientInterface) promises.push(this.refreshQuestionnaires());
+  setup (props) {
+    const { profileId } = toRefs(props);
+    const $store = useStore();
+    const $router = useRouter();
 
-    await Promise.all(promises);
-  },
-  computed: {
-    ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),
-    areQuestionnaireAnswersVisible () {
-      return !this.isClientInterface && this.questionnaires.length;
-    },
-    courseHasElearningStep () {
-      return this.course.subProgram.steps.some(step => step.type === E_LEARNING);
-    },
-    disableDownloadCompletionCertificates () {
-      return this.disableDocDownload || !get(this.course, 'subProgram.program.learningGoals');
-    },
-  },
-  methods: {
-    get,
-    formatIntervalHourly,
-    formatQuantity,
-    async refreshQuestionnaires () {
+    const questionnaires = ref([]);
+    const unsubscribedAttendances = ref([]);
+    const columns = ref([
+      { name: 'name', label: 'Nom', field: 'trainee', align: 'left' },
+      { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
+      { name: 'duration', label: 'Durée', field: 'duration', align: 'center' },
+      { name: 'expand', label: '', field: '' },
+    ]);
+    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+
+    const course = computed(() => $store.state.course.course);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const {
+      isClientInterface,
+      pdfLoading,
+      isIntraOrVendor,
+      disableDocDownload,
+      followUpDisabled,
+      followUpMissingInfo,
+      downloadAttendanceSheet,
+    } = useCourses(course);
+    const { learners, getLearnersList } = useTraineeFollowUps(profileId);
+
+    const areQuestionnaireAnswersVisible = computed(() => !isClientInterface && questionnaires.value.length);
+
+    const courseHasElearningStep = computed(() => course.value.subProgram.steps.some(step => step.type === E_LEARNING));
+
+    const disableDownloadCompletionCertificates =
+      computed(() => disableDocDownload.value || !get(course.value, 'subProgram.program.learningGoals'));
+
+    const refreshQuestionnaires = async () => {
       try {
-        this.questionnaires = await Courses.getCourseQuestionnaires(this.course._id);
+        questionnaires.value = await Courses.getCourseQuestionnaires(course.value._id);
       } catch (e) {
         console.error(e);
-        this.questionnaires = [];
+        questionnaires.value = [];
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
       }
-    },
-    goToQuestionnaireAnswers (questionnaireId) {
-      return this.$router.push(
-        { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
-      );
-    },
-    formatTraineeAttendances (attendancesGroupedByTrainee, traineeId) {
-      return {
-        _id: traineeId,
-        trainee: formatIdentity(attendancesGroupedByTrainee[traineeId][0].trainee.identity, 'FL'),
-        attendancesCount: attendancesGroupedByTrainee[traineeId].length,
-        duration: getTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)),
-        attendances: attendancesGroupedByTrainee[traineeId]
-          .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
-          .map(a => ({
-            _id: a._id,
-            date: formatDate(a.courseSlot.startDate),
-            hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
-            trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
-            misc: a.misc,
-          })),
-      };
-    },
-    async getUnsubscribedAttendances () {
+    };
+
+    const goToQuestionnaireAnswers = questionnaireId => $router.push(
+      { name: 'ni management questionnaire answers', params: { courseId: course.value._id, questionnaireId } }
+    );
+
+    const formatTraineeAttendances = (attendancesGroupedByTrainee, traineeId) => ({
+      _id: traineeId,
+      trainee: formatIdentity(attendancesGroupedByTrainee[traineeId][0].trainee.identity, 'FL'),
+      attendancesCount: attendancesGroupedByTrainee[traineeId].length,
+      duration: getTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)),
+      attendances: attendancesGroupedByTrainee[traineeId]
+        .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
+        .map(a => ({
+          _id: a._id,
+          date: formatDate(a.courseSlot.startDate),
+          hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+          trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
+          misc: a.misc,
+        })),
+    });
+    const getUnsubscribedAttendances = async () => {
       try {
         const query = {
-          course: this.course._id,
-          ...(this.isClientInterface && { company: this.loggedUser.company._id }),
+          course: course.value._id,
+          ...(isClientInterface && { company: loggedUser.value.company._id }),
         };
         const unsubscribedAttendancesGroupedByTrainees = await Attendances.listUnsubscribed(query);
-        this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByTrainees)
-          .map(traineeId => this.formatTraineeAttendances(unsubscribedAttendancesGroupedByTrainees, traineeId));
+        unsubscribedAttendances.value = Object.keys(unsubscribedAttendancesGroupedByTrainees)
+          .map(traineeId => formatTraineeAttendances(unsubscribedAttendancesGroupedByTrainees, traineeId));
       } catch (e) {
         console.error(e);
-        this.unsubscribedAttendances = [];
+        unsubscribedAttendances.value = [];
         NotifyNegative('Erreur lors de la récupération des émargements annexes.');
       }
-    },
-    formatDate,
-    async downloadCompletionCertificates () {
-      if (this.disableDownloadCompletionCertificates) return;
+    };
+
+    const downloadCompletionCertificates = async () => {
+      if (disableDownloadCompletionCertificates.value) return;
 
       try {
-        this.pdfLoading = true;
-        const formattedName = formatDownloadName(`attestations ${this.composeCourseName(this.course, true)}`);
+        pdfLoading.value = true;
+        const formattedName = formatDownloadName(`attestations ${composeCourseName(course.value, true)}`);
         const zipName = `${formattedName}.zip`;
-        const pdf = await Courses.downloadCompletionCertificates(this.course._id);
+        const pdf = await Courses.downloadCompletionCertificates(course.value._id);
         downloadZip(pdf, zipName);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');
       } finally {
-        this.pdfLoading = false;
+        pdfLoading.value = false;
       }
-    },
+    };
+
+    const created = async () => {
+      const promises = [getLearnersList(), getUnsubscribedAttendances()];
+      if (!isClientInterface) promises.push(refreshQuestionnaires());
+
+      await Promise.all(promises);
+    };
+
+    created();
+
+    return {
+      // Data
+      SURVEY,
+      OPEN_QUESTION,
+      QUESTION_ANSWER,
+      questionnaires,
+      unsubscribedAttendances,
+      columns,
+      pagination,
+      isIntraOrVendor,
+      learners,
+      // Computed
+      course,
+      areQuestionnaireAnswersVisible,
+      courseHasElearningStep,
+      disableDownloadCompletionCertificates,
+      followUpDisabled,
+      followUpMissingInfo,
+      disableDocDownload,
+      // Methods
+      upperCaseFirstLetter,
+      get,
+      formatIntervalHourly,
+      formatQuantity,
+      formatDate,
+      goToQuestionnaireAnswers,
+      downloadCompletionCertificates,
+      downloadAttendanceSheet,
+    };
   },
 };
 </script>
