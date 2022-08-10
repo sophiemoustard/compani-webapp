@@ -1,49 +1,49 @@
-name: End2end tests
+# name: End2end tests
 
-on:
-  - pull_request
+# on:
+#   - pull_request
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    services:
-      mongo:
-        image: mongo:4.2
-        ports:
-          - 27017:27017
+#     services:
+#       mongo:
+#         image: mongo:4.2
+#         ports:
+#           - 27017:27017
 
-    steps:
-      # Check out the repository
-      - id: checkout_api
-        continue-on-error: true
-        uses: actions/checkout@v2
-        with:
-          repository: 'sophiemoustard/compani-api'
-          ref: ${{ github.event.pull_request.head.ref }}
-          path: 'api'
+#     steps:
+#       # Check out the repository
+#       - id: checkout_api
+#         continue-on-error: true
+#         uses: actions/checkout@v2
+#         with:
+#           repository: 'sophiemoustard/compani-api'
+#           ref: ${{ github.event.pull_request.head.ref }}
+#           path: 'api'
 
-      - if: ${{ steps.checkout_api.outcome != 'success' }}
-        uses: actions/checkout@v2
-        with:
-          repository: 'sophiemoustard/compani-api'
-          ref: dev
-          path: 'api'
+#       - if: ${{ steps.checkout_api.outcome != 'success' }}
+#         uses: actions/checkout@v2
+#         with:
+#           repository: 'sophiemoustard/compani-api'
+#           ref: dev
+#           path: 'api'
 
-      - run: cd api && npm ci
+#       - run: cd api && npm ci
 
-      - uses: actions/checkout@v2
-        with:
-          path: 'webapp'
-      - run: cd webapp && npm ci
-      # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress run
-        uses: cypress-io/github-action@v2
-        with:
-          working-directory: ./webapp
-          start: npm run start:workflow:api, npm run start:workflow:webapp
-          wait-on: 'http://localhost:8080'
-        env:
-          API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
-          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+#       - uses: actions/checkout@v2
+#         with:
+#           path: 'webapp'
+#       - run: cd webapp && npm ci
+#       # Install NPM dependencies, cache them correctly
+#       # and run all Cypress tests
+#       - name: Cypress run
+#         uses: cypress-io/github-action@v2
+#         with:
+#           working-directory: ./webapp
+#           start: npm run start:workflow:api, npm run start:workflow:webapp
+#           wait-on: 'http://localhost:8080'
+#         env:
+#           API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
+#           TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}

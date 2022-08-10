@@ -1,9 +1,10 @@
 name: Deploy on dev
 
 on:
-  push:
-    branches:
-      - dev
+  - pull_request
+  # push:
+  #   branches:
+  #     - dev
 
 jobs:
   build:
@@ -11,8 +12,74 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "alenvi-webapp-dev"
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
+      # - uses: akhileshns/heroku-deploy@v3.12.12
+      #   with:
+      #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+      #     heroku_app_name: "alenvi-webapp-dev"
+      #     heroku_email: ${{secrets.HEROKU_EMAIL}}
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Heroku login credentials
+        run: |
+          cat > ~/.netrc <<EOF
+            machine api.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+            machine git.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+          EOF
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+
+      - name: Add Heroku remote
+        run: heroku git:remote --app $HEROKU_APP_NAME -r heroku-dev
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME_DEV }}
+
+      - name: Echo branchs
+        run: echo $BRANCHs
+        env: 
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+
+      - name: Display remote
+        run: git remote -v
+
+      - name: Display branch
+        run: git branch
+      
+      # - name: Define isShallow
+      #   run: |
+      #     isShallow=$(git rev-parse --is-shallow-repository)
+      #     if [[ *${isShallow}* ]]; then
+      #       echo "c'est bon"
+      #     else
+      #       echo "pas bon"
+      #     fi
+      #   run: git fetch --prune --unshallow
+
+      - name: Define isShallow
+        id: shallow
+        run: |
+          SHALLOW=$(git rev-parse --is-shallow-repository) &&
+          echo "::set-output name=SHALLOW::$SHALLOW"
+
+      - name: echo Shallow
+        run: echo steps.main.outputs.SHALLOW
+
+      - name: Fetch 1
+        if: ${{ steps.main.outputs.SHALLOW == true }}
+        run: git fetch --prune --unshallow
+
+      - name: Fetch 2
+        if: ${{ steps.main.outputs.SHALLOW == 'true' }}
+        run: git fetch --prune --unshallow
+
+      - name: git remote show
+        run: git remote show heroku-dev | grep 'HEAD' | cut -d':' -f2 | sed -e 's/^ *//g' -e 's/ *$//g'
+
+      - name: Push to Heroku
+        run: git push heroku-dev origin/dev:main --force

@@ -1,6 +1,6 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
+    <ni-directory-header title="Répertoire auxiliaires test" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
       @go-to="goToUserProfile" :rows-per-page="[15, 50, 100, 200]">
