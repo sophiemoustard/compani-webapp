@@ -1,11 +1,13 @@
-name: Deploy
+name: Deploy on dev
 
 on:
-  pull_request
+  push:
+    branches:
+      - dev
 
 jobs:
   build:
-    name: Run ESLint
+    name: Deployment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
