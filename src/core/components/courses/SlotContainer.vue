@@ -118,7 +118,7 @@ export default {
     const modalLoading = ref(false);
     const editedCourseSlot = ref({});
     const editionModal = ref(false);
-    const linkErrorMessage = ref('Le lien doit commencer par http:// ou https://');
+    const linkErrorMessage = 'Le lien doit commencer par http:// ou https://';
     const SLOTS_TO_PLAN_KEY = 'toPlan';
     const isOnlySlot = ref(false);
     const isPlannedSlot = ref(false);
@@ -162,9 +162,7 @@ export default {
       };
     });
 
-    const stepTypes = computed(() => [
-      ...course.value.subProgram.steps.map(step => ({ value: step._id, type: step.type })),
-    ]);
+    const stepTypes = computed(() => course.value.subProgram.steps.map(step => ({ value: step._id, type: step.type })));
 
     const courseSlotsByStepAndDate = computed(() => {
       if (!course.value.slots.length && !course.value.slotsToPlan.length) return {};
@@ -290,6 +288,7 @@ export default {
         modalLoading.value = false;
       }
     };
+
     const deleteCourseSlot = async (slotId) => {
       try {
         modalLoading.value = true;

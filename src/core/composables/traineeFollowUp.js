@@ -5,7 +5,7 @@ import { NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
 import { formatIdentity } from '@helpers/utils';
 
-export const useTraineeFollowUps = (profileId) => {
+export const useTraineeFollowUp = (profileId) => {
   const $store = useStore();
   const learners = ref([]);
   const tableLoading = ref(false);

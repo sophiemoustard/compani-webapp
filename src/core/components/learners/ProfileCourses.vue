@@ -337,7 +337,6 @@ export default {
       pagination,
       courseColumns,
       attendanceColumns,
-      E_LEARNING,
       unsubscribedAttendances,
       activitiesByMonth,
       months,

@@ -70,13 +70,13 @@ import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, E_LEARNING } from '@data/constants';
-import { upperCaseFirstLetter, formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
+import { E_LEARNING } from '@data/constants';
+import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { formatDate, ascendingSort, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/date';
 import { composeCourseName } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
 import { useCourses } from '@composables/courses';
-import { useTraineeFollowUps } from '@composables/traineeFollowUps';
+import { useTraineeFollowUp } from '@composables/traineeFollowUp';
 
 export default {
   name: 'ProfileTraineeFollowUp',
@@ -119,7 +119,7 @@ export default {
       followUpMissingInfo,
       downloadAttendanceSheet,
     } = useCourses(course);
-    const { learners, getLearnersList } = useTraineeFollowUps(profileId);
+    const { learners, getLearnersList } = useTraineeFollowUp(profileId);
 
     const areQuestionnaireAnswersVisible = computed(() => !isClientInterface && questionnaires.value.length);
 
@@ -157,6 +157,7 @@ export default {
           misc: a.misc,
         })),
     });
+
     const getUnsubscribedAttendances = async () => {
       try {
         const query = {
@@ -201,9 +202,6 @@ export default {
 
     return {
       // Data
-      SURVEY,
-      OPEN_QUESTION,
-      QUESTION_ANSWER,
       questionnaires,
       unsubscribedAttendances,
       columns,
@@ -219,11 +217,8 @@ export default {
       followUpMissingInfo,
       disableDocDownload,
       // Methods
-      upperCaseFirstLetter,
       get,
-      formatIntervalHourly,
       formatQuantity,
-      formatDate,
       goToQuestionnaireAnswers,
       downloadCompletionCertificates,
       downloadAttendanceSheet,
@@ -231,6 +226,7 @@ export default {
   },
 };
 </script>
+
 <style lang="sass" scoped>
 .questionnaires-container
   display: grid
