@@ -95,14 +95,14 @@
 
     <step-addition-modal v-model="stepAdditionModal" v-model:new-step="newStep" v-model:reused-step="reusedStep"
       @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" v-model:addition-type="additionType"
-      :program="program" :validations="stepValidations" :sub-program-id="currentSubProgramId" />
+      :program="program" :validations="newStepValidations" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="editedStepValidations"
       :theoretical-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
       :loading="modalLoading" :theoretical-minutes-error-msg="theoreticalMinutesErrorMsg" />
 
     <activity-creation-modal v-model="activityCreationModal" v-model:new-activity="newActivity" :loading="modalLoading"
-      @hide="resetActivityCreationModal" @submit="createActivity" :validations="v$.newActivity" />
+      @hide="resetActivityCreationModal" @submit="createActivity" :validations="newActivityValidations" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="v$.reusedActivity" :same-step-activities="sameStepActivities"
@@ -157,6 +157,7 @@ import { useSubProgramCreationModal } from 'src/modules/vendor/composables/SubPr
 import { useSubProgramPublicationModal } from 'src/modules/vendor/composables/SubProgramPublicationModal';
 import { useStepAdditionModal } from 'src/modules/vendor/composables/StepAdditionModal';
 import { useStepEditionModal } from 'src/modules/vendor/composables/StepEditionModal';
+import { useActivityCreationModal } from 'src/modules/vendor/composables/ActivityCreationModal';
 
 export default {
   name: 'ProfileContent',
@@ -186,6 +187,7 @@ export default {
     const modalLoading = ref(false);
     const { profileId } = toRefs(props);
     const areStepsLocked = ref({});
+    const currentStepId = ref('');
 
     const refreshProgram = async () => {
       try {
@@ -253,21 +255,25 @@ export default {
       openStepAdditionModal,
       addStep,
       resetStepAdditionModal,
-      v$: stepValidations,
+      v$: newStepValidations,
     } = useStepAdditionModal(setStepLocking, modalLoading, refreshProgram);
 
     const validateUnlockingEditionModal = ref(false);
 
-    // <activity-creation-modal
-    const newActivity = ref({ name: '' });
-    const activityCreationModal = ref(false);
-    // const currentStepId = ref('');
+    const {
+      newActivity,
+      activityCreationModal,
+      v$: newActivityValidations,
+      openActivityCreationModal,
+      createActivity,
+      resetActivityCreationModal,
+    } = useActivityCreationModal(modalLoading, refreshProgram, currentStepId);
 
     // <activity-reuse-modal
     const activityReuseModal = ref(false);
     const sameStepActivities = ref([]);
     const reusedActivity = ref('');
-    const currentStepId = ref('');
+    // const currentStepId = ref('');
     const programOptions = ref([]);
 
     // <validate-unlocking-step-modal
@@ -277,7 +283,6 @@ export default {
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
       newSubProgram: { name: { required } },
-      newActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     }));
 
@@ -285,7 +290,7 @@ export default {
 
     const v$ = useVuelidate(
       rules,
-      { program, newActivity, reusedActivity }
+      { program, reusedActivity }
     );
 
     const theoreticalHoursErrorMsg = computed(() => {
@@ -388,35 +393,6 @@ export default {
           activityId: activity._id,
         },
       });
-    };
-
-    // activity creation
-    const openActivityCreationModal = (stepId) => {
-      activityCreationModal.value = true;
-      currentStepId.value = stepId;
-    };
-
-    const createActivity = async () => {
-      try {
-        modalLoading.value = true;
-        v$.value.newActivity.$touch();
-        if (v$.value.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Steps.addActivity(currentStepId.value, newActivity.value);
-        NotifyPositive('Activitée créée.');
-
-        await refreshProgram();
-        activityCreationModal.value = false;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'activité.');
-      } finally {
-        modalLoading.value = false;
-      }
-    };
-
-    const resetActivityCreationModal = () => {
-      newActivity.value.name = '';
-      v$.value.newActivity.$reset();
     };
 
     // activity reuse
@@ -625,8 +601,9 @@ export default {
       getStepTypeIcon,
       // Computed
       v$,
-      stepValidations,
+      newStepValidations,
       newSubProgramValidations,
+      newActivityValidations,
       editedStepValidations,
       theoreticalHoursErrorMsg,
       theoreticalMinutesErrorMsg,
