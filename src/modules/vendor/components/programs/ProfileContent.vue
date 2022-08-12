@@ -105,7 +105,7 @@
       @hide="resetActivityCreationModal" @submit="createActivity" :validations="newActivityValidations" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
-      :loading="modalLoading" :validations="v$.reusedActivity" :same-step-activities="sameStepActivities"
+      :loading="modalLoading" :validations="reusedActivityValidations" :same-step-activities="sameStepActivities"
       v-model:reused-activity="reusedActivity" @hide="resetActivityReuseModal"
       @submit-duplication="duplicateActivity" />
 
@@ -129,7 +129,6 @@ import { required, helpers } from '@vuelidate/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
-import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Input from '@components/form/Input';
@@ -158,6 +157,7 @@ import { useSubProgramPublicationModal } from 'src/modules/vendor/composables/Su
 import { useStepAdditionModal } from 'src/modules/vendor/composables/StepAdditionModal';
 import { useStepEditionModal } from 'src/modules/vendor/composables/StepEditionModal';
 import { useActivityCreationModal } from 'src/modules/vendor/composables/ActivityCreationModal';
+import { useActivityReuseModal } from 'src/modules/vendor/composables/ActivityReuseModal';
 
 export default {
   name: 'ProfileContent',
@@ -269,12 +269,18 @@ export default {
       resetActivityCreationModal,
     } = useActivityCreationModal(modalLoading, refreshProgram, currentStepId);
 
-    // <activity-reuse-modal
-    const activityReuseModal = ref(false);
-    const sameStepActivities = ref([]);
-    const reusedActivity = ref('');
-    // const currentStepId = ref('');
-    const programOptions = ref([]);
+    const {
+      activityReuseModal,
+      sameStepActivities,
+      reusedActivity,
+      programOptions,
+      v$: reusedActivityValidations,
+      openActivityReuseModal,
+      refreshProgramList,
+      reuseActivity,
+      duplicateActivity,
+      resetActivityReuseModal,
+    } = useActivityReuseModal(modalLoading, refreshProgram, currentStepId);
 
     // <validate-unlocking-step-modal
     const stepToBeUnlocked = ref({ _id: '', status: '' });
@@ -282,15 +288,13 @@ export default {
 
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
-      newSubProgram: { name: { required } },
-      reusedActivity: { required },
     }));
 
     const openedStep = computed(() => $store.state.program.openedStep);
 
     const v$ = useVuelidate(
       rules,
-      { program, reusedActivity }
+      { program }
     );
 
     const theoreticalHoursErrorMsg = computed(() => {
@@ -396,66 +400,6 @@ export default {
     };
 
     // activity reuse
-    const openActivityReuseModal = (step) => {
-      currentStepId.value = step._id;
-      sameStepActivities.value = step.activities.map(a => a._id);
-      activityReuseModal.value = true;
-    };
-
-    const refreshProgramList = async () => {
-      try {
-        const programs = await Programs.list();
-
-        programOptions.value = programs.map(p => ({ label: p.name, value: p._id }));
-      } catch (e) {
-        programOptions.value = [];
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des programmes.');
-      }
-    };
-
-    const reuseActivity = async () => {
-      try {
-        modalLoading.value = true;
-
-        v$.value.reusedActivity.$touch();
-        if (v$.value.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Steps.reuseActivity(currentStepId.value, { activities: reusedActivity.value });
-        activityReuseModal.value = false;
-        await refreshProgram();
-        NotifyPositive('Activité réutilisée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la réutilisation de l\'activité.');
-      } finally {
-        modalLoading.value = false;
-      }
-    };
-    const duplicateActivity = async () => {
-      try {
-        modalLoading.value = true;
-
-        v$.value.reusedActivity.$touch();
-        if (v$.value.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Steps.addActivity(currentStepId.value, { activityId: reusedActivity.value });
-        activityReuseModal.value = false;
-        await refreshProgram();
-        NotifyPositive('Activité dupliquée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la dupliquation de l\'activité.');
-      } finally {
-        modalLoading.value = false;
-      }
-    };
-
-    const resetActivityReuseModal = () => {
-      reusedActivity.value = '';
-      v$.value.reusedActivity.$reset();
-    };
-
     const validateStepDetachment = (subProgramId, stepId) => {
       $q.dialog({
         title: 'Confirmation',
@@ -605,6 +549,7 @@ export default {
       newSubProgramValidations,
       newActivityValidations,
       editedStepValidations,
+      reusedActivityValidations,
       theoreticalHoursErrorMsg,
       theoreticalMinutesErrorMsg,
       program,
