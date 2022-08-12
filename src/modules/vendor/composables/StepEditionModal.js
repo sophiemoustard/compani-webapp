@@ -3,7 +3,7 @@ import useVuelidate from '@vuelidate/core';
 import pick from 'lodash/pick';
 import { getHoursAndMinutes, computeHours } from '@helpers/date';
 import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
-import { E_LEARNING } from '@data/constants';
+import { E_LEARNING, REQUIRED_LABEL } from '@data/constants';
 import { required, requiredIf, maxValue } from '@vuelidate/validators';
 import Steps from '@api/Steps';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -71,6 +71,23 @@ export const useStepEditionModal = (
     v$.value.$reset();
   };
 
+  const theoreticalHoursErrorMsg = computed(() => {
+    if (!v$.value.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
+    if (!v$.value.theoreticalHours.hours.integerNumber.$response ||
+      !v$.value.theoreticalHours.hours.positiveNumber.$response) return 'Durée non valide';
+
+    return '';
+  });
+
+  const theoreticalMinutesErrorMsg = computed(() => {
+    if (!v$.value.theoreticalHours.minutes.required.$response) return REQUIRED_LABEL;
+    if (!v$.value.theoreticalHours.minutes.integerNumber.$response ||
+     !v$.value.theoreticalHours.minutes.positiveNumber.$response ||
+     !v$.value.theoreticalHours.minutes.maxValue.$response) return 'Durée non valide';
+
+    return '';
+  });
+
   return {
     // Data
     editedStep,
@@ -80,5 +97,7 @@ export const useStepEditionModal = (
     openStepEditionModal,
     editStep,
     resetStepEditionModal,
+    theoreticalHoursErrorMsg,
+    theoreticalMinutesErrorMsg,
   };
 };

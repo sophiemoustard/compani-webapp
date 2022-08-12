@@ -131,13 +131,7 @@ import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import {
-  ACTIVITY_TYPES,
-  PUBLISHED,
-  PUBLISHED_DOT_ACTIVE,
-  PUBLISHED_DOT_WARNING,
-  REQUIRED_LABEL,
-} from '@data/constants';
+import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import { formatDurationFromFloat } from '@helpers/date';
@@ -188,6 +182,7 @@ export default {
     const areStepsLocked = ref({});
     const currentStepId = ref('');
 
+    // SubProgram Creation
     const refreshProgram = async () => {
       try {
         await $store.dispatch('program/fetchProgram', { programId: profileId.value });
@@ -204,6 +199,7 @@ export default {
       resetSubProgramCreationModal,
     } = useSubProgramCreationModal(profileId, modalLoading, refreshProgram);
 
+    // SubProgram publication
     const program = computed(() => $store.state.program.program);
 
     const {
@@ -214,6 +210,7 @@ export default {
       resetPublication,
     } = useSubProgramPublicationModal(program, refreshProgram);
 
+    // Unlocking step validation
     const isLocked = step => areStepsLocked.value[step._id];
 
     const setStepLocking = (step, value) => {
@@ -232,6 +229,7 @@ export default {
       cancelUnlocking,
     } = useValidateUnlockingStepModal(openNextModalAfterUnlocking, setStepLocking, isLocked);
 
+    // Step edition
     const {
       editedStep,
       stepEditionModal,
@@ -239,6 +237,8 @@ export default {
       editStep,
       resetStepEditionModal,
       v$: editedStepValidations,
+      theoreticalHoursErrorMsg,
+      theoreticalMinutesErrorMsg,
     } = useStepEditionModal(
       isLocked,
       openValidateUnlockingEditionModal,
@@ -247,6 +247,7 @@ export default {
       openNextModalAfterUnlocking
     );
 
+    // Step addition
     const {
       currentSubProgramId,
       additionType,
@@ -259,6 +260,7 @@ export default {
       v$: newStepValidations,
     } = useStepAdditionModal(setStepLocking, modalLoading, refreshProgram);
 
+    // Activity creation
     const {
       newActivity,
       activityCreationModal,
@@ -268,6 +270,7 @@ export default {
       resetActivityCreationModal,
     } = useActivityCreationModal(modalLoading, refreshProgram, currentStepId);
 
+    // Activity reuse
     const {
       activityReuseModal,
       sameStepActivities,
@@ -287,23 +290,6 @@ export default {
     const v$ = useVuelidate(rules, { program });
 
     const openedStep = computed(() => $store.state.program.openedStep);
-
-    const theoreticalHoursErrorMsg = computed(() => {
-      if (!editedStepValidations.value.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
-      if (!editedStepValidations.value.theoreticalHours.hours.integerNumber.$response ||
-        !editedStepValidations.value.theoreticalHours.hours.positiveNumber.$response) return 'Durée non valide';
-
-      return '';
-    });
-
-    const theoreticalMinutesErrorMsg = computed(() => {
-      if (!editedStepValidations.value.theoreticalHours.minutes.required.$response) return REQUIRED_LABEL;
-      if (!editedStepValidations.value.theoreticalHours.minutes.integerNumber.$response ||
-       !editedStepValidations.value.theoreticalHours.minutes.positiveNumber.$response ||
-       !editedStepValidations.value.theoreticalHours.minutes.maxValue.$response) return 'Durée non valide';
-
-      return '';
-    });
 
     const getSubProgramError = (index) => {
       const validation = v$.value.program.subPrograms.$each.$response.$errors[index];
@@ -390,7 +376,6 @@ export default {
       });
     };
 
-    // activity reuse
     const validateStepDetachment = (subProgramId, stepId) => {
       $q.dialog({
         title: 'Confirmation',
