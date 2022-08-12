@@ -196,11 +196,9 @@ export default {
 
     const userProfile = computed(() => $store.state.userProfile.userProfile);
 
-    const eLearningCourses = computed(() => courses.value
-      .filter(course => course.format === STRICTLY_E_LEARNING) || []);
+    const eLearningCourses = computed(() => courses.value.filter(c => c.format === STRICTLY_E_LEARNING) || []);
 
-    const eLearningCoursesOnGoing = computed(() => eLearningCourses.value
-      .filter(course => course.progress.eLearning < 1) || []);
+    const eLearningCoursesOnGoing = computed(() => eLearningCourses.value.filter(c => c.progress.eLearning < 1) || []);
 
     const eLearningCoursesOnGoingText = computed(() => {
       const formation = eLearningCoursesOnGoing.value.length > 1 ? 'formations' : 'formation';

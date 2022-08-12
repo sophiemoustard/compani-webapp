@@ -65,9 +65,8 @@
 
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-types="stepTypes"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
-      @submit="updateCourseSlot" :link-error-message="linkErrorMessage" @update="setCourseSlot" :is-admin="isAdmin"
-      :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
-      @unplan-slot="unplanSlot" />
+      @submit="updateCourseSlot" @update="setCourseSlot" :is-admin="isAdmin" :is-vendor-interface="isVendorInterface"
+      :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot" @unplan-slot="unplanSlot" />
   </div>
 </template>
 
@@ -118,7 +117,6 @@ export default {
     const modalLoading = ref(false);
     const editedCourseSlot = ref({});
     const editionModal = ref(false);
-    const linkErrorMessage = 'Le lien doit commencer par http:// ou https://';
     const SLOTS_TO_PLAN_KEY = 'toPlan';
     const isOnlySlot = ref(false);
     const isPlannedSlot = ref(false);
@@ -166,6 +164,7 @@ export default {
 
     const courseSlotsByStepAndDate = computed(() => {
       if (!course.value.slots.length && !course.value.slotsToPlan.length) return {};
+
       const formattedSlots = [...course.value.slots, ...course.value.slotsToPlan];
       const slotsByStep = groupBy(formattedSlots, 'step');
       const slotsByStepAndDateList = Object.keys(slotsByStep)
@@ -333,7 +332,7 @@ export default {
     const isElearningStep = step => step.type === E_LEARNING;
 
     const isPlannedStep = step => !!courseSlotsByStepAndDate.value[step.key] &&
-            Object.keys(courseSlotsByStepAndDate.value[step.key]).every(date => date !== SLOTS_TO_PLAN_KEY);
+      Object.keys(courseSlotsByStepAndDate.value[step.key]).every(date => date !== SLOTS_TO_PLAN_KEY);
 
     const isStepToPlan = step => !(isElearningStep(step) || isPlannedStep(step));
 
@@ -369,7 +368,6 @@ export default {
       modalLoading,
       editedCourseSlot,
       editionModal,
-      linkErrorMessage,
       SLOTS_TO_PLAN_KEY,
       isOnlySlot,
       isPlannedSlot,
@@ -383,7 +381,6 @@ export default {
       // Methods
       getDuration,
       formatIntervalHourly,
-      formatDate,
       get,
       omit,
       getSlotAddress,
