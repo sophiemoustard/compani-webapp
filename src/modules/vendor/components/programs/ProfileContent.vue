@@ -126,9 +126,7 @@ import { useQuasar } from 'quasar';
 import draggable from 'vuedraggable';
 import useVuelidate from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
-import pick from 'lodash/pick';
 import get from 'lodash/get';
-import groupBy from 'lodash/groupBy';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Input from '@components/form/Input';
@@ -141,7 +139,7 @@ import {
   REQUIRED_LABEL,
 } from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
-import { formatQuantity, sortStrings } from '@helpers/utils';
+import { formatQuantity } from '@helpers/utils';
 import { formatDurationFromFloat } from '@helpers/date';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
@@ -158,6 +156,7 @@ import { useStepAdditionModal } from 'src/modules/vendor/composables/StepAdditio
 import { useStepEditionModal } from 'src/modules/vendor/composables/StepEditionModal';
 import { useActivityCreationModal } from 'src/modules/vendor/composables/ActivityCreationModal';
 import { useActivityReuseModal } from 'src/modules/vendor/composables/ActivityReuseModal';
+import { useValidateUnlockingStepModal } from 'src/modules/vendor/composables/ValidateUnlockingStepModal';
 
 export default {
   name: 'ProfileContent',
@@ -217,15 +216,21 @@ export default {
 
     const isLocked = step => areStepsLocked.value[step._id];
 
-    const openValidateUnlockingEditionModal = (step) => {
-      if (!isLocked(step)) return;
-
-      stepToBeUnlocked.value = pick(step, ['_id', 'status']);
-      subProgramsReusingStepToBeUnlocked.value = getSubProgramsReusingStep(step);
-      validateUnlockingEditionModal.value = true;
+    const setStepLocking = (step, value) => {
+      Object.assign(areStepsLocked.value, { [step._id]: value });
     };
 
     const openNextModalAfterUnlocking = ref(() => ref(null));
+
+    const {
+      stepToBeUnlocked,
+      subProgramsReusingStepToBeUnlocked,
+      validateUnlockingEditionModal,
+      resetValidateUnlockingEditionModal,
+      openValidateUnlockingEditionModal,
+      confirmUnlocking,
+      cancelUnlocking,
+    } = useValidateUnlockingStepModal(openNextModalAfterUnlocking, setStepLocking, isLocked);
 
     const {
       editedStep,
@@ -242,10 +247,6 @@ export default {
       openNextModalAfterUnlocking
     );
 
-    const setStepLocking = (step, value) => {
-      Object.assign(areStepsLocked.value, { [step._id]: value });
-    };
-
     const {
       currentSubProgramId,
       additionType,
@@ -257,8 +258,6 @@ export default {
       resetStepAdditionModal,
       v$: newStepValidations,
     } = useStepAdditionModal(setStepLocking, modalLoading, refreshProgram);
-
-    const validateUnlockingEditionModal = ref(false);
 
     const {
       newActivity,
@@ -282,20 +281,12 @@ export default {
       resetActivityReuseModal,
     } = useActivityReuseModal(modalLoading, refreshProgram, currentStepId);
 
-    // <validate-unlocking-step-modal
-    const stepToBeUnlocked = ref({ _id: '', status: '' });
-    const subProgramsReusingStepToBeUnlocked = ref([]);
-
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
     }));
+    const v$ = useVuelidate(rules, { program });
 
     const openedStep = computed(() => $store.state.program.openedStep);
-
-    const v$ = useVuelidate(
-      rules,
-      { program }
-    );
 
     const theoreticalHoursErrorMsg = computed(() => {
       if (!editedStepValidations.value.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
@@ -467,31 +458,6 @@ export default {
         .map(sp => sp.steps.map(step => ({ [step._id]: isReused(step) })))
         .flat();
       areStepsLocked.value = steps.length ? Object.assign(...steps) : {};
-    };
-
-    const resetValidateUnlockingEditionModal = () => {
-      openNextModalAfterUnlocking.value = () => null;
-      stepToBeUnlocked.value = { _id: '', status: '' };
-      subProgramsReusingStepToBeUnlocked.value = [];
-    };
-
-    const getSubProgramsReusingStep = step => Object.values(groupBy(step.subPrograms, 'program._id'))
-      .map(groupSp => ({
-        programName: groupSp[0].program.name,
-        subProgramsName: groupSp.map(sP => sP.name).sort(sortStrings),
-      }))
-      .sort((a, b) => sortStrings(a.programName, b.programName));
-
-    const confirmUnlocking = () => {
-      setStepLocking(stepToBeUnlocked.value, false);
-      openNextModalAfterUnlocking.value();
-      validateUnlockingEditionModal.value = false;
-      NotifyPositive('Étape déverrouillée.');
-    };
-
-    const cancelUnlocking = () => {
-      validateUnlockingEditionModal.value = false;
-      NotifyPositive('Déverrouillage annulé.');
     };
 
     const isStepValid = step => (
