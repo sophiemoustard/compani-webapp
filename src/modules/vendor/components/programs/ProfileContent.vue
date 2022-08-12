@@ -171,6 +171,7 @@ export default {
     'published-dot': PublishedDot,
   },
   setup (props) {
+    const { profileId } = toRefs(props);
     const $router = useRouter();
     const $store = useStore();
     const $q = useQuasar();
@@ -178,7 +179,6 @@ export default {
     const areActivitiesVisible = ref({});
     const tmpInput = ref('');
     const modalLoading = ref(false);
-    const { profileId } = toRefs(props);
     const areStepsLocked = ref({});
     const currentStepId = ref('');
 
@@ -287,6 +287,7 @@ export default {
     const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
     }));
+
     const v$ = useVuelidate(rules, { program });
 
     const openedStep = computed(() => $store.state.program.openedStep);
@@ -416,6 +417,7 @@ export default {
           .onCancel(() => NotifyPositive('Retrait annulé.'));
       }
     };
+
     const detachActivity = async (stepId, activityId) => {
       try {
         await Steps.detachActivity(stepId, activityId);
@@ -492,8 +494,6 @@ export default {
       validateUnlockingEditionModal,
       subProgramsReusingStepToBeUnlocked,
       stepToBeUnlocked,
-      getStepTypeLabel,
-      getStepTypeIcon,
       // Computed
       v$,
       newStepValidations,
@@ -531,7 +531,6 @@ export default {
       duplicateActivity,
       resetActivityReuseModal,
       validateStepDetachment,
-      detachStep,
       validateActivityDeletion,
       checkPublicationAndOpenModal,
       validateSubProgramPublication,
@@ -544,6 +543,8 @@ export default {
       confirmUnlocking,
       cancelUnlocking,
       isStepValid,
+      getStepTypeLabel,
+      getStepTypeIcon,
     };
   },
 };
