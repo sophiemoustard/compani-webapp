@@ -43,7 +43,6 @@ export default {
     stepTypes: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    linkErrorMessage: { type: String, default: '' },
     isAdmin: { type: Boolean, default: false },
     isVendorInterface: { type: Boolean, default: false },
     isOnlySlot: { type: Boolean, default: false },
@@ -59,6 +58,7 @@ export default {
   emits: ['hide', 'update:model-value', 'submit', 'delete', 'update', 'unplan-slot'],
   data () {
     return {
+      linkErrorMessage: 'Le lien doit commencer par http:// ou https://',
       ON_SITE,
       REMOTE,
     };
