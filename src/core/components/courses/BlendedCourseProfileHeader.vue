@@ -15,7 +15,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
-import moment from '@helpers/moment';
+import companiDate from '@helpers/dates/companiDate';
 
 export default {
   name: 'BlendedCourseProfileHeader',
@@ -43,7 +43,7 @@ export default {
     displayArchiveButton () {
       const vendorRole = this.$store.getters['main/getVendorRole'];
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
-      const areAllCourseSlotsEnded = this.course.slots.every(slot => moment().isAfter(slot.endDate)) &&
+      const areAllCourseSlotsEnded = this.course.slots.every(slot => companiDate().isAfter(slot.endDate)) &&
         !this.course.slotsToPlan.length;
 
       return !this.course.archivedAt && areAllCourseSlotsEnded && isAdmin;
@@ -69,7 +69,7 @@ export default {
     },
     async archiveCourse () {
       try {
-        const payload = { archivedAt: new Date() };
+        const payload = { archivedAt: companiDate().toISO() };
         await Courses.update(this.course._id, payload);
 
         NotifyPositive('Formation archivée.');
