@@ -1,6 +1,6 @@
 - [ ] J'ai vérifié la fonctionnalité sur mobile
 - [ ] J'ai ajouté une variable d'environnement
-  - [ ] Si oui, J'ai précisé sur le [slite de MES](https://alenvi.slite.com/app/channels/K4ziWiq5eN/notes/mE8PaaeZN7) et [MEP](https://alenvi.slite.com/app/channels/K4ziWiq5eN/notes/VSKy3bsY9C) les modifications faites
+  - [ ] Si oui, J'ai précisé sur le [Doc de MES](https://www.notion.so/Pas-pas-Mise-en-staging-01755ac57d944b4cb0c189861428e5d2) et [Doc de MEP](https://www.notion.so/Pas-pas-Mise-en-prod-0f8e4879217d4c9e8e4d46d44211e0e3) les modifications faites
 
 ### POUR TESTER LA PR  :white_check_mark:
 - Périmètre interfaces / rôles :
@@ -9,4 +9,4 @@
 
 - Comment tester ? :
 
-_Si tu as lu cette description, pense a réagir avec un :eye:_
+_Si tu as lu cette description, pense à réagir avec un :eye:_
