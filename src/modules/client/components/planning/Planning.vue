@@ -362,7 +362,7 @@ th:first-child
       padding-bottom: 1rem
 
 .to-assign
-  background-color: rgba(253, 243, 229, 0.5)
+  background-color: rgba(255, 237, 218, 0.5)
 
 .q-page-sticky
   z-index: 20
