@@ -67,9 +67,6 @@ export default {
     pictureLink () {
       return get(this.user, 'picture.link') || null;
     },
-    canvasColor () {
-      return /\/ad\//.test(this.$route.path) ? '#FFEDDA' : '#EEE';
-    },
     noDiacriticLastname () {
       return removeDiacritics(get(this.user, 'identity.lastname') || '');
     },
