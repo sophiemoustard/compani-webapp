@@ -42,19 +42,20 @@
 
 <script>
 import get from 'lodash/get';
-import { mapState } from 'vuex';
+import { computed, ref, toRefs } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import pick from 'lodash/pick';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
+import { getStepTypeIcon } from '@helpers/courses';
 import { sortStrings } from '@helpers/utils';
-import { E_LEARNING } from '@data/constants.js';
 import { defineAbilitiesFor } from '@helpers/ability';
-import { courseMixin } from '@mixins/courseMixin';
+import { useCourses } from '@composables/courses';
 import ConnectedDot from './ConnectedDot';
 
 export default {
   name: 'ElearningFollowUpTable',
-  mixins: [courseMixin],
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
@@ -65,64 +66,75 @@ export default {
     loading: { type: Boolean, default: false },
     isBlended: { type: Boolean, default: false },
   },
-  data () {
-    const isClientInterface = !/\/ad\//.test(this.$route.path);
+  setup (props) {
+    const $router = useRouter();
+    const $store = useStore();
 
-    return {
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'identity',
-          format: value => (value ? value.fullName : ''),
-          align: 'left',
-          sortable: true,
-          sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: this.isBlended ? 'width: 40%' : 'width: 70%',
-        },
-        {
-          name: 'isConnected',
-          label: 'Connexion à l\'app ?',
-          field: 'firstMobileConnection',
-          format: value => !!value,
-          align: 'center',
-        },
-        {
-          name: 'progress',
-          label: 'Progression',
-          field: row => get(row, 'progress.eLearning'),
-          align: 'center',
-          sortable: true,
-          style: 'min-width: 150px; width: 20%',
-        },
-        { name: 'expand', label: '', field: '' },
-      ],
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
-      E_LEARNING,
-      isClientInterface,
-    };
-  },
-  computed: {
-    ...mapState('main', ['loggedUser']),
-    canReadLearnerInfo () {
-      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+    const { isBlended } = toRefs(props);
+
+    const { isClientInterface } = useCourses();
+
+    const columns = ref([
+      {
+        name: 'name',
+        label: 'Nom',
+        field: 'identity',
+        format: value => (value ? value.fullName : ''),
+        align: 'left',
+        sortable: true,
+        sort: (a, b) => sortStrings(a.lastname, b.lastname),
+        style: isBlended ? 'width: 40%' : 'width: 70%',
+      },
+      {
+        name: 'isConnected',
+        label: 'Connexion à l\'app ?',
+        field: 'firstMobileConnection',
+        format: value => !!value,
+        align: 'center',
+      },
+      {
+        name: 'progress',
+        label: 'Progression',
+        field: row => get(row, 'progress.eLearning'),
+        align: 'center',
+        sortable: true,
+        style: 'min-width: 150px; width: 20%',
+      },
+      { name: 'expand', label: '', field: '' },
+    ]);
+    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const canReadLearnerInfo = computed(() => {
+      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role', 'company', '_id', 'sector']));
 
       return ability.can('read', 'learner_info');
-    },
-    visibleColumns () {
-      return this.isBlended
-        ? ['name', 'isConnected', 'progress', 'expand']
-        : ['name', 'progress', 'expand'];
-    },
-  },
-  methods: {
-    goToLearnerProfile (row, $event) {
-      if (!this.canReadLearnerInfo) return;
+    });
+
+    const visibleColumns = computed(() => (isBlended.value
+      ? ['name', 'isConnected', 'progress', 'expand']
+      : ['name', 'progress', 'expand']));
+
+    const goToLearnerProfile = (row, $event) => {
+      if (!canReadLearnerInfo.value) return;
 
       $event.stopPropagation();
-      const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
-      this.$router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
-    },
+      const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
+      $router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
+    };
+
+    return {
+      // Data
+      columns,
+      pagination,
+      // Computed
+      canReadLearnerInfo,
+      visibleColumns,
+      // Methods
+      goToLearnerProfile,
+      getStepTypeIcon,
+    };
   },
 };
 </script>

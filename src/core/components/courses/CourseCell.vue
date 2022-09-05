@@ -47,43 +47,36 @@
 
 <script>
 import get from 'lodash/get';
-import { FORTHCOMING, COMPLETED, IN_PROGRESS, INTRA } from '@data/constants';
+import { computed, toRefs } from 'vue';
+import { FORTHCOMING, COMPLETED, IN_PROGRESS } from '@data/constants';
+import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import { formatDuration } from '@helpers/date';
 import moment from '@helpers/moment';
-import { courseMixin } from '@mixins/courseMixin';
+import { useCourses } from '@composables/courses';
 
 export default {
   name: 'CourseDetail',
-  mixins: [courseMixin],
   props: {
     course: { type: Object, default: () => ({}) },
   },
   emits: ['click'],
-  data () {
-    return {
-      INTRA,
-      FORTHCOMING,
-      IN_PROGRESS,
-      COMPLETED,
-      isVendorInterface: /\/ad\//.test(this.$route.path),
-    };
-  },
-  computed: {
-    courseName () {
-      return this.composeCourseName(this.course, this.isVendorInterface);
-    },
-    traineesCount () {
-      return get(this.course, 'trainees.length') || 0;
-    },
-    slotsHappened () {
-      return this.course.slots.filter(slot => this.happened(slot)).length;
-    },
-    slotsDurationTitle () {
-      if (!this.course || !this.course.slots) return '0h';
+  setup (props) {
+    const { course } = toRefs(props);
+
+    const { headerInfo, isVendorInterface } = useCourses(course);
+
+    const courseName = computed(() => composeCourseName(course.value, isVendorInterface));
+
+    const traineesCount = computed(() => get(course.value, 'trainees.length') || 0);
+
+    const slotsHappened = computed(() => course.value.slots.filter(slot => happened(slot)).length);
+
+    const slotsDurationTitle = computed(() => {
+      if (!course.value || !course.value.slots) return '0h';
 
       let slotsDuration = moment.duration();
-      for (const slotByDay of this.course.slots) {
+      for (const slotByDay of course.value.slots) {
         slotsDuration = slotByDay.reduce(
           (acc, slot) => acc.add(moment.duration(moment(slot.endDate).diff(slot.startDate))),
           slotsDuration
@@ -91,22 +84,23 @@ export default {
       }
 
       return formatDuration(slotsDuration);
-    },
-    courseSlotsCount () {
-      return this.course.slots.length;
-    },
-    formatCourseSlotsInfos () {
-      const slotsToPlanLength = this.course.slotsToPlan.length;
-      const totalDates = this.courseSlotsCount + slotsToPlanLength;
+    });
+
+    const courseSlotsCount = computed(() => course.value.slots.length);
+
+    const formatCourseSlotsInfos = computed(() => {
+      const slotsToPlanLength = course.value.slotsToPlan.length;
+      const totalDates = courseSlotsCount.value + slotsToPlanLength;
 
       return !totalDates
         ? '0 date'
         : `${formatQuantity('date', totalDates)},
-          ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${this.slotsDurationTitle}`;
-    },
-    formatNearestDate () {
-      if (!this.courseSlotsCount && this.course.estimatedStartDate) {
-        const rangeToEstimatedStartDate = moment(this.course.estimatedStartDate).diff(moment().startOf('day'), 'd');
+          ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${slotsDurationTitle.value}`;
+    });
+
+    const formatNearestDate = computed(() => {
+      if (!courseSlotsCount.value && course.estimatedStartDate) {
+        const rangeToEstimatedStartDate = moment(course.value.estimatedStartDate).diff(moment().startOf('day'), 'd');
         if (rangeToEstimatedStartDate < 0) {
           return `Début souhaité il y a ${formatQuantity('jour', Math.abs(rangeToEstimatedStartDate))}`;
         }
@@ -116,18 +110,18 @@ export default {
 
         return 'Début souhaité aujourd\'hui';
       }
-      if (!this.courseSlotsCount && !this.course.slotsToPlan.length) return 'Pas de date prévue';
-      if (!this.courseSlotsCount) return 'Prochaine date à planifier';
+      if (!courseSlotsCount.value && !course.value.slotsToPlan.length) return 'Pas de date prévue';
+      if (!courseSlotsCount.value) return 'Prochaine date à planifier';
 
-      if (this.course.status === FORTHCOMING) {
-        const firstSlot = this.course.slots[0];
+      if (course.value.status === FORTHCOMING) {
+        const firstSlot = course.value.slots[0];
         const rangeToNextDate = moment(firstSlot[0].startDate).diff(moment().startOf('day'), 'd');
 
         return rangeToNextDate ? `Commence dans ${formatQuantity('jour', rangeToNextDate)}` : 'Commence aujourd’hui';
       }
 
-      if (this.course.status === COMPLETED) {
-        const lastSlot = this.course.slots[this.course.slots.length - 1];
+      if (course.value.status === COMPLETED) {
+        const lastSlot = course.value.slots[course.value.slots.length - 1];
         const rangeToLastDate = moment().endOf('day').diff(moment(lastSlot[0].startDate), 'd');
 
         return rangeToLastDate
@@ -135,17 +129,29 @@ export default {
           : 'Dernière date aujourd’hui';
       }
 
-      const nextSlot = this.course.slots.filter(daySlots => !this.happened(daySlots))[0];
+      const nextSlot = course.value.slots.filter(daySlots => !happened(daySlots))[0];
       if (!nextSlot) return 'Prochaine date à planifier';
       const rangeToNextDate = moment(nextSlot[0].startDate).diff(moment().startOf('day'), 'd');
 
       return rangeToNextDate
         ? `Prochaine date dans ${formatQuantity('jour', rangeToNextDate)}`
         : 'Prochaine date aujourd’hui';
-    },
-  },
-  methods: {
-    get,
+    });
+
+    return {
+      // Data
+      FORTHCOMING,
+      IN_PROGRESS,
+      // Computed
+      courseName,
+      traineesCount,
+      slotsHappened,
+      formatCourseSlotsInfos,
+      formatNearestDate,
+      headerInfo,
+      // Methods
+      happened,
+    };
   },
 };
 </script>

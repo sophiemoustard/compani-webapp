@@ -22,7 +22,7 @@
             </div>
           </q-card>
         </div>
-        <ni-line-chart :data="this.activitiesByMonth" :labels="months" class="col-md-6 col-xs-12 line-chart-container"
+        <ni-line-chart :data="activitiesByMonth" :labels="months" class="col-md-6 col-xs-12 line-chart-container"
           title="Nombre total d'activités réalisées par mois" />
       </div>
     </div>
@@ -110,7 +110,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { useStore } from 'vuex';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
@@ -127,136 +129,126 @@ import {
   formatIntervalHourly,
   isBefore,
 } from '@helpers/date';
+import { getStepTypeIcon } from '@helpers/courses';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import { chartMixin } from '@mixins/chartMixin';
-import { courseMixin } from '@mixins/courseMixin';
+import { useCourses } from '@composables/courses';
+import { useCharts } from '@composables/charts';
 
 export default {
   name: 'ProfileCourses',
-  mixins: [chartMixin, courseMixin],
   components: {
     'ni-progress': Progress,
     'ni-expanding-table': ExpandingTable,
     'ni-e-learning-indicator': ELearningIndicator,
     'ni-line-chart': LineChart,
   },
-  data () {
-    return {
-      isVendorInterface: /\/ad\//.test(this.$route.path),
-      courses: [],
-      loading: false,
-      pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
-      courseColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: row => row,
-          align: 'left',
-          sortable: true,
-          format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
-          sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
-          style: 'width: 30%',
-        },
-        {
-          name: 'type',
-          label: 'Type de formation',
-          field: 'format',
-          align: 'left',
-          sortable: true,
-          format: value => ((value === BLENDED) ? 'Mixte' : 'ELearning'),
-          sort: sortStrings,
-        },
-        { name: 'attendances', label: 'Emargements', field: row => get(row, 'progress.presence'), align: 'center' },
-        {
-          name: 'eLearning',
-          label: 'eLearning',
-          field: row => get(row, 'progress.eLearning'),
-          align: 'center',
-          sortable: true,
-          style: 'min-width: 150px; width: 20%',
-        },
-        { name: 'expand', label: '', field: '_id' },
-      ],
-      attendanceColumns: [
-        { name: 'name', label: 'Nom', field: 'program', align: 'left' },
-        { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
-        { name: 'duration', label: 'Durée', field: 'duration', align: 'center' },
-        { name: 'expand', label: '', field: '' },
-      ],
-      E_LEARNING,
-      unsubscribedAttendances: [],
-    };
-  },
-  computed: {
-    ...mapState('userProfile', ['userProfile']),
-    eLearningCourses () {
-      return this.courses.filter(course => course.format === STRICTLY_E_LEARNING) || [];
-    },
-    eLearningCoursesOnGoing () {
-      return this.eLearningCourses.filter(course => course.progress.eLearning < 1) || [];
-    },
-    eLearningCoursesOnGoingText () {
-      const formation = this.eLearningCoursesOnGoing.length > 1 ? 'formations' : 'formation';
+  setup () {
+    const $store = useStore();
+    const $router = useRouter();
+
+    const { isVendorInterface } = useCourses();
+    const { activitiesByMonth, getDataByMonth, months } = useCharts();
+    const courses = ref([]);
+    const loading = ref(false);
+    const pagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const courseColumns = ref([
+      {
+        name: 'name',
+        label: 'Nom',
+        field: row => row,
+        align: 'left',
+        sortable: true,
+        format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
+        sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
+        style: 'width: 30%',
+      },
+      {
+        name: 'type',
+        label: 'Type de formation',
+        field: 'format',
+        align: 'left',
+        sortable: true,
+        format: value => ((value === BLENDED) ? 'Mixte' : 'ELearning'),
+        sort: sortStrings,
+      },
+      { name: 'attendances', label: 'Emargements', field: row => get(row, 'progress.presence'), align: 'center' },
+      {
+        name: 'eLearning',
+        label: 'eLearning',
+        field: row => get(row, 'progress.eLearning'),
+        align: 'center',
+        sortable: true,
+        style: 'min-width: 150px; width: 20%',
+      },
+      { name: 'expand', label: '', field: '_id' },
+    ]);
+    const attendanceColumns = ref([
+      { name: 'name', label: 'Nom', field: 'program', align: 'left' },
+      { name: 'unexpectedAttendances', label: 'Emargements imprévus', field: 'attendancesCount', align: 'center' },
+      { name: 'duration', label: 'Durée', field: 'duration', align: 'center' },
+      { name: 'expand', label: '', field: '' },
+    ]);
+    const unsubscribedAttendances = ref([]);
+
+    const userProfile = computed(() => $store.state.userProfile.userProfile);
+
+    const eLearningCourses = computed(() => courses.value.filter(c => c.format === STRICTLY_E_LEARNING) || []);
+
+    const eLearningCoursesOnGoing = computed(() => eLearningCourses.value.filter(c => c.progress.eLearning < 1) || []);
+
+    const eLearningCoursesOnGoingText = computed(() => {
+      const formation = eLearningCoursesOnGoing.value.length > 1 ? 'formations' : 'formation';
       return `${formation} eLearning en cours`;
-    },
-    eLearningCoursesCompleted () {
-      return this.eLearningCourses.filter(course => course.progress.eLearning === 1) || [];
-    },
-    eLearningCoursesCompletedText () {
-      return this.eLearningCoursesCompleted.length > 1
-        ? 'formations eLearning terminées'
-        : 'formation eLearning terminée';
-    },
-    eLearningActivitiesCompleted () {
-      const activityHistories = this.courses
+    });
+
+    const eLearningCoursesCompleted = computed(() => eLearningCourses.value
+      .filter(course => course.progress.eLearning === 1) || []);
+
+    const eLearningCoursesCompletedText = computed(() => (eLearningCoursesCompleted.value.length > 1
+      ? 'formations eLearning terminées'
+      : 'formation eLearning terminée'));
+
+    const eLearningActivitiesCompleted = computed(() => {
+      const activityHistories = courses.value
         .map(c => c.subProgram.steps.map(s => s.activities.map(a => a.activityHistories).flat()).flat())
         .flat();
 
       return uniqBy(activityHistories, '_id');
-    },
-    eLearningActivitesCompletedText () {
-      return this.eLearningActivitiesCompleted.length > 1
-        ? 'activités eLearning réalisées'
-        : 'activité eLearning réalisée';
-    },
-  },
-  async created () {
-    await this.getUserCourses();
-    this.computeChartsData();
-    this.getUnsubscribedAttendances();
-  },
-  methods: {
-    formatIdentity,
-    get,
-    has,
-    goToCourseProfile (props) {
-      if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
-        return this.$router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
+    });
+
+    const eLearningActivitesCompletedText = computed(() => (eLearningActivitiesCompleted.value.length > 1
+      ? 'activités eLearning réalisées'
+      : 'activité eLearning réalisée'));
+
+    const goToCourseProfile = (props) => {
+      if (!isVendorInterface && props.row.subProgram.isStrictlyELearning) {
+        return $router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
       }
 
-      if (!this.isVendorInterface) {
-        return this.$router.push({ name: 'ni courses info', params: { courseId: props.row._id } });
+      if (!isVendorInterface) {
+        return $router.push({ name: 'ni courses info', params: { courseId: props.row._id } });
       }
 
       if (props.row.subProgram.isStrictlyELearning) {
-        return this.$router.push({ name: 'ni management elearning courses info', params: { courseId: props.row._id } });
+        return $router.push({ name: 'ni management elearning courses info', params: { courseId: props.row._id } });
       }
 
-      this.$router.push({
+      $router.push({
         name: 'ni management blended courses info',
         params: { courseId: props.row._id, defaultTab: 'traineeFollowUp' },
       });
-    },
-    async getUserCourses () {
-      try {
-        this.loading = true;
-        const userCourses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+    };
 
-        this.courses = userCourses.map(course => ({
+    const getUserCourses = async () => {
+      try {
+        loading.value = true;
+        const userCourses = await Courses.listUserCourse({ traineeId: userProfile.value._id });
+
+        courses.value = userCourses.map(course => ({
           ...course,
           subProgram: {
             ...course.subProgram,
@@ -267,68 +259,105 @@ export default {
       } catch (e) {
         NotifyNegative('Erreur lors de la récupération des formations');
         console.error(e);
-        this.courses = [];
+        courses.value = [];
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    async computeChartsData () {
+    };
+
+    const computeChartsData = async () => {
       try {
-        this.loading = true;
+        loading.value = true;
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        const sixMonthsHistories = this.eLearningActivitiesCompleted
+        const sixMonthsHistories = eLearningActivitiesCompleted.value
           .filter(ah => isBetweenOrEqual(ah.createdAt, chartStartDate, chartEndDate));
 
-        this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories);
+        activitiesByMonth.value = getDataByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    formatDuration (duration) {
+    };
+
+    const formatDuration = (duration) => {
       const durationInHours = duration.minutes / 60;
       const hours = Math.floor(durationInHours);
       const paddedMinutes = Math.round(durationInHours % 1 * 60);
 
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
-    },
-    formatProgramAttendances (attendancesGroupedByProgram, programId) {
-      return {
-        _id: programId,
-        program: attendancesGroupedByProgram[programId][0].program.name,
-        attendancesCount: attendancesGroupedByProgram[programId].length,
-        duration: getTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)),
-        attendances: attendancesGroupedByProgram[programId]
-          .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
-          .map(a => ({
-            _id: a._id,
-            date: formatDate(a.courseSlot.startDate),
-            hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
-            trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
-            misc: a.course.misc,
-          })),
-      };
-    },
-    async getUnsubscribedAttendances () {
+    };
+
+    const formatProgramAttendances = (attendancesGroupedByProgram, programId) => ({
+      _id: programId,
+      program: attendancesGroupedByProgram[programId][0].program.name,
+      attendancesCount: attendancesGroupedByProgram[programId].length,
+      duration: getTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)),
+      attendances: attendancesGroupedByProgram[programId]
+        .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
+        .map(a => ({
+          _id: a._id,
+          date: formatDate(a.courseSlot.startDate),
+          hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+          trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
+          misc: a.course.misc,
+        })),
+    });
+
+    const getUnsubscribedAttendances = async () => {
       try {
-        const query = { trainee: this.userProfile._id };
+        const query = { trainee: userProfile.value._id };
         const unsubscribedAttendancesGroupedByPrograms = await Attendances.listUnsubscribed(query);
-        this.unsubscribedAttendances = Object.keys(unsubscribedAttendancesGroupedByPrograms)
-          .map(programId => this.formatProgramAttendances(unsubscribedAttendancesGroupedByPrograms, programId));
+        unsubscribedAttendances.value = Object.keys(unsubscribedAttendancesGroupedByPrograms)
+          .map(programId => formatProgramAttendances(unsubscribedAttendancesGroupedByPrograms, programId));
       } catch (e) {
         console.error(e);
-        this.unsubscribedAttendances = [];
+        unsubscribedAttendances.value = [];
         NotifyNegative('Erreur lors de la récupération des émargements non prévus.');
       }
-    },
-    formatDate,
-    formatIntervalHourly,
-    getDuration,
-    isBefore,
+    };
+
+    const created = async () => {
+      await getUserCourses();
+      computeChartsData();
+      getUnsubscribedAttendances();
+    };
+
+    created();
+
+    return {
+      // Data
+      courses,
+      loading,
+      pagination,
+      courseColumns,
+      attendanceColumns,
+      unsubscribedAttendances,
+      activitiesByMonth,
+      months,
+      // Computed
+      userProfile,
+      eLearningCoursesOnGoing,
+      eLearningCoursesOnGoingText,
+      eLearningCoursesCompleted,
+      eLearningCoursesCompletedText,
+      eLearningActivitiesCompleted,
+      eLearningActivitesCompletedText,
+      // Methods
+      formatIdentity,
+      get,
+      has,
+      formatDate,
+      formatIntervalHourly,
+      getDuration,
+      isBefore,
+      goToCourseProfile,
+      formatDuration,
+      getStepTypeIcon,
+    };
   },
 };
 </script>

@@ -8,21 +8,19 @@
 </template>
 
 <script>
-import { createMetaMixin } from 'quasar';
-import { onBeforeUnmount, computed, ref } from 'vue';
+import { useMeta } from 'quasar';
+import { onBeforeUnmount, computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
-import { courseMixin } from '@mixins/courseMixin';
-
-const metaInfo = { title: 'Fiche formation' };
+import { useCourses } from '@composables/courses';
+import { composeCourseName } from '@helpers/courses';
 
 export default {
   name: 'BlendedCourseProfile',
-  mixins: [courseMixin, createMetaMixin(metaInfo)],
   props: {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },
@@ -32,25 +30,52 @@ export default {
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
   },
   setup (props) {
+    const metaInfo = { title: 'Fiche formation' };
+    useMeta(metaInfo);
+
+    const { courseId, defaultTab } = toRefs(props);
+
     const $store = useStore();
     const $route = useRoute();
-    const course = computed(() => $store.state.course.course);
-    const courseName = ref('');
 
+    const courseName = ref('');
     const tabsContent = [
       {
         label: 'Organisation',
         name: 'organization',
-        default: props.defaultTab === 'organization',
+        default: defaultTab.value === 'organization',
         component: ProfileOrganization,
       },
       {
         label: 'Suivi des stagiaires',
         name: 'traineeFollowUp',
-        default: props.defaultTab === 'traineeFollowUp',
+        default: defaultTab.value === 'traineeFollowUp',
         component: ProfileTraineeFollowUp,
       },
     ];
+
+    const course = computed(() => $store.state.course.course);
+
+    const { headerInfo } = useCourses(course);
+
+    watch(course, () => {
+      courseName.value = composeCourseName(course.value);
+    });
+
+    const refreshCourse = async () => {
+      try {
+        await $store.dispatch('course/fetchCourse', { courseId: courseId.value });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const created = async () => {
+      if (!course.value) await refreshCourse();
+      courseName.value = composeCourseName(course.value);
+    };
+
+    created();
 
     onBeforeUnmount(() => {
       $store.dispatch('course/resetCourse');
@@ -63,25 +88,8 @@ export default {
       tabsContent,
       // Computed
       course,
+      headerInfo,
     };
-  },
-  async created () {
-    if (!this.course) await this.refreshCourse();
-    this.courseName = this.composeCourseName(this.course);
-  },
-  watch: {
-    course () {
-      this.courseName = this.composeCourseName(this.course);
-    },
-  },
-  methods: {
-    async refreshCourse () {
-      try {
-        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
-      } catch (e) {
-        console.error(e);
-      }
-    },
   },
 };
 </script>

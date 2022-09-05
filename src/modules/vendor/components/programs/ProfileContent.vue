@@ -90,21 +90,22 @@
       @click="subProgramCreationModal = true" />
 
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
-      :validations="v$.newSubProgram" @hide="resetSubProgramCreationModal" v-model:new-sub-program="newSubProgram" />
+      :validations="newSubProgramValidations" @hide="resetSubProgramCreationModal"
+      v-model:new-sub-program="newSubProgram" />
 
     <step-addition-modal v-model="stepAdditionModal" v-model:new-step="newStep" v-model:reused-step="reusedStep"
       @hide="resetStepAdditionModal" @submit="addStep" :loading="modalLoading" v-model:addition-type="additionType"
-      :program="program" :validations="v$" :sub-program-id="currentSubProgramId" />
+      :program="program" :validations="newStepValidations" :sub-program-id="currentSubProgramId" />
 
-    <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="v$.editedStep"
+    <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="editedStepValidations"
       :theoretical-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
       :loading="modalLoading" :theoretical-minutes-error-msg="theoreticalMinutesErrorMsg" />
 
     <activity-creation-modal v-model="activityCreationModal" v-model:new-activity="newActivity" :loading="modalLoading"
-      @hide="resetActivityCreationModal" @submit="createActivity" :validations="v$.newActivity" />
+      @hide="resetActivityCreationModal" @submit="createActivity" :validations="newActivityValidations" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
-      :loading="modalLoading" :validations="v$.reusedActivity" :same-step-activities="sameStepActivities"
+      :loading="modalLoading" :validations="reusedActivityValidations" :same-step-activities="sameStepActivities"
       v-model:reused-activity="reusedActivity" @hide="resetActivityReuseModal"
       @submit-duplication="duplicateActivity" />
 
@@ -118,31 +119,22 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { useStore } from 'vuex';
+import { ref, computed, toRefs } from 'vue';
+import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 import draggable from 'vuedraggable';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf, helpers, maxValue } from '@vuelidate/validators';
-import pick from 'lodash/pick';
+import { required, helpers } from '@vuelidate/validators';
 import get from 'lodash/get';
-import groupBy from 'lodash/groupBy';
-import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
-import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import {
-  E_LEARNING,
-  ACTIVITY_TYPES,
-  PUBLISHED,
-  PUBLISHED_DOT_ACTIVE,
-  PUBLISHED_DOT_WARNING,
-  CREATE_STEP,
-  REQUIRED_LABEL,
-} from '@data/constants';
-import { formatQuantity, formatAndSortOptions, sortStrings } from '@helpers/utils';
-import { formatDurationFromFloat, getHoursAndMinutes, computeHours } from '@helpers/date';
-import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
+import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
+import { formatQuantity } from '@helpers/utils';
+import { formatDurationFromFloat } from '@helpers/date';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
@@ -152,11 +144,16 @@ import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityR
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import ValidateUnlockingStepModal from 'src/modules/vendor/components/programs/ValidateUnlockingStepModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
-import { courseMixin } from '@mixins/courseMixin';
+import { useSubProgramCreationModal } from 'src/modules/vendor/composables/SubProgramCreationModal';
+import { useSubProgramPublicationModal } from 'src/modules/vendor/composables/SubProgramPublicationModal';
+import { useStepAdditionModal } from 'src/modules/vendor/composables/StepAdditionModal';
+import { useStepEditionModal } from 'src/modules/vendor/composables/StepEditionModal';
+import { useActivityCreationModal } from 'src/modules/vendor/composables/ActivityCreationModal';
+import { useActivityReuseModal } from 'src/modules/vendor/composables/ActivityReuseModal';
+import { useValidateUnlockingStepModal } from 'src/modules/vendor/composables/ValidateUnlockingStepModal';
 
 export default {
   name: 'ProfileContent',
-  mixins: [courseMixin],
   props: {
     profileId: { type: String, required: true },
   },
@@ -173,105 +170,137 @@ export default {
     draggable,
     'published-dot': PublishedDot,
   },
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  data () {
-    return {
-      tmpInput: '',
-      modalLoading: false,
-      subProgramCreationModal: false,
-      newSubProgram: { name: '' },
-      additionType: CREATE_STEP,
-      stepAdditionModal: false,
-      newStep: { name: '', type: E_LEARNING },
-      reusedStep: { _id: '', program: '' },
-      stepEditionModal: false,
-      editedStep: { name: '', type: E_LEARNING, theoreticalHours: { hours: 0, minutes: 0 } },
-      activityCreationModal: false,
-      newActivity: { name: '' },
-      activityReuseModal: false,
-      sameStepActivities: [],
-      reusedActivity: '',
-      programOptions: [],
-      areActivitiesVisible: {},
-      currentSubProgramId: '',
-      currentStepId: '',
-      PUBLISHED,
-      PUBLISHED_DOT_ACTIVE,
-      PUBLISHED_DOT_WARNING,
-      subProgramPublicationModal: false,
-      companyOptions: [],
-      subProgramToPublish: null,
-      areStepsLocked: {},
-      validateUnlockingEditionModal: false,
-      subProgramsReusingStepToBeUnlocked: [],
-      stepToBeUnlocked: { _id: '', status: '' },
-      openNextModalAfterUnlocking: () => null,
+  setup (props) {
+    const { profileId } = toRefs(props);
+    const $router = useRouter();
+    const $store = useStore();
+    const $q = useQuasar();
+
+    const areActivitiesVisible = ref({});
+    const tmpInput = ref('');
+    const modalLoading = ref(false);
+    const areStepsLocked = ref({});
+    const currentStepId = ref('');
+
+    // SubProgram Creation
+    const refreshProgram = async () => {
+      try {
+        await $store.dispatch('program/fetchProgram', { programId: profileId.value });
+      } catch (e) {
+        console.error(e);
+      }
     };
-  },
-  validations () {
-    return {
+
+    const {
+      newSubProgram,
+      subProgramCreationModal,
+      v$: newSubProgramValidations,
+      createSubProgram,
+      resetSubProgramCreationModal,
+    } = useSubProgramCreationModal(profileId, modalLoading, refreshProgram);
+
+    // SubProgram publication
+    const program = computed(() => $store.state.program.program);
+
+    const {
+      subProgramPublicationModal,
+      companyOptions,
+      validateSubProgramPublication,
+      checkPublicationAndOpenModal,
+      resetPublication,
+    } = useSubProgramPublicationModal(program, refreshProgram);
+
+    // Unlocking step validation
+    const isLocked = step => areStepsLocked.value[step._id];
+
+    const setStepLocking = (step, value) => {
+      Object.assign(areStepsLocked.value, { [step._id]: value });
+    };
+
+    const openNextModalAfterUnlocking = ref(() => ref(null));
+
+    const {
+      stepToBeUnlocked,
+      subProgramsReusingStepToBeUnlocked,
+      validateUnlockingEditionModal,
+      resetValidateUnlockingEditionModal,
+      openValidateUnlockingEditionModal,
+      confirmUnlocking,
+      cancelUnlocking,
+    } = useValidateUnlockingStepModal(openNextModalAfterUnlocking, setStepLocking, isLocked);
+
+    // Step edition
+    const {
+      editedStep,
+      stepEditionModal,
+      openStepEditionModal,
+      editStep,
+      resetStepEditionModal,
+      v$: editedStepValidations,
+      theoreticalHoursErrorMsg,
+      theoreticalMinutesErrorMsg,
+    } = useStepEditionModal(
+      isLocked,
+      openValidateUnlockingEditionModal,
+      refreshProgram,
+      modalLoading,
+      openNextModalAfterUnlocking
+    );
+
+    // Step addition
+    const {
+      currentSubProgramId,
+      additionType,
+      stepAdditionModal,
+      newStep,
+      reusedStep,
+      openStepAdditionModal,
+      addStep,
+      resetStepAdditionModal,
+      v$: newStepValidations,
+    } = useStepAdditionModal(setStepLocking, modalLoading, refreshProgram);
+
+    // Activity creation
+    const {
+      newActivity,
+      activityCreationModal,
+      v$: newActivityValidations,
+      openActivityCreationModal,
+      createActivity,
+      resetActivityCreationModal,
+    } = useActivityCreationModal(modalLoading, refreshProgram, currentStepId);
+
+    // Activity reuse
+    const {
+      activityReuseModal,
+      sameStepActivities,
+      reusedActivity,
+      programOptions,
+      v$: reusedActivityValidations,
+      openActivityReuseModal,
+      refreshProgramList,
+      reuseActivity,
+      duplicateActivity,
+      resetActivityReuseModal,
+    } = useActivityReuseModal(modalLoading, refreshProgram, currentStepId);
+
+    const rules = computed(() => ({
       program: { subPrograms: { $each: helpers.forEach({ name: { required } }) } },
-      newSubProgram: { name: { required } },
-      newStep: { name: { required }, type: { required } },
-      reusedStep: { _id: { required }, program: { required } },
-      editedStep: {
-        name: { required },
-        theoreticalHours: {
-          hours: { required: requiredIf(!this.editedStep.theoreticalHours.minutes), integerNumber, positiveNumber },
-          minutes: {
-            required: requiredIf(!this.editedStep.theoreticalHours.hours),
-            integerNumber,
-            positiveNumber,
-            maxValue: maxValue(59),
-          },
-        },
-      },
-      newActivity: { name: { required }, type: { required } },
-      reusedActivity: { required },
-    };
-  },
-  computed: {
-    ...mapState('program', ['program', 'openedStep']),
-    theoreticalHoursErrorMsg () {
-      const validation = this.v$.editedStep;
-      if (!validation.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
-      if (!validation.theoreticalHours.hours.integerNumber.$response ||
-        !validation.theoreticalHours.hours.positiveNumber.$response) return 'Durée non valide';
+    }));
 
-      return '';
-    },
-    theoreticalMinutesErrorMsg () {
-      const validation = this.v$.editedStep;
-      if (!validation.theoreticalHours.minutes.required.$response) return REQUIRED_LABEL;
-      if (!validation.theoreticalHours.minutes.integerNumber.$response ||
-       !validation.theoreticalHours.minutes.positiveNumber.$response ||
-       !validation.theoreticalHours.minutes.maxValue.$response) return 'Durée non valide';
+    const v$ = useVuelidate(rules, { program });
 
-      return '';
-    },
-  },
-  async created () {
-    if (!this.program) await this.refreshProgram();
-    await this.refreshProgramList();
-    await this.initAreStepsLocked();
+    const openedStep = computed(() => $store.state.program.openedStep);
 
-    if (this.openedStep) {
-      this.showActivities(this.openedStep);
-      this.scrollToOpenedStep(this.openedStep);
-      this.$store.dispatch('program/resetOpenedStep');
-    }
-  },
-  methods: {
-    getSubProgramError (index) {
-      const validation = this.v$.program.subPrograms.$each.$response.$errors[index];
+    const getSubProgramError = (index) => {
+      const validation = v$.value.program.subPrograms.$each.$response.$errors[index];
 
       return get(validation, 'name.0.$response') === false;
-    },
-    async dropStep (subProgramId) {
+    };
+
+    const dropStep = async (subProgramId) => {
       try {
-        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+        const subProgram = program.value.subPrograms.find(sp => sp._id === subProgramId);
         const steps = subProgram.steps.map(s => s._id);
         await SubPrograms.update(subProgramId, { steps });
 
@@ -280,12 +309,13 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des étapes.');
       } finally {
-        await this.refreshProgram();
+        await refreshProgram();
       }
-    },
-    async dropActivity (subProgramId, stepId) {
+    };
+
+    const dropActivity = async (subProgramId, stepId) => {
       try {
-        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+        const subProgram = program.value.subPrograms.find(sp => sp._id === subProgramId);
         const step = subProgram.steps.find(s => s._id === stepId);
         const activities = step.activities.map(a => a._id);
         await Steps.updateById(stepId, { activities });
@@ -295,261 +325,73 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des activités.');
       } finally {
-        await this.refreshProgram();
+        await refreshProgram();
       }
-    },
-    formatQuantity,
-    saveTmpName (index) {
-      this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
-    },
-    getActivityTypeLabel (value) {
+    };
+
+    const saveTmpName = (index) => {
+      tmpInput.value = program.value.subPrograms[index] ? program.value.subPrograms[index].name : '';
+    };
+
+    const getActivityTypeLabel = (value) => {
       const type = ACTIVITY_TYPES.find(t => t.value === value);
       return type ? type.label : '';
-    },
-    showActivities (stepId) {
-      this.areActivitiesVisible[stepId] = !this.areActivitiesVisible[stepId];
-    },
-    async refreshProgram () {
-      try {
-        await this.$store.dispatch('program/fetchProgram', { programId: this.profileId });
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    // SUB-PROGRAM
-    async updateSubProgramName (index) {
-      try {
-        const subProgramName = get(this.program.subPrograms[index], 'name');
-        const subProgramId = get(this.program.subPrograms[index], '_id');
+    };
+    const showActivities = (stepId) => {
+      areActivitiesVisible.value[stepId] = !areActivitiesVisible.value[stepId];
+    };
 
-        if (this.tmpInput === subProgramName) return;
-        this.v$.program.$touch();
-        if (this.v$.program.$error) return NotifyWarning('Champ(s) invalide(s)');
+    // SUB-PROGRAM
+    const updateSubProgramName = async (index) => {
+      try {
+        const subProgramName = get(program.value.subPrograms[index], 'name');
+        const subProgramId = get(program.value.subPrograms[index], '_id');
+
+        if (tmpInput.value === subProgramName) return;
+        v$.value.program.$touch();
+        if (v$.value.program.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await SubPrograms.update(subProgramId, { name: subProgramName });
         NotifyPositive('Modification enregistrée.');
 
-        await this.refreshProgram();
+        await refreshProgram();
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification du sous-programme.');
       } finally {
-        this.tmpInput = null;
+        tmpInput.value = null;
       }
-    },
-    async createSubProgram () {
-      try {
-        this.modalLoading = true;
-        this.v$.newSubProgram.$touch();
-        if (this.v$.newSubProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Programs.addSubProgram(this.profileId, this.newSubProgram);
-        NotifyPositive('Sous-programme créé.');
+    };
 
-        await this.refreshProgram();
-        this.subProgramCreationModal = false;
-      } catch (e) {
-        console.error(e);
-
-        NotifyNegative('Erreur lors de la création du sous-programme.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    resetSubProgramCreationModal () {
-      this.subProgramCreationModal = false;
-      this.newSubProgram.name = '';
-      this.v$.newSubProgram.$reset();
-    },
-    // STEP
-    async openStepAdditionModal (subProgramId) {
-      this.stepAdditionModal = true;
-      this.currentSubProgramId = subProgramId;
-    },
-    setStepLocking (step, value) {
-      Object.assign(this.areStepsLocked, { [step._id]: value });
-    },
-    async addStep () {
-      try {
-        this.modalLoading = true;
-
-        if (this.additionType === CREATE_STEP) {
-          this.v$.newStep.$touch();
-          if (this.v$.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-          await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
-          NotifyPositive('Étape créée.');
-        } else {
-          this.v$.reusedStep.$touch();
-          if (this.v$.reusedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-          await SubPrograms.reuseStep(this.currentSubProgramId, { steps: this.reusedStep._id });
-          this.setStepLocking(this.reusedStep, true);
-          NotifyPositive('Étape réutilisée.');
-        }
-
-        await this.refreshProgram();
-        this.stepAdditionModal = false;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de l\'étape.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    resetStepAdditionModal () {
-      this.newStep.name = '';
-      this.additionType = CREATE_STEP;
-      this.reusedStep = { _id: '', program: '' };
-      this.v$.newStep.$reset();
-      this.v$.reusedStep.$reset();
-    },
-    // step edition
-    async openStepEditionModal (step) {
-      if (this.isLocked(step)) {
-        this.openNextModalAfterUnlocking = () => this.openStepEditionModal(step);
-        this.openValidateUnlockingEditionModal(step);
-      } else {
-        this.editedStep = {
-          ...pick(step, ['_id', 'name', 'type']),
-          theoreticalHours: getHoursAndMinutes(step.theoreticalHours),
-        };
-        this.stepEditionModal = true;
-      }
-    },
-    async editStep () {
-      try {
-        this.modalLoading = true;
-        this.v$.editedStep.$touch();
-        if (this.v$.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Steps.updateById(
-          this.editedStep._id,
-          { ...pick(this.editedStep, ['name']), theoreticalHours: computeHours(this.editedStep.theoreticalHours) }
-        );
-        this.stepEditionModal = false;
-        await this.refreshProgram();
-        NotifyPositive('Étape modifiée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'étape.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    resetStepEditionModal () {
-      this.editedStep = { name: '', theoreticalHours: { hours: 0, minutes: 0 } };
-      this.v$.editedStep.$reset();
-    },
     // ACTIVITY
-    goToActivityProfile (subProgram, step, activity) {
-      this.$router.push({
+    const goToActivityProfile = (subProgram, step, activity) => {
+      $router.push({
         name: 'ni pedagogy activity info',
         params: {
-          programId: this.program._id,
+          programId: program.value._id,
           subProgramId: subProgram._id,
           stepId: step._id,
           activityId: activity._id,
         },
       });
-    },
-    // activity creation
-    openActivityCreationModal (stepId) {
-      this.activityCreationModal = true;
-      this.currentStepId = stepId;
-    },
-    async createActivity () {
-      try {
-        this.modalLoading = true;
-        this.v$.newActivity.$touch();
-        if (this.v$.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Steps.addActivity(this.currentStepId, this.newActivity);
-        NotifyPositive('Activitée créée.');
+    };
 
-        await this.refreshProgram();
-        this.activityCreationModal = false;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'activité.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    resetActivityCreationModal () {
-      this.newActivity.name = '';
-      this.v$.newActivity.$reset();
-    },
-    // activity reuse
-    openActivityReuseModal (step) {
-      this.currentStepId = step._id;
-      this.sameStepActivities = step.activities.map(a => a._id);
-      this.activityReuseModal = true;
-    },
-    async refreshProgramList () {
-      try {
-        const programs = await Programs.list();
-
-        this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
-      } catch (e) {
-        this.programOptions = [];
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des programmes.');
-      }
-    },
-    async reuseActivity () {
-      try {
-        this.modalLoading = true;
-
-        this.v$.reusedActivity.$touch();
-        if (this.v$.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Steps.reuseActivity(this.currentStepId, { activities: this.reusedActivity });
-        this.activityReuseModal = false;
-        await this.refreshProgram();
-        NotifyPositive('Activité réutilisée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la réutilisation de l\'activité.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    async duplicateActivity () {
-      try {
-        this.modalLoading = true;
-
-        this.v$.reusedActivity.$touch();
-        if (this.v$.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Steps.addActivity(this.currentStepId, { activityId: this.reusedActivity });
-        this.activityReuseModal = false;
-        await this.refreshProgram();
-        NotifyPositive('Activité dupliquée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la dupliquation de l\'activité.');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
-    resetActivityReuseModal () {
-      this.reusedActivity = '';
-      this.v$.reusedActivity.$reset();
-    },
-    validateStepDetachment (subProgramId, stepId) {
-      this.$q.dialog({
+    const validateStepDetachment = (subProgramId, stepId) => {
+      $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir retirer cette étape de ce sous-programme&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.detachStep(subProgramId, stepId))
+      }).onOk(() => detachStep(subProgramId, stepId))
         .onCancel(() => NotifyPositive('Retrait annulé.'));
-    },
-    async detachStep (subProgramId, stepId) {
+    };
+
+    const detachStep = async (subProgramId, stepId) => {
       try {
         await SubPrograms.detachStep(subProgramId, stepId);
-        await this.refreshProgram();
+        await refreshProgram();
         NotifyPositive('Étape retirée.');
       } catch (e) {
         console.error(e);
@@ -558,145 +400,152 @@ export default {
         }
         return NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
-    },
-    validateActivityDeletion (step, activityId) {
-      if (this.isLocked(step)) {
-        this.openNextModalAfterUnlocking = () => this.validateActivityDeletion(step, activityId);
-        this.openValidateUnlockingEditionModal(step);
+    };
+
+    const validateActivityDeletion = (step, activityId) => {
+      if (isLocked(step)) {
+        openNextModalAfterUnlocking.value = () => validateActivityDeletion(step, activityId);
+        openValidateUnlockingEditionModal(step);
       } else {
-        this.$q.dialog({
+        $q.dialog({
           title: 'Confirmation',
           message: 'Êtes-vous sûr(e) de vouloir retirer cette activité de cette étape&nbsp;?',
           html: true,
           ok: true,
           cancel: 'Annuler',
-        }).onOk(() => this.detachActivity(step._id, activityId))
+        }).onOk(() => detachActivity(step._id, activityId))
           .onCancel(() => NotifyPositive('Retrait annulé.'));
       }
-    },
-    async detachActivity (stepId, activityId) {
+    };
+
+    const detachActivity = async (stepId, activityId) => {
       try {
         await Steps.detachActivity(stepId, activityId);
-        await this.refreshProgram();
+        await refreshProgram();
         NotifyPositive('Activité détachée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du retrait de l\'activité.');
       }
-    },
-    scrollToOpenedStep (openedStep) {
-      const el = document.getElementById(openedStep);
+    };
+
+    const scrollToOpenedStep = (step) => {
+      const el = document.getElementById(step);
       el.scrollIntoView({ behavior: 'smooth' });
-    },
-    async checkPublicationAndOpenModal (subProgram) {
-      this.subProgramToPublish = subProgram;
+    };
 
-      const eLearningSubProgramAlreadyPublished = this.program.subPrograms.some(
-        sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
-      );
-      if (subProgram.isStrictlyELearning && eLearningSubProgramAlreadyPublished) {
-        return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié.');
-      }
+    const isPublished = element => element.status === PUBLISHED;
 
-      if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide.');
+    const isPublishedOrLocked = step => isPublished(step) || isLocked(step);
 
-      return subProgram.isStrictlyELearning
-        ? this.openSubProgramPublicationModal()
-        : this.validateSubProgramPublication();
-    },
-    validateSubProgramPublication (accessCompany = null) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Une fois le sous-programme publié, vous ne pourrez plus le modifier.<br />'
-          + 'Êtes-vous sûr(e) de vouloir publier ce sous-programme&nbsp;?',
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.publishSubProgram(accessCompany))
-        .onCancel(() => NotifyPositive('Publication annulée.'));
-    },
-    async publishSubProgram (accessCompany) {
-      const payload = accessCompany ? { status: PUBLISHED, accessCompany } : { status: PUBLISHED };
-      try {
-        await SubPrograms.update(this.subProgramToPublish._id, payload);
-        NotifyPositive('Sous programme publié');
-        this.refreshProgram();
-        this.subProgramPublicationModal = false;
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) {
-          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié.');
-        }
+    const isReused = step => step.subPrograms && step.subPrograms.length > 1;
 
-        NotifyNegative('Erreur lors de la publication du sous-programme.');
-      }
-    },
-    isPublished (element) {
-      return element.status === PUBLISHED;
-    },
-    isLocked (step) {
-      return this.areStepsLocked[step._id];
-    },
-    isPublishedOrLocked (step) {
-      return this.isPublished(step) || this.isLocked(step);
-    },
-    isReused (step) {
-      return step.subPrograms && step.subPrograms.length > 1;
-    },
-    initAreStepsLocked () {
-      const steps = this.program.subPrograms
-        .map(sp => sp.steps.map(step => ({ [step._id]: this.isReused(step) })))
+    const initAreStepsLocked = () => {
+      const steps = program.value.subPrograms
+        .map(sp => sp.steps.map(step => ({ [step._id]: isReused(step) })))
         .flat();
-      this.areStepsLocked = steps.length ? Object.assign(...steps) : {};
-    },
-    async openSubProgramPublicationModal () {
-      try {
-        const companies = await Companies.list();
-        this.companyOptions = formatAndSortOptions(companies, 'name');
-        this.subProgramPublicationModal = true;
-      } catch (e) {
-        console.error(e);
-        this.subProgramPublicationModal = false;
-        this.companyOptions = [];
-      }
-    },
-    resetPublication () {
-      this.subProgramToPublish = null;
-    },
-    resetValidateUnlockingEditionModal () {
-      this.openNextModalAfterUnlocking = () => null;
-      this.stepToBeUnlocked = { _id: '', status: '' };
-      this.subProgramsReusingStepToBeUnlocked = [];
-    },
-    getSubProgramsReusingStep (step) {
-      return Object.values(groupBy(step.subPrograms, 'program._id'))
-        .map(groupSp => ({
-          programName: groupSp[0].program.name,
-          subProgramsName: groupSp.map(sP => sP.name).sort(sortStrings),
-        }))
-        .sort((a, b) => sortStrings(a.programName, b.programName));
-    },
-    openValidateUnlockingEditionModal (step) {
-      if (!this.isLocked(step)) return;
+      areStepsLocked.value = steps.length ? Object.assign(...steps) : {};
+    };
 
-      this.stepToBeUnlocked = pick(step, ['_id', 'status']);
-      this.subProgramsReusingStepToBeUnlocked = this.getSubProgramsReusingStep(step);
-      this.validateUnlockingEditionModal = true;
-    },
-    confirmUnlocking () {
-      this.setStepLocking(this.stepToBeUnlocked, false);
-      this.openNextModalAfterUnlocking();
-      this.validateUnlockingEditionModal = false;
-      NotifyPositive('Étape déverrouillée.');
-    },
-    cancelUnlocking () {
-      this.validateUnlockingEditionModal = false;
-      NotifyPositive('Déverrouillage annulé.');
-    },
-    formatDurationFromFloat,
-    isStepValid (step) {
-      return step.areActivitiesValid && !!step.theoreticalHours ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING;
-    },
+    const isStepValid = step => (
+      step.areActivitiesValid && !!step.theoreticalHours
+        ? PUBLISHED_DOT_ACTIVE
+        : PUBLISHED_DOT_WARNING
+    );
+
+    const created = async () => {
+      if (!program.value) await refreshProgram();
+      await refreshProgramList();
+      await initAreStepsLocked();
+
+      if (openedStep.value) {
+        showActivities(openedStep.value);
+        scrollToOpenedStep(openedStep.value);
+        $store.dispatch('program/resetOpenedStep');
+      }
+    };
+
+    created();
+
+    return {
+      // Data
+      PUBLISHED,
+      PUBLISHED_DOT_ACTIVE,
+      PUBLISHED_DOT_WARNING,
+      modalLoading,
+      subProgramCreationModal,
+      newSubProgram,
+      additionType,
+      stepAdditionModal,
+      newStep,
+      reusedStep,
+      stepEditionModal,
+      editedStep,
+      activityCreationModal,
+      newActivity,
+      activityReuseModal,
+      sameStepActivities,
+      reusedActivity,
+      programOptions,
+      areActivitiesVisible,
+      currentSubProgramId,
+      subProgramPublicationModal,
+      companyOptions,
+      validateUnlockingEditionModal,
+      subProgramsReusingStepToBeUnlocked,
+      stepToBeUnlocked,
+      // Computed
+      v$,
+      newStepValidations,
+      newSubProgramValidations,
+      newActivityValidations,
+      editedStepValidations,
+      reusedActivityValidations,
+      theoreticalHoursErrorMsg,
+      theoreticalMinutesErrorMsg,
+      program,
+      // Methods
+      formatQuantity,
+      formatDurationFromFloat,
+      getSubProgramError,
+      dropStep,
+      dropActivity,
+      saveTmpName,
+      getActivityTypeLabel,
+      showActivities,
+      updateSubProgramName,
+      createSubProgram,
+      resetSubProgramCreationModal,
+      openStepAdditionModal,
+      addStep,
+      resetStepAdditionModal,
+      openStepEditionModal,
+      editStep,
+      resetStepEditionModal,
+      goToActivityProfile,
+      openActivityCreationModal,
+      createActivity,
+      resetActivityCreationModal,
+      openActivityReuseModal,
+      reuseActivity,
+      duplicateActivity,
+      resetActivityReuseModal,
+      validateStepDetachment,
+      validateActivityDeletion,
+      checkPublicationAndOpenModal,
+      validateSubProgramPublication,
+      isPublished,
+      isLocked,
+      isPublishedOrLocked,
+      resetPublication,
+      resetValidateUnlockingEditionModal,
+      openValidateUnlockingEditionModal,
+      confirmUnlocking,
+      cancelUnlocking,
+      isStepValid,
+      getStepTypeLabel,
+      getStepTypeIcon,
+    };
   },
 };
 </script>

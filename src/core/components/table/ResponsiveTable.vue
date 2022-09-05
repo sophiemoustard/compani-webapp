@@ -3,7 +3,7 @@
     <q-table v-if="!loading" :rows="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
       binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="data.length ? separator : 'none'"
       :hide-bottom="hideBottom" :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm"
-      @update:pagination="$emit('update:pagination', $event)" @row-click="$emit('row-click')" :color="'#ff0000'">
+      @update:pagination="$emit('update:pagination', $event)" @row-click="$emit('row-click')">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">

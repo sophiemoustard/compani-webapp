@@ -32,7 +32,9 @@
 </template>
 
 <script>
+import { useQuasar } from 'quasar';
 import useVuelidate from '@vuelidate/core';
+import { ref, computed, toRefs } from 'vue';
 import { required, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import { TRAINEE } from '@data/constants';
@@ -42,15 +44,12 @@ import Button from '@components/Button';
 import TesterCreationModal from 'src/modules/vendor/components/programs/TesterCreationModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { userMixin } from '@mixins/userMixin';
-import { courseMixin } from '@mixins/courseMixin';
 import Email from '@api/Email';
 import Programs from '@api/Programs';
 import Users from '@api/Users';
 
 export default {
   name: 'TesterTable',
-  mixins: [userMixin, courseMixin],
   props: {
     programId: { type: String, required: true },
     testers: { type: Array, default: () => [] },
@@ -61,141 +60,163 @@ export default {
     'ni-responsive-table': ResponsiveTable,
   },
   emits: ['refresh'],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  data () {
-    return {
-      columns: [
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          align: 'left',
-          field: row => get(row, 'identity.firstname') || '',
-          classes: 'text-capitalize',
-        },
-        {
-          name: 'lastname',
-          label: 'Nom',
-          align: 'left',
-          field: row => get(row, 'identity.lastname') || '',
-          classes: 'text-capitalize',
-        },
-        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
-        {
-          name: 'phone',
-          label: 'Téléphone',
-          align: 'left',
-          field: row => get(row, 'contact.phone') || '',
-          format: formatPhone,
-        },
-        { name: 'actions', label: '', field: '_id', align: 'right' },
-      ],
-      loading: false,
-      pagination: { rowsPerPage: 0, sortBy: 'lastname' },
-      testerCreationModal: false,
-      newTester: {
-        local: { email: '' },
-        identity: { firstname: '', lastname: '' },
-        contact: { phone: '' },
+  setup (props, { emit }) {
+    const { programId } = toRefs(props);
+
+    const $q = useQuasar();
+
+    const columns = ref([
+      {
+        name: 'firstname',
+        label: 'Prénom',
+        align: 'left',
+        field: row => get(row, 'identity.firstname') || '',
+        classes: 'text-capitalize',
       },
-      firstStep: true,
-      modalLoading: false,
-    };
-  },
-  validations () {
-    return {
+      {
+        name: 'lastname',
+        label: 'Nom',
+        align: 'left',
+        field: row => get(row, 'identity.lastname') || '',
+        classes: 'text-capitalize',
+      },
+      { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
+      {
+        name: 'phone',
+        label: 'Téléphone',
+        align: 'left',
+        field: row => get(row, 'contact.phone') || '',
+        format: formatPhone,
+      },
+      { name: 'actions', label: '', field: '_id', align: 'right' },
+    ]);
+    const loading = ref(false);
+    const pagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
+    const testerCreationModal = ref(false);
+    const newTester = ref({
+      local: { email: '' },
+      identity: { firstname: '', lastname: '' },
+      contact: { phone: '' },
+    });
+    const firstStep = ref(true);
+    const modalLoading = ref(false);
+
+    const rules = computed(() => ({
       newTester: {
         local: { email: { required, email } },
         identity: { lastname: { required } },
         contact: { phone: { required, frPhoneNumber } },
       },
-    };
-  },
-  methods: {
-    async nextStepTesterCreationModal () {
-      try {
-        this.v$.newTester.local.email.$touch();
-        if (this.v$.newTester.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
+    }));
 
-        this.modalLoading = true;
-        const userInfo = await Users.exists({ email: this.newTester.local.email });
+    const v$ = useVuelidate(rules, { newTester });
+
+    const nextStepTesterCreationModal = async () => {
+      try {
+        v$.value.newTester.local.email.$touch();
+        if (v$.value.newTester.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        modalLoading.value = true;
+        const userInfo = await Users.exists({ email: newTester.value.local.email });
 
         if (userInfo.exists) {
-          await Programs.addTester(this.programId, { local: { email: this.newTester.local.email } });
+          await Programs.addTester(programId.value, { local: { email: newTester.value.local.email } });
 
           NotifyPositive('Testeur(euse) ajouté(e) avec succès.');
-          this.resetTesterCreationModal();
-          this.$emit('refresh');
+          resetTesterCreationModal();
+          emit('refresh');
         } else {
-          this.firstStep = false;
+          firstStep.value = false;
         }
       } catch (e) {
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du/de la testeur(euse).');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    async addTester () {
+    };
+
+    const addTester = async () => {
       try {
-        this.v$.newTester.$touch();
-        if (this.v$.newTester.$error) return NotifyWarning('Champ(s) invalide(s)');
+        v$.value.newTester.$touch();
+        if (v$.value.newTester.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        this.modalLoading = true;
-        await Programs.addTester(this.programId, this.newTester);
-        NotifyPositive('Testeu(euse) ajouté(e) avec succès.');
+        modalLoading.value = true;
+        await Programs.addTester(programId.value, newTester.value);
+        NotifyPositive('Testeur(euse) ajouté(e) avec succès.');
 
-        await this.sendWelcome();
-        this.resetTesterCreationModal();
-        this.$emit('refresh');
+        await sendWelcome();
+        resetTesterCreationModal();
+        emit('refresh');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du/de la testeur(euse).');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    async sendWelcome () {
+    };
+
+    const sendWelcome = async () => {
       try {
-        await Email.sendWelcome({ email: this.newTester.local.email, type: TRAINEE });
+        await Email.sendWelcome({ email: newTester.value.local.email, type: TRAINEE });
         NotifyPositive('Email envoyé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'envoi de l\' email.');
       }
-    },
-    resetTesterCreationModal () {
-      this.testerCreationModal = false;
-      this.firstStep = true;
-      this.newTester = {
+    };
+
+    const resetTesterCreationModal = () => {
+      testerCreationModal.value = false;
+      firstStep.value = true;
+      newTester.value = {
         local: { email: '' },
         identity: { firstname: '', lastname: '' },
         contact: { phone: '' },
       };
-      this.v$.newTester.$reset();
-    },
-    validateTesterDeletion (testerId) {
-      this.$q.dialog({
+      v$.value.newTester.$reset();
+    };
+
+    const validateTesterDeletion = (testerId) => {
+      $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir retirer le/la testeur(euse) du programme&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteTester(testerId))
+      }).onOk(() => deleteTester(testerId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async deleteTester (testerId) {
+    };
+
+    const deleteTester = async (testerId) => {
       try {
-        await Programs.removeTester(this.programId, testerId);
-        this.$emit('refresh');
+        await Programs.removeTester(programId.value, testerId);
+        emit('refresh');
         NotifyPositive('Testeur(euse) supprimé(e).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du/de la testeur(euse).');
       }
-    },
+    };
+
+    return {
+      // Data
+      columns,
+      loading,
+      pagination,
+      testerCreationModal,
+      newTester,
+      firstStep,
+      modalLoading,
+      // Computed
+      v$,
+      // Methods
+      nextStepTesterCreationModal,
+      addTester,
+      resetTesterCreationModal,
+      validateTesterDeletion,
+    };
   },
 };
 </script>
