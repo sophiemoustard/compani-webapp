@@ -19,6 +19,10 @@
         :error="validations.company.$error" @update:model-value="update($event, 'company')" />
       <ni-date-input caption="Date de démarrage souhaitée" :model-value="newCourse.estimatedStartDate" in-modal
         @update:model-value="update($event, 'estimatedStartDate')" />
+      <ni-input v-if="isIntraCourse" in-modal required-field caption="Nombre d'inscrits max"
+        :model-value="newCourse.maxTrainees" @blur="validations.maxTrainees.$touch"
+        :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage"
+        @update:model-value="update($event, 'maxTrainees')" />
       <ni-input in-modal :model-value="newCourse.misc" @update:model-value="update($event.trim(), 'misc')"
         caption="Informations Complémentaires" />
       <template #footer>
@@ -36,7 +40,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES } from '@data/constants';
+import { COURSE_TYPES, REQUIRED_LABEL } from '@data/constants';
 import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
@@ -72,6 +76,14 @@ export default {
         .map(p => ({ label: p.name, value: p._id, disable: !get(p, 'subPrograms.length') }))
         .sort((a, b) => a.label.localeCompare(b.label));
     },
+    maxTraineesErrorMessage () {
+      if (get(this.validations, 'maxTrainees.required.$response') === false) return REQUIRED_LABEL;
+      if (get(this.validations, 'maxTrainees.strictPositiveNumber.$response') === false ||
+        get(this.validations, 'maxTrainees.integerNumber.$response') === false) {
+        return 'Nombre non valide';
+      }
+      return '';
+    },
   },
   watch: {
     'newCourse.program': function (value) {
@@ -100,7 +112,7 @@ export default {
       this.$emit('submit');
     },
     updateType (event) {
-      this.$emit('update:new-course', { ...omit(this.newCourse, 'company'), type: event });
+      this.$emit('update:new-course', { ...omit(this.newCourse, ['company', 'maxTrainees']), type: event });
     },
     update (event, prop) {
       this.$emit('update:new-course', { ...this.newCourse, [prop]: event });
