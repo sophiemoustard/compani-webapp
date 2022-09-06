@@ -32,7 +32,7 @@
 <script>
 import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import { mapState } from 'vuex';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
@@ -93,10 +93,12 @@ export default {
       newCourse: {
         program: { required },
         subProgram: { required },
-        company: { required: requiredIf(this.isIntraCourse) },
         type: { required },
         salesRepresentative: { required },
-        ...(this.isIntraCourse && { maxTrainees: { required, strictPositiveNumber, integerNumber } }),
+        ...(this.isIntraCourse && {
+          maxTrainees: { required, strictPositiveNumber, integerNumber },
+          company: { required },
+        }),
       },
       selectedStartDate: { maxDate: this.selectedEndDate ? maxDate(this.selectedEndDate) : '' },
       selectedEndDate: { minDate: this.selectedStartDate ? minDate(this.selectedStartDate) : '' },

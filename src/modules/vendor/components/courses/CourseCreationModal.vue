@@ -19,7 +19,7 @@
         :error="validations.company.$error" @update:model-value="update($event, 'company')" />
       <ni-date-input caption="Date de démarrage souhaitée" :model-value="newCourse.estimatedStartDate" in-modal
         @update:model-value="update($event, 'estimatedStartDate')" />
-      <ni-input v-if="isIntraCourse" in-modal required-field caption="Nombre d'inscrits max"
+      <ni-input v-if="isIntraCourse" in-modal required-field type="number" caption="Nombre d'inscrits max"
         :model-value="newCourse.maxTrainees" @blur="validations.maxTrainees.$touch"
         :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage"
         @update:model-value="update($event, 'maxTrainees')" />
