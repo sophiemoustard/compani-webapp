@@ -12,9 +12,9 @@
         :disabled="$q.platform.is.mobile || isPublished(subProgram)" item-key="_id">
         <template #item="{element: step, index: stepIndex}">
           <q-card flat class="step q-mb-sm">
-            <q-card-section class="step-head cursor-pointer row" :id="step._id"
-              :class="{ 'step-lock': isLocked(step) }">
-              <div class="step-info" @click="showActivities(step._id)">
+            <q-card-section :id="step._id" :class="{ 'step-lock': isLocked(step), 'step-head row': true,
+              'cursor-pointer': step.type === E_LEARNING }">
+              <div class="step-info" @click="showActivities(step._id, step.type)">
                 <q-item-section side>
                   <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="copper-grey-500" />
                 </q-item-section>
@@ -131,7 +131,7 @@ import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
+import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING, E_LEARNING } from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import { formatDurationFromFloat } from '@helpers/date';
@@ -337,7 +337,8 @@ export default {
       const type = ACTIVITY_TYPES.find(t => t.value === value);
       return type ? type.label : '';
     };
-    const showActivities = (stepId) => {
+    const showActivities = (stepId, stepType = E_LEARNING) => {
+      if (stepType !== E_LEARNING) return null;
       areActivitiesVisible.value[stepId] = !areActivitiesVisible.value[stepId];
     };
 
@@ -472,6 +473,7 @@ export default {
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
+      E_LEARNING,
       modalLoading,
       subProgramCreationModal,
       newSubProgram,
