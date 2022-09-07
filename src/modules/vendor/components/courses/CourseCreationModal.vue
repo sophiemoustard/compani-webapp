@@ -40,7 +40,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES, REQUIRED_LABEL, INTER_B2B } from '@data/constants';
+import { COURSE_TYPES, REQUIRED_LABEL, INTER_B2B, INTRA } from '@data/constants';
 import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
@@ -112,12 +112,12 @@ export default {
       this.$emit('submit');
     },
     updateType (event) {
+      const omitFields = event === INTER_B2B ? ['company', 'maxTrainees'] : ['company'];
       this.$emit(
         'update:new-course',
         {
-          ...event === INTER_B2B
-            ? omit(this.newCourse, ['company', 'maxTrainees'])
-            : { ...omit(this.newCourse, ['company']), maxTrainees: 8 },
+          ...omit(this.newCourse, omitFields),
+          ...(event === INTRA && { maxTrainees: 8 }),
           type: event,
         }
       );
