@@ -92,6 +92,11 @@ const CompaniDateFactory = (inputDate) => {
     set (values) {
       return CompaniDateFactory(_date.set(values));
     },
+
+    add (amount) {
+      if (amount instanceof Number) throw Error('Invalid argument: expected to be an object, got number');
+      return CompaniDateFactory(_date.plus(amount));
+    },
   });
 };
 
