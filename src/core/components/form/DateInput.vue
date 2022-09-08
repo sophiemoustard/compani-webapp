@@ -79,9 +79,10 @@ export default {
     },
     input (value) {
       try {
-        if (!value) return this.update(value);
+        if (!value || !/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}/.test(value)) return '';
 
         const momentValue = CompaniDate(value, 'dd/LL/yyyy');
+        if (!momentValue.isValid()) return '';
         this.update(momentValue.toISO());
       } catch (e) {
         console.error(e);
