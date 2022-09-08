@@ -31,7 +31,8 @@
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
       @update="updateCourse('estimatedStartDate')" />
-    <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
+      @update="updateCourse('maxTrainees')" :validations="v$.course" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
@@ -149,6 +150,7 @@ import { formatQuantity, formatIdentity, formatDownloadName, formatPhoneForPaylo
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { descendingSort, ascendingSort } from '@helpers/date';
+import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import BiColorButton from '@components/BiColorButton';
 import { useCourses } from '@composables/courses';
 
@@ -232,7 +234,7 @@ export default {
     const rules = computed(() => ({
       tempInterlocutor: { _id: { required } },
       tempContactId: { required },
-      course: { contact: { contact: { phone: { required } } } },
+      course: { maxTrainees: { strictPositiveNumber, integerNumber } },
       newSms: { content: { required }, type: { required } },
     }));
 
@@ -643,14 +645,6 @@ export default {
       tmpInput.value = getValue(path);
     };
 
-    const getVAttribute = (path) => {
-      if (path === 'trainer') return get(v$.course, 'trainer._id', '');
-      if (path === 'salesRepresentative') return get(v$.course, 'salesRepresentative._id', '');
-      if (path === 'contact') return '';
-
-      return get(v$.course, path);
-    };
-
     const formatUpdateCourseValue = (path, value) => (path === 'contact.phone' ? formatPhoneForPayload(value) : value);
 
     const updateCourse = async (path) => {
@@ -658,7 +652,7 @@ export default {
         const value = getValue(path);
         if (tmpInput.value === value) return;
 
-        const vAttribute = getVAttribute(path);
+        const vAttribute = get(v$.value, `course.${path}`);
         if (vAttribute) {
           vAttribute.$touch();
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
@@ -672,6 +666,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
+        if (e.status === 403 && e.data.message) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         tmpInput.value = null;

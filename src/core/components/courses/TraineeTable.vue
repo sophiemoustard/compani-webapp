@@ -4,6 +4,12 @@
       <div class="row">
         <p class="text-weight-bold table-title">{{ tableTitle }}</p>
       </div>
+      <div class="row" v-if="isIntraCourse">
+        <ni-input v-if="isRofOrAdmin && !isClientInterface" caption="Nombre max de stagiaires" :disable="isArchived"
+          v-model.trim="course.maxTrainees" @blur="updateMaxTrainees($event)" type="number"
+          :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" />
+        <div v-else>{{ course.maxTrainees }} stagiaires max</div>
+      </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
           :visible-columns="traineesVisibleColumns" :loading="tableLoading">
@@ -53,10 +59,11 @@ import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
+import set from 'lodash/set';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
-import { INTER_B2B, TRAINER, DEFAULT_AVATAR } from '@data/constants';
+import { INTER_B2B, TRAINER, DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import {
   formatPhone,
   formatPhoneForPayload,
@@ -64,6 +71,7 @@ import {
   formatAndSortOptions,
 } from '@helpers/utils';
 import Button from '@components/Button';
+import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
@@ -77,17 +85,19 @@ export default {
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    validations: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-button': Button,
+    'ni-input': Input,
     'ni-responsive-table': ResponsiveTable,
     'trainee-edition-modal': TraineeEditionModal,
     'trainee-addition-modal': TraineeAdditionModal,
     'learner-creation-modal': LearnerCreationModal,
   },
-  emits: ['refresh'],
+  emits: ['refresh', 'update'],
   setup (props, { emit }) {
-    const { canEdit } = toRefs(props);
+    const { canEdit, validations } = toRefs(props);
 
     const $store = useStore();
     const $q = useQuasar();
@@ -140,6 +150,8 @@ export default {
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
+    const isRofOrAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
+
     const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
 
     const tableTitle = computed(() => (canEdit.value || isTrainer.value
@@ -165,6 +177,14 @@ export default {
       .sort((a, b) => a.label.localeCompare(b.label)));
 
     const disableCompany = computed(() => isIntraCourse.value || userAlreadyHasCompany.value);
+
+    const maxTraineesErrorMessage = computed(() => {
+      if (get(validations.value, 'maxTrainees.strictPositiveNumber.$response') === false ||
+        get(validations.value, 'maxTrainees.integerNumber.$response') === false) {
+        return 'Nombre non valide';
+      }
+      return '';
+    });
 
     const getPotentialTrainees = async () => {
       try {
@@ -201,7 +221,7 @@ export default {
       resetLearnerCreationModal,
     } = useLearners(refresh, false, company);
 
-    const { isIntraCourse, isClientInterface } = useCourses(course);
+    const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
 
     onMounted(async () => {
       await getPotentialTrainees();
@@ -353,6 +373,10 @@ export default {
       }
     };
 
+    const updateMaxTrainees = (event) => {
+      emit('update', set(course.value, 'maxTrainee', event));
+    };
+
     return {
       // Data
       newLearner,
@@ -378,6 +402,11 @@ export default {
       traineesOptions,
       disableCompany,
       course,
+      isIntraCourse,
+      isClientInterface,
+      isArchived,
+      isRofOrAdmin,
+      maxTraineesErrorMessage,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -390,6 +419,7 @@ export default {
       validateTraineeDeletion,
       openTraineeCreationModal,
       openLearnerCreationModal,
+      updateMaxTrainees,
     };
   },
 };
