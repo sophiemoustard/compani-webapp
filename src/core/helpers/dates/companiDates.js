@@ -76,6 +76,10 @@ const CompaniDateFactory = (inputDate) => {
         (_date.startOf(unit) > firstDate.startOf(unit) && _date.startOf(unit) < secondDate.startOf(unit)));
     },
 
+    isValid () {
+      return _date.isValid;
+    },
+
     // MANIPULATE
     startOf (unit) {
       return CompaniDateFactory(_date.startOf(unit));
