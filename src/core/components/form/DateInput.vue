@@ -79,8 +79,8 @@ export default {
     },
     input (value) {
       try {
-        const isValidDate = /^[0-9]{2}\/[0-9]{2}\/[0-9]{4}/;
-        if (!value || !isValidDate.test(value)) return '';
+        const validDate = /^[0-9]{2}\/[0-9]{2}\/[0-9]{4}/;
+        if (!value || !validDate.test(value)) return '';
 
         const momentValue = CompaniDate(value, 'dd/LL/yyyy');
         if (!momentValue.isValid()) return '';
