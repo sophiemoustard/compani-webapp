@@ -120,7 +120,9 @@ export default {
 
         if (!this.disableEndHour && CompaniDate(value, 'HH:mm').isSameOrAfter(CompaniDate(this.endHour, 'HH:mm'))) {
           const max = CompaniDate(dates.startDate).endOf('day');
-          dates.endDate = CompaniDate.min(CompaniDate(dates.startDate).add({ hours: 2 }), max).toISO();
+          const shiftedEndDate = CompaniDate(dates.startDate).add({ hours: 2 });
+
+          dates.endDate = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.toISO() : max.toISO();
         }
       }
 
