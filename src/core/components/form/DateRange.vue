@@ -21,9 +21,9 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { minDate } from '@helpers/vuelidateCustomVal';
+import CompaniDate from '@helpers/dates/companiDates';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
-import moment from '@helpers/moment';
 
 export default {
   components: {
@@ -35,8 +35,8 @@ export default {
       type: Object,
       default () {
         return {
-          startDate: moment().startOf('d').toISOString(),
-          endDate: moment().endOf('d').toISOString(),
+          startDate: CompaniDate().startOf('day').toISO(),
+          endDate: CompaniDate().endOf('day').toISO(),
         };
       },
     },
@@ -79,7 +79,7 @@ export default {
   methods: {
     update (value, key) {
       this.v$.modelValue.$touch();
-      if (key === 'endDate') value = moment(value).endOf('d').toISOString();
+      if (key === 'endDate') value = CompaniDate(value).endOf('day').toISO();
 
       this.$emit('update:model-value', { ...this.modelValue, [key]: value });
     },
