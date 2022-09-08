@@ -22,6 +22,7 @@
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatDate } from '@helpers/date';
+import CompaniDate from '@helpers/dates/companiDate';
 import moment from '@helpers/moment';
 
 export default {
@@ -54,16 +55,29 @@ export default {
     dateOptions (date) {
       let isBeforeMax = true;
       let isAfterMin = true;
-      if (this.min) isAfterMin = date >= moment(this.min).format('YYYY/MM/DD');
-      if (this.max) isBeforeMax = date <= moment(this.max).format('YYYY/MM/DD');
+
+      if (this.min) {
+        const minDate = CompaniDate(this.min).format('yyyy/LL/dd');
+        isAfterMin = CompaniDate(date).isSameOrAfter(minDate);
+      }
+
+      if (this.max) {
+        const maxDate = CompaniDate(this.min).format('yyyy/LL/dd');
+        isBeforeMax = CompaniDate(date).isSameOrBefore(maxDate);
+      }
       return isAfterMin && isBeforeMax;
     },
     select (value) {
-      const momentValue = moment(value, 'YYYY/MM/DD', true);
-      if (!momentValue.isValid()) return;
-      this.update(momentValue.toISOString());
-      this.$refs.qDateMenu.hide();
-      this.$refs.dateInput.blur();
+      try {
+        const momentValue = CompaniDate(value, 'yyyy/LL/dd');
+        if (!momentValue.isValid()) return;
+
+        this.update(momentValue.toISO());
+        this.$refs.qDateMenu.hide();
+        this.$refs.dateInput.blur();
+      } catch (e) {
+        console.error(e);
+      }
     },
     input (value) {
       if (!value) return this.update(value);
