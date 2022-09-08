@@ -111,13 +111,12 @@ export default {
     },
     updateHours (value, key) {
       const dates = { ...this.modelValue };
+      const validHour = /^[0-9]{2}:[0-9]{2}/;
+      if (!validHour.test(value) || !validHour.test(this.endHour)) return;
 
       if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
       if (key === 'startHour') {
         dates.startDate = this.setDateHours(dates.startDate, value);
-
-        const isValidHour = /^[0-9]{2}:[0-9]{2}/;
-        if (!isValidHour.test(value) || !isValidHour.test(this.endHour)) return;
 
         if (!this.disableEndHour && CompaniDate(value, 'HH:mm').isSameOrAfter(CompaniDate(this.endHour, 'HH:mm'))) {
           const max = CompaniDate(dates.startDate).endOf('day');
