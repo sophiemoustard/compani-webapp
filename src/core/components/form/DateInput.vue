@@ -21,9 +21,7 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatDate } from '@helpers/date';
 import CompaniDate from '@helpers/dates/companiDates';
-import moment from '@helpers/moment';
 
 export default {
   name: 'NiDateInput',
@@ -44,11 +42,11 @@ export default {
   computed: {
     date () {
       if (!this.modelValue) return '';
-      return moment(this.modelValue).format('YYYY/MM/DD');
+      return CompaniDate(this.modelValue).format('yyyy/LL/dd');
     },
     inputDate () {
       if (!this.modelValue) return '';
-      return formatDate(this.modelValue);
+      return CompaniDate(this.modelValue).format('dd/LL/yyyy');
     },
   },
   methods: {
@@ -80,11 +78,14 @@ export default {
       }
     },
     input (value) {
-      if (!value) return this.update(value);
+      try {
+        if (!value) return this.update(value);
 
-      const momentValue = moment(value, 'DD/MM/YYYY', true);
-      if (!momentValue.isValid()) return;
-      this.update(momentValue.toISOString());
+        const momentValue = CompaniDate(value, 'dd/LL/yyyy');
+        this.update(momentValue.toISO());
+      } catch (e) {
+        console.error(e);
+      }
     },
     update (value) {
       this.$emit('update:model-value', value);
