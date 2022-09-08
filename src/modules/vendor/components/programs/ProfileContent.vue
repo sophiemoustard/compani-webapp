@@ -337,7 +337,7 @@ export default {
       const type = ACTIVITY_TYPES.find(t => t.value === value);
       return type ? type.label : '';
     };
-    const showActivities = (stepId, stepType = E_LEARNING) => {
+    const showActivities = (stepId, stepType) => {
       if (stepType !== E_LEARNING) return null;
       areActivitiesVisible.value[stepId] = !areActivitiesVisible.value[stepId];
     };
@@ -460,7 +460,7 @@ export default {
       await initAreStepsLocked();
 
       if (openedStep.value) {
-        showActivities(openedStep.value);
+        showActivities(openedStep.value, E_LEARNING);
         scrollToOpenedStep(openedStep.value);
         $store.dispatch('program/resetOpenedStep');
       }
