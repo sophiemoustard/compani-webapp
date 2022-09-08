@@ -24,13 +24,12 @@
 
 <script>
 import get from 'lodash/get';
-import pick from 'lodash/pick';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import DateInput from '@components/form/DateInput';
 import TimeInput from '@components/form/TimeInput';
 import { minDate } from '@helpers/vuelidateCustomVal';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   components: {
@@ -66,18 +65,19 @@ export default {
   computed: {
     hasError () {
       if (this.error || get(this.v$, 'modelValue.$error.$response')) return true;
+      const { startDate, endDate } = this.modelValue;
 
-      return moment(this.modelValue.startDate).isAfter(moment(this.modelValue.endDate));
+      return CompaniDate(startDate).isAfter(CompaniDate(endDate));
     },
     startHour () {
-      return moment(this.modelValue.startDate).format('HH:mm');
+      return CompaniDate(this.modelValue.startDate).format('HH:mm');
     },
     endHour () {
-      return moment(this.modelValue.endDate).format('HH:mm');
+      return CompaniDate(this.modelValue.endDate).format('HH:mm');
     },
     min () {
-      if (moment(this.modelValue.startDate).format('YYYY/MM/DD')
-        === moment(this.modelValue.endDate).format('YYYY/MM/DD')) {
+      if (CompaniDate(this.modelValue.startDate).format('yyyy/LL/dd')
+        === CompaniDate(this.modelValue.endDate).format('yyyy/LL/dd')) {
         return this.startHour;
       }
       return null;
@@ -90,33 +90,38 @@ export default {
     },
     setDateHours (date, hour) {
       const splitHour = hour.split(':');
-      return moment(date).set({
+      return CompaniDate(date).set({
         hours: Number.parseInt(splitHour[0], 10),
         minutes: Number.parseInt(splitHour[1], 10),
         seconds: 0,
         milliseconds: 0,
-      }).toISOString();
+      }).toISO();
     },
     update (date, key) {
-      const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
-      const dateObject = pick(moment(this.modelValue[key]).toObject(), hoursFields);
-      const dates = { ...this.modelValue, [key]: moment(date).set({ ...dateObject }).toISOString() };
+      const hoursFields = ['hour', 'minute', 'second', 'millisecond'];
+      const dateObject = CompaniDate(this.modelValue[key]).getUnits(hoursFields);
+      const dates = { ...this.modelValue, [key]: CompaniDate(date).set({ ...dateObject }).toISO() };
       if (key === 'startDate' && this.disableEndDate) {
-        const endDateObject = pick(moment(this.modelValue.endDate).toObject(), hoursFields);
-        dates.endDate = moment(date).set({ ...endDateObject }).toISOString();
+        const endDateObject = CompaniDate(this.modelValue.endDate).getUnits(hoursFields);
+        dates.endDate = CompaniDate(date).set({ ...endDateObject }).toISO();
       }
-      if (key === 'endDate') dates.endDate = moment(dates.endDate).endOf('d').toISOString();
+      if (key === 'endDate') dates.endDate = CompaniDate(dates.endDate).endOf('day').toISO();
 
       this.$emit('update:model-value', dates);
     },
     updateHours (value, key) {
       const dates = { ...this.modelValue };
+
       if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
       if (key === 'startHour') {
         dates.startDate = this.setDateHours(dates.startDate, value);
-        if (!this.disableEndHour && moment(value, 'HH:mm').isSameOrAfter(moment(this.endHour, 'HH:mm'))) {
-          const max = moment(dates.startDate).endOf('d');
-          dates.endDate = moment.min(moment(dates.startDate).add(2, 'H'), max).toISOString();
+
+        const isValidHour = /^[0-9]{2}:[0-9]{2}/;
+        if (!isValidHour.test(value) || !isValidHour.test(this.endHour)) return;
+
+        if (!this.disableEndHour && CompaniDate(value, 'HH:mm').isSameOrAfter(CompaniDate(this.endHour, 'HH:mm'))) {
+          const max = CompaniDate(dates.startDate).endOf('day');
+          dates.endDate = CompaniDate.min(CompaniDate(dates.startDate).add({ hours: 2 }), max).toISO();
         }
       }
 
