@@ -24,7 +24,6 @@
 
 <script>
 import get from 'lodash/get';
-import pick from 'lodash/pick';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import DateInput from '@components/form/DateInput';
