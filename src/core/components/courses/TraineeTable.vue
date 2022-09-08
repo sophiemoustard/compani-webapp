@@ -274,6 +274,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
+        if (e.status === 403) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du/de la stagiaire.');
       } finally {
         traineeModalLoading.value = false;
