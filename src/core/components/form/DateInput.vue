@@ -60,7 +60,7 @@ export default {
       }
 
       if (this.max) {
-        const maxDate = CompaniDate(this.min).format('yyyy/LL/dd');
+        const maxDate = CompaniDate(this.max).format('yyyy/LL/dd');
         isBeforeMax = CompaniDate(date).isSameOrBefore(maxDate);
       }
       return isAfterMin && isBeforeMax;
