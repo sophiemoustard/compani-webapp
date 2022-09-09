@@ -8,7 +8,7 @@
         <ni-input v-if="isRofOrAdmin && !isClientInterface" caption="Nombre max de stagiaires" :disable="isArchived"
           v-model.trim="course.maxTrainees" @blur="updateMaxTrainees($event)" type="number"
           :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" />
-        <div v-else>{{ course.maxTrainees }} stagiaires max</div>
+        <div v-else class="q-mb-sm">{{ course.maxTrainees }} stagiaires max</div>
       </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
