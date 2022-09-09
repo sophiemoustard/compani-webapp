@@ -6,7 +6,7 @@
       </div>
       <div class="row" v-if="isIntraCourse">
         <ni-input v-if="isRofOrAdmin && !isClientInterface" caption="Nombre max de stagiaires" :disable="isArchived"
-          v-model.trim="course.maxTrainees" @blur="updateMaxTrainees($event)" type="number"
+          v-model.trim="course.maxTrainees" @blur="updateMaxTrainees"
           :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" />
         <div v-else class="q-mb-sm">{{ course.maxTrainees }} stagiaires max</div>
       </div>
@@ -59,7 +59,6 @@ import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
-import set from 'lodash/set';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -373,9 +372,7 @@ export default {
       }
     };
 
-    const updateMaxTrainees = (event) => {
-      emit('update', set(course.value, 'maxTrainee', event));
-    };
+    const updateMaxTrainees = () => emit('update');
 
     return {
       // Data
