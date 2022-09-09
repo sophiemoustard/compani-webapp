@@ -1,9 +1,9 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
-import { WEBAPP, OPERATION } from '@data/constants';
+import { WEBAPP, OPERATIONS } from '@data/constants';
 
 export default {
   async list (filterParams) {
-    const params = { ...filterParams, origin: WEBAPP, action: OPERATION };
+    const params = { ...filterParams, origin: WEBAPP, action: OPERATIONS };
     const courses = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses`, { params });
     return courses.data.data.courses;
   },
