@@ -59,10 +59,9 @@ export default {
     },
     select (value) {
       try {
-        const momentValue = CompaniDate(value, 'yyyy/LL/dd');
-        if (!momentValue.isValid()) return;
+        const selectedDate = CompaniDate(value, 'yyyy/LL/dd');
 
-        this.update(momentValue.toISO());
+        this.update(selectedDate.toISO());
         this.$refs.qDateMenu.hide();
         this.$refs.dateInput.blur();
       } catch (e) {
@@ -71,13 +70,12 @@ export default {
     },
     input (value) {
       try {
-        const validDate = /^[0-9]{2}\/[0-9]{2}\/[0-9]{4}/;
-        if (!value || !validDate.test(value)) return '';
+        if (!value) return '';
 
-        const momentValue = CompaniDate(value, 'dd/LL/yyyy');
-        if (!momentValue.isValid()) return '';
-        this.update(momentValue.toISO());
+        const date = CompaniDate(value, 'dd/LL/yyyy');
+        this.update(date.toISO());
       } catch (e) {
+        if (e.message.startsWith('Invalid DateTime: unparsable')) return '';
         console.error(e);
       }
     },
