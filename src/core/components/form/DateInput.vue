@@ -51,18 +51,10 @@ export default {
   },
   methods: {
     dateOptions (date) {
-      let isBeforeMax = true;
-      let isAfterMin = true;
+      const dateValue = CompaniDate(date, 'yyyy/LL/dd');
+      const isAfterMin = this.min ? dateValue.isSameOrAfter(CompaniDate(this.min)) : true;
+      const isBeforeMax = this.max ? dateValue.isSameOrBefore(this.max) : true;
 
-      if (this.min) {
-        const minDate = CompaniDate(this.min).format('yyyy/LL/dd');
-        isAfterMin = CompaniDate(date).isSameOrAfter(minDate);
-      }
-
-      if (this.max) {
-        const maxDate = CompaniDate(this.max).format('yyyy/LL/dd');
-        isBeforeMax = CompaniDate(date).isSameOrBefore(maxDate);
-      }
       return isAfterMin && isBeforeMax;
     },
     select (value) {
