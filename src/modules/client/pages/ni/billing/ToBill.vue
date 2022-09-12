@@ -23,7 +23,9 @@
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <th>
-            <q-checkbox v-model="props.selected" indeterminate-value="some" dense />
+            <div class="q-mr-md">
+              <q-checkbox v-model="props.selected" indeterminate-value="some" dense />
+            </div>
           </th>
         </q-tr>
       </template>
