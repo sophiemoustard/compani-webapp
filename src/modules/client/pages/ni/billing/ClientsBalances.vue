@@ -16,7 +16,7 @@
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <q-th auto-width>
-            <q-checkbox @update:model-value="selectRows" :model-value="!!selected.length" dense
+            <q-checkbox class="q-mr-md" @update:model-value="selectRows" :model-value="!!selected.length" dense
               :disable="balancesOption === 2" indeterminate-value="some" />
           </q-th>
         </q-tr>
@@ -38,7 +38,7 @@
             <template v-else>{{ col.value }}</template>
           </q-td>
           <q-td v-if="props.row.toPay > 0" align="right" auto-width>
-            <q-checkbox v-model="props.selected" dense />
+            <q-checkbox class="q-mr-md" v-model="props.selected" dense />
           </q-td>
           <q-td v-else />
         </q-tr>
