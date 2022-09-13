@@ -31,11 +31,6 @@ jobs:
           path: 'api'
 
       - run: cd api && npm ci
-      - uses: szenius/set-timezone@v1.0
-        with:
-          timezoneMacos: "Europe/Paris"
-          timezoneLinux: "Europe/Paris"
-          timezoneWindows: "Paris Standard Time"
       - uses: actions/checkout@v2
         with:
           path: 'webapp'
