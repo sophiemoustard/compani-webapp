@@ -67,7 +67,7 @@ export default {
       if (this.error || get(this.v$, 'modelValue.$error.$response')) return true;
       const { startDate, endDate } = this.modelValue;
 
-      return CompaniDate(startDate).isAfter(CompaniDate(endDate));
+      return CompaniDate(startDate).isAfter(endDate);
     },
     startHour () {
       return CompaniDate(this.modelValue.startDate).format('HH:mm');
@@ -110,23 +110,27 @@ export default {
       this.$emit('update:model-value', dates);
     },
     updateHours (value, key) {
-      const dates = { ...this.modelValue };
-      const validHour = /^[0-9]{2}:[0-9]{2}/;
-      if (!validHour.test(value) || !validHour.test(this.endHour)) return;
+      try {
+        const dates = { ...this.modelValue };
 
-      if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
-      if (key === 'startHour') {
-        dates.startDate = this.setDateHours(dates.startDate, value);
+        if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
+        if (key === 'startHour') {
+          dates.startDate = this.setDateHours(dates.startDate, value);
 
-        if (!this.disableEndHour && CompaniDate(value, 'HH:mm').isSameOrAfter(CompaniDate(this.endHour, 'HH:mm'))) {
-          const max = CompaniDate(dates.startDate).endOf('day');
-          const shiftedEndDate = CompaniDate(dates.startDate).add({ hours: 2 });
+          if (!this.disableEndHour && CompaniDate(value, 'HH:mm').isSameOrAfter(this.endHour)) {
+            const max = CompaniDate(dates.startDate).endOf('day');
+            const shiftedEndDate = CompaniDate(dates.startDate).add({ hours: 2 });
 
-          dates.endDate = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.toISO() : max.toISO();
+            dates.endDate = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.toISO() : max.toISO();
+          }
         }
-      }
 
-      this.$emit('update:model-value', dates);
+        this.$emit('update:model-value', dates);
+      } catch (e) {
+        if (e.message.startsWith('Invalid DateTime: unparsable') ||
+          e.message.startsWith('Invalid unit value')) return '';
+        console.error(e);
+      }
     },
     startClick () {
       this.$emit('start-lock-click');
