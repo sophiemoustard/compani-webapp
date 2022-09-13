@@ -1,4 +1,3 @@
-const moment = require('moment');
 const { BILLING } = require('../../../../src/core/data/constants');
 
 describe('customers subscription tests', () => {
@@ -31,7 +30,7 @@ describe('customers subscription tests', () => {
 
     cy.dataCy('agreement').should(
       'contain',
-      `(Accepté le ${moment().format('DD/MM/YYYY')} par Helper TEST)`
+      `(Accepté le ${Cypress.luxon.DateTime.now().toFormat('dd/LL/yyyy')} par Helper TEST)`
     );
 
     cy.dataCy('show-subscription-history').click();
