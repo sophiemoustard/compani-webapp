@@ -52,7 +52,7 @@ export default {
   methods: {
     dateOptions (date) {
       const dateValue = CompaniDate(date, 'yyyy/LL/dd');
-      const isAfterMin = this.min ? dateValue.isSameOrAfter(CompaniDate(this.min)) : true;
+      const isAfterMin = this.min ? dateValue.isSameOrAfter(this.min) : true;
       const isBeforeMax = this.max ? dateValue.isSameOrBefore(this.max) : true;
 
       return isAfterMin && isBeforeMax;
