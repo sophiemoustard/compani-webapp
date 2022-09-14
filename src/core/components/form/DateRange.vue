@@ -24,6 +24,7 @@ import { minDate } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
+import { NotifyWarning } from '@components/popup/notify';
 
 export default {
   components: {
@@ -62,13 +63,14 @@ export default {
       return this.error || this.v$.modelValue.$error;
     },
     innerErrorMessage () {
-      if (get(this.v$.modelValue.startDate, 'required.$reponse') === false ||
-        get(this.v$.modelValue.endDate, 'required.$reponse') === false) return REQUIRED_LABEL;
-      if (get(this.v$.modelValue.endDate, 'minDate.$reponse') === false) {
+      if (get(this.v$.modelValue.startDate, 'required.$response') === false ||
+        get(this.v$.modelValue.endDate, 'required.$response') === false) return REQUIRED_LABEL;
+
+      if (get(this.v$.modelValue.endDate, 'minDate.$response') === false) {
         return 'La date de fin doit être postérieure à la date de début';
       }
 
-      return this.errorMessage;
+      return this.innerErrorMessage;
     },
   },
   watch: {
@@ -84,6 +86,9 @@ export default {
       this.$emit('update:model-value', { ...this.modelValue, [key]: value });
     },
     blur () {
+      this.v$.modelValue.$touch();
+      if (this.v$.modelValue.$error) return NotifyWarning('Champ(s) invalide(s)');
+
       this.$emit('blur');
     },
   },
