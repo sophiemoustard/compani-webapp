@@ -75,8 +75,7 @@ export default {
         const date = CompaniDate(value, 'dd/LL/yyyy');
         this.update(date.toISO());
       } catch (e) {
-        if (e.message.startsWith('Invalid DateTime: unparsable') ||
-          e.message.startsWith('Invalid DateTime: unit out of range')) return '';
+        if (e.message.startsWith('Invalid DateTime: unparsable')) return '';
         console.error(e);
       }
     },
