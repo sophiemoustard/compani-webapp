@@ -70,7 +70,7 @@ export default {
         return 'La date de fin doit être postérieure à la date de début';
       }
 
-      return this.innerErrorMessage;
+      return this.errorMessage;
     },
   },
   watch: {
