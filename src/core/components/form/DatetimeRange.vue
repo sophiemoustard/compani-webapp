@@ -134,7 +134,8 @@ export default {
         this.$emit('update:model-value', dates);
       } catch (e) {
         this.hourError = true;
-        if (e.message.startsWith('Invalid DateTime: unparsable')) return '';
+        if (e.message.startsWith('Invalid DateTime: unparsable') ||
+          e.message.startsWith('Invalid DateTime: unit out of range')) return '';
         console.error(e);
       }
     },
