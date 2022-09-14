@@ -89,12 +89,11 @@ export default {
       this.$emit('blur');
     },
     setDateHours (date, hour) {
-      const splitHour = hour.split(':');
+      const companiDateHour = CompaniDate(hour, 'HH:mm').getUnits(['hour', 'minute']);
       return CompaniDate(date).set({
-        hours: Number.parseInt(splitHour[0], 10),
-        minutes: Number.parseInt(splitHour[1], 10),
-        seconds: 0,
-        milliseconds: 0,
+        ...companiDateHour,
+        second: 0,
+        millisecond: 0,
       }).toISO();
     },
     update (date, key) {
@@ -127,8 +126,7 @@ export default {
 
         this.$emit('update:model-value', dates);
       } catch (e) {
-        if (e.message.startsWith('Invalid DateTime: unparsable') ||
-          e.message.startsWith('Invalid unit value')) return '';
+        if (e.message.startsWith('Invalid DateTime: unparsable')) return '';
         console.error(e);
       }
     },
