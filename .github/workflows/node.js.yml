@@ -31,6 +31,7 @@ jobs:
           path: 'api'
 
       - run: cd api && npm ci
+
       - uses: actions/checkout@v2
         with:
           path: 'webapp'
