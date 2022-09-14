@@ -1,4 +1,5 @@
 import transform from 'lodash/transform';
+import cloneDeep from 'lodash/cloneDeep';
 import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
@@ -6,8 +7,9 @@ import { descendingSort } from '@helpers/date';
 import { toFixedToFloat } from '@helpers/numbers';
 
 export const extend = (...sources) => {
+  const sourcesCopy = cloneDeep(sources);
   const extended = {};
-  const deep = sources[0];
+  const deep = sourcesCopy[0];
   let i = 0;
 
   // Merge the object into the extended object
@@ -26,7 +28,7 @@ export const extend = (...sources) => {
   };
 
   for (; i < sources.length; i++) {
-    merge(sources[i]);
+    merge(sourcesCopy[i]);
   }
 
   return extended;
