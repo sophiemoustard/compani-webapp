@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="hasError" name="error_outline" color="secondary" />
     </div>
-    <q-field :error="hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
+    <q-field :error="hourError || hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
       <div class="datetime-container row justify-evenly items-center">
         <ni-date-input :model-value="modelValue.startDate" @update:model-value="update($event, 'startDate')"
           @blur="blurHandler" :disable="disable || disableStartDate" :max="max" class="date-item" />
@@ -24,6 +24,7 @@
 
 <script>
 import get from 'lodash/get';
+import { ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import DateInput from '@components/form/DateInput';
@@ -52,7 +53,12 @@ export default {
   },
   emits: ['blur', 'update:model-value', 'start-lock-click', 'end-lock-click'],
   setup () {
-    return { v$: useVuelidate() };
+    const hourError = ref(false);
+
+    return {
+      hourError,
+      v$: useVuelidate(),
+    };
   },
   validations () {
     return {
@@ -110,6 +116,7 @@ export default {
     },
     updateHours (value, key) {
       try {
+        this.hourError = false;
         const dates = { ...this.modelValue };
 
         if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
@@ -126,6 +133,7 @@ export default {
 
         this.$emit('update:model-value', dates);
       } catch (e) {
+        this.hourError = true;
         if (e.message.startsWith('Invalid DateTime: unparsable')) return '';
         console.error(e);
       }
