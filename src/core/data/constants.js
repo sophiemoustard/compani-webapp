@@ -359,6 +359,7 @@ export const STRICTLY_E_LEARNING = 'strictly_e_learning';
 export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
+export const OPERATIONS = 'operations';
 
 // SUBPROGRAM
 export const PUBLISHED = 'published';

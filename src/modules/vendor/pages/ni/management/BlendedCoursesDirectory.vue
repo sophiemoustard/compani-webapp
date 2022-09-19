@@ -49,7 +49,7 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
-import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
+import { minDate, maxDate, strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -78,6 +78,7 @@ export default {
         type: INTRA,
         salesRepresentative: '',
         estimatedStartDate: '',
+        maxTrainees: 8,
       },
       programs: [],
       courseCreationModal: false,
@@ -92,9 +93,10 @@ export default {
       newCourse: {
         program: { required },
         subProgram: { required },
-        company: { required: requiredIf(this.newCourse.type === INTRA) },
         type: { required },
         salesRepresentative: { required },
+        ...(this.isIntraCourse && { maxTrainees: { required, strictPositiveNumber, integerNumber } }),
+        company: { required: requiredIf(this.newCourse.type === INTRA) },
       },
       selectedStartDate: { maxDate: this.selectedEndDate ? maxDate(this.selectedEndDate) : '' },
       selectedEndDate: { minDate: this.selectedStartDate ? minDate(this.selectedStartDate) : '' },
@@ -159,6 +161,7 @@ export default {
         type: INTRA,
         salesRepresentative: '',
         estimatedStartDate: '',
+        maxTrainees: 8,
       };
     },
     async createCourse () {

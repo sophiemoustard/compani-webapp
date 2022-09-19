@@ -1,7 +1,9 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
+import { WEBAPP, OPERATIONS } from '@data/constants';
 
 export default {
-  async list (params) {
+  async list (filterParams) {
+    const params = { ...filterParams, origin: WEBAPP, action: OPERATIONS };
     const courses = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses`, { params });
     return courses.data.data.courses;
   },
@@ -13,7 +15,8 @@ export default {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses`, payload);
   },
   async getById (courseId) {
-    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
+    const params = { action: OPERATIONS };
+    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`, { params });
     return course.data.data.course;
   },
   async getFollowUp (courseId, params = null) {
