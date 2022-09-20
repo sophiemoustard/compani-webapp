@@ -19,6 +19,4 @@ moment.updateLocale('fr', {
   workingWeekdays: [1, 2, 3, 4, 5, 6],
 });
 
-moment.tz.setDefault('Europe/Paris');
-
 export default momentRange;
