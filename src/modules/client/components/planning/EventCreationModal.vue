@@ -11,7 +11,7 @@
           @update:model-value="updateType($event)" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="newEvent.dates" required-field
-            :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
+            :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date :shifted-minutes="120"
             @update:model-value="updateEvent('dates', $event)" :max="customerStoppedDate" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
@@ -34,7 +34,7 @@
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
             :disable="isHourlyAbsence(newEvent)" @update:model-value="updateAbsence($event)" />
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="newEvent.dates" required-field
-            :disable-end-date="isAbsenceEndDateDisabled" :error="validations.dates.$error"
+            :disable-end-date="isAbsenceEndDateDisabled" :error="validations.dates.$error" :shifted-minutes="120"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="isAbsenceStartHourDisabled" @update:model-value="updateEvent('dates', $event)" />
           <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :model-value="newEvent.isExtendedAbsence"
