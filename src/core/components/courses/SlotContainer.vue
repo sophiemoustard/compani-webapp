@@ -94,6 +94,7 @@ import { getStepTypeLabel } from '@helpers/courses';
 import { formatDate, formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
 import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'SlotContainer',
@@ -213,8 +214,8 @@ export default {
       }
 
       const defaultDate = {
-        startDate: moment().startOf('d').hours(9).toISOString(),
-        endDate: moment().startOf('d').hours(12).toISOString(),
+        startDate: CompaniDate().set({ hour: 9, minute: 0 }).toISO(),
+        endDate: CompaniDate().set({ hour: 12, minute: 30 }).toISO(),
       };
       editedCourseSlot.value = {
         _id: slot._id,
