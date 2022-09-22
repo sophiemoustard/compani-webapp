@@ -80,7 +80,8 @@
     </div>
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
-      v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms" />
+      v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
+      @hide="resetSmsModal" />
 
     <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
@@ -253,8 +254,8 @@ export default {
     const canEditTrainees = computed(() => isIntraCourse.value || (!isClientInterface && !isTrainer.value));
 
     const isFinished = computed(() => {
-      const slots = course.value.slots.filter(slot => moment().isBefore(slot.endDate));
-      return !slots.length && !course.value.slotsToPlan.length;
+      const slotsToCome = course.value.slots.filter(slot => moment().isBefore(slot.endDate));
+      return !slotsToCome.length && !course.value.slotsToPlan.length;
     });
 
     const courseNotStartedYet = computed(() => {
@@ -449,6 +450,8 @@ export default {
       sendSms.value = false;
       smsModal.value = true;
     };
+
+    const resetSmsModal = () => v$.value.newSms.$reset();
 
     const setConvocationMessage = () => {
       const slots = course.value.slots
@@ -743,6 +746,7 @@ export default {
       formatContactOption,
       openHistoryModal,
       openSmsModal,
+      resetSmsModal,
       updateMessage,
       sendMessage,
       downloadConvocation,
