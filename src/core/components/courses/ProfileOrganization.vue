@@ -265,7 +265,9 @@ export default {
 
     const filteredMessageTypeOptions = computed(() => {
       if (courseNotStartedYet.value) return messageTypeOptions.value;
-      if (isFinished.value) messageTypeOptions.value.filter(t => t.value === OTHER);
+      if (isFinished.value || noFuturSlotIsPlanned.value) {
+        return messageTypeOptions.value.filter(t => t.value === OTHER);
+      }
       return messageTypeOptions.value.filter(t => t.value !== CONVOCATION);
     });
 
