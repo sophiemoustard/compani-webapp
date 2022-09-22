@@ -36,8 +36,8 @@
                 </q-item-section>
               </q-item>
             </div>
-            <q-checkbox v-else :model-value="checkboxValue(col.value, col.slot)" dense size="sm"
-              @update:model-value="updateCheckbox(col.value, col.slot)" :disable="disableCheckBox" />
+            <q-checkbox v-else :model-value="attendanceCheckboxValue(col.value, col.slot)" dense size="sm"
+              @update:model-value="updateAttendanceCheckbox(col.value, col.slot)" :disable="disableCheckBox" />
           </q-td>
         </q-tr>
       </template>
@@ -259,7 +259,7 @@ export default {
   },
   methods: {
     get,
-    checkboxValue (traineeId, slotId) {
+    attendanceCheckboxValue (traineeId, slotId) {
       if (this.attendances.length) {
         return !!this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
       }
@@ -388,34 +388,23 @@ export default {
         this.loading = false;
       }
     },
-    async updateCheckbox (traineeId, slotId) {
-      if (!this.canUpdate) return NotifyNegative('Impossible de modifier l\'émargement.');
+    async updateAttendanceCheckbox (traineeId, slotId) {
+      try {
+        if (!this.canUpdate) return NotifyNegative('Impossible de modifier l\'émargement.');
 
-      if (this.checkboxValue(traineeId, slotId)) {
-        try {
-          this.loading = true;
+        this.loading = true;
+        if (this.attendanceCheckboxValue(traineeId, slotId)) {
           const attendance = this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
           await Attendances.delete(attendance._id);
-
-          await this.refreshAttendances({ courseSlot: slotId });
-        } catch (e) {
-          console.error(e);
-          NotifyNegative('Erreur lors de la suppression de l\'émargement.');
-        } finally {
-          this.loading = false;
-        }
-      } else {
-        try {
-          this.loading = true;
+        } else {
           await Attendances.create({ trainee: traineeId, courseSlot: slotId });
-
-          await this.refreshAttendances({ courseSlot: slotId });
-        } catch (e) {
-          console.error(e);
-          NotifyNegative('Erreur lors de la validation de l\'émargement.');
-        } finally {
-          this.loading = false;
         }
+        await this.refreshAttendances({ courseSlot: slotId });
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification de l\'émargement.');
+      } finally {
+        this.loading = false;
       }
     },
     async addTrainee () {
@@ -425,7 +414,8 @@ export default {
         this.v$.newTraineeAttendance.$touch();
         if (this.v$.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
-        this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee, s));
+        this.newTraineeAttendance.attendances
+          .map(s => this.updateAttendanceCheckbox(this.newTraineeAttendance.trainee, s));
         this.traineeAdditionModal = false;
         NotifyPositive('Participant(e) ajouté(e).');
       } catch (e) {
