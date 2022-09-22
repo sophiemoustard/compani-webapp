@@ -80,7 +80,7 @@
     </div>
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
-      v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
+      v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms" />
 
     <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
@@ -139,6 +139,7 @@ import {
   TRAINER,
   CONVOCATION,
   REMINDER,
+  OTHER,
   COACH,
   CLIENT_ADMIN,
   INTRA,
@@ -190,6 +191,7 @@ export default {
     const messageTypeOptions = ref([
       { label: 'Convocation', value: CONVOCATION },
       { label: 'Rappel', value: REMINDER },
+      { label: 'Autre', value: OTHER },
     ]);
     const newSms = ref({ content: '', type: '' });
     const loading = ref(false);
@@ -251,7 +253,7 @@ export default {
     const canEditTrainees = computed(() => isIntraCourse.value || (!isClientInterface && !isTrainer.value));
 
     const isFinished = computed(() => {
-      const slots = course.value.slots.filter(slot => moment().isBefore(slot.startDate));
+      const slots = course.value.slots.filter(slot => moment().isBefore(slot.endDate));
       return !slots.length && !course.value.slotsToPlan.length;
     });
 
@@ -260,16 +262,18 @@ export default {
       return !slots.length;
     });
 
-    const filteredMessageTypeOptions = computed(() => (courseNotStartedYet.value
-      ? messageTypeOptions.value
-      : messageTypeOptions.value.filter(t => t.value === REMINDER)));
+    const filteredMessageTypeOptions = computed(() => {
+      if (courseNotStartedYet.value) return messageTypeOptions.value;
+      if (isFinished.value) messageTypeOptions.value.filter(t => t.value === OTHER);
+      return messageTypeOptions.value.filter(t => t.value !== CONVOCATION);
+    });
 
     const missingTraineesPhone = computed(() => course.value.trainees.filter(trainee => !get(trainee, 'contact.phone'))
       .map(trainee => formatIdentity(trainee.identity, 'FL')));
 
     const courseName = computed(() => composeCourseName(course.value));
 
-    const allFuturSlotsAreNotPlanned = computed(() => {
+    const noFuturSlotIsPlanned = computed(() => {
       const futurSlots = course.value.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
       return !!course.value.slotsToPlan.length && !futurSlots.length;
     });
@@ -410,7 +414,9 @@ export default {
     };
 
     const setDefaultMessageType = () => {
-      newSms.value.type = courseNotStartedYet.value ? CONVOCATION : REMINDER;
+      if (courseNotStartedYet.value) newSms.value.type = CONVOCATION;
+      else if (isFinished.value || noFuturSlotIsPlanned.value) newSms.value.type = OTHER;
+      else newSms.value.type = REMINDER;
     };
 
     const refreshSms = async () => {
@@ -428,11 +434,6 @@ export default {
     };
 
     const openHistoryModal = async () => {
-      if (allFuturSlotsAreNotPlanned.value) {
-        return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation sans créneaux à venir.');
-      }
-      if (isFinished.value) return NotifyWarning('Vous ne pouvez pas envoyer des sms pour une formation terminée.');
-
       if (smsHistoryList.value.length) {
         smsHistoriesModal.value = true;
         sendSms.value = true;
@@ -442,19 +443,11 @@ export default {
     };
 
     const openSmsModal = () => {
+      setDefaultMessageType();
       updateMessage(newSms.value.type);
       smsHistoriesModal.value = false;
       sendSms.value = false;
       smsModal.value = true;
-    };
-
-    const resetSmsModal = () => {
-      updateMessage(newSms.value.type);
-    };
-
-    const updateMessage = (newMessageType) => {
-      if (newMessageType === CONVOCATION) setConvocationMessage();
-      else if (newMessageType === REMINDER) setReminderMessage();
     };
 
     const setConvocationMessage = () => {
@@ -474,7 +467,7 @@ export default {
     const setReminderMessage = () => {
       const slots = course.value.slots
         .filter(s => !!s.startDate)
-        .filter(slot => moment().isBefore(slot.startDate))
+        .filter(slot => moment().isBefore(slot.endDate))
         .sort((a, b) => ascendingSort(a.startDate, b.startDate));
       const date = moment(slots[0].startDate).format('DD/MM');
       const hour = moment(slots[0].startDate).format('HH:mm');
@@ -484,6 +477,14 @@ export default {
       + 'de cette formation, veuillez télécharger notre application Compani :\n'
       + `Pour android : ${urlAndroid.value} \nPour iPhone : ${urlIos.value} `
       + '\nBonne formation,\nCompani';
+    };
+
+    const setOtherMessage = () => (newSms.value.content = '');
+
+    const updateMessage = (newMessageType) => {
+      if (newMessageType === CONVOCATION) setConvocationMessage();
+      else if (newMessageType === REMINDER) setReminderMessage();
+      else if (newMessageType === OTHER) setOtherMessage();
     };
 
     const sendMessage = async () => {
@@ -679,7 +680,6 @@ export default {
         promises.push(refreshSms(), refreshCompanyRepresentatives());
       }
       await Promise.all(promises);
-      setDefaultMessageType();
 
       if (isAdmin.value) await refreshTrainersAndSalesRepresentatives();
       else {
@@ -743,7 +743,6 @@ export default {
       formatContactOption,
       openHistoryModal,
       openSmsModal,
-      resetSmsModal,
       updateMessage,
       sendMessage,
       downloadConvocation,

@@ -4,9 +4,9 @@
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
       <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :model-value="newSms.type"
-        required-field @update:model-value="updateType($event)" />
+        required-field @update:model-value="updateType($event)" :error="error.type.$error" />
       <ni-input in-modal caption="Message" :model-value="newSms.content" @update:model-value="update($event, 'content')"
-        type="textarea" :rows="7" required-field />
+        type="textarea" :rows="7" required-field :error="error.content.$error" />
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" label="Envoyer message" icon-right="send" color="white"
           :loading="loading" @click="send" />
@@ -31,6 +31,7 @@ export default {
     },
     filteredMessageTypeOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
+    error: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
