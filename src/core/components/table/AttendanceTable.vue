@@ -438,19 +438,19 @@ export default {
 
       this.traineeAdditionModal = true;
     },
-    getSlotAttendances (slotId) {
-      return this.attendances.filter(a => a.courseSlot === slotId);
+    getSlotAttendancesForRegisteredLearners (slotId) {
+      return this.attendances.filter(a => a.courseSlot === slotId &&
+        this.course.trainees.some(t => t._id === a.trainee._id));
     },
     slotCheckboxValue (slotId) {
-      const slotAttendancesLength = this.attendances.filter(a => a.courseSlot === slotId).length;
-      return slotAttendancesLength === this.traineesWithAttendance.length;
+      return this.getSlotAttendancesForRegisteredLearners(slotId).length === this.course.trainees.length;
     },
     async updateSlotCheckbox (slotId) {
       try {
         this.loading = true;
         if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
 
-        const slotAttendances = this.getSlotAttendances(slotId);
+        const slotAttendances = this.getSlotAttendancesForRegisteredLearners(slotId);
         if (this.slotCheckboxValue(slotId)) {
           const attendancesIdsToDelete = slotAttendances.map(a => Attendances.delete(a._id));
           await Promise.all(attendancesIdsToDelete);
