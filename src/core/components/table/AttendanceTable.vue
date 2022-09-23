@@ -18,8 +18,8 @@
                 <q-icon name="supervisor_account" />
                 {{ traineesCount(col.slot) }}
               </div>
-              <q-checkbox :model-value="slotCheckboxValue(col.slot)" @update:model-value="updateSlotCheckbox(col.slot)"
-                dense size="sm" :disable="disableCheckbox" />
+              <q-checkbox v-if="canUpdate" :model-value="slotCheckboxValue(col.slot)" dense size="sm"
+                @update:model-value="updateSlotCheckbox(col.slot)" :disable="disableCheckbox" />
             </div>
           </q-th>
         </q-tr>
