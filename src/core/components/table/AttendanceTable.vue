@@ -18,6 +18,8 @@
                 <q-icon name="supervisor_account" />
                 {{ traineesCount(col.slot) }}
               </div>
+              <q-checkbox :model-value="slotCheckboxValue(col.slot)" @update:model-value="updateSlotCheckbox(col.slot)"
+                dense size="sm" :disable="disableCheckbox" />
             </div>
           </q-th>
         </q-tr>
@@ -37,7 +39,7 @@
               </q-item>
             </div>
             <q-checkbox v-else :model-value="attendanceCheckboxValue(col.value, col.slot)" dense size="sm"
-              @update:model-value="updateAttendanceCheckbox(col.value, col.slot)" :disable="disableCheckBox" />
+              @update:model-value="updateAttendanceCheckbox(col.value, col.slot)" :disable="disableCheckbox" />
           </q-td>
         </q-tr>
       </template>
@@ -253,7 +255,7 @@ export default {
 
       return ability.can('update', 'course_trainee_follow_up');
     },
-    disableCheckBox () {
+    disableCheckbox () {
       return this.loading || !this.canUpdate || !!this.course.archivedAt;
     },
   },
@@ -435,6 +437,29 @@ export default {
       }
 
       this.traineeAdditionModal = true;
+    },
+    getSlotAttendances (slotId) {
+      return this.attendances.filter(a => a.courseSlot === slotId);
+    },
+    slotCheckboxValue (slotId) {
+      const slotAttendancesLength = this.attendances.filter(a => a.courseSlot === slotId).length;
+      return slotAttendancesLength === this.traineesWithAttendance.length;
+    },
+    async updateSlotCheckbox (slotId) {
+      try {
+        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
+
+        const slotAttendances = this.getSlotAttendances(slotId);
+        if (this.slotCheckboxValue(slotId)) {
+          const slotAttendancesIdsToDelete = slotAttendances.map(a => Attendances.delete(a._id));
+          await Promise.all(slotAttendancesIdsToDelete);
+        }
+
+        await this.refreshAttendances({ courseSlot: slotId });
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification de l\'émargement.');
+      }
     },
   },
 };
