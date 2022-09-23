@@ -447,18 +447,27 @@ export default {
     },
     async updateSlotCheckbox (slotId) {
       try {
+        this.loading = true;
         if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
 
         const slotAttendances = this.getSlotAttendances(slotId);
         if (this.slotCheckboxValue(slotId)) {
-          const slotAttendancesIdsToDelete = slotAttendances.map(a => Attendances.delete(a._id));
-          await Promise.all(slotAttendancesIdsToDelete);
+          const attendancesIdsToDelete = slotAttendances.map(a => Attendances.delete(a._id));
+          await Promise.all(attendancesIdsToDelete);
+        } else {
+          const attendancesToCreate = this.course.trainees
+            .filter(t => !slotAttendances.some(a => a.trainee._id === t._id))
+            .map(t => Attendances.create({ trainee: t._id, courseSlot: slotId }));
+
+          await Promise.all(attendancesToCreate);
         }
 
         await this.refreshAttendances({ courseSlot: slotId });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'émargement.');
+      } finally {
+        this.loading = false;
       }
     },
   },
