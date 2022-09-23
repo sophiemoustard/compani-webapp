@@ -59,8 +59,8 @@ export default {
     const hourError = ref(false);
 
     const shiftedTime = ref({
-      ...(shiftedMinutes.value / 60 >= 1 && { hour: Math.trunc(shiftedMinutes.value / 60) }),
-      ...(shiftedMinutes.value % 60 > 0 && { minute: shiftedMinutes.value % 60 }),
+      ...(shiftedMinutes.value / 60 >= 1 && { hours: Math.trunc(shiftedMinutes.value / 60) }),
+      ...(shiftedMinutes.value % 60 > 0 && { minutes: shiftedMinutes.value % 60 }),
     });
 
     const rules = computed(() => ({
@@ -97,8 +97,8 @@ export default {
       const companiDateHour = CompaniDate(hour, 'HH:mm').getUnits(['hour', 'minute']);
       return CompaniDate(date).set({
         ...companiDateHour,
-        seconds: 0,
-        milliseconds: 0,
+        second: 0,
+        millisecond: 0,
       }).toISO();
     };
 
