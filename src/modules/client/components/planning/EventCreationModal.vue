@@ -142,7 +142,8 @@ export default {
     isContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
 
-      return this.selectedAuxiliary.contracts.some(contract => !contract.endDate);
+      return this.selectedAuxiliary.contracts.some(contract => moment(contract.startDate)
+        .isBefore(this.newEvent.dates.startDate) && !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
