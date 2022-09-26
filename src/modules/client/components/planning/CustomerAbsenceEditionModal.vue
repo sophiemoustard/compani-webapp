@@ -11,7 +11,7 @@
           required-field @update:model-value="update($event, 'absenceType')" />
       </div>
       <div class="q-mx-lg">
-        <ni-date-range borders class="last" caption="Dates de l'absence" @blur="validations.dates.$touch"
+        <ni-date-range borders class="last" caption="Dates de l'absence" @blur="validations.dates.$touch" in-modal
           :model-value="editedCustomerAbsence.dates" @update:model-value="update($event, 'dates')" required-field />
       </div>
       <q-btn class="modal-btn full-width" no-caps color="primary" :loading="loading" label="Editer l'absence"
