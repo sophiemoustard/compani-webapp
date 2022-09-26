@@ -45,6 +45,7 @@ export default {
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
     borders: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
   },
   emits: ['update:model-value', 'blur', 'update:error'],
   setup () {
@@ -86,8 +87,10 @@ export default {
       this.$emit('update:model-value', { ...this.modelValue, [key]: value });
     },
     blur () {
-      this.v$.modelValue.$touch();
-      if (this.v$.modelValue.$error) return NotifyWarning('Champ(s) invalide(s)');
+      if (!this.inModal) {
+        this.v$.modelValue.$touch();
+        if (this.v$.modelValue.$error) return NotifyWarning('Champ(s) invalide(s)');
+      }
 
       this.$emit('blur');
     },
