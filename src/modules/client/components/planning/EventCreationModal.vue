@@ -106,7 +106,7 @@ import {
   ILLNESS,
   ABSENCE_TYPES,
 } from '@data/constants';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDate';
 import { formatIdentityAndDocType } from '@helpers/utils';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
@@ -134,16 +134,11 @@ export default {
     };
   },
   computed: {
-    isEndDurationRequired () {
-      if (this.newEvent.type !== ABSENCE) return false;
-
-      return moment(this.newEvent.dates.endDate).isAfter(moment(this.newEvent.dates.startDate));
-    },
     isContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
 
-      return this.selectedAuxiliary.contracts.some(contract => moment(contract.startDate)
-        .isBefore(this.newEvent.dates.startDate) && !contract.endDate);
+      return this.selectedAuxiliary.contracts.some(contract => CompaniDate(contract.startDate)
+        .isSameOrBefore(this.newEvent.dates.startDate) && !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
@@ -283,10 +278,10 @@ export default {
 
       this.extendedAbsenceOptions = auxiliaryEvents
         .filter(e => e.absence === this.newEvent.absence &&
-            moment(e.startDate).isBefore(this.newEvent.dates.startDate))
+            CompaniDate(e.startDate).isBefore(this.newEvent.dates.startDate))
         .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
         .map(a => ({
-          label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
+          label: `${CompaniDate(a.startDate).format('dd/LL/yyyy')} - ${CompaniDate(a.endDate).format('dd/LL/yyyy')}`,
           value: a._id,
         }));
     },
