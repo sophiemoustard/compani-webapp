@@ -30,7 +30,7 @@ import Select from '@components/form/Select';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
-import { BLENDED } from '@data/constants';
+import { BLENDED, OPERATIONS } from '@data/constants';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 
 const metaInfo = { title: 'Catalogue' };
@@ -68,7 +68,11 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list({ company: get(this.loggedUser, 'company._id') || '', format: BLENDED });
+        const courses = await Courses.list({
+          company: get(this.loggedUser, 'company._id') || '',
+          format: BLENDED,
+          action: OPERATIONS,
+        });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);

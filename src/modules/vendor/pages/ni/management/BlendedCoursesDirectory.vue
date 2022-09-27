@@ -46,7 +46,7 @@ import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, OPERATIONS } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
@@ -119,7 +119,7 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list({ format: BLENDED });
+        const courses = await Courses.list({ format: BLENDED, action: OPERATIONS });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);

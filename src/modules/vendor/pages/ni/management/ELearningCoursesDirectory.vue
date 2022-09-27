@@ -11,7 +11,7 @@
 import { createMetaMixin } from 'quasar';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
-import { STRICTLY_E_LEARNING } from '@data/constants';
+import { STRICTLY_E_LEARNING, OPERATIONS } from '@data/constants';
 import { eLearningCourseDirectoryMixin } from '@mixins/eLearningCourseDirectoryMixin';
 
 const metaInfo = { title: 'Repertoire formation eLearning' };
@@ -24,7 +24,7 @@ export default {
     'ni-table-list': TableList,
   },
   async created () {
-    await this.refreshCourseList({ format: STRICTLY_E_LEARNING });
+    await this.refreshCourseList({ format: STRICTLY_E_LEARNING, action: OPERATIONS });
   },
   methods: {
     goToCourseProfile (row) {

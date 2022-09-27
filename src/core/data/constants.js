@@ -360,6 +360,7 @@ export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
 export const OPERATIONS = 'operations';
+export const PEDAGOGY = 'pedagogy';
 
 // SUBPROGRAM
 export const PUBLISHED = 'published';
