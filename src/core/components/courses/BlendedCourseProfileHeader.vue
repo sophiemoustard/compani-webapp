@@ -15,7 +15,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
-import companiDate from '@helpers/dates/companiDate';
+import companiDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'BlendedCourseProfileHeader',
