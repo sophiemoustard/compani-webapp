@@ -76,9 +76,9 @@ export default {
       return CompaniDate(startDate).isAfter(endDate);
     });
 
-    const startHour = computed(() => CompaniDate(modelValue.value.startDate).format('HH:mm'));
+    const startHour = ref(CompaniDate(modelValue.value.startDate).format('HH:mm'));
 
-    const endHour = computed(() => CompaniDate(modelValue.value.endDate).format('HH:mm'));
+    const endHour = ref(CompaniDate(modelValue.value.endDate).format('HH:mm'));
 
     const min = computed(() => {
       if (CompaniDate(modelValue.value.startDate).format('yyyy/LL/dd')
@@ -120,14 +120,19 @@ export default {
         hourError.value = false;
         const dates = { ...modelValue.value };
 
-        if (key === 'endHour') dates.endDate = setDateHours(dates.endDate, value);
+        if (key === 'endHour') {
+          endHour.value = value;
+          dates.endDate = setDateHours(dates.endDate, value);
+        }
         if (key === 'startHour') {
+          startHour.value = value;
           dates.startDate = setDateHours(dates.startDate, value);
 
           if (!disableEndHour.value && CompaniDate(value, 'HH:mm').isSameOrAfter(endHour.value)) {
             const max = CompaniDate(dates.startDate).endOf('day');
             const shiftedEndDate = CompaniDate(dates.startDate).add(shiftedTime.value);
             dates.endDate = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.toISO() : max.toISO();
+            endHour.value = CompaniDate(dates.endDate).format('HH:mm');
           }
         }
 
