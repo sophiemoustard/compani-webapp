@@ -106,7 +106,8 @@ import {
   ILLNESS,
   ABSENCE_TYPES,
 } from '@data/constants';
-import CompaniDate from '@helpers/dates/companiDate';
+import CompaniDate from '@helpers/dates/companiDates';
+import { descendingSort } from '@helpers/dates/utils';
 import { formatIdentityAndDocType } from '@helpers/utils';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
@@ -279,7 +280,7 @@ export default {
       this.extendedAbsenceOptions = auxiliaryEvents
         .filter(e => e.absence === this.newEvent.absence &&
             CompaniDate(e.startDate).isBefore(this.newEvent.dates.startDate))
-        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+        .sort(descendingSort('startDate'))
         .map(a => ({
           label: `${CompaniDate(a.startDate).format('dd/LL/yyyy')} - ${CompaniDate(a.endDate).format('dd/LL/yyyy')}`,
           value: a._id,
