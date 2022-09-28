@@ -15,7 +15,7 @@ export default {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses`, payload);
   },
   async getById (courseId) {
-    const params = { action: OPERATIONS };
+    const params = { action: OPERATIONS, origin: WEBAPP };
     const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`, { params });
     return course.data.data.course;
   },
