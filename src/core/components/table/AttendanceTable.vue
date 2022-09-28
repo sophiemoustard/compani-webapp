@@ -455,11 +455,7 @@ export default {
           const attendancesIdsToDelete = slotAttendances.map(a => Attendances.delete(a._id));
           await Promise.all(attendancesIdsToDelete);
         } else {
-          const attendancesToCreate = this.course.trainees
-            .filter(t => !slotAttendances.some(a => a.trainee._id === t._id))
-            .map(t => Attendances.create({ trainee: t._id, courseSlot: slotId }));
-
-          await Promise.all(attendancesToCreate);
+          await Attendances.create({ courseSlot: slotId });
         }
 
         await this.refreshAttendances({ courseSlot: slotId });
