@@ -391,8 +391,8 @@ export default {
       try {
         const loggedUserCompany = get(loggedUser.value, 'company._id');
         if (isTrainer.value && loggedUserCompany !== course.value.company._id) {
-          companyRepresentativeOptions.value = [formatInterlocutorOption(course.value.companyRepresentative)];
-          return null;
+          companyRepresentativeOptions.value = [];
+          return;
         }
         const clientUsersFromCompany = course.value.type === INTRA
           ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: course.value.company._id })
