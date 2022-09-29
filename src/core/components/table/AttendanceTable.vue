@@ -396,11 +396,11 @@ export default {
 
         this.loading = true;
         if (this.attendanceCheckboxValue(traineeId, slotId)) {
-          const attendance = this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
-          await Attendances.delete(attendance._id);
+          await Attendances.delete({ trainee: traineeId, courseSlot: slotId });
         } else {
           await Attendances.create({ trainee: traineeId, courseSlot: slotId });
         }
+
         await this.refreshAttendances({ courseSlot: slotId });
       } catch (e) {
         console.error(e);
@@ -438,29 +438,19 @@ export default {
 
       this.traineeAdditionModal = true;
     },
-    getSlotAttendancesForRegisteredLearners (slotId) {
-      return this.attendances.filter(a => a.courseSlot === slotId &&
-        this.course.trainees.some(t => t._id === a.trainee._id));
-    },
     slotCheckboxValue (slotId) {
-      return this.getSlotAttendancesForRegisteredLearners(slotId).length === this.course.trainees.length;
+      const attendancesForRegisteredLearners = this.attendances.filter(a => a.courseSlot === slotId &&
+        this.course.trainees.some(t => t._id === a.trainee._id));
+
+      return attendancesForRegisteredLearners.length === this.course.trainees.length;
     },
     async updateSlotCheckbox (slotId) {
       try {
         this.loading = true;
         if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
 
-        const slotAttendances = this.getSlotAttendancesForRegisteredLearners(slotId);
-        if (this.slotCheckboxValue(slotId)) {
-          const attendancesIdsToDelete = slotAttendances.map(a => Attendances.delete(a._id));
-          await Promise.all(attendancesIdsToDelete);
-        } else {
-          const attendancesToCreate = this.course.trainees
-            .filter(t => !slotAttendances.some(a => a.trainee._id === t._id))
-            .map(t => Attendances.create({ trainee: t._id, courseSlot: slotId }));
-
-          await Promise.all(attendancesToCreate);
-        }
+        if (this.slotCheckboxValue(slotId)) await Attendances.delete({ courseSlot: slotId });
+        else await Attendances.create({ courseSlot: slotId });
 
         await this.refreshAttendances({ courseSlot: slotId });
       } catch (e) {
