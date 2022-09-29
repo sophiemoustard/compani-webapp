@@ -27,17 +27,13 @@
 </template>
 
 <script>
+import { computed, ref, toRefs } from 'vue';
 import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '@data/constants';
 import moment from '@helpers/moment';
 
 export default {
   name: 'NiTimeInput',
   emits: ['update:model-value', 'blur', 'lock-click'],
-  data () {
-    return {
-      selectTime: false,
-    };
-  },
   props: {
     modelValue: { type: String, default: '' },
     min: { type: String, default: '' },
@@ -49,8 +45,12 @@ export default {
     requiredField: { type: Boolean, default: false },
     locked: { type: Boolean, default: false },
   },
-  computed: {
-    hoursOptions () {
+  setup (props, { emit }) {
+    const { min } = toRefs(props);
+    const qTimeMenu = ref(null);
+    const selectTime = ref(false);
+
+    const hoursOptions = computed(() => {
       const range = moment.range(
         moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
         moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
@@ -61,35 +61,47 @@ export default {
           acc.push({
             label: hour.format('HH:mm'),
             value: hour.format('HH:mm'),
-            disable: this.min !== '' && hour.isSameOrBefore(moment(this.min, 'HH:mm')),
+            disable: min !== '' && hour.isSameOrBefore(moment(min, 'HH:mm')),
           });
           if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
             acc.push({
               label: hour.minutes(30).format('HH:mm'),
               value: hour.minutes(30).format('HH:mm'),
-              disable: this.min !== '' && hour.minutes(30).isSameOrBefore(moment(this.min, 'HH:mm')),
+              disable: min !== '' && hour.minutes(30).isSameOrBefore(moment(min, 'HH:mm')),
             });
           }
           return acc;
         },
         []
       );
-    },
-  },
-  methods: {
-    select (value) {
-      this.update(value);
-      this.$refs.qTimeMenu.hide();
-    },
-    update (value) {
-      this.$emit('update:model-value', value);
-    },
-    onBlur () {
-      this.$emit('blur');
-    },
-    click () {
-      this.$emit('lock-click');
-    },
+    });
+
+    const select = (value) => {
+      update(value);
+      qTimeMenu.value.hide();
+    };
+    const update = (value) => {
+      emit('update:model-value', value);
+    };
+    const onBlur = () => {
+      emit('blur');
+    };
+    const click = () => {
+      emit('lock-click');
+    };
+
+    return {
+      // Data
+      selectTime,
+      qTimeMenu,
+      // computed
+      hoursOptions,
+      // Methods
+      select,
+      update,
+      onBlur,
+      click,
+    };
   },
 };
 </script>
