@@ -282,7 +282,12 @@ export const planningActionMixin = {
         misc,
         ...eventData
       } = cloneDeep(event);
-      const dates = { startDate, endDate };
+      const dates = {
+        startDate,
+        endDate,
+        startHour: moment(startDate).format('HH:mm'),
+        endHour: moment(endDate).format('HH:mm'),
+      };
 
       switch (event.type) {
         case INTERVENTION: {
@@ -391,9 +396,14 @@ export const planningActionMixin = {
         customerId: initialEvent.customer._id,
         address: initialEvent.address,
       };
+
+      const startHour = this.editedEvent.dates.startHour.split(':');
+      const endHour = this.editedEvent.dates.endHour.split(':');
       const formattedEditedEvent = {
-        startDate: this.editedEvent.dates.startDate,
-        endDate: this.editedEvent.dates.endDate,
+        startDate: moment(this.editedEvent.dates.startDate)
+          .set({ hour: startHour[0], minute: startHour[1] })
+          .toISOString(),
+        endDate: moment(this.editedEvent.dates.endDate).set({ hour: endHour[0], minute: endHour[1] }).toISOString(),
         serviceId: this.editedEvent.subscription,
         customerId: this.editedEvent.customer,
         address: this.editedEvent.address,

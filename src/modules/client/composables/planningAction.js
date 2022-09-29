@@ -89,6 +89,8 @@ export const usePlanningAction = (personKey, customers) => {
           maxDate: getCustomerStoppedDate(editedEvent.value) ? maxDate(getCustomerStoppedDate(editedEvent.value)) : '',
         },
         endDate: { required },
+        startHour: { required, validHour },
+        endHour: { required, validHour },
       },
       auxiliary: { required: requiredIf(editedEvent.value.type !== INTERVENTION) },
       sector: { required: requiredIf(!editedEvent.value.auxiliary) },

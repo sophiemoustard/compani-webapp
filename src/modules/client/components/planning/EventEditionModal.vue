@@ -432,9 +432,8 @@ export default {
     openEventRestorationModal () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: `Êtes vous sûr(e) de vouloir rétablir l’intervention du
-          ${formatDateAndHours(this.editedEvent.dates.startDate, this.editedEvent.dates.endDate)} chez
-          ${this.customerFullName}&nbsp;?`,
+        message: `Êtes vous sûr(e) de vouloir rétablir l’intervention du ${formatDateAndHours(this.editedEvent.dates)}
+          chez ${this.customerFullName}&nbsp;?`,
         html: true,
         ok: 'Oui',
         cancel: 'Non',
