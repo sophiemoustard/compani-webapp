@@ -92,7 +92,7 @@ import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel } from '@helpers/courses';
 import { formatDate, formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
-import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
+import { frAddress, minDate, maxDate, urlAddress, validHour } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -192,6 +192,8 @@ export default {
         meetingLink: { urlAddress },
         dates: {
           startDate: { required },
+          startHour: { required, validHour },
+          endHour: { required, validHour },
           endDate: {
             required,
             ...(!!get(editedCourseSlot.value, 'dates.startDate') && {
@@ -213,13 +215,19 @@ export default {
         return NotifyWarning('Vous ne pouvez pas éditer un créneau d\'une formation archivée.');
       }
 
-      const defaultDate = {
-        startDate: CompaniDate().set({ hour: 9, minute: 0 }).toISO(),
-        endDate: CompaniDate().set({ hour: 12, minute: 30 }).toISO(),
-      };
+      const defaultDate = has(slot, 'startDate')
+        ? pick(slot, ['startDate', 'endDate'])
+        : {
+          startDate: CompaniDate().set({ hour: 9, minute: 0 }).toISO(),
+          endDate: CompaniDate().set({ hour: 12, minute: 30 }).toISO(),
+        };
       editedCourseSlot.value = {
         _id: slot._id,
-        dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
+        dates: {
+          ...defaultDate,
+          startHour: CompaniDate(defaultDate.startDate).format('HH:mm'),
+          endHour: CompaniDate(defaultDate.endDate).format('HH:mm'),
+        },
         address: {},
         meetingLink: get(slot, 'meetingLink') || '',
         step: slot.step,
@@ -241,8 +249,12 @@ export default {
     const formatEditionPayload = (courseSlot) => {
       const stepType = stepTypes.value.find(item => item.value === courseSlot.step).type;
 
+      const startHour = courseSlot.dates.startHour.split(':');
+      const endHour = courseSlot.dates.endHour.split(':');
+
       return {
-        ...courseSlot.dates,
+        startDate: CompaniDate(courseSlot.dates.startDate).set({ hour: startHour[0], minute: startHour[1] }).toISO(),
+        endDate: CompaniDate(courseSlot.dates.endDate).set({ hour: endHour[0], minute: endHour[1] }).toISO(),
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
       };
