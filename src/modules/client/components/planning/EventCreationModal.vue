@@ -212,7 +212,7 @@ export default {
       this.updateEvent('extension', '');
     },
     'newEvent.auxiliary': async function () {
-      if (this.newEvent.auxiliary) {
+      if (this.newEvent.auxiliary && this.newEvent.isExtendedAbsence) {
         this.auxiliaryAbsences = await Events.list({ auxiliary: this.newEvent.auxiliary, type: ABSENCE });
       } else {
         this.auxiliaryAbsences = [];
@@ -284,7 +284,7 @@ export default {
       this.updateEvent('address', event);
       this.deleteClassFocus();
     },
-    async updateCheckBox (event) {
+    async updateCheckBox () {
       if (!this.newEvent.isExtendedAbsence) {
         this.updateEvent('extension', '');
         this.auxiliaryAbsences = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
