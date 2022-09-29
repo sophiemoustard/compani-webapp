@@ -20,7 +20,8 @@
           @click="() => openTrainerModal('Ajouter un(e) ')" />
         <interlocutor-cell v-if="!!course.companyRepresentative._id" :interlocutor="course.companyRepresentative"
           caption="Référent structure" :open-edition-modal="() => openCompanyRepresentativeModal('Modifier le ')"
-          :disable="isArchived" class="q-mt-lg" can-update :contact="course.contact" />
+          :disable="isArchived" class="q-mt-lg" :can-update="canUpdateInterlocutor || isClientInterface"
+          :contact="course.contact" />
         <ni-button v-else-if="course.type === INTRA" color="primary" icon="add" class="add-interlocutor"
           label="Ajouter un référent structure" :disable="interlocutorModalLoading || isArchived"
           @click="() => openCompanyRepresentativeModal('Ajouter un ')" />
@@ -388,6 +389,11 @@ export default {
 
     const refreshCompanyRepresentatives = async () => {
       try {
+        const loggedUserCompany = get(loggedUser.value, 'company._id');
+        if (isTrainer.value && loggedUserCompany !== course.value.company._id) {
+          companyRepresentativeOptions.value = [];
+          return;
+        }
         const clientUsersFromCompany = course.value.type === INTRA
           ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: course.value.company._id })
           : [];
@@ -739,6 +745,7 @@ export default {
       followUpDisabled,
       isArchived,
       followUpMissingInfo,
+      isClientInterface,
       // Methods
       get,
       formatQuantity,

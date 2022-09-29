@@ -30,7 +30,7 @@ import Trello from '@components/courses/Trello';
 import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
-import { BLENDED } from '@data/constants';
+import { BLENDED, OPERATIONS } from '@data/constants';
 import { createMetaMixin } from 'quasar';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 
@@ -69,7 +69,7 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list({ trainer: this.loggedUser._id, format: BLENDED });
+        const courses = await Courses.list({ trainer: this.loggedUser._id, format: BLENDED, action: OPERATIONS });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
