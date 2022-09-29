@@ -90,6 +90,8 @@ export const planningActionMixin = {
             dates: {
               startDate: moment(this.newEvent.dates.startDate).startOf('d').toISOString(),
               endDate: moment(this.newEvent.dates.endDate).endOf('d').toISOString(),
+              startHour: '00:00',
+              endHour: '23:59',
             },
           }),
         };
@@ -99,11 +101,13 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
+      const startHour = event.dates.startHour.split(':');
+      const endHour = event.dates.endHour.split(':');
       const payload = {
         ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
         ...pick(event, ['isCancelled', 'transportMode', 'misc', 'kmDuringEvent']), // pickBy removes false and '' value
-        startDate: event.dates.startDate,
-        endDate: event.dates.endDate,
+        startDate: moment(event.dates.startDate).set({ hour: startHour[0], minute: startHour[1] }).toISOString(),
+        endDate: moment(event.dates.endDate).set({ hour: endHour[0], minute: endHour[1] }).toISOString(),
       };
 
       if (event.auxiliary) delete payload.sector;
