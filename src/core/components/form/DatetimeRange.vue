@@ -77,12 +77,9 @@ export default {
     };
 
     const updateHours = (value, key) => {
-      const dates = { ...modelValue.value };
+      const dates = { ...modelValue.value, [key]: value };
       try {
-        if (key === 'endHour') dates.endHour = value;
         if (key === 'startHour') {
-          dates.startHour = value;
-
           const startHourDate = CompaniDate(dates.startHour, 'HH:mm');
           const endHourDate = CompaniDate(dates.endHour, 'HH:mm');
           if (!disableEndHour.value && startHourDate.isSameOrAfter(endHourDate)) {
