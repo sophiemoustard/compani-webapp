@@ -23,11 +23,13 @@ import {
   PERSON,
   CUSTOMER,
   WORK_ACCIDENT,
+  CANCEL_EVENT,
+  RESTORE_EVENT,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
+import CompaniDate from '@helpers/dates/companiDates';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
-import { CANCEL_EVENT, RESTORE_EVENT } from '../../../core/data/constants';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
@@ -101,13 +103,14 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
-      const startHour = event.dates.startHour.split(':');
-      const endHour = event.dates.endHour.split(':');
+      const startHour = CompaniDate(event.dates.startHour, 'HH:mm');
+      const endHour = CompaniDate(event.dates.endHour, 'HH:mm');
+
       const payload = {
         ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
         ...pick(event, ['isCancelled', 'transportMode', 'misc', 'kmDuringEvent']), // pickBy removes false and '' value
-        startDate: moment(event.dates.startDate).set({ hour: startHour[0], minute: startHour[1] }).toISOString(),
-        endDate: moment(event.dates.endDate).set({ hour: endHour[0], minute: endHour[1] }).toISOString(),
+        startDate: CompaniDate(event.dates.startDate).set(startHour.getUnits(['hour', 'minute'])).toISO(),
+        endDate: CompaniDate(event.dates.endDate).set(endHour.getUnits(['hour', 'minute'])).toISO(),
       };
 
       if (event.auxiliary) delete payload.sector;
@@ -397,13 +400,11 @@ export const planningActionMixin = {
         address: initialEvent.address,
       };
 
-      const startHour = this.editedEvent.dates.startHour.split(':');
-      const endHour = this.editedEvent.dates.endHour.split(':');
+      const startHour = CompaniDate(this.editedEvent.dates.startHour, 'HH:mm');
+      const endHour = CompaniDate(this.editedEvent.dates.endHour, 'HH:mm');
       const formattedEditedEvent = {
-        startDate: moment(this.editedEvent.dates.startDate)
-          .set({ hour: startHour[0], minute: startHour[1] })
-          .toISOString(),
-        endDate: moment(this.editedEvent.dates.endDate).set({ hour: endHour[0], minute: endHour[1] }).toISOString(),
+        startDate: CompaniDate(this.editedEvent.dates.startDate).set(startHour.getUnits(['hour', 'minute'])).toISO(),
+        endDate: CompaniDate(this.editedEvent.dates.endDate).set(endHour.getUnits(['hour', 'minute'])).toISO(),
         serviceId: this.editedEvent.subscription,
         customerId: this.editedEvent.customer,
         address: this.editedEvent.address,

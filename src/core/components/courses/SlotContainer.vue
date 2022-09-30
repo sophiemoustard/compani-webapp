@@ -249,12 +249,12 @@ export default {
     const formatEditionPayload = (courseSlot) => {
       const stepType = stepTypes.value.find(item => item.value === courseSlot.step).type;
 
-      const startHour = courseSlot.dates.startHour.split(':');
-      const endHour = courseSlot.dates.endHour.split(':');
+      const startHour = CompaniDate(courseSlot.dates.startHour, 'HH:mm');
+      const endHour = CompaniDate(courseSlot.dates.endHour, 'HH:mm');
 
       return {
-        startDate: CompaniDate(courseSlot.dates.startDate).set({ hour: startHour[0], minute: startHour[1] }).toISO(),
-        endDate: CompaniDate(courseSlot.dates.endDate).set({ hour: endHour[0], minute: endHour[1] }).toISO(),
+        startDate: CompaniDate(courseSlot.dates.startDate).set(startHour.getUnits(['hour', 'minute'])).toISO(),
+        endDate: CompaniDate(courseSlot.dates.endDate).set(endHour.getUnits(['hour', 'minute'])).toISO(),
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
       };
