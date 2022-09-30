@@ -4,7 +4,8 @@ import { isValidIBAN, isValidBIC } from 'ibantools';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
-import { isGreaterThan, isGreaterThanOrEqual } from './numbers';
+import { isGreaterThan, isGreaterThanOrEqual } from '@helpers/numbers';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;
@@ -65,6 +66,11 @@ export const integerNumber = (value) => {
 export const fractionDigits = digits => value => new RegExp(`^\\d*(\\.\\d{0,${digits}})?$`).test(value);
 
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
+
+export const minHour = min => helpers.withParams(
+  { value: min },
+  time => CompaniDate(min, 'HH:mm').isSameOrBefore(CompaniDate(time, 'HH:mm').toISO())
+);
 
 export const minDate = min => helpers.withParams({ value: min }, value => !value || new Date(min) <= new Date(value));
 

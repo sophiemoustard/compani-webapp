@@ -13,7 +13,7 @@ import {
   OTHER,
   NEVER,
 } from '@data/constants';
-import { frAddress, maxDate, positiveNumber, minDate, validHour } from '@helpers/vuelidateCustomVal';
+import { frAddress, maxDate, positiveNumber, minDate, validHour, minHour } from '@helpers/vuelidateCustomVal';
 
 export const usePlanningAction = (personKey, customers) => {
   const newEvent = ref({
@@ -46,7 +46,7 @@ export const usePlanningAction = (personKey, customers) => {
           required: requiredIf(newEvent.value.type !== ABSENCE || get(newEvent.value, 'absenceNature') === DAILY),
         },
         startHour: { required, validHour },
-        endHour: { required, validHour },
+        endHour: { required, validHour, minHour: minHour(get(newEvent.value, 'dates.startHour')) },
       },
       auxiliary: {
         required: requiredIf(newEvent.value.type !== INTERVENTION || personKey === CUSTOMER),
@@ -90,7 +90,7 @@ export const usePlanningAction = (personKey, customers) => {
         },
         endDate: { required },
         startHour: { required, validHour },
-        endHour: { required, validHour },
+        endHour: { required, validHour, minHour: minHour(get(editedEvent.value, 'dates.startHour')) },
       },
       auxiliary: { required: requiredIf(editedEvent.value.type !== INTERVENTION) },
       sector: { required: requiredIf(!editedEvent.value.auxiliary) },
