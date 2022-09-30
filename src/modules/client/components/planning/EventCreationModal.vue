@@ -131,7 +131,7 @@ export default {
   emits: ['update-event', 'close', 'reset', 'delete-document', 'document-uploaded', 'submit'],
   data () {
     return {
-      extendedAbsenceOptions: [],
+      auxiliaryAbsences: [],
     };
   },
   computed: {
@@ -186,6 +186,16 @@ export default {
     auxiliariesOptions () {
       return this.getAuxiliariesOptions(this.newEvent);
     },
+    extendedAbsenceOptions () {
+      return this.auxiliaryAbsences
+        .filter(e => e.absence === this.newEvent.absence &&
+            CompaniDate(e.startDate).isBefore(this.newEvent.dates.startDate))
+        .sort(descendingSort('startDate'))
+        .map(a => ({
+          label: `${CompaniDate(a.startDate).format('dd/LL/yyyy')} - ${CompaniDate(a.endDate).format('dd/LL/yyyy')}`,
+          value: a._id,
+        }));
+    },
   },
   watch: {
     selectedAuxiliary (value) {
@@ -198,11 +208,16 @@ export default {
         this.updateEvent('repetition.frequency', NEVER);
       }
     },
-    'newEvent.absence': function () {
-      this.getAbsences();
-    },
     'newEvent.dates.startDate': function () {
-      this.getAbsences();
+      this.updateEvent('extension', '');
+    },
+    'newEvent.auxiliary': async function () {
+      if (this.newEvent.auxiliary && this.newEvent.isExtendedAbsence) {
+        this.auxiliaryAbsences = await Events.list({ auxiliary: this.newEvent.auxiliary, type: ABSENCE });
+      } else {
+        this.auxiliaryAbsences = [];
+      }
+      this.updateEvent('extension', '');
     },
   },
   methods: {
@@ -214,7 +229,6 @@ export default {
       this.$emit('close');
     },
     reset (partialReset, type) {
-      this.extendedAbsenceOptions = [];
       this.$emit('reset', { partialReset, type });
     },
     deleteDocument (value) {
@@ -263,28 +277,19 @@ export default {
     updateAbsence (event) {
       this.updateEvent('absence', event);
       this.updateEvent('isExtendedAbsence', false);
+      this.updateEvent('extension', '');
       this.setDateHours(this.newEvent, 'newEvent');
     },
     updateCustomerAddress (event) {
       this.updateEvent('address', event);
       this.deleteClassFocus();
     },
-    async updateCheckBox (event) {
-      if (!this.newEvent.isExtendedAbsence) await this.getAbsences();
+    async updateCheckBox () {
+      if (!this.newEvent.isExtendedAbsence) {
+        this.updateEvent('extension', '');
+        this.auxiliaryAbsences = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
+      }
       this.updateEvent('isExtendedAbsence', !this.newEvent.isExtendedAbsence);
-    },
-    async getAbsences () {
-      this.updateEvent('extension', '');
-      const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
-
-      this.extendedAbsenceOptions = auxiliaryEvents
-        .filter(e => e.absence === this.newEvent.absence &&
-            CompaniDate(e.startDate).isBefore(this.newEvent.dates.startDate))
-        .sort(descendingSort('startDate'))
-        .map(a => ({
-          label: `${CompaniDate(a.startDate).format('dd/LL/yyyy')} - ${CompaniDate(a.endDate).format('dd/LL/yyyy')}`,
-          value: a._id,
-        }));
     },
   },
 };
