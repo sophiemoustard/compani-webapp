@@ -45,9 +45,11 @@ export const usePlanningAction = (personKey, customers) => {
         },
         endDate: {
           required: requiredIf(newEvent.value.type !== ABSENCE || get(newEvent.value, 'absenceNature') === DAILY),
-          ...(!!get(newEvent.value, 'dates.startDate') && { minDate: minDate(newEvent.value.dates.startDate) }),
-          ...(!!get(newEvent.value, 'dates.startDate') && get(newEvent.value, 'type') !== ABSENCE && {
-            maxDate: maxDate(moment(newEvent.value.dates.startDate).endOf('d').toISOString()),
+          ...(!!get(newEvent.value, 'dates.startDate') && {
+            minDate: minDate(newEvent.value.dates.startDate),
+            ...(get(newEvent.value, 'type') !== ABSENCE && {
+              maxDate: maxDate(moment(newEvent.value.dates.startDate).endOf('d').toISOString()),
+            }),
           }),
         },
         startHour: { required, validHour },

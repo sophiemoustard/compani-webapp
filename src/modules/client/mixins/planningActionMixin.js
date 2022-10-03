@@ -76,7 +76,7 @@ export const planningActionMixin = {
         this.newEvent = {};
       } else {
         const startDate = moment(this.newEvent.dates.startDate).startOf('d').toISOString();
-        const endDate = moment(this.newEvent.dates.endDate).startOf('d').toISOString();
+        const endDate = moment(this.newEvent.dates.startDate).endOf('d').toISOString();
         this.newEvent = {
           ...this.newEvent,
           type,
@@ -89,15 +89,13 @@ export const planningActionMixin = {
           extension: '',
           address: {},
           attachment: {},
-          ...(type === ABSENCE && {
-            absenceNature: DAILY,
-            dates: {
-              startDate,
-              endDate,
-              startHour: moment(startDate.format('HH:mm')),
-              endHour: moment(endDate.format('HH:mm')),
-            },
-          }),
+          ...(type === ABSENCE && { absenceNature: DAILY }),
+          dates: {
+            startDate,
+            endDate,
+            startHour: type === ABSENCE ? moment(startDate).format('HH:mm') : this.newEvent.dates.startHour,
+            endHour: type === ABSENCE ? moment(endDate).format('HH:mm') : this.newEvent.dates.endHour,
+          },
         };
       }
     },
