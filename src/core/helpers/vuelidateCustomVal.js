@@ -67,14 +67,20 @@ export const fractionDigits = digits => value => new RegExp(`^\\d*(\\.\\d{0,${di
 
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
-export const minHour = min => helpers.withParams(
+export const strictMinHour = min => helpers.withParams(
   { value: min },
-  time => CompaniDate(min, 'HH:mm').isSameOrBefore(CompaniDate(time, 'HH:mm').toISO())
+  time => CompaniDate(min, 'HH:mm').isBefore(CompaniDate(time, 'HH:mm'), 'minute')
 );
 
-export const minDate = min => helpers.withParams({ value: min }, value => !value || new Date(min) <= new Date(value));
+export const minDate = min => helpers.withParams(
+  { value: min },
+  value => !value || CompaniDate(min).isSameOrBefore(CompaniDate(value), 'day')
+);
 
-export const maxDate = max => helpers.withParams({ value: max }, value => !value || new Date(max) >= new Date(value));
+export const maxDate = max => helpers.withParams(
+  { value: max },
+  value => !value || CompaniDate(max).isSameOrAfter(CompaniDate(value), 'day')
+);
 
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
 

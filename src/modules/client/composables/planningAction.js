@@ -13,7 +13,7 @@ import {
   OTHER,
   NEVER,
 } from '@data/constants';
-import { frAddress, maxDate, positiveNumber, minDate, validHour, minHour } from '@helpers/vuelidateCustomVal';
+import { frAddress, maxDate, positiveNumber, minDate, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 
 export const usePlanningAction = (personKey, customers) => {
@@ -51,7 +51,7 @@ export const usePlanningAction = (personKey, customers) => {
           }),
         },
         startHour: { required, validHour },
-        endHour: { required, validHour, minHour: minHour(get(newEvent.value, 'dates.startHour')) },
+        endHour: { required, validHour, strictMinHour: strictMinHour(get(newEvent.value, 'dates.startHour')) },
       },
       auxiliary: {
         required: requiredIf(newEvent.value.type !== INTERVENTION || personKey === CUSTOMER),
@@ -101,7 +101,7 @@ export const usePlanningAction = (personKey, customers) => {
           }),
         },
         startHour: { required, validHour },
-        endHour: { required, validHour, minHour: minHour(get(editedEvent.value, 'dates.startHour')) },
+        endHour: { required, validHour, strictMinHour: strictMinHour(get(editedEvent.value, 'dates.startHour')) },
       },
       auxiliary: { required: requiredIf(editedEvent.value.type !== INTERVENTION) },
       sector: { required: requiredIf(!editedEvent.value.auxiliary) },

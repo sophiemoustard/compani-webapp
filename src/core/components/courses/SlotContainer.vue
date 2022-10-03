@@ -92,7 +92,7 @@ import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel } from '@helpers/courses';
 import { formatDate, formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
-import { frAddress, minDate, maxDate, urlAddress, validHour, minHour } from '@helpers/vuelidateCustomVal';
+import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -193,7 +193,11 @@ export default {
         dates: {
           startDate: { required },
           startHour: { required, validHour },
-          endHour: { required, validHour, minHour: minHour(get(editedCourseSlot.value, 'dates.startHour')) },
+          endHour: {
+            required,
+            validHour,
+            strictMinHour: strictMinHour(get(editedCourseSlot.value, 'dates.startHour')),
+          },
           endDate: {
             required,
             ...(!!get(editedCourseSlot.value, 'dates.startDate') && {
