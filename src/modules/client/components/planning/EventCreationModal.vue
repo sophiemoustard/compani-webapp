@@ -106,7 +106,8 @@ import {
   ILLNESS,
   ABSENCE_TYPES,
 } from '@data/constants';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
+import { descendingSort } from '@helpers/dates/utils';
 import { formatIdentityAndDocType } from '@helpers/utils';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
@@ -130,19 +131,15 @@ export default {
   emits: ['update-event', 'close', 'reset', 'delete-document', 'document-uploaded', 'submit'],
   data () {
     return {
-      extendedAbsenceOptions: [],
+      auxiliaryAbsences: [],
     };
   },
   computed: {
-    isEndDurationRequired () {
-      if (this.newEvent.type !== ABSENCE) return false;
-
-      return moment(this.newEvent.dates.endDate).isAfter(moment(this.newEvent.dates.startDate));
-    },
     isContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
 
-      return this.selectedAuxiliary.contracts.some(contract => !contract.endDate);
+      return this.selectedAuxiliary.contracts.some(contract => CompaniDate(contract.startDate)
+        .isSameOrBefore(this.newEvent.dates.startDate) && !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
@@ -189,6 +186,16 @@ export default {
     auxiliariesOptions () {
       return this.getAuxiliariesOptions(this.newEvent);
     },
+    extendedAbsenceOptions () {
+      return this.auxiliaryAbsences
+        .filter(e => e.absence === this.newEvent.absence &&
+            CompaniDate(e.startDate).isBefore(this.newEvent.dates.startDate))
+        .sort(descendingSort('startDate'))
+        .map(a => ({
+          label: `${CompaniDate(a.startDate).format('dd/LL/yyyy')} - ${CompaniDate(a.endDate).format('dd/LL/yyyy')}`,
+          value: a._id,
+        }));
+    },
   },
   watch: {
     selectedAuxiliary (value) {
@@ -201,11 +208,16 @@ export default {
         this.updateEvent('repetition.frequency', NEVER);
       }
     },
-    'newEvent.absence': function () {
-      this.getAbsences();
-    },
     'newEvent.dates.startDate': function () {
-      this.getAbsences();
+      this.updateEvent('extension', '');
+    },
+    'newEvent.auxiliary': async function () {
+      if (this.newEvent.auxiliary && this.newEvent.isExtendedAbsence) {
+        this.auxiliaryAbsences = await Events.list({ auxiliary: this.newEvent.auxiliary, type: ABSENCE });
+      } else {
+        this.auxiliaryAbsences = [];
+      }
+      this.updateEvent('extension', '');
     },
   },
   methods: {
@@ -217,7 +229,6 @@ export default {
       this.$emit('close');
     },
     reset (partialReset, type) {
-      this.extendedAbsenceOptions = [];
       this.$emit('reset', { partialReset, type });
     },
     deleteDocument (value) {
@@ -266,28 +277,19 @@ export default {
     updateAbsence (event) {
       this.updateEvent('absence', event);
       this.updateEvent('isExtendedAbsence', false);
+      this.updateEvent('extension', '');
       this.setDateHours(this.newEvent, 'newEvent');
     },
     updateCustomerAddress (event) {
       this.updateEvent('address', event);
       this.deleteClassFocus();
     },
-    async updateCheckBox (event) {
-      if (!this.newEvent.isExtendedAbsence) await this.getAbsences();
+    async updateCheckBox () {
+      if (!this.newEvent.isExtendedAbsence) {
+        this.updateEvent('extension', '');
+        this.auxiliaryAbsences = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
+      }
       this.updateEvent('isExtendedAbsence', !this.newEvent.isExtendedAbsence);
-    },
-    async getAbsences () {
-      this.updateEvent('extension', '');
-      const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
-
-      this.extendedAbsenceOptions = auxiliaryEvents
-        .filter(e => e.absence === this.newEvent.absence &&
-            moment(e.startDate).isBefore(this.newEvent.dates.startDate))
-        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-        .map(a => ({
-          label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
-          value: a._id,
-        }));
     },
   },
 };

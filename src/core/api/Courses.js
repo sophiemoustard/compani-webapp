@@ -3,19 +3,15 @@ import { WEBAPP, OPERATIONS } from '@data/constants';
 
 export default {
   async list (filterParams) {
-    const params = { ...filterParams, origin: WEBAPP, action: OPERATIONS };
+    const params = { ...filterParams, origin: WEBAPP };
     const courses = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses`, { params });
-    return courses.data.data.courses;
-  },
-  async listUserCourse (params) {
-    const courses = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/user`, { params });
     return courses.data.data.courses;
   },
   async create (payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses`, payload);
   },
   async getById (courseId) {
-    const params = { action: OPERATIONS };
+    const params = { action: OPERATIONS, origin: WEBAPP };
     const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`, { params });
     return course.data.data.course;
   },

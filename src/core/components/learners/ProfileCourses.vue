@@ -118,7 +118,7 @@ import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
-import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
+import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING, ON_SITE, REMOTE, PEDAGOGY } from '@data/constants';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import {
   isBetweenOrEqual,
@@ -246,7 +246,7 @@ export default {
     const getUserCourses = async () => {
       try {
         loading.value = true;
-        const userCourses = await Courses.listUserCourse({ traineeId: userProfile.value._id });
+        const userCourses = await Courses.list({ trainee: userProfile.value._id, action: PEDAGOGY });
 
         courses.value = userCourses.map(course => ({
           ...course,
