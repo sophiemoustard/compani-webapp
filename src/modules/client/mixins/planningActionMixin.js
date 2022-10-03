@@ -75,6 +75,8 @@ export const planningActionMixin = {
         this.creationModal = false;
         this.newEvent = {};
       } else {
+        const startDate = moment(this.newEvent.dates.startDate).startOf('d').toISOString();
+        const endDate = moment(this.newEvent.dates.endDate).startOf('d').toISOString();
         this.newEvent = {
           ...this.newEvent,
           type,
@@ -90,10 +92,10 @@ export const planningActionMixin = {
           ...(type === ABSENCE && {
             absenceNature: DAILY,
             dates: {
-              startDate: moment(this.newEvent.dates.startDate).startOf('d').toISOString(),
-              endDate: moment(this.newEvent.dates.endDate).endOf('d').toISOString(),
-              startHour: '00:00',
-              endHour: '23:59',
+              startDate,
+              endDate,
+              startHour: moment(startDate.format('HH:mm')),
+              endHour: moment(endDate.format('HH:mm')),
             },
           }),
         };
