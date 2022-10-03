@@ -14,6 +14,7 @@ import {
   NEVER,
 } from '@data/constants';
 import { frAddress, maxDate, positiveNumber, minDate, validHour, minHour } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 
 export const usePlanningAction = (personKey, customers) => {
   const newEvent = ref({
@@ -44,6 +45,10 @@ export const usePlanningAction = (personKey, customers) => {
         },
         endDate: {
           required: requiredIf(newEvent.value.type !== ABSENCE || get(newEvent.value, 'absenceNature') === DAILY),
+          ...(!!get(newEvent.value, 'dates.startDate') && { minDate: minDate(newEvent.value.dates.startDate) }),
+          ...(!!get(newEvent.value, 'dates.startDate') && get(newEvent.value, 'type') !== ABSENCE && {
+            maxDate: maxDate(moment(newEvent.value.dates.startDate).endOf('d').toISOString()),
+          }),
         },
         startHour: { required, validHour },
         endHour: { required, validHour, minHour: minHour(get(newEvent.value, 'dates.startHour')) },
@@ -88,7 +93,13 @@ export const usePlanningAction = (personKey, customers) => {
           required,
           maxDate: getCustomerStoppedDate(editedEvent.value) ? maxDate(getCustomerStoppedDate(editedEvent.value)) : '',
         },
-        endDate: { required },
+        endDate: {
+          required,
+          ...(!!get(editedEvent.value, 'dates.startDate') && { minDate: minDate(editedEvent.value.dates.startDate) }),
+          ...(!!get(editedEvent.value, 'dates.startDate') && get(editedEvent.value, 'type') !== ABSENCE && {
+            maxDate: maxDate(moment(editedEvent.value.dates.startDate).endOf('d').toISOString()),
+          }),
+        },
         startHour: { required, validHour },
         endHour: { required, validHour, minHour: minHour(get(editedEvent.value, 'dates.startHour')) },
       },
