@@ -85,6 +85,11 @@ const CompaniDateFactory = (inputDate) => {
       return CompaniDateFactory(_date.endOf(unit));
     },
 
+    add (amount) {
+      if (amount instanceof Number) throw Error('Invalid argument: expected to be an object, got number');
+      return CompaniDateFactory(_date.plus(amount));
+    },
+
     set (values) {
       return CompaniDateFactory(_date.set(values));
     },

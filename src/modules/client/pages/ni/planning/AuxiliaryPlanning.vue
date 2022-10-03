@@ -289,8 +289,10 @@ export default {
         auxiliary: person ? person._id : '',
         sector: person ? person.sector._id : sectorId,
         dates: {
-          startDate: moment(selectedDay).hours(8).toISOString(),
-          endDate: moment(selectedDay).hours(10).toISOString(),
+          startDate: moment(selectedDay).toISOString(),
+          endDate: moment(selectedDay).toISOString(),
+          startHour: '08:00',
+          endHour: '10:00',
         },
         extension: '',
         misc: '',

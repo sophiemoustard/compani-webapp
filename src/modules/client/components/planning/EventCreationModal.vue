@@ -139,7 +139,7 @@ export default {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
 
       return this.selectedAuxiliary.contracts.some(contract => CompaniDate(contract.startDate)
-        .isSameOrBefore(this.newEvent.dates.startDate) && !contract.endDate);
+        .isSameOrBefore(this.newEvent.dates.startDate, 'day') && !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;

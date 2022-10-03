@@ -13,12 +13,13 @@ import {
   OTHER,
   NEVER,
 } from '@data/constants';
-import { frAddress, maxDate, positiveNumber, minDate } from '@helpers/vuelidateCustomVal';
+import { frAddress, maxDate, positiveNumber, minDate, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 
 export const usePlanningAction = (personKey, customers) => {
   const newEvent = ref({
     type: INTERVENTION,
-    dates: { startDate: '', endDate: '' },
+    dates: { startDate: '', endDate: '', startHour: '', endHour: '' },
     auxiliary: null,
     customer: null,
     subscription: null,
@@ -44,7 +45,15 @@ export const usePlanningAction = (personKey, customers) => {
         },
         endDate: {
           required: requiredIf(newEvent.value.type !== ABSENCE || get(newEvent.value, 'absenceNature') === DAILY),
+          ...(!!get(newEvent.value, 'dates.startDate') && {
+            minDate: minDate(newEvent.value.dates.startDate),
+            ...(get(newEvent.value, 'type') !== ABSENCE && {
+              maxDate: maxDate(moment(newEvent.value.dates.startDate).endOf('d').toISOString()),
+            }),
+          }),
         },
+        startHour: { required, validHour },
+        endHour: { required, validHour, strictMinHour: strictMinHour(get(newEvent.value, 'dates.startHour')) },
       },
       auxiliary: {
         required: requiredIf(newEvent.value.type !== INTERVENTION || personKey === CUSTOMER),
@@ -86,7 +95,15 @@ export const usePlanningAction = (personKey, customers) => {
           required,
           maxDate: getCustomerStoppedDate(editedEvent.value) ? maxDate(getCustomerStoppedDate(editedEvent.value)) : '',
         },
-        endDate: { required },
+        endDate: {
+          required,
+          ...(!!get(editedEvent.value, 'dates.startDate') && { minDate: minDate(editedEvent.value.dates.startDate) }),
+          ...(!!get(editedEvent.value, 'dates.startDate') && get(editedEvent.value, 'type') !== ABSENCE && {
+            maxDate: maxDate(moment(editedEvent.value.dates.startDate).endOf('d').toISOString()),
+          }),
+        },
+        startHour: { required, validHour },
+        endHour: { required, validHour, strictMinHour: strictMinHour(get(editedEvent.value, 'dates.startHour')) },
       },
       auxiliary: { required: requiredIf(editedEvent.value.type !== INTERVENTION) },
       sector: { required: requiredIf(!editedEvent.value.auxiliary) },
