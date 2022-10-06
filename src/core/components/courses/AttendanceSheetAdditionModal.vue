@@ -11,7 +11,7 @@
       caption="Participant(e)" :options="traineeOptions" />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
-      :error="validations.file.$error" />
+      :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter la feuille d'émargement" :loading="loading"
         icon-right="add" @click="submit" color="white" />
@@ -24,7 +24,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import { INTRA } from '@data/constants';
+import { INTRA, DOC_EXTENSIONS, IMAGE_EXTENSIONS } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
@@ -48,6 +48,8 @@ export default {
   data () {
     return {
       INTRA,
+      DOC_EXTENSIONS,
+      IMAGE_EXTENSIONS,
     };
   },
   computed: {
