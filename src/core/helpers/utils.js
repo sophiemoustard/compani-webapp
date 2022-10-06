@@ -164,7 +164,3 @@ export const formatIdentityAndDocType = (identity, type) => `${identity.lastname
 export const toCents = value => parseFloat(value).toFixed(2) * 100;
 
 export const toEuros = value => value / 100;
-
-export const areObjectIdsEquals = (id1, id2) => !!id1 && !!id2 && id1 === id2;
-
-export const doesArrayIncludeId = (array, id) => array.some(item => areObjectIdsEquals(item, id));

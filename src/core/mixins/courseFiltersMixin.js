@@ -2,7 +2,7 @@ import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
-import { formatAndSortIdentityOptions, doesArrayIncludeId } from '@helpers/utils';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { formatDate, isSameOrAfter, isSameOrBefore, isBetweenOrEqual } from '@helpers/date';
 
@@ -126,8 +126,9 @@ export const courseFiltersMixin = {
     filterCoursesByCompany (courses) {
       return courses
         .filter(course => (
-          course.type === INTRA && doesArrayIncludeId(course.companies.map(c => c._id), this.selectedCompany)) ||
-          (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
+          (course.type === INTRA && (course.companies.map(c => c._id)).includes(this.selectedCompany)) ||
+          (course.type === INTER_B2B &&
+              course.trainees.some(trainee => trainee.company._id === this.selectedCompany))));
     },
     filterCoursesBySalesRepresentative (courses) {
       return courses.filter(course => (course.salesRepresentative
