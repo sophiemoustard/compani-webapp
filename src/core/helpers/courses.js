@@ -1,10 +1,10 @@
-import { E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
+import { E_LEARNING, ON_SITE, STEP_TYPES, INTRA } from '@data/constants';
 import moment from '@helpers/moment';
 
 export const happened = sameDaySlots => moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
 
 export const composeCourseName = (course, attachCompany = false) => {
-  const companyName = (attachCompany && course.company) ? `${course.company.name} - ` : '';
+  const companyName = (attachCompany && course.type === INTRA) ? `${course.companies[0].name} - ` : '';
   const misc = course.misc ? ` - ${course.misc}` : '';
   return companyName + course.subProgram.program.name + misc;
 };
