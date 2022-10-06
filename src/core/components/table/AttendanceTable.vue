@@ -104,7 +104,7 @@ import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, INTRA, INTER_B2B } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 import { formatDate } from '@helpers/date';
 import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
@@ -195,11 +195,11 @@ export default {
           field: '_id',
           align: 'center',
           style: 'width: 80px; min-width: 80px',
-          month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
-          day: moment(s.startDate).date(),
-          weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
-          startHour: moment(s.startDate).format('LT'),
-          endHour: moment(s.endDate).format('LT'),
+          month: upperCaseFirstLetter(CompaniDate(s.startDate).format('LLL')),
+          day: CompaniDate(s.startDate).format('d'),
+          weekDay: upperCaseFirstLetter(CompaniDate(s.startDate).format('ccc')),
+          startHour: CompaniDate(s.startDate).format('T'),
+          endHour: CompaniDate(s.endDate).format('T'),
         })),
       ];
     },
