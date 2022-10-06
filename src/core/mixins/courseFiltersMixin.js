@@ -2,7 +2,7 @@ import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
-import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, doesArrayIncludeId } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { formatDate, isSameOrAfter, isSameOrBefore, isBetweenOrEqual } from '@helpers/date';
 
@@ -49,8 +49,9 @@ export const courseFiltersMixin = {
       const companies = [];
 
       for (const course of this.coursesWithGroupedSlot) {
-        if (course.type === INTRA && !companies.some(company => company.value === course.company._id)) {
-          companies.push({ label: course.company.name, value: course.company._id });
+        if (course.type === INTRA && !companies.some(company => company.value === course.companies[0]._id)) {
+          const { name, _id } = course.companies[0];
+          companies.push({ label: name, value: _id });
         } else {
           for (const trainee of course.trainees) {
             if (!companies.some(company => company.value === trainee.company._id)) {
@@ -123,8 +124,10 @@ export const courseFiltersMixin = {
         : this.selectedTrainer === 'without_trainer'));
     },
     filterCoursesByCompany (courses) {
-      return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
-        (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
+      return courses
+        .filter(course => (
+          course.type === INTRA && doesArrayIncludeId(course.companies.map(c => c._id), this.selectedCompany)) ||
+          (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
     },
     filterCoursesBySalesRepresentative (courses) {
       return courses.filter(course => (course.salesRepresentative
