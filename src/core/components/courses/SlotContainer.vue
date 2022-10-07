@@ -91,7 +91,8 @@ import { useValidations } from '@composables/validations';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel } from '@helpers/courses';
-import { formatDate, formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
+import { formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
+import { ascendingSort } from '@helpers/dates/utils';
 import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -140,7 +141,10 @@ export default {
 
     const formatSlotTitle = computed(() => {
       const slotsToPlanLength = course.value.slotsToPlan.length;
-      const courseSlots = groupBy(course.value.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
+      const courseSlots = groupBy(
+        course.value.slots.filter(slot => !!slot.startDate).sort(ascendingSort('startDate')),
+        s => CompaniDate(s.startDate).format('dd/LL/yyyy')
+      );
       const slotList = Object.values(courseSlots);
       const totalDate = slotsToPlanLength + slotList.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
@@ -169,7 +173,10 @@ export default {
       const formattedSlots = [...course.value.slots, ...course.value.slotsToPlan];
       const slotsByStep = groupBy(formattedSlots, 'step');
       const slotsByStepAndDateList = Object.keys(slotsByStep)
-        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || SLOTS_TO_PLAN_KEY));
+        .map(key => groupBy(
+          slotsByStep[key],
+          s => (s.startDate ? CompaniDate(s.startDate).format('dd/LL/yyyy') : SLOTS_TO_PLAN_KEY)
+        ));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
     });
