@@ -149,8 +149,8 @@ export default {
 
       let subtitle = '';
       if (slotList.length) {
-        const firstSlot = moment(slotList[0][0].startDate).format('LL');
-        const lastSlot = moment(slotList[slotList.length - 1][0].startDate).format('LL');
+        const firstSlot = CompaniDate(slotList[0][0].startDate).format('DDD');
+        const lastSlot = CompaniDate(slotList[slotList.length - 1][0].startDate).format('DDD');
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
@@ -201,7 +201,7 @@ export default {
           endDate: {
             required,
             ...(!!get(editedCourseSlot.value, 'dates.startDate') && {
-              maxDate: maxDate(moment(editedCourseSlot.value.dates.startDate).endOf('d').toISOString()),
+              maxDate: maxDate(CompaniDate(editedCourseSlot.value.dates.startDate).endOf('day').toISO()),
               minDate: minDate(editedCourseSlot.value.dates.startDate),
             }),
           },
