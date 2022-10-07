@@ -26,8 +26,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { INTRA } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'AttendanceSheetAdditionModal',
@@ -55,9 +54,9 @@ export default {
       return formatAndSortIdentityOptions(this.course.trainees);
     },
     dateOptions () {
-      const dateOptionsSet = new Set(this.course.slots.map(date => moment(date.startDate).startOf('d').toISOString()));
+      const dateOptionsSet = new Set(this.course.slots.map(date => CompaniDate(date.startDate).startOf('day').toISO()));
 
-      return [...dateOptionsSet].map(date => ({ value: new Date(date), label: formatDate(date) }));
+      return [...dateOptionsSet].map(date => ({ value: date, label: CompaniDate(date).format('dd/LL/yyyy') }));
     },
   },
   methods: {
