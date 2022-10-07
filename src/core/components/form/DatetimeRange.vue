@@ -2,17 +2,18 @@
   <div class="col-12 margin-input">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
-      <q-icon v-if="hasError" name="error_outline" color="secondary" />
+      <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-field :error="hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
+    <q-field :error="error" error-message="Date(s) et heure(s) invalide(s)" borderless>
       <div class="datetime-container row justify-evenly items-center">
         <ni-date-input :model-value="modelValue.startDate" @update:model-value="update($event, 'startDate')"
           @blur="blurHandler" :disable="disable || disableStartDate" :max="max" class="date-item" />
-        <ni-time-input :model-value="startHour" @update:model-value="updateHours($event, 'startHour')" class="time-item"
-          @blur="blurHandler" :disable="disable || disableStartHour" @lock-click="startClick" :locked="startLocked" />
+        <ni-time-input :model-value="modelValue.startHour" @update:model-value="updateHours($event, 'startHour')"
+          @blur="blurHandler" :disable="disable || disableStartHour" @lock-click="startClick" :locked="startLocked"
+          class="time-item" />
         <p class="delimiter">-</p>
-        <ni-time-input :model-value="endHour" @update:model-value="updateHours($event, 'endHour')" class="time-item"
-          :disable="disable || disableEndHour" :min="min" @lock-click="endClick" :locked="endLocked"
+        <ni-time-input :model-value="modelValue.endHour" @update:model-value="updateHours($event, 'endHour')"
+          :disable="disable || disableEndHour" :min="min" @lock-click="endClick" :locked="endLocked" class="time-item"
           @blur="blurHandler" />
         <ni-date-input :model-value="modelValue.endDate" @update:model-value="update($event, 'endDate')"
           @blur="blurHandler" :min="modelValue.startDate" :disable="disable || disableEndDate" :max="max"
@@ -23,14 +24,10 @@
 </template>
 
 <script>
-import get from 'lodash/get';
-import pick from 'lodash/pick';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { ref, toRefs, computed } from 'vue';
 import DateInput from '@components/form/DateInput';
 import TimeInput from '@components/form/TimeInput';
-import { minDate } from '@helpers/vuelidateCustomVal';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   components: {
@@ -50,84 +47,72 @@ export default {
     max: { type: String, default: '' },
     startLocked: { type: Boolean, default: false },
     endLocked: { type: Boolean, default: false },
+    shiftedMinutes: { type: Number, default: 210 },
   },
   emits: ['blur', 'update:model-value', 'start-lock-click', 'end-lock-click'],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
-      modelValue: {
-        startDate: { required },
-        endDate: { required, minDate: minDate(this.modelValue.startDate) },
-      },
-    };
-  },
-  computed: {
-    hasError () {
-      if (this.error || get(this.v$, 'modelValue.$error.$response')) return true;
+  setup (props, { emit }) {
+    const { modelValue, disableEndDate, disableEndHour, shiftedMinutes } = toRefs(props);
 
-      return moment(this.modelValue.startDate).isAfter(moment(this.modelValue.endDate));
-    },
-    startHour () {
-      return moment(this.modelValue.startDate).format('HH:mm');
-    },
-    endHour () {
-      return moment(this.modelValue.endDate).format('HH:mm');
-    },
-    min () {
-      if (moment(this.modelValue.startDate).format('YYYY/MM/DD')
-        === moment(this.modelValue.endDate).format('YYYY/MM/DD')) {
-        return this.startHour;
+    const shiftedTime = ref({
+      ...(shiftedMinutes.value / 60 >= 1 && { hours: Math.trunc(shiftedMinutes.value / 60) }),
+      ...(shiftedMinutes.value % 60 > 0 && { minutes: shiftedMinutes.value % 60 }),
+    });
+
+    const min = computed(() => {
+      if (CompaniDate(modelValue.value.startDate).isSame(modelValue.value.endDate, 'day')) {
+        return modelValue.value.startHour;
       }
+
       return null;
-    },
-  },
-  methods: {
-    blurHandler () {
-      this.v$.modelValue.$touch();
-      this.$emit('blur');
-    },
-    setDateHours (date, hour) {
-      const splitHour = hour.split(':');
-      return moment(date).set({
-        hours: Number.parseInt(splitHour[0], 10),
-        minutes: Number.parseInt(splitHour[1], 10),
-        seconds: 0,
-        milliseconds: 0,
-      }).toISOString();
-    },
-    update (date, key) {
-      const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
-      const dateObject = pick(moment(this.modelValue[key]).toObject(), hoursFields);
-      const dates = { ...this.modelValue, [key]: moment(date).set({ ...dateObject }).toISOString() };
-      if (key === 'startDate' && this.disableEndDate) {
-        const endDateObject = pick(moment(this.modelValue.endDate).toObject(), hoursFields);
-        dates.endDate = moment(date).set({ ...endDateObject }).toISOString();
-      }
-      if (key === 'endDate') dates.endDate = moment(dates.endDate).endOf('d').toISOString();
+    });
 
-      this.$emit('update:model-value', dates);
-    },
-    updateHours (value, key) {
-      const dates = { ...this.modelValue };
-      if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
-      if (key === 'startHour') {
-        dates.startDate = this.setDateHours(dates.startDate, value);
-        if (!this.disableEndHour && moment(value, 'HH:mm').isSameOrAfter(moment(this.endHour, 'HH:mm'))) {
-          const max = moment(dates.startDate).endOf('d');
-          dates.endDate = moment.min(moment(dates.startDate).add(2, 'H'), max).toISOString();
+    const blurHandler = () => { emit('blur'); };
+
+    const update = (date, key) => {
+      const dates = { ...modelValue.value, [key]: CompaniDate(date).toISO() };
+      if (key === 'startDate' && disableEndDate.value) dates.endDate = CompaniDate(date).toISO();
+      if (key === 'endDate') dates.endDate = CompaniDate(dates.endDate).endOf('day').toISO();
+
+      emit('update:model-value', dates);
+    };
+
+    const updateHours = (value, key) => {
+      const dates = { ...modelValue.value, [key]: value };
+      try {
+        if (key === 'startHour') {
+          const startHourDate = CompaniDate(dates.startHour, 'HH:mm');
+          const endHourDate = CompaniDate(dates.endHour, 'HH:mm');
+          if (!disableEndHour.value && startHourDate.isSameOrAfter(endHourDate)) {
+            const max = CompaniDate().endOf('day');
+            const shiftedEndDate = startHourDate.add(shiftedTime.value);
+            dates.endHour = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.format('HH:mm') : max.format('HH:mm');
+          }
         }
+      } catch (e) {
+        if (e.message.startsWith('Invalid DateTime: unparsable') ||
+          e.message.startsWith('Invalid DateTime: unit out of range')) return '';
+        console.error(e);
+      } finally {
+        emit('update:model-value', dates);
       }
+    };
 
-      this.$emit('update:model-value', dates);
-    },
-    startClick () {
-      this.$emit('start-lock-click');
-    },
-    endClick () {
-      this.$emit('end-lock-click');
-    },
+    const startClick = () => { emit('start-lock-click'); };
+
+    const endClick = () => { emit('end-lock-click'); };
+
+    return {
+      // Data
+      shiftedTime,
+      // Computed
+      min,
+      // Methods
+      blurHandler,
+      update,
+      updateHours,
+      startClick,
+      endClick,
+    };
   },
 };
 </script>

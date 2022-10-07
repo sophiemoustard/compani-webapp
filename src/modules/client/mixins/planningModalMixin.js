@@ -182,14 +182,16 @@ export const planningModalMixin = {
         if ([WORK_ACCIDENT, ILLNESS].includes(event.absence)) {
           this.$emit(`update:${eventType}`, {
             ...event,
-            dates: { ...event.dates, endDate: moment(event.dates.endDate).endOf('d').toISOString() },
+            dates: { ...event.dates, endDate: moment(event.dates.endDate).endOf('d').toISOString(), endHour: '23:59' },
           });
         } else {
           this.$emit(`update:${eventType}`, {
             ...event,
             dates: {
               startDate: moment(event.dates.startDate).startOf('d').toISOString(),
+              startHour: '00:00',
               endDate: moment(event.dates.endDate).endOf('d').toISOString(),
+              endHour: '23:59',
             },
           });
         }

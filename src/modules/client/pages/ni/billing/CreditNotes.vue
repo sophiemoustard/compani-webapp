@@ -443,12 +443,14 @@ export default {
       if (!events || !events.length) return { maxStartDate: '', minEndDate: '' };
 
       const eventsWithCreditNote = this.creditNoteEvents.filter(e => events.includes(e._id));
+      if (!eventsWithCreditNote.length) return { maxStartDate: '', minEndDate: '' };
+
       const endDate = new Date(get(eventsWithCreditNote[eventsWithCreditNote.length - 1], 'endDate'));
       const startDate = new Date(get(eventsWithCreditNote[0], 'startDate'));
 
       return {
-        maxStartDate: getEndOfDay(startDate).toString(),
-        minEndDate: getStartOfDay(endDate).toString(),
+        maxStartDate: getEndOfDay(startDate).toISOString(),
+        minEndDate: getStartOfDay(endDate).toISOString(),
       };
     },
     isValidDate (date) {

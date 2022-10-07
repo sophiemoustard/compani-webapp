@@ -13,7 +13,7 @@
         :options="customerAbsenceOptions" required-field @blur="v$.deletedEvents.absenceType.$touch"
         :error="v$.deletedEvents.absenceType.$error" />
       <ni-date-range caption="Dates de début et de fin" required-field v-model="deletedEvents" @blur="validateDates"
-        :error="v$.deletedEvents.startDate.$error || v$.deletedEvents.endDate.$error" />
+        :error="v$.deletedEvents.startDate.$error || v$.deletedEvents.endDate.$error" in-modal />
     </template>
     <template v-else>
       <ni-date-input caption="Date d'arrêt des interventions" v-model="deletedEvents.startDate" type="date"

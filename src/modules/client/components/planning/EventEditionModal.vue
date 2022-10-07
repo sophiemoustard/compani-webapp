@@ -28,7 +28,7 @@
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
             :disable="!canUpdateIntervention || historiesLoading" :error="validations.dates.$error" disable-end-date
             @update:model-value="updateEvent('dates', $event)" @blur="validations.dates.$touch"
-            :disable-start-date="isEventTimeStamped" :max="customerStoppedDate"
+            :disable-start-date="isEventTimeStamped" :max="customerStoppedDate" :shifted-minutes="120"
             :disable-start-hour="!!startDateTimeStamped" :disable-end-hour="!!endDateTimeStamped"
             :start-locked="!!startDateTimeStamped" @start-lock-click="openTimeStampCancellationModal(true)"
             :end-locked="!!endDateTimeStamped" @end-lock-click="openTimeStampCancellationModal(false)" />
@@ -67,7 +67,7 @@
           <ni-select in-modal caption="Nature" :model-value="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
           <ni-select in-modal caption="Type d'absence" :model-value="editedEvent.absence" :options="ABSENCE_TYPES"
-            :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" :shifted-minutes="120"
             :disable="isHourlyAbsence(editedEvent) || historiesLoading" @update:model-value="updateAbsence($event)" />
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="editedEvent.dates" required-field
             :disable-end-date="isAbsenceEndDateDisabled" :disable-start-hour="isAbsenceStartHourDisabled"
@@ -432,9 +432,8 @@ export default {
     openEventRestorationModal () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: `Êtes vous sûr(e) de vouloir rétablir l’intervention du
-          ${formatDateAndHours(this.editedEvent.dates.startDate, this.editedEvent.dates.endDate)} chez
-          ${this.customerFullName}&nbsp;?`,
+        message: `Êtes vous sûr(e) de vouloir rétablir l’intervention du ${formatDateAndHours(this.editedEvent.dates)}
+          chez ${this.customerFullName}&nbsp;?`,
         html: true,
         ok: 'Oui',
         cancel: 'Non',
