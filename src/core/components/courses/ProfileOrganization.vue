@@ -151,8 +151,8 @@ import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
 import { formatQuantity, formatIdentity, formatDownloadName, formatPhoneForPayload } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
-import moment from '@helpers/moment';
-import { descendingSort, ascendingSort } from '@helpers/date';
+import CompaniDate from '@helpers/dates/companiDates';
+import { descendingSort, ascendingSort } from '@helpers/dates/utils';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import BiColorButton from '@components/BiColorButton';
 import { useCourses } from '@composables/courses';
@@ -255,12 +255,12 @@ export default {
     const canEditTrainees = computed(() => isIntraCourse.value || (!isClientInterface && !isTrainer.value));
 
     const isFinished = computed(() => {
-      const slotsToCome = course.value.slots.filter(slot => moment().isBefore(slot.endDate));
+      const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
       return !slotsToCome.length && !course.value.slotsToPlan.length;
     });
 
     const courseNotStartedYet = computed(() => {
-      const slots = course.value.slots.filter(slot => moment().isAfter(slot.endDate));
+      const slots = course.value.slots.filter(slot => CompaniDate().isAfter(slot.endDate));
       return !slots.length;
     });
 
@@ -278,7 +278,7 @@ export default {
     const courseName = computed(() => composeCourseName(course.value));
 
     const noFuturSlotIsPlanned = computed(() => {
-      const futurSlots = course.value.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
+      const futurSlots = course.value.slots.filter(s => s.startDate).filter(s => CompaniDate().isBefore(s.startDate));
       return !!course.value.slotsToPlan.length && !futurSlots.length;
     });
 
@@ -432,7 +432,7 @@ export default {
       try {
         smsLoading.value = true;
         const smsList = await Courses.getSMSHistory(course.value._id);
-        smsHistoryList.value = smsList.sort((a, b) => descendingSort(a.date, b.date));
+        smsHistoryList.value = smsList.sort(descendingSort('date'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
@@ -464,9 +464,9 @@ export default {
     const setConvocationMessage = () => {
       const slots = course.value.slots
         .filter(s => !!s.startDate)
-        .sort((a, b) => ascendingSort(a.startDate, b.startDate));
-      const date = moment(slots[0].startDate).format('DD/MM');
-      const hour = moment(slots[0].startDate).format('HH:mm');
+        .sort(ascendingSort('startDate'));
+      const date = CompaniDate(slots[0].startDate).format('dd/LL');
+      const hour = CompaniDate(slots[0].startDate).format('HH:mm');
 
       newSms.value.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `La première session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
@@ -478,10 +478,10 @@ export default {
     const setReminderMessage = () => {
       const slots = course.value.slots
         .filter(s => !!s.startDate)
-        .filter(slot => moment().isBefore(slot.endDate))
-        .sort((a, b) => ascendingSort(a.startDate, b.startDate));
-      const date = moment(slots[0].startDate).format('DD/MM');
-      const hour = moment(slots[0].startDate).format('HH:mm');
+        .filter(slot => CompaniDate().isBefore(slot.endDate))
+        .sort(ascendingSort('startDate'));
+      const date = CompaniDate(slots[0].startDate).format('dd/LL');
+      const hour = CompaniDate(slots[0].startDate).format('HH:mm');
 
       newSms.value.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `Votre prochaine session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
