@@ -145,17 +145,17 @@ export default {
         .filter(date => !!date)
         .map(slot => CompaniDate(slot.startDate).startOf('day'))
         .sort(ascendingSort);
-      const slotDayDates = [...new Set(slotDatesWithDuplicate)];
+      const slotDates = [...new Set(slotDatesWithDuplicate)];
 
-      const totalDate = slotsToPlanLength + slotDayDates.length;
+      const totalDate = slotsToPlanLength + slotDates.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
       const slotsToPlanTitle = slotsToPlanLength ? ` dont ${slotsToPlanLength} à planifier, ` : '';
 
       let subtitle = '';
-      if (slotDayDates.length) {
-        const firstSlot = CompaniDate(slotDayDates[0]).format('DDD');
-        const lastSlot = CompaniDate(slotDayDates[slotDayDates.length - 1]).format('DDD');
+      if (slotDates.length) {
+        const firstSlot = CompaniDate(slotDates[0]).format('DDD');
+        const lastSlot = CompaniDate(slotDates[slotDates.length - 1]).format('DDD');
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
