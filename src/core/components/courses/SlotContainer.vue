@@ -141,20 +141,21 @@ export default {
 
     const formatSlotTitle = computed(() => {
       const slotsToPlanLength = course.value.slotsToPlan.length;
-      const courseSlots = groupBy(
-        course.value.slots.filter(slot => !!slot.startDate).sort(ascendingSort('startDate')),
-        s => CompaniDate(s.startDate).format('dd/LL/yyyy')
-      );
-      const slotList = Object.values(courseSlots);
-      const totalDate = slotsToPlanLength + slotList.length;
+      const slotDatesWithDuplicate = course.value.slots
+        .filter(date => !!date)
+        .map(slot => CompaniDate(slot.startDate).startOf('day'))
+        .sort(ascendingSort);
+      const slotDayDates = [...new Set(slotDatesWithDuplicate)];
+
+      const totalDate = slotsToPlanLength + slotDayDates.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
       const slotsToPlanTitle = slotsToPlanLength ? ` dont ${slotsToPlanLength} à planifier, ` : '';
 
       let subtitle = '';
-      if (slotList.length) {
-        const firstSlot = CompaniDate(slotList[0][0].startDate).format('DDD');
-        const lastSlot = CompaniDate(slotList[slotList.length - 1][0].startDate).format('DDD');
+      if (slotDayDates.length) {
+        const firstSlot = CompaniDate(slotDayDates[0]).format('DDD');
+        const lastSlot = CompaniDate(slotDayDates[slotDayDates.length - 1]).format('DDD');
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
