@@ -33,7 +33,7 @@ import {
   TRAINEE_DELETION,
 } from '@data/constants';
 import Button from '@components/Button';
-import CompaniDates from '@helpers/dates/companiDates';
+import CompaniDate from '@helpers/dates/companiDates';
 import { formatIdentity } from '@helpers/utils';
 
 export default {
@@ -75,8 +75,8 @@ export default {
       }
     },
     historySignature () {
-      const date = CompaniDates(this.courseHistory.createdAt).format('dd/LL');
-      const hour = CompaniDates(this.courseHistory.createdAt).format('HH\'h\'mm');
+      const date = CompaniDate(this.courseHistory.createdAt).format('dd/LL');
+      const hour = CompaniDate(this.courseHistory.createdAt).format('HH\'h\'mm');
       const user = formatIdentity(this.courseHistory.createdBy.identity, 'FL');
 
       return `${user} le ${date} à ${hour}.`;
@@ -90,9 +90,9 @@ export default {
       return get(user, 'picture.link') || DEFAULT_AVATAR;
     },
     getSlotCreationTitle () {
-      const date = CompaniDates(this.courseHistory.slot.startDate).format('dd/LL');
-      const startHour = CompaniDates(this.courseHistory.slot.startDate).format('HH\'h\'mm');
-      const endHour = CompaniDates(this.courseHistory.slot.endDate).format('HH\'h\'mm');
+      const date = CompaniDate(this.courseHistory.slot.startDate).format('dd/LL');
+      const startHour = CompaniDate(this.courseHistory.slot.startDate).format('HH\'h\'mm');
+      const endHour = CompaniDate(this.courseHistory.slot.endDate).format('HH\'h\'mm');
       const infos = `${date} de ${startHour} à ${endHour}`;
 
       return { pre: 'Nouveau', type: 'créneau', post: 'le', infos };
@@ -102,7 +102,7 @@ export default {
         'Pas d\'adresse renseignée.';
     },
     getSlotDeletionTitle () {
-      const date = CompaniDates(this.courseHistory.slot.startDate).format('dd/LL');
+      const date = CompaniDate(this.courseHistory.slot.startDate).format('dd/LL');
 
       return { pre: 'Suppression du', type: 'créneau', post: 'du', infos: date };
     },
@@ -114,20 +114,20 @@ export default {
         address = ` sur ${get(this.courseHistory, 'slot.meetingLink')}`;
       }
 
-      return `Créneau initialement prévu de ${CompaniDates(this.courseHistory.slot.startDate).format('HH\'h\'mm')}`
-        + ` à ${CompaniDates(this.courseHistory.slot.endDate).format('HH\'h\'mm')}${address}`;
+      return `Créneau initialement prévu de ${CompaniDate(this.courseHistory.slot.startDate).format('HH\'h\'mm')}`
+        + ` à ${CompaniDate(this.courseHistory.slot.endDate).format('HH\'h\'mm')}${address}`;
     },
     getSlotEditionTitle () {
       if (this.courseHistory.update.startDate) {
-        const from = CompaniDates(this.courseHistory.update.startDate.from).format('dd/LL');
-        const to = CompaniDates(this.courseHistory.update.startDate.to).format('dd/LL');
+        const from = CompaniDate(this.courseHistory.update.startDate.from).format('dd/LL');
+        const to = CompaniDate(this.courseHistory.update.startDate.to).format('dd/LL');
 
         return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
       }
       if (this.courseHistory.update.startHour) {
-        const date = CompaniDates(this.courseHistory.update.startHour.from).format('dd/LL');
-        const startHour = CompaniDates(this.courseHistory.update.startHour.to).format('HH\'h\'mm');
-        const endHour = CompaniDates(this.courseHistory.update.endHour.to).format('HH\'h\'mm');
+        const date = CompaniDate(this.courseHistory.update.startHour.from).format('dd/LL');
+        const startHour = CompaniDate(this.courseHistory.update.startHour.to).format('HH\'h\'mm');
+        const endHour = CompaniDate(this.courseHistory.update.endHour.to).format('HH\'h\'mm');
 
         return { type: 'Nouvel horaire', post: ' pour le créneau du', infos: `${date} : ${startHour} - ${endHour}` };
       }
@@ -135,8 +135,8 @@ export default {
     getSlotEditionDetails () {
       if (this.courseHistory.update.startDate) return undefined;
 
-      const oldStartHour = CompaniDates(this.courseHistory.update.startHour.from).format('HH\'h\'mm');
-      const oldEndHour = CompaniDates(this.courseHistory.update.endHour.from).format('HH\'h\'mm');
+      const oldStartHour = CompaniDate(this.courseHistory.update.startHour.from).format('HH\'h\'mm');
+      const oldEndHour = CompaniDate(this.courseHistory.update.endHour.from).format('HH\'h\'mm');
 
       return `Créneau initialement prévu de ${oldStartHour} à ${oldEndHour}`;
     },
