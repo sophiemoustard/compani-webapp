@@ -152,7 +152,7 @@ import { composeCourseName } from '@helpers/courses';
 import { formatQuantity, formatIdentity, formatDownloadName, formatPhoneForPayload } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import CompaniDate from '@helpers/dates/companiDates';
-import { descendingSort, ascendingSort } from '@helpers/dates/utils';
+import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import BiColorButton from '@components/BiColorButton';
 import { useCourses } from '@composables/courses';
@@ -432,7 +432,7 @@ export default {
       try {
         smsLoading.value = true;
         const smsList = await Courses.getSMSHistory(course.value._id);
-        smsHistoryList.value = smsList.sort(descendingSort('date'));
+        smsHistoryList.value = smsList.sort(descendingSortBy('date'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
@@ -464,7 +464,7 @@ export default {
     const setConvocationMessage = () => {
       const slots = course.value.slots
         .filter(s => !!s.startDate)
-        .sort(ascendingSort('startDate'));
+        .sort(ascendingSortBy('startDate'));
       const date = CompaniDate(slots[0].startDate).format('dd/LL');
       const hour = CompaniDate(slots[0].startDate).format('HH:mm');
 
@@ -479,7 +479,7 @@ export default {
       const slots = course.value.slots
         .filter(s => !!s.startDate)
         .filter(slot => CompaniDate().isBefore(slot.endDate))
-        .sort(ascendingSort('startDate'));
+        .sort(ascendingSortBy('startDate'));
       const date = CompaniDate(slots[0].startDate).format('dd/LL');
       const hour = CompaniDate(slots[0].startDate).format('HH:mm');
 
