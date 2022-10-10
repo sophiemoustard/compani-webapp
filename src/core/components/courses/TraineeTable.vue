@@ -189,7 +189,7 @@ export default {
       try {
         let query;
 
-        if (isIntraCourse.value) query = { company: get(course.value, 'company._id') };
+        if (isIntraCourse.value) query = { company: get(course.value, 'companies[0]._id') };
         if (course.value.type === INTER_B2B) {
           query = isClientInterface ? { company: get(loggedUser.value, 'company._id') } : { hasCompany: true };
         }
