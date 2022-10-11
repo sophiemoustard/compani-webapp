@@ -91,7 +91,8 @@ import { useValidations } from '@composables/validations';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel } from '@helpers/courses';
-import { formatDate, formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
+import { formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
+import { ascendingSort } from '@helpers/dates/utils';
 import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -140,17 +141,21 @@ export default {
 
     const formatSlotTitle = computed(() => {
       const slotsToPlanLength = course.value.slotsToPlan.length;
-      const courseSlots = groupBy(course.value.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
-      const slotList = Object.values(courseSlots);
-      const totalDate = slotsToPlanLength + slotList.length;
+      const slotDatesWithDuplicate = course.value.slots
+        .filter(date => !!date)
+        .map(slot => CompaniDate(slot.startDate).startOf('day'))
+        .sort(ascendingSort);
+      const slotDates = [...new Set(slotDatesWithDuplicate)];
+
+      const totalDate = slotsToPlanLength + slotDates.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
       const slotsToPlanTitle = slotsToPlanLength ? ` dont ${slotsToPlanLength} à planifier, ` : '';
 
       let subtitle = '';
-      if (slotList.length) {
-        const firstSlot = moment(slotList[0][0].startDate).format('LL');
-        const lastSlot = moment(slotList[slotList.length - 1][0].startDate).format('LL');
+      if (slotDates.length) {
+        const firstSlot = CompaniDate(slotDates[0]).format('DDD');
+        const lastSlot = CompaniDate(slotDates[slotDates.length - 1]).format('DDD');
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
@@ -169,7 +174,10 @@ export default {
       const formattedSlots = [...course.value.slots, ...course.value.slotsToPlan];
       const slotsByStep = groupBy(formattedSlots, 'step');
       const slotsByStepAndDateList = Object.keys(slotsByStep)
-        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || SLOTS_TO_PLAN_KEY));
+        .map(key => groupBy(
+          slotsByStep[key],
+          s => (s.startDate ? CompaniDate(s.startDate).format('dd/LL/yyyy') : SLOTS_TO_PLAN_KEY)
+        ));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
     });
@@ -201,7 +209,7 @@ export default {
           endDate: {
             required,
             ...(!!get(editedCourseSlot.value, 'dates.startDate') && {
-              maxDate: maxDate(moment(editedCourseSlot.value.dates.startDate).endOf('d').toISOString()),
+              maxDate: maxDate(CompaniDate(editedCourseSlot.value.dates.startDate).endOf('day').toISO()),
               minDate: minDate(editedCourseSlot.value.dates.startDate),
             }),
           },
