@@ -248,7 +248,7 @@ export default {
       return formattedTrainees.filter(trainee => !this.traineesWithAttendance.map(t => t._id).includes(trainee.value));
     },
     selectedCompany () {
-      return this.course.company ? this.course.company._id : '';
+      return this.course.type === INTRA ? this.course.companies[0]._id : '';
     },
     canUpdate () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
