@@ -62,7 +62,15 @@ import omit from 'lodash/omit';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
-import { INTER_B2B, TRAINER, DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import {
+  INTER_B2B,
+  TRAINER,
+  DEFAULT_AVATAR,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
+  HELPER,
+  AUXILIARY_WITHOUT_COMPANY,
+} from '@data/constants';
 import {
   formatPhone,
   formatPhoneForPayload,
@@ -235,7 +243,7 @@ export default {
       newLearner.value.contact = { phone: get(user, 'contact.phone') };
 
       if (get(user, 'company._id')) newLearner.value.company = get(user, 'company._id');
-      else if (isIntraCourse.value) newLearner.value.company = course.value.company._id;
+      else if (isIntraCourse.value) newLearner.value.company = course.value.companies[0]._id;
     };
 
     const nextStepLearnerCreationModal = async () => {
@@ -247,19 +255,19 @@ export default {
         const userInfo = await Users.exists({ email: newLearner.value.local.email });
 
         if (!userInfo.exists) {
-          if (isIntraCourse.value) newLearner.value.company = course.value.company._id;
+          if (isIntraCourse.value) newLearner.value.company = course.value.companies[0]._id;
 
           return goToNextStep();
         }
 
         const user = await Users.getById(userInfo.user._id);
 
-        const isHelperOrAuxiliaryWithoutCompany = ['helper', 'auxiliary_without_company']
+        const isHelperOrAuxiliaryWithoutCompany = [HELPER, AUXILIARY_WITHOUT_COMPANY]
           .includes(get(user, 'role.client.name'));
         if (isHelperOrAuxiliaryWithoutCompany && isIntraCourse.value) {
           return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
         }
-        if (isIntraCourse.value && get(user, 'company._id') && user.company._id !== course.value.company._id) {
+        if (isIntraCourse.value && get(user, 'company._id') && user.company._id !== course.value.companies[0]._id) {
           return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
 
