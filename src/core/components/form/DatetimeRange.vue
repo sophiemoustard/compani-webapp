@@ -88,6 +88,12 @@ export default {
             dates.endHour = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.format('HH:mm') : max.format('HH:mm');
           }
         }
+
+        if (dates.endHour === '23:59') {
+          dates.endDate = CompaniDate(dates.endDate).set({ second: 59, millisecond: 999 }).toISO();
+        } else {
+          dates.endDate = CompaniDate(dates.endDate).set({ second: 0, millisecond: 0 }).toISO();
+        }
       } catch (e) {
         if (e.message.startsWith('Invalid DateTime: unparsable') ||
           e.message.startsWith('Invalid DateTime: unit out of range')) return '';

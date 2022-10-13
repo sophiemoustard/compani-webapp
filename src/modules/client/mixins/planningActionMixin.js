@@ -92,9 +92,9 @@ export const planningActionMixin = {
           ...(type === ABSENCE && { absenceNature: DAILY }),
           dates: {
             startDate,
-            endDate,
-            startHour: type === ABSENCE ? moment(startDate).format('HH:mm') : this.newEvent.dates.startHour,
-            endHour: type === ABSENCE ? moment(endDate).format('HH:mm') : this.newEvent.dates.endHour,
+            endDate: type === ABSENCE ? endDate : moment(endDate).set({ second: 0, millisecond: 0 }).toISOString(),
+            startHour: type === ABSENCE ? '00:00' : this.newEvent.dates.startHour,
+            endHour: type === ABSENCE ? '23:59' : this.newEvent.dates.endHour,
           },
         };
       }
