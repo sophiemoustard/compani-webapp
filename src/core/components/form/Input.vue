@@ -14,7 +14,7 @@
         <i aria-hidden="true" class="q-icon on-right material-icons self-center relative-position">
           add
           <input ref="inputFile" type="file" @input="updateInputFile" class="input-file absolute-full cursor-pointer"
-            @blur="onBlur">
+            @blur="onBlur" :accept="extensions">
         </i>
       </div>
       <div class="file-error" v-if="error">{{ errorMessage }}</div>
@@ -71,6 +71,7 @@ export default {
     dataCy: { type: String, default: '' },
     inputClass: { type: [Array, String, Object], default: '' },
     noBorder: { type: Boolean, default: false },
+    extensions: { type: Array, default: () => [] },
   },
   emits: ['update:model-value', 'blur', 'focus', 'click', 'keyup-enter'],
   data () {

@@ -21,8 +21,7 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatDate } from '@helpers/date';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'NiDateInput',
@@ -43,34 +42,43 @@ export default {
   computed: {
     date () {
       if (!this.modelValue) return '';
-      return moment(this.modelValue).format('YYYY/MM/DD');
+      return CompaniDate(this.modelValue).format('yyyy/LL/dd');
     },
     inputDate () {
       if (!this.modelValue) return '';
-      return formatDate(this.modelValue);
+      return CompaniDate(this.modelValue).format('dd/LL/yyyy');
     },
   },
   methods: {
     dateOptions (date) {
-      let isBeforeMax = true;
-      let isAfterMin = true;
-      if (this.min) isAfterMin = date >= moment(this.min).format('YYYY/MM/DD');
-      if (this.max) isBeforeMax = date <= moment(this.max).format('YYYY/MM/DD');
+      const dateValue = CompaniDate(date, 'yyyy/LL/dd');
+      const isAfterMin = this.min ? dateValue.isSameOrAfter(this.min) : true;
+      const isBeforeMax = this.max ? dateValue.isSameOrBefore(this.max) : true;
+
       return isAfterMin && isBeforeMax;
     },
     select (value) {
-      const momentValue = moment(value, 'YYYY/MM/DD', true);
-      if (!momentValue.isValid()) return;
-      this.update(momentValue.toISOString());
-      this.$refs.qDateMenu.hide();
-      this.$refs.dateInput.blur();
+      try {
+        const selectedDate = CompaniDate(value, 'yyyy/LL/dd');
+
+        this.update(selectedDate.toISO());
+        this.$refs.qDateMenu.hide();
+        this.$refs.dateInput.blur();
+      } catch (e) {
+        console.error(e);
+      }
     },
     input (value) {
-      if (!value) return this.update(value);
+      try {
+        if (!value) return '';
 
-      const momentValue = moment(value, 'DD/MM/YYYY', true);
-      if (!momentValue.isValid()) return;
-      this.update(momentValue.toISOString());
+        const date = CompaniDate(value, 'dd/LL/yyyy');
+        this.update(date.toISO());
+      } catch (e) {
+        if (e.message.startsWith('Invalid DateTime: unparsable') ||
+          e.message.startsWith('Invalid DateTime: unit out of range')) return '';
+        console.error(e);
+      }
     },
     update (value) {
       this.$emit('update:model-value', value);

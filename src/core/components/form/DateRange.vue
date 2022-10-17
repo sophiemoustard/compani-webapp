@@ -21,9 +21,10 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { minDate } from '@helpers/vuelidateCustomVal';
+import CompaniDate from '@helpers/dates/companiDates';
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
-import moment from '@helpers/moment';
+import { NotifyWarning } from '@components/popup/notify';
 
 export default {
   components: {
@@ -35,8 +36,8 @@ export default {
       type: Object,
       default () {
         return {
-          startDate: moment().startOf('d').toISOString(),
-          endDate: moment().endOf('d').toISOString(),
+          startDate: CompaniDate().startOf('day').toISO(),
+          endDate: CompaniDate().endOf('day').toISO(),
         };
       },
     },
@@ -44,6 +45,7 @@ export default {
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
     borders: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
   },
   emits: ['update:model-value', 'blur', 'update:error'],
   setup () {
@@ -62,9 +64,10 @@ export default {
       return this.error || this.v$.modelValue.$error;
     },
     innerErrorMessage () {
-      if (get(this.v$.modelValue.startDate, 'required.$reponse') === false ||
-        get(this.v$.modelValue.endDate, 'required.$reponse') === false) return REQUIRED_LABEL;
-      if (get(this.v$.modelValue.endDate, 'minDate.$reponse') === false) {
+      if (get(this.v$.modelValue.startDate, 'required.$response') === false ||
+        get(this.v$.modelValue.endDate, 'required.$response') === false) return REQUIRED_LABEL;
+
+      if (get(this.v$.modelValue.endDate, 'minDate.$response') === false) {
         return 'La date de fin doit être postérieure à la date de début';
       }
 
@@ -79,11 +82,16 @@ export default {
   methods: {
     update (value, key) {
       this.v$.modelValue.$touch();
-      if (key === 'endDate') value = moment(value).endOf('d').toISOString();
+      if (key === 'endDate') value = CompaniDate(value).endOf('day').toISO();
 
       this.$emit('update:model-value', { ...this.modelValue, [key]: value });
     },
     blur () {
+      if (!this.inModal) {
+        this.v$.modelValue.$touch();
+        if (this.v$.modelValue.$error) return NotifyWarning('Champ(s) invalide(s)');
+      }
+
       this.$emit('blur');
     },
   },

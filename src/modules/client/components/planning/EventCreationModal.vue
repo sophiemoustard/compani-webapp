@@ -11,7 +11,7 @@
           @update:model-value="updateType($event)" />
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="newEvent.dates" required-field
-            :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
+            :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date :shifted-minutes="120"
             @update:model-value="updateEvent('dates', $event)" :max="customerStoppedDate" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
@@ -34,7 +34,7 @@
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
             :disable="isHourlyAbsence(newEvent)" @update:model-value="updateAbsence($event)" />
           <ni-datetime-range caption="Dates et heures de l'évènement" :model-value="newEvent.dates" required-field
-            :disable-end-date="isAbsenceEndDateDisabled" :error="validations.dates.$error"
+            :disable-end-date="isAbsenceEndDateDisabled" :error="validations.dates.$error" :shifted-minutes="120"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="isAbsenceStartHourDisabled" @update:model-value="updateEvent('dates', $event)" />
           <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :model-value="newEvent.isExtendedAbsence"
@@ -107,7 +107,7 @@ import {
   ABSENCE_TYPES,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
-import { descendingSort } from '@helpers/dates/utils';
+import { descendingSortBy } from '@helpers/dates/utils';
 import { formatIdentityAndDocType } from '@helpers/utils';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
@@ -139,7 +139,7 @@ export default {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
 
       return this.selectedAuxiliary.contracts.some(contract => CompaniDate(contract.startDate)
-        .isSameOrBefore(this.newEvent.dates.startDate) && !contract.endDate);
+        .isSameOrBefore(this.newEvent.dates.startDate, 'day') && !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
@@ -190,7 +190,7 @@ export default {
       return this.auxiliaryAbsences
         .filter(e => e.absence === this.newEvent.absence &&
             CompaniDate(e.startDate).isBefore(this.newEvent.dates.startDate))
-        .sort(descendingSort('startDate'))
+        .sort(descendingSortBy('startDate'))
         .map(a => ({
           label: `${CompaniDate(a.startDate).format('dd/LL/yyyy')} - ${CompaniDate(a.endDate).format('dd/LL/yyyy')}`,
           value: a._id,

@@ -79,8 +79,7 @@ export default {
 
       $q.dialog({
         title: 'Confirmation',
-        message: `Êtes-vous sûr(e) de vouloir annuler l'intervention du
-          ${formatDateAndHours(props.editedEvent.dates.startDate, props.editedEvent.dates.endDate)}
+        message: `Êtes-vous sûr(e) de vouloir annuler l'intervention du ${formatDateAndHours(props.editedEvent.dates)}
           chez ${props.customerName}&nbsp;?`,
         ok: true,
         html: true,

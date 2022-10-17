@@ -23,11 +23,13 @@ import {
   PERSON,
   CUSTOMER,
   WORK_ACCIDENT,
+  CANCEL_EVENT,
+  RESTORE_EVENT,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
+import CompaniDate from '@helpers/dates/companiDates';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
-import { CANCEL_EVENT, RESTORE_EVENT } from '../../../core/data/constants';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
@@ -73,6 +75,8 @@ export const planningActionMixin = {
         this.creationModal = false;
         this.newEvent = {};
       } else {
+        const startDate = moment(this.newEvent.dates.startDate).startOf('d').toISOString();
+        const endDate = moment(this.newEvent.dates.startDate).endOf('d').toISOString();
         this.newEvent = {
           ...this.newEvent,
           type,
@@ -85,13 +89,13 @@ export const planningActionMixin = {
           extension: '',
           address: {},
           attachment: {},
-          ...(type === ABSENCE && {
-            absenceNature: DAILY,
-            dates: {
-              startDate: moment(this.newEvent.dates.startDate).startOf('d').toISOString(),
-              endDate: moment(this.newEvent.dates.endDate).endOf('d').toISOString(),
-            },
-          }),
+          ...(type === ABSENCE && { absenceNature: DAILY }),
+          dates: {
+            startDate,
+            endDate: type === ABSENCE ? endDate : moment(endDate).set({ second: 0, millisecond: 0 }).toISOString(),
+            startHour: type === ABSENCE ? '00:00' : this.newEvent.dates.startHour,
+            endHour: type === ABSENCE ? '23:59' : this.newEvent.dates.endHour,
+          },
         };
       }
     },
@@ -99,11 +103,14 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
+      const startHour = CompaniDate(event.dates.startHour, 'HH:mm');
+      const endHour = CompaniDate(event.dates.endHour, 'HH:mm');
+
       const payload = {
         ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
         ...pick(event, ['isCancelled', 'transportMode', 'misc', 'kmDuringEvent']), // pickBy removes false and '' value
-        startDate: event.dates.startDate,
-        endDate: event.dates.endDate,
+        startDate: CompaniDate(event.dates.startDate).set(startHour.getUnits(['hour', 'minute'])).toISO(),
+        endDate: CompaniDate(event.dates.endDate).set(endHour.getUnits(['hour', 'minute'])).toISO(),
       };
 
       if (event.auxiliary) delete payload.sector;
@@ -278,7 +285,12 @@ export const planningActionMixin = {
         misc,
         ...eventData
       } = cloneDeep(event);
-      const dates = { startDate, endDate };
+      const dates = {
+        startDate,
+        endDate,
+        startHour: moment(startDate).format('HH:mm'),
+        endHour: moment(endDate).format('HH:mm'),
+      };
 
       switch (event.type) {
         case INTERVENTION: {
@@ -387,9 +399,12 @@ export const planningActionMixin = {
         customerId: initialEvent.customer._id,
         address: initialEvent.address,
       };
+
+      const startHour = CompaniDate(this.editedEvent.dates.startHour, 'HH:mm');
+      const endHour = CompaniDate(this.editedEvent.dates.endHour, 'HH:mm');
       const formattedEditedEvent = {
-        startDate: this.editedEvent.dates.startDate,
-        endDate: this.editedEvent.dates.endDate,
+        startDate: CompaniDate(this.editedEvent.dates.startDate).set(startHour.getUnits(['hour', 'minute'])).toISO(),
+        endDate: CompaniDate(this.editedEvent.dates.endDate).set(endHour.getUnits(['hour', 'minute'])).toISO(),
         serviceId: this.editedEvent.subscription,
         customerId: this.editedEvent.customer,
         address: this.editedEvent.address,

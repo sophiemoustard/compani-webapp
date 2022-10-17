@@ -124,8 +124,8 @@ export const getHoursAndMinutes = (value) => {
 
 export const computeHours = ({ hours, minutes }) => Number(hours) + Number(minutes) / 60;
 
-export const formatDateAndHours = (startDate, endDate) => {
-  const date = moment(startDate).format('DD MMMM');
+export const formatDateAndHours = (dates) => {
+  const date = moment(dates.startDate).format('DD MMMM');
 
-  return `${date} (${formatHoursWithMinutes(startDate)} - ${formatHoursWithMinutes(endDate)})`;
+  return `${date} (${dates.startHour.replace(':', 'h')} - ${dates.endHour.replace(':', 'h')})`;
 };

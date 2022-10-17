@@ -91,9 +91,11 @@ import { useValidations } from '@composables/validations';
 import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel } from '@helpers/courses';
-import { formatDate, formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
-import { frAddress, minDate, maxDate, urlAddress } from '@helpers/vuelidateCustomVal';
+import { formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
+import { ascendingSort } from '@helpers/dates/utils';
+import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'SlotContainer',
@@ -139,17 +141,21 @@ export default {
 
     const formatSlotTitle = computed(() => {
       const slotsToPlanLength = course.value.slotsToPlan.length;
-      const courseSlots = groupBy(course.value.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
-      const slotList = Object.values(courseSlots);
-      const totalDate = slotsToPlanLength + slotList.length;
+      const slotDatesWithDuplicate = course.value.slots
+        .filter(date => !!date)
+        .map(slot => CompaniDate(slot.startDate).startOf('day'))
+        .sort(ascendingSort);
+      const slotDates = [...new Set(slotDatesWithDuplicate)];
+
+      const totalDate = slotsToPlanLength + slotDates.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
       const slotsToPlanTitle = slotsToPlanLength ? ` dont ${slotsToPlanLength} à planifier, ` : '';
 
       let subtitle = '';
-      if (slotList.length) {
-        const firstSlot = moment(slotList[0][0].startDate).format('LL');
-        const lastSlot = moment(slotList[slotList.length - 1][0].startDate).format('LL');
+      if (slotDates.length) {
+        const firstSlot = CompaniDate(slotDates[0]).format('DDD');
+        const lastSlot = CompaniDate(slotDates[slotDates.length - 1]).format('DDD');
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
@@ -168,7 +174,10 @@ export default {
       const formattedSlots = [...course.value.slots, ...course.value.slotsToPlan];
       const slotsByStep = groupBy(formattedSlots, 'step');
       const slotsByStepAndDateList = Object.keys(slotsByStep)
-        .map(key => groupBy(slotsByStep[key], s => formatDate(s.startDate) || SLOTS_TO_PLAN_KEY));
+        .map(key => groupBy(
+          slotsByStep[key],
+          s => (s.startDate ? CompaniDate(s.startDate).format('dd/LL/yyyy') : SLOTS_TO_PLAN_KEY)
+        ));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
     });
@@ -191,10 +200,16 @@ export default {
         meetingLink: { urlAddress },
         dates: {
           startDate: { required },
+          startHour: { required, validHour },
+          endHour: {
+            required,
+            validHour,
+            strictMinHour: strictMinHour(get(editedCourseSlot.value, 'dates.startHour')),
+          },
           endDate: {
             required,
             ...(!!get(editedCourseSlot.value, 'dates.startDate') && {
-              maxDate: maxDate(moment(editedCourseSlot.value.dates.startDate).endOf('d').toISOString()),
+              maxDate: maxDate(CompaniDate(editedCourseSlot.value.dates.startDate).endOf('day').toISO()),
               minDate: minDate(editedCourseSlot.value.dates.startDate),
             }),
           },
@@ -212,13 +227,19 @@ export default {
         return NotifyWarning('Vous ne pouvez pas éditer un créneau d\'une formation archivée.');
       }
 
-      const defaultDate = {
-        startDate: moment().startOf('d').hours(9).toISOString(),
-        endDate: moment().startOf('d').hours(12).toISOString(),
-      };
+      const defaultDate = has(slot, 'startDate')
+        ? pick(slot, ['startDate', 'endDate'])
+        : {
+          startDate: CompaniDate().set({ hour: 9, minute: 0 }).toISO(),
+          endDate: CompaniDate().set({ hour: 12, minute: 30 }).toISO(),
+        };
       editedCourseSlot.value = {
         _id: slot._id,
-        dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
+        dates: {
+          ...defaultDate,
+          startHour: CompaniDate(defaultDate.startDate).format('HH:mm'),
+          endHour: CompaniDate(defaultDate.endDate).format('HH:mm'),
+        },
         address: {},
         meetingLink: get(slot, 'meetingLink') || '',
         step: slot.step,
@@ -240,8 +261,12 @@ export default {
     const formatEditionPayload = (courseSlot) => {
       const stepType = stepTypes.value.find(item => item.value === courseSlot.step).type;
 
+      const startHour = CompaniDate(courseSlot.dates.startHour, 'HH:mm');
+      const endHour = CompaniDate(courseSlot.dates.endHour, 'HH:mm');
+
       return {
-        ...courseSlot.dates,
+        startDate: CompaniDate(courseSlot.dates.startDate).set(startHour.getUnits(['hour', 'minute'])).toISO(),
+        endDate: CompaniDate(courseSlot.dates.endDate).set(endHour.getUnits(['hour', 'minute'])).toISO(),
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
       };

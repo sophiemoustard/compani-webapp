@@ -21,13 +21,12 @@
 
 <script>
 import set from 'lodash/set';
-import moment from '@helpers/moment';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatDate } from '@helpers/date';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'TraineeAttendanceCreationModal',
@@ -55,7 +54,7 @@ export default {
   computed: {
     slotsOptions () {
       return this.course.slots.map(s => ({
-        label: `${formatDate(s.startDate)} ${moment(s.startDate).format('LT')} - ${moment(s.endDate).format('LT')}`,
+        label: `${CompaniDate(s.startDate).format('dd/LL/yyyy T')} - ${CompaniDate(s.endDate).format('T')}`,
         value: s._id,
       }));
     },
