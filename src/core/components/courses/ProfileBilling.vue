@@ -47,7 +47,7 @@ export default {
     const companies = computed(() => {
       const traineesCompanies = course.value.trainees.map(trainee => trainee.company);
       const billsCompanies = courseBills.value.map(bill => bill.company);
-      const intraCourseCompany = isIntraCourse.value ? [course.value.company] : [];
+      const intraCourseCompany = isIntraCourse.value ? course.value.companies : [];
 
       return uniqBy([...traineesCompanies, ...billsCompanies, ...intraCourseCompany], '_id')
         .sort((a, b) => a.name.localeCompare(b.name));

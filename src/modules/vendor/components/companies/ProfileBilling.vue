@@ -337,14 +337,19 @@ export default {
           params: { courseId: course._id, defaultTab: 'billing' },
         });
       }
-      if (loggedUser.value.company._id === course.company) {
+
+      const companies = course.type === 'intra' ? course.companies : [];
+      if (companies.includes(loggedUser.value.company._id)) {
         return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
       }
     };
 
-    const getCourseNameClass = course => (
-      canUpdateBilling.value || (loggedUser.value.company._id === course.company) ? 'course redirection' : 'course'
-    );
+    const getCourseNameClass = (course) => {
+      const companies = course.type === 'intra' ? course.companies : [];
+      return (canUpdateBilling.value || companies.includes(loggedUser.value.company._id))
+        ? 'course redirection'
+        : 'course';
+    };
 
     const getTableName = payer => (isVendorInterface || payer._id !== company.value._id
       ? `Formations facturées à ${payer.name}`
