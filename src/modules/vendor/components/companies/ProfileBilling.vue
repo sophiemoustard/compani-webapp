@@ -100,7 +100,7 @@ import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, INTRA } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
@@ -338,14 +338,14 @@ export default {
         });
       }
 
-      const companies = course.type === 'intra' ? course.companies : [];
+      const companies = course.type === INTRA ? course.companies : [];
       if (companies.includes(loggedUser.value.company._id)) {
         return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
       }
     };
 
     const getCourseNameClass = (course) => {
-      const companies = course.type === 'intra' ? course.companies : [];
+      const companies = course.type === INTRA ? course.companies : [];
       return (canUpdateBilling.value || companies.includes(loggedUser.value.company._id))
         ? 'course redirection'
         : 'course';
