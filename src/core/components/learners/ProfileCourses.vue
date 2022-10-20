@@ -119,7 +119,7 @@ import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING, ON_SITE, REMOTE, PEDAGOGY, HhMM } from '@data/constants';
-import CompaniDurations from '@helpers/dates/companiDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import {
@@ -296,7 +296,7 @@ export default {
       _id: programId,
       program: attendancesGroupedByProgram[programId][0].program.name,
       attendancesCount: attendancesGroupedByProgram[programId].length,
-      duration: CompaniDurations(getISOTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)))
+      duration: CompaniDuration(getISOTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)))
         .format(HhMM),
       attendances: attendancesGroupedByProgram[programId]
         .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))

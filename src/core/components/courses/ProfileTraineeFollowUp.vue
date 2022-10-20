@@ -71,7 +71,7 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { E_LEARNING, HhMM } from '@data/constants';
-import CompaniDurations from '@helpers/dates/companiDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
 import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { formatDate, ascendingSort, getDuration, formatIntervalHourly } from '@helpers/date';
@@ -148,7 +148,7 @@ export default {
       _id: traineeId,
       trainee: formatIdentity(attendancesGroupedByTrainee[traineeId][0].trainee.identity, 'FL'),
       attendancesCount: attendancesGroupedByTrainee[traineeId].length,
-      duration: CompaniDurations(getISOTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)))
+      duration: CompaniDuration(getISOTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)))
         .format(HhMM),
       attendances: attendancesGroupedByTrainee[traineeId]
         .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
