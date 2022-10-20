@@ -603,3 +603,9 @@ export const DAYS = {
   5: 'Samedi',
   6: 'Dimanche',
 };
+
+// TIME
+export const HhMMmin = 'h\'h\' mm\'min\'';
+export const HhMM = 'h\'h\'mm';
+export const Hh = 'h\'h\'';
+export const Mmin = 'm\'min\'';

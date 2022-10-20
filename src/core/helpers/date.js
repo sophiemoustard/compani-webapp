@@ -87,15 +87,6 @@ export const formatDuration = (duration) => {
   return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
 };
 
-export const getTotalDuration = (timePeriods) => {
-  const total = timePeriods.reduce(
-    (acc, tp) => acc.add(moment.duration(moment(tp.endDate).diff(tp.startDate))),
-    moment.duration()
-  );
-
-  return formatDuration(total);
-};
-
 export const getDuration = (timePeriod) => {
   const duration = moment.duration(moment(timePeriod.endDate).diff(timePeriod.startDate));
 

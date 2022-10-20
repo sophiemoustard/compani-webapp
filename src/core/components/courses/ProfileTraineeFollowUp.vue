@@ -70,9 +70,11 @@ import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
-import { E_LEARNING } from '@data/constants';
+import { E_LEARNING, HhMM } from '@data/constants';
+import CompaniDurations from '@helpers/dates/companiDurations';
+import { getISOTotalDuration } from '@helpers/dates/utils';
 import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
-import { formatDate, ascendingSort, getTotalDuration, getDuration, formatIntervalHourly } from '@helpers/date';
+import { formatDate, ascendingSort, getDuration, formatIntervalHourly } from '@helpers/date';
 import { composeCourseName } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
 import { useCourses } from '@composables/courses';
@@ -146,7 +148,8 @@ export default {
       _id: traineeId,
       trainee: formatIdentity(attendancesGroupedByTrainee[traineeId][0].trainee.identity, 'FL'),
       attendancesCount: attendancesGroupedByTrainee[traineeId].length,
-      duration: getTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)),
+      duration: CompaniDurations(getISOTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)))
+        .format(HhMM),
       attendances: attendancesGroupedByTrainee[traineeId]
         .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
         .map(a => ({
