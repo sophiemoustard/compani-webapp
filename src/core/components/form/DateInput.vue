@@ -20,7 +20,6 @@
 </template>
 
 <script>
-// TODO : verifier que ce n'est pas genant d'avoir changer l'ordre jour/mois/année
 import { REQUIRED_LABEL, DD_MM_YYYY } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -40,10 +39,15 @@ export default {
     placeholder: { type: String, default: 'jj/mm/yyyy' },
   },
   emits: ['blur', 'focus', 'update:model-value'],
+  data () {
+    return {
+      quasarDateFormat: 'yyyy/LL/dd',
+    };
+  },
   computed: {
     date () {
       if (!this.modelValue) return '';
-      return CompaniDate(this.modelValue).format(DD_MM_YYYY);
+      return CompaniDate(this.modelValue).format(this.quasarDateFormat);
     },
     inputDate () {
       if (!this.modelValue) return '';
@@ -52,7 +56,7 @@ export default {
   },
   methods: {
     dateOptions (date) {
-      const dateValue = CompaniDate(date, DD_MM_YYYY);
+      const dateValue = CompaniDate(date, this.quasarDateFormat);
       const isAfterMin = this.min ? dateValue.isSameOrAfter(this.min) : true;
       const isBeforeMax = this.max ? dateValue.isSameOrBefore(this.max) : true;
 
@@ -60,7 +64,7 @@ export default {
     },
     select (value) {
       try {
-        const selectedDate = CompaniDate(value, DD_MM_YYYY);
+        const selectedDate = CompaniDate(value, this.quasarDateFormat);
 
         this.update(selectedDate.toISO());
         this.$refs.qDateMenu.hide();

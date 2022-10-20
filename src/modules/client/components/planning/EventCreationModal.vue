@@ -105,7 +105,6 @@ import {
   TRANSPORT_ACCIDENT,
   ILLNESS,
   ABSENCE_TYPES,
-  DD_MM_YYYY,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy } from '@helpers/dates/utils';
@@ -193,7 +192,7 @@ export default {
             CompaniDate(e.startDate).isBefore(this.newEvent.dates.startDate))
         .sort(descendingSortBy('startDate'))
         .map(a => ({
-          label: `${CompaniDate(a.startDate).format(DD_MM_YYYY)} - ${CompaniDate(a.endDate).format(DD_MM_YYYY)}`,
+          label: `${CompaniDate(a.startDate).format('dd/LL/yyyy')} - ${CompaniDate(a.endDate).format('dd/LL/yyyy')}`,
           value: a._id,
         }));
     },
