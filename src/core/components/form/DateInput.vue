@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import { REQUIRED_LABEL } from '@data/constants';
+// TODO : verifier que ce n'est pas genant d'avoir changer l'ordre jour/mois/année
+import { REQUIRED_LABEL, DD_MM_YYYY } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
@@ -42,16 +43,16 @@ export default {
   computed: {
     date () {
       if (!this.modelValue) return '';
-      return CompaniDate(this.modelValue).format('yyyy/LL/dd');
+      return CompaniDate(this.modelValue).format(DD_MM_YYYY);
     },
     inputDate () {
       if (!this.modelValue) return '';
-      return CompaniDate(this.modelValue).format('dd/LL/yyyy');
+      return CompaniDate(this.modelValue).format(DD_MM_YYYY);
     },
   },
   methods: {
     dateOptions (date) {
-      const dateValue = CompaniDate(date, 'yyyy/LL/dd');
+      const dateValue = CompaniDate(date, DD_MM_YYYY);
       const isAfterMin = this.min ? dateValue.isSameOrAfter(this.min) : true;
       const isBeforeMax = this.max ? dateValue.isSameOrBefore(this.max) : true;
 
@@ -59,7 +60,7 @@ export default {
     },
     select (value) {
       try {
-        const selectedDate = CompaniDate(value, 'yyyy/LL/dd');
+        const selectedDate = CompaniDate(value, DD_MM_YYYY);
 
         this.update(selectedDate.toISO());
         this.$refs.qDateMenu.hide();
@@ -72,7 +73,7 @@ export default {
       try {
         if (!value) return '';
 
-        const date = CompaniDate(value, 'dd/LL/yyyy');
+        const date = CompaniDate(value, DD_MM_YYYY);
         this.update(date.toISO());
       } catch (e) {
         if (e.message.startsWith('Invalid DateTime: unparsable') ||
