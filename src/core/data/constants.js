@@ -603,3 +603,7 @@ export const DAYS = {
   5: 'Samedi',
   6: 'Dimanche',
 };
+
+// COMPANIDURATION FORMATS
+export const LONG_DURATION_H_MM = 'h\'h\' mm\'min\'';
+export const SHORT_DURATION_H_MM = 'h\'h\'mm';
