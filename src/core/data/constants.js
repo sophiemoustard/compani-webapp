@@ -611,7 +611,7 @@ export const SHORT_DURATION_H_MM = 'h\'h\'mm';
 // COMPANIDATE FORMATS
 export const DD_MM_YYYY = 'dd/LL/yyyy';
 export const DD_MM = 'dd/LL';
-export const HhMM = 'h\'h\'mm';
+export const HHhMM = 'HH\'h\'mm';
 export const DAY_MONTH_YEAR = 'DDD';
 export const HH_MM = 'T';
 export const MONTH_SHORT = 'LLL';
