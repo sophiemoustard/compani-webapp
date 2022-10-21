@@ -88,7 +88,7 @@ import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
 import { useValidations } from '@composables/validations';
-import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
+import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel } from '@helpers/courses';
 import { formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
@@ -154,8 +154,8 @@ export default {
 
       let subtitle = '';
       if (slotDates.length) {
-        const firstSlot = CompaniDate(slotDates[0]).format('DDD');
-        const lastSlot = CompaniDate(slotDates[slotDates.length - 1]).format('DDD');
+        const firstSlot = CompaniDate(slotDates[0]).format(DAY_MONTH_YEAR);
+        const lastSlot = CompaniDate(slotDates[slotDates.length - 1]).format(DAY_MONTH_YEAR);
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
@@ -176,7 +176,7 @@ export default {
       const slotsByStepAndDateList = Object.keys(slotsByStep)
         .map(key => groupBy(
           slotsByStep[key],
-          s => (s.startDate ? CompaniDate(s.startDate).format('dd/LL/yyyy') : SLOTS_TO_PLAN_KEY)
+          s => (s.startDate ? CompaniDate(s.startDate).format(DD_MM_YYYY) : SLOTS_TO_PLAN_KEY)
         ));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
@@ -237,8 +237,8 @@ export default {
         _id: slot._id,
         dates: {
           ...defaultDate,
-          startHour: CompaniDate(defaultDate.startDate).format('HH:mm'),
-          endHour: CompaniDate(defaultDate.endDate).format('HH:mm'),
+          startHour: CompaniDate(defaultDate.startDate).format(HH_MM),
+          endHour: CompaniDate(defaultDate.endDate).format(HH_MM),
         },
         address: {},
         meetingLink: get(slot, 'meetingLink') || '',

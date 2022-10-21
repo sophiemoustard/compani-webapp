@@ -146,6 +146,8 @@ import {
   CLIENT_ADMIN,
   INTRA,
   DEFAULT_AVATAR,
+  DD_MM,
+  HH_MM,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -465,8 +467,8 @@ export default {
       const slots = course.value.slots
         .filter(s => !!s.startDate)
         .sort(ascendingSortBy('startDate'));
-      const date = CompaniDate(slots[0].startDate).format('dd/LL');
-      const hour = CompaniDate(slots[0].startDate).format('HH:mm');
+      const date = CompaniDate(slots[0].startDate).format(DD_MM);
+      const hour = CompaniDate(slots[0].startDate).format(HH_MM);
 
       newSms.value.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `La première session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
@@ -480,8 +482,8 @@ export default {
         .filter(s => !!s.startDate)
         .filter(slot => CompaniDate().isBefore(slot.endDate))
         .sort(ascendingSortBy('startDate'));
-      const date = CompaniDate(slots[0].startDate).format('dd/LL');
-      const hour = CompaniDate(slots[0].startDate).format('HH:mm');
+      const date = CompaniDate(slots[0].startDate).format(DD_MM);
+      const hour = CompaniDate(slots[0].startDate).format(HH_MM);
 
       newSms.value.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `Votre prochaine session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `

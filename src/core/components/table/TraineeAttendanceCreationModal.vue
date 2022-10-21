@@ -25,7 +25,7 @@ import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, HH_MM, DD_MM_YYYY } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
@@ -54,7 +54,7 @@ export default {
   computed: {
     slotsOptions () {
       return this.course.slots.map(s => ({
-        label: `${CompaniDate(s.startDate).format('dd/LL/yyyy T')} - ${CompaniDate(s.endDate).format('T')}`,
+        label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)} - ${CompaniDate(s.endDate).format(HH_MM)}`,
         value: s._id,
       }));
     },

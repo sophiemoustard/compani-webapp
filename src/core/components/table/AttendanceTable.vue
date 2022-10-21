@@ -102,7 +102,7 @@ import AttendanceSheets from '@api/AttendanceSheets';
 import Users from '@api/Users';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { DEFAULT_AVATAR, INTRA, INTER_B2B } from '@data/constants';
+import { DEFAULT_AVATAR, INTRA, INTER_B2B, HH_MM, DAY_OF_WEEK_SHORT, DAY_OF_MONTH, MONTH_SHORT } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatDate } from '@helpers/date';
@@ -195,11 +195,11 @@ export default {
           field: '_id',
           align: 'center',
           style: 'width: 80px; min-width: 80px',
-          month: upperCaseFirstLetter(CompaniDate(s.startDate).format('LLL')),
-          day: CompaniDate(s.startDate).format('d'),
-          weekDay: upperCaseFirstLetter(CompaniDate(s.startDate).format('ccc')),
-          startHour: CompaniDate(s.startDate).format('T'),
-          endHour: CompaniDate(s.endDate).format('T'),
+          month: upperCaseFirstLetter(CompaniDate(s.startDate).format(MONTH_SHORT)),
+          day: CompaniDate(s.startDate).format(DAY_OF_MONTH),
+          weekDay: upperCaseFirstLetter(CompaniDate(s.startDate).format(DAY_OF_WEEK_SHORT)),
+          startHour: CompaniDate(s.startDate).format(HH_MM),
+          endHour: CompaniDate(s.endDate).format(HH_MM),
         })),
       ];
     },
