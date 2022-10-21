@@ -9,7 +9,7 @@
           </div>
           <div class="col-10 signup-bloctext-padding">
             <p class="no-margin" style="font-size: 0.8rem">
-              Pour vous connecter à votre compte, merci de <span class="text-weight-bold">saisir votre
+              Pour vous connecter à votre compte Compani, merci de <span class="text-weight-bold">saisir votre
                 identifiant</span> et votre <span class="text-weight-bold">mot de passe</span>
             </p>
           </div>
