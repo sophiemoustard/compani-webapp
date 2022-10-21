@@ -118,7 +118,15 @@ import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
-import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING, ON_SITE, REMOTE, PEDAGOGY, HhMM } from '@data/constants';
+import {
+  BLENDED,
+  E_LEARNING,
+  STRICTLY_E_LEARNING,
+  ON_SITE,
+  REMOTE,
+  PEDAGOGY,
+  SHORT_DURATION_H_MM,
+} from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
 import { sortStrings, formatIdentity } from '@helpers/utils';
@@ -297,7 +305,7 @@ export default {
       program: attendancesGroupedByProgram[programId][0].program.name,
       attendancesCount: attendancesGroupedByProgram[programId].length,
       duration: CompaniDuration(getISOTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)))
-        .format(HhMM),
+        .format(SHORT_DURATION_H_MM),
       attendances: attendancesGroupedByProgram[programId]
         .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
         .map(a => ({

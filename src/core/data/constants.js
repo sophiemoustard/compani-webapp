@@ -604,8 +604,6 @@ export const DAYS = {
   6: 'Dimanche',
 };
 
-// TIME
-export const HhMMmin = 'h\'h\' mm\'min\'';
-export const HhMM = 'h\'h\'mm';
-export const Hh = 'h\'h\'';
-export const Mmin = 'm\'min\'';
+// COMPANIDURATION FORMATS
+export const LONG_DURATION_H_MM = 'h\'h\' mm\'min\'';
+export const SHORT_DURATION_H_MM = 'h\'h\'mm';

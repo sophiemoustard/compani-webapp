@@ -1,5 +1,8 @@
-import { Hh, HhMM, Mmin, HhMMmin } from '@data/constants';
+import { SHORT_DURATION_H_MM, LONG_DURATION_H_MM } from '@data/constants';
 import { Duration } from './luxon';
+
+const DURATION_HOURS = 'h\'h\'';
+const DURATION_MINUTES = 'm\'min\'';
 
 const CompaniDurationFactory = (inputDuration) => {
   const _duration = inputDuration;
@@ -16,15 +19,15 @@ const CompaniDurationFactory = (inputDuration) => {
       const minutes = shiftedDuration.get('minutes');
       const hours = shiftedDuration.get('hours');
 
-      if (template === HhMM) {
-        if (minutes === 0) return _duration.toFormat(Hh);
+      if (template === SHORT_DURATION_H_MM) {
+        if (minutes === 0) return _duration.toFormat(DURATION_HOURS);
 
-        return _duration.toFormat(HhMM);
-      } if (template === HhMMmin) {
-        if (hours === 0) return _duration.toFormat(Mmin);
-        if (minutes === 0) return _duration.toFormat(Hh);
+        return _duration.toFormat(SHORT_DURATION_H_MM);
+      } if (template === LONG_DURATION_H_MM) {
+        if (hours === 0) return _duration.toFormat(DURATION_MINUTES);
+        if (minutes === 0) return _duration.toFormat(DURATION_HOURS);
 
-        return _duration.toFormat(HhMMmin);
+        return _duration.toFormat(LONG_DURATION_H_MM);
       }
       throw Error('Invalid argument: expected specific format');
     },
