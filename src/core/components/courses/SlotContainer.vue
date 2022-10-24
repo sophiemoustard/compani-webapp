@@ -88,14 +88,14 @@ import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
 import { useValidations } from '@composables/validations';
-import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY } from '@data/constants';
+import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY, SHORT_DURATION_H_MM } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel } from '@helpers/courses';
-import { formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
-import { ascendingSort } from '@helpers/dates/utils';
+import { formatIntervalHourly, getDuration } from '@helpers/date';
+import { ascendingSort, getISOTotalDuration } from '@helpers/dates/utils';
 import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
-import moment from '@helpers/moment';
 import CompaniDate from '@helpers/dates/companiDates';
+import CompaniDuration from '@helpers/dates/companiDurations';
 
 export default {
   name: 'SlotContainer',
@@ -131,12 +131,9 @@ export default {
     const slotsDurationTitle = computed(() => {
       if (!course.value || !course.value.slots) return '0h';
 
-      const total = course.value.slots.reduce(
-        (acc, slot) => acc.add(moment.duration(moment(slot.endDate).diff(slot.startDate))),
-        moment.duration()
-      );
+      const totalISO = getISOTotalDuration(course.value.slots);
 
-      return formatDuration(total);
+      return CompaniDuration(totalISO).format(SHORT_DURATION_H_MM);
     });
 
     const formatSlotTitle = computed(() => {
