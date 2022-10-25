@@ -32,6 +32,10 @@ const CompaniDurationFactory = (inputDuration) => {
       throw Error('Invalid argument: expected specific format');
     },
 
+    asDays () {
+      return _duration.as('days');
+    },
+
     toISO () {
       return _duration.toISO();
     },
