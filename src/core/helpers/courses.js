@@ -1,7 +1,7 @@
 import { E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
 
-export const happened = sameDaySlots => moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
+export const happened = sameDaySlots => CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
 
 export const composeCourseName = (course, attachCompany = false) => {
   const companyName = (attachCompany && course.company) ? `${course.company.name} - ` : '';
