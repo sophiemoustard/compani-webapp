@@ -56,13 +56,13 @@ export const planningTimelineMixin = {
     },
     goToToday () {
       this.startOfWeek = this.isThreeDaysView
-        ? moment().toISOString()
+        ? moment().startOf('day').toISOString()
         : moment().startOf('week').toISOString();
       this.updateTimeline();
     },
     goToWeek (value) {
       this.startOfWeek = this.isThreeDaysView
-        ? moment(value).toISOString()
+        ? moment(value).startOf('day').toISOString()
         : moment(value).startOf('week').toISOString();
       this.updateTimeline();
       this.datimeModal = false;
@@ -72,7 +72,7 @@ export const planningTimelineMixin = {
       this.viewMode = viewMode;
       if (!this.isThreeDaysView) this.startOfWeek = moment(this.startOfWeek).startOf('week').toISOString();
       else if (isCurrentWeek) {
-        this.startOfWeek = moment().toISOString();
+        this.startOfWeek = moment().startOf('day').toISOString();
       }
       this.updateTimeline();
     },
