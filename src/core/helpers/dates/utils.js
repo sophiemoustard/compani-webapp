@@ -1,3 +1,4 @@
+import { HH_MM } from '@data/constants';
 import CompaniDate from './companiDates';
 import CompaniDuration from './companiDurations';
 
@@ -13,3 +14,6 @@ export const getISOTotalDuration = timePeriods => timePeriods
 
 export const getRoundedDiffInDays = (date, otherDate) => Math
   .round(CompaniDuration(CompaniDate(date).diff(CompaniDate(otherDate), 'days')).asDays());
+
+export const formatIntervalHourly = slot => `${CompaniDate(slot.startDate).format(HH_MM)} - `
+  + `${CompaniDate(slot.endDate).format(HH_MM)}`;

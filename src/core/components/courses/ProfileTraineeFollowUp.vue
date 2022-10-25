@@ -74,8 +74,8 @@ import { E_LEARNING, SHORT_DURATION_H_MM } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
 import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
-import { formatDate, ascendingSort, getDuration, formatIntervalHourly } from '@helpers/date';
-import { composeCourseName } from '@helpers/courses';
+import { formatDate, ascendingSort } from '@helpers/date';
+import { composeCourseName, formatSlotSchedule } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
 import { useCourses } from '@composables/courses';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
@@ -155,7 +155,7 @@ export default {
         .map(a => ({
           _id: a._id,
           date: formatDate(a.courseSlot.startDate),
-          hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+          hours: formatSlotSchedule(a.courseSlot),
           trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
           misc: a.misc,
         })),

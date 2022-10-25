@@ -58,7 +58,7 @@
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   <div class="step-name">{{ step.name }}</div>
                   <div class="dates">{{ formatDate(slot.startDate) }}</div>
-                  <div class="hours">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                  <div class="hours">{{ formatSlotSchedule(slot) }}</div>
                   <div v-if="slot.attendances.length">
                     <q-icon size="12px" name="check_circle" color="green-600 attendance" />
                     <span class="text-green-600">Présent(e)</span>
@@ -130,15 +130,8 @@ import {
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
 import { sortStrings, formatIdentity } from '@helpers/utils';
-import {
-  isBetweenOrEqual,
-  formatDate,
-  ascendingSort,
-  getDuration,
-  formatIntervalHourly,
-  isBefore,
-} from '@helpers/date';
-import { getStepTypeIcon } from '@helpers/courses';
+import { isBetweenOrEqual, formatDate, ascendingSort, isBefore } from '@helpers/date';
+import { getStepTypeIcon, formatSlotSchedule } from '@helpers/courses';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
@@ -311,7 +304,7 @@ export default {
         .map(a => ({
           _id: a._id,
           date: formatDate(a.courseSlot.startDate),
-          hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+          hours: formatSlotSchedule(a.courseSlot),
           trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
           misc: a.course.misc,
         })),
@@ -361,12 +354,11 @@ export default {
       get,
       has,
       formatDate,
-      formatIntervalHourly,
-      getDuration,
       isBefore,
       goToCourseProfile,
       formatDuration,
       getStepTypeIcon,
+      formatSlotSchedule,
     };
   },
 };

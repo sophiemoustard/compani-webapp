@@ -32,7 +32,7 @@
                 <div>
                   <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
                     :class="getSlotClass(step)">
-                    <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                    <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
                     <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
                     <div v-else class="q-mr-md ellipsis link-container">
                       <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
@@ -90,8 +90,7 @@ import { useCourses } from '@composables/courses';
 import { useValidations } from '@composables/validations';
 import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY, SHORT_DURATION_H_MM } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
-import { getStepTypeLabel } from '@helpers/courses';
-import { formatIntervalHourly, getDuration } from '@helpers/date';
+import { getStepTypeLabel, formatSlotSchedule } from '@helpers/courses';
 import { ascendingSort, getISOTotalDuration } from '@helpers/dates/utils';
 import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -401,8 +400,6 @@ export default {
       courseSlotsByStepAndDate,
       stepList,
       // Methods
-      getDuration,
-      formatIntervalHourly,
       get,
       omit,
       getSlotAddress,
@@ -418,6 +415,7 @@ export default {
       isStepToPlan,
       getStepClass,
       getSlotClass,
+      formatSlotSchedule,
     };
   },
 };
