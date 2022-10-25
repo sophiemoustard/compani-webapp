@@ -1,5 +1,4 @@
 import { E_LEARNING, ON_SITE, STEP_TYPES } from '@data/constants';
-import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 
 export const happened = sameDaySlots => CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
@@ -20,6 +19,3 @@ export const getStepTypeLabel = (value) => {
   const type = STEP_TYPES.find(t => t.value === value);
   return type ? type.label : '';
 };
-
-export const getDiffInDays = (date, otherDate) => Math
-  .round(CompaniDuration(CompaniDate(date).diff(CompaniDate(otherDate), 'days')).asDays());

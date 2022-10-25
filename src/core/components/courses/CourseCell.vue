@@ -49,11 +49,11 @@
 import get from 'lodash/get';
 import { computed, toRefs } from 'vue';
 import { FORTHCOMING, COMPLETED, IN_PROGRESS, SHORT_DURATION_H_MM } from '@data/constants';
-import { happened, composeCourseName, getDiffInDays } from '@helpers/courses';
+import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
-import { getISOTotalDuration } from '@helpers/dates/utils';
+import { getISOTotalDuration, getDiffInDaysInt } from '@helpers/dates/utils';
 import { useCourses } from '@composables/courses';
 
 export default {
@@ -95,7 +95,10 @@ export default {
 
     const formatNearestDate = computed(() => {
       if (!courseSlotsCount.value && course.value.estimatedStartDate) {
-        const rangeToEstimatedStartDate = getDiffInDays(course.value.estimatedStartDate, CompaniDate().startOf('day'));
+        const rangeToEstimatedStartDate = getDiffInDaysInt(
+          course.value.estimatedStartDate,
+          CompaniDate().startOf('day')
+        );
         if (rangeToEstimatedStartDate < 0) {
           return `Début souhaité il y a ${formatQuantity('jour', Math.abs(rangeToEstimatedStartDate))}`;
         }
@@ -110,14 +113,20 @@ export default {
 
       if (course.value.status === FORTHCOMING) {
         const firstSlot = course.value.slots[0];
-        const rangeToNextDate = getDiffInDays(firstSlot[0].startDate, CompaniDate().startOf('day'));
+        const rangeToNextDate = getDiffInDaysInt(
+          CompaniDate(firstSlot[0].startDate).startOf('day'),
+          CompaniDate().startOf('day')
+        );
 
         return rangeToNextDate ? `Commence dans ${formatQuantity('jour', rangeToNextDate)}` : 'Commence aujourd’hui';
       }
 
       if (course.value.status === COMPLETED) {
         const lastSlot = course.value.slots[course.value.slots.length - 1];
-        const rangeToLastDate = getDiffInDays(CompaniDate().endOf('day'), lastSlot[0].startDate);
+        const rangeToLastDate = getDiffInDaysInt(
+          CompaniDate().startOf('day'),
+          CompaniDate(lastSlot[0].startDate).startOf('day')
+        );
 
         return rangeToLastDate
           ? `Dernière date il y a ${formatQuantity('jour', rangeToLastDate)}`
@@ -126,7 +135,10 @@ export default {
 
       const nextSlot = course.value.slots.filter(daySlots => !happened(daySlots))[0];
       if (!nextSlot) return 'Prochaine date à planifier';
-      const rangeToNextDate = getDiffInDays(nextSlot[0].startDate, CompaniDate().startOf('day'));
+      const rangeToNextDate = getDiffInDaysInt(
+        CompaniDate(nextSlot[0].startDate).startOf('day'),
+        CompaniDate().startOf('day')
+      );
 
       return rangeToNextDate
         ? `Prochaine date dans ${formatQuantity('jour', rangeToNextDate)}`
