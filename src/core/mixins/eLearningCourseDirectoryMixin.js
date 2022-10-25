@@ -2,7 +2,9 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
-import { formatDate, ascendingSort, formatDurationFromFloat } from '@helpers/date';
+import { formatDate, ascendingSort } from '@helpers/date';
+import CompaniDuration from '@helpers/dates/CompaniDurations';
+import { LONG_DURATION_H_MM } from '@data/constants';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
@@ -12,10 +14,10 @@ export const eLearningCourseDirectoryMixin = {
       columns: [
         { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true, style: 'width: 60%' },
         {
-          name: 'totalTheoreticalHours',
+          name: 'totalTheoreticalDuration',
           label: 'Durée',
-          field: 'totalTheoreticalHours',
-          format: formatDurationFromFloat,
+          field: 'totalTheoreticalDuration',
+          format: value => CompaniDuration(value).format(LONG_DURATION_H_MM),
           align: 'center',
           sortable: true,
           style: 'width: 10%',
@@ -64,7 +66,7 @@ export const eLearningCourseDirectoryMixin = {
           createdAt: c.createdAt,
           _id: c._id,
           traineesCount: c.trainees.length || '0',
-          totalTheoreticalHours: c.totalTheoreticalHours,
+          totalTheoreticalDuration: c.totalTheoreticalDuration,
         }));
       } catch (e) {
         console.error(e);

@@ -71,7 +71,7 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import { E_LEARNING, SHORT_DURATION_H_MM } from '@data/constants';
-import CompaniDuration from '@helpers/dates/companiDurations';
+import CompaniDuration from '@helpers/dates/CompaniDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
 import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
