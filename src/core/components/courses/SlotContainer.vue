@@ -227,8 +227,8 @@ export default {
       const defaultDate = has(slot, 'startDate')
         ? pick(slot, ['startDate', 'endDate'])
         : {
-          startDate: CompaniDate().set({ hour: 9, minute: 0 }).toISO(),
-          endDate: CompaniDate().set({ hour: 12, minute: 30 }).toISO(),
+          startDate: CompaniDate().set({ hour: 9, minute: 0, seconds: 0, milliseconds: 0 }).toISO(),
+          endDate: CompaniDate().set({ hour: 12, minute: 30, seconds: 0, milliseconds: 0 }).toISO(),
         };
       editedCourseSlot.value = {
         _id: slot._id,

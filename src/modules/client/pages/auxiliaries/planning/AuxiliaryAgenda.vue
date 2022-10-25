@@ -196,8 +196,8 @@ export default {
         auxiliary: this.selectedAuxiliary._id,
         sector: '',
         dates: {
-          startDate: moment(selectedDay).toISOString(),
-          endDate: moment(selectedDay).toISOString(),
+          startDate: moment(selectedDay).set({ second: 0, millisecond: 0 }).toISOString(),
+          endDate: moment(selectedDay).set({ second: 0, millisecond: 0 }).toISOString(),
           startHour: '08:00',
           endHour: '10:00',
         },
