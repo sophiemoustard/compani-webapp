@@ -29,7 +29,7 @@
                   </div>
                   <div class="step-subtitle">
                     {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
-                     - {{ formatDurationFromFloat(step.theoreticalHours) }}
+                     - {{ CompaniDuration(step.theoreticalDuration).format(LONG_DURATION_H_MM) }}
                   </div>
                 </q-item-section>
               </div>
@@ -131,10 +131,17 @@ import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING, E_LEARNING } from '@data/constants';
+import {
+  ACTIVITY_TYPES,
+  PUBLISHED,
+  PUBLISHED_DOT_ACTIVE,
+  PUBLISHED_DOT_WARNING,
+  E_LEARNING,
+  LONG_DURATION_H_MM,
+} from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
-import { formatDurationFromFloat } from '@helpers/date';
+import CompaniDuration from '@helpers/dates/CompaniDurations';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
@@ -449,7 +456,7 @@ export default {
     };
 
     const isStepValid = step => (
-      step.areActivitiesValid && !!step.theoreticalHours
+      step.areActivitiesValid && !!step.theoreticalDuration
         ? PUBLISHED_DOT_ACTIVE
         : PUBLISHED_DOT_WARNING
     );
@@ -474,6 +481,7 @@ export default {
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
       E_LEARNING,
+      LONG_DURATION_H_MM,
       modalLoading,
       subProgramCreationModal,
       newSubProgram,
@@ -508,7 +516,6 @@ export default {
       program,
       // Methods
       formatQuantity,
-      formatDurationFromFloat,
       getSubProgramError,
       dropStep,
       dropActivity,
@@ -547,6 +554,7 @@ export default {
       isStepValid,
       getStepTypeLabel,
       getStepTypeIcon,
+      CompaniDuration,
     };
   },
 };
