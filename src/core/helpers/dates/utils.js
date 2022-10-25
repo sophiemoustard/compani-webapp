@@ -11,5 +11,5 @@ export const getISOTotalDuration = timePeriods => timePeriods
   .reduce((acc, tp) => acc.add(CompaniDate(tp.endDate).diff(tp.startDate, 'seconds')), CompaniDuration())
   .toISO();
 
-export const getDiffInDaysInt = (date, otherDate) => Math
+export const getRoundedDiffInDays = (date, otherDate) => Math
   .round(CompaniDuration(CompaniDate(date).diff(CompaniDate(otherDate), 'days')).asDays());

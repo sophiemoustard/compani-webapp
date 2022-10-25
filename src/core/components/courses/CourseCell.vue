@@ -53,7 +53,7 @@ import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
-import { getISOTotalDuration, getDiffInDaysInt } from '@helpers/dates/utils';
+import { getISOTotalDuration, getRoundedDiffInDays } from '@helpers/dates/utils';
 import { useCourses } from '@composables/courses';
 
 export default {
@@ -95,7 +95,7 @@ export default {
 
     const formatNearestDate = computed(() => {
       if (!courseSlotsCount.value && course.value.estimatedStartDate) {
-        const rangeToEstimatedStartDate = getDiffInDaysInt(
+        const rangeToEstimatedStartDate = getRoundedDiffInDays(
           course.value.estimatedStartDate,
           CompaniDate().startOf('day')
         );
@@ -113,7 +113,7 @@ export default {
 
       if (course.value.status === FORTHCOMING) {
         const firstSlot = course.value.slots[0];
-        const rangeToNextDate = getDiffInDaysInt(
+        const rangeToNextDate = getRoundedDiffInDays(
           CompaniDate(firstSlot[0].startDate).startOf('day'),
           CompaniDate().startOf('day')
         );
@@ -123,7 +123,7 @@ export default {
 
       if (course.value.status === COMPLETED) {
         const lastSlot = course.value.slots[course.value.slots.length - 1];
-        const rangeToLastDate = getDiffInDaysInt(
+        const rangeToLastDate = getRoundedDiffInDays(
           CompaniDate().startOf('day'),
           CompaniDate(lastSlot[0].startDate).startOf('day')
         );
@@ -135,7 +135,7 @@ export default {
 
       const nextSlot = course.value.slots.filter(daySlots => !happened(daySlots))[0];
       if (!nextSlot) return 'Prochaine date à planifier';
-      const rangeToNextDate = getDiffInDaysInt(
+      const rangeToNextDate = getRoundedDiffInDays(
         CompaniDate(nextSlot[0].startDate).startOf('day'),
         CompaniDate().startOf('day')
       );
