@@ -29,7 +29,7 @@
                   </div>
                   <div class="step-subtitle">
                     {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
-                     - {{ CompaniDuration(step.theoreticalDuration).format(LONG_DURATION_H_MM) }}
+                     - {{ CompaniDuration(step.theoreticalDuration || 'PT0S').format(LONG_DURATION_H_MM) }}
                   </div>
                 </q-item-section>
               </div>
