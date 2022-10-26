@@ -1,7 +1,7 @@
 import { E_LEARNING, ON_SITE, STEP_TYPES, SHORT_DURATION_H_MM } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
-import { formatIntervalHourly, getISOTotalDuration } from './dates/utils';
+import { formatIntervalHourly, getISODuration } from './dates/utils';
 
 export const happened = sameDaySlots => CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
 
@@ -23,4 +23,4 @@ export const getStepTypeLabel = (value) => {
 };
 
 export const formatSlotSchedule = slot => `${formatIntervalHourly(slot)} `
-  + `(${CompaniDuration(getISOTotalDuration([slot])).format(SHORT_DURATION_H_MM)})`;
+  + `(${CompaniDuration(getISODuration(slot)).format(SHORT_DURATION_H_MM)})`;
