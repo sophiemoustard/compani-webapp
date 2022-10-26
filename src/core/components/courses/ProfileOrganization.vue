@@ -392,13 +392,16 @@ export default {
     const refreshCompanyRepresentatives = async () => {
       try {
         const loggedUserCompany = get(loggedUser.value, 'company._id');
-        if (isTrainer.value && loggedUserCompany !== course.value.company._id) {
+        const courseCompany = course.value.type === INTRA ? course.value.companies[0]._id : '';
+
+        if (isTrainer.value && loggedUserCompany !== courseCompany) {
           companyRepresentativeOptions.value = [];
           return;
         }
         const clientUsersFromCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: course.value.company._id })
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompany })
           : [];
+
         companyRepresentativeOptions.value = Object.freeze(clientUsersFromCompany
           .map(user => formatInterlocutorOption(user)).sort((a, b) => a.label.localeCompare(b.label)));
       } catch (e) {
