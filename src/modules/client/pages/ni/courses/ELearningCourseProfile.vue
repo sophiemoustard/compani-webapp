@@ -12,7 +12,7 @@ import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import { NotifyNegative } from '@components/popup/notify';
-import CompaniDuration from '@helpers/dates/CompaniDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import { LONG_DURATION_H_MM } from '@data/constants';
 
 const metaInfo = { title: 'Fiche formation' };

@@ -1,6 +1,6 @@
 import { HH_MM } from '@data/constants';
 import CompaniDate from './companiDates';
-import CompaniDuration from './CompaniDurations';
+import CompaniDuration from './companiDurations';
 
 export const ascendingSort = (a, b) => (CompaniDate(a).isAfter(b) ? 1 : -1);
 

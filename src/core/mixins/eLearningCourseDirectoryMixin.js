@@ -3,7 +3,7 @@ import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
-import CompaniDuration from '@helpers/dates/CompaniDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import { LONG_DURATION_H_MM } from '@data/constants';
 
 export const eLearningCourseDirectoryMixin = {

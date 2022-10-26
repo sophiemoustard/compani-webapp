@@ -127,7 +127,7 @@ import {
   PEDAGOGY,
   SHORT_DURATION_H_MM,
 } from '@data/constants';
-import CompaniDuration from '@helpers/dates/CompaniDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import { isBetweenOrEqual, formatDate, ascendingSort, isBefore } from '@helpers/date';
