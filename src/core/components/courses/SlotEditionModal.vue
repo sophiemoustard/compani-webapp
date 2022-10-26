@@ -32,8 +32,9 @@ import Input from '@components/form/Input';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive } from '@components/popup/notify';
-import { formatIntervalHourly, formatDate } from '@helpers/date';
-import { ON_SITE, REMOTE } from '@data/constants';
+import { ON_SITE, REMOTE, DD_MM_YYYY } from '@data/constants';
+import CompaniDate from '@helpers/dates/companiDates';
+import { formatIntervalHourly } from '@helpers/dates/utils';
 
 export default {
   name: 'SlotEditionModal',
@@ -67,8 +68,9 @@ export default {
     validateDatesDeletion (slot) {
       this.$q.dialog({
         title: 'Supprimer une date',
-        message: `Êtes-vous sûr(e) de vouloir supprimer la date du  ${formatDate(slot.dates.startDate)}
-          (${formatIntervalHourly(slot.dates)})&nbsp;?<br /><br />Le créneau repassera en "à planifier".`,
+        message: `Êtes-vous sûr(e) de vouloir supprimer la date du 
+          ${CompaniDate(slot.dates.startDate).format(DD_MM_YYYY)} (${formatIntervalHourly(slot.dates)})&nbsp;?<br />
+          <br />Le créneau repassera en "à planifier".`,
         html: true,
         ok: 'Oui',
         cancel: 'Non',
