@@ -141,7 +141,7 @@ import {
 } from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
-import CompaniDuration from '@helpers/dates/CompaniDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';

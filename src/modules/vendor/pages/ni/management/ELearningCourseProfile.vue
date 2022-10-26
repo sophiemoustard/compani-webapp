@@ -16,7 +16,7 @@ import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
 import ProfileQuestionnaires from 'src/modules/vendor/components/courses/ProfileQuestionnaires';
 import { NotifyNegative } from '@components/popup/notify';
-import CompaniDuration from '@helpers/dates/CompaniDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import { LONG_DURATION_H_MM } from '@data/constants';
 
 export default {

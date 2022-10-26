@@ -94,7 +94,7 @@ import { getStepTypeLabel, formatSlotSchedule } from '@helpers/courses';
 import { ascendingSort, getISOTotalDuration } from '@helpers/dates/utils';
 import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
-import CompaniDuration from '@helpers/dates/CompaniDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 
 export default {
   name: 'SlotContainer',
