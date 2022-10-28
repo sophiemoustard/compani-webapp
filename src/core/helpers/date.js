@@ -78,16 +78,6 @@ export const formatHours = (value, digits = 2) => {
 
 export const formatHoursWithMinutes = date => `${moment(date).hours()}h${moment(date).format('mm')}`;
 
-export const getHoursAndMinutes = (value) => {
-  if (!value) return { hours: '', minutes: '' };
-  const hours = Math.floor(value);
-  const minutes = Math.round(value % 1 * 60);
-
-  return { hours, minutes };
-};
-
-export const computeHours = ({ hours, minutes }) => Number(hours) + Number(minutes) / 60;
-
 export const formatDateAndHours = (dates) => {
   const date = moment(dates.startDate).format('DD MMMM');
 

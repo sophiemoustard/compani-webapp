@@ -32,8 +32,22 @@ const CompaniDurationFactory = (inputDuration) => {
       throw Error('Invalid argument: expected specific format');
     },
 
+    asMinutes () {
+      return _duration.as('minutes');
+    },
+
+    asHours () {
+      return _duration.as('hours');
+    },
     asDays () {
       return _duration.as('days');
+    },
+
+    toHoursAndMinutesObject () {
+      const shiftedDuration = _duration.shiftTo('hours', 'minutes');
+      const minutes = shiftedDuration.get('minutes');
+      const hours = shiftedDuration.get('hours');
+      return { hours, minutes };
     },
 
     toISO () {
