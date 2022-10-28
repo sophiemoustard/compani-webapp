@@ -28,8 +28,9 @@
 
 <script>
 import { computed, ref, toRefs } from 'vue';
-import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '@data/constants';
-import moment from '@helpers/moment';
+import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR, HH_MM } from '@data/constants';
+import CompaniDate from '@helpers/dates/companiDates';
+import CompaniInterval from '@helpers/dates/companiIntervals';
 
 export default {
   name: 'NiTimeInput',
@@ -51,29 +52,19 @@ export default {
     const selectTime = ref(false);
 
     const hoursOptions = computed(() => {
-      const range = moment.range(
-        moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
-        moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
-      );
+      const startISO = CompaniDate()
+        .set({ hour: PLANNING_VIEW_START_HOUR, minute: 0, second: 0, millisecond: 0 })
+        .toISO();
+      const endISO = CompaniDate().set({ hour: PLANNING_VIEW_END_HOUR, minute: 0, second: 0, millisecond: 0 }).toISO();
+      const interval = CompaniInterval(startISO, endISO);
 
-      return Array.from(range.by('hours')).reduce(
-        (acc, hour) => {
-          acc.push({
-            label: hour.format('HH:mm'),
-            value: hour.format('HH:mm'),
-            disable: min.value !== '' && hour.isSameOrBefore(moment(min.value, 'HH:mm')),
-          });
-          if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
-            acc.push({
-              label: hour.minutes(30).format('HH:mm'),
-              value: hour.minutes(30).format('HH:mm'),
-              disable: min.value !== '' && hour.minutes(30).isSameOrBefore(moment(min.value, 'HH:mm')),
-            });
-          }
-          return acc;
-        },
-        []
-      );
+      return interval
+        .rangeBy('PT30M')
+        .map(dateISO => ({
+          label: CompaniDate(dateISO).format(HH_MM),
+          value: CompaniDate(dateISO).format(HH_MM),
+          disable: !!min.value && CompaniDate(min.value, HH_MM).isAfter(dateISO),
+        }));
     });
 
     const select = (value) => {
