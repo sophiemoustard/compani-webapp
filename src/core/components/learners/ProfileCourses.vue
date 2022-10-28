@@ -58,7 +58,7 @@
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   <div class="step-name">{{ step.name }}</div>
                   <div class="dates">{{ formatDate(slot.startDate) }}</div>
-                  <div class="hours">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                  <div class="hours">{{ formatSlotSchedule(slot) }}</div>
                   <div v-if="slot.attendances.length">
                     <q-icon size="12px" name="check_circle" color="green-600 attendance" />
                     <span class="text-green-600">Présent(e)</span>
@@ -118,18 +118,20 @@ import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
-import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING, ON_SITE, REMOTE, PEDAGOGY } from '@data/constants';
-import { sortStrings, formatIdentity } from '@helpers/utils';
 import {
-  isBetweenOrEqual,
-  formatDate,
-  ascendingSort,
-  getTotalDuration,
-  getDuration,
-  formatIntervalHourly,
-  isBefore,
-} from '@helpers/date';
-import { getStepTypeIcon } from '@helpers/courses';
+  BLENDED,
+  E_LEARNING,
+  STRICTLY_E_LEARNING,
+  ON_SITE,
+  REMOTE,
+  PEDAGOGY,
+  SHORT_DURATION_H_MM,
+} from '@data/constants';
+import CompaniDuration from '@helpers/dates/companiDurations';
+import { getISOTotalDuration } from '@helpers/dates/utils';
+import { sortStrings, formatIdentity } from '@helpers/utils';
+import { isBetweenOrEqual, formatDate, ascendingSort, isBefore } from '@helpers/date';
+import { getStepTypeIcon, formatSlotSchedule } from '@helpers/courses';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
@@ -295,13 +297,14 @@ export default {
       _id: programId,
       program: attendancesGroupedByProgram[programId][0].program.name,
       attendancesCount: attendancesGroupedByProgram[programId].length,
-      duration: getTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)),
+      duration: CompaniDuration(getISOTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)))
+        .format(SHORT_DURATION_H_MM),
       attendances: attendancesGroupedByProgram[programId]
         .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
         .map(a => ({
           _id: a._id,
           date: formatDate(a.courseSlot.startDate),
-          hours: `${formatIntervalHourly(a.courseSlot)} (${getDuration(a.courseSlot)})`,
+          hours: formatSlotSchedule(a.courseSlot),
           trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
           misc: a.course.misc,
         })),
@@ -351,12 +354,11 @@ export default {
       get,
       has,
       formatDate,
-      formatIntervalHourly,
-      getDuration,
       isBefore,
       goToCourseProfile,
       formatDuration,
       getStepTypeIcon,
+      formatSlotSchedule,
     };
   },
 };

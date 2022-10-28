@@ -100,7 +100,7 @@ import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND } from '@data/constants.js';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, INTRA } from '@data/constants.js';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
 import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
@@ -337,14 +337,19 @@ export default {
           params: { courseId: course._id, defaultTab: 'billing' },
         });
       }
-      if (loggedUser.value.company._id === course.company) {
+
+      const companies = course.type === INTRA ? course.companies : [];
+      if (companies.includes(loggedUser.value.company._id)) {
         return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
       }
     };
 
-    const getCourseNameClass = course => (
-      canUpdateBilling.value || (loggedUser.value.company._id === course.company) ? 'course redirection' : 'course'
-    );
+    const getCourseNameClass = (course) => {
+      const companies = course.type === INTRA ? course.companies : [];
+      return (canUpdateBilling.value || companies.includes(loggedUser.value.company._id))
+        ? 'course redirection'
+        : 'course';
+    };
 
     const getTableName = payer => (isVendorInterface || payer._id !== company.value._id
       ? `Formations facturées à ${payer.name}`

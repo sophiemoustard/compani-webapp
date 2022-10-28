@@ -32,7 +32,7 @@
                 <div>
                   <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
                     :class="getSlotClass(step)">
-                    <div class="q-mr-md">{{ formatIntervalHourly(slot) }} ({{ getDuration(slot) }})</div>
+                    <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
                     <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
                     <div v-else class="q-mr-md ellipsis link-container">
                       <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
@@ -88,14 +88,13 @@ import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
 import { useValidations } from '@composables/validations';
-import { E_LEARNING, ON_SITE, REMOTE } from '@data/constants';
+import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY, SHORT_DURATION_H_MM } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
-import { getStepTypeLabel } from '@helpers/courses';
-import { formatDuration, formatIntervalHourly, getDuration } from '@helpers/date';
-import { ascendingSort } from '@helpers/dates/utils';
+import { getStepTypeLabel, formatSlotSchedule } from '@helpers/courses';
+import { ascendingSort, getISOTotalDuration } from '@helpers/dates/utils';
 import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
-import moment from '@helpers/moment';
 import CompaniDate from '@helpers/dates/companiDates';
+import CompaniDuration from '@helpers/dates/companiDurations';
 
 export default {
   name: 'SlotContainer',
@@ -131,12 +130,9 @@ export default {
     const slotsDurationTitle = computed(() => {
       if (!course.value || !course.value.slots) return '0h';
 
-      const total = course.value.slots.reduce(
-        (acc, slot) => acc.add(moment.duration(moment(slot.endDate).diff(slot.startDate))),
-        moment.duration()
-      );
+      const totalISO = getISOTotalDuration(course.value.slots);
 
-      return formatDuration(total);
+      return CompaniDuration(totalISO).format(SHORT_DURATION_H_MM);
     });
 
     const formatSlotTitle = computed(() => {
@@ -154,8 +150,8 @@ export default {
 
       let subtitle = '';
       if (slotDates.length) {
-        const firstSlot = CompaniDate(slotDates[0]).format('DDD');
-        const lastSlot = CompaniDate(slotDates[slotDates.length - 1]).format('DDD');
+        const firstSlot = CompaniDate(slotDates[0]).format(DAY_MONTH_YEAR);
+        const lastSlot = CompaniDate(slotDates[slotDates.length - 1]).format(DAY_MONTH_YEAR);
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
@@ -176,7 +172,7 @@ export default {
       const slotsByStepAndDateList = Object.keys(slotsByStep)
         .map(key => groupBy(
           slotsByStep[key],
-          s => (s.startDate ? CompaniDate(s.startDate).format('dd/LL/yyyy') : SLOTS_TO_PLAN_KEY)
+          s => (s.startDate ? CompaniDate(s.startDate).format(DD_MM_YYYY) : SLOTS_TO_PLAN_KEY)
         ));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
@@ -230,15 +226,15 @@ export default {
       const defaultDate = has(slot, 'startDate')
         ? pick(slot, ['startDate', 'endDate'])
         : {
-          startDate: CompaniDate().set({ hour: 9, minute: 0 }).toISO(),
-          endDate: CompaniDate().set({ hour: 12, minute: 30 }).toISO(),
+          startDate: CompaniDate().set({ hour: 9, minute: 0, seconds: 0, milliseconds: 0 }).toISO(),
+          endDate: CompaniDate().set({ hour: 12, minute: 30, seconds: 0, milliseconds: 0 }).toISO(),
         };
       editedCourseSlot.value = {
         _id: slot._id,
         dates: {
           ...defaultDate,
-          startHour: CompaniDate(defaultDate.startDate).format('HH:mm'),
-          endHour: CompaniDate(defaultDate.endDate).format('HH:mm'),
+          startHour: CompaniDate(defaultDate.startDate).format(HH_MM),
+          endHour: CompaniDate(defaultDate.endDate).format(HH_MM),
         },
         address: {},
         meetingLink: get(slot, 'meetingLink') || '',
@@ -404,8 +400,6 @@ export default {
       courseSlotsByStepAndDate,
       stepList,
       // Methods
-      getDuration,
-      formatIntervalHourly,
       get,
       omit,
       getSlotAddress,
@@ -421,6 +415,7 @@ export default {
       isStepToPlan,
       getStepClass,
       getSlotClass,
+      formatSlotSchedule,
     };
   },
 };

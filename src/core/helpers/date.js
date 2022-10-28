@@ -78,30 +78,6 @@ export const formatHours = (value, digits = 2) => {
 
 export const formatHoursWithMinutes = date => `${moment(date).hours()}h${moment(date).format('mm')}`;
 
-export const formatDuration = (duration) => {
-  const paddedMinutes = duration.minutes() > 0 && duration.minutes() < 10
-    ? duration.minutes().toString().padStart(2, 0)
-    : duration.minutes();
-  const hours = (duration.days() * 24) + duration.hours();
-
-  return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
-};
-
-export const getTotalDuration = (timePeriods) => {
-  const total = timePeriods.reduce(
-    (acc, tp) => acc.add(moment.duration(moment(tp.endDate).diff(tp.startDate))),
-    moment.duration()
-  );
-
-  return formatDuration(total);
-};
-
-export const getDuration = (timePeriod) => {
-  const duration = moment.duration(moment(timePeriod.endDate).diff(timePeriod.startDate));
-
-  return formatDuration(duration);
-};
-
 export const formatDurationFromFloat = (durationHours = 0) => {
   const hours = Math.floor(durationHours);
   const minutes = Math.round(durationHours % 1 * 60);
@@ -110,9 +86,6 @@ export const formatDurationFromFloat = (durationHours = 0) => {
 
   return `${hours}h ${minutes.toString().padStart(2, '0')}min`;
 };
-
-export const formatIntervalHourly = timePeriod => `${moment(timePeriod.startDate).format('HH:mm')} - `
-  + `${moment(timePeriod.endDate).format('HH:mm')}`;
 
 export const getHoursAndMinutes = (value) => {
   if (!value) return { hours: '', minutes: '' };

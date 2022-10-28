@@ -85,6 +85,15 @@ const CompaniDateFactory = (inputDate) => {
       return CompaniDateFactory(_date.endOf(unit));
     },
 
+    diff (miscTypeOtherDate, unit) {
+      if (typeof unit !== 'string') throw Error('Invalid argument: expected unit to be a string');
+
+      const otherDate = _formatMiscToCompaniDate(miscTypeOtherDate);
+      const diffInSecondAndInputUnit = _date.diff(otherDate, [unit, 'seconds']);
+
+      return diffInSecondAndInputUnit.toISO();
+    },
+
     add (amount) {
       if (amount instanceof Number) throw Error('Invalid argument: expected to be an object, got number');
       return CompaniDateFactory(_date.plus(amount));
