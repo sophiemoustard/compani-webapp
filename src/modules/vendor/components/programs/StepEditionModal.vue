@@ -5,16 +5,19 @@
     </template>
     <ni-input in-modal :model-value="editedStep.name" :error="validations.name.$error" caption="Nom"
       @update:model-value="update($event.trim(), 'name')" @blur="validations.name.$touch" required-field />
-    <div class="row items-end">
-      <ni-input in-modal caption="Durée théorique" type="number" :model-value="hours"
-        :error="validations.theoreticalDuration.hours.$error" :error-message="theoreticalHoursErrorMsg" suffix="h"
-        required-field @blur="validations.theoreticalDuration.hours.$touch"
-        @update:model-value="updateTheoreticalDuration($event, 'hours')" class="flex-1 q-pr-sm" />
-      <ni-input in-modal caption="" type="number" :model-value="minutes"
-        :error="validations.theoreticalDuration.minutes.$error" :error-message="theoreticalMinutesErrorMsg" suffix="min"
-        @blur="validations.theoreticalDuration.hours.$touch"
-        @update:model-value="updateTheoreticalDuration($event, 'minutes')" class="flex-1 q-pl-sm" />
+    <div class="row justify-between">
+      <p :class="['input-caption', { required: requiredField }]">Durée Théorique *</p>
+      <q-icon v-if="validations.theoreticalDuration.$error" name="error_outline" color="secondary" />
     </div>
+    <q-field class="duration-field" dense :error="validations.theoreticalDuration.$error"
+      error-message="Durée non valide" borderless>
+      <div class="duration-container row items-end">
+        <ni-input in-modal type="number" :model-value="hours" suffix="h" class="flex-1 q-pr-sm"
+          @update:model-value="updateTmp($event, 'hours')" @blur="updateTheoreticalDuration()" />
+        <ni-input in-modal type="number" :model-value="minutes" suffix="min" class="flex-1 q-pl-sm"
+          @update:model-value="updateTmp($event, 'minutes')" @blur="updateTheoreticalDuration()" />
+      </div>
+    </q-field>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -24,7 +27,6 @@
 
 <script>
 import { ref, toRefs, watch } from 'vue';
-import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -36,8 +38,6 @@ export default {
     editedStep: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    theoreticalHoursErrorMsg: { type: String, default: '' },
-    theoreticalMinutesErrorMsg: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
@@ -46,15 +46,17 @@ export default {
   emits: ['hide', 'update:model-value', 'submit', 'update:edited-step'],
   setup (props, { emit }) {
     const { editedStep } = toRefs(props);
-    const hours = ref(null);
-    const minutes = ref(null);
+    const hours = ref(0);
+    const minutes = ref(0);
+    const tmpInput = ref({ path: 'minutes', event: 0 });
 
     watch(
       () => editedStep.value.theoreticalDuration,
       () => {
         if (editedStep.value.theoreticalDuration) {
-          hours.value = CompaniDuration(editedStep.value.theoreticalDuration.hours).asHours();
-          minutes.value = CompaniDuration(editedStep.value.theoreticalDuration.minutes).asMinutes();
+          const durationObject = CompaniDuration(editedStep.value.theoreticalDuration).toHoursAndMinutesObject();
+          hours.value = durationObject.hours;
+          minutes.value = durationObject.minutes;
         }
       }
     );
@@ -63,12 +65,13 @@ export default {
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
     const update = (event, path) => emit('update:edited-step', { ...editedStep.value, [path]: event });
-    const updateTheoreticalDuration = (event, path) => {
-      const value = path === 'hours' ? `PT${event || 0}H` : `PT${event || 0}M`;
-      emit(
-        'update:edited-step',
-        set(editedStep.value, 'theoreticalDuration', { ...editedStep.value.theoreticalDuration, [path]: value })
-      );
+    const updateTheoreticalDuration = () => {
+      const { path, event } = tmpInput.value;
+      const value = path === 'hours' ? `PT${event || 0}H${minutes.value}M` : `PT${hours.value}H${event || 0}M`;
+      update(value, 'theoreticalDuration');
+    };
+    const updateTmp = (event, path) => {
+      tmpInput.value = { path, event };
     };
 
     return {
@@ -81,7 +84,21 @@ export default {
       submit,
       update,
       updateTheoreticalDuration,
+      updateTmp,
     };
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.duration-field
+  :deep(.q-field__control)
+    border: none !important
+
+.duration-container
+  :deep(.q-field__control)
+    border: 1px solid $copper-grey-300 !important
+    border-radius: 3px !important
+  :deep(.q-field--with-bottom)
+    padding: 0
+</style>

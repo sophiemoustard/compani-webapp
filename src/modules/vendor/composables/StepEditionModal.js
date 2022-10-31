@@ -1,11 +1,9 @@
 import { ref, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import pick from 'lodash/pick';
-import { E_LEARNING, REQUIRED_LABEL } from '@data/constants';
 import { required } from '@vuelidate/validators';
 import Steps from '@api/Steps';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import CompaniDuration from '@helpers/dates/companiDurations';
 
 export const useStepEditionModal = (
   isLocked,
@@ -14,27 +12,14 @@ export const useStepEditionModal = (
   modalLoading,
   openNextModalAfterUnlocking
 ) => {
-  const editedStep = ref({ name: '', type: E_LEARNING, theoreticalDuration: { hours: 'PT0H', minutes: 'PT0M' } });
+  const editedStep = ref({ name: '', theoreticalDuration: 'PT0S' });
   const stepEditionModal = ref(false);
 
-  const validateISOHours = (value) => {
-    if (!value) return true;
-
-    return editedStep.value.theoreticalDuration.minutes === 'PT0M'
-      ? !!value.match(/PT[1-9]\d*H/)
-      : !!value.match(/PT[0-9]\d*H/);
-  };
-
-  const validateISOMinutes = (value) => {
-    if (!value) return true;
-    return editedStep.value.theoreticalDuration.hours === 'PT0H'
-      ? !!value.match(/PT([1-9]|[1-5]\d)M/)
-      : !!value.match(/PT(\d|[1-5]\d)M/);
-  };
+  const positiveIntDuration = value => value !== 'PT0H0M' && value !== 'PT0S' && value.match(/(PT\d*H\d*M|PT\d*S)/);
 
   const rules = computed(() => ({
     name: { required },
-    theoreticalDuration: { hours: { required, validateISOHours }, minutes: { required, validateISOMinutes } },
+    theoreticalDuration: { positiveIntDuration },
   }));
   const v$ = useVuelidate(rules, editedStep);
 
@@ -43,11 +28,7 @@ export const useStepEditionModal = (
       openNextModalAfterUnlocking.value = () => openStepEditionModal(step);
       openValidateUnlockingEditionModal(step);
     } else {
-      const { hours, minutes } = CompaniDuration(step.theoreticalDuration || 'PT0S').toHoursAndMinutesObject();
-      editedStep.value = {
-        ...pick(step, ['_id', 'name', 'type']),
-        theoreticalDuration: { hours: `PT${hours}H`, minutes: `PT${minutes}M` },
-      };
+      editedStep.value = { ...pick(step, ['_id', 'name', 'theoreticalDuration']) };
       stepEditionModal.value = true;
     }
   };
@@ -57,9 +38,8 @@ export const useStepEditionModal = (
       modalLoading.value = true;
       v$.value.$touch();
       if (v$.value.$error) return NotifyWarning('Champ(s) invalide(s)');
-      const payload = { ...pick(editedStep.value, ['name']),
-        theoreticalDuration: CompaniDuration(editedStep.value.theoreticalDuration.hours)
-          .add(editedStep.value.theoreticalDuration.minutes).toISO() };
+
+      const payload = pick(editedStep.value, ['name', 'theoreticalDuration']);
       await Steps.updateById(editedStep.value._id, payload);
       stepEditionModal.value = false;
       await refreshProgram();
@@ -73,23 +53,9 @@ export const useStepEditionModal = (
   };
 
   const resetStepEditionModal = () => {
-    editedStep.value = { name: '', theoreticalDuration: { hours: 'PT0H', minutes: 'PT0M' } };
+    editedStep.value = { name: '', theoreticalDuration: 'PT0S' };
     v$.value.$reset();
   };
-
-  const theoreticalHoursErrorMsg = computed(() => {
-    if (!v$.value.theoreticalDuration.hours.required.$response) return REQUIRED_LABEL;
-    if (!v$.value.theoreticalDuration.hours.validateISOHours.$response) return 'Durée non valide';
-
-    return '';
-  });
-
-  const theoreticalMinutesErrorMsg = computed(() => {
-    if (!v$.value.theoreticalDuration.minutes.required.$response) return REQUIRED_LABEL;
-    if (!v$.value.theoreticalDuration.minutes.validateISOMinutes.$response) return 'Durée non valide';
-
-    return '';
-  });
 
   return {
     // Data
@@ -100,7 +66,5 @@ export const useStepEditionModal = (
     openStepEditionModal,
     editStep,
     resetStepEditionModal,
-    theoreticalHoursErrorMsg,
-    theoreticalMinutesErrorMsg,
   };
 };
