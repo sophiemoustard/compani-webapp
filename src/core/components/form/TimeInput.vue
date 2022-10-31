@@ -63,7 +63,7 @@ export default {
         .map(dateISO => ({
           label: CompaniDate(dateISO).format(HH_MM),
           value: CompaniDate(dateISO).format(HH_MM),
-          disable: !!min.value && CompaniDate(min.value, HH_MM).isAfter(dateISO),
+          disable: !!min.value && CompaniDate(min.value, HH_MM).isSameOrAfter(dateISO),
         }));
     });
 
