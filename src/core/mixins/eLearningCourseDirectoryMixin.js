@@ -1,8 +1,11 @@
 import escapeRegExp from 'lodash/escapeRegExp';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
+import { DD_MM_YYYY } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
-import { formatDate, ascendingSort, formatDurationFromFloat } from '@helpers/date';
+import { formatDurationFromFloat } from '@helpers/date';
+import CompaniDate from '@helpers/dates/companiDates';
+import { ascendingSort } from '@helpers/dates/utils';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
@@ -34,7 +37,7 @@ export const eLearningCourseDirectoryMixin = {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: formatDate,
+          format: value => CompaniDate(value).format(DD_MM_YYYY),
           sort: ascendingSort,
           style: 'width: 10%',
         },
