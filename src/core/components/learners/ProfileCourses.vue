@@ -130,7 +130,7 @@ import {
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
-import { getISOTotalDuration, ascendingSortBy } from '@helpers/dates/utils';
+import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import { isBetweenOrEqual, isBefore } from '@helpers/date';
 import { getStepTypeIcon, formatSlotSchedule } from '@helpers/courses';
@@ -302,7 +302,7 @@ export default {
       duration: CompaniDuration(getISOTotalDuration(attendancesGroupedByProgram[programId].map(a => a.courseSlot)))
         .format(SHORT_DURATION_H_MM),
       attendances: attendancesGroupedByProgram[programId]
-        .sort((a, b) => ascendingSortBy('courseSlot.startDate'))
+        .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
         .map(a => ({
           _id: a._id,
           date: CompaniDate(a.courseSlot.startDate).format(DD_MM_YYYY),
@@ -361,6 +361,7 @@ export default {
       formatDuration,
       getStepTypeIcon,
       formatSlotSchedule,
+      CompaniDate,
     };
   },
 };

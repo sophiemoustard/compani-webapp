@@ -417,6 +417,7 @@ export default {
       getCourseNameClass,
       getTableName,
       getProgramName,
+      CompaniDate,
     };
   },
 };

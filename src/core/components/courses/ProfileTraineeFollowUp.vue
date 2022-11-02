@@ -73,7 +73,7 @@ import Banner from '@components/Banner';
 import { E_LEARNING, SHORT_DURATION_H_MM, DD_MM_YYYY } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
-import { getISOTotalDuration, ascendingSortBy } from '@helpers/dates/utils';
+import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
 import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { composeCourseName, formatSlotSchedule } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
@@ -150,8 +150,8 @@ export default {
       attendancesCount: attendancesGroupedByTrainee[traineeId].length,
       duration: CompaniDuration(getISOTotalDuration(attendancesGroupedByTrainee[traineeId].map(a => a.courseSlot)))
         .format(SHORT_DURATION_H_MM),
-      attendances: attendancesGroupedByTrainee[traineeId]
-        .sort(ascendingSortBy('courseSlot.startDate'))
+      attendances: [...attendancesGroupedByTrainee[traineeId]]
+        .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
         .map(a => ({
           _id: a._id,
           date: CompaniDate(a.courseSlot.startDate).format(DD_MM_YYYY),

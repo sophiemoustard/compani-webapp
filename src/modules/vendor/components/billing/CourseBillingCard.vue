@@ -150,6 +150,7 @@ import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatPrice, formatDownloadName, formatQuantity } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
+import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy } from '@helpers/dates/utils';
 import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
@@ -703,6 +704,7 @@ export default {
       omit,
       pickBy,
       formatPrice,
+      CompaniDate,
     };
   },
 };
