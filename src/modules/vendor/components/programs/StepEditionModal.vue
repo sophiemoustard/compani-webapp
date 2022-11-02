@@ -12,9 +12,9 @@
     <q-field class="duration-field" dense :error="validations.theoreticalDuration.$error"
       error-message="Durée non valide" borderless>
       <div class="duration-container row items-end">
-        <ni-input in-modal type="number" :model-value="hours" suffix="h" class="flex-1 q-pr-sm"
+        <ni-input in-modal :model-value="hours" suffix="h" class="flex-1 q-pr-sm"
           @update:model-value="updateTmp($event, 'hours')" @blur="updateTheoreticalDuration()" />
-        <ni-input in-modal type="number" :model-value="minutes" suffix="min" class="flex-1 q-pl-sm"
+        <ni-input in-modal :model-value="minutes" suffix="min" class="flex-1 q-pl-sm"
           @update:model-value="updateTmp($event, 'minutes')" @blur="updateTheoreticalDuration()" />
       </div>
     </q-field>
@@ -63,10 +63,7 @@ export default {
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
-    const submit = () => {
-      updateTheoreticalDuration();
-      emit('submit');
-    };
+    const submit = () => emit('submit');
     const update = (event, path) => emit('update:edited-step', { ...editedStep.value, [path]: event });
     const updateTheoreticalDuration = () => {
       const { path, event } = currentEditedField.value;
