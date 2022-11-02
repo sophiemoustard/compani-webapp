@@ -63,7 +63,10 @@ export default {
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
-    const submit = () => emit('submit');
+    const submit = () => {
+      updateTheoreticalDuration();
+      emit('submit');
+    };
     const update = (event, path) => emit('update:edited-step', { ...editedStep.value, [path]: event });
     const updateTheoreticalDuration = () => {
       const { path, event } = currentEditedField.value;
