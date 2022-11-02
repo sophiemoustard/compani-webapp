@@ -163,12 +163,10 @@ export const courseFiltersMixin = {
       return courses
         .filter((course) => {
           const hasEstimationInRange = !course.slots.length && course.estimatedStartDate &&
-            CompaniDate(course.estimatedStartDate).isSameOrAfter(this.selectedStartDate) &&
-            CompaniDate(course.estimatedStartDate).isSameOrBefore(this.selectedEndDate);
+            CompaniDate(course.estimatedStartDate).isSameOrBetween(this.selectedStartDate, this.selectedEndDate);
           const hasSlotsInRange = course.slots
             .some(slotGroup => slotGroup
-              .some(s => CompaniDate(s.endDate).isSameOrAfter(this.selectedStartDate) &&
-                CompaniDate(s.endDate).isSameOrBefore(this.selectedEndDate)));
+              .some(s => CompaniDate(s.endDate).isSameOrBetween(this.selectedStartDate, this.selectedEndDate)));
 
           return hasEstimationInRange || hasSlotsInRange;
         });
