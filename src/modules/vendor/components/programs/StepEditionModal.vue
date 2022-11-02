@@ -6,7 +6,7 @@
     <ni-input in-modal :model-value="editedStep.name" :error="validations.name.$error" caption="Nom"
       @update:model-value="update($event.trim(), 'name')" @blur="validations.name.$touch" required-field />
     <div class="row justify-between">
-      <p :class="['input-caption', { required: requiredField }]">Durée Théorique *</p>
+      <p class="input-caption required">Durée Théorique</p>
       <q-icon v-if="validations.theoreticalDuration.$error" name="error_outline" color="secondary" />
     </div>
     <q-field class="duration-field" dense :error="validations.theoreticalDuration.$error"
@@ -48,7 +48,7 @@ export default {
     const { editedStep } = toRefs(props);
     const hours = ref(0);
     const minutes = ref(0);
-    const tmpInput = ref({ path: 'minutes', event: 0 });
+    const currentEditedField = ref({});
 
     watch(
       () => editedStep.value.theoreticalDuration,
@@ -66,13 +66,11 @@ export default {
     const submit = () => emit('submit');
     const update = (event, path) => emit('update:edited-step', { ...editedStep.value, [path]: event });
     const updateTheoreticalDuration = () => {
-      const { path, event } = tmpInput.value;
+      const { path, event } = currentEditedField.value;
       const value = path === 'hours' ? `PT${event || 0}H${minutes.value}M` : `PT${hours.value}H${event || 0}M`;
       update(value, 'theoreticalDuration');
     };
-    const updateTmp = (event, path) => {
-      tmpInput.value = { path, event };
-    };
+    const updateTmp = (event, path) => { currentEditedField.value = { path, event }; };
 
     return {
       // Data
