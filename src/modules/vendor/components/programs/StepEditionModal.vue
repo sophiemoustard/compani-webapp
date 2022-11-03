@@ -67,12 +67,15 @@ export default {
     const update = (event, path) => emit('update:edited-step', { ...editedStep.value, [path]: event });
     const updateTheoreticalDuration = () => {
       const { path, event } = currentEditedField.value;
+
       if (event) {
         const parsedEvent = parseFloat(event);
         const value = path === 'hours'
           ? `PT${parsedEvent || 0}H${minutes.value}M`
           : `PT${hours.value}H${parsedEvent || 0}M`;
-        update(value, 'theoreticalDuration');
+
+        const { hours: updatedHours, minutes: updatedMinutes } = CompaniDuration(value).toHoursAndMinutesObject();
+        update(`PT${updatedHours}H${updatedMinutes}M`, 'theoreticalDuration');
         currentEditedField.value = {};
       }
     };
