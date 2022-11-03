@@ -99,6 +99,11 @@ const CompaniDateFactory = (inputDate) => {
       return CompaniDateFactory(_date.plus(isoDuration));
     },
 
+    subtract (amount) {
+      const isoDuration = Duration.fromISO(amount);
+      return CompaniDateFactory(_date.minus(isoDuration));
+    },
+
     set (values) {
       return CompaniDateFactory(_date.set(values));
     },
