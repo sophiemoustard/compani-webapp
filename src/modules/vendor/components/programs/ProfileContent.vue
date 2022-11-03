@@ -29,7 +29,7 @@
                   </div>
                   <div class="step-subtitle">
                     {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
-                     - {{ CompaniDuration(step.theoreticalDuration || 'PT0S').format(LONG_DURATION_H_MM) }}
+                     - {{ CompaniDuration(step.theoreticalDuration || PT0S).format(LONG_DURATION_H_MM) }}
                   </div>
                 </q-item-section>
               </div>
@@ -137,6 +137,7 @@ import {
   PUBLISHED_DOT_WARNING,
   E_LEARNING,
   LONG_DURATION_H_MM,
+  PT0S,
 } from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
@@ -479,6 +480,7 @@ export default {
       PUBLISHED_DOT_WARNING,
       E_LEARNING,
       LONG_DURATION_H_MM,
+      PT0S,
       modalLoading,
       subProgramCreationModal,
       newSubProgram,

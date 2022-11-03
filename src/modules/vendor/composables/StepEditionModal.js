@@ -4,6 +4,8 @@ import pick from 'lodash/pick';
 import { required } from '@vuelidate/validators';
 import Steps from '@api/Steps';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import CompaniDuration from '@helpers/dates/companiDurations';
+import { PT0S } from '@data/constants';
 
 export const useStepEditionModal = (
   isLocked,
@@ -12,10 +14,11 @@ export const useStepEditionModal = (
   modalLoading,
   openNextModalAfterUnlocking
 ) => {
-  const editedStep = ref({ name: '', theoreticalDuration: 'PT0S' });
+  const editedStep = ref({ name: '', theoreticalDuration: PT0S });
   const stepEditionModal = ref(false);
 
-  const positiveIntDuration = value => value !== 'PT0H0M' && value !== 'PT0S' && value.match(/(PT\d*H\d*M|PT\d*S)/);
+  const positiveIntDuration = value => !CompaniDuration(value).isEquivalentTo(PT0S) &&
+    value.match(/(PT\d*H\d*M|PT\d*S)/);
 
   const rules = computed(() => ({
     name: { required },
@@ -53,7 +56,7 @@ export const useStepEditionModal = (
   };
 
   const resetStepEditionModal = () => {
-    editedStep.value = { name: '', theoreticalDuration: 'PT0S' };
+    editedStep.value = { name: '', theoreticalDuration: PT0S };
     v$.value.$reset();
   };
 

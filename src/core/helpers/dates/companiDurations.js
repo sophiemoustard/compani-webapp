@@ -1,4 +1,4 @@
-import { SHORT_DURATION_H_MM, LONG_DURATION_H_MM } from '@data/constants';
+import { SHORT_DURATION_H_MM, LONG_DURATION_H_MM, PT0S } from '@data/constants';
 import { Duration } from './luxon';
 
 const DURATION_HOURS = 'h\'h\'';
@@ -39,6 +39,7 @@ const CompaniDurationFactory = (inputDuration) => {
     asHours () {
       return _duration.as('hours');
     },
+
     asDays () {
       return _duration.as('days');
     },
@@ -54,17 +55,30 @@ const CompaniDurationFactory = (inputDuration) => {
       return _duration.toISO();
     },
 
+    // QUERY
+    isEquivalentTo (miscTypeOtherDuration) {
+      const otherDurationInSeconds = _formatMiscToCompaniDuration(miscTypeOtherDuration).shiftTo('seconds');
+      const durationInSeconds = _duration.shiftTo('seconds');
+
+      return durationInSeconds.equals(otherDurationInSeconds);
+    },
+
     // MANIPULATE
     add (miscTypeOtherDuration) {
       const otherDuration = _formatMiscToCompaniDuration(miscTypeOtherDuration);
 
       return CompaniDurationFactory(_duration.plus(otherDuration));
     },
+
+    toHoursAndMinutes () {
+      const shiftedDuration = _duration.shiftTo('hours', 'minutes');
+      return CompaniDurationFactory(shiftedDuration);
+    },
   };
 };
 
 const _formatMiscToCompaniDuration = (...args) => {
-  if (args.length === 0) return Duration.fromISO('PT0S');
+  if (args.length === 0) return Duration.fromISO(PT0S);
 
   if (args.length === 1) {
     if (typeof args[0] === 'string') return Duration.fromISO(args[0]);
