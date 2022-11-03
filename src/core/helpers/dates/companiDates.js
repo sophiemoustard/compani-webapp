@@ -1,5 +1,5 @@
 import pick from 'lodash/pick';
-import { DateTime } from './luxon';
+import { DateTime, Duration } from './luxon';
 
 const CompaniDateFactory = (inputDate) => {
   const _date = inputDate;
@@ -95,8 +95,8 @@ const CompaniDateFactory = (inputDate) => {
     },
 
     add (amount) {
-      if (amount instanceof Number) throw Error('Invalid argument: expected to be an object, got number');
-      return CompaniDateFactory(_date.plus(amount));
+      const isoDuration = Duration.fromISO(amount);
+      return CompaniDateFactory(_date.plus(isoDuration));
     },
 
     set (values) {

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ref, toRefs, computed } from 'vue';
+import { toRefs, computed } from 'vue';
 import DateInput from '@components/form/DateInput';
 import TimeInput from '@components/form/TimeInput';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -47,16 +47,11 @@ export default {
     max: { type: String, default: '' },
     startLocked: { type: Boolean, default: false },
     endLocked: { type: Boolean, default: false },
-    shiftedMinutes: { type: Number, default: 210 },
+    shiftedDuration: { type: String, default: 'PT3H30M' },
   },
   emits: ['blur', 'update:model-value', 'start-lock-click', 'end-lock-click'],
   setup (props, { emit }) {
-    const { modelValue, disableEndDate, disableEndHour, shiftedMinutes } = toRefs(props);
-
-    const shiftedTime = ref({
-      ...(shiftedMinutes.value / 60 >= 1 && { hours: Math.trunc(shiftedMinutes.value / 60) }),
-      ...(shiftedMinutes.value % 60 > 0 && { minutes: shiftedMinutes.value % 60 }),
-    });
+    const { modelValue, disableEndDate, disableEndHour, shiftedDuration } = toRefs(props);
 
     const min = computed(() => {
       if (CompaniDate(modelValue.value.startDate).isSame(modelValue.value.endDate, 'day')) {
@@ -84,7 +79,7 @@ export default {
           const endHourDate = CompaniDate(dates.endHour, 'HH:mm');
           if (!disableEndHour.value && startHourDate.isSameOrAfter(endHourDate)) {
             const max = CompaniDate().endOf('day');
-            const shiftedEndDate = startHourDate.add(shiftedTime.value);
+            const shiftedEndDate = startHourDate.add(shiftedDuration.value);
             dates.endHour = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.format('HH:mm') : max.format('HH:mm');
           }
         }
@@ -108,8 +103,6 @@ export default {
     const endClick = () => { emit('end-lock-click'); };
 
     return {
-      // Data
-      shiftedTime,
       // Computed
       min,
       // Methods
