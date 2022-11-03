@@ -67,10 +67,16 @@ export default {
     const update = (event, path) => emit('update:edited-step', { ...editedStep.value, [path]: event });
     const updateTheoreticalDuration = () => {
       const { path, event } = currentEditedField.value;
-      const value = path === 'hours' ? `PT${event || 0}H${minutes.value}M` : `PT${hours.value}H${event || 0}M`;
-      update(value, 'theoreticalDuration');
+      if (event) {
+        const parsedEvent = parseFloat(event);
+        const value = path === 'hours'
+          ? `PT${parsedEvent || 0}H${minutes.value}M`
+          : `PT${hours.value}H${parsedEvent || 0}M`;
+        update(value, 'theoreticalDuration');
+        currentEditedField.value = {};
+      }
     };
-    const updateTmp = (event, path) => { currentEditedField.value = { path, event }; };
+    const updateTmp = (event, path) => { currentEditedField.value = { path, event: event || '0' }; };
 
     return {
       // Data
