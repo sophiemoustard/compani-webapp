@@ -57,7 +57,7 @@
                 <div v-for="slot in step.slots" :key="slot._id" class="q-ml-md slots">
                   <q-icon :name="getStepTypeIcon(step.type)" />
                   <div class="step-name">{{ step.name }}</div>
-                  <div class="dates">{{ formatDate(slot.startDate) }}</div>
+                  <div class="dates">{{ CompaniDate(slot.startDate).format(DD_MM_YYYY) }}</div>
                   <div class="hours">{{ formatSlotSchedule(slot) }}</div>
                   <div v-if="slot.attendances.length">
                     <q-icon size="12px" name="check_circle" color="green-600 attendance" />
@@ -126,11 +126,13 @@ import {
   REMOTE,
   PEDAGOGY,
   SHORT_DURATION_H_MM,
+  DD_MM_YYYY,
 } from '@data/constants';
+import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
-import { getISOTotalDuration } from '@helpers/dates/utils';
+import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
 import { sortStrings, formatIdentity } from '@helpers/utils';
-import { isBetweenOrEqual, formatDate, ascendingSort, isBefore } from '@helpers/date';
+import { isBetweenOrEqual, isBefore } from '@helpers/date';
 import { getStepTypeIcon, formatSlotSchedule } from '@helpers/courses';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
@@ -303,7 +305,7 @@ export default {
         .sort((a, b) => ascendingSort(a.courseSlot.startDate, b.courseSlot.startDate))
         .map(a => ({
           _id: a._id,
-          date: formatDate(a.courseSlot.startDate),
+          date: CompaniDate(a.courseSlot.startDate).format(DD_MM_YYYY),
           hours: formatSlotSchedule(a.courseSlot),
           trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
           misc: a.course.misc,
@@ -341,6 +343,7 @@ export default {
       unsubscribedAttendances,
       activitiesByMonth,
       months,
+      DD_MM_YYYY,
       // Computed
       userProfile,
       eLearningCoursesOnGoing,
@@ -353,12 +356,12 @@ export default {
       formatIdentity,
       get,
       has,
-      formatDate,
       isBefore,
       goToCourseProfile,
       formatDuration,
       getStepTypeIcon,
       formatSlotSchedule,
+      CompaniDate,
     };
   },
 };

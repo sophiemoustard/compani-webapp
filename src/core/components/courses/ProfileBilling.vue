@@ -17,7 +17,6 @@ import omit from 'lodash/omit';
 import uniqBy from 'lodash/uniqBy';
 import pickBy from 'lodash/pickBy';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
 import Companies from '@api/Companies';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
@@ -128,7 +127,6 @@ export default {
       omit,
       pickBy,
       formatPrice,
-      formatDate,
     };
   },
 };

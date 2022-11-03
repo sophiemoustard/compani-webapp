@@ -40,7 +40,7 @@
                 Payeur : {{ get(bill, 'payer.name') }}
                 <q-icon v-if="!isBilled(bill)" size="16px" name="edit" color="copper-grey-500" />
               </div>
-              {{ isDateVisible(bill) ? `Date : ${formatDate(bill.billedAt)}` : '' }}
+              {{ isDateVisible(bill) ? `Date : ${CompaniDate(bill.billedAt).format(DD_MM_YYYY)}` : '' }}
             </q-item-section>
             <q-icon size="24px" :name="areDetailsVisible[bill._id] ? 'expand_less' : 'expand_more'" />
           </q-card-section>
@@ -149,13 +149,14 @@ import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatPrice, formatDownloadName, formatQuantity } from '@helpers/utils';
-import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
+import CompaniDate from '@helpers/dates/companiDates';
+import { descendingSortBy } from '@helpers/dates/utils';
 import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B } from '@data/constants';
+import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import PayerEditionModal from 'src/modules/vendor/components/billing/PayerEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
@@ -396,7 +397,7 @@ export default {
     });
 
     const unrollBill = () => {
-      const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
+      const bill = [...courseBills.value].sort(descendingSortBy('createdAt'))[0];
       showDetails(bill._id);
     };
 
@@ -656,6 +657,7 @@ export default {
       creditNoteMetaInfo,
       INTRA,
       INTER_B2B,
+      DD_MM_YYYY,
       // Computed
       validations,
       newBillErrorMessages,
@@ -702,7 +704,7 @@ export default {
       omit,
       pickBy,
       formatPrice,
-      formatDate,
+      CompaniDate,
     };
   },
 };

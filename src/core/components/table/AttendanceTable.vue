@@ -102,10 +102,18 @@ import AttendanceSheets from '@api/AttendanceSheets';
 import Users from '@api/Users';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { DEFAULT_AVATAR, INTRA, INTER_B2B, HH_MM, DAY_OF_WEEK_SHORT, DAY_OF_MONTH, MONTH_SHORT } from '@data/constants';
+import {
+  DEFAULT_AVATAR,
+  INTRA,
+  INTER_B2B,
+  HH_MM,
+  DAY_OF_WEEK_SHORT,
+  DAY_OF_MONTH,
+  MONTH_SHORT,
+  DD_MM_YYYY,
+} from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
-import { formatDate } from '@helpers/date';
 import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
 import SimpleTable from '@components/table/SimpleTable';
@@ -143,7 +151,13 @@ export default {
       attendanceSheets: [],
       newAttendanceSheet: { course: this.course._id },
       attendanceSheetColumns: [
-        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
+        {
+          name: 'date',
+          label: 'Date',
+          align: 'left',
+          field: 'date',
+          format: value => CompaniDate(value).format(DD_MM_YYYY),
+        },
         {
           name: 'trainee',
           label: 'Participant(e)',

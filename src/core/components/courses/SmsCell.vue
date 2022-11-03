@@ -16,8 +16,10 @@
 <script>
 
 import { toRefs, computed } from 'vue';
-import { dateDiff, formatDateDiff, formatDate } from '@helpers/date';
+import { DD_MM_YYYY } from '@data/constants';
+import { dateDiff, formatDateDiff } from '@helpers/date';
 import { formatIdentity } from '@helpers/utils';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'SmsCell',
@@ -36,7 +38,7 @@ export default {
     const getDate = computed(() => {
       const dateDifference = dateDiff(Date.now(), history.value.date);
       const millisecondsToDays = 1000 * 60 * 60 * 24;
-      if ((dateDifference / millisecondsToDays) > 15) return `le ${formatDate(history.value.date)}`;
+      if ((dateDifference / millisecondsToDays) > 15) return `le ${CompaniDate(history.value.date).format(DD_MM_YYYY)}`;
 
       return `il y a ${formatDateDiff(dateDifference)}`;
     });
