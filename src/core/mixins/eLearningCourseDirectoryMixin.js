@@ -5,7 +5,7 @@ import { DD_MM_YYYY, LONG_DURATION_H_MM } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { ascendingSort } from '@helpers/dates/utils';
-import CompaniDuration from '@helpers/dates/CompaniDurations';
+import CompaniDuration from '@helpers/dates/companiDurations';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
