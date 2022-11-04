@@ -23,8 +23,7 @@ import DateRange from '@components/form/DateRange';
 import { VENDOR_EXPORT_HISTORY_TYPES, COURSE } from '@data/constants';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
-import moment from '@helpers/moment';
-import { isBefore } from '@helpers/date';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'History',
@@ -40,11 +39,11 @@ export default {
     const exportTypeOptions = VENDOR_EXPORT_HISTORY_TYPES;
     const type = ref(COURSE);
     const dateRange = ref({
-      startDate: moment().startOf('M').toISOString(),
-      endDate: moment().endOf('M').toISOString(),
+      startDate: CompaniDate().startOf('month').toISO(),
+      endDate: CompaniDate().endOf('month').toISO(),
     });
-    const min = ref(moment().endOf('M').subtract(1, 'year').toISOString());
-    const max = ref(moment().startOf('M').add(1, 'year').toISOString());
+    const min = ref(CompaniDate().endOf('month').subtract('P1Y').toISO());
+    const max = ref(CompaniDate().startOf('month').add('P1Y').toISO());
     const loading = ref(false);
 
     const rules = computed(() => ({
@@ -57,7 +56,7 @@ export default {
     const v$ = useVuelidate(rules, { dateRange });
 
     const dateRangeErrorMessage = computed(() => {
-      if (isBefore(dateRange.value.endDate, dateRange.value.startDate)) {
+      if (CompaniDate(dateRange.value.endDate).isBefore(dateRange.value.startDate)) {
         return 'La date de fin doit être postérieure à la date de début';
       }
 
@@ -65,8 +64,8 @@ export default {
     });
 
     const input = (date) => {
-      min.value = moment(date.endDate).subtract(1, 'year').add(1, 'day').toISOString();
-      max.value = moment(date.startDate).add(1, 'year').subtract(1, 'day').toISOString();
+      min.value = CompaniDate(date.endDate).subtract('P1Y').add('P1D').toISO();
+      max.value = CompaniDate(date.startDate).add('P1Y').subtract('P1D').toISO();
     };
 
     const exportCsv = async () => {
