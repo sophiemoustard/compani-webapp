@@ -69,11 +69,6 @@ const CompaniDurationFactory = (inputDuration) => {
 
       return CompaniDurationFactory(_duration.plus(otherDuration));
     },
-
-    toHoursAndMinutes () {
-      const shiftedDuration = _duration.shiftTo('hours', 'minutes');
-      return CompaniDurationFactory(shiftedDuration);
-    },
   };
 };
 
