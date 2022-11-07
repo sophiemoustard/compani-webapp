@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div v-if="isIntraCourse" class="row gutter-profile">
+      <ni-input v-model="course.billsToCreate" required-field type="number" @focus="saveTmp()"
+        @blur="updateCourse($event)" caption="Nombre de factures"
+        :error="v$.course.billsToCreate.$error" error-message="Nombre invalide" />
+    </div>
     <div v-for="company of companies" :key="company._id">
       <ni-course-billing-card :company="company" :course="course" :payer-list="payerList"
       :billing-item-list="billingItemList" :course-bills="courseBills.filter(bill => bill.company._id === company._id)"
@@ -16,20 +21,26 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import uniqBy from 'lodash/uniqBy';
 import pickBy from 'lodash/pickBy';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
 import Companies from '@api/Companies';
+import Courses from '@api/Courses';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { LIST, COMPANY } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
+import Input from '@components/form/Input';
 import { useCourses } from '@composables/courses';
+import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'ProfileBilling',
   components: {
     'ni-course-billing-card': CourseBillingCard,
+    'ni-input': Input,
   },
   setup () {
     const $store = useStore();
@@ -37,9 +48,13 @@ export default {
     const billsLoading = ref(false);
     const payerList = ref([]);
     const billingItemList = ref([]);
+    const tmpInput = ref('');
     const FUNDING_ORGANISATION = 'funding_organisation';
 
     const course = computed(() => $store.state.course.course);
+    const rules = computed(() => ({ course: { billsToCreate: { required, positiveNumber, integerNumber } } }));
+
+    const v$ = useVuelidate(rules, { course });
 
     const { isIntraCourse } = useCourses(course);
 
@@ -51,6 +66,8 @@ export default {
       return uniqBy([...traineesCompanies, ...billsCompanies, ...intraCourseCompany], '_id')
         .sort((a, b) => a.name.localeCompare(b.name));
     });
+
+    const saveTmp = () => (tmpInput.value = course.value.billsToCreate);
 
     const refreshCourseBills = async () => {
       try {
@@ -102,6 +119,32 @@ export default {
       }
     };
 
+    const refreshCourse = async () => {
+      try {
+        await $store.dispatch('course/fetchCourse', { courseId: course.value._id });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const updateCourse = async () => {
+      try {
+        if (course.value.billsToCreate === tmpInput.value) return;
+
+        v$.value.course.$touch();
+        if (v$.value.course.billsToCreate.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Courses.update(course.value._id, { billsToCreate: course.value.billsToCreate });
+        NotifyPositive('Modification enregistrée.');
+
+        await refreshCourse();
+      } catch (e) {
+        console.error(e);
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
+        NotifyNegative('Erreur lors de la modification.');
+      }
+    };
+
     const created = async () => {
       await refreshCourseBills();
       await refreshPayers();
@@ -111,6 +154,8 @@ export default {
     created();
 
     return {
+      // Validation
+      v$,
       // Data
       payerList,
       billingItemList,
@@ -118,7 +163,10 @@ export default {
       // Computed
       course,
       companies,
+      isIntraCourse,
+      updateCourse,
       // Methods
+      saveTmp,
       refreshCourseBills,
       refreshAndUnroll,
       refreshPayers,
