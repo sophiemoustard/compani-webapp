@@ -1,9 +1,9 @@
 <template>
   <div>
     <div v-if="isIntraCourse" class="row gutter-profile">
-      <ni-input v-model="course.billsToCreate" required-field type="number" @focus="saveTmp()"
+      <ni-input v-model="course.expectedBillsCount" required-field type="number" @focus="saveTmp()"
         @blur="updateCourse($event)" caption="Nombre de factures"
-        :error="v$.course.billsToCreate.$error" error-message="Nombre invalide" />
+        :error="v$.course.expectedBillsCount.$error" error-message="Nombre invalide" />
     </div>
     <div v-for="company of companies" :key="company._id">
       <ni-course-billing-card :company="company" :course="course" :payer-list="payerList"
@@ -52,7 +52,7 @@ export default {
     const FUNDING_ORGANISATION = 'funding_organisation';
 
     const course = computed(() => $store.state.course.course);
-    const rules = computed(() => ({ course: { billsToCreate: { required, positiveNumber, integerNumber } } }));
+    const rules = computed(() => ({ course: { expectedBillsCount: { required, positiveNumber, integerNumber } } }));
 
     const v$ = useVuelidate(rules, { course });
 
@@ -67,7 +67,7 @@ export default {
         .sort((a, b) => a.name.localeCompare(b.name));
     });
 
-    const saveTmp = () => (tmpInput.value = course.value.billsToCreate);
+    const saveTmp = () => (tmpInput.value = course.value.expectedBillsCount);
 
     const refreshCourseBills = async () => {
       try {
@@ -129,12 +129,12 @@ export default {
 
     const updateCourse = async () => {
       try {
-        if (course.value.billsToCreate === tmpInput.value) return;
+        if (course.value.expectedBillsCount === tmpInput.value) return;
 
         v$.value.course.$touch();
-        if (v$.value.course.billsToCreate.$error) return NotifyWarning('Champ(s) invalide(s).');
+        if (v$.value.course.expectedBillsCount.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Courses.update(course.value._id, { billsToCreate: course.value.billsToCreate });
+        await Courses.update(course.value._id, { expectedBillsCount: course.value.expectedBillsCount });
         NotifyPositive('Modification enregistrée.');
 
         await refreshCourse();

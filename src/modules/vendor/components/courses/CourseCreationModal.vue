@@ -23,10 +23,10 @@
         :model-value="newCourse.maxTrainees" @blur="validations.maxTrainees.$touch"
         :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage"
         @update:model-value="update($event, 'maxTrainees')" />
-      <ni-input v-if="isIntraCourse" :model-value="newCourse.billsToCreate" in-modal required-field type="number"
-        @update:model-value="update($event, 'billsToCreate')" caption="Nombre de factures"
-        :error="validations.billsToCreate.$error" error-message="Nombre invalide"
-        @blur="validations.billsToCreate.$touch" />
+      <ni-input v-if="isIntraCourse" :model-value="newCourse.expectedBillsCount" in-modal required-field type="number"
+        @update:model-value="update($event, 'expectedBillsCount')" caption="Nombre de factures"
+        :error="validations.expectedBillsCount.$error" error-message="Nombre invalide"
+        @blur="validations.expectedBillsCount.$touch" />
       <ni-input in-modal :model-value="newCourse.misc" @update:model-value="update($event.trim(), 'misc')"
         caption="Informations Complémentaires" />
       <template #footer>
@@ -119,8 +119,8 @@ export default {
       this.$emit(
         'update:new-course',
         {
-          ...omit(this.newCourse, ['company', 'maxTrainees', 'billsToCreate']),
-          ...(event === INTRA && { maxTrainees: 8, billsToCreate: '0' }),
+          ...omit(this.newCourse, ['company', 'maxTrainees', 'expectedBillsCount']),
+          ...(event === INTRA && { maxTrainees: 8, expectedBillsCount: '0' }),
           type: event,
         }
       );
