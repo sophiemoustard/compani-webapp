@@ -25,7 +25,7 @@
         @update:model-value="update($event, 'maxTrainees')" />
       <ni-input v-if="isIntraCourse" :model-value="newCourse.expectedBillsCount" in-modal required-field type="number"
         @update:model-value="update($event, 'expectedBillsCount')" caption="Nombre de factures"
-        :error="validations.expectedBillsCount.$error" error-message="Nombre invalide"
+        :error="validations.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage"
         @blur="validations.expectedBillsCount.$touch" />
       <ni-input in-modal :model-value="newCourse.misc" @update:model-value="update($event.trim(), 'misc')"
         caption="Informations Complémentaires" />
@@ -87,6 +87,10 @@ export default {
         return 'Nombre non valide';
       }
       return '';
+    },
+    expectedBillsCountErrorMessage () {
+      if (this.validations.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
+      return 'Nombre non valide';
     },
   },
   watch: {
