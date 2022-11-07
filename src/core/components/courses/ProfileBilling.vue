@@ -3,7 +3,7 @@
     <div v-if="isIntraCourse" class="row gutter-profile">
       <ni-input v-model="course.expectedBillsCount" required-field type="number" @focus="saveTmp()"
         @blur="updateCourse($event)" caption="Nombre de factures"
-        :error="v$.course.expectedBillsCount.$error" error-message="Nombre invalide" />
+        :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
     </div>
     <div v-for="company of companies" :key="company._id">
       <ni-course-billing-card :company="company" :course="course" :payer-list="payerList"
@@ -30,7 +30,7 @@ import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { LIST, COMPANY } from '@data/constants';
+import { LIST, COMPANY, REQUIRED_LABEL } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
 import Input from '@components/form/Input';
 import { useCourses } from '@composables/courses';
@@ -65,6 +65,11 @@ export default {
 
       return uniqBy([...traineesCompanies, ...billsCompanies, ...intraCourseCompany], '_id')
         .sort((a, b) => a.name.localeCompare(b.name));
+    });
+
+    const expectedBillsCountErrorMessage = computed(() => {
+      if (v$.value.course.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
+      return 'Nombre non valide';
     });
 
     const saveTmp = () => (tmpInput.value = course.value.expectedBillsCount);
@@ -165,6 +170,7 @@ export default {
       companies,
       isIntraCourse,
       updateCourse,
+      expectedBillsCountErrorMessage,
       // Methods
       saveTmp,
       refreshCourseBills,
