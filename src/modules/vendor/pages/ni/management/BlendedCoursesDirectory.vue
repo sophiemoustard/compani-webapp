@@ -79,7 +79,7 @@ export default {
         salesRepresentative: '',
         estimatedStartDate: '',
         maxTrainees: 8,
-        billsToCreate: '0',
+        expectedBillsCount: '0',
       },
       programs: [],
       courseCreationModal: false,
@@ -99,7 +99,7 @@ export default {
         ...(this.isIntraCourse &&
           {
             maxTrainees: { required, strictPositiveNumber, integerNumber },
-            billsToCreate: { required, positiveNumber, integerNumber },
+            expectedBillsCount: { required, positiveNumber, integerNumber },
           }),
         company: { required: requiredIf(this.newCourse.type === INTRA) },
       },
@@ -167,7 +167,7 @@ export default {
         salesRepresentative: '',
         estimatedStartDate: '',
         maxTrainees: 8,
-        billsToCreate: '0',
+        expectedBillsCount: '0',
       };
     },
     async createCourse () {
