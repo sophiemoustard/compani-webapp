@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
+    <div class="q-mt-lg q-mb-xl">
       <p v-if="course.type === INTER_B2B" class="text-weight-bold">
         {{ company.name }}
         <span class="text-weight-regular text-copper-500">
@@ -93,11 +93,10 @@
         </q-card>
       </div>
       <div v-if="canAddBill" class="row justify-start">
-        <ni-button label="Créer une facture" color="white" class="bg-primary" icon="payment"
+        <ni-button label="Créer une facture" color="white" class="bg-primary" icon="payment" :loading="loading"
           @click="openBillCreationModal" :disable="billCreationLoading" />
       </div>
     </div>
-    <div v-else class="row justify-center q-mt-md"><q-spinner size="30px" /></div>
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal" :loading="billCreationLoading"
@@ -172,6 +171,7 @@ export default {
     payerList: { type: Array, default: () => ([]) },
     billingItemList: { type: Array, default: () => ([]) },
     courseBills: { type: Array, default: () => ([]) },
+    loading: { type: Boolean, default: false },
   },
   emits: ['refresh-course-bills', 'refresh-and-unroll'],
   components: {
@@ -196,7 +196,6 @@ export default {
     const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
     const creditNoteCreationLoading = ref(false);
-    const billsLoading = ref(false);
     const pdfLoading = ref(false);
     const billCreationModal = ref(false);
     const payerEditionModal = ref(false);
@@ -632,7 +631,6 @@ export default {
       // Data
       billCreationLoading,
       billEditionLoading,
-      billsLoading,
       pdfLoading,
       billingPurchaseCreationLoading,
       billingPurchaseEditionLoading,

@@ -6,7 +6,7 @@
         :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
     </div>
     <div v-for="company of companies" :key="company._id">
-      <ni-course-billing-card :company="company" :course="course" :payer-list="payerList"
+      <ni-course-billing-card :company="company" :course="course" :payer-list="payerList" :loading="billsLoading"
       :billing-item-list="billingItemList" :course-bills="courseBills.filter(bill => bill.company._id === company._id)"
       @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll" />
     </div>
@@ -126,14 +126,18 @@ export default {
 
     const refreshCourse = async () => {
       try {
+        billsLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: course.value._id });
       } catch (e) {
         console.error(e);
+      } finally {
+        billsLoading.value = false;
       }
     };
 
     const updateCourse = async () => {
       try {
+        billsLoading.value = true;
         if (course.value.expectedBillsCount === tmpInput.value) return;
 
         v$.value.course.$touch();
@@ -147,6 +151,8 @@ export default {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
+      } finally {
+        billsLoading.value = false;
       }
     };
 
@@ -165,6 +171,7 @@ export default {
       payerList,
       billingItemList,
       courseBills,
+      billsLoading,
       // Computed
       course,
       companies,
