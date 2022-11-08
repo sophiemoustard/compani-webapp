@@ -1,9 +1,9 @@
 <template>
   <div>
     <div v-if="isIntraCourse" class="row gutter-profile">
-      <ni-input v-model="course.expectedBillsCount" required-field type="number" @focus="saveTmp()"
-        @blur="updateCourse($event)" caption="Nombre de factures"
-        :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
+      <ni-input v-model="course.expectedBillsCount" required-field @focus="saveTmp()" @blur="updateCourse($event)"
+        caption="Nombre de factures" :error="v$.course.expectedBillsCount.$error"
+        :error-message="expectedBillsCountErrorMessage" />
     </div>
     <div v-for="company of companies" :key="company._id">
       <ni-course-billing-card :company="company" :course="course" :payer-list="payerList" :loading="billsLoading"
