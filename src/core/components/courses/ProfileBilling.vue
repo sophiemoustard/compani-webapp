@@ -79,7 +79,7 @@ export default {
     const expectedBillsCountErrorMessage = computed(() => {
       if (v$.value.course.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
       if (v$.value.course.expectedBillsCount.minValue.$response === false) {
-        return 'Le nombre doit être supérieur ou égal au nombre de factures valides pour cette formation';
+        return 'Le nombre doit être supérieur ou égal au nombre de factures valides pour cette formation.';
       }
       return 'Nombre non valide';
     });
