@@ -1,4 +1,4 @@
-import { SHORT_DURATION_H_MM, LONG_DURATION_H_MM } from '@data/constants';
+import { SHORT_DURATION_H_MM, LONG_DURATION_H_MM, PT0S } from '@data/constants';
 import { Duration } from './luxon';
 
 const DURATION_HOURS = 'h\'h\'';
@@ -32,12 +32,42 @@ const CompaniDurationFactory = (inputDuration) => {
       throw Error('Invalid argument: expected specific format');
     },
 
+    asMinutes () {
+      return _duration.as('minutes');
+    },
+
+    asHours () {
+      return _duration.as('hours');
+    },
+
     asDays () {
       return _duration.as('days');
     },
 
+    toHoursAndMinutesObject () {
+      const shiftedDuration = _duration.shiftTo('hours', 'minutes');
+      const minutes = shiftedDuration.get('minutes');
+      const hours = shiftedDuration.get('hours');
+      return { hours, minutes };
+    },
+
     toISO () {
       return _duration.toISO();
+    },
+
+    // QUERY
+    isEquivalentTo (miscTypeOtherDuration) {
+      const otherDurationInSeconds = _formatMiscToCompaniDuration(miscTypeOtherDuration).shiftTo('seconds');
+      const durationInSeconds = _duration.shiftTo('seconds');
+
+      return durationInSeconds.equals(otherDurationInSeconds);
+    },
+
+    isLongerThan (miscTypeOtherDuration) {
+      const otherDurationInSeconds = _formatMiscToCompaniDuration(miscTypeOtherDuration).as('seconds');
+      const durationInSeconds = _duration.as('seconds');
+
+      return durationInSeconds > otherDurationInSeconds;
     },
 
     // MANIPULATE
@@ -50,7 +80,7 @@ const CompaniDurationFactory = (inputDuration) => {
 };
 
 const _formatMiscToCompaniDuration = (...args) => {
-  if (args.length === 0) return Duration.fromISO('PT0S');
+  if (args.length === 0) return Duration.fromISO(PT0S);
 
   if (args.length === 1) {
     if (typeof args[0] === 'string') return Duration.fromISO(args[0]);

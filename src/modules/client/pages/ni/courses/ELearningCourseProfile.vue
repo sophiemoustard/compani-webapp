@@ -9,10 +9,11 @@
 import { createMetaMixin } from 'quasar';
 import { mapState } from 'vuex';
 import get from 'lodash/get';
-import { formatDurationFromFloat } from '@helpers/date';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import { NotifyNegative } from '@components/popup/notify';
+import CompaniDuration from '@helpers/dates/companiDurations';
+import { LONG_DURATION_H_MM } from '@data/constants';
 
 const metaInfo = { title: 'Fiche formation' };
 
@@ -34,7 +35,7 @@ export default {
     headerInfo () {
       return [{
         icon: 'hourglass_empty',
-        label: `Durée : ${formatDurationFromFloat(this.course.totalTheoreticalHours)}`,
+        label: `Durée : ${CompaniDuration(this.course.totalTheoreticalDuration).format(LONG_DURATION_H_MM)}`,
       }];
     },
   },

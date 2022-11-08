@@ -1,12 +1,11 @@
 import { ref, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import pick from 'lodash/pick';
-import { getHoursAndMinutes, computeHours } from '@helpers/date';
-import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
-import { E_LEARNING, REQUIRED_LABEL } from '@data/constants';
-import { required, requiredIf, maxValue } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import Steps from '@api/Steps';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import CompaniDuration from '@helpers/dates/companiDurations';
+import { PT0S } from '@data/constants';
 
 export const useStepEditionModal = (
   isLocked,
@@ -15,20 +14,15 @@ export const useStepEditionModal = (
   modalLoading,
   openNextModalAfterUnlocking
 ) => {
-  const editedStep = ref({ name: '', type: E_LEARNING, theoreticalHours: { hours: 0, minutes: 0 } });
+  const editedStep = ref({ name: '', theoreticalDuration: PT0S });
   const stepEditionModal = ref(false);
+
+  const positiveIntDuration = value => !CompaniDuration(value).isEquivalentTo(PT0S) &&
+    value.match(/(PT\d*H\d*M|PT\d*S)/);
 
   const rules = computed(() => ({
     name: { required },
-    theoreticalHours: {
-      hours: { required: requiredIf(!editedStep.value.theoreticalHours.minutes), integerNumber, positiveNumber },
-      minutes: {
-        required: requiredIf(!editedStep.value.theoreticalHours.hours),
-        integerNumber,
-        positiveNumber,
-        maxValue: maxValue(59),
-      },
-    },
+    theoreticalDuration: { positiveIntDuration },
   }));
   const v$ = useVuelidate(rules, editedStep);
 
@@ -37,10 +31,7 @@ export const useStepEditionModal = (
       openNextModalAfterUnlocking.value = () => openStepEditionModal(step);
       openValidateUnlockingEditionModal(step);
     } else {
-      editedStep.value = {
-        ...pick(step, ['_id', 'name', 'type']),
-        theoreticalHours: getHoursAndMinutes(step.theoreticalHours),
-      };
+      editedStep.value = { ...pick(step, ['_id', 'name', 'theoreticalDuration']) };
       stepEditionModal.value = true;
     }
   };
@@ -51,10 +42,8 @@ export const useStepEditionModal = (
       v$.value.$touch();
       if (v$.value.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-      await Steps.updateById(
-        editedStep.value._id,
-        { ...pick(editedStep.value, ['name']), theoreticalHours: computeHours(editedStep.value.theoreticalHours) }
-      );
+      const payload = pick(editedStep.value, ['name', 'theoreticalDuration']);
+      await Steps.updateById(editedStep.value._id, payload);
       stepEditionModal.value = false;
       await refreshProgram();
       NotifyPositive('Étape modifiée.');
@@ -67,26 +56,9 @@ export const useStepEditionModal = (
   };
 
   const resetStepEditionModal = () => {
-    editedStep.value = { name: '', theoreticalHours: { hours: 0, minutes: 0 } };
+    editedStep.value = { name: '', theoreticalDuration: PT0S };
     v$.value.$reset();
   };
-
-  const theoreticalHoursErrorMsg = computed(() => {
-    if (!v$.value.theoreticalHours.hours.required.$response) return REQUIRED_LABEL;
-    if (!v$.value.theoreticalHours.hours.integerNumber.$response ||
-      !v$.value.theoreticalHours.hours.positiveNumber.$response) return 'Durée non valide';
-
-    return '';
-  });
-
-  const theoreticalMinutesErrorMsg = computed(() => {
-    if (!v$.value.theoreticalHours.minutes.required.$response) return REQUIRED_LABEL;
-    if (!v$.value.theoreticalHours.minutes.integerNumber.$response ||
-     !v$.value.theoreticalHours.minutes.positiveNumber.$response ||
-     !v$.value.theoreticalHours.minutes.maxValue.$response) return 'Durée non valide';
-
-    return '';
-  });
 
   return {
     // Data
@@ -97,7 +69,5 @@ export const useStepEditionModal = (
     openStepEditionModal,
     editStep,
     resetStepEditionModal,
-    theoreticalHoursErrorMsg,
-    theoreticalMinutesErrorMsg,
   };
 };

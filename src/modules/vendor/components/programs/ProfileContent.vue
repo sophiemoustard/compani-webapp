@@ -29,7 +29,7 @@
                   </div>
                   <div class="step-subtitle">
                     {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
-                     - {{ formatDurationFromFloat(step.theoreticalHours) }}
+                     - {{ CompaniDuration(step.theoreticalDuration || PT0S).format(LONG_DURATION_H_MM) }}
                   </div>
                 </q-item-section>
               </div>
@@ -98,8 +98,7 @@
       :program="program" :validations="newStepValidations" :sub-program-id="currentSubProgramId" />
 
     <step-edition-modal v-model="stepEditionModal" v-model:edited-step="editedStep" :validations="editedStepValidations"
-      :theoretical-hours-error-msg="theoreticalHoursErrorMsg" @hide="resetStepEditionModal" @submit="editStep"
-      :loading="modalLoading" :theoretical-minutes-error-msg="theoreticalMinutesErrorMsg" />
+      @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
     <activity-creation-modal v-model="activityCreationModal" v-model:new-activity="newActivity" :loading="modalLoading"
       @hide="resetActivityCreationModal" @submit="createActivity" :validations="newActivityValidations" />
@@ -131,10 +130,18 @@ import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING, E_LEARNING } from '@data/constants';
+import {
+  ACTIVITY_TYPES,
+  PUBLISHED,
+  PUBLISHED_DOT_ACTIVE,
+  PUBLISHED_DOT_WARNING,
+  E_LEARNING,
+  LONG_DURATION_H_MM,
+  PT0S,
+} from '@data/constants';
 import { getStepTypeLabel, getStepTypeIcon } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
-import { formatDurationFromFloat } from '@helpers/date';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepAdditionModal from 'src/modules/vendor/components/programs/StepAdditionModal';
@@ -237,8 +244,6 @@ export default {
       editStep,
       resetStepEditionModal,
       v$: editedStepValidations,
-      theoreticalHoursErrorMsg,
-      theoreticalMinutesErrorMsg,
     } = useStepEditionModal(
       isLocked,
       openValidateUnlockingEditionModal,
@@ -449,7 +454,7 @@ export default {
     };
 
     const isStepValid = step => (
-      step.areActivitiesValid && !!step.theoreticalHours
+      step.areActivitiesValid && !!step.theoreticalDuration
         ? PUBLISHED_DOT_ACTIVE
         : PUBLISHED_DOT_WARNING
     );
@@ -474,6 +479,8 @@ export default {
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
       E_LEARNING,
+      LONG_DURATION_H_MM,
+      PT0S,
       modalLoading,
       subProgramCreationModal,
       newSubProgram,
@@ -503,12 +510,9 @@ export default {
       newActivityValidations,
       editedStepValidations,
       reusedActivityValidations,
-      theoreticalHoursErrorMsg,
-      theoreticalMinutesErrorMsg,
       program,
       // Methods
       formatQuantity,
-      formatDurationFromFloat,
       getSubProgramError,
       dropStep,
       dropActivity,
@@ -547,6 +551,7 @@ export default {
       isStepValid,
       getStepTypeLabel,
       getStepTypeIcon,
+      CompaniDuration,
     };
   },
 };
