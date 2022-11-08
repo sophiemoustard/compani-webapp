@@ -124,7 +124,7 @@ export default {
         'update:new-course',
         {
           ...omit(this.newCourse, ['company', 'maxTrainees', 'expectedBillsCount']),
-          ...(event === INTRA && { maxTrainees: 8, expectedBillsCount: '0' }),
+          ...(event === INTRA && { maxTrainees: '8', expectedBillsCount: '0' }),
           type: event,
         }
       );
