@@ -301,7 +301,7 @@ export default {
 
       const courseBillsWithoutCreditNote = courseBills.value.filter(cb => !cb.courseCreditNote);
       if (course.value.type === INTRA && courseBillsWithoutCreditNote.length === course.value.expectedBillsCount) {
-        return NotifyWarning('Impossible de créer une facture, nombre de factures maximum atteint');
+        return NotifyWarning('Impossible de créer une facture, nombre de factures maximum atteint.');
       }
 
       billCreationModal.value = true;
