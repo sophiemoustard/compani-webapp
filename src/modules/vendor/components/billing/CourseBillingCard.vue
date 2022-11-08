@@ -298,6 +298,12 @@ export default {
       if (course.value.type === INTER_B2B && !traineesLength.value) {
         return NotifyWarning('Aucun stagiaire rattaché à cette structure n\'est inscrit à la formation.');
       }
+
+      const courseBillsWithoutCreditNote = courseBills.value.filter(cb => !cb.courseCreditNote);
+      if (course.value.type === INTRA && courseBillsWithoutCreditNote.length === course.value.expectedBillsCount) {
+        return NotifyWarning('Impossible de créer une facture, nombre de factures maximum atteint');
+      }
+
       billCreationModal.value = true;
     };
 
@@ -582,7 +588,8 @@ export default {
 
     const isBilled = bill => !!bill.billedAt;
 
-    const canAddBill = computed(() => courseBills.value.every(bill => bill.courseCreditNote));
+    const canAddBill = computed(() => course.value.type === INTRA ||
+      courseBills.value.every(bill => bill.courseCreditNote));
 
     const showDetails = (billId) => {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
