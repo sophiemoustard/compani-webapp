@@ -22,7 +22,7 @@ import omit from 'lodash/omit';
 import uniqBy from 'lodash/uniqBy';
 import pickBy from 'lodash/pickBy';
 import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { required, minValue } from '@vuelidate/validators';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -52,7 +52,16 @@ export default {
     const FUNDING_ORGANISATION = 'funding_organisation';
 
     const course = computed(() => $store.state.course.course);
-    const rules = computed(() => ({ course: { expectedBillsCount: { required, positiveNumber, integerNumber } } }));
+    const rules = computed(() => ({
+      course: {
+        expectedBillsCount: {
+          required,
+          positiveNumber,
+          integerNumber,
+          minValue: minValue(courseBills.value.filter(cb => !cb.courseCreditNote).length),
+        },
+      },
+    }));
 
     const v$ = useVuelidate(rules, { course });
 
@@ -69,6 +78,9 @@ export default {
 
     const expectedBillsCountErrorMessage = computed(() => {
       if (v$.value.course.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
+      if (v$.value.course.expectedBillsCount.minValue.$response === false) {
+        return 'Le nombre doit être supérieur ou égal au nombre de factures valides pour cette formation';
+      }
       return 'Nombre non valide';
     });
 
