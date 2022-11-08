@@ -25,6 +25,9 @@
                       :disable="!!course.archivedAt" />
                   </div>
                 </template>
+                <template v-else-if="col.name === 'company'">
+                  <div class="company-tag">{{ col.value }}</div>
+                </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
@@ -115,7 +118,7 @@ export default {
       {
         name: 'company',
         label: 'Structure',
-        align: 'left',
+        align: 'center',
         field: row => get(row, 'company.name') || '',
         classes: 'text-capitalize',
       },
@@ -437,4 +440,10 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
+.company-tag
+  background-color: $copper-100
+  border-radius: 8px
+  color: $copper-700
+  padding: 4px 8px
+  margin: 4px 0px
 </style>
