@@ -78,7 +78,7 @@ export default {
         type: INTRA,
         salesRepresentative: '',
         estimatedStartDate: '',
-        maxTrainees: 8,
+        maxTrainees: '8',
         expectedBillsCount: '0',
       },
       programs: [],
@@ -166,7 +166,7 @@ export default {
         type: INTRA,
         salesRepresentative: '',
         estimatedStartDate: '',
-        maxTrainees: 8,
+        maxTrainees: '8',
         expectedBillsCount: '0',
       };
     },

@@ -1,9 +1,9 @@
 <template>
   <div>
     <div v-if="isIntraCourse" class="row gutter-profile">
-      <ni-input v-model="course.expectedBillsCount" required-field @focus="saveTmp()" @blur="updateCourse($event)"
-        caption="Nombre de factures" :error="v$.course.expectedBillsCount.$error"
-        :error-message="expectedBillsCountErrorMessage" />
+      <ni-input v-model="course.expectedBillsCount" required-field @focus="saveTmp('expectedBillsCount')"
+        @blur="updateCourse('expectedBillsCount')" caption="Nombre de factures"
+        :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
     </div>
     <div v-for="company of companies" :key="company._id">
       <ni-course-billing-card :company="company" :course="course" :payer-list="payerList" :loading="billsLoading"
@@ -72,7 +72,7 @@ export default {
       return 'Nombre non valide';
     });
 
-    const saveTmp = () => (tmpInput.value = course.value.expectedBillsCount);
+    const saveTmp = path => (tmpInput.value = course.value[path]);
 
     const refreshCourseBills = async () => {
       try {
@@ -135,15 +135,15 @@ export default {
       }
     };
 
-    const updateCourse = async () => {
+    const updateCourse = async (path) => {
       try {
         billsLoading.value = true;
-        if (course.value.expectedBillsCount === tmpInput.value) return;
+        if (course.value[path] === tmpInput.value) return;
 
         v$.value.course.$touch();
-        if (v$.value.course.expectedBillsCount.$error) return NotifyWarning('Champ(s) invalide(s).');
+        if (v$.value.course.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Courses.update(course.value._id, { expectedBillsCount: course.value.expectedBillsCount });
+        await Courses.update(course.value._id, { [path]: course.value[path] });
         NotifyPositive('Modification enregistrée.');
 
         await refreshCourse();
