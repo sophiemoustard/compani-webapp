@@ -32,6 +32,7 @@
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
       @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
+    <ni-company-table v-if="isCourseInter && (isTrainer || isAdmin)" :companies="course.companies" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse"
       v-model:max-trainees="tmpCourse.maxTrainees" />
@@ -125,6 +126,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
+import CompanyTable from '@components/courses/CompanyTable';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
@@ -167,6 +169,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-slot-container': SlotContainer,
+    'ni-company-table': CompanyTable,
     'ni-trainee-table': TraineeTable,
     'ni-course-info-link': CourseInfoLink,
     'ni-banner': Banner,
@@ -742,6 +745,8 @@ export default {
       isArchived,
       followUpMissingInfo,
       isClientInterface,
+      isCourseInter,
+      isTrainer,
       // Methods
       get,
       formatQuantity,
