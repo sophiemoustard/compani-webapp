@@ -120,7 +120,7 @@ export default {
         label: 'Structure',
         align: 'center',
         field: row => get(row, 'company.name') || '',
-        classes: 'text-capitalize',
+        classes: 'text-capitalize company-tag-content',
       },
       {
         name: 'firstname',
@@ -446,4 +446,9 @@ export default {
   color: $copper-700
   padding: 4px 8px
   margin: 4px 0px
+  &-content
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: center
 </style>
