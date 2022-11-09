@@ -7,7 +7,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import Email from '@api/Email';
 import { TRAINEE } from '@data/constants';
-import { dateDiff } from '@helpers/date';
+import CompaniDate from '@helpers/dates/companiDates';
 import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -61,10 +61,10 @@ export const useLearners = (refresh, isClientInterface, company) => {
     learnerValidation.value.newLearner.$reset();
   };
 
-  const getDaysSinceLastActivityHistory = (lastActivityHistory) => {
+  const getISODurationSinceLastActivityHistory = (lastActivityHistory) => {
     if (!lastActivityHistory) return null;
 
-    return dateDiff(Date.now(), lastActivityHistory.updatedAt);
+    return CompaniDate().diff(lastActivityHistory.updatedAt, 'days');
   };
 
   const formatRow = (user) => {
@@ -82,7 +82,7 @@ export const useLearners = (refresh, isClientInterface, company) => {
       blendedCoursesCount: user.blendedCoursesCount,
       eLearningCoursesCount: user.eLearningCoursesCount,
       activityHistoryCount: user.activityHistoryCount,
-      daysSinceLastActivityHistory: getDaysSinceLastActivityHistory(user.lastActivityHistory),
+      isoDurationSinceLastActivityHistory: getISODurationSinceLastActivityHistory(user.lastActivityHistory),
     };
   };
 
