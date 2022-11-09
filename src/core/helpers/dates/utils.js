@@ -22,29 +22,29 @@ export const formatIntervalHourly = slot => `${CompaniDate(slot.startDate).forma
   + `${CompaniDate(slot.endDate).format(HH_MM)}`;
 
 export const formatISODurationWithBestUnit = (durationISO) => {
-  const durationAbs = CompaniDuration(durationISO).abs();
+  const absoluteDuration = CompaniDuration(durationISO).abs();
 
-  if (durationAbs.isShorterThan('PT1H')) {
-    const minutes = Math.floor(durationAbs.asMinutes());
+  if (absoluteDuration.isShorterThan('PT1H')) {
+    const minutes = Math.floor(absoluteDuration.asMinutes());
 
     return formatQuantity('minute', minutes);
   }
-  if (durationAbs.isShorterThan('P1D')) {
-    const hours = Math.floor(durationAbs.asHours());
+  if (absoluteDuration.isShorterThan('P1D')) {
+    const hours = Math.floor(absoluteDuration.asHours());
 
     return formatQuantity('heure', hours);
   }
-  if (durationAbs.isShorterThan('P1M')) {
-    const days = Math.floor(durationAbs.asDays());
+  if (absoluteDuration.isShorterThan('P1M')) {
+    const days = Math.floor(absoluteDuration.asDays());
 
     return formatQuantity('jour', days);
   }
-  if (durationAbs.isShorterThan('P1Y')) {
-    const months = Math.floor(durationAbs.asMonths());
+  if (absoluteDuration.isShorterThan('P1Y')) {
+    const months = Math.floor(absoluteDuration.asMonths());
 
     return `${months} mois`;
   }
-  const years = Math.floor(durationAbs.asYears());
+  const years = Math.floor(absoluteDuration.asYears());
 
   return formatQuantity('an', years);
 };
