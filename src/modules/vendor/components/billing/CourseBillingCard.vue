@@ -133,7 +133,8 @@
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
       :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate"
-      :credit-note-meta-info="creditNoteMetaInfo" />
+      :credit-note-meta-info="creditNoteMetaInfo" :validated-course-bills-count="validatedCourseBillsCount"
+      :display-course-bills-count="!!course.expectedBillsCount" />
   </div>
 </template>
 
@@ -263,8 +264,13 @@ export default {
 
     const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
+    const validatedCourseBillsCount = computed(() => courseBills.value
+      .filter(cb => cb.billedAt && !cb.courseCreditNote)
+      .length);
+
     const traineesLength = computed(() => course.value.trainees
-      .filter(trainee => trainee.company._id === company.value._id).length);
+      .filter(trainee => trainee.company._id === company.value._id)
+      .length);
 
     const courseName = computed(() => `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
       ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
@@ -673,6 +679,7 @@ export default {
       traineesLength,
       courseName,
       traineesQuantity,
+      validatedCourseBillsCount,
       // Methods
       resetBillCreationModal,
       resetEditedBill,
