@@ -2,11 +2,23 @@ import { HH_MM } from '@data/constants';
 import CompaniDate from './companiDates';
 import CompaniDuration from './companiDurations';
 
-export const ascendingSort = (a, b) => (CompaniDate(a).isAfter(b) ? 1 : -1);
+export const ascendingSort = (a, b) => {
+  if (CompaniDate(a).isSame(b)) return 0;
 
-export const ascendingSortBy = key => (a, b) => (CompaniDate(a[key]).isAfter(b[key]) ? 1 : -1);
+  return CompaniDate(a).isAfter(b) ? 1 : -1;
+};
 
-export const descendingSortBy = key => (a, b) => (CompaniDate(a[key]).isBefore(b[key]) ? 1 : -1);
+export const ascendingSortBy = key => (a, b) => {
+  if (CompaniDate(a[key]).isSame(b[key])) return 0;
+
+  return CompaniDate(a[key]).isAfter(b[key]) ? 1 : -1;
+};
+
+export const descendingSortBy = key => (a, b) => {
+  if (CompaniDate(a[key]).isSame(b[key])) return 0;
+
+  return CompaniDate(a[key]).isBefore(b[key]) ? 1 : -1;
+};
 
 export const getISODuration = timePeriod => CompaniDate(timePeriod.endDate).diff(timePeriod.startDate, 'seconds');
 
