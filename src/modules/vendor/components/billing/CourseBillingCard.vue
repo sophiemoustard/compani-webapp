@@ -134,7 +134,7 @@
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
       :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate"
       :credit-note-meta-info="creditNoteMetaInfo" :validated-course-bills-count="validatedCourseBillsCount"
-      :display-course-bills-count="!!course.expectedBillsCount" />
+      :display-course-bills-count="course.type === INTRA && course.expectedBillsCount > 1" />
   </div>
 </template>
 
