@@ -25,7 +25,7 @@
                       :disable="!!course.archivedAt" />
                   </div>
                 </template>
-                <template v-else-if="col.name === 'company'">
+                <template v-else-if="!isClientInterface && col.name === 'company'">
                   <div class="company-tag">{{ col.value }}</div>
                 </template>
                 <template v-else>{{ col.value }}</template>
