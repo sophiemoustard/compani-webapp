@@ -34,8 +34,7 @@ export default {
   components: {
     'ni-responsive-table': ResponsiveTable,
   },
-  emits: ['refresh', 'update'],
-  setup (props, { emit }) {
+  setup (props) {
     const { companies } = toRefs(props);
     const columns = ref([
       {
