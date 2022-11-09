@@ -32,7 +32,7 @@
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
       @update="updateCourse('estimatedStartDate')" />
-    <ni-company-table v-if="isCourseInter && (isTrainer || isAdmin)" :companies="course.companies" />
+    <ni-company-table v-if="isCourseInter && isVendorInterface" :companies="course.companies" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
       @update="updateCourse('maxTrainees')" :validations="v$.course" />
     <q-page-sticky expand position="right">
@@ -755,7 +755,7 @@ export default {
       followUpMissingInfo,
       isClientInterface,
       isCourseInter,
-      isTrainer,
+      isVendorInterface,
       // Methods
       get,
       formatQuantity,
