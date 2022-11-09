@@ -134,7 +134,7 @@
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
       :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate"
       :credit-note-meta-info="creditNoteMetaInfo" :validated-course-bills-count="validatedCourseBillsCount"
-      :display-course-bills-count="course.type === INTRA && course.expectedBillsCount > 1" />
+      :display-validated-course-bills-count="displayValidatedCourseBillsCount" />
   </div>
 </template>
 
@@ -312,6 +312,9 @@ export default {
 
       billCreationModal.value = true;
     };
+
+    const displayValidatedCourseBillsCount = computed(() => course.value.type === INTRA &&
+      course.value.expectedBillsCount > 1);
 
     const setEditedBill = (bill) => {
       const payer = get(bill, 'payer._id');
@@ -680,6 +683,7 @@ export default {
       courseName,
       traineesQuantity,
       validatedCourseBillsCount,
+      displayValidatedCourseBillsCount,
       // Methods
       resetBillCreationModal,
       resetEditedBill,
