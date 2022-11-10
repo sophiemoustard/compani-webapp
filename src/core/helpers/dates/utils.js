@@ -1,4 +1,5 @@
 import { HH_MM } from '@data/constants';
+import { formatQuantity } from '../utils';
 import CompaniDate from './companiDates';
 import CompaniDuration from './companiDurations';
 
@@ -31,3 +32,31 @@ export const getRoundedDiffInDays = (date, otherDate) => Math
 
 export const formatIntervalHourly = slot => `${CompaniDate(slot.startDate).format(HH_MM)} - `
   + `${CompaniDate(slot.endDate).format(HH_MM)}`;
+
+export const formatISODurationWithBestUnit = (durationISO) => {
+  const absoluteDuration = CompaniDuration(durationISO).abs();
+
+  if (absoluteDuration.isShorterThan('PT1H')) {
+    const minutes = Math.floor(absoluteDuration.asMinutes());
+
+    return formatQuantity('minute', minutes);
+  }
+  if (absoluteDuration.isShorterThan('P1D')) {
+    const hours = Math.floor(absoluteDuration.asHours());
+
+    return formatQuantity('heure', hours);
+  }
+  if (absoluteDuration.isShorterThan('P1M')) {
+    const days = Math.floor(absoluteDuration.asDays());
+
+    return formatQuantity('jour', days);
+  }
+  if (absoluteDuration.isShorterThan('P1Y')) {
+    const months = Math.floor(absoluteDuration.asMonths());
+
+    return `${months} mois`;
+  }
+  const years = Math.floor(absoluteDuration.asYears());
+
+  return formatQuantity('an', years);
+};

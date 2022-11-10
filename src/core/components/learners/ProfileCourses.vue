@@ -63,7 +63,7 @@
                     <q-icon size="12px" name="check_circle" color="green-600 attendance" />
                     <span class="text-green-600">Présent(e)</span>
                   </div>
-                  <div v-else-if="isBefore(new Date(), slot.endDate)" class="attendance">
+                  <div v-else-if="CompaniDate().isBefore(slot.endDate)" class="attendance">
                     <span class="q-mx-sm text-italic text-copper-grey-800">à venir</span>
                   </div>
                   <div v-else>
@@ -132,7 +132,6 @@ import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
 import { sortStrings, formatIdentity } from '@helpers/utils';
-import { isBetweenOrEqual, isBefore } from '@helpers/date';
 import { getStepTypeIcon, formatSlotSchedule } from '@helpers/courses';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
@@ -272,10 +271,11 @@ export default {
     const computeChartsData = async () => {
       try {
         loading.value = true;
-        const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-        const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const chartStartDate = CompaniDate().startOf('month').subtract('P6M');
+        const chartEndDate = CompaniDate().startOf('month');
+
         const sixMonthsHistories = eLearningActivitiesCompleted.value
-          .filter(ah => isBetweenOrEqual(ah.createdAt, chartStartDate, chartEndDate));
+          .filter(ah => CompaniDate(ah.createdAt).isSameOrBetween(chartStartDate, chartEndDate));
 
         activitiesByMonth.value = getDataByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
@@ -356,12 +356,12 @@ export default {
       formatIdentity,
       get,
       has,
-      isBefore,
       goToCourseProfile,
       formatDuration,
       getStepTypeIcon,
       formatSlotSchedule,
       CompaniDate,
+      CompaniDuration,
     };
   },
 };

@@ -32,16 +32,24 @@ const CompaniDurationFactory = (inputDuration) => {
       throw Error('Invalid argument: expected specific format');
     },
 
-    asMinutes () {
-      return _duration.as('minutes');
+    asYears () {
+      return _duration.as('years');
+    },
+
+    asMonths () {
+      return _duration.as('months');
+    },
+
+    asDays () {
+      return _duration.as('days');
     },
 
     asHours () {
       return _duration.as('hours');
     },
 
-    asDays () {
-      return _duration.as('days');
+    asMinutes () {
+      return _duration.as('minutes');
     },
 
     toHoursAndMinutesObject () {
@@ -70,11 +78,23 @@ const CompaniDurationFactory = (inputDuration) => {
       return durationInSeconds > otherDurationInSeconds;
     },
 
+    isShorterThan (miscTypeOtherDuration) {
+      const otherDurationInSeconds = _formatMiscToCompaniDuration(miscTypeOtherDuration).as('seconds');
+      const durationInSeconds = _duration.as('seconds');
+
+      return durationInSeconds < otherDurationInSeconds;
+    },
+
     // MANIPULATE
     add (miscTypeOtherDuration) {
       const otherDuration = _formatMiscToCompaniDuration(miscTypeOtherDuration);
 
       return CompaniDurationFactory(_duration.plus(otherDuration));
+    },
+
+    abs () {
+      if (_duration.as('seconds') > 0) return CompaniDurationFactory(_duration);
+      return CompaniDurationFactory(_duration.mapUnits(value => -value));
     },
   };
 };
