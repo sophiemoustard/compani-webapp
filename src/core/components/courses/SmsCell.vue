@@ -4,7 +4,7 @@
       <div class="row justify-between items-center cursor-pointer" @click="showDetails">
         <div>
           <div class="text-weight-bold">SMS de {{ getHistoryType }}</div>
-          <div>envoyé {{ getTimestampSending }} par {{ senderIdentity }}</div>
+          <div>envoyé {{ getSmsTimeStamp }} par {{ senderIdentity }}</div>
         </div>
         <q-icon size="24px" :name="isExpanded ? 'expand_less' : 'expand_more'" />
       </div>
@@ -36,7 +36,7 @@ export default {
     const getHistoryType =
       computed(() => messageTypeOptions.value.find(option => option.value === history.value.type).label.toLowerCase());
 
-    const getTimestampSending = computed(() => {
+    const getSmsTimeStamp = computed(() => {
       const diffInDaysISO = CompaniDate().diff(history.value.date, 'days');
 
       if (CompaniDuration(diffInDaysISO).isLongerThan('P15D')) {
@@ -57,7 +57,7 @@ export default {
       senderIdentity,
       // Methods
       getHistoryType,
-      getTimestampSending,
+      getSmsTimeStamp,
       formatIdentity,
       showDetails,
     };
