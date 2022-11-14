@@ -114,7 +114,6 @@ import { copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
-import set from 'lodash/set';
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
@@ -151,7 +150,7 @@ import {
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
-import { formatQuantity, formatIdentity, formatDownloadName, formatPhoneForPayload } from '@helpers/utils';
+import { formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
@@ -662,8 +661,6 @@ export default {
       tmpInput.value = getValue(path);
     };
 
-    const formatUpdateCourseValue = (path, value) => (path === 'contact.phone' ? formatPhoneForPayload(value) : value);
-
     const updateCourse = async (path) => {
       try {
         const value = getValue(path);
@@ -675,8 +672,7 @@ export default {
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
         }
 
-        const payload = set({}, path, formatUpdateCourseValue(path, value));
-        await Courses.update(profileId.value, payload);
+        await Courses.update(profileId.value, { [path]: value });
         NotifyPositive('Modification enregistrée.');
 
         await refreshCourse();
