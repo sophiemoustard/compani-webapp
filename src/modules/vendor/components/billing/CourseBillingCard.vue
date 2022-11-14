@@ -173,6 +173,7 @@ export default {
     billingItemList: { type: Array, default: () => ([]) },
     courseBills: { type: Array, default: () => ([]) },
     loading: { type: Boolean, default: false },
+    disable: { type: Boolean, default: false },
   },
   emits: ['refresh-course-bills', 'refresh-and-unroll'],
   components: {
@@ -190,7 +191,7 @@ export default {
     const $q = useQuasar();
     const $router = useRouter();
 
-    const { company, course, payerList, billingItemList, courseBills } = toRefs(props);
+    const { company, course, payerList, billingItemList, courseBills, disable } = toRefs(props);
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingPurchaseCreationLoading = ref(false);
@@ -301,6 +302,7 @@ export default {
     };
 
     const openBillCreationModal = () => {
+      if (disable.value) return NotifyWarning('Champ(s) invalide(s).');
       if (course.value.type === INTER_B2B && !traineesLength.value) {
         return NotifyWarning('Aucun stagiaire rattaché à cette structure n\'est inscrit à la formation.');
       }
@@ -524,6 +526,7 @@ export default {
     };
 
     const openCreditNoteCreationModal = (bill) => {
+      if (disable.value) return NotifyWarning('Champ(s) invalide(s).');
       const { _id: billId, number, netInclTaxes } = bill;
       newCreditNote.value = {
         courseBill: billId,
