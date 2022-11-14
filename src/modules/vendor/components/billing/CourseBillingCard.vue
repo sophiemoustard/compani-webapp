@@ -133,7 +133,8 @@
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
       :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate"
-      :credit-note-meta-info="creditNoteMetaInfo" />
+      :credit-note-meta-info="creditNoteMetaInfo" :validated-course-bills-count="validatedCourseBillsCount"
+      :display-validated-course-bills-count="displayValidatedCourseBillsCount" />
   </div>
 </template>
 
@@ -172,6 +173,7 @@ export default {
     billingItemList: { type: Array, default: () => ([]) },
     courseBills: { type: Array, default: () => ([]) },
     loading: { type: Boolean, default: false },
+    expectedBillsCountInvalid: { type: Boolean, default: false },
   },
   emits: ['refresh-course-bills', 'refresh-and-unroll'],
   components: {
@@ -189,7 +191,7 @@ export default {
     const $q = useQuasar();
     const $router = useRouter();
 
-    const { company, course, payerList, billingItemList, courseBills } = toRefs(props);
+    const { company, course, payerList, billingItemList, courseBills, expectedBillsCountInvalid } = toRefs(props);
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingPurchaseCreationLoading = ref(false);
@@ -263,8 +265,13 @@ export default {
 
     const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
+    const validatedCourseBillsCount = computed(() => courseBills.value
+      .filter(cb => cb.billedAt && !cb.courseCreditNote)
+      .length);
+
     const traineesLength = computed(() => course.value.trainees
-      .filter(trainee => trainee.company._id === company.value._id).length);
+      .filter(trainee => trainee.company._id === company.value._id)
+      .length);
 
     const courseName = computed(() => `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
       ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
@@ -295,6 +302,7 @@ export default {
     };
 
     const openBillCreationModal = () => {
+      if (expectedBillsCountInvalid.value) return NotifyWarning('Champ(s) invalide(s).');
       if (course.value.type === INTER_B2B && !traineesLength.value) {
         return NotifyWarning('Aucun stagiaire rattaché à cette structure n\'est inscrit à la formation.');
       }
@@ -306,6 +314,9 @@ export default {
 
       billCreationModal.value = true;
     };
+
+    const displayValidatedCourseBillsCount = computed(() => course.value.type === INTRA &&
+      course.value.expectedBillsCount > 1);
 
     const setEditedBill = (bill) => {
       const payer = get(bill, 'payer._id');
@@ -515,6 +526,7 @@ export default {
     };
 
     const openCreditNoteCreationModal = (bill) => {
+      if (expectedBillsCountInvalid.value) return NotifyWarning('Champ(s) invalide(s).');
       const { _id: billId, number, netInclTaxes } = bill;
       newCreditNote.value = {
         courseBill: billId,
@@ -673,6 +685,8 @@ export default {
       traineesLength,
       courseName,
       traineesQuantity,
+      validatedCourseBillsCount,
+      displayValidatedCourseBillsCount,
       // Methods
       resetBillCreationModal,
       resetEditedBill,

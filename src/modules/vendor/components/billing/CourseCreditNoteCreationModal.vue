@@ -10,6 +10,12 @@
       </span>
     </div>
     <div class="course-name">{{ creditNoteMetaInfo.courseName }}</div>
+    <ni-banner v-if="displayValidatedCourseBillsCount" icon="info_outline" icon-color="copper-grey-700"
+      class="bg-copper-grey-200 text-copper-grey-700">
+      <template #message>
+        Il y a {{ formatQuantity('facture valide', validatedCourseBillsCount) }} pour cette formation.
+      </template>
+    </ni-banner>
     <ni-date-input in-modal caption="Date" :model-value="newCreditNote.date" @blur="validations.date.$touch"
       required-field :error="validations.date.$error" @update:model-value="update($event, 'date')" :min="minDate"
       :error-message="dateErrorMessage(validations)" />
@@ -29,8 +35,9 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
+import Banner from '@components/Banner';
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, formatQuantity } from '@helpers/utils';
 
 export default {
   name: 'CourseCreditNoteCreationModal',
@@ -41,12 +48,15 @@ export default {
     loading: { type: Boolean, default: false },
     minDate: { type: String, required: true },
     creditNoteMetaInfo: { type: Object, default: () => ({}) },
+    validatedCourseBillsCount: { type: Number, default: 0 },
+    displayValidatedCourseBillsCount: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
     'ni-input': Input,
     'ni-button': Button,
     'ni-date-input': DateInput,
+    'ni-banner': Banner,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-credit-note'],
   setup (props, { emit }) {
@@ -71,6 +81,7 @@ export default {
       submit,
       update,
       formatPrice,
+      formatQuantity,
     };
   },
 };
