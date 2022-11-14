@@ -9,7 +9,7 @@
       <ni-course-billing-card :company="company" :course="course" :payer-list="payerList" :loading="billsLoading"
       :billing-item-list="billingItemList" :course-bills="courseBills.filter(bill => bill.company._id === company._id)"
       @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll"
-      :disable="v$.course.expectedBillsCount.$error" />
+      :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
     </div>
     <div v-if="!companies.length" class="text-italic">Aucun stagiaire n'est inscrit à la formation</div>
   </div>
