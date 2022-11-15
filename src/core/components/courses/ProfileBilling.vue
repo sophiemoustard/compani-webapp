@@ -1,9 +1,15 @@
 <template>
   <div>
+    <div v-if="isIntraCourse" class="row gutter-profile">
+      <ni-input v-model="course.expectedBillsCount" required-field @focus="saveTmp('expectedBillsCount')"
+        @blur="updateCourse('expectedBillsCount')" caption="Nombre de factures"
+        :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
+    </div>
     <div v-for="company of companies" :key="company._id">
-      <ni-course-billing-card :company="company" :course="course" :payer-list="payerList"
+      <ni-course-billing-card :company="company" :course="course" :payer-list="payerList" :loading="billsLoading"
       :billing-item-list="billingItemList" :course-bills="courseBills.filter(bill => bill.company._id === company._id)"
-      @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll" />
+      @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll"
+      :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
     </div>
     <div v-if="!companies.length" class="text-italic">Aucun stagiaire n'est inscrit à la formation</div>
   </div>
@@ -16,21 +22,26 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import uniqBy from 'lodash/uniqBy';
 import pickBy from 'lodash/pickBy';
+import useVuelidate from '@vuelidate/core';
+import { required, minValue } from '@vuelidate/validators';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
 import Companies from '@api/Companies';
+import Courses from '@api/Courses';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
-import { NotifyNegative } from '@components/popup/notify';
-import { LIST, COMPANY } from '@data/constants';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { LIST, COMPANY, REQUIRED_LABEL } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
+import Input from '@components/form/Input';
 import { useCourses } from '@composables/courses';
+import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'ProfileBilling',
   components: {
     'ni-course-billing-card': CourseBillingCard,
+    'ni-input': Input,
   },
   setup () {
     const $store = useStore();
@@ -38,9 +49,22 @@ export default {
     const billsLoading = ref(false);
     const payerList = ref([]);
     const billingItemList = ref([]);
+    const tmpInput = ref('');
     const FUNDING_ORGANISATION = 'funding_organisation';
 
     const course = computed(() => $store.state.course.course);
+    const rules = computed(() => ({
+      course: {
+        expectedBillsCount: {
+          required,
+          positiveNumber,
+          integerNumber,
+          minValue: minValue(courseBills.value.filter(cb => !cb.courseCreditNote).length),
+        },
+      },
+    }));
+
+    const v$ = useVuelidate(rules, { course });
 
     const { isIntraCourse } = useCourses(course);
 
@@ -52,6 +76,19 @@ export default {
       return uniqBy([...traineesCompanies, ...billsCompanies, ...intraCourseCompany], '_id')
         .sort((a, b) => a.name.localeCompare(b.name));
     });
+
+    const expectedBillsCountErrorMessage = computed(() => {
+      if (v$.value.course.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
+      if (v$.value.course.expectedBillsCount.positiveNumber.$response === false) {
+        return 'Nombre non valide, doit être positif';
+      }
+      if (v$.value.course.expectedBillsCount.minValue.$response === false) {
+        return 'Le nombre doit être supérieur ou égal au nombre de factures valides pour cette formation';
+      }
+      return 'Nombre non valide';
+    });
+
+    const saveTmp = path => (tmpInput.value = course.value[path]);
 
     const refreshCourseBills = async () => {
       try {
@@ -103,23 +140,60 @@ export default {
       }
     };
 
+    const refreshCourse = async () => {
+      try {
+        billsLoading.value = true;
+        await $store.dispatch('course/fetchCourse', { courseId: course.value._id });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        billsLoading.value = false;
+      }
+    };
+
+    const updateCourse = async (path) => {
+      try {
+        billsLoading.value = true;
+        if (course.value[path] === tmpInput.value) return;
+
+        v$.value.course.$touch();
+        if (v$.value.course.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Courses.update(course.value._id, { [path]: course.value[path] });
+        NotifyPositive('Modification enregistrée.');
+
+        await refreshCourse();
+      } catch (e) {
+        console.error(e);
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
+        NotifyNegative('Erreur lors de la modification.');
+      } finally {
+        billsLoading.value = false;
+      }
+    };
+
     const created = async () => {
-      await refreshCourseBills();
-      await refreshPayers();
-      await refreshBillingItems();
+      await Promise.all([refreshCourseBills(), refreshPayers(), refreshBillingItems(), refreshCourse()]);
     };
 
     created();
 
     return {
+      // Validation
+      v$,
       // Data
       payerList,
       billingItemList,
       courseBills,
+      billsLoading,
       // Computed
       course,
       companies,
+      isIntraCourse,
+      updateCourse,
+      expectedBillsCountErrorMessage,
       // Methods
+      saveTmp,
       refreshCourseBills,
       refreshAndUnroll,
       refreshPayers,
@@ -128,7 +202,6 @@ export default {
       omit,
       pickBy,
       formatPrice,
-      formatDate,
     };
   },
 };

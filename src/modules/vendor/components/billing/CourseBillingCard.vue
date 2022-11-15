@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!billsLoading" class="q-mt-lg q-mb-xl">
+    <div class="q-mt-lg q-mb-xl">
       <p v-if="course.type === INTER_B2B" class="text-weight-bold">
         {{ company.name }}
         <span class="text-weight-regular text-copper-500">
@@ -40,7 +40,7 @@
                 Payeur : {{ get(bill, 'payer.name') }}
                 <q-icon v-if="!isBilled(bill)" size="16px" name="edit" color="copper-grey-500" />
               </div>
-              {{ isDateVisible(bill) ? `Date : ${formatDate(bill.billedAt)}` : '' }}
+              {{ isDateVisible(bill) ? `Date : ${CompaniDate(bill.billedAt).format(DD_MM_YYYY)}` : '' }}
             </q-item-section>
             <q-icon size="24px" :name="areDetailsVisible[bill._id] ? 'expand_less' : 'expand_more'" />
           </q-card-section>
@@ -93,11 +93,10 @@
         </q-card>
       </div>
       <div v-if="canAddBill" class="row justify-start">
-        <ni-button label="Créer une facture" color="white" class="bg-primary" icon="payment"
+        <ni-button label="Créer une facture" color="white" class="bg-primary" icon="payment" :loading="loading"
           @click="openBillCreationModal" :disable="billCreationLoading" />
       </div>
     </div>
-    <div v-else class="row justify-center q-mt-md"><q-spinner size="30px" /></div>
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal" :loading="billCreationLoading"
@@ -134,7 +133,8 @@
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
       :validations="validations.newCreditNote" :min-date="minCourseCreditNoteDate"
-      :credit-note-meta-info="creditNoteMetaInfo" />
+      :credit-note-meta-info="creditNoteMetaInfo" :validated-course-bills-count="validatedCourseBillsCount"
+      :display-validated-course-bills-count="displayValidatedCourseBillsCount" />
   </div>
 </template>
 
@@ -149,13 +149,14 @@ import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatPrice, formatDownloadName, formatQuantity } from '@helpers/utils';
-import { formatDate, descendingSortArray } from '@helpers/date';
 import { downloadFile } from '@helpers/file';
+import CompaniDate from '@helpers/dates/companiDates';
+import { descendingSortBy } from '@helpers/dates/utils';
 import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B } from '@data/constants';
+import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY } from '@data/constants';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import PayerEditionModal from 'src/modules/vendor/components/billing/PayerEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
@@ -171,6 +172,8 @@ export default {
     payerList: { type: Array, default: () => ([]) },
     billingItemList: { type: Array, default: () => ([]) },
     courseBills: { type: Array, default: () => ([]) },
+    loading: { type: Boolean, default: false },
+    expectedBillsCountInvalid: { type: Boolean, default: false },
   },
   emits: ['refresh-course-bills', 'refresh-and-unroll'],
   components: {
@@ -188,14 +191,13 @@ export default {
     const $q = useQuasar();
     const $router = useRouter();
 
-    const { company, course, payerList, billingItemList, courseBills } = toRefs(props);
+    const { company, course, payerList, billingItemList, courseBills, expectedBillsCountInvalid } = toRefs(props);
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingPurchaseCreationLoading = ref(false);
     const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
     const creditNoteCreationLoading = ref(false);
-    const billsLoading = ref(false);
     const pdfLoading = ref(false);
     const billCreationModal = ref(false);
     const payerEditionModal = ref(false);
@@ -263,8 +265,13 @@ export default {
 
     const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
+    const validatedCourseBillsCount = computed(() => courseBills.value
+      .filter(cb => cb.billedAt && !cb.courseCreditNote)
+      .length);
+
     const traineesLength = computed(() => course.value.trainees
-      .filter(trainee => trainee.company._id === company.value._id).length);
+      .filter(trainee => trainee.company._id === company.value._id)
+      .length);
 
     const courseName = computed(() => `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
       ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
@@ -295,11 +302,21 @@ export default {
     };
 
     const openBillCreationModal = () => {
+      if (expectedBillsCountInvalid.value) return NotifyWarning('Champ(s) invalide(s).');
       if (course.value.type === INTER_B2B && !traineesLength.value) {
         return NotifyWarning('Aucun stagiaire rattaché à cette structure n\'est inscrit à la formation.');
       }
+
+      const courseBillsWithoutCreditNote = courseBills.value.filter(cb => !cb.courseCreditNote);
+      if (course.value.type === INTRA && courseBillsWithoutCreditNote.length === course.value.expectedBillsCount) {
+        return NotifyWarning('Impossible de créer une facture, nombre de factures maximum atteint.');
+      }
+
       billCreationModal.value = true;
     };
+
+    const displayValidatedCourseBillsCount = computed(() => course.value.type === INTRA &&
+      course.value.expectedBillsCount > 1);
 
     const setEditedBill = (bill) => {
       const payer = get(bill, 'payer._id');
@@ -396,7 +413,7 @@ export default {
     });
 
     const unrollBill = () => {
-      const bill = descendingSortArray(courseBills.value, 'createdAt')[0];
+      const bill = [...courseBills.value].sort(descendingSortBy('createdAt'))[0];
       showDetails(bill._id);
     };
 
@@ -509,6 +526,7 @@ export default {
     };
 
     const openCreditNoteCreationModal = (bill) => {
+      if (expectedBillsCountInvalid.value) return NotifyWarning('Champ(s) invalide(s).');
       const { _id: billId, number, netInclTaxes } = bill;
       newCreditNote.value = {
         courseBill: billId,
@@ -582,7 +600,8 @@ export default {
 
     const isBilled = bill => !!bill.billedAt;
 
-    const canAddBill = computed(() => courseBills.value.every(bill => bill.courseCreditNote));
+    const canAddBill = computed(() => course.value.type === INTRA ||
+      courseBills.value.every(bill => bill.courseCreditNote));
 
     const showDetails = (billId) => {
       areDetailsVisible.value[billId] = !areDetailsVisible.value[billId];
@@ -631,7 +650,6 @@ export default {
       // Data
       billCreationLoading,
       billEditionLoading,
-      billsLoading,
       pdfLoading,
       billingPurchaseCreationLoading,
       billingPurchaseEditionLoading,
@@ -656,6 +674,7 @@ export default {
       creditNoteMetaInfo,
       INTRA,
       INTER_B2B,
+      DD_MM_YYYY,
       // Computed
       validations,
       newBillErrorMessages,
@@ -666,6 +685,8 @@ export default {
       traineesLength,
       courseName,
       traineesQuantity,
+      validatedCourseBillsCount,
+      displayValidatedCourseBillsCount,
       // Methods
       resetBillCreationModal,
       resetEditedBill,
@@ -702,7 +723,7 @@ export default {
       omit,
       pickBy,
       formatPrice,
-      formatDate,
+      CompaniDate,
     };
   },
 };

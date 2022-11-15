@@ -1,5 +1,6 @@
 import { sortStrings } from '@helpers/utils';
-import { formatDateDiff } from '@helpers/date';
+import { formatISODurationWithBestUnit } from '@helpers/dates/utils';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import { DEFAULT_AVATAR } from '@data/constants';
 
 export const learnerDirectoryMixin = {
@@ -38,13 +39,13 @@ export const learnerDirectoryMixin = {
           sortable: true,
         },
         {
-          name: 'daysSinceLastActivityHistory',
+          name: 'isoDurationSinceLastActivityHistory',
           label: 'Dernière activité il y a...',
-          field: 'daysSinceLastActivityHistory',
+          field: 'isoDurationSinceLastActivityHistory',
           align: 'center',
           sortable: true,
-          format: value => (value !== null ? formatDateDiff(value) : '-'),
-          sort: (a, b) => b - a,
+          format: value => (value !== null ? formatISODurationWithBestUnit(value) : '-'),
+          sort: (a, b) => (CompaniDuration(b).isLongerThan(a) ? 1 : -1),
         },
       ],
     };

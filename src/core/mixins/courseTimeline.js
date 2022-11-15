@@ -1,5 +1,6 @@
 import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
-import moment from '@helpers/moment';
+import CompaniDate from '@helpers/dates/companiDates';
+import CompaniDuration from '@helpers/dates/companiDurations';
 
 export const courseTimelineMixin = {
   computed: {
@@ -7,7 +8,11 @@ export const courseTimelineMixin = {
       return this.courses
         .filter(this.isForthcoming)
         .map(course => ({ ...course, status: FORTHCOMING }))
-        .sort((a, b) => this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b));
+        .sort((a, b) => (
+          CompaniDuration(this.getDurationNowToStartCourse(a)).isLongerThan(this.getDurationNowToStartCourse(b))
+            ? 1
+            : -1
+        ));
     },
     courseListInProgress () {
       return this.courses
@@ -16,14 +21,20 @@ export const courseTimelineMixin = {
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
-          return this.getRangeNowToNextSlot(a) - this.getRangeNowToNextSlot(b);
+          return CompaniDuration(this.getDurationNowToNextSlot(a)).isLongerThan(this.getDurationNowToNextSlot(b))
+            ? 1
+            : -1;
         });
     },
     courseListCompleted () {
       return this.courses
         .filter(this.isCompleted)
         .map(course => ({ ...course, status: COMPLETED }))
-        .sort((a, b) => this.getRangeNowToEndCourse(a) - this.getRangeNowToEndCourse(b));
+        .sort((a, b) => (
+          CompaniDuration(this.getDurationNowToEndCourse(a)).isLongerThan(this.getDurationNowToEndCourse(b))
+            ? 1
+            : -1
+        ));
     },
   },
   methods: {
@@ -42,28 +53,28 @@ export const courseTimelineMixin = {
     isCompleted (course) {
       return !this.isForthcoming(course) && !this.isInProgress(course);
     },
-    getRangeNowToStartCourse (course) {
+    getDurationNowToStartCourse (course) {
       if (!course.slots.length && course.estimatedStartDate) {
-        return moment(course.estimatedStartDate).diff(moment(), 'd', true);
+        return CompaniDate(course.estimatedStartDate).diff(CompaniDate(), 'day');
       }
-      if (!course.slots.length && course.slotsToPlan.length) return Number.MAX_SAFE_INTEGER - 1;
-      if (!course.slots.length) return Number.MAX_SAFE_INTEGER;
+      if (!course.slots.length && course.slotsToPlan.length) return `PT${Number.MAX_SAFE_INTEGER - 1}S`;
+      if (!course.slots.length) return `PT${Number.MAX_SAFE_INTEGER}S`;
 
       const firstSlot = course.slots[0];
-      return moment(firstSlot[0].startDate).diff(moment(), 'd', true);
+      return CompaniDate(firstSlot[0].startDate).diff(CompaniDate(), 'day');
     },
-    getRangeNowToNextSlot (course) {
+    getDurationNowToNextSlot (course) {
       const nextSlot = course.slots.filter(daySlots => !this.happened(daySlots))[0];
-      if (!nextSlot) return 0;
+      if (!nextSlot) return 'PT0S';
 
-      return moment(nextSlot[0].startDate).diff(moment(), 'd', true);
+      return CompaniDate(nextSlot[0].startDate).diff(CompaniDate(), 'day');
     },
-    getRangeNowToEndCourse (course) {
+    getDurationNowToEndCourse (course) {
       const lastSlot = course.slots[course.slots.length - 1];
-      return moment().diff(moment(lastSlot[0].startDate), 'd', true);
+      return CompaniDate().diff(CompaniDate(lastSlot[0].startDate), 'day');
     },
     happened (sameDaySlots) {
-      return moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
+      return CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
   },
 };

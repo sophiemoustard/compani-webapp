@@ -10,13 +10,14 @@ import { useMeta } from 'quasar';
 import { computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
-import { formatDurationFromFloat } from '@helpers/date';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
 import ProfileQuestionnaires from 'src/modules/vendor/components/courses/ProfileQuestionnaires';
 import { NotifyNegative } from '@components/popup/notify';
+import CompaniDuration from '@helpers/dates/companiDurations';
+import { LONG_DURATION_H_MM } from '@data/constants';
 
 export default {
   name: 'ELearningCourseProfile',
@@ -53,7 +54,7 @@ export default {
     const courseName = computed(() => get(course.value, 'subProgram.program.name'));
     const headerInfo = computed(() => [{
       icon: 'hourglass_empty',
-      label: `Durée : ${formatDurationFromFloat(course.value.totalTheoreticalHours)}`,
+      label: `Durée : ${CompaniDuration(course.value.totalTheoreticalDuration).format(LONG_DURATION_H_MM)}`,
     }]);
 
     const refreshCourse = async () => {

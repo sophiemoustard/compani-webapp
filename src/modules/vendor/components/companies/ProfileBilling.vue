@@ -40,7 +40,7 @@
               Aucun règlement renseigné.
             </div>
             <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
-              <div class="date">{{ formatDate(item.date) }}</div>
+              <div class="date">{{ CompaniDate(item.date).format(DD_MM_YYYY) }}</div>
               <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
               <div class="progress" />
               <div class="formatted-price" />
@@ -100,8 +100,9 @@ import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, INTRA } from '@data/constants.js';
-import { formatDate, ascendingSort } from '@helpers/date';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, INTRA, DD_MM_YYYY } from '@data/constants.js';
+import CompaniDate from '@helpers/dates/companiDates';
+import { ascendingSortBy } from '@helpers/dates/utils';
 import { downloadFile } from '@helpers/file';
 import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -137,7 +138,7 @@ export default {
         name: 'date',
         label: 'Date',
         field: 'billedAt',
-        format: value => formatDate(value),
+        format: value => CompaniDate(value).format(DD_MM_YYYY),
         align: 'left',
         classes: 'date',
       },
@@ -321,8 +322,8 @@ export default {
       : CREDIT_OPTION.label);
 
     const getSortedItems = bill => (bill.courseCreditNote
-      ? [...bill.coursePayments, bill.courseCreditNote].sort((a, b) => ascendingSort(a.date, b.date))
-      : bill.coursePayments.sort((a, b) => ascendingSort(a.date, b.date)));
+      ? [...bill.coursePayments, bill.courseCreditNote].sort(ascendingSortBy('date'))
+      : bill.coursePayments.sort(ascendingSortBy('date')));
 
     const getTotal = (bills) => {
       const total = bills.reduce((acc, val) => acc + val.total, 0);
@@ -394,6 +395,7 @@ export default {
       paymentEditionLoading,
       PAYMENT_OPTIONS,
       REFUND,
+      DD_MM_YYYY,
       // Computed
       validations,
       canUpdateBilling,
@@ -411,11 +413,11 @@ export default {
       getSortedItems,
       getTotal,
       get,
-      formatDate,
       goToCourse,
       getCourseNameClass,
       getTableName,
       getProgramName,
+      CompaniDate,
     };
   },
 };

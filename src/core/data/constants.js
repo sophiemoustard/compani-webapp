@@ -604,6 +604,9 @@ export const DAYS = {
   6: 'Dimanche',
 };
 
+// COMPANIDURATION
+export const PT0S = 'PT0S';
+
 // COMPANIDURATION FORMATS
 export const LONG_DURATION_H_MM = 'h\'h\' mm\'min\'';
 export const SHORT_DURATION_H_MM = 'h\'h\'mm';

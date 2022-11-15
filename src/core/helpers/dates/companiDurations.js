@@ -1,4 +1,4 @@
-import { SHORT_DURATION_H_MM, LONG_DURATION_H_MM } from '@data/constants';
+import { SHORT_DURATION_H_MM, LONG_DURATION_H_MM, PT0S } from '@data/constants';
 import { Duration } from './luxon';
 
 const DURATION_HOURS = 'h\'h\'';
@@ -32,12 +32,57 @@ const CompaniDurationFactory = (inputDuration) => {
       throw Error('Invalid argument: expected specific format');
     },
 
+    asYears () {
+      return _duration.as('years');
+    },
+
+    asMonths () {
+      return _duration.as('months');
+    },
+
     asDays () {
       return _duration.as('days');
     },
 
+    asHours () {
+      return _duration.as('hours');
+    },
+
+    asMinutes () {
+      return _duration.as('minutes');
+    },
+
+    toHoursAndMinutesObject () {
+      const shiftedDuration = _duration.shiftTo('hours', 'minutes');
+      const minutes = shiftedDuration.get('minutes');
+      const hours = shiftedDuration.get('hours');
+      return { hours, minutes };
+    },
+
     toISO () {
       return _duration.toISO();
+    },
+
+    // QUERY
+    isEquivalentTo (miscTypeOtherDuration) {
+      const otherDurationInSeconds = _formatMiscToCompaniDuration(miscTypeOtherDuration).shiftTo('seconds');
+      const durationInSeconds = _duration.shiftTo('seconds');
+
+      return durationInSeconds.equals(otherDurationInSeconds);
+    },
+
+    isLongerThan (miscTypeOtherDuration) {
+      const otherDurationInSeconds = _formatMiscToCompaniDuration(miscTypeOtherDuration).as('seconds');
+      const durationInSeconds = _duration.as('seconds');
+
+      return durationInSeconds > otherDurationInSeconds;
+    },
+
+    isShorterThan (miscTypeOtherDuration) {
+      const otherDurationInSeconds = _formatMiscToCompaniDuration(miscTypeOtherDuration).as('seconds');
+      const durationInSeconds = _duration.as('seconds');
+
+      return durationInSeconds < otherDurationInSeconds;
     },
 
     // MANIPULATE
@@ -46,11 +91,16 @@ const CompaniDurationFactory = (inputDuration) => {
 
       return CompaniDurationFactory(_duration.plus(otherDuration));
     },
+
+    abs () {
+      if (_duration.as('seconds') > 0) return CompaniDurationFactory(_duration);
+      return CompaniDurationFactory(_duration.mapUnits(value => -value));
+    },
   };
 };
 
 const _formatMiscToCompaniDuration = (...args) => {
-  if (args.length === 0) return Duration.fromISO('PT0S');
+  if (args.length === 0) return Duration.fromISO(PT0S);
 
   if (args.length === 1) {
     if (typeof args[0] === 'string') return Duration.fromISO(args[0]);

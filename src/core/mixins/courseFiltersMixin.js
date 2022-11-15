@@ -1,10 +1,9 @@
 import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
-import { INTER_B2B, INTRA } from '@data/constants';
+import { INTER_B2B, INTRA, DD_MM_YYYY } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import moment from '@helpers/moment';
-import { formatDate, isSameOrAfter, isSameOrBefore, isBetweenOrEqual } from '@helpers/date';
+import CompaniDate from '@helpers/dates/companiDates';
 
 export const courseFiltersMixin = {
   data () {
@@ -107,10 +106,10 @@ export const courseFiltersMixin = {
       this.$store.dispatch('course/setSelectedSalesRepresentative', { salesRepresentativeId });
     },
     updateSelectedStartDate (startDate) {
-      this.$store.dispatch('course/setSelectedStartDate', { startDate: moment(startDate).startOf('d').toISOString() });
+      this.$store.dispatch('course/setSelectedStartDate', { startDate: CompaniDate(startDate).startOf('day').toISO() });
     },
     updateSelectedEndDate (endDate) {
-      this.$store.dispatch('course/setSelectedEndDate', { endDate: moment(endDate).endOf('d').toISOString() });
+      this.$store.dispatch('course/setSelectedEndDate', { endDate: CompaniDate(endDate).endOf('day').toISO() });
     },
     resetFilters () {
       this.$store.dispatch('course/resetFilters');
@@ -140,22 +139,34 @@ export const courseFiltersMixin = {
     },
     filterCoursesByStartDate (courses) {
       return courses
-        .filter(course => (!course.slots.length && isSameOrAfter(course.estimatedStartDate, this.selectedStartDate)) ||
-          (course.slots.some(slotGroup => slotGroup.some(s => isSameOrAfter(s.startDate, this.selectedStartDate)))));
+        .filter((course) => {
+          const estimatedDateIsAfter = !course.slots.length && course.estimatedStartDate &&
+            CompaniDate(course.estimatedStartDate).isSameOrAfter(this.selectedStartDate);
+          const someSlotsAreAfter = course.slots
+            .some(slotGroup => slotGroup.some(s => CompaniDate(s.startDate).isSameOrAfter(this.selectedStartDate)));
+
+          return estimatedDateIsAfter || someSlotsAreAfter;
+        });
     },
     filterCoursesByEndDate (courses) {
       return courses
-        .filter(course => (!course.slots.length && isSameOrBefore(course.estimatedStartDate, this.selectedEndDate)) ||
-          (course.slots.some(slotGroup => slotGroup.some(s => isSameOrBefore(s.endDate, this.selectedEndDate)))));
+        .filter((course) => {
+          const estimatedDateIsBefore = !course.slots.length && course.estimatedStartDate &&
+            CompaniDate(course.estimatedStartDate).isSameOrBefore(this.selectedEndDate);
+          const someSlotsAreBefore = course.slots
+            .some(slotGroup => slotGroup.some(s => CompaniDate(s.endDate).isSameOrBefore(this.selectedEndDate)));
+
+          return estimatedDateIsBefore || someSlotsAreBefore;
+        });
     },
     filterCoursesByStartDateAndEndDate (courses) {
       return courses
         .filter((course) => {
-          const hasEstimationInRange = !course.slots.length &&
-            isBetweenOrEqual(course.estimatedStartDate, this.selectedStartDate, this.selectedEndDate);
+          const hasEstimationInRange = !course.slots.length && course.estimatedStartDate &&
+            CompaniDate(course.estimatedStartDate).isSameOrBetween(this.selectedStartDate, this.selectedEndDate);
           const hasSlotsInRange = course.slots
             .some(slotGroup => slotGroup
-              .some(s => isBetweenOrEqual(s.endDate, this.selectedStartDate, this.selectedEndDate)));
+              .some(s => CompaniDate(s.endDate).isSameOrBetween(this.selectedStartDate, this.selectedEndDate)));
 
           return hasEstimationInRange || hasSlotsInRange;
         });
@@ -163,7 +174,9 @@ export const courseFiltersMixin = {
     groupByCourses (courses) {
       return courses.map(course => ({
         ...course,
-        slots: course.slots.length ? Object.values(groupBy(course.slots, s => formatDate(s.startDate))) : [],
+        slots: course.slots.length
+          ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
+          : [],
         slotsToPlan: course.slotsToPlan || [],
       }));
     },

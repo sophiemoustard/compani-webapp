@@ -4,7 +4,7 @@
       <div class="row justify-between items-center cursor-pointer" @click="showDetails">
         <div>
           <div class="text-weight-bold">SMS de {{ getHistoryType }}</div>
-          <div>envoyé {{ getDate }} par {{ senderIdentity }}</div>
+          <div>envoyé {{ getSmsTimeStamp }} par {{ senderIdentity }}</div>
         </div>
         <q-icon size="24px" :name="isExpanded ? 'expand_less' : 'expand_more'" />
       </div>
@@ -16,8 +16,11 @@
 <script>
 
 import { toRefs, computed } from 'vue';
-import { dateDiff, formatDateDiff, formatDate } from '@helpers/date';
+import { DD_MM_YYYY } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
+import CompaniDate from '@helpers/dates/companiDates';
+import CompaniDuration from '@helpers/dates/companiDurations';
+import { formatISODurationWithBestUnit } from '@helpers/dates/utils';
 
 export default {
   name: 'SmsCell',
@@ -33,12 +36,14 @@ export default {
     const getHistoryType =
       computed(() => messageTypeOptions.value.find(option => option.value === history.value.type).label.toLowerCase());
 
-    const getDate = computed(() => {
-      const dateDifference = dateDiff(Date.now(), history.value.date);
-      const millisecondsToDays = 1000 * 60 * 60 * 24;
-      if ((dateDifference / millisecondsToDays) > 15) return `le ${formatDate(history.value.date)}`;
+    const getSmsTimeStamp = computed(() => {
+      const diffInDaysISO = CompaniDate().diff(history.value.date, 'days');
 
-      return `il y a ${formatDateDiff(dateDifference)}`;
+      if (CompaniDuration(diffInDaysISO).isLongerThan('P15D')) {
+        return `le ${CompaniDate(history.value.date).format(DD_MM_YYYY)}`;
+      }
+
+      return `il y a ${formatISODurationWithBestUnit(diffInDaysISO)}`;
     });
 
     const senderIdentity = computed(() => formatIdentity(history.value.sender.identity, 'FL'));
@@ -52,7 +57,7 @@ export default {
       senderIdentity,
       // Methods
       getHistoryType,
-      getDate,
+      getSmsTimeStamp,
       formatIdentity,
       showDetails,
     };

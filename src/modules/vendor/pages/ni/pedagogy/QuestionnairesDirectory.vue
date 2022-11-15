@@ -30,7 +30,7 @@ import QuestionnaireCell from '@components/courses/QuestionnaireCell';
 import QuestionnaireCreationModal from 'src/modules/vendor/components/programs/QuestionnaireCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { QUESTIONNAIRE_TYPES } from '@data/constants';
-import { descendingSort } from '@helpers/date';
+import { descendingSortBy } from '@helpers/dates/utils';
 
 export default {
   name: 'QuestionnairesDirectory',
@@ -74,7 +74,7 @@ export default {
         const questionnaires = await Questionnaires.list();
 
         const questionnairesGroups = groupBy(
-          questionnaires.sort((a, b) => descendingSort(a.createdAt, b.createdAt)),
+          questionnaires.sort(descendingSortBy('createdAt')),
           q => q.type
         );
 
