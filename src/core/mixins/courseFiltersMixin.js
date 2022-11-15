@@ -1,7 +1,7 @@
 import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
-import { INTER_B2B, INTRA, DD_MM_YYYY } from '@data/constants';
+import { DD_MM_YYYY } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -48,20 +48,12 @@ export const courseFiltersMixin = {
       const companies = [];
 
       for (const course of this.coursesWithGroupedSlot) {
-        if (course.type === INTRA && !companies.some(company => company.value === course.companies[0]._id)) {
-          const { name, _id } = course.companies[0];
-          companies.push({ label: name, value: _id });
-        } else {
-          for (const trainee of course.trainees) {
-            if (!companies.some(company => company.value === trainee.company._id)) {
-              companies.push({ label: trainee.company.name, value: trainee.company._id });
-            }
-          }
-        }
+        const courseCompanies = course.companies.map(company => ({ label: company.name, value: company._id }));
+        companies.push(...courseCompanies);
       }
       return [
         { label: 'Toutes les structures', value: '' },
-        ...companies.sort((a, b) => a.label.localeCompare(b.label)),
+        ...uniqBy(companies, 'value').sort((a, b) => a.label.localeCompare(b.label)),
       ];
     },
     trainerFilterOptions () {
@@ -123,11 +115,7 @@ export const courseFiltersMixin = {
         : this.selectedTrainer === 'without_trainer'));
     },
     filterCoursesByCompany (courses) {
-      return courses
-        .filter(course => (
-          (course.type === INTRA && (course.companies.map(c => c._id)).includes(this.selectedCompany)) ||
-          (course.type === INTER_B2B &&
-              course.trainees.some(trainee => trainee.company._id === this.selectedCompany))));
+      return courses.filter(course => (course.companies.map(company => company._id)).includes(this.selectedCompany));
     },
     filterCoursesBySalesRepresentative (courses) {
       return courses.filter(course => (course.salesRepresentative
