@@ -34,6 +34,7 @@ import {
   ESTIMATED_START_DATE_EDITION,
   DD_MM_YYYY,
   HHhMM,
+  COMPANY_ADDITION,
 } from '@data/constants';
 import Button from '@components/Button';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -59,6 +60,8 @@ export default {
           return { title: this.getTraineeDeletionTitle() };
         case TRAINEE_ADDITION:
           return { title: this.getTraineeAdditionTitle() };
+        case COMPANY_ADDITION:
+          return { title: this.getCompanyAdditionTitle() };
         case SLOT_DELETION:
           return {
             title: this.getSlotDeletionTitle(),
@@ -201,6 +204,14 @@ export default {
         return `Début précédemment souhaité le ${previousStartDate}`;
       }
       return '';
+    },
+    getCompanyAdditionTitle () {
+      return {
+        pre: 'Ajout d\'une',
+        type: 'structure',
+        post: 'à la formation :',
+        infos: `\r\n${this.courseHistory.company.name}`,
+      };
     },
   },
 };
