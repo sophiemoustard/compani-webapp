@@ -74,4 +74,7 @@ export default {
       { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
     );
   },
+  async addCompany (courseId, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/courses/${courseId}/companies`, payload);
+  },
 };
