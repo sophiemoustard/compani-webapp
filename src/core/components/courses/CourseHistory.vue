@@ -33,6 +33,7 @@ import {
   TRAINEE_DELETION,
   DD_MM,
   HHhMM,
+  COMPANY_ADDITION,
 } from '@data/constants';
 import Button from '@components/Button';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -58,6 +59,8 @@ export default {
           return { title: this.getTraineeDeletionTitle() };
         case TRAINEE_ADDITION:
           return { title: this.getTraineeAdditionTitle() };
+        case COMPANY_ADDITION:
+          return { title: this.getCompanyAdditionTitle() };
         case SLOT_DELETION:
           return {
             title: this.getSlotDeletionTitle(),
@@ -156,6 +159,14 @@ export default {
         type: 'stagiaire',
         post: 'de la formation :',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
+      };
+    },
+    getCompanyAdditionTitle () {
+      return {
+        pre: 'Ajout d\'une',
+        type: 'structure',
+        post: 'à la formation :',
+        infos: `\r\n${this.courseHistory.company.name}`,
       };
     },
   },
