@@ -117,7 +117,7 @@ export default {
       {
         name: 'company',
         label: 'Structure',
-        align: 'center',
+        align: 'left',
         field: row => get(row, 'company.name') || '',
         classes: 'text-capitalize company-tag-content',
       },
