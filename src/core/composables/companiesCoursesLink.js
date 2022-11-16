@@ -39,7 +39,7 @@ export const useCompaniesCoursesLink = (course, emit) => {
 
   const openCompanyAdditionModal = () => {
     if (course.value.archivedAt) {
-      return NotifyWarning('Vous ne pouvez pas ajouter de structure à une formation archivée.');
+      return NotifyWarning('Vous ne pouvez pas rattacher de structure à une formation archivée.');
     }
 
     companyAdditionModal.value = true;
@@ -54,12 +54,12 @@ export const useCompaniesCoursesLink = (course, emit) => {
       await Courses.addCompany(course.value._id, { company: selectedCompany.value });
       companyAdditionModal.value = false;
       emit('refresh');
-      NotifyPositive('Structure ajoutée.');
+      NotifyPositive('Structure rattachée.');
     } catch (e) {
       console.error(e);
       if (e.status === 409) return NotifyNegative(e.data.message);
       if (e.status === 403) return NotifyWarning(e.data.message);
-      NotifyNegative('Erreur lors de l\'ajout de la structure.');
+      NotifyNegative('Erreur lors du rattachement de la structure.');
     } finally {
       companyModalLoading.value = false;
     }
