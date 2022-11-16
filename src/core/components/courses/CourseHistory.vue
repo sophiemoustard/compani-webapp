@@ -31,6 +31,7 @@ import {
   SLOT_EDITION,
   TRAINEE_ADDITION,
   TRAINEE_DELETION,
+  ESTIMATED_START_DATE_EDITION,
   DD_MM,
   HHhMM,
 } from '@data/constants';
@@ -68,6 +69,8 @@ export default {
             title: this.getSlotEditionTitle(),
             details: this.getSlotEditionDetails(),
           };
+        case ESTIMATED_START_DATE_EDITION:
+          return { title: this.getEstimatedStartDateEditionTitle() };
         case SLOT_CREATION:
         default:
           return {
@@ -156,6 +159,14 @@ export default {
         type: 'stagiaire',
         post: 'de la formation :',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
+      };
+    },
+    getEstimatedStartDateEditionTitle () {
+      return {
+        pre: 'Nouvelle',
+        type: 'date de démarrage souhaitée',
+        post: 'le',
+        infos: CompaniDate(this.courseHistory.update.estimatedStartDate.to).format(DD_MM),
       };
     },
   },

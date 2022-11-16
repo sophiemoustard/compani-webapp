@@ -450,6 +450,7 @@ export const SLOT_DELETION = 'slot_deletion';
 export const SLOT_EDITION = 'slot_edition';
 export const TRAINEE_ADDITION = 'trainee_addition';
 export const TRAINEE_DELETION = 'trainee_deletion';
+export const ESTIMATED_START_DATE_EDITION = 'estimated_start_date_edition';
 
 // MEDIA UPLOAD
 export const UPLOAD_IMAGE = 'image';
