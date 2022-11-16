@@ -33,7 +33,7 @@
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
       @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
     <ni-company-table v-if="isCourseInter && isVendorInterface" :companies="course.companies"
-      @refresh="refreshCourse" :can-edit="canEditCompanies" :loading="courseLoading" />
+      @refresh="refreshCourse" :can-edit="isAdmin" :loading="courseLoading" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse"
       v-model:max-trainees="tmpCourse.maxTrainees" />
@@ -260,8 +260,6 @@ export default {
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
     const canEditTrainees = computed(() => isIntraCourse.value || (!isClientInterface && !isTrainer.value));
-
-    const canEditCompanies = computed(() => isCourseInter.value && !isClientInterface && !isTrainer.value);
 
     const isFinished = computed(() => {
       const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
@@ -735,7 +733,6 @@ export default {
       isAdmin,
       canEditSlots,
       canEditTrainees,
-      canEditCompanies,
       filteredMessageTypeOptions,
       missingTraineesPhone,
       smsMissingInfo,
