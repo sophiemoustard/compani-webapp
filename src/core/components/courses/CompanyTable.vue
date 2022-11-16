@@ -10,7 +10,10 @@
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
-              {{ col.value }}
+              <template v-if="col.name === 'actions'">
+                <ni-button icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
+              </template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </template>
@@ -59,6 +62,7 @@ export default {
         field: row => get(row, 'name'),
         classes: 'text-capitalize',
       },
+      { name: 'actions', label: '', align: 'right', field: '_id' },
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'name' });
 
@@ -73,6 +77,7 @@ export default {
       companyOptions,
       openCompanyAdditionModal,
       addCompany,
+      validateCompanyDeletion,
     } = useCompaniesCoursesLink(course, emit);
 
     const created = async () => { await getPotentialCompanies(); };
@@ -95,6 +100,7 @@ export default {
       openCompanyAdditionModal,
       addCompany,
       resetCompanyAdditionModal,
+      validateCompanyDeletion,
     };
   },
 };
