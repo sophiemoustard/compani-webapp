@@ -31,12 +31,10 @@
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
-import Courses from '@api/Courses';
 import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
-import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { useCompaniesLink } from '@composables/companiesLink';
+import { useCompaniesCoursesLink } from '@composables/companiesCoursesLink';
 
 export default {
   name: 'CompanyTable',
@@ -79,27 +77,8 @@ export default {
       getPotentialCompanies,
       companyOptions,
       openCompanyAdditionModal,
-    } = useCompaniesLink(companies, course);
-
-    const addCompany = async () => {
-      try {
-        companyModalLoading.value = true;
-        companyValidation.value.selectedCompany.$touch();
-        if (companyValidation.value.selectedCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Courses.addCompany(course.value._id, { company: selectedCompany.value });
-        companyAdditionModal.value = false;
-        emit('refresh');
-        NotifyPositive('Structure ajoutée.');
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        if (e.status === 403) return NotifyWarning(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout de la structure.');
-      } finally {
-        companyModalLoading.value = false;
-      }
-    };
+      addCompany,
+    } = useCompaniesCoursesLink(companies, course, emit);
 
     const created = async () => { await getPotentialCompanies(); };
 
