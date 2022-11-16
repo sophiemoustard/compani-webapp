@@ -4,7 +4,7 @@ import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
 import { NotifyWarning } from '@components/popup/notify';
 
-export const useCompanies = (companies, course) => {
+export const useCompaniesLink = (companies, course) => {
   const selectedCompany = ref('');
   const companyAdditionModal = ref(false);
   const companyModalLoading = ref(false);
