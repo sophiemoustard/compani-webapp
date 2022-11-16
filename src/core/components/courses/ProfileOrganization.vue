@@ -32,8 +32,8 @@
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
       @update="updateCourse('estimatedStartDate')" />
-    <ni-company-table v-if="isCourseInter && isVendorInterface" :companies="course.companies"
-      @refresh="refreshCourse" :can-edit="isAdmin" :loading="courseLoading" />
+    <ni-company-table v-if="isCourseInter && isVendorInterface" :course="course" @refresh="refreshCourse"
+      :can-edit="isAdmin" :loading="courseLoading" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
       @update="updateCourse('maxTrainees')" :validations="v$.course" />
     <q-page-sticky expand position="right">
