@@ -5,13 +5,13 @@ import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useCompaniesCoursesLink = (companies, course, emit) => {
+export const useCompaniesCoursesLink = (course, emit) => {
   const selectedCompany = ref('');
   const companyAdditionModal = ref(false);
   const companyModalLoading = ref(false);
   const companyOptions = ref([]);
 
-  const companiesCount = computed(() => companies.value.length);
+  const companiesCount = computed(() => course.value.companies.length);
 
   const rules = { selectedCompany: { required } };
 
