@@ -19,7 +19,7 @@
         </template>
       </ni-responsive-table>
       <q-card-actions align="right" v-if="canEdit">
-        <ni-button color="primary" icon="add" label="Ajouter une structure" :disable="loading"
+        <ni-button color="primary" icon="add" label="Rattacher une structure" :disable="loading"
           @click="openCompanyAdditionModal" />
       </q-card-actions>
     </q-card>
