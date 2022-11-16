@@ -36,7 +36,7 @@ import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { useCompanies } from '@composables/companies';
+import { useCompaniesLink } from '@composables/companiesLink';
 
 export default {
   name: 'CompanyTable',
@@ -79,7 +79,7 @@ export default {
       getPotentialCompanies,
       companyOptions,
       openCompanyAdditionModal,
-    } = useCompanies(companies, course);
+    } = useCompaniesLink(companies, course);
 
     const addCompany = async () => {
       try {

@@ -259,7 +259,7 @@ export default {
 
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
-    const canEditTrainees = computed(() => isIntraCourse.value || (!isClientInterface && !isTrainer.value));
+    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isAdmin.value));
 
     const isFinished = computed(() => {
       const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
