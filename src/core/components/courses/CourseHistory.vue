@@ -166,7 +166,7 @@ export default {
     },
     getCompanyAdditionTitle () {
       return {
-        pre: 'Ajout d\'une',
+        pre: 'Rattachement d\'une',
         type: 'structure',
         post: 'à la formation :',
         infos: `\r\n${this.courseHistory.company.name}`,
@@ -174,7 +174,7 @@ export default {
     },
     getCompanyDeletionTitle () {
       return {
-        pre: 'Retrait d\'une',
+        pre: 'Détachement d\'une',
         type: 'structure',
         post: 'de la formation :',
         infos: `\r\n${this.courseHistory.company.name}`,
