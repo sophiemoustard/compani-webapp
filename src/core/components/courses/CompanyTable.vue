@@ -28,17 +28,15 @@
 </template>
 
 <script>
-import { onMounted, computed, ref, toRefs } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
-import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import { useCompanies } from '@composables/companies';
 
 export default {
   name: 'CompanyTable',
@@ -68,35 +66,21 @@ export default {
       },
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'name' });
-    const companyAdditionModal = ref(false);
-    const companyModalLoading = ref(false);
-    const companyOptions = ref([]);
-    const selectedCompany = ref('');
-
-    const companiesCount = computed(() => companies.value.length);
 
     const course = computed(() => $store.state.course.course);
 
-    const rules = { selectedCompany: { required } };
+    const {
+      selectedCompany,
+      companyAdditionModal,
+      companyModalLoading,
+      companyValidation,
+      resetCompanyAdditionModal,
+      companiesCount,
+      getPotentialCompanies,
+      companyOptions,
+      openCompanyAdditionModal,
+    } = useCompanies(companies, course);
 
-    const companyValidation = useVuelidate(rules, { selectedCompany });
-
-    const getPotentialCompanies = async () => {
-      try {
-        const potentialCompanies = Object.freeze(await Companies.list());
-        companyOptions.value = potentialCompanies
-          .map(company => ({ value: company._id, label: company.name }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-      } catch (error) {
-        companyOptions.value = [];
-        console.error(error);
-      }
-    };
-
-    const resetCompanyAdditionModal = () => {
-      selectedCompany.value = '';
-      companyValidation.value.selectedCompany.$reset();
-    };
     const addCompany = async () => {
       try {
         companyModalLoading.value = true;
@@ -116,17 +100,10 @@ export default {
         companyModalLoading.value = false;
       }
     };
-    const openCompanyAdditionModal = () => {
-      if (course.value.archivedAt) {
-        return NotifyWarning('Vous ne pouvez pas ajouter de structure à une formation archivée.');
-      }
 
-      companyAdditionModal.value = true;
-    };
+    const created = async () => { await getPotentialCompanies(); };
 
-    onMounted(async () => {
-      await getPotentialCompanies();
-    });
+    created();
 
     return {
       // Data
