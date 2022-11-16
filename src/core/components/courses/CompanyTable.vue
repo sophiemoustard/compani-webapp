@@ -4,8 +4,8 @@
       <p class="text-weight-bold table-title">Structures ({{ companiesCount }})</p>
     </div>
     <q-card>
-      <ni-responsive-table :data="companies" :columns="columns" v-model:pagination="pagination"
-        no-data-label="Aucune structure n’est rattachée à la formation" :hide-bottom="!!companies.length">
+      <ni-responsive-table :data="course.companies" :columns="columns" v-model:pagination="pagination"
+        no-data-label="Aucune structure n’est rattachée à la formation" :hide-bottom="!!companiesCount">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -28,8 +28,7 @@
 </template>
 
 <script>
-import { computed, ref, toRefs } from 'vue';
-import { useStore } from 'vuex';
+import { ref, toRefs } from 'vue';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
@@ -40,7 +39,7 @@ export default {
   name: 'CompanyTable',
   props: {
     canEdit: { type: Boolean, default: false },
-    companies: { type: Array, default: () => [] },
+    course: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -50,9 +49,7 @@ export default {
   },
   emits: ['refresh'],
   setup (props, { emit }) {
-    const { companies } = toRefs(props);
-
-    const $store = useStore();
+    const { course } = toRefs(props);
 
     const columns = ref([
       {
@@ -65,8 +62,6 @@ export default {
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'name' });
 
-    const course = computed(() => $store.state.course.course);
-
     const {
       selectedCompany,
       companyAdditionModal,
@@ -78,7 +73,7 @@ export default {
       companyOptions,
       openCompanyAdditionModal,
       addCompany,
-    } = useCompaniesCoursesLink(companies, course, emit);
+    } = useCompaniesCoursesLink(course, emit);
 
     const created = async () => { await getPotentialCompanies(); };
 
