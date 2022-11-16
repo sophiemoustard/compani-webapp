@@ -2,9 +2,10 @@ import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
-import { NotifyWarning } from '@components/popup/notify';
+import Courses from '@api/Courses';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useCompaniesLink = (companies, course) => {
+export const useCompaniesCoursesLink = (companies, course, emit) => {
   const selectedCompany = ref('');
   const companyAdditionModal = ref(false);
   const companyModalLoading = ref(false);
@@ -41,6 +42,26 @@ export const useCompaniesLink = (companies, course) => {
     companyAdditionModal.value = true;
   };
 
+  const addCompany = async () => {
+    try {
+      companyModalLoading.value = true;
+      companyValidation.value.selectedCompany.$touch();
+      if (companyValidation.value.selectedCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      await Courses.addCompany(course.value._id, { company: selectedCompany.value });
+      companyAdditionModal.value = false;
+      emit('refresh');
+      NotifyPositive('Structure ajoutée.');
+    } catch (e) {
+      console.error(e);
+      if (e.status === 409) return NotifyNegative(e.data.message);
+      if (e.status === 403) return NotifyWarning(e.data.message);
+      NotifyNegative('Erreur lors de l\'ajout de la structure.');
+    } finally {
+      companyModalLoading.value = false;
+    }
+  };
+
   return {
     // Data
     selectedCompany,
@@ -55,5 +76,6 @@ export const useCompaniesLink = (companies, course) => {
     resetCompanyAdditionModal,
     getPotentialCompanies,
     openCompanyAdditionModal,
+    addCompany,
   };
 };
