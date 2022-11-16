@@ -34,6 +34,7 @@ import {
   DD_MM,
   HHhMM,
   COMPANY_ADDITION,
+  COMPANY_DELETION,
 } from '@data/constants';
 import Button from '@components/Button';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -61,6 +62,8 @@ export default {
           return { title: this.getTraineeAdditionTitle() };
         case COMPANY_ADDITION:
           return { title: this.getCompanyAdditionTitle() };
+        case COMPANY_DELETION:
+          return { title: this.getCompanyDeletionTitle() };
         case SLOT_DELETION:
           return {
             title: this.getSlotDeletionTitle(),
@@ -166,6 +169,14 @@ export default {
         pre: 'Ajout d\'une',
         type: 'structure',
         post: 'à la formation :',
+        infos: `\r\n${this.courseHistory.company.name}`,
+      };
+    },
+    getCompanyDeletionTitle () {
+      return {
+        pre: 'Retrait d\'une',
+        type: 'structure',
+        post: 'de la formation :',
         infos: `\r\n${this.courseHistory.company.name}`,
       };
     },

@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue';
+import { useQuasar } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
@@ -6,6 +7,8 @@ import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
 export const useCompaniesCoursesLink = (course, emit) => {
+  const $q = useQuasar();
+
   const selectedCompany = ref('');
   const companyAdditionModal = ref(false);
   const companyModalLoading = ref(false);
@@ -62,6 +65,29 @@ export const useCompaniesCoursesLink = (course, emit) => {
     }
   };
 
+  const validateCompanyDeletion = (companyId) => {
+    $q.dialog({
+      title: 'Confirmation',
+      message: 'Êtes-vous sûr(e) de vouloir détacher la structure de la formation&nbsp;?',
+      html: true,
+      ok: true,
+      cancel: 'Annuler',
+    }).onOk(() => deleteCompany(companyId))
+      .onCancel(() => NotifyPositive('Détachement annulé.'));
+  };
+
+  const deleteCompany = async (companyId) => {
+    try {
+      await Courses.deleteCompany(course.value._id, companyId);
+      emit('refresh');
+      NotifyPositive('Structure détachée.');
+    } catch (e) {
+      console.error(e);
+      if (e.status === 403 && e.data.message) return NotifyNegative(e.data.message);
+      NotifyNegative('Erreur lors du détachement de la structure.');
+    }
+  };
+
   return {
     // Data
     selectedCompany,
@@ -77,5 +103,6 @@ export const useCompaniesCoursesLink = (course, emit) => {
     getPotentialCompanies,
     openCompanyAdditionModal,
     addCompany,
+    validateCompanyDeletion,
   };
 };
