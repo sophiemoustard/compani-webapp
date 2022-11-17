@@ -152,7 +152,7 @@ export default {
       return {
         pre: 'Ajout d\'un(e)',
         type: 'stagiaire',
-        post: 'à la formation :',
+        post: 'à la formation\u00A0:',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };
     },
@@ -160,7 +160,7 @@ export default {
       return {
         pre: 'Retrait d\'un(e)',
         type: 'stagiaire',
-        post: 'de la formation :',
+        post: 'de la formation\u00A0:',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };
     },
@@ -168,7 +168,7 @@ export default {
       return {
         pre: 'Rattachement d\'une',
         type: 'structure',
-        post: 'à la formation :',
+        post: 'à la formation\u00A0:',
         infos: `\r\n${this.courseHistory.company.name}`,
       };
     },
@@ -176,7 +176,7 @@ export default {
       return {
         pre: 'Détachement d\'une',
         type: 'structure',
-        post: 'de la formation :',
+        post: 'de la formation\u00A0:',
         infos: `\r\n${this.courseHistory.company.name}`,
       };
     },
