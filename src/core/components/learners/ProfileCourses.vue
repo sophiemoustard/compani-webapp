@@ -34,8 +34,8 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'attendances' && has(col, 'value.attendanceDuration')">
                 <div>
-                  {{ formatDuration(get(col, 'value.attendanceDuration')) }}
-                  / {{ formatDuration(get(col, 'value.maxDuration')) }}
+                  {{ CompaniDuration(get(col, 'value.attendanceDuration')).format(SHORT_DURATION_H_MM) }}
+                  / {{ CompaniDuration(get(col, 'value.maxDuration')).format(SHORT_DURATION_H_MM) }}
                   </div>
               </template>
               <template v-else-if="col.name === 'eLearning' && col.value >= 0">
@@ -287,14 +287,6 @@ export default {
       }
     };
 
-    const formatDuration = (duration) => {
-      const durationInHours = duration.minutes / 60;
-      const hours = Math.floor(durationInHours);
-      const paddedMinutes = Math.round(durationInHours % 1 * 60);
-
-      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
-    };
-
     const formatProgramAttendances = (attendancesGroupedByProgram, programId) => ({
       _id: programId,
       program: attendancesGroupedByProgram[programId][0].program.name,
@@ -344,6 +336,7 @@ export default {
       activitiesByMonth,
       months,
       DD_MM_YYYY,
+      SHORT_DURATION_H_MM,
       // Computed
       userProfile,
       eLearningCoursesOnGoing,
@@ -357,7 +350,6 @@ export default {
       get,
       has,
       goToCourseProfile,
-      formatDuration,
       getStepTypeIcon,
       formatSlotSchedule,
       CompaniDate,
