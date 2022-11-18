@@ -70,7 +70,10 @@ export default {
             details: this.getSlotEditionDetails(),
           };
         case ESTIMATED_START_DATE_EDITION:
-          return { title: this.getEstimatedStartDateEditionTitle() };
+          return {
+            title: this.getEstimatedStartDateEditionTitle(),
+            details: this.getEstimatedStartDateEditionDetails(),
+          };
         case SLOT_CREATION:
         default:
           return {
@@ -168,6 +171,12 @@ export default {
         post: 'le',
         infos: CompaniDate(this.courseHistory.update.estimatedStartDate.to).format(DD_MM),
       };
+    },
+    getEstimatedStartDateEditionDetails () {
+      if (!this.courseHistory.update.estimatedStartDate.from) return '';
+      const formerStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM);
+
+      return `Début précédement souhaité le ${formerStartDate}`;
     },
   },
 };
