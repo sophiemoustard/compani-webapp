@@ -176,7 +176,7 @@ export default {
       if (!this.courseHistory.update.estimatedStartDate.from) return '';
       const formerStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM);
 
-      return `Début précédement souhaité le ${formerStartDate}`;
+      return `Début précédemment souhaité le ${formerStartDate}`;
     },
   },
 };
