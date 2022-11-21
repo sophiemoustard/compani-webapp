@@ -291,7 +291,7 @@ export default {
         if (this.isClientInterface) query = { companies: [get(this.loggedUser.value, 'company._id')] };
         else query = { companies: this.course.companies.map(c => c._id) };
 
-        this.potentialTrainees = Object.freeze(await Users.learnerList(query));
+        this.potentialTrainees = query.companies.length ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
         this.potentialTrainees = [];
         console.error(error);
