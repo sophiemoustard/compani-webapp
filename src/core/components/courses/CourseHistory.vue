@@ -174,9 +174,9 @@ export default {
     },
     getEstimatedStartDateEditionDetails () {
       if (!this.courseHistory.update.estimatedStartDate.from) return '';
-      const formerStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM);
+      const previousStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM);
 
-      return `Début précédemment souhaité le ${formerStartDate}`;
+      return `Début précédemment souhaité le ${previousStartDate}`;
     },
   },
 };
