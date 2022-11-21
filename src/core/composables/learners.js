@@ -89,7 +89,7 @@ export const useLearners = (refresh, isClientInterface, company) => {
   const getLearnerList = async (companyId = null) => {
     try {
       tableLoading.value = true;
-      const learners = await Users.learnerList(companyId ? { company: companyId } : {});
+      const learners = await Users.learnerList(companyId ? { companies: [companyId] } : {});
       learnerList.value = Object.freeze(learners.map(formatRow));
     } catch (e) {
       console.error(e);
