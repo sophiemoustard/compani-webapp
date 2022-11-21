@@ -202,7 +202,7 @@ export default {
         if (isClientInterface) query = { companies: [get(loggedUser.value, 'company._id')] };
         else query = { companies: course.value.companies.map(c => c._id) };
 
-        potentialTrainees.value = Object.freeze(await Users.learnerList(query));
+        potentialTrainees.value = query.companies.length ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
         potentialTrainees.value = [];
         console.error(error);
@@ -358,10 +358,11 @@ export default {
         NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
     };
-    const openTraineeCreationModal = () => {
+    const openTraineeCreationModal = async () => {
       if (course.value.archivedAt) {
         return NotifyWarning('Vous ne pouvez pas ajouter de stagiaire à une formation archivée.');
       }
+      await refresh();
 
       traineeAdditionModal.value = true;
     };
