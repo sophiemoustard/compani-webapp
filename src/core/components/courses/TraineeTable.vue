@@ -66,7 +66,6 @@ import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import {
-  INTER_B2B,
   TRAINER,
   DEFAULT_AVATAR,
   TRAINING_ORGANISATION_MANAGER,
@@ -201,10 +200,8 @@ export default {
       try {
         let query;
 
-        if (isIntraCourse.value) query = { company: get(course.value, 'companies[0]._id') };
-        if (course.value.type === INTER_B2B) {
-          query = isClientInterface ? { company: get(loggedUser.value, 'company._id') } : { hasCompany: true };
-        }
+        if (isClientInterface) query = { companies: [get(loggedUser.value, 'company._id')] };
+        else query = { companies: course.value.companies.map(c => c._id) };
 
         potentialTrainees.value = Object.freeze(await Users.learnerList(query));
       } catch (error) {
