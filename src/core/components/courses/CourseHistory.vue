@@ -152,6 +152,7 @@ export default {
 
         return { type: 'Nouvel horaire', post: ' pour le créneau du', infos: `${date} : ${startHour} - ${endHour}` };
       }
+      return '';
     },
     getSlotEditionDetails () {
       if (this.courseHistory.update.startDate && this.courseHistory.update.startHour) {
@@ -161,13 +162,13 @@ export default {
 
         return `Créneau initialement prévu le ${previousStartDate} de ${previousStartHour} à ${previousEndHour}`;
       }
-      if (this.courseHistory.update.startDate) return '';
       if (this.courseHistory.update.startHour) {
         const previousStartHour = CompaniDate(this.courseHistory.update.startHour.from).format(HHhMM);
         const previousEndHour = CompaniDate(this.courseHistory.update.endHour.from).format(HHhMM);
 
         return `Créneau initialement prévu de ${previousStartHour} à ${previousEndHour}`;
       }
+      return '';
     },
     getTraineeAdditionTitle () {
       return {
@@ -194,10 +195,12 @@ export default {
       };
     },
     getEstimatedStartDateEditionDetails () {
-      if (!this.courseHistory.update.estimatedStartDate.from) return '';
-      const previousStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM);
+      if (this.courseHistory.update.estimatedStartDate.from) {
+        const previousStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM);
 
-      return `Début précédemment souhaité le ${previousStartDate}`;
+        return `Début précédemment souhaité le ${previousStartDate}`;
+      }
+      return '';
     },
   },
 };
