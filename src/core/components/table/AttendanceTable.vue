@@ -288,10 +288,11 @@ export default {
       try {
         let query;
 
-        if (this.isClientInterface) query = { companies: [get(this.loggedUser, 'company._id')] };
+        if (this.isClientInterface) query = { companies: get(this.loggedUser, 'company._id') };
         else query = { companies: this.course.companies.map(c => c._id) };
 
-        this.potentialTrainees = query.companies.length ? Object.freeze(await Users.learnerList(query)) : [];
+        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
+        this.potentialTrainees = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
         this.potentialTrainees = [];
         console.error(error);
