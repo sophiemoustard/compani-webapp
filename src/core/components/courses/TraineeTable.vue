@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { onMounted, computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
@@ -95,6 +95,7 @@ export default {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
+    potentialTrainees: { type: Array, default: () => [] },
   },
   components: {
     'ni-button': Button,
@@ -106,12 +107,10 @@ export default {
   },
   emits: ['refresh', 'update'],
   setup (props, { emit }) {
-    const { canEdit, validations } = toRefs(props);
+    const { canEdit, validations, potentialTrainees } = toRefs(props);
 
     const $store = useStore();
     const $q = useQuasar();
-
-    const potentialTrainees = ref([]);
     const traineesColumns = ref([
       {
         name: 'company',
@@ -155,8 +154,6 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
-    const loggedUser = computed(() => $store.state.main.loggedUser);
-
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
     const isRofOrAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
@@ -195,22 +192,8 @@ export default {
       return '';
     });
 
-    const getPotentialTrainees = async () => {
-      try {
-        let query;
+    const refresh = async () => emit('refresh');
 
-        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
-        else query = { companies: course.value.companies.map(c => c._id) };
-
-        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
-        potentialTrainees.value = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
-      } catch (error) {
-        potentialTrainees.value = [];
-        console.error(error);
-      }
-    };
-
-    const refresh = async () => getPotentialTrainees();
     const {
       newLearner,
       newTrainee,
@@ -230,10 +213,6 @@ export default {
     } = useLearners(refresh, false, company);
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
-
-    onMounted(async () => {
-      await getPotentialTrainees();
-    });
 
     const setNewLearner = (user) => {
       newLearner.value._id = user._id;
@@ -363,7 +342,6 @@ export default {
       if (course.value.archivedAt) {
         return NotifyWarning('Vous ne pouvez pas ajouter de stagiaire à une formation archivée.');
       }
-      await refresh();
 
       traineeAdditionModal.value = true;
     };
