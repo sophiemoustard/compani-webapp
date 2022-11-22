@@ -35,7 +35,7 @@
     <ni-company-table v-if="isCourseInter && isVendorInterface" :course="course" @refresh="refreshCourse"
       :can-edit="isAdmin" :loading="courseLoading" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
-      @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse"
+      @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
@@ -112,7 +112,7 @@
 
 <script>
 import { useStore } from 'vuex';
-import { computed, ref, toRefs, watch } from 'vue';
+import { computed, onMounted, ref, toRefs, watch } from 'vue';
 import { copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -223,6 +223,7 @@ export default {
     const SALES_REPRESENTATIVE = ref('salesRepresentative');
     const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
+    const potentialTrainees = ref([]);
 
     const course = computed(() => $store.state.course.course);
 
@@ -239,6 +240,25 @@ export default {
       followUpMissingInfo,
       downloadAttendanceSheet,
     } = useCourses(course);
+
+    const getPotentialTrainees = async () => {
+      try {
+        let query;
+
+        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
+        else query = { companies: course.value.companies.map(c => c._id) };
+
+        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
+        potentialTrainees.value = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
+      } catch (error) {
+        potentialTrainees.value = [];
+        console.error(error);
+      }
+    };
+
+    onMounted(async () => {
+      await getPotentialTrainees();
+    });
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -376,6 +396,7 @@ export default {
           await getCourseHistories();
           courseHistoryFeed.value.resumeScroll();
         }
+        await getPotentialTrainees();
       } catch (e) {
         console.error(e);
       } finally {
@@ -703,6 +724,7 @@ export default {
       // Data
       INTRA,
       trainerOptions,
+      potentialTrainees,
       salesRepresentativeOptions,
       companyRepresentativeOptions,
       courseLoading,
