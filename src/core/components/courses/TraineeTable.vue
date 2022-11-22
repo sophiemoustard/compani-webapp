@@ -199,10 +199,11 @@ export default {
       try {
         let query;
 
-        if (isClientInterface) query = { companies: [get(loggedUser.value, 'company._id')] };
+        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
         else query = { companies: course.value.companies.map(c => c._id) };
 
-        potentialTrainees.value = query.companies.length ? Object.freeze(await Users.learnerList(query)) : [];
+        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
+        potentialTrainees.value = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
         potentialTrainees.value = [];
         console.error(error);
