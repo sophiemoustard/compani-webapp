@@ -193,7 +193,7 @@ export default {
       return '';
     });
 
-    const refresh = async () => emit('refresh');
+    const refresh = () => emit('refresh');
 
     const {
       newLearner,
@@ -277,7 +277,8 @@ export default {
 
         await Courses.addTrainee(course.value._id, { trainee: newTrainee.value });
         traineeAdditionModal.value = false;
-        emit('refresh');
+
+        refresh();
         NotifyPositive('Stagiaire ajouté(e).');
       } catch (e) {
         console.error(e);
@@ -310,7 +311,8 @@ export default {
 
         await Users.updateById(editedTrainee.value._id, omit(editedTrainee.value, ['_id', 'local']));
         traineeEditionModal.value = false;
-        emit('refresh');
+
+        refresh();
         NotifyPositive('Stagiaire modifié(e).');
       } catch (e) {
         console.error(e);
@@ -332,14 +334,15 @@ export default {
     const deleteTrainee = async (traineeId) => {
       try {
         await Courses.deleteTrainee(course.value._id, traineeId);
-        emit('refresh');
+
+        refresh();
         NotifyPositive('Stagiaire supprimé(e).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
     };
-    const openTraineeCreationModal = async () => {
+    const openTraineeCreationModal = () => {
       if (course.value.archivedAt) {
         return NotifyWarning('Vous ne pouvez pas ajouter de stagiaire à une formation archivée.');
       }

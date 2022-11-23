@@ -112,7 +112,7 @@
 
 <script>
 import { useStore } from 'vuex';
-import { computed, onMounted, ref, toRefs, watch } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import { copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -241,25 +241,6 @@ export default {
       downloadAttendanceSheet,
     } = useCourses(course);
 
-    const getPotentialTrainees = async () => {
-      try {
-        let query;
-
-        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
-        else query = { companies: course.value.companies.map(c => c._id) };
-
-        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
-        potentialTrainees.value = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
-      } catch (error) {
-        potentialTrainees.value = [];
-        console.error(error);
-      }
-    };
-
-    onMounted(async () => {
-      await getPotentialTrainees();
-    });
-
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const rules = computed(() => ({
@@ -386,6 +367,21 @@ export default {
       const olderCourseHistories = await getCourseHistories(lastCreatedAt);
 
       return done(!olderCourseHistories.length);
+    };
+
+    const getPotentialTrainees = async () => {
+      try {
+        let query;
+
+        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
+        else query = { companies: course.value.companies.map(c => c._id) };
+
+        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
+        potentialTrainees.value = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
+      } catch (error) {
+        potentialTrainees.value = [];
+        console.error(error);
+      }
     };
 
     const refreshCourse = async () => {
@@ -710,12 +706,14 @@ export default {
       if (isVendorInterface || isIntraCourse.value) {
         promises.push(refreshSms(), refreshCompanyRepresentatives());
       }
-      await Promise.all(promises);
 
-      if (isAdmin.value) await refreshTrainersAndSalesRepresentatives();
+      if (isAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
+      promises.push(getPotentialTrainees());
+
+      await Promise.all(promises);
     };
 
     created();
