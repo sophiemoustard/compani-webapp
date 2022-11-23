@@ -118,6 +118,7 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
@@ -372,8 +373,7 @@ export default {
         if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
         else query = { companies: course.value.companies.map(c => c._id) };
 
-        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
-        potentialTrainees.value = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
+        potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
         potentialTrainees.value = [];
         console.error(error);
