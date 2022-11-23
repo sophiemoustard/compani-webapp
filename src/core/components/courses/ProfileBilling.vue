@@ -11,7 +11,7 @@
       @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll"
       :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
     </div>
-    <div v-if="!companies.length" class="text-italic">Aucun stagiaire n'est inscrit à la formation</div>
+    <div v-if="!companies.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
   </div>
 </template>
 
@@ -69,11 +69,9 @@ export default {
     const { isIntraCourse } = useCourses(course);
 
     const companies = computed(() => {
-      const traineesCompanies = course.value.trainees.map(trainee => trainee.company);
       const billsCompanies = courseBills.value.map(bill => bill.company);
-      const intraCourseCompany = isIntraCourse.value ? course.value.companies : [];
 
-      return uniqBy([...traineesCompanies, ...billsCompanies, ...intraCourseCompany], '_id')
+      return uniqBy([...course.value.companies, ...billsCompanies], '_id')
         .sort((a, b) => a.name.localeCompare(b.name));
     });
 
