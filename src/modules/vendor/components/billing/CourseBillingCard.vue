@@ -303,9 +303,6 @@ export default {
 
     const openBillCreationModal = () => {
       if (expectedBillsCountInvalid.value) return NotifyWarning('Champ(s) invalide(s).');
-      if (course.value.type === INTER_B2B && !traineesLength.value) {
-        return NotifyWarning('Aucun stagiaire rattaché à cette structure n\'est inscrit à la formation.');
-      }
 
       const courseBillsWithoutCreditNote = courseBills.value.filter(cb => !cb.courseCreditNote);
       if (course.value.type === INTRA && courseBillsWithoutCreditNote.length === course.value.expectedBillsCount) {

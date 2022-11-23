@@ -100,7 +100,7 @@ import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, INTRA, DD_MM_YYYY } from '@data/constants.js';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, DD_MM_YYYY } from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
 import { ascendingSortBy, ascendingSort } from '@helpers/dates/utils';
 import { downloadFile } from '@helpers/file';
@@ -352,19 +352,16 @@ export default {
           params: { courseId: course._id, defaultTab: 'billing' },
         });
       }
-
-      const companies = course.type === INTRA ? course.companies : [];
-      if (companies.includes(loggedUser.value.company._id)) {
+      if (course.companies.includes(loggedUser.value.company._id)) {
         return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
       }
     };
 
-    const getCourseNameClass = (course) => {
-      const companies = course.type === INTRA ? course.companies : [];
-      return (canUpdateBilling.value || companies.includes(loggedUser.value.company._id))
+    const getCourseNameClass = course => (
+      (canUpdateBilling.value || course.companies.includes(loggedUser.value.company._id))
         ? 'course redirection'
-        : 'course';
-    };
+        : 'course'
+    );
 
     const getTableName = payer => (isVendorInterface || payer._id !== company.value._id
       ? `Formations facturées à ${payer.name}`
