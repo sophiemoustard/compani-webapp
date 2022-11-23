@@ -95,6 +95,7 @@
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import Attendances from '@api/Attendances';
@@ -291,8 +292,7 @@ export default {
         if (this.isClientInterface) query = { companies: get(this.loggedUser, 'company._id') };
         else query = { companies: this.course.companies.map(c => c._id) };
 
-        const queryCompaniesIsNotEmpty = Array.isArray(query.companies) ? !!query.companies.length : !!query.companies;
-        this.potentialTrainees = queryCompaniesIsNotEmpty ? Object.freeze(await Users.learnerList(query)) : [];
+        this.potentialTrainees = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
         this.potentialTrainees = [];
         console.error(error);
