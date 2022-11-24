@@ -11,7 +11,8 @@
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'actions'">
-                <ni-button icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
+                <ni-button v-if="canEdit" icon="close" @click="validateCompanyDeletion(col.value)"
+                  :disable="!!course.archivedAt" />
               </template>
               <template v-else>{{ col.value }}</template>
             </q-td>
