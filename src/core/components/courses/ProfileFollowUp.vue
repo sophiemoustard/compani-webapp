@@ -20,20 +20,23 @@
       <ni-line-chart :data="this.traineesByMonth" :labels="months" title="Nombre d'apprenants dans le temps"
         class="col-md-6 col-xs-12 line-chart-container" />
     </div>
-    <elearning-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
+    <elearning-follow-up-table :learners="learners" :loading="tableLoading" class="q-mt-xl" />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+import Courses from '@api/Courses';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import LineChart from '@components/charts/LineChart';
-import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
+import { NotifyNegative } from '@components/popup/notify';
 import { chartMixin } from '@mixins/chartMixin';
+import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'ProfileFollowUp',
-  mixins: [traineeFollowUpTableMixin, chartMixin],
+  mixins: [chartMixin],
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'elearning-follow-up-table': ElearningFollowUpTable,
@@ -42,11 +45,21 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
+  data () {
+    const isClientInterface = !/\/ad\//.test(this.$route.path);
+
+    return {
+      learners: [],
+      tableLoading: false,
+      isClientInterface,
+    };
+  },
   async created () {
     await this.getLearnersList();
     this.computeChartData();
   },
   computed: {
+    ...mapGetters({ company: 'main/getCompany' }),
     traineesOnGoingCount () {
       return this.learners.filter(l => l.progress.eLearning !== 1).length;
     },
@@ -66,6 +79,34 @@ export default {
         .flat(3);
 
       this.traineesByMonth = this.getDataByMonth(activityHistories, 'user');
+    },
+    formatRow (trainee) {
+      const formattedName = formatIdentity(trainee.identity, 'FL');
+
+      return {
+        _id: trainee._id,
+        identity: { ...trainee.identity, fullName: formattedName },
+        progress: trainee.progress,
+        steps: trainee.steps,
+        firstMobileConnection: trainee.firstMobileConnection,
+      };
+    },
+    async getLearnersList () {
+      try {
+        this.tableLoading = true;
+        const course = await Courses.getFollowUp(
+          this.profileId,
+          this.isClientInterface ? { company: this.company._id } : null
+        );
+
+        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des apprenants');
+        this.learners = [];
+      } finally {
+        this.tableLoading = false;
+      }
     },
   },
 };
