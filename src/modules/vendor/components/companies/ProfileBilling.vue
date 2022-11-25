@@ -201,23 +201,27 @@ export default {
 
     const company = computed(() => (canUpdateBilling.value ? $store.state.company.company : loggedUser.value.company));
 
+    const sortCourseBills = (a, b) => {
+      const payerCompare = a.payer.name.localeCompare(b.payer.name);
+
+      if (payerCompare === 0) {
+        const billedAtCompare = ascendingSort(a.billedAt, b.billedAt);
+
+        return billedAtCompare === 0 ? ascendingSort(a.createdAt, b.createdAt) : billedAtCompare;
+      }
+
+      return payerCompare;
+    };
+
     const refreshCourseBills = async () => {
       try {
         loading.value = true;
-        const courseBillList = await CourseBills.list({ company: company.value._id, action: BALANCE });
-        const sortedBills = courseBillList.sort((a, b) => {
-          const payerCompare = a.payer.name.localeCompare(b.payer.name);
+        const courseBillList = await CourseBills
+          .list({ company: company.value._id, action: BALANCE })
+          .then(data => data.sort(sortCourseBills));
 
-          if (payerCompare === 0) {
-            const billedAtCompare = ascendingSort(a.billedAt, b.billedAt);
-
-            return billedAtCompare === 0 ? ascendingSort(a.createdAt, b.createdAt) : billedAtCompare;
-          }
-
-          return payerCompare;
-        });
-        if (sortedBills.length) {
-          const billsGroupedByPayer = groupBy(sortedBills, 'payer._id');
+        if (courseBillList.length) {
+          const billsGroupedByPayer = groupBy(courseBillList, 'payer._id');
           courseBills.value = {
             ...(!!billsGroupedByPayer[company.value._id] &&
             { [company.value._id]: billsGroupedByPayer[company.value._id] }
