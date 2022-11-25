@@ -3,6 +3,7 @@ import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 
 export const useCharts = () => {
+  const traineesByMonth = ref([]);
   const activitiesByMonth = ref([]);
   const months = ref([]);
 
@@ -38,6 +39,7 @@ export const useCharts = () => {
 
   return {
     // Data
+    traineesByMonth,
     activitiesByMonth,
     months,
     // Methods

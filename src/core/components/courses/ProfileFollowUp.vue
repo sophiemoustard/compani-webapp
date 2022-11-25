@@ -17,7 +17,7 @@
           </div>
         </q-card>
       </div>
-      <ni-line-chart :data="this.traineesByMonth" :labels="months" title="Nombre d'apprenants dans le temps"
+      <ni-line-chart :data="traineesByMonth" :labels="months" title="Nombre d'apprenants dans le temps"
         class="col-md-6 col-xs-12 line-chart-container" />
     </div>
     <elearning-follow-up-table :learners="learners" :loading="tableLoading" class="q-mt-xl" />
@@ -25,18 +25,19 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { computed, ref, toRefs } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import Courses from '@api/Courses';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import LineChart from '@components/charts/LineChart';
 import { NotifyNegative } from '@components/popup/notify';
-import { chartMixin } from '@mixins/chartMixin';
+import { useCharts } from '@composables/charts';
 import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'ProfileFollowUp',
-  mixins: [chartMixin],
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'elearning-follow-up-table': ElearningFollowUpTable,
@@ -45,42 +46,24 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  data () {
-    const isClientInterface = !/\/ad\//.test(this.$route.path);
+  setup (props) {
+    const { profileId } = toRefs(props);
+    const $store = useStore();
+    const $router = useRouter();
 
-    return {
-      learners: [],
-      tableLoading: false,
-      isClientInterface,
-    };
-  },
-  async created () {
-    await this.getLearnersList();
-    this.computeChartData();
-  },
-  computed: {
-    ...mapGetters({ company: 'main/getCompany' }),
-    traineesOnGoingCount () {
-      return this.learners.filter(l => l.progress.eLearning !== 1).length;
-    },
-    traineesFinishedCount () {
-      return this.learners.length - this.traineesOnGoingCount;
-    },
-  },
-  methods: {
-    computeChartData () {
-      const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-      const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-      const activityHistories = this.learners.map(l => l.steps
-        .map(s => s.activities
-          .map(a => a.activityHistories
-            .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
-            .map(ah => ({ user: ah.user, date: ah.date })))))
-        .flat(3);
+    const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
 
-      this.traineesByMonth = this.getDataByMonth(activityHistories, 'user');
-    },
-    formatRow (trainee) {
+    const learners = ref([]);
+    const tableLoading = ref(false);
+
+    const company = computed(() => $store.state.company.company);
+
+    const { traineesByMonth, getDataByMonth, months } = useCharts();
+
+    const traineesOnGoingCount = computed(() => learners.value.filter(l => l.progress.eLearning !== 1).length);
+    const traineesFinishedCount = computed(() => learners.value.length - traineesOnGoingCount.value);
+
+    const formatRow = (trainee) => {
       const formattedName = formatIdentity(trainee.identity, 'FL');
 
       return {
@@ -90,24 +73,57 @@ export default {
         steps: trainee.steps,
         firstMobileConnection: trainee.firstMobileConnection,
       };
-    },
-    async getLearnersList () {
+    };
+
+    const getLearnersList = async () => {
       try {
-        this.tableLoading = true;
+        tableLoading.value = true;
         const course = await Courses.getFollowUp(
-          this.profileId,
-          this.isClientInterface ? { company: this.company._id } : null
+          profileId.value,
+          isVendorInterface ? null : { company: company.value._id }
         );
 
-        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
+        if (course) learners.value = Object.freeze(course.trainees.map(formatRow));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des apprenants');
-        this.learners = [];
+        learners.value = [];
       } finally {
-        this.tableLoading = false;
+        tableLoading.value = false;
       }
-    },
+    };
+
+    const computeChartData = () => {
+      const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
+      const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const activityHistories = learners.value.map(l => l.steps
+        .map(s => s.activities
+          .map(a => a.activityHistories
+            .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
+            .map(ah => ({ user: ah.user, date: ah.date })))))
+        .flat(3);
+
+      traineesByMonth.value = getDataByMonth(activityHistories, 'user');
+    };
+
+    const created = async () => {
+      await getLearnersList();
+      computeChartData();
+    };
+
+    created();
+    return {
+      // Data
+      learners,
+      tableLoading,
+      months,
+      traineesByMonth,
+      // Computed
+      traineesOnGoingCount,
+      traineesFinishedCount,
+      // Methods
+      formatRow,
+    };
   },
 };
 </script>
