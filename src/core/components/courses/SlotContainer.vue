@@ -11,8 +11,8 @@
         </q-item-section>
       </q-item>
       <div v-if="!course.slots.length && isVendorInterface && isAdmin" class="row gutter-profile">
-        <ni-date-input caption="Date de démarrage souhaitée" :model-value="course.estimatedStartDate"
-          @update:model-value="updateEstimatedStartDate($event)" class="col-xs-12 col-md-6" />
+        <ni-date-input caption="Date de démarrage souhaitée" v-model="course.estimatedStartDate"
+          @blur="updateEstimatedStartDate($event)" class="col-xs-12 col-md-6" />
       </div>
       <q-card class="q-pa-md">
         <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
@@ -346,9 +346,7 @@ export default {
       set(editedCourseSlot.value, path, value);
     };
 
-    const updateEstimatedStartDate = async (event) => {
-      emit('update', set(course.value, 'estimatedStartDate', event));
-    };
+    const updateEstimatedStartDate = () => emit('update');
 
     const isElearningStep = step => step.type === E_LEARNING;
 
