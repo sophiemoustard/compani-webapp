@@ -4,7 +4,7 @@
       <ni-bi-color-button v-if="isIntraOrVendor" class="button-history" icon="history" label="Historique"
         @click="toggleHistory" />
       <div v-if="isIntraOrVendor" class="row gutter-profile">
-        <ni-input caption="Informations complémentaires" v-model.trim="tempCourse.misc"
+        <ni-input caption="Informations complémentaires" v-model.trim="tmpCourse.misc"
           @blur="updateCourse('misc')" :disable="isArchived" />
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
@@ -31,10 +31,10 @@
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
-      @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tempCourse.estimatedStartDate" />
+      @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
-      @update="updateCourse('maxTrainees')" :validations="v$.tempCourse"
-      v-model:max-trainees="tempCourse.maxTrainees" />
+      @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse"
+      v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
@@ -88,22 +88,22 @@
     <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
-    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tempInterlocutor"
-      @submit="updateInterlocutor('salesRepresentative')" :validations="v$.tempInterlocutor"
+    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
+      @submit="updateInterlocutor('salesRepresentative')" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
       :interlocutors-options="salesRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
-    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tempInterlocutor" @hide="resetInterlocutor"
-      @submit="updateInterlocutor('trainer')" :validations="v$.tempInterlocutor" :loading="interlocutorModalLoading"
+    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
+      @submit="updateInterlocutor('trainer')" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
-    <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tempInterlocutor"
-      @submit="updateInterlocutor('companyRepresentative')" :validations="v$.tempInterlocutor"
+    <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
+      @submit="updateInterlocutor('companyRepresentative')" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
-    <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tempContactId"
-      @submit="updateContact" :validations="v$.tempContactId" :loading="contactModalLoading"
+    <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
+      @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
       @hide="resetContactAddition" :contact-options="contactOptions" />
   </div>
 </template>
@@ -204,8 +204,8 @@ export default {
     const smsHistoriesModal = ref(false);
     const urlAndroid = ref('https://bit.ly/3en5OkF');
     const urlIos = ref('https://apple.co/33kKzcU');
-    const tempInterlocutor = ref({ _id: '', isContact: false });
-    const tempCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: '' });
+    const tmpInterlocutor = ref({ _id: '', isContact: false });
+    const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0 });
     const salesRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'référent Compani' });
     const salesRepresentativeEditionModal = ref(false);
     const interlocutorModalLoading = ref(false);
@@ -215,7 +215,7 @@ export default {
     const companyRepresentativeModal = ref(false);
     const contactModalLoading = ref(false);
     const contactAdditionModal = ref(false);
-    const tempContactId = ref('');
+    const tmpContactId = ref('');
     const SALES_REPRESENTATIVE = ref('salesRepresentative');
     const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
@@ -239,13 +239,13 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const rules = computed(() => ({
-      tempInterlocutor: { _id: { required } },
-      tempContactId: { required },
-      tempCourse: { maxTrainees: { strictPositiveNumber, integerNumber } },
+      tmpInterlocutor: { _id: { required } },
+      tmpContactId: { required },
+      tmpCourse: { maxTrainees: { strictPositiveNumber, integerNumber } },
       newSms: { content: { required }, type: { required } },
     }));
 
-    const v$ = useVuelidate(rules, { tempInterlocutor, tempContactId, tempCourse, newSms });
+    const v$ = useVuelidate(rules, { tmpInterlocutor, tmpContactId, tmpCourse, newSms });
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
@@ -326,7 +326,7 @@ export default {
       const phoneValidation = get(v$.value, 'course.contact.contact.phone');
       if (phoneValidation) phoneValidation.$touch();
 
-      tempCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
+      tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
     });
 
     const toggleHistory = async () => {
@@ -547,17 +547,17 @@ export default {
     const updateInterlocutor = async (role) => {
       try {
         interlocutorModalLoading.value = true;
-        v$.value.tempInterlocutor.$touch();
-        if (v$.value.tempInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+        v$.value.tmpInterlocutor.$touch();
+        if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = {
-          [role]: tempInterlocutor.value._id,
+          [role]: tmpInterlocutor.value._id,
           ...(
             (
-              tempInterlocutor.value.isContact ||
+              tmpInterlocutor.value.isContact ||
               get(course.value, 'contact._id') === get(course.value, `${role}._id`)
             ) &&
-            { contact: tempInterlocutor.value.isContact ? tempInterlocutor.value._id : '' }
+            { contact: tmpInterlocutor.value.isContact ? tmpInterlocutor.value._id : '' }
           ),
         };
 
@@ -584,10 +584,10 @@ export default {
     const updateContact = async () => {
       try {
         contactModalLoading.value = true;
-        v$.value.tempContactId.$touch();
-        if (v$.value.tempContactId.$error) return NotifyWarning('Champ(s) invalide(s)');
+        v$.value.tmpContactId.$touch();
+        if (v$.value.tmpContactId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Courses.update(profileId.value, { contact: tempContactId.value });
+        await Courses.update(profileId.value, { contact: tmpContactId.value });
         contactAdditionModal.value = false;
         await refreshCourse();
         NotifyPositive('Contact mis à jour.');
@@ -600,17 +600,17 @@ export default {
     };
 
     const resetContactAddition = () => {
-      tempContactId.value = '';
-      v$.value.tempContactId.$reset();
+      tmpContactId.value = '';
+      v$.value.tmpContactId.$reset();
     };
 
     const resetSalesRepresentativeEdition = () => {
-      tempInterlocutor.value = { _id: '', isContact: false };
-      v$.value.tempInterlocutor.$reset();
+      tmpInterlocutor.value = { _id: '', isContact: false };
+      v$.value.tmpInterlocutor.$reset();
     };
 
     const openSalesRepresentativeModal = () => {
-      tempInterlocutor.value = {
+      tmpInterlocutor.value = {
         _id: course.value.salesRepresentative._id,
         isContact: course.value.salesRepresentative._id === course.value.contact._id,
       };
@@ -618,13 +618,13 @@ export default {
     };
 
     const resetInterlocutor = () => {
-      tempInterlocutor.value = { _id: '', isContact: false };
+      tmpInterlocutor.value = { _id: '', isContact: false };
       interlocutorLabel.value = { action: '', interlocutor: '' };
-      v$.value.tempInterlocutor.$reset();
+      v$.value.tmpInterlocutor.$reset();
     };
 
     const openTrainerModal = (action) => {
-      tempInterlocutor.value = {
+      tmpInterlocutor.value = {
         _id: course.value.trainer._id,
         isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
       };
@@ -633,7 +633,7 @@ export default {
     };
 
     const openCompanyRepresentativeModal = (action) => {
-      tempInterlocutor.value = {
+      tmpInterlocutor.value = {
         _id: course.value.companyRepresentative._id,
         isContact: !!course.value.companyRepresentative._id &&
         course.value.companyRepresentative._id === course.value.contact._id,
@@ -643,7 +643,7 @@ export default {
     };
 
     const openContactAdditionModal = () => {
-      tempContactId.value = course.value.contact._id;
+      tmpContactId.value = course.value.contact._id;
       contactAdditionModal.value = true;
     };
 
@@ -653,24 +653,11 @@ export default {
         .catch(() => NotifyNegative('Erreur lors de la copie des emails.'));
     };
 
-    const getValue = (path) => {
-      if (path === 'trainer') return get(course.value, 'trainer._id', '');
-      if (path === 'salesRepresentative') return get(course.value, 'salesRepresentative._id', '');
-      if (path === 'contact') return get(course.value, 'contact._id', '');
-
-      return get(course.value, path);
-    };
-
-    const saveTmp = (path) => {
-      tmpInput.value = getValue(path);
-    };
-
     const updateCourse = async (path) => {
       try {
-        const value = get(tempCourse.value, path);
-        if (tmpInput.value === value) return;
+        const value = get(tmpCourse.value, path);
 
-        const vAttribute = get(v$.value, `tempCourse.${path}`);
+        const vAttribute = get(v$.value, `tmpCourse.${path}`);
         if (vAttribute) {
           vAttribute.$touch();
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
@@ -720,7 +707,7 @@ export default {
       loading,
       smsHistoryList,
       smsHistoriesModal,
-      tempInterlocutor,
+      tmpInterlocutor,
       salesRepresentativeLabel,
       salesRepresentativeEditionModal,
       interlocutorModalLoading,
@@ -730,9 +717,9 @@ export default {
       companyRepresentativeModal,
       contactModalLoading,
       contactAdditionModal,
-      tempContactId,
+      tmpContactId,
       courseHistoryFeed,
-      tempCourse,
+      tmpCourse,
       // Computed
       course,
       v$,
@@ -775,7 +762,6 @@ export default {
       openCompanyRepresentativeModal,
       openContactAdditionModal,
       copy,
-      saveTmp,
       updateCourse,
       downloadAttendanceSheet,
     };
