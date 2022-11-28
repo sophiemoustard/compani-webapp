@@ -4,8 +4,8 @@
       <ni-bi-color-button v-if="isIntraOrVendor" class="button-history" icon="history" label="Historique"
         @click="toggleHistory" />
       <div v-if="isIntraOrVendor" class="row gutter-profile">
-        <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
-          @blur="updateCourse('misc')" @focus="saveTmp('misc')" :disable="isArchived" />
+        <ni-input caption="Informations complémentaires" v-model.trim="tempCourse.misc"
+          @blur="updateCourse('misc')" :disable="isArchived" />
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div class="interlocutor-container">
@@ -31,9 +31,10 @@
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
-      @update="updateCourse('estimatedStartDate')" />
+      @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tempCourse.estimatedStartDate" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
-      @update="updateCourse('maxTrainees')" :validations="v$.course" />
+      @update="updateCourse('maxTrainees')" :validations="v$.tempCourse"
+      v-model:max-trainees="tempCourse.maxTrainees" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
@@ -204,6 +205,7 @@ export default {
     const urlAndroid = ref('https://bit.ly/3en5OkF');
     const urlIos = ref('https://apple.co/33kKzcU');
     const tempInterlocutor = ref({ _id: '', isContact: false });
+    const tempCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: '' });
     const salesRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'référent Compani' });
     const salesRepresentativeEditionModal = ref(false);
     const interlocutorModalLoading = ref(false);
@@ -239,11 +241,11 @@ export default {
     const rules = computed(() => ({
       tempInterlocutor: { _id: { required } },
       tempContactId: { required },
-      course: { maxTrainees: { strictPositiveNumber, integerNumber } },
+      tempCourse: { maxTrainees: { strictPositiveNumber, integerNumber } },
       newSms: { content: { required }, type: { required } },
     }));
 
-    const v$ = useVuelidate(rules, { tempInterlocutor, tempContactId, course, newSms });
+    const v$ = useVuelidate(rules, { tempInterlocutor, tempContactId, tempCourse, newSms });
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
@@ -323,6 +325,8 @@ export default {
     watch(course, () => {
       const phoneValidation = get(v$.value, 'course.contact.contact.phone');
       if (phoneValidation) phoneValidation.$touch();
+
+      tempCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
     });
 
     const toggleHistory = async () => {
@@ -663,10 +667,10 @@ export default {
 
     const updateCourse = async (path) => {
       try {
-        const value = getValue(path);
+        const value = get(tempCourse.value, path);
         if (tmpInput.value === value) return;
 
-        const vAttribute = get(v$.value, `course.${path}`);
+        const vAttribute = get(v$.value, `tempCourse.${path}`);
         if (vAttribute) {
           vAttribute.$touch();
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
@@ -728,6 +732,7 @@ export default {
       contactAdditionModal,
       tempContactId,
       courseHistoryFeed,
+      tempCourse,
       // Computed
       course,
       v$,

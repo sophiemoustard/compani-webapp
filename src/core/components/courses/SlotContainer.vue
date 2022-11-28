@@ -11,8 +11,9 @@
         </q-item-section>
       </q-item>
       <div v-if="!course.slots.length && isVendorInterface && isAdmin" class="row gutter-profile">
-        <ni-date-input caption="Date de démarrage souhaitée" v-model="course.estimatedStartDate"
-          @blur="updateEstimatedStartDate($event)" class="col-xs-12 col-md-6" />
+        <ni-date-input class="col-xs-12 col-md-6" caption="Date de démarrage souhaitée"
+          :model-value="estimatedStartDate" @update:model-value="inputTempEstimatedStartDate($event)"
+          @blur="updateEstimatedStartDate()" />
       </div>
       <q-card class="q-pa-md">
         <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
@@ -102,13 +103,14 @@ export default {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
+    estimatedStartDate: { type: String, default: '' },
   },
   components: {
     'slot-edition-modal': SlotEditionModal,
     'ni-button': Button,
     'ni-date-input': DateInput,
   },
-  emits: ['refresh', 'update'],
+  emits: ['refresh', 'update', 'update:estimatedStartDate'],
   setup (props, { emit }) {
     const { canEdit } = toRefs(props);
 
@@ -348,6 +350,8 @@ export default {
 
     const updateEstimatedStartDate = () => emit('update');
 
+    const inputTempEstimatedStartDate = event => emit('update:estimatedStartDate', event);
+
     const isElearningStep = step => step.type === E_LEARNING;
 
     const isPlannedStep = step => !!courseSlotsByStepAndDate.value[step.key] &&
@@ -409,6 +413,7 @@ export default {
       unplanSlot,
       setCourseSlot,
       updateEstimatedStartDate,
+      inputTempEstimatedStartDate,
       isElearningStep,
       isStepToPlan,
       getStepClass,
