@@ -93,7 +93,7 @@ export default {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
-    maxTrainees: { type: Number, default: 0 },
+    maxTrainees: { type: [Number, String], default: '' },
   },
   components: {
     'ni-button': Button,

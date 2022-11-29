@@ -655,7 +655,9 @@ export default {
 
     const updateCourse = async (path) => {
       try {
-        const value = get(tmpCourse.value, path);
+        let value = get(tmpCourse.value, path);
+        if (path === 'maxTrainees') value = Number(value);
+
         if (get(course.value, path) === value) return;
 
         const vAttribute = get(v$.value, `tmpCourse.${path}`);
