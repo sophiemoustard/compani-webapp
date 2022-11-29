@@ -620,6 +620,6 @@ export const HHhMM = 'HH\'h\'mm';
 export const DAY_MONTH_YEAR = 'DDD';
 export const HH_MM = 'T';
 export const MONTH_SHORT = 'LLL';
-export const MONTH_SHORT_YYYY = 'LLL YYYY';
+export const MONTH_SHORT_YYYY = 'LLL yyyy';
 export const DAY_OF_MONTH = 'd';
 export const DAY_OF_WEEK_SHORT = 'ccc';

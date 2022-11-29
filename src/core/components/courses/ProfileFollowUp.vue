@@ -17,7 +17,7 @@
           </div>
         </q-card>
       </div>
-      <ni-line-chart :data="traineesByMonth" :labels="months" title="Nombre d'apprenants dans le temps"
+      <ni-line-chart :data="traineesByMonth" :labels="monthAxisLabels" title="Nombre d'apprenants dans le temps"
         class="col-md-6 col-xs-12 line-chart-container" />
     </div>
     <elearning-follow-up-table :learners="learners" :loading="tableLoading" class="q-mt-xl" />
@@ -54,11 +54,12 @@ export default {
     const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
 
     const learners = ref([]);
+    const traineesByMonth = ref([]);
     const tableLoading = ref(false);
 
     const company = computed(() => $store.state.company.company);
 
-    const { traineesByMonth, getDataByMonth, months } = useCharts();
+    const { getCountsByMonth, monthAxisLabels } = useCharts();
 
     const traineesOnGoingCount = computed(() => learners.value.filter(l => l.progress.eLearning !== 1).length);
     const traineesFinishedCount = computed(() => learners.value.length - traineesOnGoingCount.value);
@@ -94,16 +95,13 @@ export default {
     };
 
     const computeChartData = () => {
-      const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-      const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       const activityHistories = learners.value.map(l => l.steps
         .map(s => s.activities
           .map(a => a.activityHistories
-            .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
             .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
-      traineesByMonth.value = getDataByMonth(activityHistories, 'user');
+      traineesByMonth.value = getCountsByMonth(activityHistories, 'user');
     };
 
     const created = async () => {
@@ -116,7 +114,7 @@ export default {
       // Data
       learners,
       tableLoading,
-      months,
+      monthAxisLabels,
       traineesByMonth,
       // Computed
       traineesOnGoingCount,
