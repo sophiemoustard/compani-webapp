@@ -22,12 +22,9 @@ export const useCharts = () => {
     return lastMonthsStartDates
       .map((date) => {
         const monthKey = CompaniDate(date).format(MM_YYYY);
+        const monthActivityHistories = activityHistoriesByMonth[monthKey] || [];
 
-        const monthActivityHistories = uniqByKey
-          ? uniqBy(activityHistoriesByMonth[monthKey], uniqByKey)
-          : activityHistoriesByMonth[monthKey];
-
-        return monthActivityHistories.length;
+        return uniqByKey ? uniqBy(monthActivityHistories, uniqByKey).length : monthActivityHistories.length;
       });
   };
 
