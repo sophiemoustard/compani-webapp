@@ -20,7 +20,7 @@
           <div class="text-center">apprenants actifs</div>
         </div>
         <div class="column items-center">
-          <ni-e-learning-indicator :indicator="activityHistories.length" />
+          <ni-e-learning-indicator :indicator="activityHistoriesBetweenDates.length" />
           <div class="text-center">activités de eLearning réalisées</div>
         </div>
       </div>
@@ -106,13 +106,13 @@ export default {
       startDate: CompaniDate().subtract('P1M').startOf(DAY).toISO(),
       endDate: CompaniDate().toISO(),
     });
-    const activityHistories = ref([]);
+    const activityHistoriesBetweenDates = ref([]);
     const linkRequests = ref([]);
 
-    const activeLearners = computed(() => uniqBy(activityHistories.value, 'user._id').length);
+    const activeLearners = computed(() => uniqBy(activityHistoriesBetweenDates.value, 'user._id').length);
 
     const courseList = computed(() => {
-      const usersParticipationsToPrograms = activityHistories.value
+      const usersParticipationsToPrograms = activityHistoriesBetweenDates.value
         .map(aH => aH.activity.steps.map(s => s.subPrograms.map(sP => ({ userId: aH.user._id, program: sP.program }))))
         .flat(3);
       const participationsGroupedByProgram = Object.values(groupBy(usersParticipationsToPrograms, 'program._id'));
@@ -123,7 +123,7 @@ export default {
     });
 
     const learnerList = computed(() => {
-      const groupedByLearners = Object.values(groupBy(activityHistories.value, h => h.user._id));
+      const groupedByLearners = Object.values(groupBy(activityHistoriesBetweenDates.value, h => h.user._id));
 
       return groupedByLearners.map(group => ({ ...group[0].user, activityCount: group.length }))
         .sort((a, b) => b.activityCount - a.activityCount);
@@ -138,13 +138,13 @@ export default {
         const { endDate, startDate } = dates.value;
         if (!endDate || CompaniDate(startDate).isAfter(endDate)) return;
 
-        activityHistories.value = await ActivityHistories.list({
+        activityHistoriesBetweenDates.value = await ActivityHistories.list({
           startDate,
           endDate: CompaniDate(endDate).endOf(DAY).toISO(),
         });
         NotifyPositive('Données mises à jour.');
       } catch (e) {
-        activityHistories.value = [];
+        activityHistoriesBetweenDates.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
       }
@@ -185,7 +185,7 @@ export default {
     return {
       // Data
       dates,
-      activityHistories,
+      activityHistoriesBetweenDates,
       linkRequests,
       months,
       traineesByMonth,
