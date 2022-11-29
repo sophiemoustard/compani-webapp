@@ -63,9 +63,9 @@
     <div class="q-mt-xl">
       <p class="text-weight-bold section-title">Evolution dans le temps</p>
       <div class="row">
-        <ni-line-chart :data="traineesByMonth" :labels="months" title="Apprenants actifs mensuels"
+        <ni-line-chart :data="traineesByMonth" :labels="monthAxisLabels" title="Apprenants actifs mensuels"
           class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
-        <ni-line-chart :data="activitiesByMonth" :labels="months"
+        <ni-line-chart :data="activitiesByMonth" :labels="monthAxisLabels"
           title="Nombre total d'activités réalisées par mois" class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
       </div>
     </div>
@@ -85,9 +85,9 @@ import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import LineChart from '@components/charts/LineChart';
 import CompanyLinkRequestCell from '@components/CompanyLinkRequestCell';
-import { DEFAULT_AVATAR, DAY } from '@data/constants';
+import { DEFAULT_AVATAR, DAY, MONTH } from '@data/constants';
 import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
-import CompaniDate from '@helpers/dates/CompaniDates';
+import CompaniDate from '@helpers/dates/companiDates';
 import { useCharts } from '@composables/charts';
 
 export default {
@@ -107,6 +107,8 @@ export default {
       endDate: CompaniDate().toISO(),
     });
     const activityHistoriesBetweenDates = ref([]);
+    const traineesByMonth = ref([]);
+    const activitiesByMonth = ref([]);
     const linkRequests = ref([]);
 
     const activeLearners = computed(() => uniqBy(activityHistoriesBetweenDates.value, 'user._id').length);
@@ -129,7 +131,7 @@ export default {
         .sort((a, b) => b.activityCount - a.activityCount);
     });
 
-    const { traineesByMonth, activitiesByMonth, getDataByMonth, months } = useCharts();
+    const { getCountsByMonth, monthAxisLabels } = useCharts();
 
     watch(dates, () => getActivityHistories());
 
@@ -152,12 +154,12 @@ export default {
 
     const computeChartsData = async () => {
       try {
-        const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-        const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        const sixMonthsHistories = await ActivityHistories.list({ startDate: chartStartDate, endDate: chartEndDate });
+        const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
+        const endDate = CompaniDate().startOf(MONTH).toISO();
+        const sixMonthsHistories = await ActivityHistories.list({ startDate, endDate });
 
-        traineesByMonth.value = getDataByMonth(sixMonthsHistories, 'user._id');
-        activitiesByMonth.value = getDataByMonth(sixMonthsHistories);
+        traineesByMonth.value = getCountsByMonth(sixMonthsHistories, 'user._id');
+        activitiesByMonth.value = getCountsByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
       } catch (e) {
         console.error(e);
@@ -187,7 +189,7 @@ export default {
       dates,
       activityHistoriesBetweenDates,
       linkRequests,
-      months,
+      monthAxisLabels,
       traineesByMonth,
       activitiesByMonth,
       DEFAULT_AVATAR,

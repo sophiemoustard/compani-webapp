@@ -285,7 +285,7 @@ export const INVALID_NUMBER = 'Nombre invalide';
 // BILLING
 
 export const TWO_WEEKS = 'two_weeks';
-export const MONTH = 'month';
+
 export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
 
@@ -604,6 +604,17 @@ export const DAYS = {
   5: 'Samedi',
   6: 'Dimanche',
 };
+
+// DATE AND DURATION UNITS
+export const YEAR = 'year';
+export const QUARTER = 'quarter';
+export const MONTH = 'month';
+export const WEEK = 'week';
+export const DAY = 'day';
+export const HOUR = 'hour';
+export const MINUTE = 'minute';
+export const SECOND = 'second';
+export const MILLISECOND = 'millisecond';
 
 // COMPANIDURATION
 export const PT0S = 'PT0S';
