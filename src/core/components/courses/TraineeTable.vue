@@ -6,7 +6,7 @@
       </div>
       <div class="row" v-if="isIntraCourse">
         <ni-input v-if="isRofOrAdmin && !isClientInterface" caption="Nombre max de stagiaires" :disable="isArchived"
-          :model-value="maxTrainees" @update:model-value="inputTempMaxTrainees($event)"
+          :model-value="maxTrainees" @update:model-value="inputTmpMaxTrainees($event)"
           :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" @blur="updateMaxTrainees" />
         <div v-else class="q-mb-sm">{{ maxTrainees }} stagiaires max</div>
       </div>
@@ -383,7 +383,7 @@ export default {
 
     const updateMaxTrainees = () => emit('update');
 
-    const inputTempMaxTrainees = event => emit('update:maxTrainees', event);
+    const inputTmpMaxTrainees = event => emit('update:maxTrainees', event);
 
     return {
       // Data
@@ -428,7 +428,7 @@ export default {
       openTraineeCreationModal,
       openLearnerCreationModal,
       updateMaxTrainees,
-      inputTempMaxTrainees,
+      inputTmpMaxTrainees,
     };
   },
 };
