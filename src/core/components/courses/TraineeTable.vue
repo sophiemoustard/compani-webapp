@@ -6,9 +6,9 @@
       </div>
       <div class="row" v-if="isIntraCourse">
         <ni-input v-if="isRofOrAdmin && !isClientInterface" caption="Nombre max de stagiaires" :disable="isArchived"
-          v-model.trim="course.maxTrainees" @blur="updateMaxTrainees"
-          :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" />
-        <div v-else class="q-mb-sm">{{ course.maxTrainees }} stagiaires max</div>
+          :model-value="maxTrainees" @update:model-value="inputTmpMaxTrainees($event)"
+          :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" @blur="updateMaxTrainees" />
+        <div v-else class="q-mb-sm">{{ maxTrainees }} stagiaires max</div>
       </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" v-model:pagination="traineesPagination"
@@ -93,6 +93,7 @@ export default {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
+    maxTrainees: { type: [Number, String], default: '' },
   },
   components: {
     'ni-button': Button,
@@ -102,7 +103,7 @@ export default {
     'trainee-addition-modal': TraineeAdditionModal,
     'learner-creation-modal': LearnerCreationModal,
   },
-  emits: ['refresh', 'update'],
+  emits: ['refresh', 'update', 'update:maxTrainees'],
   setup (props, { emit }) {
     const { canEdit, validations } = toRefs(props);
 
@@ -382,6 +383,8 @@ export default {
 
     const updateMaxTrainees = () => emit('update');
 
+    const inputTmpMaxTrainees = event => emit('update:maxTrainees', event);
+
     return {
       // Data
       newLearner,
@@ -425,6 +428,7 @@ export default {
       openTraineeCreationModal,
       openLearnerCreationModal,
       updateMaxTrainees,
+      inputTmpMaxTrainees,
     };
   },
 };
