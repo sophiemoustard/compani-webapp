@@ -32,7 +32,7 @@ import {
   TRAINEE_ADDITION,
   TRAINEE_DELETION,
   ESTIMATED_START_DATE_EDITION,
-  DD_MM,
+  DD_MM_YY,
   HHhMM,
 } from '@data/constants';
 import Button from '@components/Button';
@@ -83,7 +83,7 @@ export default {
       }
     },
     historySignature () {
-      const date = CompaniDate(this.courseHistory.createdAt).format(DD_MM);
+      const date = CompaniDate(this.courseHistory.createdAt).format(DD_MM_YY);
       const hour = CompaniDate(this.courseHistory.createdAt).format(HHhMM);
       const user = formatIdentity(this.courseHistory.createdBy.identity, 'FL');
 
@@ -98,7 +98,7 @@ export default {
       return get(user, 'picture.link') || DEFAULT_AVATAR;
     },
     getSlotCreationTitle () {
-      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM);
+      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM_YY);
       const startHour = CompaniDate(this.courseHistory.slot.startDate).format(HHhMM);
       const endHour = CompaniDate(this.courseHistory.slot.endDate).format(HHhMM);
       const infos = `${date} de ${startHour} à ${endHour}`;
@@ -110,7 +110,7 @@ export default {
         'Pas d\'adresse renseignée.';
     },
     getSlotDeletionTitle () {
-      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM);
+      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM_YY);
 
       return { pre: 'Suppression du', type: 'créneau', post: 'du', infos: date };
     },
@@ -127,8 +127,8 @@ export default {
     },
     getSlotEditionTitle () {
       if (this.courseHistory.update.startDate && this.courseHistory.update.startHour) {
-        const previousStartDate = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM);
-        const startDate = CompaniDate(this.courseHistory.update.startDate.to).format(DD_MM);
+        const previousStartDate = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM_YY);
+        const startDate = CompaniDate(this.courseHistory.update.startDate.to).format(DD_MM_YY);
         const startHour = CompaniDate(this.courseHistory.update.startHour.to).format(HHhMM);
         const endHour = CompaniDate(this.courseHistory.update.endHour.to).format(HHhMM);
 
@@ -140,13 +140,13 @@ export default {
         };
       }
       if (this.courseHistory.update.startDate) {
-        const from = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM);
-        const to = CompaniDate(this.courseHistory.update.startDate.to).format(DD_MM);
+        const from = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM_YY);
+        const to = CompaniDate(this.courseHistory.update.startDate.to).format(DD_MM_YY);
 
         return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
       }
       if (this.courseHistory.update.startHour) {
-        const date = CompaniDate(this.courseHistory.update.startHour.from).format(DD_MM);
+        const date = CompaniDate(this.courseHistory.update.startHour.from).format(DD_MM_YY);
         const startHour = CompaniDate(this.courseHistory.update.startHour.to).format(HHhMM);
         const endHour = CompaniDate(this.courseHistory.update.endHour.to).format(HHhMM);
 
@@ -156,7 +156,7 @@ export default {
     },
     getSlotEditionDetails () {
       if (this.courseHistory.update.startDate && this.courseHistory.update.startHour) {
-        const previousStartDate = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM);
+        const previousStartDate = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM_YY);
         const previousStartHour = CompaniDate(this.courseHistory.update.startHour.from).format(HHhMM);
         const previousEndHour = CompaniDate(this.courseHistory.update.endHour.from).format(HHhMM);
 
@@ -191,12 +191,12 @@ export default {
         pre: 'Nouvelle',
         type: 'date de démarrage souhaitée',
         post: 'le',
-        infos: CompaniDate(this.courseHistory.update.estimatedStartDate.to).format(DD_MM),
+        infos: CompaniDate(this.courseHistory.update.estimatedStartDate.to).format(DD_MM_YY),
       };
     },
     getEstimatedStartDateEditionDetails () {
       if (this.courseHistory.update.estimatedStartDate.from) {
-        const previousStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM);
+        const previousStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM_YY);
 
         return `Début précédemment souhaité le ${previousStartDate}`;
       }
