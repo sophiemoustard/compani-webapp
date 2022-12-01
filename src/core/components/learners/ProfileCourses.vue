@@ -128,6 +128,7 @@ import {
   SHORT_DURATION_H_MM,
   DD_MM_YYYY,
   MONTH,
+  DAY,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -277,7 +278,7 @@ export default {
         const endDate = CompaniDate().startOf(MONTH).toISO();
 
         const filteredActivities = eLearningActivitiesCompleted.value
-          .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate));
+          .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate, DAY));
 
         activitiesByMonth.value = getCountsByMonth(filteredActivities);
         NotifyPositive('Données mises à jour.');

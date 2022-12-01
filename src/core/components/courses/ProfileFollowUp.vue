@@ -32,7 +32,7 @@ import LineChart from '@components/charts/LineChart';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
 import { useCharts } from '@composables/charts';
 import CompaniDate from '@helpers/dates/companiDates';
-import { MONTH } from '@data/constants';
+import { MONTH, DAY } from '@data/constants';
 
 export default {
   name: 'ProfileFollowUp',
@@ -62,7 +62,7 @@ export default {
       const activityHistories = learners.value.map(l => l.steps
         .map(s => s.activities
           .map(a => a.activityHistories
-            .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate))
+            .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate, DAY))
             .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
