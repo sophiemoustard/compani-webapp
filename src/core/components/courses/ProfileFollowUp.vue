@@ -57,7 +57,7 @@ export default {
 
     const computeChartData = () => {
       const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
-      const endDate = CompaniDate().startOf(MONTH).toISO();
+      const endDate = CompaniDate().endOf(MONTH).toISO();
 
       const activityHistories = learners.value.map(l => l.steps
         .map(s => s.activities

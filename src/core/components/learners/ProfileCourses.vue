@@ -275,7 +275,7 @@ export default {
       loading.value = true;
       try {
         const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
-        const endDate = CompaniDate().startOf(MONTH).toISO();
+        const endDate = CompaniDate().endOf(MONTH).toISO();
 
         const filteredActivities = eLearningActivitiesCompleted.value
           .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate, DAY));
