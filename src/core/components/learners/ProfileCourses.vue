@@ -127,6 +127,7 @@ import {
   PEDAGOGY,
   SHORT_DURATION_H_MM,
   DD_MM_YYYY,
+  MONTH,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -272,7 +273,13 @@ export default {
     const computeChartsData = async () => {
       loading.value = true;
       try {
-        activitiesByMonth.value = getCountsByMonth(eLearningActivitiesCompleted.value);
+        const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
+        const endDate = CompaniDate().startOf(MONTH).toISO();
+
+        const filteredActivities = eLearningActivitiesCompleted.value
+          .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate));
+
+        activitiesByMonth.value = getCountsByMonth(filteredActivities);
         NotifyPositive('Données mises à jour.');
       } catch (e) {
         console.error(e);

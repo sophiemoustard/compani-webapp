@@ -31,6 +31,8 @@ import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import LineChart from '@components/charts/LineChart';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
 import { useCharts } from '@composables/charts';
+import CompaniDate from '@helpers/dates/companiDates';
+import { MONTH } from '@data/constants';
 
 export default {
   name: 'ProfileFollowUp',
@@ -54,9 +56,13 @@ export default {
     const traineesFinishedCount = computed(() => learners.value.length - traineesOnGoingCount.value);
 
     const computeChartData = () => {
+      const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
+      const endDate = CompaniDate().startOf(MONTH).toISO();
+
       const activityHistories = learners.value.map(l => l.steps
         .map(s => s.activities
           .map(a => a.activityHistories
+            .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate))
             .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
