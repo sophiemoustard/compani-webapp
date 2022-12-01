@@ -20,21 +20,17 @@
       <ni-line-chart :data="traineesByMonth" :labels="monthAxisLabels" title="Nombre d'apprenants dans le temps"
         class="col-md-6 col-xs-12 line-chart-container" />
     </div>
-    <elearning-follow-up-table :learners="learners" :loading="tableLoading" class="q-mt-xl" />
+    <elearning-follow-up-table :learners="learners" :loading="learnersLoading" class="q-mt-xl" />
   </div>
 </template>
 
 <script>
 import { computed, ref, toRefs } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-import Courses from '@api/Courses';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import LineChart from '@components/charts/LineChart';
-import { NotifyNegative } from '@components/popup/notify';
+import { useTraineeFollowUp } from '@composables/traineeFollowUp';
 import { useCharts } from '@composables/charts';
-import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'ProfileFollowUp',
@@ -48,51 +44,14 @@ export default {
   },
   setup (props) {
     const { profileId } = toRefs(props);
-    const $store = useStore();
-    const $router = useRouter();
 
-    const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
-
-    const learners = ref([]);
     const traineesByMonth = ref([]);
-    const tableLoading = ref(false);
-
-    const company = computed(() => $store.getters['main/getCompany']);
 
     const { getCountsByMonth, monthAxisLabels } = useCharts();
+    const { learners, learnersLoading, getLearnersList } = useTraineeFollowUp(profileId);
 
     const traineesOnGoingCount = computed(() => learners.value.filter(l => l.progress.eLearning !== 1).length);
     const traineesFinishedCount = computed(() => learners.value.length - traineesOnGoingCount.value);
-
-    const formatRow = (trainee) => {
-      const formattedName = formatIdentity(trainee.identity, 'FL');
-
-      return {
-        _id: trainee._id,
-        identity: { ...trainee.identity, fullName: formattedName },
-        progress: trainee.progress,
-        steps: trainee.steps,
-        firstMobileConnection: trainee.firstMobileConnection,
-      };
-    };
-
-    const getLearnersList = async () => {
-      try {
-        tableLoading.value = true;
-        const course = await Courses.getFollowUp(
-          profileId.value,
-          isVendorInterface ? null : { company: company.value._id }
-        );
-
-        if (course) learners.value = Object.freeze(course.trainees.map(formatRow));
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des apprenants');
-        learners.value = [];
-      } finally {
-        tableLoading.value = false;
-      }
-    };
 
     const computeChartData = () => {
       const activityHistories = learners.value.map(l => l.steps
@@ -113,14 +72,13 @@ export default {
     return {
       // Data
       learners,
-      tableLoading,
+      learnersLoading,
       monthAxisLabels,
       traineesByMonth,
       // Computed
       traineesOnGoingCount,
       traineesFinishedCount,
       // Methods
-      formatRow,
     };
   },
 };
