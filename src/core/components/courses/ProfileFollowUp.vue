@@ -57,7 +57,7 @@ export default {
     const traineesByMonth = ref([]);
     const tableLoading = ref(false);
 
-    const company = computed(() => $store.state.company.company);
+    const company = computed(() => $store.getters['main/getCompany']);
 
     const { getCountsByMonth, monthAxisLabels } = useCharts();
 
