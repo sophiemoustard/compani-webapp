@@ -154,8 +154,8 @@ export default {
 
     const computeChartsData = async () => {
       try {
-        const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
-        const endDate = CompaniDate().endOf(MONTH).toISO();
+        const startDate = CompaniDate().subtract('P6M').startOf(MONTH).toISO();
+        const endDate = CompaniDate().subtract('P1M').endOf(MONTH).toISO();
         const sixMonthsHistories = await ActivityHistories.list({ startDate, endDate });
 
         traineesByMonth.value = getCountsByMonth(sixMonthsHistories, 'user._id');

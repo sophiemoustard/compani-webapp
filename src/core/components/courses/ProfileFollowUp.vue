@@ -56,8 +56,8 @@ export default {
     const traineesFinishedCount = computed(() => learners.value.length - traineesOnGoingCount.value);
 
     const computeChartData = () => {
-      const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
-      const endDate = CompaniDate().endOf(MONTH).toISO();
+      const startDate = CompaniDate().subtract('P6M').startOf(MONTH).toISO();
+      const endDate = CompaniDate().subtract('P1M').endOf(MONTH).toISO();
 
       const activityHistories = learners.value.map(l => l.steps
         .map(s => s.activities
