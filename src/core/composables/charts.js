@@ -8,7 +8,7 @@ import { MONTH, MONTH_SHORT_YYYY, MM_YYYY } from '@data/constants';
 export const useCharts = () => {
   const lastMonthsStartDates = CompaniInterval(
     CompaniDate().startOf(MONTH).subtract('P6M').toISO(),
-    CompaniDate().endOf(MONTH).subtract('P1M').toISO()
+    CompaniDate().startOf(MONTH).subtract('P1M').toISO()
   ).rangeBy('P1M');
 
   const monthAxisLabels = ref(lastMonthsStartDates.map(date => CompaniDate(date).format(MONTH_SHORT_YYYY)));
