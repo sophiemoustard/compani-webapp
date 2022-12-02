@@ -1,5 +1,6 @@
 import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
+import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
@@ -18,11 +19,8 @@ export const useTraineeFollowUp = (profileId) => {
     const formattedName = formatIdentity(trainee.identity, 'FL');
 
     return {
-      _id: trainee._id,
+      ...omit(trainee, 'company'),
       identity: { ...trainee.identity, fullName: formattedName },
-      progress: trainee.progress,
-      steps: trainee.steps,
-      firstMobileConnection: trainee.firstMobileConnection,
     };
   };
 
