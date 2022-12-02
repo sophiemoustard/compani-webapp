@@ -25,6 +25,9 @@
                       :disable="!!course.archivedAt" />
                   </div>
                 </template>
+                <template v-else-if="!isClientInterface && col.name === 'company'">
+                  <div class="company-tag">{{ col.value }}</div>
+                </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
@@ -53,7 +56,7 @@
 </template>
 
 <script>
-import { onMounted, computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
@@ -63,7 +66,6 @@ import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import {
-  INTER_B2B,
   TRAINER,
   DEFAULT_AVATAR,
   TRAINING_ORGANISATION_MANAGER,
@@ -94,6 +96,7 @@ export default {
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     maxTrainees: { type: [Number, String], default: '' },
+    potentialTrainees: { type: Array, default: () => [] },
   },
   components: {
     'ni-button': Button,
@@ -105,19 +108,17 @@ export default {
   },
   emits: ['refresh', 'update', 'update:maxTrainees'],
   setup (props, { emit }) {
-    const { canEdit, validations } = toRefs(props);
+    const { canEdit, validations, potentialTrainees } = toRefs(props);
 
     const $store = useStore();
     const $q = useQuasar();
-
-    const potentialTrainees = ref([]);
     const traineesColumns = ref([
       {
         name: 'company',
         label: 'Structure',
         align: 'left',
         field: row => get(row, 'company.name') || '',
-        classes: 'text-capitalize',
+        classes: 'text-capitalize company-tag-content',
       },
       {
         name: 'firstname',
@@ -153,8 +154,6 @@ export default {
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
     const course = computed(() => $store.state.course.course);
-
-    const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
@@ -194,23 +193,8 @@ export default {
       return '';
     });
 
-    const getPotentialTrainees = async () => {
-      try {
-        let query;
+    const refresh = () => emit('refresh');
 
-        if (isIntraCourse.value) query = { company: get(course.value, 'companies[0]._id') };
-        if (course.value.type === INTER_B2B) {
-          query = isClientInterface ? { company: get(loggedUser.value, 'company._id') } : { hasCompany: true };
-        }
-
-        potentialTrainees.value = Object.freeze(await Users.learnerList(query));
-      } catch (error) {
-        potentialTrainees.value = [];
-        console.error(error);
-      }
-    };
-
-    const refresh = async () => getPotentialTrainees();
     const {
       newLearner,
       newTrainee,
@@ -230,10 +214,6 @@ export default {
     } = useLearners(refresh, false, company);
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
-
-    onMounted(async () => {
-      await getPotentialTrainees();
-    });
 
     const setNewLearner = (user) => {
       newLearner.value._id = user._id;
@@ -297,7 +277,8 @@ export default {
 
         await Courses.addTrainee(course.value._id, { trainee: newTrainee.value });
         traineeAdditionModal.value = false;
-        emit('refresh');
+
+        refresh();
         NotifyPositive('Stagiaire ajouté(e).');
       } catch (e) {
         console.error(e);
@@ -330,7 +311,8 @@ export default {
 
         await Users.updateById(editedTrainee.value._id, omit(editedTrainee.value, ['_id', 'local']));
         traineeEditionModal.value = false;
-        emit('refresh');
+
+        refresh();
         NotifyPositive('Stagiaire modifié(e).');
       } catch (e) {
         console.error(e);
@@ -352,7 +334,8 @@ export default {
     const deleteTrainee = async (traineeId) => {
       try {
         await Courses.deleteTrainee(course.value._id, traineeId);
-        emit('refresh');
+
+        refresh();
         NotifyPositive('Stagiaire supprimé(e).');
       } catch (e) {
         console.error(e);
@@ -437,4 +420,15 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
+.company-tag
+  background-color: $copper-100
+  border-radius: 8px
+  color: $copper-700
+  padding: 4px 8px
+  margin: 4px 0px
+  &-content
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: center
 </style>

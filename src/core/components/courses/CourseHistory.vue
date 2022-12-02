@@ -34,6 +34,8 @@ import {
   ESTIMATED_START_DATE_EDITION,
   DD_MM_YYYY,
   HHhMM,
+  COMPANY_ADDITION,
+  COMPANY_DELETION,
 } from '@data/constants';
 import Button from '@components/Button';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -59,6 +61,10 @@ export default {
           return { title: this.getTraineeDeletionTitle() };
         case TRAINEE_ADDITION:
           return { title: this.getTraineeAdditionTitle() };
+        case COMPANY_ADDITION:
+          return { title: this.getCompanyAdditionTitle() };
+        case COMPANY_DELETION:
+          return { title: this.getCompanyDeletionTitle() };
         case SLOT_DELETION:
           return {
             title: this.getSlotDeletionTitle(),
@@ -174,7 +180,7 @@ export default {
       return {
         pre: 'Ajout d\'un(e)',
         type: 'stagiaire',
-        post: 'à la formation :',
+        post: 'à la formation\u00A0:',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };
     },
@@ -182,7 +188,7 @@ export default {
       return {
         pre: 'Retrait d\'un(e)',
         type: 'stagiaire',
-        post: 'de la formation :',
+        post: 'de la formation\u00A0:',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };
     },
@@ -201,6 +207,22 @@ export default {
         return `Début précédemment souhaité le ${previousStartDate}`;
       }
       return '';
+    },
+    getCompanyAdditionTitle () {
+      return {
+        pre: 'Rattachement d\'une',
+        type: 'structure',
+        post: 'à la formation\u00A0:',
+        infos: `\r\n${this.courseHistory.company.name}`,
+      };
+    },
+    getCompanyDeletionTitle () {
+      return {
+        pre: 'Détachement d\'une',
+        type: 'structure',
+        post: 'de la formation\u00A0:',
+        infos: `\r\n${this.courseHistory.company.name}`,
+      };
     },
   },
 };

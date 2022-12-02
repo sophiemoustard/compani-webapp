@@ -32,8 +32,10 @@
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
       @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
+    <ni-company-table v-if="isCourseInter && isVendorInterface" :course="course" @refresh="refreshCourse"
+      :can-edit="isAdmin" :loading="courseLoading" />
     <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
-      @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse"
+      @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
@@ -117,6 +119,7 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
@@ -125,6 +128,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
+import CompanyTable from '@components/courses/CompanyTable';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
@@ -167,6 +171,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-slot-container': SlotContainer,
+    'ni-company-table': CompanyTable,
     'ni-trainee-table': TraineeTable,
     'ni-course-info-link': CourseInfoLink,
     'ni-banner': Banner,
@@ -219,6 +224,7 @@ export default {
     const SALES_REPRESENTATIVE = ref('salesRepresentative');
     const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
+    const potentialTrainees = ref([]);
 
     const course = computed(() => $store.state.course.course);
 
@@ -255,7 +261,7 @@ export default {
 
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
-    const canEditTrainees = computed(() => isIntraCourse.value || (!isClientInterface && !isTrainer.value));
+    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isAdmin.value));
 
     const isFinished = computed(() => {
       const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
@@ -364,6 +370,20 @@ export default {
       return done(!olderCourseHistories.length);
     };
 
+    const getPotentialTrainees = async () => {
+      try {
+        let query;
+
+        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
+        else query = { companies: course.value.companies.map(c => c._id) };
+
+        potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
+      } catch (error) {
+        potentialTrainees.value = [];
+        console.error(error);
+      }
+    };
+
     const refreshCourse = async () => {
       try {
         courseLoading.value = true;
@@ -372,6 +392,7 @@ export default {
           await getCourseHistories();
           courseHistoryFeed.value.resumeScroll();
         }
+        await getPotentialTrainees();
       } catch (e) {
         console.error(e);
       } finally {
@@ -685,12 +706,14 @@ export default {
       if (isVendorInterface || isIntraCourse.value) {
         promises.push(refreshSms(), refreshCompanyRepresentatives());
       }
-      await Promise.all(promises);
 
-      if (isAdmin.value) await refreshTrainersAndSalesRepresentatives();
+      if (isAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
+      promises.push(getPotentialTrainees());
+
+      await Promise.all(promises);
     };
 
     created();
@@ -699,6 +722,7 @@ export default {
       // Data
       INTRA,
       trainerOptions,
+      potentialTrainees,
       salesRepresentativeOptions,
       companyRepresentativeOptions,
       courseLoading,
@@ -742,6 +766,8 @@ export default {
       isArchived,
       followUpMissingInfo,
       isClientInterface,
+      isCourseInter,
+      isVendorInterface,
       // Methods
       get,
       formatQuantity,
