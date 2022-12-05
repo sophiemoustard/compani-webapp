@@ -1,46 +1,37 @@
 import { ref } from 'vue';
 import groupBy from 'lodash/groupBy';
-import get from 'lodash/get';
+import uniqBy from 'lodash/uniqBy';
+import CompaniDate from '@helpers/dates/companiDates';
+import CompaniInterval from '@helpers/dates/companiIntervals';
+import { MONTH, MONTH_SHORT_YYYY, MM_YYYY } from '@data/constants';
 
 export const useCharts = () => {
-  const activitiesByMonth = ref([]);
-  const months = ref([]);
+  const lastMonthsStartDates = CompaniInterval(
+    CompaniDate().startOf(MONTH).subtract('P6M').toISO(),
+    CompaniDate().startOf(MONTH).subtract('P1M').toISO()
+  ).rangeBy('P1M');
 
-  const formatMonthAndYear = (date) => {
-    const month = new Date(date).getMonth() < 10 ? `0${new Date(date).getMonth()}` : new Date(date).getMonth();
+  const monthAxisLabels = ref(lastMonthsStartDates.map(date => CompaniDate(date).format(MONTH_SHORT_YYYY)));
 
-    return `${new Date(date).getFullYear()}${month}`;
-  };
+  const getCountsByMonth = (histories, uniqByKey) => {
+    const activityHistoriesByMonth = groupBy(
+      histories,
+      ah => CompaniDate(ah.date).format(MM_YYYY)
+    );
 
-  const getDataByMonth = (histories, groupByKey) => {
-    const historiesByMonth = groupBy(histories, h => formatMonthAndYear(h.date));
-    const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-    const monthlyData = [];
-    months.value = [];
+    return lastMonthsStartDates
+      .map((date) => {
+        const monthKey = CompaniDate(date).format(MM_YYYY);
+        const monthActivityHistories = activityHistoriesByMonth[monthKey] || [];
 
-    for (let i = 6; i > 0; i -= 1) {
-      const date = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
-      const month = monthNames[date.getMonth()];
-      const year = date.getFullYear();
-      months.value.push(`${month} ${year}`);
-
-      const monthKey = formatMonthAndYear(date);
-      if (!historiesByMonth[monthKey]) monthlyData.push(0);
-      else if (!groupByKey) monthlyData.push(historiesByMonth[monthKey].length);
-      else {
-        const monthlyHistoriesGroupedByKey = groupBy(historiesByMonth[monthKey], g => get(g, groupByKey) || null);
-        monthlyData.push(Object.keys(monthlyHistoriesGroupedByKey).length);
-      }
-    }
-
-    return monthlyData;
+        return uniqByKey ? uniqBy(monthActivityHistories, uniqByKey).length : monthActivityHistories.length;
+      });
   };
 
   return {
     // Data
-    activitiesByMonth,
-    months,
+    monthAxisLabels,
     // Methods
-    getDataByMonth,
+    getCountsByMonth,
   };
 };

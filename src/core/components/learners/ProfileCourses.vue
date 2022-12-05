@@ -22,8 +22,8 @@
             </div>
           </q-card>
         </div>
-        <ni-line-chart :data="activitiesByMonth" :labels="months" class="col-md-6 col-xs-12 line-chart-container"
-          title="Nombre total d'activités réalisées par mois" />
+        <ni-line-chart :data="activitiesByMonth" :labels="monthAxisLabels"
+          class="col-md-6 col-xs-12 line-chart-container" title="Nombre total d'activités réalisées par mois" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -127,6 +127,8 @@ import {
   PEDAGOGY,
   SHORT_DURATION_H_MM,
   DD_MM_YYYY,
+  MONTH,
+  DAY,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -154,8 +156,9 @@ export default {
     const $router = useRouter();
 
     const { isVendorInterface } = useCourses();
-    const { activitiesByMonth, getDataByMonth, months } = useCharts();
+    const { getCountsByMonth, monthAxisLabels } = useCharts();
     const courses = ref([]);
+    const activitiesByMonth = ref([]);
     const loading = ref(false);
     const pagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
     const courseColumns = ref([
@@ -269,15 +272,15 @@ export default {
     };
 
     const computeChartsData = async () => {
+      loading.value = true;
       try {
-        loading.value = true;
-        const chartStartDate = CompaniDate().startOf('month').subtract('P6M');
-        const chartEndDate = CompaniDate().startOf('month');
+        const startDate = CompaniDate().startOf(MONTH).subtract('P6M').toISO();
+        const endDate = CompaniDate().endOf(MONTH).toISO();
 
-        const sixMonthsHistories = eLearningActivitiesCompleted.value
-          .filter(ah => CompaniDate(ah.createdAt).isSameOrBetween(chartStartDate, chartEndDate));
+        const filteredActivities = eLearningActivitiesCompleted.value
+          .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate, DAY));
 
-        activitiesByMonth.value = getDataByMonth(sixMonthsHistories);
+        activitiesByMonth.value = getCountsByMonth(filteredActivities);
         NotifyPositive('Données mises à jour.');
       } catch (e) {
         console.error(e);
@@ -334,7 +337,7 @@ export default {
       attendanceColumns,
       unsubscribedAttendances,
       activitiesByMonth,
-      months,
+      monthAxisLabels,
       DD_MM_YYYY,
       SHORT_DURATION_H_MM,
       // Computed

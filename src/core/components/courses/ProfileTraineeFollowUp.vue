@@ -21,8 +21,8 @@
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
     </div>
-    <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" class="q-mb-xl"
-      is-blended />
+    <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="learnersLoading"
+      class="q-mb-xl" is-blended />
     <div class="q-mb-sm">
       <p class="text-weight-bold">Attestations de formation</p>
       <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
@@ -121,7 +121,7 @@ export default {
       followUpMissingInfo,
       downloadAttendanceSheet,
     } = useCourses(course);
-    const { learners, getLearnersList } = useTraineeFollowUp(profileId);
+    const { learners, getLearnersList, learnersLoading } = useTraineeFollowUp(profileId);
 
     const areQuestionnaireAnswersVisible = computed(() => !isClientInterface && questionnaires.value.length);
 
@@ -211,6 +211,7 @@ export default {
       pagination,
       isIntraOrVendor,
       learners,
+      learnersLoading,
       // Computed
       course,
       areQuestionnaireAnswersVisible,
