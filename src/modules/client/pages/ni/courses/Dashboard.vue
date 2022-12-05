@@ -200,6 +200,7 @@ export default {
       // Methods
       formatIdentity,
       upperCaseFirstLetter,
+      refreshCompanyLinkRequests,
     };
   },
 };

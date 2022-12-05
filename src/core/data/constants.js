@@ -283,7 +283,6 @@ export const REQUIRED_LABEL = 'Champ requis';
 export const INVALID_NUMBER = 'Nombre invalide';
 
 // BILLING
-
 export const TWO_WEEKS = 'two_weeks';
 export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
