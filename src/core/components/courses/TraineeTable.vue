@@ -63,7 +63,6 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Users from '@api/Users';
-import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import {
   TRAINER,
@@ -147,7 +146,6 @@ export default {
     const traineesPagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
-    const companyOptions = ref([]);
 
     const company = computed(() => $store.getters['main/getCompany']);
 
@@ -192,6 +190,8 @@ export default {
       }
       return '';
     });
+
+    const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
     const refresh = () => emit('refresh');
 
@@ -241,6 +241,9 @@ export default {
           return goToNextStep();
         }
 
+        if (!get(userInfo, 'user._id')) {
+          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+        }
         const user = await Users.getById(userInfo.user._id);
 
         const isHelperOrAuxiliaryWithoutCompany = [HELPER, AUXILIARY_WITHOUT_COMPANY]
@@ -248,7 +251,9 @@ export default {
         if (isHelperOrAuxiliaryWithoutCompany && isIntraCourse.value) {
           return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
         }
-        if (isIntraCourse.value && get(user, 'company._id') && user.company._id !== course.value.companies[0]._id) {
+
+        const companyIds = course.value.companies.map(c => c._id);
+        if (get(user, 'company._id') && !companyIds.includes(user.company._id)) {
           return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
 
@@ -352,16 +357,6 @@ export default {
     const openLearnerCreationModal = async () => {
       traineeAdditionModal.value = false;
       learnerCreationModal.value = true;
-      await refreshCompanies();
-    };
-    const refreshCompanies = async () => {
-      try {
-        const companies = await Companies.list();
-        companyOptions.value = formatAndSortOptions(companies, 'name');
-      } catch (e) {
-        console.error(e);
-        companyOptions.value = [];
-      }
     };
 
     const updateMaxTrainees = () => emit('update');
