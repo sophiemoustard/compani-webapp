@@ -241,6 +241,9 @@ export default {
           return goToNextStep();
         }
 
+        if (!get(userInfo, 'user._id')) {
+          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+        }
         const user = await Users.getById(userInfo.user._id);
 
         const isHelperOrAuxiliaryWithoutCompany = [HELPER, AUXILIARY_WITHOUT_COMPANY]
@@ -248,7 +251,9 @@ export default {
         if (isHelperOrAuxiliaryWithoutCompany && isIntraCourse.value) {
           return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
         }
-        if (isIntraCourse.value && get(user, 'company._id') && user.company._id !== course.value.companies[0]._id) {
+
+        const companyIds = course.value.companies.map(c => c._id);
+        if (get(user, 'company._id') && !companyIds.includes(user.company._id)) {
           return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
 
