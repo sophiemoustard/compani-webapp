@@ -12,7 +12,20 @@
       </div>
       <q-card>
         <ni-trainee-table v-if="isIntraCourse" :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
-        <ni-expanding-table v-else :data="course.companies">
+        <ni-expanding-table v-else :data="course.companies" :columns="companyColumns"
+          :visible-columns="companyVisibleColumns">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'company'">
+                <div :class="['name', 'clickable-name']" @click="goToCompany(col.value)">{{ col.value }}</div>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </template>
+          <template #expanding-row="{ props }">
+            <ni-trainee-table :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
+              @refresh="refresh" />
+          </template>
         </ni-expanding-table>
         <q-card-actions align="right" v-if="canEdit">
           <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
@@ -36,6 +49,7 @@
 <script>
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import Users from '@api/Users';
@@ -84,8 +98,20 @@ export default {
     const { canEdit, validations, potentialTrainees } = toRefs(props);
 
     const $store = useStore();
+    const $router = useRouter();
 
     const traineeModalLoading = ref(false);
+
+    const companyColumns = ref([
+      {
+        name: 'company',
+        label: 'Structure',
+        align: 'left',
+        class: 'clickable-name',
+        field: row => get(row, 'name') || '',
+      },
+      { name: 'actions', label: '', align: 'left', field: '' },
+    ]);
 
     const company = computed(() => $store.getters['main/getCompany']);
 
@@ -127,6 +153,8 @@ export default {
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.company._id));
+
+    const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
 
     const refresh = () => emit('refresh');
 
@@ -243,6 +271,11 @@ export default {
 
     const inputTmpMaxTrainees = event => emit('update:maxTrainees', event);
 
+    const goToCompany = async (companyName) => {
+      const companyId = course.value.companies.find(c => c.name === companyName)._id;
+      $router.push({ name: 'ni users companies info', params: { companyId } });
+    };
+
     return {
       // Data
       newLearner,
@@ -254,6 +287,8 @@ export default {
       newTrainee,
       traineeModalLoading,
       companyOptions,
+      companyColumns,
+      companyVisibleColumns,
       // Validations
       learnerValidation,
       traineeValidation,
@@ -279,6 +314,7 @@ export default {
       updateMaxTrainees,
       inputTmpMaxTrainees,
       refresh,
+      goToCompany,
     };
   },
 };

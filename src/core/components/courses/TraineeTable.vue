@@ -8,7 +8,7 @@
           <template v-if="col.name === 'actions' && canEdit">
             <div class="row no-wrap table-actions">
               <ni-button icon="edit" @click="openTraineeEditionModal(props.row)" :disable="!!course.archivedAt" />
-              <ni-button icon="close" @click="validateTraineeDeletion(col.value)" :disable="!!course.archivedAt" />
+              <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
           </template>
           <template v-else>{{ col.value }}</template>
@@ -81,7 +81,7 @@ export default {
         field: row => get(row, 'contact.phone') || '',
         format: formatPhone,
       },
-      { name: 'actions', label: '', align: 'left', field: '_id' },
+      { name: 'actions', label: '', align: 'left', field: '' },
     ]);
 
     const company = computed(() => $store.getters['main/getCompany']);
