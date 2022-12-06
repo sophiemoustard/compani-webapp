@@ -63,7 +63,6 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import Users from '@api/Users';
-import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import {
   TRAINER,
@@ -147,7 +146,6 @@ export default {
     const traineesPagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
-    const companyOptions = ref([]);
 
     const company = computed(() => $store.getters['main/getCompany']);
 
@@ -192,6 +190,8 @@ export default {
       }
       return '';
     });
+
+    const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
     const refresh = () => emit('refresh');
 
@@ -352,16 +352,6 @@ export default {
     const openLearnerCreationModal = async () => {
       traineeAdditionModal.value = false;
       learnerCreationModal.value = true;
-      await refreshCompanies();
-    };
-    const refreshCompanies = async () => {
-      try {
-        const companies = await Companies.list();
-        companyOptions.value = formatAndSortOptions(companies, 'name');
-      } catch (e) {
-        console.error(e);
-        companyOptions.value = [];
-      }
     };
 
     const updateMaxTrainees = () => emit('update');
