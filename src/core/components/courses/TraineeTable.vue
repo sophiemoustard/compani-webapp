@@ -1,6 +1,6 @@
 <template>
   <ni-responsive-table :data="trainees" :columns="traineeColumns" v-model:pagination="traineePagination"
-    :loading="tableLoading">
+    :loading="tableLoading" :hide-header="hideHeader">
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -42,6 +42,7 @@ export default {
   props: {
     trainees: { type: Array, default: () => [] },
     canEdit: { type: Boolean, default: false },
+    hideHeader: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,

@@ -13,7 +13,7 @@
       <q-card>
         <ni-trainee-table v-if="isIntraCourse" :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
         <ni-expanding-table v-else :data="course.companies" :columns="companyColumns"
-          :visible-columns="companyVisibleColumns">
+          :visible-columns="companyVisibleColumns" hide-header>
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'company'">
@@ -24,7 +24,7 @@
           </template>
           <template #expanding-row="{ props }">
             <ni-trainee-table :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
-              @refresh="refresh" />
+              @refresh="refresh" hide-header />
           </template>
         </ni-expanding-table>
         <q-card-actions align="right" v-if="canEdit">

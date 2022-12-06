@@ -3,7 +3,7 @@
     <q-table v-if="!loading" :rows="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
       binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="data.length ? separator : 'none'"
       :hide-bottom="hideBottom" :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm"
-      @update:pagination="$emit('update:pagination', $event)" @row-click="$emit('row-click')">
+      @update:pagination="$emit('update:pagination', $event)" @row-click="$emit('row-click')" :hide-header="hideHeader">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
@@ -49,6 +49,7 @@ export default {
     loading: { type: Boolean, default: false },
     hideBottom: { type: Boolean, default: true },
     noDataLabel: { type: String, default: '' },
+    hideHeader: { type: Boolean, default: false },
   },
   emits: ['update:pagination', 'row-click'],
   computed: {
