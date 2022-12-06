@@ -89,7 +89,7 @@ import { useLearners } from '@composables/learners';
 import { useCourses } from '@composables/courses';
 
 export default {
-  name: 'TraineeTable',
+  name: 'TraineeContainer',
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },

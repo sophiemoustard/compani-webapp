@@ -34,7 +34,7 @@
       @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
     <ni-company-table v-if="isCourseInter && isVendorInterface" :course="course" @refresh="refreshCourse"
       :can-edit="isAdmin" :loading="courseLoading" />
-    <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
+    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
@@ -127,7 +127,7 @@ import Courses from '@api/Courses';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import SlotContainer from '@components/courses/SlotContainer';
-import TraineeTable from '@components/courses/TraineeTable';
+import TraineeContainer from '@components/courses/TraineeContainer';
 import CompanyTable from '@components/courses/CompanyTable';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
@@ -172,7 +172,7 @@ export default {
     'ni-input': Input,
     'ni-slot-container': SlotContainer,
     'ni-company-table': CompanyTable,
-    'ni-trainee-table': TraineeTable,
+    'ni-trainee-container': TraineeContainer,
     'ni-course-info-link': CourseInfoLink,
     'ni-banner': Banner,
     'course-history-feed': CourseHistoryFeed,
