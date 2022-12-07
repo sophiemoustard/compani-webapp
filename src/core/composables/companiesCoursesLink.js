@@ -12,7 +12,7 @@ export const useCompaniesCoursesLink = (course, emit) => {
   const selectedCompany = ref('');
   const companyAdditionModal = ref(false);
   const companyModalLoading = ref(false);
-  const selectedCompanyOptions = ref([]);
+  const selectCompanyOptions = ref([]);
 
   const companiesCount = computed(() => course.value.companies.length);
 
@@ -28,11 +28,11 @@ export const useCompaniesCoursesLink = (course, emit) => {
   const getPotentialCompanies = async () => {
     try {
       const potentialCompanies = Object.freeze(await Companies.list());
-      selectedCompanyOptions.value = potentialCompanies
+      selectCompanyOptions.value = potentialCompanies
         .map(company => ({ value: company._id, label: company.name }))
         .sort((a, b) => a.label.localeCompare(b.label));
     } catch (error) {
-      selectedCompanyOptions.value = [];
+      selectCompanyOptions.value = [];
       console.error(error);
     }
   };
@@ -93,7 +93,7 @@ export const useCompaniesCoursesLink = (course, emit) => {
     selectedCompany,
     companyAdditionModal,
     companyModalLoading,
-    selectedCompanyOptions,
+    selectCompanyOptions,
     // Computed
     companiesCount,
     // Validations

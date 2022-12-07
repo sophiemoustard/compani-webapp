@@ -15,9 +15,10 @@
           :columns="companyColumns"
           :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds">
           <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="[col.class, 'company'] ">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.class">
               <template v-if="col.name === 'company'">
-                <div @click="goToCompany(col.value)"> {{ col.value }}</div>
+                <div v-if="canEdit" @click="goToCompany(col.value)"> {{ col.value }}</div>
+                <div v-else>{{ col.value }}</div>
               </template>
               <template v-else-if="col.name === 'actions'">
                 <ni-button v-if="canEdit" icon="close" @click="validateCompanyDeletion(col.value)"
@@ -52,7 +53,7 @@
 
     <company-addition-modal v-model="companyAdditionModal" v-model:selected-company="selectedCompany"
       @submit="addCompany" :validations="companyValidation.selectedCompany" :loading="companyModalLoading"
-      @hide="resetCompanyAdditionModal" :company-options="selectedCompanyOptions" />
+      @hide="resetCompanyAdditionModal" :company-options="selectCompanyOptions" />
   </div>
 </template>
 
@@ -120,7 +121,7 @@ export default {
         name: 'company',
         label: 'Structure',
         align: 'left',
-        class: ['clickable-name'],
+        class: canEdit.value ? 'clickable-name' : 'company-name',
         field: row => get(row, 'name') || '',
       },
       { name: 'actions', label: '', align: 'left', field: '_id' },
@@ -199,7 +200,7 @@ export default {
       resetCompanyAdditionModal,
       openCompanyAdditionModal,
       addCompany,
-      selectedCompanyOptions,
+      selectCompanyOptions,
       validateCompanyDeletion,
       getPotentialCompanies,
     } = useCompaniesCoursesLink(course, emit);
@@ -323,7 +324,7 @@ export default {
       companyVisibleColumns,
       companyAdditionModal,
       selectedCompany,
-      selectedCompanyOptions,
+      selectCompanyOptions,
       companyModalLoading,
       // Validations
       learnerValidation,
@@ -365,7 +366,7 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
-.company
-  background-color: $copper-50
-  color: $copper-700
+.company-name
+  color: $primary
+  width: fit-content
 </style>
