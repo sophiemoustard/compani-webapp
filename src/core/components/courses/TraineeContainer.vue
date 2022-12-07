@@ -11,8 +11,8 @@
         <div v-else class="q-mb-sm">{{ maxTrainees }} stagiaires max</div>
       </div>
       <q-card>
-        <ni-trainee-table v-if="isIntraCourse" :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
-        <ni-expanding-table v-else :data="course.companies" :columns="companyColumns"
+        <ni-expanding-table v-if="!isIntraCourse && !isClientInterface" :data="course.companies"
+          :columns="companyColumns"
           :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -27,6 +27,7 @@
               @refresh="refresh" hide-header />
           </template>
         </ni-expanding-table>
+        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
         <q-card-actions align="right" v-if="canEdit">
           <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
             @click="openTraineeCreationModal" />
