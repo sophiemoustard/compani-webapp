@@ -15,11 +15,16 @@
           :columns="companyColumns"
           :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds">
           <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.class">
               <template v-if="col.name === 'company'">
-                <div :class="['name', 'clickable-name']" @click="goToCompany(col.value)">{{ col.value }}</div>
+                <div @click="goToCompany(col.value)">
+                  {{ col.value }}
+                </div>
               </template>
-              <template v-else>{{ col.value }}</template>
+              <template v-else-if="col.name === 'actions'">
+                <ni-button v-if="canEdit" icon="close" @click="validateCompanyDeletion(col.value)"
+                  :disable="!!course.archivedAt" />
+              </template>
             </q-td>
           </template>
           <template #expanding-row="{ props }">
@@ -29,6 +34,8 @@
         </ni-expanding-table>
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
         <q-card-actions align="right" v-if="canEdit">
+          <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
+            @click="openCompanyAdditionModal" />
           <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
             @click="openTraineeCreationModal" />
         </q-card-actions>
@@ -44,6 +51,10 @@
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
       @submit="submitLearnerCreationModal" />
+
+    <company-addition-modal v-model="companyAdditionModal" v-model:selected-company="selectedCompany"
+      @submit="addCompany" :validations="companyValidation.selectedCompany" :loading="companyModalLoading"
+      @hide="resetCompanyAdditionModal" :company-options="selectedCompanyOptions" />
   </div>
 </template>
 
@@ -73,9 +84,11 @@ import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeTable from '@components/courses/TraineeTable';
 import ExpandingTable from '@components/table/ExpandingTable';
+import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useLearners } from '@composables/learners';
 import { useCourses } from '@composables/courses';
+import { useCompaniesCoursesLink } from '@composables/companiesCoursesLink';
 
 export default {
   name: 'TraineeContainer',
@@ -93,6 +106,7 @@ export default {
     'trainee-addition-modal': TraineeAdditionModal,
     'learner-creation-modal': LearnerCreationModal,
     'ni-expanding-table': ExpandingTable,
+    'company-addition-modal': CompanyAdditionModal,
   },
   emits: ['refresh', 'update', 'update:maxTrainees'],
   setup (props, { emit }) {
@@ -108,10 +122,10 @@ export default {
         name: 'company',
         label: 'Structure',
         align: 'left',
-        class: 'clickable-name',
+        class: ['clickable-name'],
         field: row => get(row, 'name') || '',
       },
-      { name: 'actions', label: '', align: 'left', field: '' },
+      { name: 'actions', label: '', align: 'left', field: '_id' },
     ]);
 
     const company = computed(() => $store.getters['main/getCompany']);
@@ -178,6 +192,19 @@ export default {
     } = useLearners(refresh, false, company);
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
+
+    const {
+      selectedCompany,
+      companyAdditionModal,
+      companyValidation,
+      companyModalLoading,
+      resetCompanyAdditionModal,
+      openCompanyAdditionModal,
+      addCompany,
+      selectedCompanyOptions,
+      validateCompanyDeletion,
+      getPotentialCompanies,
+    } = useCompaniesCoursesLink(course, emit);
 
     const setNewLearner = (user) => {
       newLearner.value._id = user._id;
@@ -279,6 +306,10 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId } });
     };
 
+    const created = async () => { await getPotentialCompanies(); };
+
+    created();
+
     return {
       // Data
       newLearner,
@@ -292,9 +323,14 @@ export default {
       companyOptions,
       companyColumns,
       companyVisibleColumns,
+      companyAdditionModal,
+      selectedCompany,
+      selectedCompanyOptions,
+      companyModalLoading,
       // Validations
       learnerValidation,
       traineeValidation,
+      companyValidation,
       // Computed
       tableTitle,
       traineesOptions,
@@ -319,6 +355,10 @@ export default {
       inputTmpMaxTrainees,
       refresh,
       goToCompany,
+      openCompanyAdditionModal,
+      addCompany,
+      resetCompanyAdditionModal,
+      validateCompanyDeletion,
     };
   },
 };
@@ -327,15 +367,4 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
-.company-tag
-  background-color: $copper-100
-  border-radius: 8px
-  color: $copper-700
-  padding: 4px 8px
-  margin: 4px 0px
-  &-content
-    display: flex
-    flex-direction: row
-    justify-content: space-between
-    align-items: center
 </style>
