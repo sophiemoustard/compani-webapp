@@ -1,6 +1,6 @@
 <template>
   <ni-responsive-table :data="trainees" :columns="traineeColumns" v-model:pagination="traineePagination"
-    :loading="tableLoading" :hide-header="hideHeader">
+    :loading="tableLoading" :hide-header="hideHeader" separator="none">
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -74,7 +74,7 @@ export default {
         field: row => get(row, 'identity.lastname') || '',
         classes: 'text-capitalize',
       },
-      { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
+      { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '', classes: 'email' },
       {
         name: 'phone',
         label: 'Téléphone',
@@ -174,3 +174,7 @@ export default {
   },
 };
 </script>
+<style lang="sass" scoped>
+.email
+  width: 30%
+</style>
