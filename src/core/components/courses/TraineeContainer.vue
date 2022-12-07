@@ -13,7 +13,7 @@
       <q-card>
         <ni-trainee-table v-if="isIntraCourse" :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
         <ni-expanding-table v-else :data="course.companies" :columns="companyColumns"
-          :visible-columns="companyVisibleColumns" hide-header>
+          :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'company'">
@@ -155,6 +155,8 @@ export default {
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.company._id));
 
     const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
+
+    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
 
     const refresh = () => emit('refresh');
 
@@ -303,6 +305,7 @@ export default {
       isRofOrAdmin,
       maxTraineesErrorMessage,
       traineesGroupedByCompanies,
+      courseCompanyIds,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
