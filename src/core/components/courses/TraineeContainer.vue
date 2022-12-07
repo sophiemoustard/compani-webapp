@@ -15,11 +15,9 @@
           :columns="companyColumns"
           :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds">
           <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.class">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="[col.class, 'company'] ">
               <template v-if="col.name === 'company'">
-                <div @click="goToCompany(col.value)">
-                  {{ col.value }}
-                </div>
+                <div @click="goToCompany(col.value)"> {{ col.value }}</div>
               </template>
               <template v-else-if="col.name === 'actions'">
                 <ni-button v-if="canEdit" icon="close" @click="validateCompanyDeletion(col.value)"
@@ -367,4 +365,7 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
+.company
+  background-color: $copper-50
+  color: $copper-700
 </style>
