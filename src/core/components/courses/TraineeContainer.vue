@@ -22,8 +22,8 @@
                 <div v-else>{{ col.value }}</div>
               </template>
               <template v-else-if="col.name === 'actions'">
-                <ni-button v-if="canEdit" icon="close" @click="validateCompanyDeletion(col.value)"
-                  :disable="!!course.archivedAt" />
+                <ni-button v-if="canEdit && !traineesGroupedByCompanies[props.row._id]"
+                  icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
               </template>
             </q-td>
           </template>
@@ -132,11 +132,11 @@ export default {
 
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
+    const isTrainer = ref(vendorRole.value === TRAINER);
+
+    const isRofOrAdmin = ref([TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
+
     const course = computed(() => $store.state.course.course);
-
-    const isTrainer = computed(() => vendorRole.value === TRAINER);
-
-    const isRofOrAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
 
     const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
 
@@ -303,7 +303,7 @@ export default {
 
     const goToCompany = async (companyName) => {
       const companyId = course.value.companies.find(c => c.name === companyName)._id;
-      $router.push({ name: 'ni users companies info', params: { companyId } });
+      $router.push({ name: 'ni users companies info', params: { companyId, defaultTab: 'infos' } });
     };
 
     const created = async () => { await getPotentialCompanies(); };
