@@ -11,8 +11,11 @@
         <div v-else class="q-mb-sm">{{ maxTrainees }} stagiaires max</div>
       </div>
       <q-card>
-        <ni-expanding-table v-if="!isIntraCourse && !isClientInterface" :data="course.companies"
-          :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
+        <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
+          Aucune structure n'est rattachée à cette formation
+        </div>
+        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface"
+          :data="course.companies" :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
           :expanded="courseCompanyIds" separator="none" hide-bottom>
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
@@ -28,8 +31,12 @@
             </q-td>
           </template>
           <template #expanding-row="{ props }">
-            <ni-trainee-table :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
+            <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
+              :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
               @refresh="refresh" hide-header />
+            <div class="text-center text-italic no-data" v-else>
+              Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
+            </div>
           </template>
         </ni-expanding-table>
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
@@ -172,6 +179,8 @@ export default {
     const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
 
     const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
+
+    const hasLinkedCompanies = computed(() => !!course.value.companies.length);
 
     const refresh = () => emit('refresh');
 
@@ -343,6 +352,7 @@ export default {
       maxTraineesErrorMessage,
       traineesGroupedByCompanies,
       courseCompanyIds,
+      hasLinkedCompanies,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -372,4 +382,7 @@ export default {
   width: fit-content
 .company
   border-top: 1px solid $copper-grey-200
+.no-data
+  font-size: 12px
+  padding: 12px 0px 12px 0px
 </style>
