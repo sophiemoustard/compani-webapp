@@ -22,14 +22,8 @@ export default {
     const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
 
     return {
-      interfaceType,
       backgroundClass: interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
     };
-  },
-  computed: {
-    vendorRole () {
-      return this.$store.getters['main/getVendorRole'];
-    },
   },
 };
 </script>
