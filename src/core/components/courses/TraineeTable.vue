@@ -1,6 +1,6 @@
 <template>
   <ni-responsive-table :data="trainees" :columns="traineeColumns" v-model:pagination="traineePagination"
-    :loading="tableLoading" :hide-header="hideHeader" separator="none">
+    :hide-header="hideHeader" separator="none" :loading="loading">
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -25,6 +25,8 @@
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -35,7 +37,7 @@ import Button from '@components/Button';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { useLearners } from '@composables/learners';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'TraineeTable',
@@ -43,6 +45,7 @@ export default {
     trainees: { type: Array, default: () => [] },
     canEdit: { type: Boolean, default: false },
     hideHeader: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
@@ -84,10 +87,16 @@ export default {
       },
       { name: 'actions', label: '', align: 'left', field: '' },
     ]);
+    const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
 
-    const company = computed(() => $store.getters['main/getCompany']);
+    const traineeRules = {
+      editedTrainee: {
+        identity: { lastname: { required } },
+        contact: { phone: { required, frPhoneNumber } },
+      },
+    };
 
-    const { editedTrainee, traineeValidation, tableLoading } = useLearners(emit('refresh'), false, company);
+    const traineeValidation = useVuelidate(traineeRules, { editedTrainee });
 
     const course = computed(() => $store.state.course.course);
 
@@ -140,6 +149,7 @@ export default {
       }).onOk(() => deleteTrainee(traineeId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     };
+
     const deleteTrainee = async (traineeId) => {
       try {
         await Courses.deleteTrainee(course.value._id, traineeId);
@@ -157,9 +167,8 @@ export default {
       traineeColumns,
       traineePagination,
       traineeEditionModal,
-      editedTrainee,
       traineeModalLoading,
-      tableLoading,
+      editedTrainee,
       // Validation
       traineeValidation,
       // Computed
@@ -180,5 +189,5 @@ export default {
 .q-table
   & tbody
     & td
-      height: 10px
+      height: 25px
 </style>

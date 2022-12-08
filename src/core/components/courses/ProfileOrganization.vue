@@ -698,7 +698,7 @@ export default {
     };
 
     const created = async () => {
-      const promises = [refreshCourse()];
+      const promises = [];
       if (isVendorInterface || isIntraCourse.value) {
         promises.push(refreshSms(), refreshCompanyRepresentatives());
       }

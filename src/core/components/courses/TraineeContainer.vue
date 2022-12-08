@@ -16,7 +16,7 @@
         </div>
         <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface"
           :data="course.companies" :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
-          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="tableLoading">
+          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="loading">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
@@ -39,7 +39,8 @@
             </div>
           </template>
         </ni-expanding-table>
-        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh" />
+        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
+          :loading="loading" />
       </q-card>
       <q-card-actions align="right" v-if="canEdit">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
