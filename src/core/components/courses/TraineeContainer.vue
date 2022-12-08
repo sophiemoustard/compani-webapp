@@ -16,7 +16,7 @@
         </div>
         <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface"
           :data="course.companies" :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
-          :expanded="courseCompanyIds" separator="none" hide-bottom>
+          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="tableLoading">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
@@ -198,6 +198,7 @@ export default {
       goToNextStep,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
+      tableLoading,
     } = useLearners(refresh, false, company);
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
@@ -340,6 +341,7 @@ export default {
       learnerValidation,
       traineeValidation,
       companyValidation,
+      tableLoading,
       // Computed
       tableTitle,
       traineesOptions,
