@@ -1,13 +1,12 @@
 <template>
   <div :class="`course-container ${backgroundClass}`">
     <div class="text-weight-bold q-mb-sm">{{ title }} ({{ courses.length }})</div>
-    <course-cell class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course"
-      @click="goToBlendedCourseProfile" />
+    <course-cell class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course" />
   </div>
 </template>
 
 <script>
-import { TRAINER, CLIENT, VENDOR } from '@data/constants';
+import { CLIENT, VENDOR } from '@data/constants';
 import CourseCell from '@components/courses/CourseCell';
 
 export default {
@@ -30,17 +29,6 @@ export default {
   computed: {
     vendorRole () {
       return this.$store.getters['main/getVendorRole'];
-    },
-  },
-  methods: {
-    goToBlendedCourseProfile (course) {
-      let name = '';
-      if (this.interfaceType === VENDOR) {
-        name = this.vendorRole === TRAINER ? 'trainers courses info' : 'ni management blended courses info';
-      } else {
-        name = 'ni courses info';
-      }
-      this.$router.push({ name, params: { courseId: course._id } });
     },
   },
 };
