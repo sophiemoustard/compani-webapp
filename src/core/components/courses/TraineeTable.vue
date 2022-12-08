@@ -177,4 +177,8 @@ export default {
 <style lang="sass" scoped>
 .email
   width: 30%
+.q-table
+  & tbody
+    & td
+      height: 10px
 </style>

@@ -387,4 +387,9 @@ export default {
 .no-data
   font-size: 12px
   padding: 12px 0px 12px 0px
+.q-table
+  & tbody
+    & td
+      height: 25px
+      padding: 12px 0px 0px 4px
 </style>
