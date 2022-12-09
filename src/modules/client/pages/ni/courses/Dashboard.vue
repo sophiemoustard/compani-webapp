@@ -20,7 +20,7 @@
           <div class="text-center">apprenants actifs</div>
         </div>
         <div class="column items-center">
-          <ni-e-learning-indicator :indicator="activityHistories.length" />
+          <ni-e-learning-indicator :indicator="activityHistoriesBetweenDates.length" />
           <div class="text-center">activités de eLearning réalisées</div>
         </div>
       </div>
@@ -63,9 +63,9 @@
     <div class="q-mt-xl">
       <p class="text-weight-bold section-title">Evolution dans le temps</p>
       <div class="row">
-        <ni-line-chart :data="this.traineesByMonth" :labels="months" title="Apprenants actifs mensuels"
+        <ni-line-chart :data="traineesByMonth" :labels="monthAxisLabels" title="Apprenants actifs mensuels"
           class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
-        <ni-line-chart :data="this.activitiesByMonth" :labels="months"
+        <ni-line-chart :data="activitiesByMonth" :labels="monthAxisLabels"
           title="Nombre total d'activités réalisées par mois" class="col-md-6 col-xs-12 q-mt-sm line-chart-container" />
       </div>
     </div>
@@ -73,7 +73,8 @@
 </template>
 
 <script>
-import { createMetaMixin } from 'quasar';
+import { useMeta } from 'quasar';
+import { computed, ref, watch } from 'vue';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
@@ -84,16 +85,13 @@ import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import LineChart from '@components/charts/LineChart';
 import CompanyLinkRequestCell from '@components/CompanyLinkRequestCell';
-import { DEFAULT_AVATAR } from '@data/constants';
-import moment from '@helpers/moment';
+import { DEFAULT_AVATAR, DAY, MONTH } from '@data/constants';
 import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
-import { chartMixin } from '@mixins/chartMixin';
-
-const metaInfo = { title: 'Tableau de bord des formations' };
+import CompaniDate from '@helpers/dates/companiDates';
+import { useCharts } from '@composables/charts';
 
 export default {
   name: 'CourseDashboard',
-  mixins: [chartMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-title-header': TitleHeader,
     'ni-date-range': DateRange,
@@ -101,25 +99,22 @@ export default {
     'ni-line-chart': LineChart,
     'company-link-request-cell': CompanyLinkRequestCell,
   },
-  data () {
-    return {
-      dates: {
-        startDate: moment().subtract(30, 'd').startOf('d').toISOString(),
-        endDate: moment().toISOString(),
-      },
-      activityHistories: [],
-      formatIdentity,
-      upperCaseFirstLetter,
-      DEFAULT_AVATAR,
-      linkRequests: [],
-    };
-  },
-  computed: {
-    activeLearners () {
-      return uniqBy(this.activityHistories, 'user._id').length;
-    },
-    courseList () {
-      const usersParticipationsToPrograms = this.activityHistories
+  setup () {
+    useMeta({ title: 'Tableau de bord des formations' });
+
+    const dates = ref({
+      startDate: CompaniDate().subtract('P1M').startOf(DAY).toISO(),
+      endDate: CompaniDate().toISO(),
+    });
+    const activityHistoriesBetweenDates = ref([]);
+    const traineesByMonth = ref([]);
+    const activitiesByMonth = ref([]);
+    const linkRequests = ref([]);
+
+    const activeLearners = computed(() => uniqBy(activityHistoriesBetweenDates.value, 'user._id').length);
+
+    const courseList = computed(() => {
+      const usersParticipationsToPrograms = activityHistoriesBetweenDates.value
         .map(aH => aH.activity.steps.map(s => s.subPrograms.map(sP => ({ userId: aH.user._id, program: sP.program }))))
         .flat(3);
       const participationsGroupedByProgram = Object.values(groupBy(usersParticipationsToPrograms, 'program._id'));
@@ -127,62 +122,86 @@ export default {
       return participationsGroupedByProgram
         .map(group => ({ name: group[0].program.name, activeTraineesCount: new Set(group.map(a => a.userId)).size }))
         .sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
-    },
-    learnerList () {
-      const groupedByLearners = Object.values(groupBy(this.activityHistories, h => h.user._id));
+    });
+
+    const learnerList = computed(() => {
+      const groupedByLearners = Object.values(groupBy(activityHistoriesBetweenDates.value, h => h.user._id));
 
       return groupedByLearners.map(group => ({ ...group[0].user, activityCount: group.length }))
         .sort((a, b) => b.activityCount - a.activityCount);
-    },
-  },
-  watch: {
-    async dates () {
-      await this.getActivityHistories();
-    },
-  },
-  async created () {
-    await Promise.all([this.getActivityHistories(), this.computeChartsData(), this.refreshCompanyLinkRequests()]);
-  },
-  methods: {
-    async getActivityHistories () {
+    });
+
+    const { getCountsByMonth, monthAxisLabels } = useCharts();
+
+    watch(dates, () => getActivityHistories());
+
+    const getActivityHistories = async () => {
       try {
-        if (!this.dates.startDate || moment(this.dates.startDate).isAfter(this.dates.endDate)) return;
-        const { endDate } = this.dates;
-        this.activityHistories = await ActivityHistories.list({
-          ...this.dates,
-          endDate: moment(endDate).endOf('d').toISOString(),
+        const { endDate, startDate } = dates.value;
+        if (!endDate || CompaniDate(startDate).isAfter(endDate)) return;
+
+        activityHistoriesBetweenDates.value = await ActivityHistories.list({
+          startDate,
+          endDate: CompaniDate(endDate).endOf(DAY).toISO(),
         });
         NotifyPositive('Données mises à jour.');
       } catch (e) {
-        this.activityHistories = [];
+        activityHistoriesBetweenDates.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
       }
-    },
-    async computeChartsData () {
-      try {
-        const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-        const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        const sixMonthsHistories = await ActivityHistories.list({ startDate: chartStartDate, endDate: chartEndDate });
+    };
 
-        this.traineesByMonth = this.getDataByMonth(sixMonthsHistories, 'user._id');
-        this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories);
-        NotifyPositive('Données mises à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des données.');
-      }
-    },
-    async refreshCompanyLinkRequests () {
+    const computeChartsData = async () => {
       try {
-        this.linkRequests = await CompanyLinkRequests.list();
+        const startDate = CompaniDate().subtract('P6M').startOf(MONTH).toISO();
+        const endDate = CompaniDate().subtract('P1M').endOf(MONTH).toISO();
+        const sixMonthsHistories = await ActivityHistories.list({ startDate, endDate });
+
+        traineesByMonth.value = getCountsByMonth(sixMonthsHistories, 'user._id');
+        activitiesByMonth.value = getCountsByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
       } catch (e) {
-        this.linkRequests = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données.');
       }
-    },
+    };
+
+    const refreshCompanyLinkRequests = async () => {
+      try {
+        linkRequests.value = await CompanyLinkRequests.list();
+        NotifyPositive('Données mises à jour.');
+      } catch (e) {
+        linkRequests.value = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des données.');
+      }
+    };
+
+    const created = async () => {
+      await Promise.all([getActivityHistories(), computeChartsData(), refreshCompanyLinkRequests()]);
+    };
+
+    created();
+
+    return {
+      // Data
+      dates,
+      activityHistoriesBetweenDates,
+      linkRequests,
+      monthAxisLabels,
+      traineesByMonth,
+      activitiesByMonth,
+      DEFAULT_AVATAR,
+      // Computed
+      activeLearners,
+      courseList,
+      learnerList,
+      // Methods
+      formatIdentity,
+      upperCaseFirstLetter,
+      refreshCompanyLinkRequests,
+    };
   },
 };
 </script>

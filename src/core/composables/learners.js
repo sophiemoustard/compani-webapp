@@ -29,7 +29,6 @@ export const useLearners = (refresh, isClientInterface, company) => {
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
   const newTrainee = ref('');
-  const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
 
   const filteredLearners = computed(() => {
     const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
@@ -45,16 +44,10 @@ export const useLearners = (refresh, isClientInterface, company) => {
       company: { required: requiredIf(!isClientInterface) },
     },
   }));
-  const traineeRules = {
-    newTrainee: { required },
-    editedTrainee: {
-      identity: { lastname: { required } },
-      contact: { phone: { required, frPhoneNumber } },
-    },
-  };
+  const traineeRules = { newTrainee: { required } };
 
   const learnerValidation = useVuelidate(learnerRules, { newLearner });
-  const traineeValidation = useVuelidate(traineeRules, { newTrainee, editedTrainee });
+  const traineeValidation = useVuelidate(traineeRules, { newTrainee });
 
   const goToNextStep = () => {
     firstStep.value = false;
@@ -89,7 +82,7 @@ export const useLearners = (refresh, isClientInterface, company) => {
   const getLearnerList = async (companyId = null) => {
     try {
       tableLoading.value = true;
-      const learners = await Users.learnerList(companyId ? { company: companyId } : {});
+      const learners = await Users.learnerList(companyId ? { companies: companyId } : {});
       learnerList.value = Object.freeze(learners.map(formatRow));
     } catch (e) {
       console.error(e);
@@ -184,7 +177,6 @@ export const useLearners = (refresh, isClientInterface, company) => {
     learnerAlreadyExists,
     traineeAdditionModal,
     newTrainee,
-    editedTrainee,
     // Computed
     filteredLearners,
     // Validations

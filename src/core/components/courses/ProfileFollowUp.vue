@@ -17,23 +17,25 @@
           </div>
         </q-card>
       </div>
-      <ni-line-chart :data="this.traineesByMonth" :labels="months" title="Nombre d'apprenants dans le temps"
+      <ni-line-chart :data="traineesByMonth" :labels="monthAxisLabels" title="Nombre d'apprenants dans le temps"
         class="col-md-6 col-xs-12 line-chart-container" />
     </div>
-    <elearning-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
+    <elearning-follow-up-table :learners="learners" :loading="learnersLoading" class="q-mt-xl" />
   </div>
 </template>
 
 <script>
+import { computed, ref, toRefs } from 'vue';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import LineChart from '@components/charts/LineChart';
-import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
-import { chartMixin } from '@mixins/chartMixin';
+import { useTraineeFollowUp } from '@composables/traineeFollowUp';
+import { useCharts } from '@composables/charts';
+import CompaniDate from '@helpers/dates/companiDates';
+import { MONTH, DAY } from '@data/constants';
 
 export default {
   name: 'ProfileFollowUp',
-  mixins: [traineeFollowUpTableMixin, chartMixin],
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'elearning-follow-up-table': ElearningFollowUpTable,
@@ -42,31 +44,48 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  async created () {
-    await this.getLearnersList();
-    this.computeChartData();
-  },
-  computed: {
-    traineesOnGoingCount () {
-      return this.learners.filter(l => l.progress.eLearning !== 1).length;
-    },
-    traineesFinishedCount () {
-      return this.learners.length - this.traineesOnGoingCount;
-    },
-  },
-  methods: {
-    computeChartData () {
-      const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-      const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-      const activityHistories = this.learners.map(l => l.steps
+  setup (props) {
+    const { profileId } = toRefs(props);
+
+    const traineesByMonth = ref([]);
+
+    const { getCountsByMonth, monthAxisLabels } = useCharts();
+    const { learners, learnersLoading, getLearnersList } = useTraineeFollowUp(profileId);
+
+    const traineesOnGoingCount = computed(() => learners.value.filter(l => l.progress.eLearning !== 1).length);
+    const traineesFinishedCount = computed(() => learners.value.length - traineesOnGoingCount.value);
+
+    const computeChartData = () => {
+      const startDate = CompaniDate().subtract('P6M').startOf(MONTH).toISO();
+      const endDate = CompaniDate().subtract('P1M').endOf(MONTH).toISO();
+
+      const activityHistories = learners.value.map(l => l.steps
         .map(s => s.activities
           .map(a => a.activityHistories
-            .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
+            .filter(ah => CompaniDate(ah.date).isSameOrBetween(startDate, endDate, DAY))
             .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
-      this.traineesByMonth = this.getDataByMonth(activityHistories, 'user');
-    },
+      traineesByMonth.value = getCountsByMonth(activityHistories, 'user');
+    };
+
+    const created = async () => {
+      await getLearnersList();
+      computeChartData();
+    };
+
+    created();
+    return {
+      // Data
+      learners,
+      learnersLoading,
+      monthAxisLabels,
+      traineesByMonth,
+      // Computed
+      traineesOnGoingCount,
+      traineesFinishedCount,
+      // Methods
+    };
   },
 };
 </script>

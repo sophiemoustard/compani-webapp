@@ -1,5 +1,6 @@
 import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
+import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
@@ -8,7 +9,7 @@ import { formatIdentity } from '@helpers/utils';
 export const useTraineeFollowUp = (profileId) => {
   const $store = useStore();
   const learners = ref([]);
-  const tableLoading = ref(false);
+  const learnersLoading = ref(false);
 
   const company = computed(() => $store.getters['main/getCompany']);
 
@@ -18,17 +19,14 @@ export const useTraineeFollowUp = (profileId) => {
     const formattedName = formatIdentity(trainee.identity, 'FL');
 
     return {
-      _id: trainee._id,
+      ...omit(trainee, 'company'),
       identity: { ...trainee.identity, fullName: formattedName },
-      progress: trainee.progress,
-      steps: trainee.steps,
-      firstMobileConnection: trainee.firstMobileConnection,
     };
   };
 
   const getLearnersList = async () => {
     try {
-      tableLoading.value = true;
+      learnersLoading.value = true;
       const course = await Courses.getFollowUp(
         profileId.value,
         isClientInterface ? { company: company.value._id } : null
@@ -40,13 +38,14 @@ export const useTraineeFollowUp = (profileId) => {
       NotifyNegative('Erreur lors de la récupération des apprenants');
       learners.value = [];
     } finally {
-      tableLoading.value = false;
+      learnersLoading.value = false;
     }
   };
 
   return {
     // Data
     learners,
+    learnersLoading,
     // Methods
     getLearnersList,
   };

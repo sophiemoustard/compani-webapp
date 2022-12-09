@@ -283,9 +283,7 @@ export const REQUIRED_LABEL = 'Champ requis';
 export const INVALID_NUMBER = 'Nombre invalide';
 
 // BILLING
-
 export const TWO_WEEKS = 'two_weeks';
-export const MONTH = 'month';
 export const BILL = 'bill';
 export const CREDIT_NOTE = 'creditNote';
 
@@ -450,6 +448,9 @@ export const SLOT_DELETION = 'slot_deletion';
 export const SLOT_EDITION = 'slot_edition';
 export const TRAINEE_ADDITION = 'trainee_addition';
 export const TRAINEE_DELETION = 'trainee_deletion';
+export const ESTIMATED_START_DATE_EDITION = 'estimated_start_date_edition';
+export const COMPANY_ADDITION = 'company_addition';
+export const COMPANY_DELETION = 'company_deletion';
 
 // MEDIA UPLOAD
 export const UPLOAD_IMAGE = 'image';
@@ -604,6 +605,17 @@ export const DAYS = {
   6: 'Dimanche',
 };
 
+// DATE AND DURATION UNITS
+export const YEAR = 'year';
+export const QUARTER = 'quarter';
+export const MONTH = 'month';
+export const WEEK = 'week';
+export const DAY = 'day';
+export const HOUR = 'hour';
+export const MINUTE = 'minute';
+export const SECOND = 'second';
+export const MILLISECOND = 'millisecond';
+
 // COMPANIDURATION
 export const PT0S = 'PT0S';
 
@@ -614,9 +626,11 @@ export const SHORT_DURATION_H_MM = 'h\'h\'mm';
 // COMPANIDATE FORMATS
 export const DD_MM_YYYY = 'dd/LL/yyyy';
 export const DD_MM = 'dd/LL';
+export const MM_YYYY = 'LL-yyyy';
 export const HHhMM = 'HH\'h\'mm';
 export const DAY_MONTH_YEAR = 'DDD';
 export const HH_MM = 'T';
 export const MONTH_SHORT = 'LLL';
+export const MONTH_SHORT_YYYY = 'LLL yyyy';
 export const DAY_OF_MONTH = 'd';
 export const DAY_OF_WEEK_SHORT = 'ccc';

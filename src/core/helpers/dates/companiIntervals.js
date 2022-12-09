@@ -8,18 +8,18 @@ const CompaniIntervalFactory = (inputInterval) => {
       return _interval;
     },
 
-    rangeBy (durationISO, excludeEnd = false) {
+    rangeBy (durationISO) {
       const luxonDurationStep = Duration.fromISO(durationISO);
       if (luxonDurationStep.toMillis() === 0) throw new Error('invalid argument : duration is zero');
 
       const fragmentedIntervals = _interval.splitBy(luxonDurationStep);
       const dates = fragmentedIntervals.map(fi => fi.start.toUTC().toISO());
 
-      const lastFragmentEqualsDurationStep =
-        fragmentedIntervals[fragmentedIntervals.length - 1].toDuration().toMillis() === luxonDurationStep.toMillis();
+      const lastFragment = fragmentedIntervals[fragmentedIntervals.length - 1];
+      const lastFragmentEqualsDurationStep = lastFragment.start.plus(luxonDurationStep).equals(lastFragment.end);
       if (lastFragmentEqualsDurationStep) dates.push(_interval.end.toUTC().toISO());
 
-      return excludeEnd ? dates.slice(0, -1) : dates;
+      return dates;
     },
   });
 };

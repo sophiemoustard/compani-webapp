@@ -100,9 +100,9 @@ import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, INTRA, DD_MM_YYYY } from '@data/constants.js';
+import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, DD_MM_YYYY } from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
-import { ascendingSortBy } from '@helpers/dates/utils';
+import { ascendingSortBy, ascendingSort } from '@helpers/dates/utils';
 import { downloadFile } from '@helpers/file';
 import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -171,7 +171,7 @@ export default {
       { name: 'payment', align: 'center', field: val => val.coursePayments || '', classes: 'formatted-price' },
       { name: 'expand', classes: 'expand' },
     ]);
-    const pagination = ref({ sortBy: 'date', ascending: true, page: 1, rowsPerPage: 15 });
+    const pagination = ref({ page: 1, rowsPerPage: 15 });
 
     const rules = {
       newCoursePayment: {
@@ -201,13 +201,27 @@ export default {
 
     const company = computed(() => (canUpdateBilling.value ? $store.state.company.company : loggedUser.value.company));
 
+    const sortCourseBills = (a, b) => {
+      const payerCompare = a.payer.name.localeCompare(b.payer.name);
+
+      if (payerCompare === 0) {
+        const billedAtCompare = ascendingSort(a.billedAt, b.billedAt);
+
+        return billedAtCompare === 0 ? ascendingSort(a.createdAt, b.createdAt) : billedAtCompare;
+      }
+
+      return payerCompare;
+    };
+
     const refreshCourseBills = async () => {
       try {
         loading.value = true;
-        const courseBillList = await CourseBills.list({ company: company.value._id, action: BALANCE });
-        const sortedBills = courseBillList.sort((a, b) => a.payer.name.localeCompare(b.payer.name));
-        if (sortedBills.length) {
-          const billsGroupedByPayer = groupBy(sortedBills, 'payer._id');
+        const courseBillList = await CourseBills
+          .list({ company: company.value._id, action: BALANCE })
+          .then(data => data.sort(sortCourseBills));
+
+        if (courseBillList.length) {
+          const billsGroupedByPayer = groupBy(courseBillList, 'payer._id');
           courseBills.value = {
             ...(!!billsGroupedByPayer[company.value._id] &&
             { [company.value._id]: billsGroupedByPayer[company.value._id] }
@@ -338,19 +352,16 @@ export default {
           params: { courseId: course._id, defaultTab: 'billing' },
         });
       }
-
-      const companies = course.type === INTRA ? course.companies : [];
-      if (companies.includes(loggedUser.value.company._id)) {
+      if (course.companies.includes(loggedUser.value.company._id)) {
         return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
       }
     };
 
-    const getCourseNameClass = (course) => {
-      const companies = course.type === INTRA ? course.companies : [];
-      return (canUpdateBilling.value || companies.includes(loggedUser.value.company._id))
+    const getCourseNameClass = course => (
+      (canUpdateBilling.value || course.companies.includes(loggedUser.value.company._id))
         ? 'course redirection'
-        : 'course';
-    };
+        : 'course'
+    );
 
     const getTableName = payer => (isVendorInterface || payer._id !== company.value._id
       ? `Formations facturées à ${payer.name}`

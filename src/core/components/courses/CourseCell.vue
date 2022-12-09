@@ -1,31 +1,33 @@
 <template>
   <q-card flat>
-    <q-card-section @click="$emit('click', course)">
-      <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
-      <div class="title-text">{{ courseName }}</div>
-      <div class="items-container">
-        <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container">
-          <q-item-section side>
-            <q-icon size="12px" :name="info.icon" :class="info.iconClass" />
-          </q-item-section>
-          <q-item-section>{{ info.label }}</q-item-section>
-        </q-item>
-      </div>
-      <div v-if="course.status === FORTHCOMING" class="additional-infos-container">
-        <q-item class="infos-course-container">
-          <q-item-section :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
-            <q-icon size="12px" name="mdi-calendar-range" />
-            <q-item-label>{{ formatCourseSlotsInfos }}</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item class="infos-course-container">
-          <q-item-section class="additional-infos">
-            <q-icon size="12px" name="mdi-account-multiple" />
-            <q-item-label>({{ traineesCount }})</q-item-label>
-          </q-item-section>
-        </q-item>
-      </div>
-    </q-card-section>
+    <router-link :to="goToBlendedCourseProfile">
+      <q-card-section>
+        <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
+        <div class="title-text">{{ courseName }}</div>
+        <div class="items-container">
+          <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container">
+            <q-item-section side>
+              <q-icon size="12px" :name="info.icon" :class="info.iconClass" />
+            </q-item-section>
+            <q-item-section>{{ info.label }}</q-item-section>
+          </q-item>
+        </div>
+        <div v-if="course.status === FORTHCOMING" class="additional-infos-container">
+          <q-item class="infos-course-container">
+            <q-item-section :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
+              <q-icon size="12px" name="mdi-calendar-range" />
+              <q-item-label>{{ formatCourseSlotsInfos }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item class="infos-course-container">
+            <q-item-section class="additional-infos">
+              <q-icon size="12px" name="mdi-account-multiple" />
+              <q-item-label>({{ traineesCount }})</q-item-label>
+            </q-item-section>
+          </q-item>
+        </div>
+      </q-card-section>
+    </router-link>
     <q-card-section v-if="course.status === IN_PROGRESS" class="slots-timeline-container">
       <div :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
         {{ slotsHappened }} / {{ course.slots.length + course.slotsToPlan.length }}
@@ -48,7 +50,7 @@
 <script>
 import get from 'lodash/get';
 import { computed, toRefs } from 'vue';
-import { FORTHCOMING, COMPLETED, IN_PROGRESS, SHORT_DURATION_H_MM } from '@data/constants';
+import { FORTHCOMING, COMPLETED, IN_PROGRESS, SHORT_DURATION_H_MM, TRAINER } from '@data/constants';
 import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -65,7 +67,7 @@ export default {
   setup (props) {
     const { course } = toRefs(props);
 
-    const { headerInfo, isVendorInterface } = useCourses(course);
+    const { headerInfo, isVendorInterface, vendorRole } = useCourses(course);
 
     const courseName = computed(() => composeCourseName(course.value, isVendorInterface));
 
@@ -145,6 +147,16 @@ export default {
         : 'Prochaine date aujourd’hui';
     });
 
+    const goToBlendedCourseProfile = computed(() => {
+      let name = '';
+      if (isVendorInterface) {
+        name = vendorRole.value === TRAINER ? 'trainers courses info' : 'ni management blended courses info';
+      } else {
+        name = 'ni courses info';
+      }
+      return { name, params: { courseId: course.value._id } };
+    });
+
     return {
       // Data
       FORTHCOMING,
@@ -156,6 +168,7 @@ export default {
       formatCourseSlotsInfos,
       formatNearestDate,
       headerInfo,
+      goToBlendedCourseProfile,
       // Methods
       happened,
     };
@@ -172,6 +185,7 @@ export default {
     padding: 10px
 .title-text
   font-size: 14px
+  color: $copper-grey-700
 .items-container
   display: flex
   flex-wrap: wrap

@@ -95,6 +95,7 @@
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import Attendances from '@api/Attendances';
@@ -244,8 +245,8 @@ export default {
       const attendanceInfos = [...this.attendances, ...this.attendanceSheets];
 
       const unsubscribedTraineesId = [...new Set(attendanceInfos
-        .filter(a => (!traineesId.includes(get(a, 'trainee._id'))))
-        .map(a => get(a, 'trainee._id')))];
+        .filter(a => (!traineesId.includes(a.trainee)))
+        .map(a => a.trainee))];
 
       if (!unsubscribedTraineesId.length) return [];
 
@@ -261,9 +262,6 @@ export default {
 
       return formattedTrainees.filter(trainee => !this.traineesWithAttendance.map(t => t._id).includes(trainee.value));
     },
-    selectedCompany () {
-      return this.course.type === INTRA ? this.course.companies[0]._id : '';
-    },
     canUpdate () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
@@ -277,7 +275,7 @@ export default {
     get,
     attendanceCheckboxValue (traineeId, slotId) {
       if (this.attendances.length) {
-        return !!this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
+        return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
       }
       return false;
     },
@@ -291,12 +289,10 @@ export default {
       try {
         let query;
 
-        if (this.course.type === INTRA) query = { company: this.selectedCompany };
-        if (this.course.type === INTER_B2B) {
-          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
-        }
+        if (this.isClientInterface) query = { companies: get(this.loggedUser, 'company._id') };
+        else query = { companies: this.course.companies.map(c => c._id) };
 
-        this.potentialTrainees = Object.freeze(await Users.learnerList(query));
+        this.potentialTrainees = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
         this.potentialTrainees = [];
         console.error(error);
@@ -454,7 +450,7 @@ export default {
     },
     slotCheckboxValue (slotId) {
       const attendancesForRegisteredLearners = this.attendances.filter(a => a.courseSlot === slotId &&
-        this.course.trainees.some(t => t._id === a.trainee._id));
+        this.course.trainees.some(t => t._id === a.trainee));
 
       return attendancesForRegisteredLearners.length === this.course.trainees.length;
     },

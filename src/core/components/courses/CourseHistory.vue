@@ -31,8 +31,11 @@ import {
   SLOT_EDITION,
   TRAINEE_ADDITION,
   TRAINEE_DELETION,
-  DD_MM,
+  ESTIMATED_START_DATE_EDITION,
+  DD_MM_YYYY,
   HHhMM,
+  COMPANY_ADDITION,
+  COMPANY_DELETION,
 } from '@data/constants';
 import Button from '@components/Button';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -58,6 +61,10 @@ export default {
           return { title: this.getTraineeDeletionTitle() };
         case TRAINEE_ADDITION:
           return { title: this.getTraineeAdditionTitle() };
+        case COMPANY_ADDITION:
+          return { title: this.getCompanyAdditionTitle() };
+        case COMPANY_DELETION:
+          return { title: this.getCompanyDeletionTitle() };
         case SLOT_DELETION:
           return {
             title: this.getSlotDeletionTitle(),
@@ -68,6 +75,11 @@ export default {
             title: this.getSlotEditionTitle(),
             details: this.getSlotEditionDetails(),
           };
+        case ESTIMATED_START_DATE_EDITION:
+          return {
+            title: this.getEstimatedStartDateEditionTitle(),
+            details: this.getEstimatedStartDateEditionDetails(),
+          };
         case SLOT_CREATION:
         default:
           return {
@@ -77,7 +89,7 @@ export default {
       }
     },
     historySignature () {
-      const date = CompaniDate(this.courseHistory.createdAt).format(DD_MM);
+      const date = CompaniDate(this.courseHistory.createdAt).format(DD_MM_YYYY);
       const hour = CompaniDate(this.courseHistory.createdAt).format(HHhMM);
       const user = formatIdentity(this.courseHistory.createdBy.identity, 'FL');
 
@@ -92,7 +104,7 @@ export default {
       return get(user, 'picture.link') || DEFAULT_AVATAR;
     },
     getSlotCreationTitle () {
-      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM);
+      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM_YYYY);
       const startHour = CompaniDate(this.courseHistory.slot.startDate).format(HHhMM);
       const endHour = CompaniDate(this.courseHistory.slot.endDate).format(HHhMM);
       const infos = `${date} de ${startHour} à ${endHour}`;
@@ -104,7 +116,7 @@ export default {
         'Pas d\'adresse renseignée.';
     },
     getSlotDeletionTitle () {
-      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM);
+      const date = CompaniDate(this.courseHistory.slot.startDate).format(DD_MM_YYYY);
 
       return { pre: 'Suppression du', type: 'créneau', post: 'du', infos: date };
     },
@@ -120,33 +132,55 @@ export default {
         + ` à ${CompaniDate(this.courseHistory.slot.endDate).format(HHhMM)}${address}`;
     },
     getSlotEditionTitle () {
+      if (this.courseHistory.update.startDate && this.courseHistory.update.startHour) {
+        const previousStartDate = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM_YYYY);
+        const startDate = CompaniDate(this.courseHistory.update.startDate.to).format(DD_MM_YYYY);
+        const startHour = CompaniDate(this.courseHistory.update.startHour.to).format(HHhMM);
+        const endHour = CompaniDate(this.courseHistory.update.endHour.to).format(HHhMM);
+
+        return {
+          pre: 'Nouvelles',
+          type: 'date et horaire',
+          post: ' pour le créneau du',
+          infos: `${previousStartDate} : le ${startDate} de ${startHour} à ${endHour}`,
+        };
+      }
       if (this.courseHistory.update.startDate) {
-        const from = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM);
-        const to = CompaniDate(this.courseHistory.update.startDate.to).format(DD_MM);
+        const from = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM_YYYY);
+        const to = CompaniDate(this.courseHistory.update.startDate.to).format(DD_MM_YYYY);
 
         return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
       }
       if (this.courseHistory.update.startHour) {
-        const date = CompaniDate(this.courseHistory.update.startHour.from).format(DD_MM);
+        const date = CompaniDate(this.courseHistory.update.startHour.from).format(DD_MM_YYYY);
         const startHour = CompaniDate(this.courseHistory.update.startHour.to).format(HHhMM);
         const endHour = CompaniDate(this.courseHistory.update.endHour.to).format(HHhMM);
 
         return { type: 'Nouvel horaire', post: ' pour le créneau du', infos: `${date} : ${startHour} - ${endHour}` };
       }
+      return '';
     },
     getSlotEditionDetails () {
-      if (this.courseHistory.update.startDate) return undefined;
+      if (this.courseHistory.update.startDate && this.courseHistory.update.startHour) {
+        const previousStartDate = CompaniDate(this.courseHistory.update.startDate.from).format(DD_MM_YYYY);
+        const previousStartHour = CompaniDate(this.courseHistory.update.startHour.from).format(HHhMM);
+        const previousEndHour = CompaniDate(this.courseHistory.update.endHour.from).format(HHhMM);
 
-      const oldStartHour = CompaniDate(this.courseHistory.update.startHour.from).format(HHhMM);
-      const oldEndHour = CompaniDate(this.courseHistory.update.endHour.from).format(HHhMM);
+        return `Créneau initialement prévu le ${previousStartDate} de ${previousStartHour} à ${previousEndHour}`;
+      }
+      if (this.courseHistory.update.startHour) {
+        const previousStartHour = CompaniDate(this.courseHistory.update.startHour.from).format(HHhMM);
+        const previousEndHour = CompaniDate(this.courseHistory.update.endHour.from).format(HHhMM);
 
-      return `Créneau initialement prévu de ${oldStartHour} à ${oldEndHour}`;
+        return `Créneau initialement prévu de ${previousStartHour} à ${previousEndHour}`;
+      }
+      return '';
     },
     getTraineeAdditionTitle () {
       return {
         pre: 'Ajout d\'un(e)',
         type: 'stagiaire',
-        post: 'à la formation :',
+        post: 'à la formation\u00A0:',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };
     },
@@ -154,8 +188,40 @@ export default {
       return {
         pre: 'Retrait d\'un(e)',
         type: 'stagiaire',
-        post: 'de la formation :',
+        post: 'de la formation\u00A0:',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
+      };
+    },
+    getEstimatedStartDateEditionTitle () {
+      return {
+        pre: 'Nouvelle',
+        type: 'date de démarrage souhaitée',
+        post: 'le',
+        infos: CompaniDate(this.courseHistory.update.estimatedStartDate.to).format(DD_MM_YYYY),
+      };
+    },
+    getEstimatedStartDateEditionDetails () {
+      if (this.courseHistory.update.estimatedStartDate.from) {
+        const previousStartDate = CompaniDate(this.courseHistory.update.estimatedStartDate.from).format(DD_MM_YYYY);
+
+        return `Début précédemment souhaité le ${previousStartDate}`;
+      }
+      return '';
+    },
+    getCompanyAdditionTitle () {
+      return {
+        pre: 'Rattachement d\'une',
+        type: 'structure',
+        post: 'à la formation\u00A0:',
+        infos: `\r\n${this.courseHistory.company.name}`,
+      };
+    },
+    getCompanyDeletionTitle () {
+      return {
+        pre: 'Détachement d\'une',
+        type: 'structure',
+        post: 'de la formation\u00A0:',
+        infos: `\r\n${this.courseHistory.company.name}`,
       };
     },
   },
