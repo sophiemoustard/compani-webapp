@@ -40,7 +40,9 @@ const routes = [
         props: true,
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni management blended courses info') to.params.defaultTab = 'bills';
+            if (!to.params.defaultTab && from.name === 'ni management blended courses info') {
+              to.params.defaultTab = 'bills';
+            }
 
             return next();
           } catch (e) {
@@ -153,8 +155,13 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni users learners info') to.params.defaultTab = 'traineeFollowUp';
-            if (from.name === 'ni users companies info') to.params.defaultTab = 'billing';
+            if (from.name === 'ni users learners info') {
+              to.params.defaultTab = 'traineeFollowUp';
+            } else if (from.name === 'ni users companies info' && from.params.defaultTab === 'bills') {
+              to.params.defaultTab = 'billing';
+            } else {
+              to.params.defaultTab = 'organization';
+            }
 
             return next();
           } catch (e) {
