@@ -245,8 +245,8 @@ export default {
       const attendanceInfos = [...this.attendances, ...this.attendanceSheets];
 
       const unsubscribedTraineesId = [...new Set(attendanceInfos
-        .filter(a => (!traineesId.includes(get(a, 'trainee._id'))))
-        .map(a => get(a, 'trainee._id')))];
+        .filter(a => (!traineesId.includes(a.trainee)))
+        .map(a => a.trainee))];
 
       if (!unsubscribedTraineesId.length) return [];
 
@@ -275,7 +275,7 @@ export default {
     get,
     attendanceCheckboxValue (traineeId, slotId) {
       if (this.attendances.length) {
-        return !!this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
+        return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
       }
       return false;
     },
@@ -450,7 +450,7 @@ export default {
     },
     slotCheckboxValue (slotId) {
       const attendancesForRegisteredLearners = this.attendances.filter(a => a.courseSlot === slotId &&
-        this.course.trainees.some(t => t._id === a.trainee._id));
+        this.course.trainees.some(t => t._id === a.trainee));
 
       return attendancesForRegisteredLearners.length === this.course.trainees.length;
     },
