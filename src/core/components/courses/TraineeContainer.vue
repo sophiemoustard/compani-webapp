@@ -40,7 +40,7 @@
           </template>
         </ni-expanding-table>
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
-          :loading="loading" />
+          :loading="loading" table-class="q-py-md" />
       </q-card>
       <q-card-actions align="right" v-if="canEdit">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
@@ -133,7 +133,7 @@ export default {
         class: canEdit.value ? 'clickable-name' : 'company-name',
         field: row => get(row, 'name') || '',
       },
-      { name: 'actions', label: '', align: 'left', field: '_id' },
+      { name: 'actions', label: '', align: 'right', field: '_id' },
     ]);
 
     const company = computed(() => $store.getters['main/getCompany']);
@@ -386,7 +386,7 @@ export default {
 .company
   border-top: 1px solid $copper-grey-200
 .no-data
-  font-size: 12px
+  font-size: 13px
   padding: 12px 0px 12px 0px
 .q-table
   & tbody

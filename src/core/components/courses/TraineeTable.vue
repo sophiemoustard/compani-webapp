@@ -1,6 +1,6 @@
 <template>
   <ni-responsive-table :data="trainees" :columns="traineeColumns" v-model:pagination="traineePagination"
-    :hide-header="hideHeader" separator="none" :loading="loading">
+    :hide-header="hideHeader" separator="none" :loading="loading" :class="tableClass">
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -46,6 +46,7 @@ export default {
     canEdit: { type: Boolean, default: false },
     hideHeader: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    tableClass: { type: String, default: () => '' },
   },
   components: {
     'ni-button': Button,
@@ -85,7 +86,7 @@ export default {
         field: row => get(row, 'contact.phone') || '',
         format: formatPhone,
       },
-      { name: 'actions', label: '', align: 'left', field: '' },
+      { name: 'actions', label: '', align: 'right', field: '' },
     ]);
     const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
 
@@ -185,7 +186,8 @@ export default {
 </script>
 <style lang="sass" scoped>
 .email
-  width: 30%
+  @media screen and (min-width: 767px)
+    width: 30%
 .q-table
   & tbody
     & td
