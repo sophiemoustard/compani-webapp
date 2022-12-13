@@ -11,7 +11,7 @@
     </div>
 
     <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkUserToCompany"
-      :validations="v$.newCompany" @hide="resetCompanyLinkModal" v-model:new-company="newCompany"
+      :validations="v$.newCompanyLink" @hide="resetCompanyLinkModal" v-model:new-company-link="newCompanyLink"
       :company-options="companyOptions" />
   </q-page>
 </template>
@@ -30,8 +30,9 @@ import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';
+import CompaniDate from '@helpers/dates/companiDates';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { ROLE_TRANSLATION } from '@data/constants';
+import { ROLE_TRANSLATION, DAY } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 
@@ -58,7 +59,7 @@ export default {
     ];
     const companyOptions = ref([]);
     const companyLinkModal = ref(false);
-    const newCompany = ref('');
+    const newCompanyLink = ref({ company: '', startDate: CompaniDate().startOf(DAY).toISO() });
     const modalLoading = ref(false);
 
     const $store = useStore();
@@ -72,8 +73,8 @@ export default {
       return infos;
     });
 
-    const rules = { newCompany: { required } };
-    const v$ = useVuelidate(rules, { newCompany });
+    const rules = { newCompanyLink: { company: { required }, startDate: { required } } };
+    const v$ = useVuelidate(rules, { newCompanyLink });
 
     watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
 
@@ -100,17 +101,20 @@ export default {
 
     const resetCompanyLinkModal = () => {
       companyOptions.value = [];
-      newCompany.value = '';
-      v$.value.newCompany.$reset();
+      newCompanyLink.value = { company: '', startDate: CompaniDate().startOf(DAY).toISO() };
+      v$.value.newCompanyLink.$reset();
     };
 
     const linkUserToCompany = async () => {
       try {
-        v$.value.newCompany.$touch();
-        if (v$.value.newCompany.$error) return NotifyWarning('Une structure est requise.');
+        v$.value.newCompanyLink.$touch();
+        if (v$.value.newCompanyLink.$error) return NotifyWarning('Une structure est requise.');
 
         modalLoading.value = true;
-        await Users.updateById(userProfile.value._id, { company: newCompany.value });
+        await Users.updateById(
+          userProfile.value._id,
+          { company: newCompanyLink.value.company, userCompanyStartDate: newCompanyLink.value.startDate }
+        );
 
         companyLinkModal.value = false;
         NotifyPositive('Rattachement à la structure effectué.');
@@ -139,7 +143,7 @@ export default {
       tabsContent,
       companyOptions,
       companyLinkModal,
-      newCompany,
+      newCompanyLink,
       modalLoading,
       // Computed
       userProfile,
