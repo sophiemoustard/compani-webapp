@@ -12,7 +12,7 @@ import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneF
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (refresh, isClientInterface, isDirectory, companies = []) => {
+export const useLearners = (refresh, isClientInterface, isDirectory, companies = { value: [] }) => {
   const newLearner = ref({
     identity: { firstname: '', lastname: '' },
     contact: { phone: '' },
@@ -122,7 +122,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     };
     newLearner.value.contact = { phone: get(user, 'contact.phone') };
 
-    if (companies.length === 1) newLearner.value.company = companies[0];
+    if (companies.value.length === 1) newLearner.value.company = companies.value[0];
   };
 
   const nextStepLearnerCreationModal = async () => {
@@ -134,7 +134,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       const userInfo = await Users.exists({ email: newLearner.value.local.email });
 
       if (!userInfo.exists) {
-        if (companies.length === 1) newLearner.value.company = companies[0];
+        if (companies.value.length === 1) newLearner.value.company = companies.value[0];
 
         return goToNextStep();
       }
@@ -153,7 +153,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
           return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
         }
 
-        if (get(user, 'company._id') && !companies.includes(user.company._id)) {
+        if (get(user, 'company._id') && !companies.value.includes(user.company._id)) {
           return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
       }

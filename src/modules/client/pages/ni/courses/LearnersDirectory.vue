@@ -48,6 +48,7 @@ export default {
 
     const $store = useStore();
     const company = computed(() => $store.getters['main/getCompany']);
+    const companies = computed(() => [company.value._id]);
     const companyOption = computed(() => [{ value: company.value._id, label: company.value.name }]);
 
     const refresh = async () => getLearnerList(company.value._id);
@@ -67,7 +68,7 @@ export default {
       getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    } = useLearners(refresh, true, true, [company.value._id]);
+    } = useLearners(refresh, true, true, companies);
 
     onMounted(async () => { await refresh(); });
 
