@@ -1,23 +1,24 @@
 import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required, email, requiredIf } from '@vuelidate/validators';
+import { required, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import Email from '@api/Email';
-import { TRAINEE } from '@data/constants';
+import { TRAINEE, DAY, HELPER, AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (refresh, isClientInterface, company) => {
+export const useLearners = (refresh, isClientInterface, isDirectory, companies = []) => {
   const newLearner = ref({
     identity: { firstname: '', lastname: '' },
     contact: { phone: '' },
     local: { email: '' },
     company: '',
+    userCompanyStartDate: CompaniDate().startOf(DAY).toISO(),
   });
   const searchStr = ref('');
   const learnerCreationModalLoading = ref(false);
@@ -41,7 +42,8 @@ export const useLearners = (refresh, isClientInterface, company) => {
       identity: { lastname: { required } },
       local: { email: { required, email } },
       contact: { phone: { required, frPhoneNumber } },
-      company: { required: requiredIf(!isClientInterface) },
+      company: { required },
+      userCompanyStartDate: { required },
     },
   }));
   const traineeRules = { newTrainee: { required } };
@@ -93,10 +95,13 @@ export const useLearners = (refresh, isClientInterface, company) => {
   };
 
   const formatUserPayload = () => {
-    const payload = removeEmptyProps(pick(newLearner.value, ['identity', 'local', 'contact', 'company']));
+    const payload = removeEmptyProps(pick(
+      newLearner.value,
+      ['identity', 'local', 'contact', 'company', 'userCompanyStartDate']
+    ));
     if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(newLearner.value.contact.phone);
 
-    return isClientInterface ? { ...payload, company: company._id } : payload;
+    return payload;
   };
 
   const sendWelcome = async () => {
@@ -106,6 +111,63 @@ export const useLearners = (refresh, isClientInterface, company) => {
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de l\'envoi du mail.');
+    }
+  };
+
+  const setNewLearner = (user) => {
+    newLearner.value._id = user._id;
+    newLearner.value.identity = {
+      firstname: get(user, 'identity.firstname'),
+      lastname: get(user, 'identity.lastname'),
+    };
+    newLearner.value.contact = { phone: get(user, 'contact.phone') };
+
+    if (companies.length === 1) newLearner.value.company = companies[0];
+  };
+
+  const nextStepLearnerCreationModal = async () => {
+    try {
+      learnerValidation.value.newLearner.$touch();
+      if (learnerValidation.value.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
+
+      learnerCreationModalLoading.value = true;
+      const userInfo = await Users.exists({ email: newLearner.value.local.email });
+
+      if (!userInfo.exists) {
+        if (companies.length === 1) newLearner.value.company = companies[0];
+
+        return goToNextStep();
+      }
+
+      if (isDirectory && !isClientInterface) return NotifyWarning('L\'apprenant(e) est déjà ajouté(e).');
+
+      if (!get(userInfo, 'user._id')) {
+        return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+      }
+      const user = await Users.getById(userInfo.user._id);
+
+      if (!isDirectory) {
+        const isHelperOrAuxiliaryWithoutCompany = [HELPER, AUXILIARY_WITHOUT_COMPANY]
+          .includes(get(user, 'role.client.name'));
+        if (isHelperOrAuxiliaryWithoutCompany) {
+          return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
+        }
+
+        if (get(user, 'company._id') && !companies.includes(user.company._id)) {
+          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+        }
+      }
+
+      setNewLearner(user);
+      userAlreadyHasCompany.value = !!get(user, 'company._id');
+      learnerAlreadyExists.value = true;
+
+      return goToNextStep();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
+    } finally {
+      learnerCreationModalLoading.value = false;
     }
   };
 
@@ -154,7 +216,7 @@ export const useLearners = (refresh, isClientInterface, company) => {
 
   const resetLearnerCreationModal = () => {
     firstStep.value = true;
-    newLearner.value = { ...clear(newLearner.value) };
+    newLearner.value = { ...clear(newLearner.value), userCompanyStartDate: CompaniDate().startOf(DAY).toISO() };
     learnerValidation.value.newLearner.$reset();
     userAlreadyHasCompany.value = false;
     learnerAlreadyExists.value = false;
@@ -188,5 +250,6 @@ export const useLearners = (refresh, isClientInterface, company) => {
     getLearnerList,
     submitLearnerCreationModal,
     resetLearnerCreationModal,
+    nextStepLearnerCreationModal,
   };
 };
