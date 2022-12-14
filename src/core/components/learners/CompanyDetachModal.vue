@@ -3,7 +3,7 @@
     <template #title>
       Détacher la personne de la <span class="text-weight-bold">structure</span>
     </template>
-    <div class="text"> {formatIdentity(userIdentity)} ne fera plus partie de la structure {companyName}</div>
+    <div class="text"> {{ userIdentity }} ne fera plus partie de la structure {{ companyName }}</div>
     <ni-date-input in-modal last class="col-xs-12 col-md-6" caption="Détachement à partir du"
       :model-value="detachmentDate" @update:model-value="update" />
   </ni-modal>
@@ -13,7 +13,6 @@
 import Modal from '@components/modal/Modal';
 import DateInput from '@components/form/DateInput';
 import { DAY } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
@@ -24,9 +23,9 @@ export default {
   },
   props: {
     modelValue: { type: Boolean, default: false },
-    userIdentity: { type: Object, default: () => ({}) },
+    userIdentity: { type: String, default: '' },
     companyName: { type: String, default: '' },
-    detachmentDate: { type: Date, default: () => CompaniDate().startOf(DAY).toISO() },
+    detachmentDate: { type: String, default: () => CompaniDate().startOf(DAY).toISO() },
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:detachmentDate'],
   setup (_, { emit }) {
@@ -40,7 +39,6 @@ export default {
     return {
       // Data
       // Methods
-      formatIdentity,
       hide,
       input,
       update,
