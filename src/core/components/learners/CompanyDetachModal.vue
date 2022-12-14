@@ -6,6 +6,10 @@
     <div class="text"> {{ userIdentity }} ne fera plus partie de la structure {{ companyName }}</div>
     <ni-date-input in-modal last class="col-xs-12 col-md-6" caption="Détachement à partir du"
       :model-value="detachmentDate" @update:model-value="update" />
+    <template #footer>
+      <q-btn no-caps class="full-width modal-btn" label="Détacher la personne" color="primary" :loading="loading"
+        icon-right="add" @click="submit" />
+    </template>
   </ni-modal>
 </template>
 
@@ -26,6 +30,7 @@ export default {
     userIdentity: { type: String, default: '' },
     companyName: { type: String, default: '' },
     detachmentDate: { type: String, default: () => CompaniDate().startOf(DAY).toISO() },
+    loading: { type: Boolean, default: false },
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:detachmentDate'],
   setup (_, { emit }) {
