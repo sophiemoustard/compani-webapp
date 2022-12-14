@@ -5,6 +5,8 @@
         <template #title>
           <ni-button color="primary" icon="add" v-if="!userProfile.company" class="q-ml-sm"
             label="Rattacher à une structure" @click="openCompanyLinkModal" />
+          <ni-button color="primary" icon="add" v-if="userProfile.company" class="q-ml-sm"
+            label="Détacher de la structure" @click="openCompanyDetachModal" />
         </template>
       </ni-profile-header>
       <profile-tabs :profile-id="learnerId" :tabs-content="tabsContent" />
@@ -13,6 +15,9 @@
     <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkUserToCompany"
       :validations="v$.newCompanyLink" @hide="resetCompanyLinkModal" v-model:new-company-link="newCompanyLink"
       :company-options="companyOptions" />
+
+    <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity"
+      :company-name="companyName" v-model:detachment-date="detachmentDate" />
   </q-page>
 </template>
 
@@ -31,6 +36,7 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';
 import CompaniDate from '@helpers/dates/companiDates';
+import CompanyDetachModal from '@components/learners/CompanyDetachModal';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import { ROLE_TRANSLATION, DAY } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -47,6 +53,7 @@ export default {
     'profile-tabs': ProfileTabs,
     'ni-button': Button,
     'company-link-modal': CompanyLinkModal,
+    'ni-company-detach-modal': CompanyDetachModal,
   },
   setup (props) {
     const metaInfo = { title: 'Fiche apprenant' };
@@ -61,6 +68,8 @@ export default {
     const companyLinkModal = ref(false);
     const newCompanyLink = ref({ company: '', startDate: CompaniDate().startOf(DAY).toISO() });
     const modalLoading = ref(false);
+    const companyDetachModal = ref(false);
+    const detachmentDate = ref(CompaniDate().startOf(DAY).toISO());
 
     const $store = useStore();
     const userProfile = computed(() => $store.state.userProfile.userProfile);
@@ -72,6 +81,7 @@ export default {
 
       return infos;
     });
+    const companyName = computed(() => get(userProfile.value, 'company.name'));
 
     const rules = { newCompanyLink: { company: { required }, startDate: { required } } };
     const v$ = useVuelidate(rules, { newCompanyLink });
@@ -103,6 +113,10 @@ export default {
       companyOptions.value = [];
       newCompanyLink.value = { company: '', startDate: CompaniDate().startOf(DAY).toISO() };
       v$.value.newCompanyLink.$reset();
+    };
+
+    const openCompanyDetachModal = () => {
+      companyDetachModal.value = true;
     };
 
     const linkUserToCompany = async () => {
@@ -145,15 +159,20 @@ export default {
       companyLinkModal,
       newCompanyLink,
       modalLoading,
+      companyDetachModal,
+      detachmentDate,
       // Computed
+      companyName,
       userProfile,
       headerInfo,
       // Validations
       v$,
       // Methods
+      get,
       openCompanyLinkModal,
       resetCompanyLinkModal,
       linkUserToCompany,
+      openCompanyDetachModal,
     };
   },
 };
