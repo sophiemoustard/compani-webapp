@@ -20,7 +20,7 @@
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
       :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" @hide="resetLearnerCreationModal"
       @next-step="nextStepLearnerCreationModal" :validations="learnerValidation.newLearner" disable-company
-      :company-options="companyOption" />
+      :company-options="companyOptions" />
   </q-page>
 </template>
 
@@ -49,7 +49,7 @@ export default {
     const $store = useStore();
     const company = computed(() => $store.getters['main/getCompany']);
     const companies = computed(() => [company.value._id]);
-    const companyOption = computed(() => [{ value: company.value._id, label: company.value.name }]);
+    const companyOptions = computed(() => [{ value: company.value._id, label: company.value.name }]);
 
     const refresh = async () => getLearnerList(company.value._id);
 
@@ -84,7 +84,7 @@ export default {
       // Computed
       filteredLearners,
       company,
-      companyOption,
+      companyOptions,
       // Validations
       learnerValidation,
       // Methods
