@@ -16,13 +16,13 @@
       :validations="v$.newCompanyLink" @hide="resetCompanyLinkModal" v-model:new-company-link="newCompanyLink"
       :company-options="companyOptions" />
 
-    <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity"
-      :company-name="companyName" v-model:detachment-date="detachmentDate" />
+    <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
+      :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement" />
   </q-page>
 </template>
 
 <script>
-import { useMeta } from 'quasar';
+import { useMeta, useQuasar } from 'quasar';
 import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
@@ -31,6 +31,7 @@ import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
 import Users from '@api/Users';
+import UserCompanies from '@api/UserCompanies';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
@@ -58,6 +59,7 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche apprenant' };
     useMeta(metaInfo);
+    const $q = useQuasar();
 
     const userIdentity = ref('');
     const tabsContent = [
@@ -70,6 +72,7 @@ export default {
     const modalLoading = ref(false);
     const companyDetachModal = ref(false);
     const detachmentDate = ref(CompaniDate().startOf(DAY).toISO());
+    const detachModalLoading = ref(false);
 
     const $store = useStore();
     const userProfile = computed(() => $store.state.userProfile.userProfile);
@@ -151,6 +154,24 @@ export default {
 
     created();
 
+    const validateCompanyDetachement = () => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: `Êtes-vous sûr(e) de vouloir détacher ${userIdentity.value} de la structure ${companyName.value}&nbsp;?
+          \nLa structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
+          formation.`,
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => detachCompany())
+        .onCancel(() => NotifyPositive('Détachement annulé.'));
+    };
+
+    const detachCompany = async () => {
+      companyDetachModal.value = false;
+      // await UserCompanies.update(, { endDate: detachmentDate });
+    };
+
     return {
       // Data
       userIdentity,
@@ -161,6 +182,7 @@ export default {
       modalLoading,
       companyDetachModal,
       detachmentDate,
+      detachModalLoading,
       // Computed
       companyName,
       userProfile,
@@ -173,6 +195,7 @@ export default {
       resetCompanyLinkModal,
       linkUserToCompany,
       openCompanyDetachModal,
+      validateCompanyDetachement,
     };
   },
 };
