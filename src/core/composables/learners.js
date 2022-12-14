@@ -146,15 +146,15 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       }
       const user = await Users.getById(userInfo.user._id);
 
+      if (get(user, 'company._id') && !companies.value.includes(user.company._id)) {
+        return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+      }
+
       if (!isDirectory) {
         const isHelperOrAuxiliaryWithoutCompany = [HELPER, AUXILIARY_WITHOUT_COMPANY]
           .includes(get(user, 'role.client.name'));
         if (isHelperOrAuxiliaryWithoutCompany) {
           return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
-        }
-
-        if (get(user, 'company._id') && !companies.value.includes(user.company._id)) {
-          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
       }
 
