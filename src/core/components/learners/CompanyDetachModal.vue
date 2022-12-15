@@ -4,7 +4,7 @@
       Détacher la personne de la <span class="text-weight-bold">structure</span>
     </template>
     <div class="text"> {{ userIdentity }} ne fera plus partie de la structure {{ companyName }}</div>
-    <ni-date-input in-modal last class="col-xs-12 col-md-6" caption="Détachement à partir du"
+    <ni-date-input in-modal last required-field class="col-xs-12 col-md-6" caption="Détachement à partir du"
       :model-value="detachmentDate" @update:model-value="update" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Détacher la personne" color="primary" :loading="loading"
