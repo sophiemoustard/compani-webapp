@@ -148,7 +148,11 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
       if (get(user, 'company._id')) {
         if (companies.value.includes(user.company._id)) {
-          return NotifyWarning('L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.');
+          const msg = isDirectory
+            ? 'Un compte rattaché à la structure existe déjà avec cette adresse mail.'
+            : 'L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.';
+
+          return NotifyWarning(msg);
         }
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
