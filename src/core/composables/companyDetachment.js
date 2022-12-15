@@ -16,6 +16,10 @@ export const useCompanyDetachment = (userProfile) => {
 
   const companyName = computed(() => get(userProfile.value, 'company.name'));
 
+  const canDetachFromCompany = computed(
+    () => process.env.COMPANIES_ID_DETACHMENT_IS_ALLOWED.includes(userProfile.value.company._id)
+  );
+
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
 
   const validateCompanyDetachement = () => {
@@ -49,6 +53,7 @@ export const useCompanyDetachment = (userProfile) => {
     userIdentity,
     // Computed
     companyName,
+    canDetachFromCompany,
     // Methods
     validateCompanyDetachement,
     openCompanyDetachModal,

@@ -123,6 +123,7 @@ module.exports = configure(ctx => ({
       ALENVI_BOT_ID: process.env.ALENVI_BOT_ID,
       GA_TRACKING_ID: process.env.GA_TRACKING_ID,
       BULB_LINK: process.env.BULB_LINK,
+      COMPANIES_ID_DETACHMENT_IS_ALLOWED: process.env.COMPANIES_ID_DETACHMENT_IS_ALLOWED,
     },
   },
   devServer: { open: true },
