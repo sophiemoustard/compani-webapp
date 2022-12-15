@@ -22,8 +22,8 @@
 </template>
 
 <script>
-import { useMeta, useQuasar } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { useMeta } from 'quasar';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -31,7 +31,7 @@ import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
 import Users from '@api/Users';
-import UserCompanies from '@api/UserCompanies';
+// import UserCompanies from '@api/UserCompanies';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
@@ -39,9 +39,10 @@ import ProfileCourses from '@components/learners/ProfileCourses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompanyDetachModal from '@components/learners/CompanyDetachModal';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { ROLE_TRANSLATION, DAY } from '@data/constants';
+import { ROLE_TRANSLATION } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
+import { useCompanyDetachment } from '@composables/companyDetachment';
 
 export default {
   name: 'LearnerProfile',
@@ -59,9 +60,7 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche apprenant' };
     useMeta(metaInfo);
-    const $q = useQuasar();
 
-    const userIdentity = ref('');
     const tabsContent = [
       { label: 'Infos personnelles', name: 'info', default: props.defaultTab === 'info', component: ProfileInfo },
       { label: 'Formations', name: 'courses', default: props.defaultTab === 'courses', component: ProfileCourses },
@@ -70,9 +69,6 @@ export default {
     const companyLinkModal = ref(false);
     const newCompanyLink = ref({ company: '', startDate: CompaniDate().startOf(DAY).toISO() });
     const modalLoading = ref(false);
-    const companyDetachModal = ref(false);
-    const detachmentDate = ref(CompaniDate().startOf(DAY).toISO());
-    const detachModalLoading = ref(false);
 
     const $store = useStore();
     const userProfile = computed(() => $store.state.userProfile.userProfile);
@@ -84,12 +80,19 @@ export default {
 
       return infos;
     });
-    const companyName = computed(() => get(userProfile.value, 'company.name'));
+
+    const {
+      companyDetachModal,
+      detachmentDate,
+      detachModalLoading,
+      companyName,
+      validateCompanyDetachement,
+      openCompanyDetachModal,
+      userIdentity,
+    } = useCompanyDetachment(userProfile);
 
     const rules = { newCompanyLink: { company: { required }, startDate: { required } } };
     const v$ = useVuelidate(rules, { newCompanyLink });
-
-    watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
 
     const refreshUserProfile = async () => {
       try {
@@ -116,10 +119,6 @@ export default {
       companyOptions.value = [];
       newCompanyLink.value = { company: '', startDate: CompaniDate().startOf(DAY).toISO() };
       v$.value.newCompanyLink.$reset();
-    };
-
-    const openCompanyDetachModal = () => {
-      companyDetachModal.value = true;
     };
 
     const linkUserToCompany = async () => {
@@ -153,24 +152,6 @@ export default {
     };
 
     created();
-
-    const validateCompanyDetachement = () => {
-      $q.dialog({
-        title: 'Confirmation',
-        message: `Êtes-vous sûr(e) de vouloir détacher ${userIdentity.value} de la structure ${companyName.value}&nbsp;?
-          \nLa structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
-          formation.`,
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => detachCompany())
-        .onCancel(() => NotifyPositive('Détachement annulé.'));
-    };
-
-    const detachCompany = async () => {
-      companyDetachModal.value = false;
-      // await UserCompanies.update(, { endDate: detachmentDate });
-    };
 
     return {
       // Data
