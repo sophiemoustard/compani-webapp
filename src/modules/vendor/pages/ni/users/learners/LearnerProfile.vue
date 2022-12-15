@@ -17,21 +17,22 @@
       :company-options="companyOptions" />
 
     <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
-      :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement" />
+      :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
+      @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate" :validations="v$.detachmentDate" />
   </q-page>
 </template>
 
 <script>
-import { useMeta } from 'quasar';
+import { useMeta, useQuasar } from 'quasar';
 import { ref, computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import { minDate } from '@helpers/vuelidateCustomVal';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
 import Users from '@api/Users';
-// import UserCompanies from '@api/UserCompanies';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
@@ -39,10 +40,11 @@ import ProfileCourses from '@components/learners/ProfileCourses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompanyDetachModal from '@components/learners/CompanyDetachModal';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { ROLE_TRANSLATION, DAY } from '@data/constants';
+import { ROLE_TRANSLATION, DAY, REQUIRED_LABEL } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 import { useCompanyDetachment } from '@composables/companyDetachment';
+import UserCompanies from '@api/UserCompanies';
 
 export default {
   name: 'LearnerProfile',
@@ -71,9 +73,14 @@ export default {
     const modalLoading = ref(false);
 
     const $store = useStore();
+
+    const $q = useQuasar();
+
     const userProfile = computed(() => $store.state.userProfile.userProfile);
+
     const userProfileRole = computed(() => get(userProfile.value, 'role.client.name') ||
       get(userProfile.value, 'role.vendor.name') || '');
+
     const headerInfo = computed(() => {
       const infos = [{ icon: 'apartment', label: userProfile.value.company ? userProfile.value.company.name : 'N/A' }];
       if (userProfileRole.value) infos.push({ icon: 'person', label: ROLE_TRANSLATION[userProfileRole.value] });
@@ -81,26 +88,79 @@ export default {
       return infos;
     });
 
-    const {
-      companyDetachModal,
-      detachmentDate,
-      detachModalLoading,
-      companyName,
-      validateCompanyDetachement,
-      openCompanyDetachModal,
-      userIdentity,
-      canDetachFromCompany,
-    } = useCompanyDetachment(userProfile);
-
-    const rules = { newCompanyLink: { company: { required }, startDate: { required } } };
-    const v$ = useVuelidate(rules, { newCompanyLink });
-
     const refreshUserProfile = async () => {
       try {
         await $store.dispatch('userProfile/fetchUserProfile', { userId: props.learnerId });
       } catch (e) {
         console.error(e);
       }
+    };
+
+    const {
+      companyDetachModal,
+      detachmentDate,
+      detachModalLoading,
+      companyName,
+      openCompanyDetachModal,
+      userIdentity,
+      canDetachFromCompany,
+      userCompany,
+      minDetachmentDate,
+    } = useCompanyDetachment(userProfile, refreshUserProfile);
+
+    const rules = {
+      newCompanyLink: { company: { required }, startDate: { required } },
+      detachmentDate: { required },
+    };
+    const v$ = useVuelidate(rules, { newCompanyLink, detachmentDate });
+
+    const dateErrorMessage = computed(() => {
+      if (!!v$.value.detachmentDate.minDate.$response === false) {
+        return 'La date de détachement doit être postérieure à la date de rattachement';
+      }
+      if (!!v$.value.detachmentDate.required.$response === false) return REQUIRED_LABEL;
+
+      return '';
+    });
+
+    const validateCompanyDetachement = () => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: `Êtes-vous sûr(e) de vouloir détacher <b>${userIdentity.value}</b> de la structure
+          <b>${companyName.value}</b>&nbsp;?
+          <br /> <br />La structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
+          formation.`,
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => detachCompany())
+        .onCancel(() => NotifyPositive('Détachement annulé.'));
+    };
+
+    const detachCompany = async () => {
+      try {
+        v$.value.detachmentDate.$touch();
+        if (v$.value.detachmentDate.$error) return NotifyWarning('Date invalide.');
+
+        await UserCompanies.update(
+          get(userCompany.value, '_id'),
+          { endDate: CompaniDate(detachmentDate.value).toISO() }
+        );
+
+        companyDetachModal.value = false;
+        NotifyPositive('Modification enregistrée.');
+
+        await refreshUserProfile();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 403 && e.data.message) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la modification.');
+      }
+    };
+
+    const resetDetachmentModal = () => {
+      detachmentDate.value = CompaniDate().endOf(DAY).toISO();
+      v$.value.detachmentDate.$reset();
     };
 
     const openCompanyLinkModal = async () => {
@@ -167,9 +227,12 @@ export default {
       detachModalLoading,
       // Computed
       companyName,
+      userCompany,
       userProfile,
       headerInfo,
       canDetachFromCompany,
+      minDetachmentDate,
+      dateErrorMessage,
       // Validations
       v$,
       // Methods
@@ -179,6 +242,7 @@ export default {
       linkUserToCompany,
       openCompanyDetachModal,
       validateCompanyDetachement,
+      resetDetachmentModal,
     };
   },
 };

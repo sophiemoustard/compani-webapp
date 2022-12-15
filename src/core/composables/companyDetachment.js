@@ -1,49 +1,29 @@
 import { computed, ref, watch } from 'vue';
-import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import { formatIdentity } from '@helpers/utils';
-import { NotifyPositive } from '@components/popup/notify';
 import CompaniDate from '@helpers/dates/companiDates';
 import { DAY } from '@data/constants';
 
-export const useCompanyDetachment = (userProfile) => {
-  const $q = useQuasar();
-
+export const useCompanyDetachment = (userProfile, refresh) => {
   const companyDetachModal = ref(false);
-  const detachmentDate = ref(CompaniDate().startOf(DAY).toISO());
+  const detachmentDate = ref(CompaniDate().endOf(DAY).toISO());
   const detachModalLoading = ref(false);
   const userIdentity = ref('');
 
+  const userCompany = computed(() => (get(userProfile.value, 'userCompanyList') || []).find(uc => !uc.endDate));
+
+  const minDetachmentDate = computed(() => (userCompany.value ? userCompany.value.startDate : ''));
+
   const companyName = computed(() => get(userProfile.value, 'company.name'));
 
-  const canDetachFromCompany = computed(
-    () => process.env.COMPANIES_ID_DETACHMENT_IS_ALLOWED.includes(userProfile.value.company._id)
-  );
+  const canDetachFromCompany = computed(() => {
+    const isFromEps = process.env.COMPANIES_ID_DETACHMENT_IS_ALLOWED.includes(get(userProfile.value, 'company._id'));
+    return isFromEps && !!userCompany.value;
+  });
 
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
 
-  const validateCompanyDetachement = () => {
-    $q.dialog({
-      title: 'Confirmation',
-      message: `Êtes-vous sûr(e) de vouloir détacher <b>${userIdentity.value}</b> de la structure
-        <b>${companyName.value}</b>&nbsp;?
-        <br /> <br />La structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
-        formation.`,
-      html: true,
-      ok: true,
-      cancel: 'Annuler',
-    }).onOk(() => detachCompany())
-      .onCancel(() => NotifyPositive('Détachement annulé.'));
-  };
-
-  const detachCompany = async () => {
-    companyDetachModal.value = false;
-    // await UserCompanies.update(, { endDate: detachmentDate });
-  };
-
-  const openCompanyDetachModal = () => {
-    companyDetachModal.value = true;
-  };
+  const openCompanyDetachModal = () => (companyDetachModal.value = true);
 
   return {
     // Data
@@ -54,8 +34,9 @@ export const useCompanyDetachment = (userProfile) => {
     // Computed
     companyName,
     canDetachFromCompany,
+    userCompany,
+    minDetachmentDate,
     // Methods
-    validateCompanyDetachement,
     openCompanyDetachModal,
   };
 };
