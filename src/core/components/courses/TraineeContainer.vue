@@ -54,7 +54,7 @@
       :validations="traineeValidation.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
       :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
 
-    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" disable-start-date
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
