@@ -21,8 +21,9 @@ export const useCompanyDetachment = (userProfile) => {
   const validateCompanyDetachement = () => {
     $q.dialog({
       title: 'Confirmation',
-      message: `Êtes-vous sûr(e) de vouloir détacher ${userIdentity.value} de la structure ${companyName.value}&nbsp;?
-        \nLa structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
+      message: `Êtes-vous sûr(e) de vouloir détacher <b>${userIdentity.value}</b> de la structure
+        <b>${companyName.value}</b>&nbsp;?
+        <br /> <br />La structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
         formation.`,
       html: true,
       ok: true,
