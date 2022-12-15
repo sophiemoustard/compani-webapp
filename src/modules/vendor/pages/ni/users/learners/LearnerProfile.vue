@@ -5,7 +5,7 @@
         <template #title>
           <ni-button color="primary" icon="add" v-if="!userProfile.company" class="q-ml-sm"
             label="Rattacher à une structure" @click="openCompanyLinkModal" />
-          <ni-button color="primary" icon="add" v-if="userProfile.company" class="q-ml-sm"
+          <ni-button v-if="canDetachFromCompany" color="primary" icon="add" class="q-ml-sm"
             label="Détacher de la structure" @click="openCompanyDetachModal" />
         </template>
       </ni-profile-header>
@@ -89,6 +89,7 @@ export default {
       validateCompanyDetachement,
       openCompanyDetachModal,
       userIdentity,
+      canDetachFromCompany,
     } = useCompanyDetachment(userProfile);
 
     const rules = { newCompanyLink: { company: { required }, startDate: { required } } };
@@ -168,6 +169,7 @@ export default {
       companyName,
       userProfile,
       headerInfo,
+      canDetachFromCompany,
       // Validations
       v$,
       // Methods
