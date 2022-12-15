@@ -8,7 +8,8 @@
       ci-dessous.
     </div>
     <ni-date-input in-modal last required-field class="col-xs-12 col-md-6" caption="Détachement à partir du"
-      :model-value="detachmentDate" @update:model-value="update" />
+      :model-value="detachmentDate" @update:model-value="update" :min="minDateDetachment"
+      :error="validations.$error" :error-message="errorMessage" @blur="validations.$touch" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Détacher la personne" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -32,8 +33,11 @@ export default {
     modelValue: { type: Boolean, default: false },
     userIdentity: { type: String, default: '' },
     companyName: { type: String, default: '' },
-    detachmentDate: { type: String, default: () => CompaniDate().startOf(DAY).toISO() },
+    detachmentDate: { type: String, default: CompaniDate().endOf(DAY).toISO() },
     loading: { type: Boolean, default: false },
+    minDateDetachment: { type: String, default: '' },
+    validations: { type: Object, default: () => ({}) },
+    errorMessage: { type: String, default: '' },
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:detachmentDate'],
   setup (_, { emit }) {
