@@ -148,8 +148,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
       if (get(user, 'company._id')) {
         if (companies.value.includes(user.company._id)) {
-          return NotifyWarning('Cette personne peut être ajoutée à la formation sans modification sur son compte.'
-            + '\nVeuillez re-ouvrir cette pop-up et sélectionner la personne parmi les propositions.');
+          return NotifyWarning('L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.');
         }
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
