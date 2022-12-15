@@ -39,7 +39,7 @@ import ProfileCourses from '@components/learners/ProfileCourses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompanyDetachModal from '@components/learners/CompanyDetachModal';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { ROLE_TRANSLATION } from '@data/constants';
+import { ROLE_TRANSLATION, DAY } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 import { useCompanyDetachment } from '@composables/companyDetachment';
