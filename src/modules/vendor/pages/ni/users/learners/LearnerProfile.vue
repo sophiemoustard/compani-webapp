@@ -18,8 +18,7 @@
 
     <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
       :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
-      @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate"
-      :validations="detachmentValidations.detachmentDate" />
+      @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate" />
   </q-page>
 </template>
 
@@ -40,7 +39,7 @@ import ProfileCourses from '@components/learners/ProfileCourses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompanyDetachModal from '@components/learners/CompanyDetachModal';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { ROLE_TRANSLATION, DAY, REQUIRED_LABEL } from '@data/constants';
+import { ROLE_TRANSLATION, DAY } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 import { useCompanyDetachment } from '@composables/companyDetachment';
@@ -102,7 +101,6 @@ export default {
       canDetachFromCompany,
       userCompany,
       minDetachmentDate,
-      detachmentValidations,
       validateCompanyDetachement,
       resetDetachmentModal,
     } = useCompanyDetachment(userProfile, refreshUserProfile);
@@ -154,15 +152,6 @@ export default {
       }
     };
 
-    const dateErrorMessage = computed(() => {
-      if (!!detachmentValidations.value.detachmentDate.minDate.$response === false) {
-        return 'La date de détachement doit être postérieure à la date de rattachement';
-      }
-      if (!!detachmentValidations.value.detachmentDate.required.$response === false) return REQUIRED_LABEL;
-
-      return '';
-    });
-
     onBeforeUnmount(() => { $store.dispatch('userProfile/resetUserProfile'); });
 
     const created = async () => {
@@ -190,10 +179,8 @@ export default {
       headerInfo,
       canDetachFromCompany,
       minDetachmentDate,
-      dateErrorMessage,
       // Validations
       v$,
-      detachmentValidations,
       // Methods
       get,
       openCompanyLinkModal,

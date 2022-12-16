@@ -1,14 +1,11 @@
 import { computed, ref, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
-// import { minDate } from '@helpers/vuelidateCustomVal';
 import { formatIdentity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import UserCompanies from '@api/UserCompanies';
 import { DAY } from '@data/constants';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export const useCompanyDetachment = (userProfile, refresh) => {
   const companyDetachModal = ref(false);
@@ -26,18 +23,14 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const canDetachFromCompany = computed(() => {
     const isFromEps = process.env.COMPANIES_ID_DETACHMENT_IS_ALLOWED.includes(get(userProfile.value, 'company._id'));
-    return isFromEps && !!userCompany.value;
+    const userGetRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
+
+    return isFromEps && !!userCompany.value && !userGetRole;
   });
 
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
 
   const openCompanyDetachModal = () => (companyDetachModal.value = true);
-
-  const rules = {
-    // detachmentDate: { required, minDate: minDate(minDetachmentDate.value) },
-    detachmentDate: { required },
-  };
-  const v$ = useVuelidate(rules, { detachmentDate });
 
   const validateCompanyDetachement = () => {
     $q.dialog({
@@ -55,13 +48,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const detachCompany = async () => {
     try {
-      v$.value.detachmentDate.$touch();
-      if (v$.value.detachmentDate.$error) return NotifyWarning('Date invalide.');
-
-      await UserCompanies.update(
-        get(userCompany.value, '_id'),
-        { endDate: CompaniDate(detachmentDate.value).toISO() }
-      );
+      await UserCompanies.update(get(userCompany.value, '_id'), { endDate: CompaniDate(detachmentDate.value).toISO() });
 
       companyDetachModal.value = false;
       NotifyPositive('Modification enregistrée.');
@@ -74,10 +61,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     }
   };
 
-  const resetDetachmentModal = () => {
-    detachmentDate.value = CompaniDate().endOf(DAY).toISO();
-    v$.value.detachmentDate.$reset();
-  };
+  const resetDetachmentModal = () => (detachmentDate.value = CompaniDate().endOf(DAY).toISO());
 
   return {
     // Data
@@ -85,8 +69,6 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     detachmentDate,
     detachModalLoading,
     userIdentity,
-    // Validations
-    detachmentValidations: v$,
     // Computed
     companyName,
     canDetachFromCompany,
