@@ -13,8 +13,7 @@
 
   <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
     :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
-    @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate"
-    :validations="detachmentValidations.detachmentDate" />
+    @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate" />
 </template>
 
 <script>
@@ -80,7 +79,6 @@ export default {
       companyName,
       canDetachFromCompany,
       minDetachmentDate,
-      detachmentValidations,
       validateCompanyDetachement,
       resetDetachmentModal,
     } = useCompanyDetachment(userProfile, refreshUserProfile);
@@ -102,8 +100,6 @@ export default {
       detachmentDate,
       detachModalLoading,
       companyName,
-      // Validations
-      detachmentValidations,
       // Computed
       userProfile,
       userProfileRole,
