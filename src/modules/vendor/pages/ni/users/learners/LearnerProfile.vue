@@ -18,17 +18,17 @@
 
     <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
       :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
-      @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate" :validations="v$.detachmentDate" />
+      @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate"
+      :validations="detachmentValidations.detachmentDate" />
   </q-page>
 </template>
 
 <script>
-import { useMeta, useQuasar } from 'quasar';
+import { useMeta } from 'quasar';
 import { ref, computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { minDate } from '@helpers/vuelidateCustomVal';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
@@ -44,7 +44,6 @@ import { ROLE_TRANSLATION, DAY, REQUIRED_LABEL } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 import { useCompanyDetachment } from '@composables/companyDetachment';
-import UserCompanies from '@api/UserCompanies';
 
 export default {
   name: 'LearnerProfile',
@@ -73,9 +72,6 @@ export default {
     const modalLoading = ref(false);
 
     const $store = useStore();
-
-    const $q = useQuasar();
-
     const userProfile = computed(() => $store.state.userProfile.userProfile);
 
     const userProfileRole = computed(() => get(userProfile.value, 'role.client.name') ||
@@ -106,62 +102,15 @@ export default {
       canDetachFromCompany,
       userCompany,
       minDetachmentDate,
+      detachmentValidations,
+      validateCompanyDetachement,
+      resetDetachmentModal,
     } = useCompanyDetachment(userProfile, refreshUserProfile);
 
     const rules = {
       newCompanyLink: { company: { required }, startDate: { required } },
-      detachmentDate: { required },
     };
-    const v$ = useVuelidate(rules, { newCompanyLink, detachmentDate });
-
-    const dateErrorMessage = computed(() => {
-      if (!!v$.value.detachmentDate.minDate.$response === false) {
-        return 'La date de détachement doit être postérieure à la date de rattachement';
-      }
-      if (!!v$.value.detachmentDate.required.$response === false) return REQUIRED_LABEL;
-
-      return '';
-    });
-
-    const validateCompanyDetachement = () => {
-      $q.dialog({
-        title: 'Confirmation',
-        message: `Êtes-vous sûr(e) de vouloir détacher <b>${userIdentity.value}</b> de la structure
-          <b>${companyName.value}</b>&nbsp;?
-          <br /> <br />La structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
-          formation.`,
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => detachCompany())
-        .onCancel(() => NotifyPositive('Détachement annulé.'));
-    };
-
-    const detachCompany = async () => {
-      try {
-        v$.value.detachmentDate.$touch();
-        if (v$.value.detachmentDate.$error) return NotifyWarning('Date invalide.');
-
-        await UserCompanies.update(
-          get(userCompany.value, '_id'),
-          { endDate: CompaniDate(detachmentDate.value).toISO() }
-        );
-
-        companyDetachModal.value = false;
-        NotifyPositive('Modification enregistrée.');
-
-        await refreshUserProfile();
-      } catch (e) {
-        console.error(e);
-        if (e.status === 403 && e.data.message) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de la modification.');
-      }
-    };
-
-    const resetDetachmentModal = () => {
-      detachmentDate.value = CompaniDate().endOf(DAY).toISO();
-      v$.value.detachmentDate.$reset();
-    };
+    const v$ = useVuelidate(rules, { newCompanyLink });
 
     const openCompanyLinkModal = async () => {
       try {
@@ -205,6 +154,15 @@ export default {
       }
     };
 
+    const dateErrorMessage = computed(() => {
+      if (!!detachmentValidations.value.detachmentDate.minDate.$response === false) {
+        return 'La date de détachement doit être postérieure à la date de rattachement';
+      }
+      if (!!detachmentValidations.value.detachmentDate.required.$response === false) return REQUIRED_LABEL;
+
+      return '';
+    });
+
     onBeforeUnmount(() => { $store.dispatch('userProfile/resetUserProfile'); });
 
     const created = async () => {
@@ -235,6 +193,7 @@ export default {
       dateErrorMessage,
       // Validations
       v$,
+      detachmentValidations,
       // Methods
       get,
       openCompanyLinkModal,
