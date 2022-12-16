@@ -22,7 +22,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
   const companyName = computed(() => get(userProfile.value, 'company.name'));
 
   const canDetachFromCompany = computed(() => {
-    const isFromEps = process.env.COMPANIES_ID_DETACHMENT_IS_ALLOWED.includes(get(userProfile.value, 'company._id'));
+    const isFromEps = process.env.DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
     const userGetRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
 
     return isFromEps && !!userCompany.value && !userGetRole;
