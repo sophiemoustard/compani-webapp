@@ -17,7 +17,8 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const $q = useQuasar();
 
-  const userCompany = computed(() => (get(userProfile.value, 'userCompanyList') || []).find(uc => !uc.endDate));
+  const userCompany = computed(() => (get(userProfile.value, 'userCompanyList') || [])
+    .find(uc => !uc.endDate || CompaniDate().isBefore(uc.endDate)));
 
   const minDetachmentDate = computed(() => (get(userCompany.value, 'startDate') || ''));
 
@@ -28,7 +29,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
       DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
     const userGetRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
 
-    return doesCompanyAllowingDetachment && !!userCompany.value && !userGetRole;
+    return doesCompanyAllowingDetachment && !get(userCompany.value, 'endDate') && !userGetRole;
   });
 
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
