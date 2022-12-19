@@ -76,13 +76,6 @@ export default {
     const userProfileRole = computed(() => get(userProfile.value, 'role.client.name') ||
       get(userProfile.value, 'role.vendor.name') || '');
 
-    const headerInfo = computed(() => {
-      const infos = [{ icon: 'apartment', label: userProfile.value.company ? userProfile.value.company.name : 'N/A' }];
-      if (userProfileRole.value) infos.push({ icon: 'person', label: ROLE_TRANSLATION[userProfileRole.value] });
-
-      return infos;
-    });
-
     const refreshUserProfile = async () => {
       try {
         await $store.dispatch('userProfile/fetchUserProfile', { userId: props.learnerId });
@@ -104,6 +97,13 @@ export default {
       validateCompanyDetachement,
       resetDetachmentModal,
     } = useCompanyDetachment(userProfile, refreshUserProfile);
+
+    const headerInfo = computed(() => {
+      const infos = [{ icon: 'apartment', label: companyName.value || 'N/A' }];
+      if (userProfileRole.value) infos.push({ icon: 'person', label: ROLE_TRANSLATION[userProfileRole.value] });
+
+      return infos;
+    });
 
     const rules = {
       newCompanyLink: { company: { required }, startDate: { required } },
