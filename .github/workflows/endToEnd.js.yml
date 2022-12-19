@@ -2,6 +2,9 @@ name: End2end tests
 
 on:
   - pull_request
+env:
+  DETACHMENT_ALLOWED_COMPANY_IDS : ${{ secrets.DETACHMENT_ALLOWED_COMPANY_IDS }}
+
 
 jobs:
   build:
@@ -31,7 +34,6 @@ jobs:
           path: 'api'
 
       - run: cd api && npm ci
-
       - uses: actions/checkout@v2
         with:
           path: 'webapp'
