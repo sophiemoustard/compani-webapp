@@ -7,6 +7,8 @@ import UserCompanies from '@api/UserCompanies';
 import { DAY } from '@data/constants';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
+const DETACHMENT_ALLOWED_COMPANY_IDS = process.env.DETACHMENT_ALLOWED_COMPANY_IDS.split(',');
+
 export const useCompanyDetachment = (userProfile, refresh) => {
   const companyDetachModal = ref(false);
   const detachmentDate = ref(CompaniDate().endOf(DAY).toISO());
@@ -22,10 +24,11 @@ export const useCompanyDetachment = (userProfile, refresh) => {
   const companyName = computed(() => get(userProfile.value, 'company.name'));
 
   const canDetachFromCompany = computed(() => {
-    const isFromEps = process.env.DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
+    const doesCompanyAllowingDetachment =
+      DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
     const userGetRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
 
-    return isFromEps && !!userCompany.value && !userGetRole;
+    return doesCompanyAllowingDetachment && !!userCompany.value && !userGetRole;
   });
 
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
