@@ -5,7 +5,7 @@
         <template #title>
           <ni-button color="primary" icon="add" v-if="!userProfile.company" class="q-ml-sm"
             label="Rattacher à une structure" @click="openCompanyLinkModal" />
-          <ni-button v-if="canDetachFromCompany" color="primary" icon="add" class="q-ml-sm"
+          <ni-button v-if="canDetachFromCompany" icon="person_remove" class="q-ml-sm"
             label="Détacher de la structure" @click="openCompanyDetachModal" />
         </template>
       </ni-profile-header>
