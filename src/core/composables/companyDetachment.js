@@ -17,19 +17,16 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const $q = useQuasar();
 
-  const userCompany = computed(() => (get(userProfile.value, 'userCompanyList') || [])
-    .find(uc => !uc.endDate || CompaniDate().isBefore(uc.endDate)));
+  const company = computed(() => get(userProfile.value, 'company'));
 
-  const minDetachmentDate = computed(() => (get(userCompany.value, 'startDate') || ''));
-
-  const companyName = computed(() => get(userProfile.value, 'company.name'));
+  const minDetachmentDate = computed(() => (get(company.value, 'startDate') || ''));
 
   const canDetachFromCompany = computed(() => {
     const doesCompanyAllowingDetachment =
       DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
     const userGetRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
 
-    return doesCompanyAllowingDetachment && !get(userCompany.value, 'endDate') && !userGetRole;
+    return doesCompanyAllowingDetachment && !get(company.value, 'endDate') && !userGetRole;
   });
 
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
@@ -40,7 +37,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     $q.dialog({
       title: 'Confirmation',
       message: `Êtes-vous sûr(e) de vouloir détacher <b>${userIdentity.value}</b> de la structure
-        <b>${companyName.value}</b>&nbsp;?
+        <b>${get(company.value, 'name')}</b>&nbsp;?
         <br /> <br />La structure n’aura plus accès aux informations de cette personne et ne pourra plus l’inscrire en
         formation.`,
       html: true,
@@ -52,7 +49,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const detachCompany = async () => {
     try {
-      await UserCompanies.update(get(userCompany.value, '_id'), { endDate: CompaniDate(detachmentDate.value).toISO() });
+      await UserCompanies.update(get(company.value, '_id'), { endDate: CompaniDate(detachmentDate.value).toISO() });
 
       companyDetachModal.value = false;
       NotifyPositive('Modification enregistrée.');
@@ -74,9 +71,8 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     detachModalLoading,
     userIdentity,
     // Computed
-    companyName,
     canDetachFromCompany,
-    userCompany,
+    company,
     minDetachmentDate,
     // Methods
     openCompanyDetachModal,

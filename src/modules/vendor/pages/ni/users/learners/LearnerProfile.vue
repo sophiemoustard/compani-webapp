@@ -17,7 +17,7 @@
       :company-options="companyOptions" />
 
     <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
-      :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
+      :company-name="get(company, 'name')" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
       @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate" />
   </q-page>
 </template>
@@ -88,7 +88,7 @@ export default {
       companyDetachModal,
       detachmentDate,
       detachModalLoading,
-      companyName,
+      company,
       openCompanyDetachModal,
       userIdentity,
       canDetachFromCompany,
@@ -98,7 +98,7 @@ export default {
     } = useCompanyDetachment(userProfile, refreshUserProfile);
 
     const headerInfo = computed(() => {
-      const infos = [{ icon: 'apartment', label: companyName.value || 'N/A' }];
+      const infos = [{ icon: 'apartment', label: get(company.value, 'name') || 'N/A' }];
       if (userProfileRole.value) infos.push({ icon: 'person', label: ROLE_TRANSLATION[userProfileRole.value] });
 
       return infos;
@@ -172,7 +172,7 @@ export default {
       detachmentDate,
       detachModalLoading,
       // Computed
-      companyName,
+      company,
       userProfile,
       headerInfo,
       canDetachFromCompany,

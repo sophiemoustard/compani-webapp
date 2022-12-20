@@ -12,7 +12,7 @@
   </q-page>
 
   <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
-    :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
+    :company-name="get(company, 'name')" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
     @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate" />
 </template>
 
@@ -76,7 +76,7 @@ export default {
       detachModalLoading,
       openCompanyDetachModal,
       userIdentity,
-      companyName,
+      company,
       canDetachFromCompany,
       minDetachmentDate,
       validateCompanyDetachement,
@@ -99,7 +99,7 @@ export default {
       companyDetachModal,
       detachmentDate,
       detachModalLoading,
-      companyName,
+      company,
       // Computed
       userProfile,
       userProfileRole,
