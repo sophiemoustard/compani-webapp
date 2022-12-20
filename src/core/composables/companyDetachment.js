@@ -26,7 +26,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const canDetachFromCompany = computed(() => {
     const isCompanyAllowed = DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
-    const userHasRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
+    const userHasRole = !!(get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id'));
 
     return isCompanyAllowed && !userHasRole && !!detachableUserCompany.value;
   });
@@ -62,7 +62,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
       await refresh();
     } catch (e) {
       console.error(e);
-      if (e.status === 403 && e.data.message) return NotifyNegative(e.data.message);
+      if (e.status === 403) return NotifyNegative(e.data.message);
       NotifyNegative('Erreur lors de la modification.');
     }
   };
