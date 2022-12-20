@@ -145,6 +145,7 @@ export default {
         await refreshUserProfile();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors du rattachement à la structure.');
       } finally {
         modalLoading.value = false;
