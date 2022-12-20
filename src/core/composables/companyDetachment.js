@@ -1,5 +1,6 @@
 import { computed, ref, watch } from 'vue';
 import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import { formatIdentity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -10,12 +11,14 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 const DETACHMENT_ALLOWED_COMPANY_IDS = process.env.DETACHMENT_ALLOWED_COMPANY_IDS.split(';');
 
 export const useCompanyDetachment = (userProfile, refresh) => {
+  const $q = useQuasar();
+  const $router = useRouter();
+
   const companyDetachModal = ref(false);
   const detachmentDate = ref(CompaniDate().endOf(DAY).toISO());
   const detachModalLoading = ref(false);
   const userIdentity = ref('');
-
-  const $q = useQuasar();
+  const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
 
   const detachableUserCompany = computed(() => (get(userProfile.value, 'userCompanyList') || [])
     .find(uc => !uc.endDate && CompaniDate().isAfter(uc.startDate)));
@@ -60,6 +63,9 @@ export const useCompanyDetachment = (userProfile, refresh) => {
       NotifyPositive('Modification enregistrée.');
 
       await refresh();
+      if (CompaniDate().isAfter(detachmentDate.value) && isClientInterface) {
+        $router.push({ name: 'ni courses learners' });
+      }
     } catch (e) {
       console.error(e);
       if (e.status === 403) return NotifyNegative(e.data.message);
