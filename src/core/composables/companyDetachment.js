@@ -17,19 +17,17 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const $q = useQuasar();
 
-  const userCompany = computed(() => (get(userProfile.value, 'userCompanyList') || [])
-    .find(uc => !uc.endDate || CompaniDate().isBefore(uc.endDate)));
+  const userCompany = computed(() => (get(userProfile.value, 'userCompanyList') || []).find(uc => !uc.endDate));
 
   const minDetachmentDate = computed(() => (get(userCompany.value, 'startDate') || ''));
 
   const companyName = computed(() => get(userProfile.value, 'company.name'));
 
   const canDetachFromCompany = computed(() => {
-    const doesCompanyAllowingDetachment =
-      DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
-    const userGetRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
+    const isCompanyAllowed = DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
+    const userHasRole = get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id') || '';
 
-    return doesCompanyAllowingDetachment && !get(userCompany.value, 'endDate') && !userGetRole;
+    return isCompanyAllowed && !userHasRole && !!userCompany.value;
   });
 
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
@@ -76,7 +74,6 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     // Computed
     companyName,
     canDetachFromCompany,
-    userCompany,
     minDetachmentDate,
     // Methods
     openCompanyDetachModal,
