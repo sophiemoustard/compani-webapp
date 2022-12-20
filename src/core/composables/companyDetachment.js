@@ -18,7 +18,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
   const $q = useQuasar();
 
   const detachableUserCompany = computed(() => (get(userProfile.value, 'userCompanyList') || [])
-    .find(uc => !uc.endDate));
+    .find(uc => !uc.endDate && CompaniDate().isAfter(uc.startDate)));
 
   const minDetachmentDate = computed(() => (get(detachableUserCompany.value, 'startDate') || ''));
 
