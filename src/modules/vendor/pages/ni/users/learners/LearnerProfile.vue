@@ -92,7 +92,6 @@ export default {
       openCompanyDetachModal,
       userIdentity,
       canDetachFromCompany,
-      userCompany,
       minDetachmentDate,
       validateCompanyDetachement,
       resetDetachmentModal,
@@ -174,7 +173,6 @@ export default {
       detachModalLoading,
       // Computed
       companyName,
-      userCompany,
       userProfile,
       headerInfo,
       canDetachFromCompany,
