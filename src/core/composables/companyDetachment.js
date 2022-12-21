@@ -26,7 +26,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
 
   const canDetachFromCompany = computed(() => {
     const isCompanyAllowed = DETACHMENT_ALLOWED_COMPANY_IDS.includes(get(userProfile.value, 'company._id'));
-    const userHasRole = !!(get(userProfile.value, 'role.client._id') || get(userProfile.value, 'role.vendor._id'));
+    const userHasRole = !!get(userProfile.value, 'role.client._id') || !!get(userProfile.value, 'role.vendor._id');
 
     return isCompanyAllowed && !userHasRole && !!detachableUserCompany.value;
   });
