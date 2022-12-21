@@ -20,15 +20,8 @@ export const useCompanyDetachment = (userProfile, refresh) => {
   const userIdentity = ref('');
   const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
 
-  const currentOrFutureUserCompany = computed(() => (get(userProfile.value, 'userCompanyList') || [])
-    .find(uc => !uc.endDate));
-
-  const detachableUserCompany = computed(() => (
-    get(currentOrFutureUserCompany.value, 'startDate') &&
-    CompaniDate().isAfter(currentOrFutureUserCompany.value.startDate)
-      ? currentOrFutureUserCompany.value
-      : undefined
-  ));
+  const detachableUserCompany = computed(() => (get(userProfile.value, 'userCompanyList') || [])
+    .find(uc => !uc.endDate && CompaniDate().isAfter(uc.startDate)));
 
   const minDetachmentDate = computed(() => (get(detachableUserCompany.value, 'startDate') || ''));
 
@@ -91,7 +84,6 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     // Computed
     companyName,
     canDetachFromCompany,
-    currentOrFutureUserCompany,
     minDetachmentDate,
     // Methods
     openCompanyDetachModal,
