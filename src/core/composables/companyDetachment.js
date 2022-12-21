@@ -67,7 +67,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     }
   };
 
-  const resetDetachmentModal = () => (detachmentDate.value = CompaniDate().endOf(DAY).toISO());
+  const resetDetachmentModal = () => { detachmentDate.value = CompaniDate().endOf(DAY).toISO(); };
 
   return {
     // Data
