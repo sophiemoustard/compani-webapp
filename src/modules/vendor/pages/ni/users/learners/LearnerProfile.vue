@@ -3,9 +3,9 @@
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity" :header-info="headerInfo">
         <template #title>
-          <ni-button color="primary" icon="add" v-if="!userProfile.company" class="q-ml-sm"
+          <ni-button color="primary" icon="add" v-if="canLinkToCompany" class="q-ml-sm"
             label="Rattacher à une structure" @click="openCompanyLinkModal" />
-          <ni-button v-if="canDetachFromCompany" icon="person_remove" class="q-ml-sm"
+          <ni-button v-else-if="canDetachFromCompany" icon="person_remove" class="q-ml-sm"
             label="Détacher de la structure" @click="openCompanyDetachModal" />
         </template>
       </ni-profile-header>
@@ -92,6 +92,7 @@ export default {
       openCompanyDetachModal,
       userIdentity,
       canDetachFromCompany,
+      canLinkToCompany,
       minDetachmentDate,
       validateCompanyDetachement,
       resetDetachmentModal,
@@ -177,6 +178,7 @@ export default {
       userProfile,
       headerInfo,
       canDetachFromCompany,
+      canLinkToCompany,
       minDetachmentDate,
       // Validations
       v$,

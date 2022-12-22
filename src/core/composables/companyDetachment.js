@@ -34,6 +34,9 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     return isCompanyAllowed && !userHasRole && !!detachableUserCompany.value;
   });
 
+  const canLinkToCompany = computed(() => !get(userProfile.value, 'userCompanyList') ||
+    userProfile.value.userCompanyList.every(uc => uc.endDate));
+
   watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
 
   const openCompanyDetachModal = () => (companyDetachModal.value = true);
@@ -84,6 +87,7 @@ export const useCompanyDetachment = (userProfile, refresh) => {
     // Computed
     companyName,
     canDetachFromCompany,
+    canLinkToCompany,
     minDetachmentDate,
     // Methods
     openCompanyDetachModal,
