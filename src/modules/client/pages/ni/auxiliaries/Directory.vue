@@ -363,9 +363,7 @@ export default {
         if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
       } catch (e) {
         console.error(e);
-        if (e.status === 409) {
-          return e.data.message ? NotifyNegative(e.data.message) : NotifyNegative('Email déjà existant.');
-        }
+        if (e.status === 409 && e.data.message) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;
