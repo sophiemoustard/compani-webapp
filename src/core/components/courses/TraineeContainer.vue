@@ -14,10 +14,9 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface"
-          :data="course.companies" :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
-          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="loading"
-          v-model:pagination="companyPagination">
+        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface" :data="course.companies"
+          :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
+          separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
