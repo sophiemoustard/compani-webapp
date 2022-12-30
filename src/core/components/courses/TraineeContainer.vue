@@ -324,6 +324,7 @@ export default {
 .company-name
   color: $primary
   width: fit-content
+  cursor: default
 .company
   border-top: 1px solid $copper-grey-200
 .no-data
