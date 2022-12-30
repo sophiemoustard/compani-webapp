@@ -3,10 +3,10 @@
     :hide-header="hideHeader" separator="none" :loading="loading" :class="tableClass">
     <template #body="{ props }">
       <q-tr :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-          :style="col.style">
+        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
+          :style="col.style" :class="{ 'border': props.rowIndex === 0 && !hideHeader}">
           <template v-if="col.name === 'actions' && canEdit">
-            <div class="row no-wrap table-actions">
+            <div class="no-wrap table-actions">
               <ni-button icon="edit" @click="openTraineeEditionModal(props.row)" :disable="!!course.archivedAt" />
               <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
@@ -191,5 +191,7 @@ export default {
 .q-table
   & tbody
     & td
-      height: 25px
+      height: 35px
+.border
+  border-top: 1px solid $copper-grey-200
 </style>
