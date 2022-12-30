@@ -16,7 +16,8 @@
         </div>
         <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface"
           :data="course.companies" :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
-          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="loading">
+          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="loading"
+          v-model:pagination="companyPagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
@@ -79,10 +80,7 @@ import {
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
 } from '@data/constants';
-import {
-  formatIdentity,
-  formatAndSortOptions,
-} from '@helpers/utils';
+import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
@@ -132,6 +130,8 @@ export default {
       },
       { name: 'actions', label: '', align: 'right', field: '_id' },
     ]);
+
+    const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
 
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
@@ -278,6 +278,7 @@ export default {
       selectedCompany,
       selectCompanyOptions,
       companyModalLoading,
+      companyPagination,
       // Validations
       learnerValidation,
       traineeValidation,

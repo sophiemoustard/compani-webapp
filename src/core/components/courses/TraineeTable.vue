@@ -60,7 +60,7 @@ export default {
     const $q = useQuasar();
     const $store = useStore();
 
-    const traineePagination = ref({ rowsPerPage: 0 });
+    const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
     const traineeColumns = ref([
