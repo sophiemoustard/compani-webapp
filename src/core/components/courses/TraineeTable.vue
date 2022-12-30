@@ -4,7 +4,7 @@
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
-          :style="col.style" :class="{ 'border': props.rowIndex === 0 && !hideHeader}">
+          :style="col.style" :class="[col.classes, { 'border': props.rowIndex === 0 && !hideHeader}]">
           <template v-if="col.name === 'actions' && canEdit">
             <div class="no-wrap table-actions">
               <ni-button icon="edit" @click="openTraineeEditionModal(props.row)" :disable="!!course.archivedAt" />
@@ -188,10 +188,8 @@ export default {
 .email
   @media screen and (min-width: 767px)
     width: 30%
-.q-table
-  & tbody
-    & td
-      height: 35px
+.q-table tbody td
+  height: 35px
 .border
   border-top: 1px solid $copper-grey-200
 </style>

@@ -41,7 +41,7 @@
           </template>
         </ni-expanding-table>
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
-          :loading="loading" table-class="q-py-md" />
+          :loading="loading" table-class="q-pb-md" />
       </q-card>
       <q-card-actions align="right" v-if="canEdit">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
