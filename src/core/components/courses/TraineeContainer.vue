@@ -14,9 +14,9 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface"
-          :data="course.companies" :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
-          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="loading">
+        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface" :data="course.companies"
+          :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
+          separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
@@ -40,7 +40,7 @@
           </template>
         </ni-expanding-table>
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
-          :loading="loading" table-class="q-py-md" />
+          :loading="loading" table-class="q-pb-md" />
       </q-card>
       <q-card-actions align="right" v-if="canEdit">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
@@ -79,10 +79,7 @@ import {
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
 } from '@data/constants';
-import {
-  formatIdentity,
-  formatAndSortOptions,
-} from '@helpers/utils';
+import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
@@ -132,6 +129,8 @@ export default {
       },
       { name: 'actions', label: '', align: 'right', field: '_id' },
     ]);
+
+    const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
 
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
@@ -278,6 +277,7 @@ export default {
       selectedCompany,
       selectCompanyOptions,
       companyModalLoading,
+      companyPagination,
       // Validations
       learnerValidation,
       traineeValidation,
@@ -323,6 +323,7 @@ export default {
 .company-name
   color: $primary
   width: fit-content
+  cursor: default
 .company
   border-top: 1px solid $copper-grey-200
 .no-data

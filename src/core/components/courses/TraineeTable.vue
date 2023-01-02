@@ -1,12 +1,21 @@
 <template>
   <ni-responsive-table :data="trainees" :columns="traineeColumns" v-model:pagination="traineePagination"
-    :hide-header="hideHeader" separator="none" :loading="loading" :class="tableClass">
+    :hide-header="hideHeader" separator="none" :loading="loading" :class="tableClass"
+    :visible-columns="traineeVisibleColumns">
+    <template #header="{ props }">
+      <q-tr :props="props">
+        <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
+          :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
+          {{ col.label }}
+        </q-th>
+      </q-tr>
+    </template>
     <template #body="{ props }">
       <q-tr :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-          :style="col.style">
+        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
+          :style="col.style" :class="[col.classes, { 'border': props.rowIndex === 0 && !hideHeader}]">
           <template v-if="col.name === 'actions' && canEdit">
-            <div class="row no-wrap table-actions">
+            <div>
               <ni-button icon="edit" @click="openTraineeEditionModal(props.row)" :disable="!!course.archivedAt" />
               <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
@@ -60,7 +69,7 @@ export default {
     const $q = useQuasar();
     const $store = useStore();
 
-    const traineePagination = ref({ rowsPerPage: 0 });
+    const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
     const traineeColumns = ref([
@@ -188,8 +197,11 @@ export default {
 .email
   @media screen and (min-width: 767px)
     width: 30%
-.q-table
-  & tbody
-    & td
-      height: 25px
+.table-actions-responsive
+  width: 15%
+.q-table tbody td
+  height: 35px
+.border
+  @media screen and (min-width: 767px)
+    border-top: 1px solid $copper-grey-200
 </style>
