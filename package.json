@@ -30,7 +30,7 @@
     "heroku-ssl-redirect": "^0.1.1",
     "ibantools": "^4.1.5",
     "joi": "^17.6.0",
-    "luxon": "^3.0.1",
+    "luxon": "^3.2.1",
     "moment": "^2.29.3",
     "moment-business-days": "^1.2.0",
     "moment-range": "^4.0.1",
