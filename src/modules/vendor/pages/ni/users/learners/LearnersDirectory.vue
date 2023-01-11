@@ -19,7 +19,7 @@
     <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
       @next-step="nextStepLearnerCreationModal" @hide="resetLearnerCreationModal" :company-options="companyOptions"
-      :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading" display-company
+      :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
       @submit="submitLearnerCreationModal" />
   </q-page>
 </template>
@@ -30,8 +30,6 @@ import { onMounted } from 'vue';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Companies from '@api/Companies';
-import Users from '@api/Users';
-import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { formatAndSortOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
@@ -62,32 +60,13 @@ export default {
       filteredLearners,
       learnerValidation,
       updateSearch,
-      goToNextStep,
+      nextStepLearnerCreationModal,
       getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    } = useLearners(refresh, false, null);
+    } = useLearners(refresh, false, true);
 
     onMounted(async () => { await refresh(); });
-
-    const nextStepLearnerCreationModal = async () => {
-      try {
-        learnerValidation.value.newLearner.$touch();
-        if (learnerValidation.value.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
-
-        learnerCreationModalLoading.value = true;
-        const userInfo = await Users.exists({ email: newLearner.value.local.email });
-
-        if (!userInfo.exists) return goToNextStep();
-
-        NotifyWarning('L\'apprenant(e) est déjà ajouté(e).');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
-      } finally {
-        learnerCreationModalLoading.value = false;
-      }
-    };
 
     return {
       // Data

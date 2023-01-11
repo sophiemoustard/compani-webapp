@@ -13,12 +13,15 @@
         <ni-input in-modal :model-value="newUser.identity.lastname" :error="validations.identity.lastname.$error"
           required-field @blur="validations.identity.lastname.$touch" caption="Nom"
           @update:model-value="update($event, 'identity.lastname')" />
-        <ni-input in-modal :model-value="newUser.contact.phone" :last="!displayCompany" required-field
+        <ni-input in-modal :model-value="newUser.contact.phone" required-field
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" @update:model-value="update($event.trim(), 'contact.phone')" />
-        <ni-select v-if="displayCompany" in-modal :options="companyOptions" :model-value="newUser.company"
-          @update:model-value="update($event.trim(), 'company')" caption="Structure" last required-field
+        <ni-select in-modal :options="companyOptions" :model-value="newUser.company"
+          @update:model-value="update($event.trim(), 'company')" caption="Structure" required-field
           @blur="validations.company.$touch" :error="validations.company.$error" :disable="disableCompany" />
+        <ni-date-input caption="Date de rattachement" :model-value="newUser.userCompanyStartDate" in-modal last
+          @update:model-value="update($event, 'userCompanyStartDate')" required :disable="disableStartDate"
+          :error="validations.userCompanyStartDate.$error" />
       </template>
       <template #footer>
         <ni-button v-if="firstStep" class="bg-primary full-width modal-btn" label="Suivant" color="white"
@@ -33,6 +36,7 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import DateInput from '@components/form/DateInput';
 import Button from '@components/Button';
 import { userMixin } from '@mixins/userMixin';
 import set from 'lodash/set';
@@ -43,8 +47,8 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
-    displayCompany: { type: Boolean, default: false },
     disableCompany: { type: Boolean, default: false },
+    disableStartDate: { type: Boolean, default: false },
     newUser: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
@@ -56,6 +60,7 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-button': Button,
+    'ni-date-input': DateInput,
   },
   computed: {
     secondStepFooterLabel () {

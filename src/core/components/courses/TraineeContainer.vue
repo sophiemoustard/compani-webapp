@@ -14,9 +14,9 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface"
-          :data="course.companies" :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header
-          :expanded="courseCompanyIds" separator="none" hide-bottom :loading="loading">
+        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface" :data="course.companies"
+          :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
+          separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
@@ -40,7 +40,7 @@
           </template>
         </ni-expanding-table>
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
-          :loading="loading" table-class="q-py-md" />
+          :loading="loading" table-class="q-pb-md" />
       </q-card>
       <q-card-actions align="right" v-if="canEdit">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
@@ -54,7 +54,7 @@
       :validations="traineeValidation.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
       :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
 
-    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" display-company
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" disable-start-date
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
@@ -72,20 +72,14 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
-import Users from '@api/Users';
 import Courses from '@api/Courses';
 import {
   TRAINER,
   DEFAULT_AVATAR,
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
-  HELPER,
-  AUXILIARY_WITHOUT_COMPANY,
 } from '@data/constants';
-import {
-  formatIdentity,
-  formatAndSortOptions,
-} from '@helpers/utils';
+import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
@@ -136,7 +130,7 @@ export default {
       { name: 'actions', label: '', align: 'right', field: '_id' },
     ]);
 
-    const company = computed(() => $store.getters['main/getCompany']);
+    const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
 
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
@@ -196,11 +190,11 @@ export default {
       learnerAlreadyExists,
       learnerValidation,
       traineeValidation,
-      goToNextStep,
+      nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
       tableLoading,
-    } = useLearners(refresh, false, company);
+    } = useLearners(refresh, false, false, courseCompanyIds);
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
 
@@ -216,61 +210,6 @@ export default {
       validateCompanyDeletion,
       getPotentialCompanies,
     } = useCompaniesCoursesLink(course, emit);
-
-    const setNewLearner = (user) => {
-      newLearner.value._id = user._id;
-      newLearner.value.identity = {
-        firstname: get(user, 'identity.firstname'),
-        lastname: get(user, 'identity.lastname'),
-      };
-      newLearner.value.contact = { phone: get(user, 'contact.phone') };
-
-      if (get(user, 'company._id')) newLearner.value.company = get(user, 'company._id');
-      else if (isIntraCourse.value) newLearner.value.company = course.value.companies[0]._id;
-    };
-
-    const nextStepLearnerCreationModal = async () => {
-      try {
-        learnerValidation.value.newLearner.$touch();
-        if (learnerValidation.value.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
-
-        learnerCreationModalLoading.value = true;
-        const userInfo = await Users.exists({ email: newLearner.value.local.email });
-
-        if (!userInfo.exists) {
-          if (isIntraCourse.value) newLearner.value.company = course.value.companies[0]._id;
-
-          return goToNextStep();
-        }
-
-        if (!get(userInfo, 'user._id')) {
-          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
-        }
-        const user = await Users.getById(userInfo.user._id);
-
-        const isHelperOrAuxiliaryWithoutCompany = [HELPER, AUXILIARY_WITHOUT_COMPANY]
-          .includes(get(user, 'role.client.name'));
-        if (isHelperOrAuxiliaryWithoutCompany && isIntraCourse.value) {
-          return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
-        }
-
-        const companyIds = course.value.companies.map(c => c._id);
-        if (get(user, 'company._id') && !companyIds.includes(user.company._id)) {
-          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
-        }
-
-        setNewLearner(user);
-        userAlreadyHasCompany.value = !!get(user, 'company._id');
-        learnerAlreadyExists.value = true;
-
-        return goToNextStep();
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
-      } finally {
-        learnerCreationModalLoading.value = false;
-      }
-    };
 
     const resetTraineeAdditionForm = () => {
       newTrainee.value = '';
@@ -338,6 +277,7 @@ export default {
       selectedCompany,
       selectCompanyOptions,
       companyModalLoading,
+      companyPagination,
       // Validations
       learnerValidation,
       traineeValidation,
@@ -383,6 +323,7 @@ export default {
 .company-name
   color: $primary
   width: fit-content
+  cursor: default
 .company
   border-top: 1px solid $copper-grey-200
 .no-data
