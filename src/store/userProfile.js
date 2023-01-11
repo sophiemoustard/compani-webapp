@@ -1,10 +1,10 @@
-import get from 'lodash/get';
 import Users from '@api/Users';
 import { userModel } from '@data/user';
 import { extend } from '@helpers/utils';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import store from 'src/store/index';
 import router from 'src/router/index';
+import { hasActiveOrFutureCompany } from '@helpers/userCompanies';
 
 export default {
   namespaced: true,
@@ -35,7 +35,9 @@ export default {
         const userClientRole = store.getters['main/getClientRole'];
         if (userClientRole && !/\/ad\//.test(router.currentRoute.value.path)) {
           const loggedUserCompany = store.getters['main/getCompany'];
-          if (get(user, 'company._id') !== loggedUserCompany._id) return router.replace({ path: '/404' });
+          if (!hasActiveOrFutureCompany(user.userCompanyList, loggedUserCompany._id)) {
+            return router.replace({ path: '/404' });
+          }
         }
 
         commit('SET_USER_PROFILE', { ...extend(userModel, user) });
