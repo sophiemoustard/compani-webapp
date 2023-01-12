@@ -51,7 +51,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
-import { hasActiveOrFutureCompany } from '@helpers/userCompanies';
+import { getCurrentOrFutureCompanies } from '@helpers/userCompanies';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -302,7 +302,8 @@ export default {
         const value = get(user, path);
         if (value) set(this.newUser, path, value);
       });
-      if (!hasActiveOrFutureCompany(user.userCompanyList)) this.newUser.company = this.company._id;
+      const currentOrFutureCompaniesExist = getCurrentOrFutureCompanies(user.userCompanyList).length;
+      if (!currentOrFutureCompaniesExist) this.newUser.company = this.company._id;
     },
     async nextStep () {
       try {
@@ -314,8 +315,9 @@ export default {
 
         if (userExistsInfo.exists) {
           const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
-          const userHasValidCompany = !hasActiveOrFutureCompany(userExistsInfo.user.userCompanyList) ||
-            hasActiveOrFutureCompany(userExistsInfo.user.userCompanyList, this.company._id);
+          const currentOrFutureCompanies = getCurrentOrFutureCompanies(userExistsInfo.user.userCompanyList);
+          const userHasValidCompany = !currentOrFutureCompanies.length ||
+            currentOrFutureCompanies.includes(this.company._id);
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
           if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
