@@ -36,7 +36,7 @@ export default {
         const userClientRole = store.getters['main/getClientRole'];
         if (userClientRole && !/\/ad\//.test(router.currentRoute.value.path)) {
           const loggedUserCompany = store.getters['main/getCompany'];
-          course.trainees = course.trainees.filter(t => get(t, 'company._id') === loggedUserCompany._id);
+          course.trainees = course.trainees.filter(t => t.company === loggedUserCompany._id);
         }
 
         commit('SET_COURSE', course);
