@@ -289,7 +289,7 @@ export default {
         NotifyNegative('Erreur lors de l\'envoi de SMS.');
       }
     },
-    fillNewUser (user) {
+    fillNewUser (user, alreadyHasCompany) {
       const paths = [
         'identity.lastname',
         'identity.firstname',
@@ -302,8 +302,7 @@ export default {
         const value = get(user, path);
         if (value) set(this.newUser, path, value);
       });
-      const currentOrFutureCompaniesExist = getCurrentOrFutureCompanies(user.userCompanyList).length;
-      if (!currentOrFutureCompaniesExist) this.newUser.company = this.company._id;
+      if (!alreadyHasCompany) this.newUser.company = this.company._id;
     },
     async nextStep () {
       try {
@@ -322,7 +321,7 @@ export default {
 
           if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
             this.fetchedUser = await Users.getById(userExistsInfo.user._id);
-            this.fillNewUser(this.fetchedUser);
+            this.fillNewUser(this.fetchedUser, currentOrFutureCompanies.length);
           } else {
             const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
             if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
