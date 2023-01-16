@@ -2,6 +2,7 @@
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
+    <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
         @update:model-value="updateSelectedCompany" />
@@ -15,7 +16,10 @@
       <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
         placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
-      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
+    </div>
+    <div class="q-mb-lg filters-container">
+      <q-checkbox dense v-model="selectedNoAddressInSlots" color="primary" label="Aucune Adresse"
+        @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
     <ni-trello :courses="coursesFiltered" />
   </q-page>

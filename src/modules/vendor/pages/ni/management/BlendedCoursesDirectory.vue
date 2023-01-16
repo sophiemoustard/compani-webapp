@@ -2,6 +2,7 @@
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
       display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
+    <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
         @update:model-value="updateSelectedCompany" />
@@ -17,7 +18,10 @@
       <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
         placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
-      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
+    </div>
+    <div class="q-mb-lg filters-container">
+      <q-checkbox dense v-model="selectedNoAddressInSlots" color="primary" label="Aucune Adresse"
+        @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
     <ni-trello :courses="coursesFiltered" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
@@ -127,7 +131,7 @@ export default {
         const courses = await Courses.list({ format: BLENDED, action: OPERATIONS });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
-        console.error(e);
+        
         this.coursesWithGroupedSlot = [];
       }
     },
@@ -135,7 +139,7 @@ export default {
       try {
         this.programs = await Programs.list();
       } catch (e) {
-        console.error(e);
+        
         this.programs = [];
       }
     },
@@ -144,7 +148,7 @@ export default {
         const companies = await Companies.list();
         this.companyOptions = formatAndSortOptions(companies, 'name');
       } catch (e) {
-        console.error(e);
+        
         this.companyOptions = [];
       }
     },
@@ -153,7 +157,7 @@ export default {
         const salesRepresentative = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         this.salesRepresentativeOptions = formatAndSortIdentityOptions(salesRepresentative);
       } catch (e) {
-        console.error(e);
+        
         this.salesRepresentativeOptions = [];
       }
     },
@@ -182,7 +186,7 @@ export default {
         NotifyPositive('Formation créée.');
         await this.refreshCourses();
       } catch (e) {
-        console.error(e);
+        
         NotifyNegative('Impossible de créer la formation.');
       } finally {
         this.modalLoading = false;

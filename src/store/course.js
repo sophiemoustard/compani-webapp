@@ -13,6 +13,7 @@ export default {
     selectedSalesRepresentative: '',
     selectedStartDate: '',
     selectedEndDate: '',
+    selectedNoAddressInSlots: false,
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = data ? ({ ...data }) : data; },
@@ -22,6 +23,7 @@ export default {
     SET_SELECTED_SALES_REPRESENTATIVE: (state, data) => { state.selectedSalesRepresentative = data; },
     SET_SELECTED_START_DATE: (state, data) => { state.selectedStartDate = data; },
     SET_SELECTED_END_DATE: (state, data) => { state.selectedEndDate = data; },
+    SET_SELECTED_NO_ADDRESS_IN_SLOTS: (state, data) => { state.selectedNoAddressInSlots = data; },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {
@@ -53,6 +55,9 @@ export default {
     },
     setSelectedStartDate: ({ commit }, params) => { commit('SET_SELECTED_START_DATE', params.startDate); },
     setSelectedEndDate: ({ commit }, params) => { commit('SET_SELECTED_END_DATE', params.endDate); },
+    setSelectedNoAddressInSlots: ({ commit }, params) => {
+      commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', params.isSelected);
+    },
     resetFilters: ({ commit }) => {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
@@ -60,6 +65,7 @@ export default {
       commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
       commit('SET_SELECTED_START_DATE', '');
       commit('SET_SELECTED_END_DATE', '');
+      commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
     },
   },
   getters: {},

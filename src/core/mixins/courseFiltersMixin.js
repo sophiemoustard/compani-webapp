@@ -1,7 +1,8 @@
 import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
-import { DD_MM_YYYY } from '@data/constants';
+import get from 'lodash/get';
+import { DD_MM_YYYY, ON_SITE } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -22,6 +23,7 @@ export const courseFiltersMixin = {
         'selectedSalesRepresentative',
         'selectedStartDate',
         'selectedEndDate',
+        'selectedNoAddressInSlots',
       ]
     ),
     coursesFiltered () {
@@ -41,6 +43,8 @@ export const courseFiltersMixin = {
       if (this.selectedEndDate && !this.selectedStartDate) courses = this.filterCoursesByEndDate(courses);
 
       if (this.selectedEndDate && this.selectedStartDate) courses = this.filterCoursesByStartDateAndEndDate(courses);
+
+      if (this.selectedNoAddressInSlots) courses = this.filterCoursesByNoAddressInSlots(courses);
 
       return courses;
     },
@@ -103,6 +107,9 @@ export const courseFiltersMixin = {
     updateSelectedEndDate (endDate) {
       this.$store.dispatch('course/setSelectedEndDate', { endDate: CompaniDate(endDate).endOf('day').toISO() });
     },
+    updateSelectedNoAddressInSlots (isSelected) {
+      this.$store.dispatch('course/setSelectedNoAddressInSlots', { isSelected });
+    },
     resetFilters () {
       this.$store.dispatch('course/resetFilters');
     },
@@ -157,6 +164,16 @@ export const courseFiltersMixin = {
               .some(s => CompaniDate(s.endDate).isSameOrBetween(this.selectedStartDate, this.selectedEndDate)));
 
           return hasEstimationInRange || hasSlotsInRange;
+        });
+    },
+    filterCoursesByNoAddressInSlots (courses) {
+      return courses
+        .filter((course) => {
+          const onSiteSlots = course.slots
+            .filter(slotGroup => slotGroup.some(slot => get(slot, 'step.type') === ON_SITE));
+          const hasNoAddressInOnSiteSlots = !onSiteSlots.some(slotGroup => slotGroup.some(slot => slot.address));
+
+          return !!onSiteSlots.length && hasNoAddressInOnSiteSlots;
         });
     },
     groupByCourses (courses) {
