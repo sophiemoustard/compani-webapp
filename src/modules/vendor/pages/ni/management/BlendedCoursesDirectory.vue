@@ -20,7 +20,7 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
     </div>
     <div class="q-mb-lg filters-container">
-      <q-checkbox dense v-model="selectedNoAddressInSlots" color="primary" label="Aucune Adresse"
+      <q-checkbox dense v-model="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
     <ni-trello :courses="coursesFiltered" />
