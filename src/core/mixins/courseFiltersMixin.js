@@ -171,7 +171,7 @@ export const courseFiltersMixin = {
         .filter((course) => {
           const onSiteSlots = course.slots
             .filter(slotGroup => slotGroup.some(slot => get(slot, 'step.type') === ON_SITE));
-          const hasNoAddressInOnSiteSlots = !onSiteSlots.some(slotGroup => slotGroup.some(slot => slot.address));
+          const hasNoAddressInOnSiteSlots = onSiteSlots.every(slotGroup => slotGroup.every(slot => !slot.address));
 
           return !!onSiteSlots.length && hasNoAddressInOnSiteSlots;
         });
