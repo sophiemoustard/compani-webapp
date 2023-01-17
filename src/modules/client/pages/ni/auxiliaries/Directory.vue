@@ -51,6 +51,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
+import { getCurrentOrFutureCompanies } from '@helpers/userCompanies';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -288,7 +289,7 @@ export default {
         NotifyNegative('Erreur lors de l\'envoi de SMS.');
       }
     },
-    fillNewUser (user) {
+    fillNewUser (user, alreadyHasCompany) {
       const paths = [
         'identity.lastname',
         'identity.firstname',
@@ -301,7 +302,7 @@ export default {
         const value = get(user, path);
         if (value) set(this.newUser, path, value);
       });
-      if (!user.company) this.newUser.company = this.company._id;
+      if (!alreadyHasCompany) this.newUser.company = this.company._id;
     },
     async nextStep () {
       try {
@@ -313,13 +314,14 @@ export default {
 
         if (userExistsInfo.exists) {
           const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
-          const userHasValidCompany = !get(userExistsInfo, 'user.company') ||
-            get(userExistsInfo, 'user.company') === this.company._id;
+          const currentOrFutureCompanies = getCurrentOrFutureCompanies(userExistsInfo.user.userCompanyList);
+          const userHasValidCompany = !currentOrFutureCompanies.length ||
+            currentOrFutureCompanies.includes(this.company._id);
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
           if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
             this.fetchedUser = await Users.getById(userExistsInfo.user._id);
-            this.fillNewUser(this.fetchedUser);
+            this.fillNewUser(this.fetchedUser, currentOrFutureCompanies.length);
           } else {
             const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
             if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
@@ -363,7 +365,7 @@ export default {
         if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative('Email déjà existant.');
+        if (e.status === 409 && e.data.message) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;

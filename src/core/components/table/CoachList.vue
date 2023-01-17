@@ -181,6 +181,7 @@ export default {
         } else this.firstStep = false;
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la création du compte.');
       } finally {
         this.loading = false;
