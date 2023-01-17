@@ -131,7 +131,7 @@ export default {
         const courses = await Courses.list({ format: BLENDED, action: OPERATIONS });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
-        
+        console.error(e);
         this.coursesWithGroupedSlot = [];
       }
     },
@@ -139,7 +139,7 @@ export default {
       try {
         this.programs = await Programs.list();
       } catch (e) {
-        
+        console.error(e);
         this.programs = [];
       }
     },
@@ -148,7 +148,7 @@ export default {
         const companies = await Companies.list();
         this.companyOptions = formatAndSortOptions(companies, 'name');
       } catch (e) {
-        
+        console.error(e);
         this.companyOptions = [];
       }
     },
@@ -157,7 +157,7 @@ export default {
         const salesRepresentative = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         this.salesRepresentativeOptions = formatAndSortIdentityOptions(salesRepresentative);
       } catch (e) {
-        
+        console.error(e);
         this.salesRepresentativeOptions = [];
       }
     },
@@ -186,7 +186,7 @@ export default {
         NotifyPositive('Formation créée.');
         await this.refreshCourses();
       } catch (e) {
-        
+        console.error(e);
         NotifyNegative('Impossible de créer la formation.');
       } finally {
         this.modalLoading = false;
