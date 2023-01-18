@@ -155,7 +155,7 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni users learners info') {
+            if (['ni users learners info', 'ni management questionnaire answers'].includes(from.name)) {
               to.params.defaultTab = 'traineeFollowUp';
             } else if (from.name === 'ni users companies info' && from.params.defaultTab === 'bills') {
               to.params.defaultTab = 'billing';
