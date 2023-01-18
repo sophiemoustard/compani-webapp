@@ -18,7 +18,7 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
     </div>
     <div class="q-mb-lg filters-container">
-      <q-checkbox dense v-model="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
+      <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -26,23 +26,22 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { computed, ref } from 'vue';
+import { useStore } from 'vuex';
+import { useMeta } from 'quasar';
+import { onBeforeRouteLeave } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
 import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
-import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { BLENDED, OPERATIONS } from '@data/constants';
-import { createMetaMixin } from 'quasar';
+import { useCourseFilters } from '@composables/courseFilters';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
-
-const metaInfo = { title: 'Catalogue' };
 
 export default {
   name: 'BlendedCoursesDirectory',
-  mixins: [courseFiltersMixin, createMetaMixin(metaInfo)],
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-trello': Trello,
@@ -50,39 +49,87 @@ export default {
     'ni-date-input': DateInput,
   },
   setup () {
-    return { v$: useVuelidate() };
-  },
-  data () {
-    return {
-      coursesWithGroupedSlot: [],
-      displayArchived: false,
-    };
-  },
-  validations () {
-    return {
-      selectedStartDate: { maxDate: this.selectedEndDate ? maxDate(this.selectedEndDate) : '' },
-      selectedEndDate: { minDate: this.selectedStartDate ? minDate(this.selectedStartDate) : '' },
-    };
-  },
-  computed: {
-    ...mapState('main', ['loggedUser']),
-  },
-  async created () {
-    await this.refreshCourses();
-  },
-  methods: {
-    async refreshCourses () {
+    const $store = useStore();
+    const metaInfo = { title: 'Kanban formations mixtes' };
+    useMeta(metaInfo);
+
+    const coursesWithGroupedSlot = ref([]);
+    const displayArchived = ref(false);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const {
+      selectedCompany,
+      companyFilterOptions,
+      selectedProgram,
+      programFilterOptions,
+      selectedSalesRepresentative,
+      salesRepresentativesFilterOptions,
+      selectedStartDate,
+      selectedEndDate,
+      selectedNoAddressInSlots,
+      coursesFiltered,
+      updateSelectedCompany,
+      updateSelectedProgram,
+      updateSelectedSalesRepresentative,
+      updateSelectedStartDate,
+      updateSelectedEndDate,
+      updateSelectedNoAddressInSlots,
+      resetFilters,
+      groupByCourses,
+    } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
+
+    const rules = computed(() => ({
+      selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
+      selectedEndDate: { minDate: selectedStartDate.value ? minDate(selectedStartDate.value) : '' },
+    }));
+    const v$ = useVuelidate(rules, { selectedStartDate, selectedEndDate });
+
+    const refreshCourses = async () => {
       try {
-        const courses = await Courses.list({ trainer: this.loggedUser._id, format: BLENDED, action: OPERATIONS });
-        this.coursesWithGroupedSlot = this.groupByCourses(courses);
+        const courses = await Courses.list({ trainer: loggedUser.value._id, format: BLENDED, action: OPERATIONS });
+        coursesWithGroupedSlot.value = groupByCourses(courses);
       } catch (e) {
         console.error(e);
-        this.coursesWithGroupedSlot = [];
+        coursesWithGroupedSlot.value = [];
       }
-    },
-  },
-  beforeUnmount () {
-    if (this.$route.name !== 'trainers courses info') this.$store.dispatch('course/resetFilters');
+    };
+
+    const created = async () => {
+      refreshCourses();
+    };
+
+    onBeforeRouteLeave((to) => {
+      if (to.name !== 'trainers courses info') resetFilters();
+    });
+
+    created();
+
+    return {
+      // Validation
+      v$,
+      // Data
+      coursesWithGroupedSlot,
+      displayArchived,
+      // Computed
+      selectedCompany,
+      companyFilterOptions,
+      selectedProgram,
+      programFilterOptions,
+      selectedSalesRepresentative,
+      salesRepresentativesFilterOptions,
+      selectedStartDate,
+      selectedEndDate,
+      selectedNoAddressInSlots,
+      coursesFiltered,
+      // Methods
+      updateSelectedCompany,
+      updateSelectedProgram,
+      updateSelectedSalesRepresentative,
+      updateSelectedStartDate,
+      updateSelectedEndDate,
+      updateSelectedNoAddressInSlots,
+    };
   },
 };
 </script>
