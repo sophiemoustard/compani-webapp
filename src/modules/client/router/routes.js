@@ -392,6 +392,15 @@ const routes = [
         path: 'ni/courses/:courseId',
         name: 'ni courses info',
         component: () => import('src/modules/client/pages/ni/courses/BlendedCourseProfile'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni courses learners info') to.params.defaultTab = 'traineeFollowUp';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
