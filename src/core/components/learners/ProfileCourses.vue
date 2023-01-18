@@ -155,7 +155,7 @@ export default {
     const $store = useStore();
     const $router = useRouter();
 
-    const { isVendorInterface } = useCourses();
+    const { isVendorInterface, isClientInterface } = useCourses();
     const { getCountsByMonth, monthAxisLabels } = useCharts();
     const courses = ref([]);
     const activitiesByMonth = ref([]);
@@ -199,6 +199,8 @@ export default {
       { name: 'expand', label: '', field: '' },
     ]);
     const unsubscribedAttendances = ref([]);
+
+    const company = computed(() => $store.getters['main/getCompany']);
 
     const userProfile = computed(() => $store.state.userProfile.userProfile);
 
@@ -252,7 +254,11 @@ export default {
     const getUserCourses = async () => {
       try {
         loading.value = true;
-        const userCourses = await Courses.list({ trainee: userProfile.value._id, action: PEDAGOGY });
+        const userCourses = await Courses.list({
+          trainee: userProfile.value._id,
+          action: PEDAGOGY,
+          ...(isClientInterface && { company: company.value._id }),
+        });
 
         courses.value = userCourses.map(course => ({
           ...course,

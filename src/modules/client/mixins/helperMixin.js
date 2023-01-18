@@ -162,6 +162,7 @@ export const helperMixin = {
         }
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la création de l\'aidant(e).');
       } finally {
         this.loading = false;

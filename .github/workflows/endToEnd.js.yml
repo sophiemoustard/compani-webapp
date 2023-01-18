@@ -31,7 +31,8 @@ jobs:
           path: 'api'
 
       - run: cd api && npm ci
-
+        env:
+          DETACHMENT_ALLOWED_COMPANY_IDS : ${{ secrets.DETACHMENT_ALLOWED_COMPANY_IDS }}
       - uses: actions/checkout@v2
         with:
           path: 'webapp'
@@ -47,3 +48,4 @@ jobs:
         env:
           API_HOSTNAME: ${{ secrets.API_HOSTNAME }}
           TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
+          DETACHMENT_ALLOWED_COMPANY_IDS : ${{ secrets.DETACHMENT_ALLOWED_COMPANY_IDS }}

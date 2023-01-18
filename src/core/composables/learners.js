@@ -215,7 +215,8 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       learnerCreationModal.value = false;
       traineeAdditionModal.value = true;
     } catch (e) {
-      NotifyNegative('Erreur lors de l\'ajout de l\' apprenant(e).');
+      if (e.status === 409) return NotifyNegative(e.data.message);
+      NotifyNegative('Erreur lors de l\'ajout de l\'apprenant(e).');
     } finally {
       learnerCreationModalLoading.value = false;
     }

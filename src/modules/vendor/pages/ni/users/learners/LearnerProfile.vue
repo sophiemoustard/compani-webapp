@@ -3,8 +3,10 @@
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity" :header-info="headerInfo">
         <template #title>
-          <ni-button color="primary" icon="add" v-if="!userProfile.company" class="q-ml-sm"
+          <ni-button color="primary" icon="add" v-if="canLinkToCompany" class="q-ml-sm"
             label="Rattacher à une structure" @click="openCompanyLinkModal" />
+          <ni-button v-else-if="canDetachFromCompany" icon="person_remove" class="q-ml-sm"
+            label="Détacher de la structure" @click="openCompanyDetachModal" />
         </template>
       </ni-profile-header>
       <profile-tabs :profile-id="learnerId" :tabs-content="tabsContent" />
@@ -13,12 +15,16 @@
     <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkUserToCompany"
       :validations="v$.newCompanyLink" @hide="resetCompanyLinkModal" v-model:new-company-link="newCompanyLink"
       :company-options="companyOptions" />
+
+    <ni-company-detach-modal v-model="companyDetachModal" :user-identity="userIdentity" :loading="detachModalLoading"
+      :company-name="companyName" v-model:detachment-date="detachmentDate" @submit="validateCompanyDetachement"
+      @hide="resetDetachmentModal" :min-detachment-date="minDetachmentDate" />
   </q-page>
 </template>
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -31,10 +37,12 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';
 import CompaniDate from '@helpers/dates/companiDates';
+import CompanyDetachModal from '@components/learners/CompanyDetachModal';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import { ROLE_TRANSLATION, DAY } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
+import { useCompanyDetachment } from '@composables/companyDetachment';
 
 export default {
   name: 'LearnerProfile',
@@ -47,12 +55,12 @@ export default {
     'profile-tabs': ProfileTabs,
     'ni-button': Button,
     'company-link-modal': CompanyLinkModal,
+    'ni-company-detach-modal': CompanyDetachModal,
   },
   setup (props) {
     const metaInfo = { title: 'Fiche apprenant' };
     useMeta(metaInfo);
 
-    const userIdentity = ref('');
     const tabsContent = [
       { label: 'Infos personnelles', name: 'info', default: props.defaultTab === 'info', component: ProfileInfo },
       { label: 'Formations', name: 'courses', default: props.defaultTab === 'courses', component: ProfileCourses },
@@ -64,19 +72,9 @@ export default {
 
     const $store = useStore();
     const userProfile = computed(() => $store.state.userProfile.userProfile);
+
     const userProfileRole = computed(() => get(userProfile.value, 'role.client.name') ||
       get(userProfile.value, 'role.vendor.name') || '');
-    const headerInfo = computed(() => {
-      const infos = [{ icon: 'apartment', label: userProfile.value.company ? userProfile.value.company.name : 'N/A' }];
-      if (userProfileRole.value) infos.push({ icon: 'person', label: ROLE_TRANSLATION[userProfileRole.value] });
-
-      return infos;
-    });
-
-    const rules = { newCompanyLink: { company: { required }, startDate: { required } } };
-    const v$ = useVuelidate(rules, { newCompanyLink });
-
-    watch(userProfile, () => { userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL'); });
 
     const refreshUserProfile = async () => {
       try {
@@ -85,6 +83,32 @@ export default {
         console.error(e);
       }
     };
+
+    const {
+      companyDetachModal,
+      detachmentDate,
+      detachModalLoading,
+      companyName,
+      openCompanyDetachModal,
+      userIdentity,
+      canDetachFromCompany,
+      canLinkToCompany,
+      minDetachmentDate,
+      validateCompanyDetachement,
+      resetDetachmentModal,
+    } = useCompanyDetachment(userProfile, refreshUserProfile);
+
+    const headerInfo = computed(() => {
+      const infos = [{ icon: 'apartment', label: companyName.value || 'N/A' }];
+      if (userProfileRole.value) infos.push({ icon: 'person', label: ROLE_TRANSLATION[userProfileRole.value] });
+
+      return infos;
+    });
+
+    const rules = {
+      newCompanyLink: { company: { required }, startDate: { required } },
+    };
+    const v$ = useVuelidate(rules, { newCompanyLink });
 
     const openCompanyLinkModal = async () => {
       try {
@@ -122,6 +146,7 @@ export default {
         await refreshUserProfile();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors du rattachement à la structure.');
       } finally {
         modalLoading.value = false;
@@ -145,15 +170,26 @@ export default {
       companyLinkModal,
       newCompanyLink,
       modalLoading,
+      companyDetachModal,
+      detachmentDate,
+      detachModalLoading,
       // Computed
+      companyName,
       userProfile,
       headerInfo,
+      canDetachFromCompany,
+      canLinkToCompany,
+      minDetachmentDate,
       // Validations
       v$,
       // Methods
+      get,
       openCompanyLinkModal,
       resetCompanyLinkModal,
       linkUserToCompany,
+      openCompanyDetachModal,
+      validateCompanyDetachement,
+      resetDetachmentModal,
     };
   },
 };
