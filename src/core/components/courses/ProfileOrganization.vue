@@ -371,9 +371,9 @@ export default {
         let query;
 
         if (isClientInterface) {
-          query = { companies: get(loggedUser.value, 'company._id'), endDate: CompaniDate().toISO() };
+          query = { companies: get(loggedUser.value, 'company._id'), startDate: CompaniDate().toISO() };
         } else {
-          query = { companies: course.value.companies.map(c => c._id), endDate: CompaniDate().toISO() };
+          query = { companies: course.value.companies.map(c => c._id), startDate: CompaniDate().toISO() };
         }
 
         potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
