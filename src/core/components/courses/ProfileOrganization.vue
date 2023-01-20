@@ -372,7 +372,9 @@ export default {
 
         if (isClientInterface) {
           query = { companies: get(loggedUser.value, 'company._id'), endDate: CompaniDate().toISO() };
-        } else query = { companies: course.value.companies.map(c => c._id), endDate: CompaniDate().toISO() };
+        } else {
+          query = { companies: course.value.companies.map(c => c._id), endDate: CompaniDate().toISO() };
+        }
 
         potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
