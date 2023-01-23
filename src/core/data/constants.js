@@ -590,6 +590,10 @@ export const CREDIT_NOTE_TYPE_OPTIONS = [
 export const LIST = 'list';
 export const BALANCE = 'balance';
 
+// KANBAN COURSE FILTERS
+export const WITHOUT_TRAINER = 'without_trainer';
+export const WITHOUT_SALES_REPRESENTATIVE = 'without_sales_representative';
+
 // END_TO_END TESTS
 export const BILLING = 'billing';
 export const AUTHENTICATION = 'authentication';

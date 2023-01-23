@@ -10,7 +10,7 @@
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativesFilterOptions" :model-value="selectedSalesRepresentative"
+      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
         @update:model-value="updateSelectedSalesRepresentative" />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
@@ -20,7 +20,7 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
     </div>
     <div class="q-mb-lg filters-container">
-      <q-checkbox dense v-model="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
+      <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
     <ni-trello :courses="coursesFiltered" />
@@ -34,10 +34,12 @@
 </template>
 
 <script>
+import { computed, ref } from 'vue';
 import { useMeta } from 'quasar';
+import { useStore } from 'vuex';
+import { onBeforeRouteLeave } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
-import { mapState } from 'vuex';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
@@ -50,14 +52,13 @@ import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, OPERATIONS } from '@data/constants';
-import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
+import { useCourseFilters } from '@composables/courseFilters';
+import { INTRA, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, OPERATIONS } from '@data/constants';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'BlendedCoursesDirectory',
-  mixins: [courseFiltersMixin],
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-select': Select,
@@ -66,104 +67,68 @@ export default {
     'ni-date-input': DateInput,
   },
   setup () {
-    const metaInfo = { title: 'Catalogue' };
+    const $store = useStore();
+    const metaInfo = { title: 'Kanban formations mixtes' };
     useMeta(metaInfo);
 
-    return { v$: useVuelidate() };
-  },
-  data () {
-    return {
-      modalLoading: false,
-      newCourse: {
-        program: '',
-        subProgram: '',
-        company: '',
-        misc: '',
-        type: INTRA,
-        salesRepresentative: '',
-        estimatedStartDate: '',
-        maxTrainees: '8',
-        expectedBillsCount: '0',
-      },
-      programs: [],
-      courseCreationModal: false,
-      coursesWithGroupedSlot: [],
-      courseTypes: COURSE_TYPES,
-      salesRepresentativeOptions: [],
-      displayArchived: false,
-    };
-  },
-  validations () {
-    return {
-      newCourse: {
-        program: { required },
-        subProgram: { required },
-        type: { required },
-        salesRepresentative: { required },
-        ...(this.isIntraCourse &&
-          {
-            maxTrainees: { required, strictPositiveNumber, integerNumber },
-            expectedBillsCount: { required, positiveNumber, integerNumber },
-          }),
-        company: { required: requiredIf(this.newCourse.type === INTRA) },
-      },
-      selectedStartDate: { maxDate: this.selectedEndDate ? maxDate(this.selectedEndDate) : '' },
-      selectedEndDate: { minDate: this.selectedStartDate ? minDate(this.selectedStartDate) : '' },
-    };
-  },
-  computed: {
-    ...mapState('main', ['loggedUser']),
-    isIntraCourse () {
-      return this.newCourse.type === INTRA;
-    },
-  },
-  async created () {
-    await Promise.all([
-      this.refreshCourses(),
-      this.refreshPrograms(),
-      this.refreshCompanies(),
-      this.refreshSalesRepresentatives(),
-    ]);
-  },
-  methods: {
-    async refreshCourses () {
+    /* COURSE CREATION */
+    const courseCreationModal = ref(false);
+    const modalLoading = ref(false);
+    const newCourse = ref({
+      program: '',
+      subProgram: '',
+      company: '',
+      misc: '',
+      type: INTRA,
+      salesRepresentative: '',
+      estimatedStartDate: '',
+      maxTrainees: '8',
+      expectedBillsCount: '0',
+    });
+    const companyOptions = ref([]);
+    const programs = ref([]);
+    const salesRepresentativeOptions = ref([]);
+
+    const isIntraCourse = computed(() => newCourse.value.type === INTRA);
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const refreshPrograms = async () => {
       try {
-        const courses = await Courses.list({ format: BLENDED, action: OPERATIONS });
-        this.coursesWithGroupedSlot = this.groupByCourses(courses);
+        programs.value = await Programs.list();
       } catch (e) {
         console.error(e);
-        this.coursesWithGroupedSlot = [];
+        programs.value = [];
       }
-    },
-    async refreshPrograms () {
-      try {
-        this.programs = await Programs.list();
-      } catch (e) {
-        console.error(e);
-        this.programs = [];
-      }
-    },
-    async refreshCompanies () {
+    };
+
+    const refreshCompanies = async () => {
       try {
         const companies = await Companies.list();
-        this.companyOptions = formatAndSortOptions(companies, 'name');
+        companyOptions.value = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
-        this.companyOptions = [];
+        companyOptions.value = [];
       }
-    },
-    async refreshSalesRepresentatives () {
+    };
+
+    const refreshSalesRepresentatives = async () => {
       try {
-        const salesRepresentative = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.salesRepresentativeOptions = formatAndSortIdentityOptions(salesRepresentative);
+        const salesRepresentatives = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        salesRepresentativeOptions.value = formatAndSortIdentityOptions(salesRepresentatives);
       } catch (e) {
         console.error(e);
-        this.salesRepresentativeOptions = [];
+        salesRepresentativeOptions.value = [];
       }
-    },
-    resetCreationModal () {
-      this.v$.newCourse.$reset();
-      this.newCourse = {
+    };
+
+    const openCourseCreationModal = () => {
+      newCourse.value = { ...newCourse.value, salesRepresentative: loggedUser.value._id };
+      courseCreationModal.value = true;
+    };
+
+    const resetCreationModal = () => {
+      v$.value.newCourse.$reset();
+      newCourse.value = {
         program: '',
         company: '',
         misc: '',
@@ -173,34 +138,138 @@ export default {
         maxTrainees: '8',
         expectedBillsCount: '0',
       };
-    },
-    async createCourse () {
+    };
+
+    const createCourse = async () => {
       try {
-        this.v$.newCourse.$touch();
-        if (this.v$.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
+        v$.value.newCourse.$touch();
+        if (v$.value.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        this.modalLoading = true;
-        await Courses.create(pickBy(omit(this.newCourse, 'program')));
+        modalLoading.value = true;
+        await Courses.create(pickBy(omit(newCourse.value, 'program')));
 
-        this.courseCreationModal = false;
+        courseCreationModal.value = false;
         NotifyPositive('Formation créée.');
-        await this.refreshCourses();
+        await refreshCourses();
       } catch (e) {
         console.error(e);
         NotifyNegative('Impossible de créer la formation.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    openCourseCreationModal () {
-      this.newCourse = { ...this.newCourse, salesRepresentative: this.loggedUser._id };
-      this.courseCreationModal = true;
-    },
-  },
-  beforeUnmount () {
-    if (this.$route.name !== 'ni management blended courses info') {
-      this.$store.dispatch('course/resetFilters');
-    }
+    };
+
+    /* FILTERS */
+    const coursesWithGroupedSlot = ref([]);
+    const displayArchived = ref(false);
+
+    const {
+      selectedCompany,
+      companyFilterOptions,
+      selectedTrainer,
+      trainerFilterOptions,
+      selectedProgram,
+      programFilterOptions,
+      selectedSalesRepresentative,
+      salesRepresentativeFilterOptions,
+      selectedStartDate,
+      selectedEndDate,
+      selectedNoAddressInSlots,
+      coursesFiltered,
+      updateSelectedCompany,
+      updateSelectedTrainer,
+      updateSelectedProgram,
+      updateSelectedSalesRepresentative,
+      updateSelectedStartDate,
+      updateSelectedEndDate,
+      updateSelectedNoAddressInSlots,
+      resetFilters,
+      groupByCourses,
+    } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
+
+    const refreshCourses = async () => {
+      try {
+        const courses = await Courses.list({ format: BLENDED, action: OPERATIONS });
+        coursesWithGroupedSlot.value = groupByCourses(courses);
+      } catch (e) {
+        console.error(e);
+        coursesWithGroupedSlot.value = [];
+      }
+    };
+
+    onBeforeRouteLeave((to) => {
+      if (to.name !== 'ni management blended courses info') resetFilters();
+    });
+
+    /* MAIN */
+    const rules = computed(() => ({
+      newCourse: {
+        program: { required },
+        subProgram: { required },
+        type: { required },
+        salesRepresentative: { required },
+        ...(isIntraCourse.value &&
+          {
+            maxTrainees: { required, strictPositiveNumber, integerNumber },
+            expectedBillsCount: { required, positiveNumber, integerNumber },
+          }),
+        company: { required: requiredIf(isIntraCourse.value) },
+      },
+      selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
+      selectedEndDate: { minDate: selectedStartDate.value ? minDate(selectedStartDate.value) : '' },
+    }));
+    const v$ = useVuelidate(rules, { newCourse, selectedStartDate, selectedEndDate });
+
+    const created = async () => {
+      await Promise.all([
+        refreshCourses(),
+        refreshPrograms(),
+        refreshCompanies(),
+        refreshSalesRepresentatives(),
+      ]);
+    };
+
+    created();
+
+    return {
+      // Validation
+      v$,
+      // Data
+      courseCreationModal,
+      modalLoading,
+      newCourse,
+      companyOptions,
+      programs,
+      salesRepresentativeOptions,
+      coursesWithGroupedSlot,
+      displayArchived,
+      // Computed
+      isIntraCourse,
+      selectedCompany,
+      companyFilterOptions,
+      selectedTrainer,
+      trainerFilterOptions,
+      selectedProgram,
+      programFilterOptions,
+      selectedSalesRepresentative,
+      salesRepresentativeFilterOptions,
+      selectedStartDate,
+      selectedEndDate,
+      selectedNoAddressInSlots,
+      coursesFiltered,
+      // Methods
+      openCourseCreationModal,
+      resetCreationModal,
+      createCourse,
+      updateSelectedCompany,
+      updateSelectedTrainer,
+      updateSelectedProgram,
+      updateSelectedSalesRepresentative,
+      updateSelectedStartDate,
+      updateSelectedEndDate,
+      updateSelectedNoAddressInSlots,
+      resetFilters,
+    };
   },
 };
 </script>
