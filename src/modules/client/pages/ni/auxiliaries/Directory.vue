@@ -51,7 +51,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
-import { getCurrentOrFutureCompanies } from '@helpers/userCompanies';
+import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -314,7 +314,7 @@ export default {
 
         if (userExistsInfo.exists) {
           const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
-          const currentOrFutureCompanies = getCurrentOrFutureCompanies(userExistsInfo.user.userCompanyList);
+          const currentOrFutureCompanies = getCurrentAndFutureCompanies(userExistsInfo.user.userCompanyList);
           const userHasValidCompany = !currentOrFutureCompanies.length ||
             currentOrFutureCompanies.includes(this.company._id);
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
