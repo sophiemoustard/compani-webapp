@@ -10,7 +10,7 @@
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativesFilterOptions" :model-value="selectedSalesRepresentative"
+      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
         @update:model-value="updateSelectedSalesRepresentative" />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
@@ -113,8 +113,8 @@ export default {
 
     const refreshSalesRepresentatives = async () => {
       try {
-        const salesRepresentative = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        salesRepresentativeOptions.value = formatAndSortIdentityOptions(salesRepresentative);
+        const salesRepresentatives = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        salesRepresentativeOptions.value = formatAndSortIdentityOptions(salesRepresentatives);
       } catch (e) {
         console.error(e);
         salesRepresentativeOptions.value = [];
@@ -171,7 +171,7 @@ export default {
       selectedProgram,
       programFilterOptions,
       selectedSalesRepresentative,
-      salesRepresentativesFilterOptions,
+      salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedNoAddressInSlots,
@@ -202,7 +202,6 @@ export default {
     });
 
     /* MAIN */
-
     const rules = computed(() => ({
       newCourse: {
         program: { required },
@@ -253,7 +252,7 @@ export default {
       selectedProgram,
       programFilterOptions,
       selectedSalesRepresentative,
-      salesRepresentativesFilterOptions,
+      salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedNoAddressInSlots,

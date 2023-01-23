@@ -5,7 +5,7 @@ import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { DD_MM_YYYY, ON_SITE } from '@data/constants';
+import { DD_MM_YYYY, ON_SITE, WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE } from '@data/constants';
 
 export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
   const $store = useStore();
@@ -19,18 +19,16 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
 
     return [
       { label: 'Tous les intervenants', value: '' },
-      { label: 'Sans intervenant(e)', value: 'without_trainer' },
+      { label: 'Sans intervenant(e)', value: WITHOUT_TRAINER },
       ...uniqBy(trainers, 'value'),
     ];
   });
 
-  const updateSelectedTrainer = (trainerId) => {
-    $store.dispatch('course/setSelectedTrainer', { trainerId });
-  };
+  const updateSelectedTrainer = trainerId => $store.dispatch('course/setSelectedTrainer', { trainerId });
 
   const filterCoursesByTrainer = courses => courses.filter(course => (course.trainer
     ? selectedTrainer.value === course.trainer._id
-    : selectedTrainer.value === 'without_trainer'));
+    : selectedTrainer.value === WITHOUT_TRAINER));
 
   /* PROGRAM */
   const selectedProgram = computed(() => $store.state.course.selectedProgram);
@@ -43,9 +41,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
   });
 
-  const updateSelectedProgram = (programId) => {
-    $store.dispatch('course/setSelectedProgram', { programId });
-  };
+  const updateSelectedProgram = programId => $store.dispatch('course/setSelectedProgram', { programId });
 
   const filterCoursesByProgram = courses => courses
     .filter(course => course.subProgram.program._id === selectedProgram.value);
@@ -66,24 +62,21 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     ];
   });
 
-  const updateSelectedCompany = (companyId) => {
-    $store.dispatch('course/setSelectedCompany', { companyId });
-  };
+  const updateSelectedCompany = companyId => $store.dispatch('course/setSelectedCompany', { companyId });
 
   const filterCoursesByCompany = courses => courses
     .filter(course => (course.companies.map(company => company._id)).includes(selectedCompany.value));
 
   /* SALES REPRESENTATIVE */
-
   const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
 
-  const salesRepresentativesFilterOptions = computed(() => {
+  const salesRepresentativeFilterOptions = computed(() => {
     const filteredCourses = coursesWithGroupedSlot.value.filter(course => !!course.salesRepresentative);
     const salesRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'salesRepresentative');
 
     return [
       { label: 'Tous les référents Compani', value: '' },
-      { label: 'Sans référent(e) Compani', value: 'without_sales_representative' },
+      { label: 'Sans référent(e) Compani', value: WITHOUT_SALES_REPRESENTATIVE },
       ...uniqBy(salesRepresentatives, 'value'),
     ];
   });
@@ -94,7 +87,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
 
   const filterCoursesBySalesRepresentative = courses => courses.filter(course => (course.salesRepresentative
     ? selectedSalesRepresentative.value === course.salesRepresentative._id
-    : selectedSalesRepresentative.value === 'without_sales_representative'));
+    : selectedSalesRepresentative.value === WITHOUT_SALES_REPRESENTATIVE));
 
   /* DATES */
   const selectedStartDate = computed(() => $store.state.course.selectedStartDate);
@@ -181,9 +174,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     return courses;
   });
 
-  const resetFilters = () => {
-    $store.dispatch('course/resetFilters');
-  };
+  const resetFilters = () => $store.dispatch('course/resetFilters');
 
   const groupByCourses = courses => courses.map(course => ({
     ...course,
@@ -202,7 +193,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     selectedCompany,
     companyFilterOptions,
     selectedSalesRepresentative,
-    salesRepresentativesFilterOptions,
+    salesRepresentativeFilterOptions,
     selectedStartDate,
     selectedEndDate,
     selectedNoAddressInSlots,

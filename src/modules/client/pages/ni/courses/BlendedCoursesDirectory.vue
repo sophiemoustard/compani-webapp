@@ -96,7 +96,7 @@ export default {
     };
 
     const created = async () => {
-      refreshCourses();
+      await refreshCourses();
     };
 
     onBeforeRouteLeave((to) => {

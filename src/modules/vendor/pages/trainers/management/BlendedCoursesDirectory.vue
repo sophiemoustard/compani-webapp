@@ -8,7 +8,7 @@
         @update:model-value="updateSelectedCompany" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativesFilterOptions" clearable
+      <ni-select :options="salesRepresentativeFilterOptions" clearable
         :model-value="selectedSalesRepresentative" @update:model-value="updateSelectedSalesRepresentative" />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
@@ -64,7 +64,7 @@ export default {
       selectedProgram,
       programFilterOptions,
       selectedSalesRepresentative,
-      salesRepresentativesFilterOptions,
+      salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedNoAddressInSlots,
@@ -96,7 +96,7 @@ export default {
     };
 
     const created = async () => {
-      refreshCourses();
+      await refreshCourses();
     };
 
     onBeforeRouteLeave((to) => {
@@ -117,7 +117,7 @@ export default {
       selectedProgram,
       programFilterOptions,
       selectedSalesRepresentative,
-      salesRepresentativesFilterOptions,
+      salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedNoAddressInSlots,
