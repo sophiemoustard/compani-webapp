@@ -171,13 +171,14 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
 
   const resetFilters = () => $store.dispatch('course/resetFilters');
 
-  const groupByCourses = courses => courses.map(course => ({
-    ...course,
-    slots: course.slots.length
-      ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
-      : [],
-    slotsToPlan: course.slotsToPlan || [],
-  }));
+  const groupByCourses = courses => courses
+    .map(course => ({
+      ...course,
+      slots: course.slots.length
+        ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
+        : [],
+      slotsToPlan: course.slotsToPlan || [],
+    }));
 
   return {
     // Computed
