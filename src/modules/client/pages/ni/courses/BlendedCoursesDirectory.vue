@@ -16,8 +16,12 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
     </div>
     <div class="q-mb-lg filters-container">
-      <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
-        @update:model-value="updateSelectedNoAddressInSlots" />
+      <div class="q-mb-lg toto">
+        <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
+          @update:model-value="updateSelectedNoAddressInSlots" />
+      </div>
+      <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
+        @update:model-value="updateSelectedType" />
     </div>
     <ni-trello :courses="coursesFiltered" />
   </q-page>
@@ -58,18 +62,21 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const {
+      typeFilterOptions,
       selectedTrainer,
       trainerFilterOptions,
       selectedProgram,
       programFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       updateSelectedTrainer,
       updateSelectedProgram,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
       resetFilters,
       groupByCourses,
@@ -111,6 +118,7 @@ export default {
       // Data
       coursesWithGroupedSlot,
       displayArchived,
+      typeFilterOptions,
       // Computed
       selectedTrainer,
       trainerFilterOptions,
@@ -118,6 +126,7 @@ export default {
       programFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       // Methods
@@ -125,9 +134,16 @@ export default {
       updateSelectedProgram,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
       resetFilters,
     };
   },
 };
 </script>
+
+<style lang="sass" scoped>
+
+.toto
+  justify-content: center
+</style>

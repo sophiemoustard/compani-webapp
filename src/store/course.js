@@ -13,6 +13,7 @@ export default {
     selectedSalesRepresentative: '',
     selectedStartDate: '',
     selectedEndDate: '',
+    selectedType: '',
     selectedNoAddressInSlots: false,
   },
   mutations: {
@@ -23,6 +24,7 @@ export default {
     SET_SELECTED_SALES_REPRESENTATIVE: (state, data) => { state.selectedSalesRepresentative = data; },
     SET_SELECTED_START_DATE: (state, data) => { state.selectedStartDate = data; },
     SET_SELECTED_END_DATE: (state, data) => { state.selectedEndDate = data; },
+    SET_SELECTED_TYPE: (state, data) => { state.selectedType = data; },
     SET_SELECTED_NO_ADDRESS_IN_SLOTS: (state, data) => { state.selectedNoAddressInSlots = data; },
   },
   actions: {
@@ -55,6 +57,7 @@ export default {
     },
     setSelectedStartDate: ({ commit }, params) => { commit('SET_SELECTED_START_DATE', params.startDate); },
     setSelectedEndDate: ({ commit }, params) => { commit('SET_SELECTED_END_DATE', params.endDate); },
+    setSelectedType: ({ commit }, params) => { commit('SET_SELECTED_TYPE', params.type); },
     setSelectedNoAddressInSlots: ({ commit }, params) => {
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', params.isSelected);
     },
@@ -65,6 +68,7 @@ export default {
       commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
       commit('SET_SELECTED_START_DATE', '');
       commit('SET_SELECTED_END_DATE', '');
+      commit('SET_SELECTED_TYPE', '');
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
     },
   },

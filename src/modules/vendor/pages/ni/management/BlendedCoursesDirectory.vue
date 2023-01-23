@@ -20,6 +20,8 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
     </div>
     <div class="q-mb-lg filters-container">
+      <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
+        @update:model-value="updateSelectedType" />
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
@@ -164,6 +166,7 @@ export default {
     const displayArchived = ref(false);
 
     const {
+      typeFilterOptions,
       selectedCompany,
       companyFilterOptions,
       selectedTrainer,
@@ -174,6 +177,7 @@ export default {
       salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       updateSelectedCompany,
@@ -182,6 +186,7 @@ export default {
       updateSelectedSalesRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
       resetFilters,
       groupByCourses,
@@ -243,6 +248,7 @@ export default {
       salesRepresentativeOptions,
       coursesWithGroupedSlot,
       displayArchived,
+      typeFilterOptions,
       // Computed
       isIntraCourse,
       selectedCompany,
@@ -255,6 +261,7 @@ export default {
       salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       // Methods
@@ -267,6 +274,7 @@ export default {
       updateSelectedSalesRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
       resetFilters,
     };
