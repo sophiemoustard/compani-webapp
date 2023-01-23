@@ -1,6 +1,6 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import uniqBy from 'lodash/uniqBy';
+import sortedUniqBy from 'lodash/sortedUniqBy';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -20,7 +20,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     return [
       { label: 'Tous les intervenants', value: '' },
       { label: 'Sans intervenant(e)', value: WITHOUT_TRAINER },
-      ...uniqBy(trainers, 'value'),
+      ...sortedUniqBy(trainers, 'value'),
     ];
   });
 
@@ -38,7 +38,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
       .map(course => ({ label: course.subProgram.program.name, value: course.subProgram.program._id }))
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
+    return [{ label: 'Tous les programmes', value: '' }, ...sortedUniqBy(programs, 'value')];
   });
 
   const updateSelectedProgram = programId => $store.dispatch('course/setSelectedProgram', { programId });
@@ -50,16 +50,11 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
   const selectedCompany = computed(() => $store.state.course.selectedCompany);
 
   const companyFilterOptions = computed(() => {
-    const companies = [];
+    const companies = coursesWithGroupedSlot.value
+      .flatMap(course => course.companies.map(company => ({ label: company.name, value: company._id })))
+      .sort((a, b) => a.label.localeCompare(b.label));
 
-    for (const course of coursesWithGroupedSlot.value) {
-      const courseCompanies = course.companies.map(company => ({ label: company.name, value: company._id }));
-      companies.push(...courseCompanies);
-    }
-    return [
-      { label: 'Toutes les structures', value: '' },
-      ...uniqBy(companies, 'value').sort((a, b) => a.label.localeCompare(b.label)),
-    ];
+    return [{ label: 'Toutes les structures', value: '' }, ...sortedUniqBy(companies, 'value')];
   });
 
   const updateSelectedCompany = companyId => $store.dispatch('course/setSelectedCompany', { companyId });
@@ -77,7 +72,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     return [
       { label: 'Tous les référents Compani', value: '' },
       { label: 'Sans référent(e) Compani', value: WITHOUT_SALES_REPRESENTATIVE },
-      ...uniqBy(salesRepresentatives, 'value'),
+      ...sortedUniqBy(salesRepresentatives, 'value'),
     ];
   });
 
