@@ -16,12 +16,10 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
     </div>
     <div class="q-mb-lg filters-container">
-      <div class="q-mb-lg toto">
-        <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
-          @update:model-value="updateSelectedNoAddressInSlots" />
-      </div>
       <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
         @update:model-value="updateSelectedType" />
+      <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
+        @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
     <ni-trello :courses="coursesFiltered" />
   </q-page>
@@ -141,9 +139,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-
-.toto
-  justify-content: center
-</style>
