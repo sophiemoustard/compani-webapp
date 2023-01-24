@@ -192,6 +192,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     if (selectedNoAddressInSlots.value) courses = filterCoursesByNoAddressInSlots(courses);
 
     if (selectedMissingTrainees.value) courses = filterCoursesByMissingTrainees(courses);
+
     return courses;
   });
 
