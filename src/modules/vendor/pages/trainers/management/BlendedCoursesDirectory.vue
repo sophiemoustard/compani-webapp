@@ -22,6 +22,8 @@
     <div class="q-mb-lg filters-container">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
+      <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s)"
+        @update:model-value="updateSelectedMissingTrainees" />
     </div>
     <ni-trello :courses="coursesFiltered" />
   </q-page>
@@ -72,6 +74,7 @@ export default {
       selectedEndDate,
       selectedType,
       selectedNoAddressInSlots,
+      selectedMissingTrainees,
       coursesFiltered,
       updateSelectedCompany,
       updateSelectedProgram,
@@ -80,6 +83,7 @@ export default {
       updateSelectedEndDate,
       updateSelectedType,
       updateSelectedNoAddressInSlots,
+      updateSelectedMissingTrainees,
       resetFilters,
       groupByCourses,
     } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
@@ -128,6 +132,7 @@ export default {
       selectedEndDate,
       selectedType,
       selectedNoAddressInSlots,
+      selectedMissingTrainees,
       coursesFiltered,
       // Methods
       updateSelectedCompany,
@@ -137,6 +142,7 @@ export default {
       updateSelectedEndDate,
       updateSelectedType,
       updateSelectedNoAddressInSlots,
+      updateSelectedMissingTrainees,
       resetFilters,
     };
   },

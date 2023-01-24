@@ -156,6 +156,16 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
       return !!onSiteSlots.length && hasNoAddressInOnSiteSlots;
     });
 
+  /* MISSING TRAINEES */
+  const selectedMissingTrainees = computed(() => $store.state.course.selectedMissingTrainees);
+
+  const updateSelectedMissingTrainees = (isSelected) => {
+    $store.dispatch('course/setSelectedMissingTrainees', { isSelected });
+  };
+
+  const filterCoursesByMissingTrainees = courses => courses
+    .filter(course => course.type === INTRA && course.maxTrainees !== course.trainees.length);
+
   /* MAIN */
   const filterArchivedCourses = courses => courses.filter(course => !course.archivedAt);
 
@@ -181,6 +191,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
 
     if (selectedNoAddressInSlots.value) courses = filterCoursesByNoAddressInSlots(courses);
 
+    if (selectedMissingTrainees.value) courses = filterCoursesByMissingTrainees(courses);
     return courses;
   });
 
@@ -211,6 +222,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     selectedEndDate,
     selectedType,
     selectedNoAddressInSlots,
+    selectedMissingTrainees,
     coursesFiltered,
 
     // Methods
@@ -222,6 +234,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     updateSelectedEndDate,
     updateSelectedType,
     updateSelectedNoAddressInSlots,
+    updateSelectedMissingTrainees,
     resetFilters,
     groupByCourses,
   };
