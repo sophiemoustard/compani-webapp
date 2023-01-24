@@ -10,7 +10,7 @@
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
+      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative" clearable
         @update:model-value="updateSelectedSalesRepresentative" />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"

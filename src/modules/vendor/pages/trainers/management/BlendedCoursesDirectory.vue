@@ -137,6 +137,7 @@ export default {
       updateSelectedEndDate,
       updateSelectedType,
       updateSelectedNoAddressInSlots,
+      resetFilters,
     };
   },
 };

@@ -8,7 +8,7 @@
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-     <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
+     <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate" clearable
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
         error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
       <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
