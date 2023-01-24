@@ -35,8 +35,8 @@ export default {
         const userClientRole = store.getters['main/getClientRole'];
         if (userClientRole && !/\/ad\//.test(router.currentRoute.value.path)) {
           const loggedUserCompany = store.getters['main/getCompany'];
-          const currentOrFutureCompanies = getCurrentAndFutureCompanies(user.userCompanyList);
-          if (!currentOrFutureCompanies.includes(loggedUserCompany._id)) {
+          const currentAndFutureCompanies = getCurrentAndFutureCompanies(user.userCompanyList);
+          if (!currentAndFutureCompanies.includes(loggedUserCompany._id)) {
             return router.replace({ path: '/404' });
           }
         }

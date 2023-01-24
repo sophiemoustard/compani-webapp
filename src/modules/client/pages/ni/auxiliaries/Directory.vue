@@ -314,14 +314,14 @@ export default {
 
         if (userExistsInfo.exists) {
           const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
-          const currentOrFutureCompanies = getCurrentAndFutureCompanies(userExistsInfo.user.userCompanyList);
-          const userHasValidCompany = !currentOrFutureCompanies.length ||
-            currentOrFutureCompanies.includes(this.company._id);
+          const currentAndFutureCompanies = getCurrentAndFutureCompanies(userExistsInfo.user.userCompanyList);
+          const userHasValidCompany = !currentAndFutureCompanies.length ||
+            currentAndFutureCompanies.includes(this.company._id);
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
           if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
             this.fetchedUser = await Users.getById(userExistsInfo.user._id);
-            this.fillNewUser(this.fetchedUser, currentOrFutureCompanies.length);
+            this.fillNewUser(this.fetchedUser, currentAndFutureCompanies.length);
           } else {
             const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
             if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
