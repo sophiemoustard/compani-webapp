@@ -16,10 +16,10 @@
       <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
         placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
-    </div>
-    <div class="q-mb-lg filters-container">
       <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
         @update:model-value="updateSelectedType" />
+    </div>
+    <div class="q-mb-lg filters-container">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
     </div>
