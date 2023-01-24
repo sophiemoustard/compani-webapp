@@ -16,6 +16,8 @@
       <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
         placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
+      <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
+        @update:model-value="updateSelectedType" />
     </div>
     <div class="q-mb-lg filters-container">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
@@ -59,6 +61,7 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const {
+      typeFilterOptions,
       selectedCompany,
       companyFilterOptions,
       selectedProgram,
@@ -67,6 +70,7 @@ export default {
       salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       updateSelectedCompany,
@@ -74,6 +78,7 @@ export default {
       updateSelectedSalesRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
       resetFilters,
       groupByCourses,
@@ -111,6 +116,7 @@ export default {
       // Data
       coursesWithGroupedSlot,
       displayArchived,
+      typeFilterOptions,
       // Computed
       selectedCompany,
       companyFilterOptions,
@@ -120,6 +126,7 @@ export default {
       salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       // Methods
@@ -128,7 +135,9 @@ export default {
       updateSelectedSalesRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
+      resetFilters,
     };
   },
 };

@@ -1,11 +1,11 @@
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { DD_MM_YYYY, ON_SITE, WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE } from '@data/constants';
+import { DD_MM_YYYY, ON_SITE, WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
 
 export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
   const $store = useStore();
@@ -127,6 +127,19 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
       return hasEstimationInRange || hasSlotsInRange;
     });
 
+  /* TYPE */
+  const selectedType = computed(() => $store.state.course.selectedType);
+
+  const typeFilterOptions = ref([
+    { label: 'Tous les types', value: '' },
+    { label: 'Intra', value: INTRA },
+    { label: 'Inter B2B', value: INTER_B2B },
+  ]);
+
+  const updateSelectedType = type => $store.dispatch('course/setSelectedType', { type });
+
+  const filterCoursesByType = courses => courses.filter(course => selectedType.value === course.type);
+
   /* NO ADDRESS IN SLOTS */
   const selectedNoAddressInSlots = computed(() => $store.state.course.selectedNoAddressInSlots);
 
@@ -164,6 +177,8 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
 
     if (selectedEndDate.value && selectedStartDate.value) courses = filterCoursesByStartDateAndEndDate(courses);
 
+    if (selectedType.value) courses = filterCoursesByType(courses);
+
     if (selectedNoAddressInSlots.value) courses = filterCoursesByNoAddressInSlots(courses);
 
     return courses;
@@ -181,6 +196,8 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     }));
 
   return {
+    // data
+    typeFilterOptions,
     // Computed
     selectedTrainer,
     trainerFilterOptions,
@@ -192,6 +209,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     salesRepresentativeFilterOptions,
     selectedStartDate,
     selectedEndDate,
+    selectedType,
     selectedNoAddressInSlots,
     coursesFiltered,
 
@@ -202,6 +220,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     updateSelectedSalesRepresentative,
     updateSelectedStartDate,
     updateSelectedEndDate,
+    updateSelectedType,
     updateSelectedNoAddressInSlots,
     resetFilters,
     groupByCourses,

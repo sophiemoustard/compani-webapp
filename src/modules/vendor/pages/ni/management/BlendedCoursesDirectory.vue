@@ -10,7 +10,7 @@
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
+      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative" clearable
         @update:model-value="updateSelectedSalesRepresentative" />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
@@ -18,6 +18,8 @@
       <ni-date-input :model-value="selectedEndDate" @update:model-value="updateSelectedEndDate"
         placeholder="Fin de période" :min="selectedStartDate" :error="v$.selectedEndDate.$error"
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
+      <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
+        @update:model-value="updateSelectedType" />
     </div>
     <div class="q-mb-lg filters-container">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
@@ -164,6 +166,7 @@ export default {
     const displayArchived = ref(false);
 
     const {
+      typeFilterOptions,
       selectedCompany,
       companyFilterOptions,
       selectedTrainer,
@@ -174,6 +177,7 @@ export default {
       salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       updateSelectedCompany,
@@ -182,6 +186,7 @@ export default {
       updateSelectedSalesRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
       resetFilters,
       groupByCourses,
@@ -243,6 +248,7 @@ export default {
       salesRepresentativeOptions,
       coursesWithGroupedSlot,
       displayArchived,
+      typeFilterOptions,
       // Computed
       isIntraCourse,
       selectedCompany,
@@ -255,6 +261,7 @@ export default {
       salesRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
+      selectedType,
       selectedNoAddressInSlots,
       coursesFiltered,
       // Methods
@@ -267,6 +274,7 @@ export default {
       updateSelectedSalesRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
+      updateSelectedType,
       updateSelectedNoAddressInSlots,
       resetFilters,
     };
