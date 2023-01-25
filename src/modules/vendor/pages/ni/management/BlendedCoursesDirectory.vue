@@ -21,9 +21,11 @@
       <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
         @update:model-value="updateSelectedType" />
     </div>
-    <div class="q-mb-lg filters-container">
+    <div class="q-mb-lg filters-container checkboxes">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
+      <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
+        @update:model-value="updateSelectedMissingTrainees" />
     </div>
     <ni-trello :courses="coursesFiltered" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
@@ -179,6 +181,7 @@ export default {
       selectedEndDate,
       selectedType,
       selectedNoAddressInSlots,
+      selectedMissingTrainees,
       coursesFiltered,
       updateSelectedCompany,
       updateSelectedTrainer,
@@ -188,6 +191,7 @@ export default {
       updateSelectedEndDate,
       updateSelectedType,
       updateSelectedNoAddressInSlots,
+      updateSelectedMissingTrainees,
       resetFilters,
       groupByCourses,
     } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
@@ -263,6 +267,7 @@ export default {
       selectedEndDate,
       selectedType,
       selectedNoAddressInSlots,
+      selectedMissingTrainees,
       coursesFiltered,
       // Methods
       openCourseCreationModal,
@@ -276,8 +281,14 @@ export default {
       updateSelectedEndDate,
       updateSelectedType,
       updateSelectedNoAddressInSlots,
+      updateSelectedMissingTrainees,
       resetFilters,
     };
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.checkboxes
+  grid-gap: 12px 10px
+</style>
