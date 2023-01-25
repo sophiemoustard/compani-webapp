@@ -1,6 +1,6 @@
 import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
-import CompaniDuration from '@helpers/dates/companiDurations';
+import { durationAscendingSort } from '@helpers/dates/utils';
 
 export const courseTimelineMixin = {
   computed: {
@@ -8,11 +8,9 @@ export const courseTimelineMixin = {
       return this.courses
         .filter(this.isForthcoming)
         .map(course => ({ ...course, status: FORTHCOMING }))
-        .sort((a, b) => (
-          CompaniDuration(this.getDurationNowToStartCourse(a)).isLongerThan(this.getDurationNowToStartCourse(b))
-            ? 1
-            : -1
-        ));
+        .sort(
+          (a, b) => durationAscendingSort(this.getDurationNowToStartCourse(a), this.getDurationNowToStartCourse(b))
+        );
     },
     courseListInProgress () {
       return this.courses
@@ -21,20 +19,15 @@ export const courseTimelineMixin = {
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
-          return CompaniDuration(this.getDurationNowToNextSlot(a)).isLongerThan(this.getDurationNowToNextSlot(b))
-            ? 1
-            : -1;
+
+          return durationAscendingSort(this.getDurationNowToNextSlot(a), this.getDurationNowToNextSlot(b));
         });
     },
     courseListCompleted () {
       return this.courses
         .filter(this.isCompleted)
         .map(course => ({ ...course, status: COMPLETED }))
-        .sort((a, b) => (
-          CompaniDuration(this.getDurationNowToEndCourse(a)).isLongerThan(this.getDurationNowToEndCourse(b))
-            ? 1
-            : -1
-        ));
+        .sort((a, b) => durationAscendingSort(this.getDurationNowToEndCourse(a), this.getDurationNowToEndCourse(b)));
     },
   },
   methods: {
