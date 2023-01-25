@@ -92,7 +92,7 @@ const CompaniDurationFactory = (inputDuration) => {
       return CompaniDurationFactory(_duration.plus(otherDuration));
     },
 
-    minus (miscTypeOtherDuration) {
+    subtract (miscTypeOtherDuration) {
       const otherDuration = _formatMiscToCompaniDuration(miscTypeOtherDuration);
 
       return CompaniDurationFactory(_duration.minus(otherDuration));
