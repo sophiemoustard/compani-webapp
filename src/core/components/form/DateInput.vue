@@ -64,6 +64,7 @@ export default {
     },
     select (value) {
       try {
+        if (value === null) return;
         const selectedDate = CompaniDate(value, this.quasarDateFormat);
 
         this.update(selectedDate.toISO());
