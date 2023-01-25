@@ -17,14 +17,14 @@ jobs:
       # Check out the repository
       - id: checkout_api
         continue-on-error: true
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 'sophiemoustard/compani-api'
           ref: ${{ github.event.pull_request.head.ref }}
           path: 'api'
 
       - if: ${{ steps.checkout_api.outcome != 'success' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 'sophiemoustard/compani-api'
           ref: dev
@@ -33,14 +33,14 @@ jobs:
       - run: cd api && npm ci
         env:
           DETACHMENT_ALLOWED_COMPANY_IDS : ${{ secrets.DETACHMENT_ALLOWED_COMPANY_IDS }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: 'webapp'
       - run: cd webapp && npm ci
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v5
         with:
           working-directory: ./webapp
           start: npm run start:workflow:api, npm run start:workflow:webapp
