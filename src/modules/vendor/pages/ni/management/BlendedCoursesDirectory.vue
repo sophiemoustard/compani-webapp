@@ -21,7 +21,7 @@
       <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
         @update:model-value="updateSelectedType" />
     </div>
-    <div class="q-mb-lg filters-container">
+    <div class="q-mb-lg filters-container checkboxes">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
         @update:model-value="updateSelectedNoAddressInSlots" />
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s)"
@@ -287,3 +287,8 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.checkboxes
+  grid-gap: 12px 10px
+</style>
