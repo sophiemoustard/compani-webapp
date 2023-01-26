@@ -66,7 +66,7 @@ export const courseTimelineMixin = {
     },
     getDurationTodayToEndCourse (course) {
       const lastSlot = course.slots[course.slots.length - 1];
-      return CompaniDate().diff(CompaniDate(lastSlot[0].startDate).startOf(DAY), SECOND);
+      return CompaniDate().startOf(DAY).diff(CompaniDate(lastSlot[0].startDate), SECOND);
     },
     happened (sameDaySlots) {
       return CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
