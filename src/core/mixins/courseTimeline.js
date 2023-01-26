@@ -1,4 +1,4 @@
-import { FORTHCOMING, IN_PROGRESS, COMPLETED, DAY, PT0S } from '@data/constants';
+import { FORTHCOMING, IN_PROGRESS, COMPLETED, DAY, PT0S, SECOND } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import { durationAscendingSort } from '@helpers/dates/utils';
 
@@ -50,23 +50,23 @@ export const courseTimelineMixin = {
     },
     getDurationTodayToStartCourse (course) {
       if (!course.slots.length && course.estimatedStartDate) {
-        return CompaniDate(course.estimatedStartDate).diff(CompaniDate().startOf(DAY), DAY);
+        return CompaniDate(course.estimatedStartDate).diff(CompaniDate().startOf(DAY), SECOND);
       }
       if (!course.slots.length && course.slotsToPlan.length) return `PT${Number.MAX_SAFE_INTEGER - 1}S`;
       if (!course.slots.length) return `PT${Number.MAX_SAFE_INTEGER}S`;
 
       const firstSlot = course.slots[0];
-      return CompaniDate(firstSlot[0].startDate).diff(CompaniDate().startOf(DAY), DAY);
+      return CompaniDate(firstSlot[0].startDate).diff(CompaniDate().startOf(DAY), SECOND);
     },
     getDurationTodayToNextSlot (course) {
       const nextSlot = course.slots.filter(daySlots => !this.happened(daySlots))[0];
       if (!nextSlot) return PT0S;
 
-      return CompaniDate(nextSlot[0].startDate).diff(CompaniDate().startOf(DAY), DAY);
+      return CompaniDate(nextSlot[0].startDate).diff(CompaniDate().startOf(DAY), SECOND);
     },
     getDurationTodayToEndCourse (course) {
       const lastSlot = course.slots[course.slots.length - 1];
-      return CompaniDate().diff(CompaniDate(lastSlot[0].startDate).startOf(DAY), DAY);
+      return CompaniDate().diff(CompaniDate(lastSlot[0].startDate).startOf(DAY), SECOND);
     },
     happened (sameDaySlots) {
       return CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
