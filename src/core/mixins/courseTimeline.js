@@ -1,6 +1,6 @@
-import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
+import { FORTHCOMING, IN_PROGRESS, COMPLETED, DAY, PT0S, SECOND } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
-import CompaniDuration from '@helpers/dates/companiDurations';
+import { durationAscendingSort } from '@helpers/dates/utils';
 
 export const courseTimelineMixin = {
   computed: {
@@ -8,11 +8,9 @@ export const courseTimelineMixin = {
       return this.courses
         .filter(this.isForthcoming)
         .map(course => ({ ...course, status: FORTHCOMING }))
-        .sort((a, b) => (
-          CompaniDuration(this.getDurationNowToStartCourse(a)).isLongerThan(this.getDurationNowToStartCourse(b))
-            ? 1
-            : -1
-        ));
+        .sort(
+          (a, b) => durationAscendingSort(this.getDurationTodayToStartCourse(a), this.getDurationTodayToStartCourse(b))
+        );
     },
     courseListInProgress () {
       return this.courses
@@ -21,20 +19,17 @@ export const courseTimelineMixin = {
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
-          return CompaniDuration(this.getDurationNowToNextSlot(a)).isLongerThan(this.getDurationNowToNextSlot(b))
-            ? 1
-            : -1;
+
+          return durationAscendingSort(this.getDurationTodayToNextSlot(a), this.getDurationTodayToNextSlot(b));
         });
     },
     courseListCompleted () {
       return this.courses
         .filter(this.isCompleted)
         .map(course => ({ ...course, status: COMPLETED }))
-        .sort((a, b) => (
-          CompaniDuration(this.getDurationNowToEndCourse(a)).isLongerThan(this.getDurationNowToEndCourse(b))
-            ? 1
-            : -1
-        ));
+        .sort(
+          (a, b) => durationAscendingSort(this.getDurationTodayToEndCourse(a), this.getDurationTodayToEndCourse(b))
+        );
     },
   },
   methods: {
@@ -53,25 +48,25 @@ export const courseTimelineMixin = {
     isCompleted (course) {
       return !this.isForthcoming(course) && !this.isInProgress(course);
     },
-    getDurationNowToStartCourse (course) {
+    getDurationTodayToStartCourse (course) {
       if (!course.slots.length && course.estimatedStartDate) {
-        return CompaniDate(course.estimatedStartDate).diff(CompaniDate(), 'day');
+        return CompaniDate(course.estimatedStartDate).diff(CompaniDate().startOf(DAY), SECOND);
       }
       if (!course.slots.length && course.slotsToPlan.length) return `PT${Number.MAX_SAFE_INTEGER - 1}S`;
       if (!course.slots.length) return `PT${Number.MAX_SAFE_INTEGER}S`;
 
       const firstSlot = course.slots[0];
-      return CompaniDate(firstSlot[0].startDate).diff(CompaniDate(), 'day');
+      return CompaniDate(firstSlot[0].startDate).diff(CompaniDate().startOf(DAY), SECOND);
     },
-    getDurationNowToNextSlot (course) {
+    getDurationTodayToNextSlot (course) {
       const nextSlot = course.slots.filter(daySlots => !this.happened(daySlots))[0];
-      if (!nextSlot) return 'PT0S';
+      if (!nextSlot) return PT0S;
 
-      return CompaniDate(nextSlot[0].startDate).diff(CompaniDate(), 'day');
+      return CompaniDate(nextSlot[0].startDate).diff(CompaniDate().startOf(DAY), SECOND);
     },
-    getDurationNowToEndCourse (course) {
+    getDurationTodayToEndCourse (course) {
       const lastSlot = course.slots[course.slots.length - 1];
-      return CompaniDate().diff(CompaniDate(lastSlot[0].startDate), 'day');
+      return CompaniDate().startOf(DAY).diff(CompaniDate(lastSlot[0].startDate), SECOND);
     },
     happened (sameDaySlots) {
       return CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);

@@ -115,7 +115,7 @@ import {
 } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
-import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions } from '@helpers/utils';
+import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions, sortStrings } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
@@ -250,12 +250,14 @@ export default {
 
       if (!unsubscribedTraineesId.length) return [];
 
-      return unsubscribedTraineesId.reduce((acc, traineeId) => {
-        const trainee = this.potentialTrainees.find(t => (t._id === traineeId));
-        if (trainee) acc.push({ ...trainee, external: true });
+      return unsubscribedTraineesId
+        .reduce((acc, traineeId) => {
+          const trainee = this.potentialTrainees.find(t => (t._id === traineeId));
+          if (trainee) acc.push({ ...trainee, external: true });
 
-        return acc;
-      }, []);
+          return acc;
+        }, [])
+        .sort((a, b) => sortStrings(a.identity.lastname, b.identity.lastname));
     },
     traineeFilterOptions () {
       const formattedTrainees = formatAndSortIdentityOptions(this.potentialTrainees);

@@ -13,7 +13,9 @@ export default {
     selectedSalesRepresentative: '',
     selectedStartDate: '',
     selectedEndDate: '',
+    selectedType: '',
     selectedNoAddressInSlots: false,
+    selectedMissingTrainees: false,
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = data ? ({ ...data }) : data; },
@@ -23,7 +25,9 @@ export default {
     SET_SELECTED_SALES_REPRESENTATIVE: (state, data) => { state.selectedSalesRepresentative = data; },
     SET_SELECTED_START_DATE: (state, data) => { state.selectedStartDate = data; },
     SET_SELECTED_END_DATE: (state, data) => { state.selectedEndDate = data; },
+    SET_SELECTED_TYPE: (state, data) => { state.selectedType = data; },
     SET_SELECTED_NO_ADDRESS_IN_SLOTS: (state, data) => { state.selectedNoAddressInSlots = data; },
+    SET_SELECTED_MISSING_TRAINEES: (state, data) => { state.selectedMissingTrainees = data; },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {
@@ -55,9 +59,9 @@ export default {
     },
     setSelectedStartDate: ({ commit }, params) => { commit('SET_SELECTED_START_DATE', params.startDate); },
     setSelectedEndDate: ({ commit }, params) => { commit('SET_SELECTED_END_DATE', params.endDate); },
-    setSelectedNoAddressInSlots: ({ commit }, params) => {
-      commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', params.isSelected);
-    },
+    setSelectedType: ({ commit }, params) => { commit('SET_SELECTED_TYPE', params.type); },
+    setSelectedNoAddressInSlots: ({ commit }, params) => commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', params.isSelected),
+    setSelectedMissingTrainees: ({ commit }, params) => commit('SET_SELECTED_MISSING_TRAINEES', params.isSelected),
     resetFilters: ({ commit }) => {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
@@ -65,7 +69,9 @@ export default {
       commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
       commit('SET_SELECTED_START_DATE', '');
       commit('SET_SELECTED_END_DATE', '');
+      commit('SET_SELECTED_TYPE', '');
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
+      commit('SET_SELECTED_MISSING_TRAINEES', false);
     },
   },
   getters: {},
