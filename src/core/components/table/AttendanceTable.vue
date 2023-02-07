@@ -306,8 +306,7 @@ export default {
         const attendanceSheets = await AttendanceSheets.list({ course: this.course._id });
 
         if (this.course.type === INTER_B2B && this.isClientInterface) {
-          this.attendanceSheets = attendanceSheets
-            .filter(a => get(a, 'trainee.company') === this.loggedUser.company._id);
+          this.attendanceSheets = attendanceSheets.filter(a => a.company === this.loggedUser.company._id);
         } else this.attendanceSheets = attendanceSheets;
       } catch (e) {
         console.error(e);
