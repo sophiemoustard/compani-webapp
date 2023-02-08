@@ -154,7 +154,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
 
-      const lastUserCompany = userInfo.user.userCompanyList;
+      const lastUserCompany = userInfo.user.userCompanyList[0];
       doesLearnerHaveCurrentCompanyAndCandBeLink.value = lastUserCompany && !!lastUserCompany.endDate;
       let user;
 
