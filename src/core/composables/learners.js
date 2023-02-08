@@ -31,7 +31,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
   const newTrainee = ref('');
-  const doesLearnerHaveCurrentCompanyAndCandBeLink = ref(false);
+  const doesLearnerLastUserCompanyHaveAnEnding = ref(false);
 
   const filteredLearners = computed(() => {
     const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
@@ -97,7 +97,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   };
 
   const formatUserPayload = () => {
-    if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) {
+    if (doesLearnerLastUserCompanyHaveAnEnding.value) {
       return removeEmptyProps(pick(newLearner.value, ['company', 'userCompanyStartDate']));
     }
 
@@ -135,6 +135,34 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     if (companies.value.length === 1) newLearner.value.company = companies.value[0];
   };
 
+  const goToCreateUser = () => {
+    if (companies.value.length === 1) newLearner.value.company = companies.value[0];
+
+    return goToNextStep();
+  };
+
+  const handleErrorsForUserWithNoEndingUserCompany = (lastCompany) => {
+    if (companies.value.includes(lastCompany)) {
+      return isDirectory
+        ? NotifyWarning('Un compte rattaché à la structure existe déjà avec cette adresse mail.')
+        : NotifyWarning('L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.');
+    }
+    return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+  };
+
+  const handleErrorsForUserWithCurrentCompany = (company) => {
+    if (company && companies.value.includes(company)) {
+      const msg = isDirectory
+        ? 'Un compte rattaché à la structure existe déjà avec cette adresse mail.'
+        : 'L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.';
+
+      return NotifyWarning(msg);
+    }
+    if (company) {
+      return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+    }
+  };
+
   const nextStepLearnerCreationModal = async () => {
     try {
       learnerValidation.value.newLearner.$touch();
@@ -143,12 +171,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       learnerCreationModalLoading.value = true;
       const userInfo = await Users.exists({ email: newLearner.value.local.email });
 
-      if (!userInfo.exists) {
-        if (companies.value.length === 1) newLearner.value.company = companies.value[0];
-
-        return goToNextStep();
-      }
-
+      if (!userInfo.exists) return goToCreateUser();
       if (isDirectory && !isClientInterface) return NotifyWarning('L\'apprenant(e) est déjà ajouté(e).');
 
       if (!get(userInfo, 'user._id')) {
@@ -156,43 +179,24 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       }
 
       const lastUserCompany = userInfo.user.userCompanyList.sort(descendingSortBy('startDate'))[0];
-      doesLearnerHaveCurrentCompanyAndCandBeLink.value = lastUserCompany && !!lastUserCompany.endDate;
+      doesLearnerLastUserCompanyHaveAnEnding.value = lastUserCompany && !!lastUserCompany.endDate;
       let user;
 
-      if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) user = userInfo.user;
+      if (doesLearnerLastUserCompanyHaveAnEnding.value) user = userInfo.user;
       else {
-        const hasCurrentCompany = lastUserCompany && !lastUserCompany.endDate;
-        if (hasCurrentCompany && companies.value.includes(lastUserCompany.company)) {
-          return isDirectory
-            ? NotifyWarning('Un compte rattaché à la structure existe déjà avec cette adresse mail.')
-            : NotifyWarning('L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.');
-        }
-        if (hasCurrentCompany) {
-          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
-        }
+        const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
+        if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany();
 
         user = await Users.getById(userInfo.user._id);
+
         const company = get(user, 'company._id');
         userAlreadyHasCompany.value = !!get(user, 'company._id');
 
-        if (company && companies.value.includes(company)) {
-          const msg = isDirectory
-            ? 'Un compte rattaché à la structure existe déjà avec cette adresse mail.'
-            : 'L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.';
-
-          return NotifyWarning(msg);
-        }
-        if (company) {
-          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
-        }
+        if (company) return handleErrorsForUserWithCurrentCompany(company);
       }
 
-      if (!isDirectory) {
-        const isHelperOrAuxiliaryWithoutCompany = [HELPER, AUXILIARY_WITHOUT_COMPANY]
-          .includes(get(user, 'role.client.name'));
-        if (isHelperOrAuxiliaryWithoutCompany) {
-          return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
-        }
+      if (!isDirectory && [HELPER, AUXILIARY_WITHOUT_COMPANY].includes(get(user, 'role.client.name'))) {
+        return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
       }
 
       setNewLearner(user, lastUserCompany);
@@ -276,7 +280,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     learnerAlreadyExists,
     traineeAdditionModal,
     newTrainee,
-    doesLearnerHaveCurrentCompanyAndCandBeLink,
+    doesLearnerLastUserCompanyHaveAnEnding,
     // Computed
     filteredLearners,
     // Validations
