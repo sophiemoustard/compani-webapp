@@ -313,25 +313,26 @@ export default {
         const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
 
         if (userExistsInfo.exists) {
-          const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
-          const currentAndFutureCompanies = getCurrentAndFutureCompanies(userExistsInfo.user.userCompanyList);
+          const { _id: userId, userCompanyList } = userExistsInfo.user;
+          const hasPermissionOnUserInfo = !!userId;
+          if (!hasPermissionOnUserInfo) return NotifyNegative('Email relié à une autre structure.');
+
+          const currentAndFutureCompanies = getCurrentAndFutureCompanies(userCompanyList);
           const userHasValidCompany = !currentAndFutureCompanies.length ||
             currentAndFutureCompanies.includes(this.company._id);
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
-          if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
-            this.fetchedUser = await Users.getById(userExistsInfo.user._id);
-            this.fillNewUser(this.fetchedUser, currentAndFutureCompanies.length);
-          } else {
-            const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
-            if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
-            if (userHasClientRole) return NotifyNegative('Email déjà existant.');
-          }
+          if (!userHasValidCompany) return NotifyNegative('Email relié à une autre structure.');
+          if (userHasClientRole) return NotifyNegative('Email déjà existant.');
+
+          this.fetchedUser = await Users.getById(userExistsInfo.user._id);
+          this.fillNewUser(this.fetchedUser, currentAndFutureCompanies.length);
         }
 
         this.firstStep = false;
         this.v$.newUser.$reset();
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;
