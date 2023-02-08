@@ -464,29 +464,29 @@ export default {
     emergencyPhoneNbrError () {
       const validations = this.v$.userProfile.administrative.emergencyContact.phoneNumber;
 
-      if (validations.required.$reponse === false) return REQUIRED_LABEL;
-      if (validations.frPhoneNumber.$reponse === false) return 'Numéro de téléphone non valide';
+      if (validations.required.$response === false) return REQUIRED_LABEL;
+      if (validations.frPhoneNumber.$response === false) return 'Numéro de téléphone non valide';
 
       return '';
     },
     ibanError () {
       const validations = this.v$.userProfile.administrative.payment.rib.iban;
 
-      if (validations.required.$reponse === false) return REQUIRED_LABEL;
-      if (validations.iban.$reponse === false) return 'IBAN non valide';
+      if (validations.required.$response === false) return REQUIRED_LABEL;
+      if (validations.iban.$response === false) return 'IBAN non valide';
 
       return '';
     },
     bicError () {
       const validations = this.v$.userProfile.administrative.payment.rib.bic;
 
-      if (validations.required.$reponse === false) return REQUIRED_LABEL;
-      if (validations.bic.$reponse === false) return 'BIC non valide';
+      if (validations.required.$response === false) return REQUIRED_LABEL;
+      if (validations.bic.$response === false) return 'BIC non valide';
 
       return '';
     },
     addressError () {
-      return this.v$.userProfile.contact.address.fullAddress.required.$reponse === false
+      return this.v$.userProfile.contact.address.fullAddress.required.$response === false
         ? REQUIRED_LABEL
         : 'Adresse non valide';
     },

@@ -83,7 +83,7 @@ export default {
         align: 'left',
         sortable: true,
         sort: (a, b) => sortStrings(a.lastname, b.lastname),
-        style: isBlended ? 'width: 40%' : 'width: 70%',
+        style: isBlended.value ? 'width: 40%' : 'width: 70%',
       },
       {
         name: 'isConnected',

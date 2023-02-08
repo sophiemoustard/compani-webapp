@@ -34,8 +34,7 @@
   </q-card>
 </template>
 <script>
-import { computed } from 'vue';
-import { toRefs } from 'vue-demi';
+import { computed, toRefs } from 'vue';
 import { get } from 'lodash';
 import moment from '@helpers/moment';
 import { formatHoursWithMinutes } from '@helpers/date';
