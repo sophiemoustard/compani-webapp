@@ -58,7 +58,7 @@
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
-      @submit="submitLearnerCreationModal" :disable-user-info="doesLearnerHaveCurrentCompanyAndCandBeLink" />
+      @submit="submitLearnerCreationModal" :disable-user-info="doesLearnerLastUserCompanyHaveAnEnding" />
 
     <company-addition-modal v-model="companyAdditionModal" v-model:selected-company="selectedCompany"
       @submit="addCompany" :validations="companyValidation.selectedCompany" :loading="companyModalLoading"
@@ -194,7 +194,7 @@ export default {
       submitLearnerCreationModal,
       resetLearnerCreationModal,
       tableLoading,
-      doesLearnerHaveCurrentCompanyAndCandBeLink,
+      doesLearnerLastUserCompanyHaveAnEnding,
     } = useLearners(refresh, false, false, courseCompanyIds);
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
@@ -279,7 +279,7 @@ export default {
       selectCompanyOptions,
       companyModalLoading,
       companyPagination,
-      doesLearnerHaveCurrentCompanyAndCandBeLink,
+      doesLearnerLastUserCompanyHaveAnEnding,
       // Validations
       learnerValidation,
       traineeValidation,
