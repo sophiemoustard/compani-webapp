@@ -186,7 +186,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       if (lastUserCompany && !!lastUserCompany.endDate) user = userInfo.user;
       else {
         const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
-        if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany();
+        if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany(lastUserCompany.company);
 
         user = await Users.getById(userInfo.user._id);
 
