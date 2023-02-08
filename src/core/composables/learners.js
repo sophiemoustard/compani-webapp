@@ -31,7 +31,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
   const newTrainee = ref('');
-  const doesLearnerLastUserCompanyHaveAnEnding = ref(false);
+  const doesLearnerHaveCurrentCompanyAndCandBeLink = ref(false);
 
   const filteredLearners = computed(() => {
     const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
@@ -97,7 +97,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   };
 
   const formatUserPayload = () => {
-    if (doesLearnerLastUserCompanyHaveAnEnding.value) {
+    if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) {
       return removeEmptyProps(pick(newLearner.value, ['company', 'userCompanyStartDate']));
     }
 
@@ -179,10 +179,11 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       }
 
       const lastUserCompany = userInfo.user.userCompanyList.sort(descendingSortBy('startDate'))[0];
-      doesLearnerLastUserCompanyHaveAnEnding.value = lastUserCompany && !!lastUserCompany.endDate;
+      doesLearnerHaveCurrentCompanyAndCandBeLink.value = lastUserCompany && !!lastUserCompany.endDate &&
+        CompaniDate().isBefore(lastUserCompany.endDate);
       let user;
 
-      if (doesLearnerLastUserCompanyHaveAnEnding.value) user = userInfo.user;
+      if (lastUserCompany && !!lastUserCompany.endDate) user = userInfo.user;
       else {
         const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
         if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany();
@@ -280,7 +281,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     learnerAlreadyExists,
     traineeAdditionModal,
     newTrainee,
-    doesLearnerLastUserCompanyHaveAnEnding,
+    doesLearnerHaveCurrentCompanyAndCandBeLink,
     // Computed
     filteredLearners,
     // Validations
