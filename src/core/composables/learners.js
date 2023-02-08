@@ -30,6 +30,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
   const newTrainee = ref('');
+  const doesLearnerHaveCurrentCompanyAndCandBeLink = ref(false);
 
   const filteredLearners = computed(() => {
     const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
@@ -95,6 +96,10 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   };
 
   const formatUserPayload = () => {
+    if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) {
+      return removeEmptyProps(pick(newLearner.value, ['company', 'userCompanyStartDate']));
+    }
+
     const payload = removeEmptyProps(pick(
       newLearner.value,
       ['identity', 'local', 'contact', 'company', 'userCompanyStartDate']
@@ -114,13 +119,17 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     }
   };
 
-  const setNewLearner = (user) => {
+  const setNewLearner = (user, lastUserCompany) => {
     newLearner.value._id = user._id;
     newLearner.value.identity = {
       firstname: get(user, 'identity.firstname'),
       lastname: get(user, 'identity.lastname'),
     };
     newLearner.value.contact = { phone: get(user, 'contact.phone') };
+
+    if (lastUserCompany && lastUserCompany.endDate) {
+      newLearner.value.userCompanyStartDate = CompaniDate(lastUserCompany.endDate).startOf(DAY).add('P1D').toISO();
+    }
 
     if (companies.value.length === 1) newLearner.value.company = companies.value[0];
   };
@@ -144,17 +153,38 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       if (!get(userInfo, 'user._id')) {
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
-      const user = await Users.getById(userInfo.user._id);
 
-      if (get(user, 'company._id')) {
-        if (companies.value.includes(user.company._id)) {
-          const msg = isDirectory
-            ? 'Un compte rattaché à la structure existe déjà avec cette adresse mail.'
-            : 'L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.';
+      const lastUserCompany = userInfo.user.userCompanyList;
+      doesLearnerHaveCurrentCompanyAndCandBeLink.value = lastUserCompany && !!lastUserCompany.endDate;
+      let user;
 
-          return NotifyWarning(msg);
+      if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) {
+        const hasCurrentCompany = lastUserCompany && !lastUserCompany.endDate;
+        if (hasCurrentCompany && companies.value.includes(lastUserCompany.company)) {
+          return isDirectory
+            ? NotifyWarning('Un compte rattaché à la structure existe déjà avec cette adresse mail.')
+            : NotifyWarning('L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.');
         }
-        return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+        if (hasCurrentCompany) {
+          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+        }
+
+        user = userInfo.user;
+      } else {
+        user = await Users.getById(userInfo.user._id);
+        const company = get(user, 'company._id');
+        userAlreadyHasCompany.value = !!get(user, 'company._id');
+
+        if (company) {
+          if (companies.value.includes(company)) {
+            const msg = isDirectory
+              ? 'Un compte rattaché à la structure existe déjà avec cette adresse mail.'
+              : 'L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.';
+
+            return NotifyWarning(msg);
+          }
+          return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+        }
       }
 
       if (!isDirectory) {
@@ -165,8 +195,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
         }
       }
 
-      setNewLearner(user);
-      userAlreadyHasCompany.value = !!get(user, 'company._id');
+      setNewLearner(user, lastUserCompany);
       learnerAlreadyExists.value = true;
 
       return goToNextStep();
@@ -247,6 +276,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     learnerAlreadyExists,
     traineeAdditionModal,
     newTrainee,
+    doesLearnerHaveCurrentCompanyAndCandBeLink,
     // Computed
     filteredLearners,
     // Validations
