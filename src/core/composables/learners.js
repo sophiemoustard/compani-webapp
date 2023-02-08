@@ -8,6 +8,7 @@ import Users from '@api/Users';
 import Email from '@api/Email';
 import { TRAINEE, DAY, HELPER, AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
+import { descendingSortBy } from '@helpers/dates/utils';
 import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -154,11 +155,12 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
 
-      const lastUserCompany = userInfo.user.userCompanyList[0];
+      const lastUserCompany = userInfo.user.userCompanyList.sort(descendingSortBy('startDate'))[0];
       doesLearnerHaveCurrentCompanyAndCandBeLink.value = lastUserCompany && !!lastUserCompany.endDate;
       let user;
 
-      if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) {
+      if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) user = userInfo.user;
+      else {
         const hasCurrentCompany = lastUserCompany && !lastUserCompany.endDate;
         if (hasCurrentCompany && companies.value.includes(lastUserCompany.company)) {
           return isDirectory
@@ -169,8 +171,6 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
           return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
         }
 
-        user = userInfo.user;
-      } else {
         user = await Users.getById(userInfo.user._id);
         const company = get(user, 'company._id');
         userAlreadyHasCompany.value = !!get(user, 'company._id');
