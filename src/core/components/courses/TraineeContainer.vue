@@ -58,7 +58,8 @@
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
       :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
-      @submit="submitLearnerCreationModal" :disable-user-info="doesLearnerHaveCurrentCompanyAndCandBeLink" />
+      @submit="submitLearnerCreationModal"
+      :disable-user-info="!isRofOrAdmin && doesLearnerHaveCurrentCompanyAndCandBeLink" />
 
     <company-addition-modal v-model="companyAdditionModal" v-model:selected-company="selectedCompany"
       @submit="addCompany" :validations="companyValidation.selectedCompany" :loading="companyModalLoading"
