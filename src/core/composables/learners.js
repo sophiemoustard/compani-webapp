@@ -193,7 +193,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
       const hasCurrentCompany = lastUserCompany && CompaniDate().isBefore(lastUserCompany.endDate);
       const loggedUserCompany = get(loggedUser.value, 'company._id');
-      const sameCompany = lastUserCompany.company === loggedUserCompany;
+      const sameCompany = lastUserCompany && lastUserCompany.company === loggedUserCompany;
       disableUserInfoEdition.value = (isClientInterface || !isRofOrAdmin.value) && hasCurrentCompany && !sameCompany;
 
       return goToNextStep();
