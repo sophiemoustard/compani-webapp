@@ -42,6 +42,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
   const $store = useStore();
   const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+  const loggedUser = computed(() => $store.state.main.loggedUser);
   const isRofOrAdmin = ref([TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
 
   const filteredLearners = computed(() => {
@@ -191,7 +192,9 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       learnerAlreadyExists.value = true;
 
       const hasCurrentCompany = lastUserCompany && CompaniDate().isBefore(lastUserCompany.endDate);
-      disableUserInfoEdition.value = (isClientInterface || !isRofOrAdmin.value) && hasCurrentCompany;
+      const loggedUserCompany = get(loggedUser.value, 'company._id');
+      const sameCompany = lastUserCompany.company === loggedUserCompany;
+      disableUserInfoEdition.value = (isClientInterface || !isRofOrAdmin.value) && hasCurrentCompany && !sameCompany;
 
       return goToNextStep();
     } catch (e) {
