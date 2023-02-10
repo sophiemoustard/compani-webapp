@@ -1,4 +1,5 @@
 import { computed, ref } from 'vue';
+import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required, email } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -6,7 +7,14 @@ import pick from 'lodash/pick';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import Email from '@api/Email';
-import { TRAINEE, DAY, HELPER, AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
+import {
+  TRAINEE,
+  DAY,
+  HELPER,
+  AUXILIARY_WITHOUT_COMPANY,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
+} from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy } from '@helpers/dates/utils';
 import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
@@ -27,11 +35,14 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const firstStep = ref(true);
   const learnerList = ref([]);
   const tableLoading = ref(false);
-  const userAlreadyHasCompany = ref(false);
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
   const newTrainee = ref('');
-  const doesLearnerHaveCurrentCompanyAndCandBeLink = ref(false);
+  const disableUserInfoEdition = ref(false);
+
+  const $store = useStore();
+  const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+  const isRofOrAdmin = ref([TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
 
   const filteredLearners = computed(() => {
     const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
@@ -97,7 +108,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   };
 
   const formatUserPayload = () => {
-    if (doesLearnerHaveCurrentCompanyAndCandBeLink.value) {
+    if (disableUserInfoEdition.value) {
       return removeEmptyProps(pick(newLearner.value, ['company', 'userCompanyStartDate']));
     }
 
@@ -150,19 +161,6 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
   };
 
-  const handleErrorsForUserWithCurrentCompany = (company) => {
-    if (company && companies.value.includes(company)) {
-      const msg = isDirectory
-        ? 'Un compte rattaché à la structure existe déjà avec cette adresse mail.'
-        : 'L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.';
-
-      return NotifyWarning(msg);
-    }
-    if (company) {
-      return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
-    }
-  };
-
   const nextStepLearnerCreationModal = async () => {
     try {
       learnerValidation.value.newLearner.$touch();
@@ -179,22 +177,11 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       }
 
       const lastUserCompany = userInfo.user.userCompanyList.sort(descendingSortBy('startDate'))[0];
-      doesLearnerHaveCurrentCompanyAndCandBeLink.value = lastUserCompany && !!lastUserCompany.endDate &&
-        CompaniDate().isBefore(lastUserCompany.endDate);
-      let user;
 
-      if (lastUserCompany && !!lastUserCompany.endDate) user = userInfo.user;
-      else {
-        const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
-        if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany(lastUserCompany.company);
+      const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
+      if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany(lastUserCompany.company);
 
-        user = await Users.getById(userInfo.user._id);
-
-        const company = get(user, 'company._id');
-        userAlreadyHasCompany.value = !!get(user, 'company._id');
-
-        if (company) return handleErrorsForUserWithCurrentCompany(company);
-      }
+      const { user } = userInfo;
 
       if (!isDirectory && [HELPER, AUXILIARY_WITHOUT_COMPANY].includes(get(user, 'role.client.name'))) {
         return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
@@ -202,6 +189,9 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
       setNewLearner(user, lastUserCompany);
       learnerAlreadyExists.value = true;
+
+      const hasCurrentCompany = lastUserCompany && CompaniDate().isBefore(lastUserCompany.endDate);
+      disableUserInfoEdition.value = (isClientInterface || !isRofOrAdmin.value) && hasCurrentCompany;
 
       return goToNextStep();
     } catch (e) {
@@ -260,7 +250,6 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     firstStep.value = true;
     newLearner.value = { ...clear(newLearner.value), userCompanyStartDate: CompaniDate().startOf(DAY).toISO() };
     learnerValidation.value.newLearner.$reset();
-    userAlreadyHasCompany.value = false;
     learnerAlreadyExists.value = false;
   };
 
@@ -277,13 +266,13 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     firstStep,
     learnerList,
     tableLoading,
-    userAlreadyHasCompany,
     learnerAlreadyExists,
     traineeAdditionModal,
     newTrainee,
-    doesLearnerHaveCurrentCompanyAndCandBeLink,
+    disableUserInfoEdition,
     // Computed
     filteredLearners,
+    isRofOrAdmin,
     // Validations
     learnerValidation,
     traineeValidation,

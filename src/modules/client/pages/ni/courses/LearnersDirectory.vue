@@ -20,7 +20,7 @@
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
       :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" @hide="resetLearnerCreationModal"
       @next-step="nextStepLearnerCreationModal" :validations="learnerValidation.newLearner" disable-company
-      :company-options="companyOptions" />
+      :company-options="companyOptions" :disable-user-info="disableUserInfoEdition" />
   </q-page>
 </template>
 
@@ -58,6 +58,7 @@ export default {
       newLearner,
       learnerCreationModal,
       learnerCreationModalLoading,
+      disableUserInfoEdition,
       firstStep,
       learnerList,
       tableLoading,
@@ -81,6 +82,7 @@ export default {
       tableLoading,
       learnerCreationModalLoading,
       learnerCreationModal,
+      disableUserInfoEdition,
       // Computed
       filteredLearners,
       company,

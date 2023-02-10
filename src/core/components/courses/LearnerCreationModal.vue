@@ -21,7 +21,7 @@
           @update:model-value="update($event.trim(), 'company')" caption="Structure" required-field
           @blur="validations.company.$touch" :error="validations.company.$error" :disable="disableCompany" />
         <ni-date-input caption="Date de rattachement" :model-value="newUser.userCompanyStartDate" in-modal last
-          @update:model-value="update($event, 'userCompanyStartDate')" required :disable="disableStartDate"
+          @update:model-value="update($event, 'userCompanyStartDate')" required
           :error="validations.userCompanyStartDate.$error" />
       </template>
       <template #footer>
@@ -49,7 +49,6 @@ export default {
     modelValue: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
     disableCompany: { type: Boolean, default: false },
-    disableStartDate: { type: Boolean, default: false },
     disableUserInfo: { type: Boolean, default: false },
     newUser: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
