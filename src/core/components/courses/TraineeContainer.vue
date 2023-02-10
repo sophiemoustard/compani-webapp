@@ -56,10 +56,9 @@
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
-      :company-options="companyOptions" :disable-company="disableCompany" :learner-edition="learnerAlreadyExists"
+      :company-options="companyOptions" :disable-company="isIntraCourse" :learner-edition="learnerAlreadyExists"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
-      @submit="submitLearnerCreationModal"
-      :disable-user-info="!isRofOrAdmin && doesLearnerHaveCurrentCompanyAndCandBeLink" />
+      @submit="submitLearnerCreationModal" :disable-user-info="disableUserInfoEdition" />
 
     <company-addition-modal v-model="companyAdditionModal" v-model:selected-company="selectedCompany"
       @submit="addCompany" :validations="companyValidation.selectedCompany" :loading="companyModalLoading"
@@ -74,12 +73,7 @@ import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
-import {
-  TRAINER,
-  DEFAULT_AVATAR,
-  TRAINING_ORGANISATION_MANAGER,
-  VENDOR_ADMIN,
-} from '@data/constants';
+import { TRAINER, DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -137,8 +131,6 @@ export default {
 
     const isTrainer = ref(vendorRole.value === TRAINER);
 
-    const isRofOrAdmin = ref([TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
-
     const course = computed(() => $store.state.course.course);
 
     const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
@@ -157,8 +149,6 @@ export default {
         additionalFilters: [pt.local.email],
       }))
       .sort((a, b) => a.label.localeCompare(b.label)));
-
-    const disableCompany = computed(() => isIntraCourse.value || userAlreadyHasCompany.value);
 
     const maxTraineesErrorMessage = computed(() => {
       if (get(validations.value, 'maxTrainees.strictPositiveNumber.$response') === false ||
@@ -180,6 +170,8 @@ export default {
 
     const refresh = () => emit('refresh');
 
+    const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
+
     const {
       newLearner,
       newTrainee,
@@ -187,18 +179,16 @@ export default {
       learnerCreationModal,
       learnerCreationModalLoading,
       firstStep,
-      userAlreadyHasCompany,
       learnerAlreadyExists,
+      isRofOrAdmin,
       learnerValidation,
       traineeValidation,
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
       tableLoading,
-      doesLearnerHaveCurrentCompanyAndCandBeLink,
-    } = useLearners(refresh, false, false, courseCompanyIds);
-
-    const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
+      disableUserInfoEdition,
+    } = useLearners(refresh, isClientInterface, false, courseCompanyIds);
 
     const {
       selectedCompany,
@@ -280,7 +270,7 @@ export default {
       selectCompanyOptions,
       companyModalLoading,
       companyPagination,
-      doesLearnerHaveCurrentCompanyAndCandBeLink,
+      disableUserInfoEdition,
       // Validations
       learnerValidation,
       traineeValidation,
@@ -289,7 +279,6 @@ export default {
       // Computed
       tableTitle,
       traineesOptions,
-      disableCompany,
       course,
       isIntraCourse,
       isClientInterface,
