@@ -16,8 +16,14 @@ import {
   VENDOR_ADMIN,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
-import { descendingSortBy } from '@helpers/dates/utils';
-import { clear, formatIdentity, removeDiacritics, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
+import {
+  clear,
+  formatIdentity,
+  removeDiacritics,
+  removeEmptyProps,
+  formatPhoneForPayload,
+  getLastVersion,
+} from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
@@ -177,23 +183,21 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
 
-      const lastUserCompany = userInfo.user.userCompanyList.sort(descendingSortBy('startDate'))[0];
+      const lastUserCompany = userInfo.user.userCompanyList.length &&
+        getLastVersion(userInfo.user.userCompanyList, 'startDate');
 
       const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
       if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany(lastUserCompany.company);
 
-      const { user } = userInfo;
-
-      if (!isDirectory && [HELPER, AUXILIARY_WITHOUT_COMPANY].includes(get(user, 'role.client.name'))) {
+      if (!isDirectory && [HELPER, AUXILIARY_WITHOUT_COMPANY].includes(get(userInfo, 'user.role.client.name'))) {
         return NotifyNegative('Cette personne ne peut pas être ajoutée à la formation.');
       }
 
-      setNewLearner(user, lastUserCompany);
+      setNewLearner(userInfo.user, lastUserCompany);
       learnerAlreadyExists.value = true;
 
       const hasCurrentCompany = lastUserCompany && CompaniDate().isBefore(lastUserCompany.endDate);
-      const loggedUserCompany = get(loggedUser.value, 'company._id');
-      const sameCompany = lastUserCompany && lastUserCompany.company === loggedUserCompany;
+      const sameCompany = lastUserCompany && lastUserCompany.company === get(loggedUser.value, 'company._id');
       disableUserInfoEdition.value = (isClientInterface || !isRofOrAdmin.value) && hasCurrentCompany && !sameCompany;
 
       return goToNextStep();

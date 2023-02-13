@@ -313,16 +313,15 @@ export default {
         const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
 
         if (userExistsInfo.exists) {
-          const { _id: userId, userCompanyList } = userExistsInfo.user;
-          const hasPermissionOnUserInfo = !!userId;
+          const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
           if (!hasPermissionOnUserInfo) return NotifyNegative('Email relié à une autre structure.');
 
-          const currentAndFutureCompanies = getCurrentAndFutureCompanies(userCompanyList);
+          const currentAndFutureCompanies = getCurrentAndFutureCompanies(userExistsInfo.user.userCompanyList);
           const userHasValidCompany = !currentAndFutureCompanies.length ||
             currentAndFutureCompanies.includes(this.company._id);
-          const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
-
           if (!userHasValidCompany) return NotifyNegative('Email relié à une autre structure.');
+
+          const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
           if (userHasClientRole) return NotifyNegative('Email déjà existant.');
 
           this.fetchedUser = await Users.getById(userExistsInfo.user._id);
