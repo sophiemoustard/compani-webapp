@@ -50,9 +50,11 @@
       </q-card-actions>
     </div>
 
-    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee="newTrainee" @submit="addTrainee"
-      :validations="traineeValidation.newTrainee" :loading="traineeModalLoading" @hide="resetTraineeAdditionForm"
-      :trainees-options="traineesOptions" @open-learner-creation-modal="openLearnerCreationModal" />
+    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee-registration="newTraineeRegistration"
+      @submit="addTrainee" :validations="traineeValidation.newTraineeRegistration" :loading="traineeModalLoading"
+      @hide="resetTraineeAdditionForm" :trainees-options="traineesOptions" @update-trainee="updateTrainee"
+      @open-learner-creation-modal="openLearnerCreationModal" :trainee-company-options="traineeCompanyOptions"
+      :display-company-select="!isIntraCourse" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -75,6 +77,7 @@ import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import { TRAINER, DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
@@ -168,13 +171,27 @@ export default {
 
     const hasLinkedCompanies = computed(() => !!course.value.companies.length);
 
+    const traineeCompanyOptions = computed(() => {
+      let options = {};
+      for (let i = 0; i < potentialTrainees.value.length; i++) {
+        const currentAndFutureCompanyList = getCurrentAndFutureCompanies(potentialTrainees.value[i].userCompanyList);
+        options = {
+          ...options,
+          [potentialTrainees.value[i]._id]: currentAndFutureCompanyList
+            .filter(company => courseCompanyIds.value.includes(company._id))
+            .map(company => ({ label: company.name, value: company._id })),
+        };
+      }
+      return options;
+    });
+
     const refresh = () => emit('refresh');
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
 
     const {
       newLearner,
-      newTrainee,
+      newTraineeRegistration,
       traineeAdditionModal,
       learnerCreationModal,
       learnerCreationModalLoading,
@@ -204,16 +221,18 @@ export default {
     } = useCompaniesCoursesLink(course, emit);
 
     const resetTraineeAdditionForm = () => {
-      newTrainee.value = '';
-      traineeValidation.value.newTrainee.$reset();
+      newTraineeRegistration.value = {};
+      traineeValidation.value.newTraineeRegistration.$reset();
     };
     const addTrainee = async () => {
       try {
         traineeModalLoading.value = true;
-        traineeValidation.value.newTrainee.$touch();
-        if (traineeValidation.value.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Courses.addTrainee(course.value._id, { trainee: newTrainee.value });
+        traineeValidation.value.newTraineeRegistration.$touch();
+        if (traineeValidation.value.newTraineeRegistration.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const payload = isIntraCourse.value
+          ? { trainee: newTraineeRegistration.value.trainee }
+          : newTraineeRegistration.value;
+        await Courses.addTrainee(course.value._id, payload);
         traineeAdditionModal.value = false;
 
         refresh();
@@ -248,6 +267,15 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId, defaultTab: 'infos' } });
     };
 
+    const updateTrainee = (payload) => {
+      let trainee = { ...payload };
+      if (traineeCompanyOptions.value[payload.trainee].length === 1) {
+        const company = traineeCompanyOptions.value[payload.trainee][0].value;
+        trainee = { ...trainee, company };
+      }
+      newTraineeRegistration.value = { ...newTraineeRegistration.value, ...trainee };
+    };
+
     const created = async () => { await getPotentialCompanies(); };
 
     created();
@@ -260,7 +288,7 @@ export default {
       learnerCreationModal,
       learnerAlreadyExists,
       traineeAdditionModal,
-      newTrainee,
+      newTraineeRegistration,
       traineeModalLoading,
       companyOptions,
       companyColumns,
@@ -288,6 +316,7 @@ export default {
       traineesGroupedByCompanies,
       courseCompanyIds,
       hasLinkedCompanies,
+      traineeCompanyOptions,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -304,6 +333,7 @@ export default {
       addCompany,
       resetCompanyAdditionModal,
       validateCompanyDeletion,
+      updateTrainee,
     };
   },
 };
