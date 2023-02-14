@@ -51,10 +51,10 @@
     </div>
 
     <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee-registration="newTraineeRegistration"
-      @submit="addTrainee" :validations="traineeValidation.newTraineeRegistration" :loading="traineeModalLoading"
-      @hide="resetTraineeAdditionForm" :trainees-options="traineesOptions" @update-trainee="updateTrainee"
-      @open-learner-creation-modal="openLearnerCreationModal" :trainee-company-options="traineeCompanyOptions"
-      :display-company-select="!isIntraCourse" />
+      @submit="addTrainee" :validations="traineeRegistrationValidation.newTraineeRegistration"
+      :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :trainees-options="traineesOptions"
+      @update-trainee-registration="updateTraineeRegistration" @open-learner-creation-modal="openLearnerCreationModal"
+      :trainees-company-options="traineesCompanyOptions" :display-company-select="!isIntraCourse" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -171,16 +171,13 @@ export default {
 
     const hasLinkedCompanies = computed(() => !!course.value.companies.length);
 
-    const traineeCompanyOptions = computed(() => {
-      let options = {};
+    const traineesCompanyOptions = computed(() => {
+      const options = {};
       for (let i = 0; i < potentialTrainees.value.length; i++) {
         const currentAndFutureCompanyList = getCurrentAndFutureCompanies(potentialTrainees.value[i].userCompanyList);
-        options = {
-          ...options,
-          [potentialTrainees.value[i]._id]: currentAndFutureCompanyList
-            .filter(company => courseCompanyIds.value.includes(company._id))
-            .map(company => ({ label: company.name, value: company._id })),
-        };
+        options[potentialTrainees.value[i]._id] = currentAndFutureCompanyList
+          .filter(company => courseCompanyIds.value.includes(company._id))
+          .map(company => ({ label: company.name, value: company._id }));
       }
       return options;
     });
@@ -199,7 +196,7 @@ export default {
       learnerAlreadyExists,
       isRofOrAdmin,
       learnerValidation,
-      traineeValidation,
+      traineeRegistrationValidation,
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
@@ -222,19 +219,22 @@ export default {
 
     const resetTraineeAdditionForm = () => {
       newTraineeRegistration.value = {};
-      traineeValidation.value.newTraineeRegistration.$reset();
+      traineeRegistrationValidation.value.newTraineeRegistration.$reset();
     };
     const addTrainee = async () => {
       try {
         traineeModalLoading.value = true;
-        traineeValidation.value.newTraineeRegistration.$touch();
-        if (traineeValidation.value.newTraineeRegistration.$error) return NotifyWarning('Champ(s) invalide(s)');
+        traineeRegistrationValidation.value.newTraineeRegistration.$touch();
+        if (traineeRegistrationValidation.value.newTraineeRegistration.$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
         const payload = isIntraCourse.value
           ? { trainee: newTraineeRegistration.value.trainee }
           : newTraineeRegistration.value;
         await Courses.addTrainee(course.value._id, payload);
-        traineeAdditionModal.value = false;
 
+        traineeAdditionModal.value = false;
         refresh();
         NotifyPositive('Stagiaire ajouté(e).');
       } catch (e) {
@@ -267,10 +267,10 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId, defaultTab: 'infos' } });
     };
 
-    const updateTrainee = (payload) => {
+    const updateTraineeRegistration = (payload) => {
       let trainee = { ...payload };
-      if (traineeCompanyOptions.value[payload.trainee].length === 1) {
-        const company = traineeCompanyOptions.value[payload.trainee][0].value;
+      if (traineesCompanyOptions.value[payload.trainee].length === 1) {
+        const company = traineesCompanyOptions.value[payload.trainee][0].value;
         trainee = { ...trainee, company };
       }
       newTraineeRegistration.value = { ...newTraineeRegistration.value, ...trainee };
@@ -301,7 +301,7 @@ export default {
       disableUserInfoEdition,
       // Validations
       learnerValidation,
-      traineeValidation,
+      traineeRegistrationValidation,
       companyValidation,
       tableLoading,
       // Computed
@@ -316,7 +316,7 @@ export default {
       traineesGroupedByCompanies,
       courseCompanyIds,
       hasLinkedCompanies,
-      traineeCompanyOptions,
+      traineesCompanyOptions,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -333,7 +333,7 @@ export default {
       addCompany,
       resetCompanyAdditionModal,
       validateCompanyDeletion,
-      updateTrainee,
+      updateTraineeRegistration,
     };
   },
 };
