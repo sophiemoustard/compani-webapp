@@ -53,8 +53,8 @@
     <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee-registration="newTraineeRegistration"
       @submit="addTrainee" :validations="traineeRegistrationValidation.newTraineeRegistration"
       :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :trainees-options="traineesOptions"
-      @update-trainee-registration="updateTraineeRegistration" @open-learner-creation-modal="openLearnerCreationModal"
-      :trainees-company-options="traineesCompanyOptions" :display-company-select="!isIntraCourse" />
+      @open-learner-creation-modal="openLearnerCreationModal" :trainees-company-options="traineesCompanyOptions"
+      :display-company-select="!isIntraCourse" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -267,15 +267,6 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId, defaultTab: 'infos' } });
     };
 
-    const updateTraineeRegistration = (payload) => {
-      let trainee = { ...payload };
-      if (traineesCompanyOptions.value[payload.trainee].length === 1) {
-        const company = traineesCompanyOptions.value[payload.trainee][0].value;
-        trainee = { ...trainee, company };
-      }
-      newTraineeRegistration.value = { ...newTraineeRegistration.value, ...trainee };
-    };
-
     const created = async () => { await getPotentialCompanies(); };
 
     created();
@@ -333,7 +324,6 @@ export default {
       addCompany,
       resetCompanyAdditionModal,
       validateCompanyDeletion,
-      updateTraineeRegistration,
     };
   },
 };
