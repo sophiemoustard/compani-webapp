@@ -87,7 +87,7 @@ export default {
           dates.startDate = CompaniDate(dates.startDate).set({ second: 0, millisecond: 0 }).toISO();
         }
 
-        if ((key === 'startHour' && !disableEndHour.value) || key === 'endHour') {
+        if (!disableEndHour.value) {
           if (dates.endHour === '23:59') {
             dates.endDate = CompaniDate(dates.endDate).set({ second: 59, millisecond: 999 }).toISO();
           } else {
