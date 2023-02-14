@@ -43,7 +43,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const tableLoading = ref(false);
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
-  const newTrainee = ref('');
+  const newTraineeRegistration = ref({ trainee: '', company: '' });
   const disableUserInfoEdition = ref(false);
 
   const $store = useStore();
@@ -66,10 +66,10 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       userCompanyStartDate: { required },
     },
   }));
-  const traineeRules = { newTrainee: { required } };
+  const traineeRules = { newTraineeRegistration: { trainee: { required }, company: { required } } };
 
   const learnerValidation = useVuelidate(learnerRules, { newLearner });
-  const traineeValidation = useVuelidate(traineeRules, { newTrainee });
+  const traineeRegistrationValidation = useVuelidate(traineeRules, { newTraineeRegistration });
 
   const goToNextStep = () => {
     firstStep.value = false;
@@ -239,8 +239,8 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
     try {
       learnerCreationModalLoading.value = true;
-      if (learnerAlreadyExists.value) newTrainee.value = await updateLearner();
-      else newTrainee.value = await createLearner();
+      if (learnerAlreadyExists.value) newTraineeRegistration.value = { trainee: await updateLearner(), company: '' };
+      else newTraineeRegistration.value = { trainee: await createLearner(), company: '' };
 
       await refresh();
       learnerCreationModal.value = false;
@@ -275,14 +275,14 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     tableLoading,
     learnerAlreadyExists,
     traineeAdditionModal,
-    newTrainee,
+    newTraineeRegistration,
     disableUserInfoEdition,
     // Computed
     filteredLearners,
     isRofOrAdmin,
     // Validations
     learnerValidation,
-    traineeValidation,
+    traineeRegistrationValidation,
     // Methods
     updateSearch,
     goToNextStep,
