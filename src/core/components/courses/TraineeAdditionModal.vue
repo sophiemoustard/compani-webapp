@@ -57,7 +57,7 @@ export default {
     'ni-select': Select,
     'ni-button': Button,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update-trainee-registration', 'open-learner-creation-modal'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-trainee-registration', 'open-learner-creation-modal'],
   setup (props, { emit }) {
     const { newTraineeRegistration, traineesCompanyOptions } = toRefs(props);
 
@@ -68,13 +68,22 @@ export default {
     });
 
     const hide = () => emit('hide');
+
     const input = event => emit('update:model-value', event);
+
     const submit = () => emit('submit');
+
     const updateTrainee = (event) => {
-      emit('update-trainee-registration', set({ ...newTraineeRegistration.value }, 'trainee', event));
+      if (traineesCompanyOptions.value[event].length === 1) {
+        const company = traineesCompanyOptions.value[event][0].value;
+        emit('update:new-trainee-registration', { company, trainee: event });
+      } else {
+        emit('update:new-trainee-registration', set({ ...newTraineeRegistration.value }, 'trainee', event));
+      }
     };
+
     const updateCompany = (event) => {
-      emit('update-trainee-registration', set({ ...newTraineeRegistration.value }, 'company', event));
+      emit('update:new-trainee-registration', set({ ...newTraineeRegistration.value }, 'company', event));
     };
 
     const openLearnerCreationModal = () => emit('open-learner-creation-modal');
