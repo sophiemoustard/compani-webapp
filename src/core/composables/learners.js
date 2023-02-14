@@ -69,7 +69,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const traineeRules = { newTraineeRegistration: { trainee: { required }, company: { required } } };
 
   const learnerValidation = useVuelidate(learnerRules, { newLearner });
-  const traineeValidation = useVuelidate(traineeRules, { newTraineeRegistration });
+  const traineeRegistrationValidation = useVuelidate(traineeRules, { newTraineeRegistration });
 
   const goToNextStep = () => {
     firstStep.value = false;
@@ -282,7 +282,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     isRofOrAdmin,
     // Validations
     learnerValidation,
-    traineeValidation,
+    traineeRegistrationValidation,
     // Methods
     updateSearch,
     goToNextStep,

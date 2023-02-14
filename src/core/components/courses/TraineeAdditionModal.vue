@@ -49,7 +49,7 @@ export default {
     newTraineeRegistration: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    traineeCompanyOptions: { type: Object, default: () => ({}) },
+    traineesCompanyOptions: { type: Object, default: () => ({}) },
     displayCompanySelect: { type: Boolean, default: false },
   },
   components: {
@@ -57,21 +57,26 @@ export default {
     'ni-select': Select,
     'ni-button': Button,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update-trainee', 'open-learner-creation-modal'],
+  emits: ['hide', 'update:model-value', 'submit', 'update-trainee-registration', 'open-learner-creation-modal'],
   setup (props, { emit }) {
-    const { newTraineeRegistration, traineeCompanyOptions } = toRefs(props);
+    const { newTraineeRegistration, traineesCompanyOptions } = toRefs(props);
 
     const companyOptionsForTrainee = computed(() => {
       if (!newTraineeRegistration.value.trainee) return [];
 
-      return traineeCompanyOptions.value[newTraineeRegistration.value.trainee];
+      return traineesCompanyOptions.value[newTraineeRegistration.value.trainee];
     });
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
-    const updateTrainee = event => emit('update-trainee', set({ ...newTraineeRegistration.value }, 'trainee', event));
-    const updateCompany = event => emit('update-trainee', set({ ...newTraineeRegistration.value }, 'company', event));
+    const updateTrainee = (event) => {
+      emit('update-trainee-registration', set({ ...newTraineeRegistration.value }, 'trainee', event));
+    };
+    const updateCompany = (event) => {
+      emit('update-trainee-registration', set({ ...newTraineeRegistration.value }, 'company', event));
+    };
+
     const openLearnerCreationModal = () => emit('open-learner-creation-modal');
 
     return {
