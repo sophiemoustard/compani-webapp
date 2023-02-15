@@ -20,7 +20,7 @@
           @click="() => openTrainerModal('Ajouter un(e) ')" />
         <interlocutor-cell v-if="!!course.companyRepresentative._id" :interlocutor="course.companyRepresentative"
           caption="Référent structure" :open-edition-modal="() => openCompanyRepresentativeModal('Modifier le ')"
-          :disable="isArchived" class="q-mt-lg" :can-update="canUpdateInterlocutor || isClientInterface"
+          :disable="isArchived" :can-update="canUpdateInterlocutor || isClientInterface"
           :contact="course.contact" />
         <ni-button v-else-if="course.type === INTRA" color="primary" icon="add" class="add-interlocutor"
           label="Ajouter un référent structure" :disable="interlocutorModalLoading || isArchived"
@@ -805,6 +805,7 @@ export default {
   grid-auto-flow: row
   display: grid
   grid-template-columns: repeat(2, 1fr)
+  grid-gap: 24px
 .add-interlocutor
   justify-self: start
   align-self: end
