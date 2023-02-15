@@ -18,15 +18,15 @@
                 <q-icon name="supervisor_account" />
                 {{ traineesCount(col.slot) }}
               </div>
-              <q-checkbox v-if="canUpdate" :model-value="slotCheckboxValue(col.slot)" dense size="sm"
-                @update:model-value="updateSlotCheckbox(col.slot)" :disable="disableCheckbox" />
+              <q-checkbox v-if="canUpdate && course.trainees.length" :model-value="slotCheckboxValue(col.slot)"
+                dense size="sm" @update:model-value="updateSlotCheckbox(col.slot)" :disable="disableCheckbox" />
             </div>
           </q-th>
         </q-tr>
       </template>
       <template #body="props">
         <q-tr :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="getBorderClass(props.rowIndex)">
             <div v-if="col.name === 'trainee'" class="rows">
               <q-item>
                 <q-item-section avatar>
@@ -471,6 +471,10 @@ export default {
         this.loading = false;
       }
     },
+    getBorderClass (index) {
+      if (index === this.course.trainees.length) return 'border';
+      if (index === this.course.trainees.length - 1) return 'interline';
+    },
   },
 };
 </script>
@@ -520,4 +524,11 @@ export default {
   font-size: 11px
   font-style: italic
   padding-top: 3px
+
+.border
+  border-top: 1px solid $copper-grey-200
+  padding-top: 16px
+
+.interline
+  padding-bottom: 16px
 </style>
