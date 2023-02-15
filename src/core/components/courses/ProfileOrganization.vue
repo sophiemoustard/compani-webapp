@@ -805,8 +805,8 @@ export default {
   grid-auto-flow: row
   display: grid
   grid-gap: 24px
-  grid-auto-rows: 1fr
   @media screen and (min-width: 768px)
+    grid-auto-rows: 1fr
     grid-template-columns: repeat(2, 1fr)
 .add-interlocutor
   justify-self: start
