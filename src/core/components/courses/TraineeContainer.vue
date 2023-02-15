@@ -202,7 +202,7 @@ export default {
       resetLearnerCreationModal,
       tableLoading,
       disableUserInfoEdition,
-    } = useLearners(refresh, isClientInterface, false, courseCompanyIds);
+    } = useLearners(refresh, isClientInterface, false, courseCompanyIds, !isIntraCourse.value);
 
     const {
       selectedCompany,

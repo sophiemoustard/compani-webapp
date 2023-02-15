@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
-import { required, email } from '@vuelidate/validators';
+import { required, email, requiredIf } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -27,7 +27,13 @@ import {
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (refresh, isClientInterface, isDirectory, companies = { value: [] }) => {
+export const useLearners = (
+  refresh,
+  isClientInterface,
+  isDirectory,
+  companies = { value: [] },
+  isInterCourse = false
+) => {
   const newLearner = ref({
     identity: { firstname: '', lastname: '' },
     contact: { phone: '' },
@@ -43,7 +49,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const tableLoading = ref(false);
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
-  const newTraineeRegistration = ref({ trainee: '', company: '' });
+  const newTraineeRegistration = ref(isInterCourse ? { trainee: '', company: '' } : { trainee: '' });
   const disableUserInfoEdition = ref(false);
 
   const $store = useStore();
@@ -66,7 +72,9 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       userCompanyStartDate: { required },
     },
   }));
-  const traineeRules = { newTraineeRegistration: { trainee: { required }, company: { required } } };
+  const traineeRules = {
+    newTraineeRegistration: { trainee: { required }, company: { required: requiredIf(isInterCourse) } },
+  };
 
   const learnerValidation = useVuelidate(learnerRules, { newLearner });
   const traineeRegistrationValidation = useVuelidate(traineeRules, { newTraineeRegistration });
@@ -239,9 +247,15 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     try {
       learnerCreationModalLoading.value = true;
       if (learnerAlreadyExists.value) {
-        newTraineeRegistration.value = { trainee: await updateLearner(), company: newLearner.value.company };
+        newTraineeRegistration.value = {
+          trainee: await updateLearner(),
+          ...(isInterCourse && { company: newLearner.value.company }),
+        };
       } else {
-        newTraineeRegistration.value = { trainee: await createLearner(), company: newLearner.value.company };
+        newTraineeRegistration.value = {
+          trainee: await createLearner(),
+          ...(isInterCourse && { company: newLearner.value.company }),
+        };
       }
 
       await refresh();
