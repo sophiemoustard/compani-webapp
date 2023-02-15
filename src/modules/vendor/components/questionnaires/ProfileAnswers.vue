@@ -119,7 +119,7 @@ export default {
     },
     formatFollowUp (fu) {
       const answers = fu.answers
-        .filter(a => !this.selectedTrainer || (get(a, 'course.trainer._id') === this.selectedTrainer))
+        .filter(a => !this.selectedTrainer || (get(a, 'course.trainer') === this.selectedTrainer))
         .filter(a => !this.selectedCompany || (a.traineeCompany === this.selectedCompany))
         .filter(a => !this.selectedProgram || (get(a, 'course.subProgram.program._id') === this.selectedProgram));
 
