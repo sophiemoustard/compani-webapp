@@ -64,7 +64,7 @@ export default {
     const companyOptionsForTrainee = computed(() => {
       if (!newTraineeRegistration.value.trainee) return [];
 
-      return traineesCompanyOptions.value[newTraineeRegistration.value.trainee];
+      return traineesCompanyOptions.value[newTraineeRegistration.value.trainee] || [];
     });
 
     const hide = () => emit('hide');
