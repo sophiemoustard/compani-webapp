@@ -806,6 +806,7 @@ export default {
   display: grid
   grid-template-columns: repeat(2, 1fr)
   grid-gap: 24px
+  grid-auto-rows: 1fr
 .add-interlocutor
   justify-self: start
   align-self: end
