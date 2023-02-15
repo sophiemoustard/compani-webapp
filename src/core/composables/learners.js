@@ -49,7 +49,7 @@ export const useLearners = (
   const tableLoading = ref(false);
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
-  const newTraineeRegistration = ref(isInterCourse ? { trainee: '', company: '' } : { trainee: '' });
+  const newTraineeRegistration = ref({ trainee: '', ...(isInterCourse && { company: '' }) });
   const disableUserInfoEdition = ref(false);
 
   const $store = useStore();
@@ -154,7 +154,7 @@ export const useLearners = (
     };
     newLearner.value.contact = { phone: get(user, 'contact.phone') };
 
-    if (lastUserCompany && lastUserCompany.endDate) {
+    if (lastUserCompany && lastUserCompany.endDate && CompaniDate().isBefore(lastUserCompany.endDate)) {
       newLearner.value.userCompanyStartDate = CompaniDate(lastUserCompany.endDate).startOf(DAY).add('P1D').toISO();
     }
 
@@ -246,17 +246,9 @@ export const useLearners = (
 
     try {
       learnerCreationModalLoading.value = true;
-      if (learnerAlreadyExists.value) {
-        newTraineeRegistration.value = {
-          trainee: await updateLearner(),
-          ...(isInterCourse && { company: newLearner.value.company }),
-        };
-      } else {
-        newTraineeRegistration.value = {
-          trainee: await createLearner(),
-          ...(isInterCourse && { company: newLearner.value.company }),
-        };
-      }
+      if (learnerAlreadyExists.value) newTraineeRegistration.value = { trainee: await updateLearner() };
+      else newTraineeRegistration.value = { trainee: await createLearner() };
+      if (isInterCourse) newTraineeRegistration.value.company = newLearner.value.company;
 
       await refresh();
       learnerCreationModal.value = false;
