@@ -183,8 +183,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
 
-      const lastUserCompany = userInfo.user.userCompanyList.length &&
-        getLastVersion(userInfo.user.userCompanyList, 'startDate');
+      const lastUserCompany = getLastVersion(userInfo.user.userCompanyList, 'startDate');
 
       const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
       if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany(lastUserCompany.company);
@@ -239,8 +238,11 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
     try {
       learnerCreationModalLoading.value = true;
-      if (learnerAlreadyExists.value) newTraineeRegistration.value = { trainee: await updateLearner(), company: '' };
-      else newTraineeRegistration.value = { trainee: await createLearner(), company: '' };
+      if (learnerAlreadyExists.value) {
+        newTraineeRegistration.value = { trainee: await updateLearner(), company: newLearner.value.company };
+      } else {
+        newTraineeRegistration.value = { trainee: await createLearner(), company: newLearner.value.company };
+      }
 
       await refresh();
       learnerCreationModal.value = false;
