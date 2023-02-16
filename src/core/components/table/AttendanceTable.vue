@@ -18,15 +18,15 @@
                 <q-icon name="supervisor_account" />
                 {{ traineesCount(col.slot) }}
               </div>
-              <q-checkbox v-if="canUpdate" :model-value="slotCheckboxValue(col.slot)" dense size="sm"
-                @update:model-value="updateSlotCheckbox(col.slot)" :disable="disableCheckbox" />
+              <q-checkbox v-if="canUpdate && course.trainees.length" :model-value="slotCheckboxValue(col.slot)"
+                dense size="sm" @update:model-value="updateSlotCheckbox(col.slot)" :disable="disableCheckbox" />
             </div>
           </q-th>
         </q-tr>
       </template>
       <template #body="props">
         <q-tr :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="getDelimiterClass(props.rowIndex)">
             <div v-if="col.name === 'trainee'" class="rows">
               <q-item>
                 <q-item-section avatar>
@@ -44,14 +44,14 @@
         </q-tr>
       </template>
       <template #no-data>
-        <div class="text-center text-italic">Aucun(e) participant(e) n'a été ajouté(e) à cette formation</div>
+        <div class="text-center text-italic">Aucun(e) stagiaire n'a été ajouté(e) à cette formation</div>
       </template>
     </q-table>
     <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
-    <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm"
-      label="Ajouter un(e) participant(e)" :disable="loading" @click="openTraineeAttendanceAdditionModal" />
+    <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm" :disable="loading"
+      label="Ajouter un(e) participant(e) non inscrit(e)" @click="openTraineeAttendanceAdditionModal" />
   </q-card>
 
   <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" v-model:pagination="pagination"
@@ -471,6 +471,10 @@ export default {
         this.loading = false;
       }
     },
+    getDelimiterClass (index) {
+      if (index === this.course.trainees.length) return 'unsubscribed-delimiter';
+      if (index === this.course.trainees.length - 1) return 'last-subscribed-interline';
+    },
   },
 };
 </script>
@@ -520,4 +524,11 @@ export default {
   font-size: 11px
   font-style: italic
   padding-top: 3px
+
+.unsubscribed-delimiter
+  border-top: 1px solid $copper-grey-200
+  padding-top: 16px
+
+.last-subscribed-interline
+  padding-bottom: 16px
 </style>
