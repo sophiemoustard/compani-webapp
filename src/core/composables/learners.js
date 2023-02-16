@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
-import { required, email } from '@vuelidate/validators';
+import { required, email, requiredIf } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -27,7 +27,13 @@ import {
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (refresh, isClientInterface, isDirectory, companies = { value: [] }) => {
+export const useLearners = (
+  refresh,
+  isClientInterface,
+  isDirectory,
+  companies = { value: [] },
+  isInterCourse = false
+) => {
   const newLearner = ref({
     identity: { firstname: '', lastname: '' },
     contact: { phone: '' },
@@ -43,7 +49,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
   const tableLoading = ref(false);
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
-  const newTraineeRegistration = ref({ trainee: '', company: '' });
+  const newTraineeRegistration = ref({ trainee: '', ...(isInterCourse && { company: '' }) });
   const disableUserInfoEdition = ref(false);
 
   const $store = useStore();
@@ -66,7 +72,9 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
       userCompanyStartDate: { required },
     },
   }));
-  const traineeRules = { newTraineeRegistration: { trainee: { required }, company: { required } } };
+  const traineeRules = {
+    newTraineeRegistration: { trainee: { required }, company: { required: requiredIf(isInterCourse) } },
+  };
 
   const learnerValidation = useVuelidate(learnerRules, { newLearner });
   const traineeRegistrationValidation = useVuelidate(traineeRules, { newTraineeRegistration });
@@ -146,7 +154,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
     };
     newLearner.value.contact = { phone: get(user, 'contact.phone') };
 
-    if (lastUserCompany && lastUserCompany.endDate) {
+    if (lastUserCompany && lastUserCompany.endDate && CompaniDate().isBefore(lastUserCompany.endDate)) {
       newLearner.value.userCompanyStartDate = CompaniDate(lastUserCompany.endDate).startOf(DAY).add('P1D').toISO();
     }
 
@@ -183,9 +191,7 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
         return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
       }
 
-      const lastUserCompany = userInfo.user.userCompanyList.length &&
-        getLastVersion(userInfo.user.userCompanyList, 'startDate');
-
+      const lastUserCompany = getLastVersion(userInfo.user.userCompanyList, 'startDate');
       const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
       if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany(lastUserCompany.company);
 
@@ -239,8 +245,10 @@ export const useLearners = (refresh, isClientInterface, isDirectory, companies =
 
     try {
       learnerCreationModalLoading.value = true;
-      if (learnerAlreadyExists.value) newTraineeRegistration.value = { trainee: await updateLearner(), company: '' };
-      else newTraineeRegistration.value = { trainee: await createLearner(), company: '' };
+      if (learnerAlreadyExists.value) newTraineeRegistration.value = { trainee: await updateLearner() };
+      else newTraineeRegistration.value = { trainee: await createLearner() };
+
+      if (isInterCourse) newTraineeRegistration.value.company = newLearner.value.company;
 
       await refresh();
       learnerCreationModal.value = false;
