@@ -192,7 +192,6 @@ export const useLearners = (
       }
 
       const lastUserCompany = getLastVersion(userInfo.user.userCompanyList, 'startDate');
-
       const hasUserCompanyWithoutEndDate = lastUserCompany && !lastUserCompany.endDate;
       if (hasUserCompanyWithoutEndDate) return handleErrorsForUserWithNoEndingUserCompany(lastUserCompany.company);
 
@@ -248,6 +247,7 @@ export const useLearners = (
       learnerCreationModalLoading.value = true;
       if (learnerAlreadyExists.value) newTraineeRegistration.value = { trainee: await updateLearner() };
       else newTraineeRegistration.value = { trainee: await createLearner() };
+
       if (isInterCourse) newTraineeRegistration.value.company = newLearner.value.company;
 
       await refresh();
