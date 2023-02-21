@@ -77,17 +77,22 @@ export default {
         if (key === 'startHour') {
           const startHourDate = CompaniDate(dates.startHour, 'HH:mm');
           const endHourDate = CompaniDate(dates.endHour, 'HH:mm');
+
           if (!disableEndHour.value && startHourDate.isSameOrAfter(endHourDate)) {
             const max = CompaniDate().endOf('day');
             const shiftedEndDate = startHourDate.add(shiftedDuration.value);
             dates.endHour = shiftedEndDate.isSameOrBefore(max) ? shiftedEndDate.format('HH:mm') : max.format('HH:mm');
           }
+
+          dates.startDate = CompaniDate(dates.startDate).set({ second: 0, millisecond: 0 }).toISO();
         }
 
-        if (dates.endHour === '23:59') {
-          dates.endDate = CompaniDate(dates.endDate).set({ second: 59, millisecond: 999 }).toISO();
-        } else {
-          dates.endDate = CompaniDate(dates.endDate).set({ second: 0, millisecond: 0 }).toISO();
+        if (!disableEndHour.value) {
+          if (dates.endHour === '23:59') {
+            dates.endDate = CompaniDate(dates.endDate).set({ second: 59, millisecond: 999 }).toISO();
+          } else {
+            dates.endDate = CompaniDate(dates.endDate).set({ second: 0, millisecond: 0 }).toISO();
+          }
         }
       } catch (e) {
         if (e.message.startsWith('Invalid DateTime: unparsable') ||

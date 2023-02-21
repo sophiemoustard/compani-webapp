@@ -51,7 +51,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
-import { getCurrentOrFutureCompanies } from '@helpers/userCompanies';
+import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -314,24 +314,24 @@ export default {
 
         if (userExistsInfo.exists) {
           const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
-          const currentOrFutureCompanies = getCurrentOrFutureCompanies(userExistsInfo.user.userCompanyList);
-          const userHasValidCompany = !currentOrFutureCompanies.length ||
-            currentOrFutureCompanies.includes(this.company._id);
-          const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
+          if (!hasPermissionOnUserInfo) return NotifyNegative('Email relié à une autre structure.');
 
-          if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
-            this.fetchedUser = await Users.getById(userExistsInfo.user._id);
-            this.fillNewUser(this.fetchedUser, currentOrFutureCompanies.length);
-          } else {
-            const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
-            if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
-            if (userHasClientRole) return NotifyNegative('Email déjà existant.');
-          }
+          const currentAndFutureCompanies = getCurrentAndFutureCompanies(userExistsInfo.user.userCompanyList);
+          const userHasValidCompany = !currentAndFutureCompanies.length ||
+            currentAndFutureCompanies.includes(this.company._id);
+          if (!userHasValidCompany) return NotifyNegative('Email relié à une autre structure.');
+
+          const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
+          if (userHasClientRole) return NotifyNegative('Email déjà existant.');
+
+          this.fetchedUser = await Users.getById(userExistsInfo.user._id);
+          this.fillNewUser(this.fetchedUser, currentAndFutureCompanies.length);
         }
 
         this.firstStep = false;
         this.v$.newUser.$reset();
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;

@@ -20,7 +20,7 @@
           @click="() => openTrainerModal('Ajouter un(e) ')" />
         <interlocutor-cell v-if="!!course.companyRepresentative._id" :interlocutor="course.companyRepresentative"
           caption="Référent structure" :open-edition-modal="() => openCompanyRepresentativeModal('Modifier le ')"
-          :disable="isArchived" class="q-mt-lg" :can-update="canUpdateInterlocutor || isClientInterface"
+          :disable="isArchived" :can-update="canUpdateInterlocutor || isClientInterface"
           :contact="course.contact" />
         <ni-button v-else-if="course.type === INTRA" color="primary" icon="add" class="add-interlocutor"
           label="Ajouter un référent structure" :disable="interlocutorModalLoading || isArchived"
@@ -370,8 +370,11 @@ export default {
       try {
         let query;
 
-        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
-        else query = { companies: course.value.companies.map(c => c._id) };
+        if (isClientInterface) {
+          query = { companies: get(loggedUser.value, 'company._id'), startDate: CompaniDate().toISO() };
+        } else {
+          query = { companies: course.value.companies.map(c => c._id), startDate: CompaniDate().toISO() };
+        }
 
         potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
@@ -804,7 +807,10 @@ export default {
   flex-direction: row
   grid-auto-flow: row
   display: grid
-  grid-template-columns: repeat(2, 1fr)
+  grid-gap: 24px
+  @media screen and (min-width: 768px)
+    grid-auto-rows: 1fr
+    grid-template-columns: repeat(2, 1fr)
 .add-interlocutor
   justify-self: start
   align-self: end

@@ -9,18 +9,19 @@
         :error="validations.local.email.$error" required-field :last="firstStep" :disable="!firstStep" />
       <template v-if="!firstStep">
         <ni-input in-modal caption="Prénom" :model-value="newUser.identity.firstname"
-          @update:model-value="update($event, 'identity.firstname')" />
+          @update:model-value="update($event, 'identity.firstname')" :disable="disableUserInfo" />
         <ni-input in-modal :model-value="newUser.identity.lastname" :error="validations.identity.lastname.$error"
           required-field @blur="validations.identity.lastname.$touch" caption="Nom"
-          @update:model-value="update($event, 'identity.lastname')" />
+          @update:model-value="update($event, 'identity.lastname')" :disable="disableUserInfo" />
         <ni-input in-modal :model-value="newUser.contact.phone" required-field
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
-          :error-message="phoneNbrError(validations)" @update:model-value="update($event.trim(), 'contact.phone')" />
+          :error-message="phoneNbrError(validations)" @update:model-value="update($event.trim(), 'contact.phone')"
+          :disable="disableUserInfo" />
         <ni-select in-modal :options="companyOptions" :model-value="newUser.company"
           @update:model-value="update($event.trim(), 'company')" caption="Structure" required-field
           @blur="validations.company.$touch" :error="validations.company.$error" :disable="disableCompany" />
         <ni-date-input caption="Date de rattachement" :model-value="newUser.userCompanyStartDate" in-modal last
-          @update:model-value="update($event, 'userCompanyStartDate')" required :disable="disableStartDate"
+          @update:model-value="update($event, 'userCompanyStartDate')" required
           :error="validations.userCompanyStartDate.$error" />
       </template>
       <template #footer>
@@ -48,7 +49,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
     disableCompany: { type: Boolean, default: false },
-    disableStartDate: { type: Boolean, default: false },
+    disableUserInfo: { type: Boolean, default: false },
     newUser: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
