@@ -117,14 +117,14 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/pedagogy/ProgramProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni pedagogy activity info') to.params.defaultTab = 'content';
+            if (from.name === 'ni pedagogy activity info') to.query.defaultTab = 'content';
 
             return next();
           } catch (e) {
             console.error(e);
           }
         },
-        props: true,
+        props: route => ({ ...route.query, ...route.params }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'pedagogy',
