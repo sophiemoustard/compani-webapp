@@ -143,7 +143,7 @@ export default {
     };
 
     const goToCustomerInfos = (customerId) => {
-      $router.push({ name: 'ni customers info', params: { customerId, defaultTab: 'billing' } });
+      $router.push({ name: 'ni customers info', params: { customerId }, query: { defaultTab: 'billing' } });
     };
 
     const max = computed(() => moment(billingDates.value.startDate).add(1, 'year').subtract(1, 'day').toISOString());
