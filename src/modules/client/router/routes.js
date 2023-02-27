@@ -374,15 +374,15 @@ const routes = [
         component: () => import('src/modules/client/pages/ni/courses/LearnerProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni courses info') to.params.defaultTab = 'courses';
-            if (from.name === 'ni elearning courses info') to.params.defaultTab = 'courses';
+            if (from.name === 'ni courses info') to.query.defaultTab = 'courses';
+            if (from.name === 'ni elearning courses info') to.query.defaultTab = 'courses';
 
             return next();
           } catch (e) {
             console.error(e);
           }
         },
-        props: true,
+        props: route => ({ ...route.params, ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'courses',
@@ -394,7 +394,7 @@ const routes = [
         component: () => import('src/modules/client/pages/ni/courses/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni courses learners info') to.params.defaultTab = 'traineeFollowUp';
+            if (from.name === 'ni courses learners info') to.query.defaultTab = 'traineeFollowUp';
 
             return next();
           } catch (e) {

@@ -86,11 +86,11 @@ const routes = [
         path: 'ni/users/learners/:learnerId',
         name: 'ni users learners info',
         component: () => import('src/modules/vendor/pages/ni/users/learners/LearnerProfile'),
-        props: true,
+        props: route => ({ ...route.query, ...route.params }),
         beforeEnter: async (to, from, next) => {
           try {
             if (from.name === 'ni management blended courses info' ||
-              from.name === 'ni management elearning courses info') to.params.defaultTab = 'courses';
+              from.name === 'ni management elearning courses info') to.query.defaultTab = 'courses';
 
             return next();
           } catch (e) {
@@ -189,7 +189,7 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/ELearningCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni users learners info') to.params.defaultTab = 'followUp';
+            if (from.name === 'ni users learners info') to.query.defaultTab = 'followUp';
 
             return next();
           } catch (e) {
