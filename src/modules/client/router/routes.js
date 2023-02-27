@@ -293,7 +293,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/planning/auxiliaries/:targetedAuxiliaryId',
+        path: 'ni/planning/auxiliaries/:targetedAuxiliaryId?',
         name: 'ni planning auxiliaries',
         component: () => import('src/modules/client/pages/ni/planning/AuxiliaryPlanning'),
         props: true,
@@ -303,7 +303,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/planning/customers/:targetedCustomerId',
+        path: 'ni/planning/customers/:targetedCustomerId?',
         name: 'ni planning customers',
         component: () => import('src/modules/client/pages/ni/planning/CustomerPlanning'),
         props: true,
