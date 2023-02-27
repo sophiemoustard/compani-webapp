@@ -37,11 +37,11 @@ const routes = [
         path: 'ni/users/companies/:companyId',
         name: 'ni users companies info',
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompanyProfile'),
-        props: true,
+        props: route => ({ ...route.query, ...route.params }),
         beforeEnter: async (to, from, next) => {
           try {
-            if (!to.params.defaultTab && from.name === 'ni management blended courses info') {
-              to.params.defaultTab = 'bills';
+            if (!to.query.defaultTab && from.name === 'ni management blended courses info') {
+              to.query.defaultTab = 'bills';
             }
 
             return next();
@@ -156,11 +156,11 @@ const routes = [
         beforeEnter: async (to, from, next) => {
           try {
             if (['ni users learners info', 'ni management questionnaire answers'].includes(from.name)) {
-              to.params.defaultTab = 'traineeFollowUp';
-            } else if (from.name === 'ni users companies info' && from.params.defaultTab === 'bills') {
-              to.params.defaultTab = 'billing';
+              to.query.defaultTab = 'traineeFollowUp';
+            } else if (from.name === 'ni users companies info' && from.query.defaultTab === 'bills') {
+              to.query.defaultTab = 'billing';
             } else {
-              to.params.defaultTab = 'organization';
+              to.query.defaultTab = 'organization';
             }
 
             return next();
@@ -168,7 +168,7 @@ const routes = [
             console.error(e);
           }
         },
-        props: true,
+        props: route => ({ ...route.query, ...route.params }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',

@@ -349,7 +349,8 @@ export default {
       if (canUpdateBilling.value) {
         return $router.push({
           name: 'ni management blended courses info',
-          params: { courseId: course._id, defaultTab: 'billing' },
+          params: { courseId: course._id },
+          query: { defaultTab: 'billing' },
         });
       }
       if (course.companies.includes(loggedUser.value.company._id)) {
