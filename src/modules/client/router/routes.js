@@ -239,7 +239,7 @@ const routes = [
         path: 'ni/auxiliaries/:auxiliaryId',
         name: 'ni auxiliaries info',
         component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryProfile'),
-        props: true,
+        props: route => ({ ...route.params, ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'teams',
