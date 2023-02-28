@@ -639,7 +639,11 @@ export default {
     };
 
     const goToCompany = () => {
-      $router.push({ name: 'ni users companies info', params: { companyId: company.value._id, defaultTab: 'bills' } });
+      $router.push({
+        name: 'ni users companies info',
+        params: { companyId: company.value._id },
+        query: { defaultTab: 'bills' },
+      });
     };
 
     return {

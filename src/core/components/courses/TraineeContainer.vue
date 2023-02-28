@@ -264,7 +264,7 @@ export default {
 
     const goToCompany = async (companyName) => {
       const companyId = course.value.companies.find(c => c.name === companyName)._id;
-      $router.push({ name: 'ni users companies info', params: { companyId, defaultTab: 'infos' } });
+      $router.push({ name: 'ni users companies info', params: { companyId }, query: { defaultTab: 'infos' } });
     };
 
     const created = async () => { await getPotentialCompanies(); };

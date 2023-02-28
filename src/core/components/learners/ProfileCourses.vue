@@ -247,7 +247,8 @@ export default {
 
       $router.push({
         name: 'ni management blended courses info',
-        params: { courseId: props.row._id, defaultTab: 'traineeFollowUp' },
+        params: { courseId: props.row._id },
+        query: { defaultTab: 'traineeFollowUp' },
       });
     };
 

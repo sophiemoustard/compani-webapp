@@ -186,7 +186,11 @@ export default {
       });
     },
     goToUserContractPage (user) {
-      this.$router.push({ name: 'ni auxiliaries info', params: { auxiliaryId: user._id, defaultTab: 'contracts' } });
+      this.$router.push({
+        name: 'ni auxiliaries info',
+        params: { auxiliaryId: user._id },
+        query: { defaultTab: 'contracts' },
+      });
     },
   },
 };
