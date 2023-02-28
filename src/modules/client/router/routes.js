@@ -401,7 +401,7 @@ const routes = [
             console.error(e);
           }
         },
-        props: true,
+        props: route => ({ ...route.params, ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'courses',
