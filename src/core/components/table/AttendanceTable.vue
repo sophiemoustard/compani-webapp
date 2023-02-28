@@ -27,14 +27,18 @@
       <template #body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="getDelimiterClass(props.rowIndex)">
-            <div v-if="col.name === 'trainee'" class="rows">
-              <q-item>
+            <div v-if="col.name === 'trainee'">
+              <q-item class="rows">
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
-                <q-item-section class="ellipsis">
-                  {{ col.value }}
-                  <q-item-section v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-section>
+                <q-item-section>
+                  <q-item-label v-if="isRofOrAdmin || isCoachOrAdmin" class="ellipsis clickable-name cursor-pointer"
+                    @click="goToLearnerProfile(props.row)">
+                    {{ col.value }}
+                  </q-item-label>
+                  <q-item-label v-else class="ellipsis">{{ col.value }}</q-item-label>
+                  <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
                 </q-item-section>
               </q-item>
             </div>
@@ -92,7 +96,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, useStore } from 'vuex';
+import { computed } from 'vue';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -112,6 +117,9 @@ import {
   DAY_OF_MONTH,
   MONTH_SHORT,
   DD_MM_YYYY,
+  COACH_ROLES,
+  VENDOR_ADMIN,
+  TRAINING_ORGANISATION_MANAGER,
 } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -133,7 +141,19 @@ export default {
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
   },
   setup () {
-    return { v$: useVuelidate() };
+    const $store = useStore();
+    const clientRole = computed(() => $store.getters['main/getClientRole']);
+    const isCoachOrAdmin = computed(() => COACH_ROLES.includes(clientRole.value));
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+    const isRofOrAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+
+    return {
+      // Computed
+      isCoachOrAdmin,
+      isRofOrAdmin,
+      // Validations
+      v$: useVuelidate(),
+    };
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$route.path);
@@ -480,6 +500,10 @@ export default {
       if (index === this.course.trainees.length) return 'unsubscribed-delimiter';
       if (index === this.course.trainees.length - 1) return 'last-subscribed-interline';
     },
+    goToLearnerProfile (row) {
+      const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
+      this.$router.push({ name, params: { learnerId: row._id } });
+    },
   },
 };
 </script>
@@ -497,7 +521,6 @@ export default {
   overflow: hidden
   text-overflow: ellipsis
   display: block
-  align-self: center
 
 .table
   thead tr:first-child th:first-child
