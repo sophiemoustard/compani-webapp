@@ -293,20 +293,20 @@ const routes = [
         },
       },
       {
-        path: 'ni/planning/auxiliaries/:targetedAuxiliaryId?',
+        path: 'ni/planning/auxiliaries',
         name: 'ni planning auxiliaries',
         component: () => import('src/modules/client/pages/ni/planning/AuxiliaryPlanning'),
-        props: true,
+        props: route => ({ ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'planning',
         },
       },
       {
-        path: 'ni/planning/customers/:targetedCustomerId?',
+        path: 'ni/planning/customers',
         name: 'ni planning customers',
         component: () => import('src/modules/client/pages/ni/planning/CustomerPlanning'),
-        props: true,
+        props: route => ({ ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'planning',

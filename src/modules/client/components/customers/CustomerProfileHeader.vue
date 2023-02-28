@@ -101,7 +101,7 @@ export default {
     },
     goToPlanning () {
       if (this.customer.subscriptions.length) {
-        return this.$router.push({ name: 'ni planning customers', params: { targetedCustomerId: this.customer._id } });
+        return this.$router.push({ name: 'ni planning customers', query: { targetedCustomerId: this.customer._id } });
       }
 
       return NotifyWarning('Le/la bénéficiaire n\'a pas de souscription.');
