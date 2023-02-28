@@ -96,8 +96,10 @@
 </template>
 
 <script>
-import { mapState, useStore } from 'vuex';
-import { computed } from 'vue';
+import { useStore } from 'vuex';
+import { computed, toRefs, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -127,6 +129,7 @@ import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions, sor
 import { defineAbilitiesFor } from '@helpers/ability';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
+import { useCourses } from '@composables/courses';
 import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
@@ -140,91 +143,79 @@ export default {
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
   },
-  setup () {
+  setup (props) {
+    const { course } = toRefs(props);
+
     const $store = useStore();
-    const clientRole = computed(() => $store.getters['main/getClientRole']);
-    const isCoachOrAdmin = computed(() => COACH_ROLES.includes(clientRole.value));
-    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
-    const isRofOrAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+    const $q = useQuasar();
+    const $router = useRouter();
 
-    return {
-      // Computed
-      isCoachOrAdmin,
-      isRofOrAdmin,
-      // Validations
-      v$: useVuelidate(),
-    };
-  },
-  data () {
-    const isClientInterface = !/\/ad\//.test(this.$route.path);
+    const attendances = ref([]);
+    const loading = ref(false);
+    const modalLoading = ref(false);
+    const attendanceSheetTableLoading = ref(false);
+    const traineeAdditionModal = ref(false);
+    const newTraineeAttendance = ref({ trainee: '', attendances: [] });
+    const attendanceSheetAdditionModal = ref(false);
+    const attendanceSheets = ref([]);
+    const newAttendanceSheet = ref({ course: course.value._id });
+    const attendanceSheetColumns = ref([
+      {
+        name: 'date',
+        label: 'Date',
+        align: 'left',
+        field: 'date',
+        format: value => CompaniDate(value).format(DD_MM_YYYY),
+      },
+      {
+        name: 'trainee',
+        label: 'Participant(e)',
+        align: 'left',
+        field: row => formatIdentity(get(row, 'trainee.identity'), 'FL'),
+      },
+      { name: 'actions', label: '', align: 'left' },
+    ]);
+    const pagination = ref({ page: 1, rowsPerPage: 15 });
+    const potentialTrainees = ref([]);
 
-    return {
-      formatIdentity,
-      DEFAULT_AVATAR,
-      attendances: [],
-      loading: false,
-      modalLoading: false,
-      attendanceSheetTableLoading: false,
-      traineeAdditionModal: false,
-      newTraineeAttendance: { trainee: '', attendances: [] },
-      isClientInterface,
-      attendanceSheetAdditionModal: false,
-      attendanceSheets: [],
-      newAttendanceSheet: { course: this.course._id },
-      attendanceSheetColumns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => CompaniDate(value).format(DD_MM_YYYY),
-        },
-        {
-          name: 'trainee',
-          label: 'Participant(e)',
-          align: 'left',
-          field: row => formatIdentity(get(row, 'trainee.identity'), 'FL'),
-        },
-        { name: 'actions', label: '', align: 'left' },
-      ],
-      pagination: { page: 1, rowsPerPage: 15 },
-      potentialTrainees: [],
-    };
-  },
-  validations () {
-    return {
+    const { isClientInterface } = useCourses(course);
+
+    const rules = computed(() => ({
       newTraineeAttendance: {
         trainee: { required },
         attendances: { minArrayLength: minArrayLength(1) },
       },
       newAttendanceSheet: {
         file: { required },
-        trainee: { required: requiredIf(this.course.type !== INTRA) },
-        date: { required: requiredIf(this.course.type === INTRA) },
+        trainee: { required: requiredIf(course.value.type !== INTRA) },
+        date: { required: requiredIf(course.value.type === INTRA) },
       },
-    };
-  },
-  async created () {
-    await Promise.all([
-      this.refreshAttendances({ course: this.course._id }),
-      this.refreshAttendanceSheets(),
-      this.getPotentialTrainees(),
-    ]);
-  },
-  computed: {
-    ...mapState('main', ['loggedUser']),
-    attendanceColumns () {
+    }));
+
+    const v$ = useVuelidate(rules, { newTraineeAttendance, newAttendanceSheet });
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const clientRole = computed(() => $store.getters['main/getClientRole']);
+
+    const isCoachOrAdmin = computed(() => COACH_ROLES.includes(clientRole.value));
+
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+
+    const isRofOrAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+
+    const attendanceColumns = computed(() => {
       const columns = [{
         name: 'trainee',
         align: 'left',
         field: row => formatIdentity(row.identity, 'FL'),
-        style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
+        style: !$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
       }];
-      if (!this.course.slots) return columns;
+      if (!course.value.slots) return columns;
 
       return [
         ...columns,
-        ...this.course.slots.map(s => ({
+        ...course.value.slots.map(s => ({
           name: `slot-${s._id}`,
           slot: s._id,
           field: '_id',
@@ -237,32 +228,30 @@ export default {
           endHour: CompaniDate(s.endDate).format(HH_MM),
         })),
       ];
-    },
-    attendanceSheetVisibleColumns () {
-      return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
-    },
-    noTrainees () {
-      return !this.course.trainees.length;
-    },
-    courseHasSlot () {
-      return this.course.slots.length;
-    },
-    traineesWithAttendance () {
-      return [...this.course.trainees, ...this.unsubscribedTrainees];
-    },
-    formattedAttendanceSheets () {
-      if (this.course.type === INTER_B2B) {
-        return this.attendanceSheets.map(as => ({
+    });
+
+    const attendanceSheetVisibleColumns = computed(() => (course.value.type === INTRA
+      ? ['date', 'actions']
+      : ['trainee', 'actions']));
+
+    const noTrainees = computed(() => !course.value.trainees.length);
+
+    const courseHasSlot = computed(() => course.value.slots.length);
+
+    const formattedAttendanceSheets = computed(() => {
+      if (course.value.type === INTER_B2B) {
+        return attendanceSheets.value.map(as => ({
           ...as,
-          trainee: this.traineesWithAttendance.find(trainee => trainee._id === as.trainee._id),
+          trainee: traineesWithAttendance.value.find(trainee => trainee._id === as.trainee._id),
         }));
       }
 
-      return this.attendanceSheets;
-    },
-    unsubscribedTrainees () {
-      const traineesId = this.course.trainees.map(trainee => trainee._id);
-      const attendanceInfos = [...this.attendances, ...this.attendanceSheets];
+      return attendanceSheets.value;
+    });
+
+    const unsubscribedTrainees = computed(() => {
+      const traineesId = course.value.trainees.map(trainee => trainee._id);
+      const attendanceInfos = [...attendances.value, ...attendanceSheets.value];
 
       const unsubscribedTraineesId = [...new Set(attendanceInfos
         .filter(a => (!traineesId.includes(a.trainee)))
@@ -272,238 +261,318 @@ export default {
 
       return unsubscribedTraineesId
         .reduce((acc, traineeId) => {
-          const trainee = this.potentialTrainees.find(t => (t._id === traineeId));
+          const trainee = potentialTrainees.value.find(t => (t._id === traineeId));
           if (trainee) acc.push({ ...trainee, external: true });
 
           return acc;
         }, [])
         .sort((a, b) => sortStrings(a.identity.lastname, b.identity.lastname));
-    },
-    traineeFilterOptions () {
-      const formattedTrainees = formatAndSortIdentityOptions(this.potentialTrainees);
+    });
 
-      return formattedTrainees.filter(trainee => !this.traineesWithAttendance.map(t => t._id).includes(trainee.value));
-    },
-    canUpdate () {
-      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+    const traineesWithAttendance = computed(() => ([...course.value.trainees, ...unsubscribedTrainees.value]));
+
+    const traineeFilterOptions = computed(() => {
+      const formattedTrainees = formatAndSortIdentityOptions(potentialTrainees.value);
+
+      return formattedTrainees.filter(trainee => !traineesWithAttendance.value.map(t => t._id).includes(trainee.value));
+    });
+
+    const canUpdate = computed(() => {
+      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role', 'company', '_id', 'sector']));
 
       return ability.can('update', 'course_trainee_follow_up');
-    },
-    disableCheckbox () {
-      return this.loading || !this.canUpdate || !!this.course.archivedAt;
-    },
-  },
-  methods: {
-    get,
-    attendanceCheckboxValue (traineeId, slotId) {
-      if (this.attendances.length) {
-        return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
+    });
+
+    const disableCheckbox = computed(() => loading.value || !canUpdate.value || !!course.value.archivedAt);
+
+    const attendanceCheckboxValue = (traineeId, slotId) => {
+      if (attendances.value.length) {
+        return !!attendances.value.find(a => a.trainee === traineeId && a.courseSlot === slotId);
       }
       return false;
-    },
-    disableSheetDeletion (attendanceSheet) {
-      return !attendanceSheet.file.link || !!this.course.archivedAt;
-    },
-    traineesCount (slotId) {
-      return this.attendances.filter(a => a.courseSlot === slotId).length;
-    },
-    async getPotentialTrainees () {
+    };
+
+    const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
+
+    const traineesCount = slotId => attendances.value.filter(a => a.courseSlot === slotId).length;
+
+    const getPotentialTrainees = async () => {
       try {
         let query;
 
-        if (this.isClientInterface) query = { companies: get(this.loggedUser, 'company._id') };
-        else query = { companies: this.course.companies.map(c => c._id) };
+        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
+        else query = { companies: course.value.companies.map(c => c._id) };
 
-        this.potentialTrainees = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
+        potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
       } catch (error) {
-        this.potentialTrainees = [];
+        potentialTrainees.value = [];
         console.error(error);
       }
-    },
-    async refreshAttendanceSheets () {
-      try {
-        this.attendanceSheetTableLoading = true;
-        const attendanceSheets = await AttendanceSheets.list({ course: this.course._id });
+    };
 
-        if (this.course.type === INTER_B2B && this.isClientInterface) {
-          this.attendanceSheets = attendanceSheets.filter(a => a.company === this.loggedUser.company._id);
-        } else this.attendanceSheets = attendanceSheets;
+    const refreshAttendanceSheets = async () => {
+      try {
+        attendanceSheetTableLoading.value = true;
+        const attendanceSheetList = await AttendanceSheets.list({ course: course.value._id });
+
+        if (course.value.type === INTER_B2B && isClientInterface) {
+          attendanceSheets.value = attendanceSheetList.filter(a => a.company === loggedUser.value.company._id);
+        } else attendanceSheets.value = attendanceSheetList;
       } catch (e) {
         console.error(e);
-        this.attendanceSheets = [];
+        attendanceSheets.value = [];
         NotifyNegative('Erreur lors de la récupération des feuilles d\'émargement.');
       } finally {
-        this.attendanceSheetTableLoading = false;
+        attendanceSheetTableLoading.value = false;
       }
-    },
-    openAttendanceSheetAdditionModal () {
-      if (this.course.archivedAt) {
+    };
+
+    const openAttendanceSheetAdditionModal = () => {
+      if (course.value.archivedAt) {
         return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
       }
 
-      this.attendanceSheetAdditionModal = true;
-    },
-    resetAttendanceSheetAdditionModal () {
-      this.v$.newAttendanceSheet.$reset();
-      this.newAttendanceSheet = { course: this.course._id };
-    },
-    formatPayload () {
-      const { course, file, trainee, date } = this.newAttendanceSheet;
+      attendanceSheetAdditionModal.value = true;
+    };
+
+    const resetAttendanceSheetAdditionModal = () => {
+      v$.value.newAttendanceSheet.$reset();
+      newAttendanceSheet.value = { course: course.value._id };
+    };
+
+    const formatPayload = () => {
+      const { course: newAttendanceSheetCourse, file, trainee, date } = newAttendanceSheet.value;
       const form = new FormData();
-      this.course.type === INTRA ? form.append('date', date) : form.append('trainee', trainee);
-      form.append('course', course);
+      course.value.type === INTRA ? form.append('date', date) : form.append('trainee', trainee);
+      form.append('course', newAttendanceSheetCourse);
       form.append('file', file);
 
       return form;
-    },
-    async addAttendanceSheet () {
+    };
+
+    const addAttendanceSheet = async () => {
       try {
-        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter une feuille d\'émargement.');
+        if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter une feuille d\'émargement.');
 
-        this.v$.newAttendanceSheet.$touch();
-        if (this.v$.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
-        this.modalLoading = true;
+        v$.value.newAttendanceSheet.$touch();
+        if (v$.value.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
+        modalLoading.value = true;
 
-        await AttendanceSheets.create(this.formatPayload());
+        await AttendanceSheets.create(formatPayload());
 
-        this.attendanceSheetAdditionModal = false;
+        attendanceSheetAdditionModal.value = false;
         NotifyPositive('Feuille d\'émargement ajoutée.');
-        await this.refreshAttendanceSheets();
+        await refreshAttendanceSheets();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    validateAttendanceSheetDeletion (attendanceSheet) {
-      if (!this.canUpdate) return NotifyNegative('Impossible de supprimer la feuille d\'émargement.');
+    };
 
-      this.$q.dialog({
+    const validateAttendanceSheetDeletion = (attendanceSheet) => {
+      if (!canUpdate.value) return NotifyNegative('Impossible de supprimer la feuille d\'émargement.');
+
+      $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir supprimer cette feuille d\'émargement&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteAttendanceSheet(attendanceSheet._id))
+      }).onOk(() => deleteAttendanceSheet(attendanceSheet._id))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async deleteAttendanceSheet (attendanceSheetId) {
+    };
+
+    const deleteAttendanceSheet = async (attendanceSheetId) => {
       try {
-        this.$q.loading.show();
+        $q.loading.show();
         await AttendanceSheets.delete(attendanceSheetId);
 
         NotifyPositive('Feuille d\'émargement supprimée.');
-        await this.refreshAttendanceSheets();
+        await refreshAttendanceSheets();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppresion de la feuille d\'émargement.');
       } finally {
-        this.$q.loading.hide();
+        $q.loading.hide();
       }
-    },
-    async refreshAttendances (query) {
+    };
+
+    const refreshAttendances = async (query) => {
       try {
-        this.loading = true;
-        if (!this.courseHasSlot) return;
+        loading.value = true;
+        if (!courseHasSlot.value) return;
 
         const updatedCourseSlot = await Attendances.list(query);
 
-        this.attendances = query.courseSlot
-          ? [...this.attendances.filter(a => a.courseSlot !== query.courseSlot), ...updatedCourseSlot]
+        attendances.value = query.courseSlot
+          ? [...attendances.value.filter(a => a.courseSlot !== query.courseSlot), ...updatedCourseSlot]
           : updatedCourseSlot;
         NotifyPositive('Liste mise à jour.');
       } catch (e) {
         console.error(e);
-        this.attendances = [];
+        attendances.value = [];
         NotifyNegative('Erreur lors de la mise à jour des émargements.');
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    async updateAttendanceCheckbox (traineeId, slotId) {
+    };
+
+    const updateAttendanceCheckbox = async (traineeId, slotId) => {
       try {
-        if (!this.canUpdate) {
+        if (!canUpdate.value) {
           NotifyNegative('Impossible de modifier l\'émargement.');
           return false;
         }
 
-        this.loading = true;
-        if (this.attendanceCheckboxValue(traineeId, slotId)) {
+        loading.value = true;
+        if (attendanceCheckboxValue(traineeId, slotId)) {
           await Attendances.delete({ trainee: traineeId, courseSlot: slotId });
         } else {
           await Attendances.create({ trainee: traineeId, courseSlot: slotId });
         }
 
-        await this.refreshAttendances({ courseSlot: slotId });
+        await refreshAttendances({ courseSlot: slotId });
         return true;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'émargement.');
         return false;
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    async addTrainee () {
-      try {
-        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
+    };
 
-        this.v$.newTraineeAttendance.$touch();
-        if (this.v$.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
-        this.modalLoading = true;
-        const promises = await Promise.all(this.newTraineeAttendance.attendances
-          .map(s => this.updateAttendanceCheckbox(this.newTraineeAttendance.trainee, s)));
-        this.traineeAdditionModal = false;
-        if (promises.some(p => !!p)) NotifyPositive('Participant(e) ajouté(e).');
+    const addTrainee = async () => {
+      try {
+        if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
+
+        v$.value.newTraineeAttendance.$touch();
+        if (v$.value.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
+        modalLoading.value = true;
+        const promises = await Promise.all(newTraineeAttendance.value.attendances
+          .map(s => updateAttendanceCheckbox(newTraineeAttendance.value.trainee, s)));
+        traineeAdditionModal.value = false;
+        if (promises.some(p => !!p))NotifyPositive('Participant(e) ajouté(e).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout du/de la participant(e).');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    resetNewTraineeAttendance () {
-      this.v$.newTraineeAttendance.$reset();
-      this.newTraineeAttendance = { trainee: '', attendances: [] };
-    },
-    openTraineeAttendanceAdditionModal () {
-      if (this.course.archivedAt) {
+    };
+
+    const resetNewTraineeAttendance = () => {
+      v$.value.newTraineeAttendance.$reset();
+      newTraineeAttendance.value = { trainee: '', attendances: [] };
+    };
+
+    const openTraineeAttendanceAdditionModal = () => {
+      if (course.value.archivedAt) {
         return NotifyWarning('Vous ne pouvez pas ajouter un(e) participant(e) à une formation archivée.');
       }
 
-      this.traineeAdditionModal = true;
-    },
-    slotCheckboxValue (slotId) {
-      const attendancesForRegisteredLearners = this.attendances.filter(a => a.courseSlot === slotId &&
-        this.course.trainees.some(t => t._id === a.trainee));
+      traineeAdditionModal.value = true;
+    };
 
-      return attendancesForRegisteredLearners.length === this.course.trainees.length;
-    },
-    async updateSlotCheckbox (slotId) {
+    const slotCheckboxValue = (slotId) => {
+      const attendancesForRegisteredLearners = attendances.value.filter(a => a.courseSlot === slotId &&
+        course.value.trainees.some(t => t._id === a.trainee));
+
+      return attendancesForRegisteredLearners.length === course.value.trainees.length;
+    };
+
+    const updateSlotCheckbox = async (slotId) => {
       try {
-        this.loading = true;
-        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
+        loading.value = true;
+        if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
 
-        if (this.slotCheckboxValue(slotId)) await Attendances.delete({ courseSlot: slotId });
+        if (slotCheckboxValue(slotId)) await Attendances.delete({ courseSlot: slotId });
         else await Attendances.create({ courseSlot: slotId });
 
-        await this.refreshAttendances({ courseSlot: slotId });
+        await refreshAttendances({ courseSlot: slotId });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'émargement.');
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    getDelimiterClass (index) {
-      if (index === this.course.trainees.length) return 'unsubscribed-delimiter';
-      if (index === this.course.trainees.length - 1) return 'last-subscribed-interline';
-    },
-    goToLearnerProfile (row) {
-      const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
-      this.$router.push({ name, params: { learnerId: row._id } });
-    },
+    };
+
+    const getDelimiterClass = (index) => {
+      if (index === course.value.trainees.length) return 'unsubscribed-delimiter';
+      if (index === course.value.trainees.length - 1) return 'last-subscribed-interline';
+    };
+
+    const goToLearnerProfile = (row) => {
+      const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
+      $router.push({ name, params: { learnerId: row._id } });
+    };
+
+    onMounted(async () => {
+      await Promise.all([
+        refreshAttendances({ course: course.value._id }),
+        refreshAttendanceSheets(),
+        getPotentialTrainees(),
+      ]);
+    });
+
+    return {
+      // Data
+      formatIdentity,
+      DEFAULT_AVATAR,
+      loading,
+      modalLoading,
+      attendanceSheetTableLoading,
+      traineeAdditionModal,
+      newTraineeAttendance,
+      attendanceSheetAdditionModal,
+      attendanceSheets,
+      newAttendanceSheet,
+      attendanceSheetColumns,
+      pagination,
+      potentialTrainees,
+      isClientInterface,
+      // Computed
+      loggedUser,
+      isCoachOrAdmin,
+      isRofOrAdmin,
+      attendanceColumns,
+      attendanceSheetVisibleColumns,
+      noTrainees,
+      courseHasSlot,
+      traineesWithAttendance,
+      formattedAttendanceSheets,
+      unsubscribedTrainees,
+      traineeFilterOptions,
+      canUpdate,
+      disableCheckbox,
+      // Methods
+      get,
+      attendanceCheckboxValue,
+      disableSheetDeletion,
+      traineesCount,
+      getPotentialTrainees,
+      refreshAttendanceSheets,
+      openAttendanceSheetAdditionModal,
+      resetAttendanceSheetAdditionModal,
+      formatPayload,
+      addAttendanceSheet,
+      validateAttendanceSheetDeletion,
+      deleteAttendanceSheet,
+      refreshAttendances,
+      updateAttendanceCheckbox,
+      addTrainee,
+      resetNewTraineeAttendance,
+      openTraineeAttendanceAdditionModal,
+      slotCheckboxValue,
+      updateSlotCheckbox,
+      getDelimiterClass,
+      goToLearnerProfile,
+      // Validations
+      v$,
+    };
   },
 };
 </script>
