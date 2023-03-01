@@ -447,7 +447,7 @@ export default {
         const promises = await Promise.all(newTraineeAttendance.value.attendances
           .map(s => updateAttendanceCheckbox(newTraineeAttendance.value.trainee, s)));
         traineeAdditionModal.value = false;
-        if (promises.some(p => !!p))NotifyPositive('Participant(e) ajouté(e).');
+        if (promises.some(p => !!p)) NotifyPositive('Participant(e) ajouté(e).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout du/de la participant(e).');
