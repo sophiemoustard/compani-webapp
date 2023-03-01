@@ -5,7 +5,7 @@ import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 const instance = axios.create({
   withCredentials: true,
-  paramsSerializer: params => qs.stringify(params, { indices: false }),
+  paramsSerializer: { serialize: params => qs.stringify(params, { indices: false }) },
 });
 
 instance.interceptors.request.use(async config => config, err => Promise.reject(err));
