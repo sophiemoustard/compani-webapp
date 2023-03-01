@@ -638,3 +638,6 @@ export const MONTH_SHORT = 'LLL';
 export const MONTH_SHORT_YYYY = 'LLL yyyy';
 export const DAY_OF_MONTH = 'd';
 export const DAY_OF_WEEK_SHORT = 'ccc';
+
+// LEARNERS
+export const DIRECTORY = 'directory';

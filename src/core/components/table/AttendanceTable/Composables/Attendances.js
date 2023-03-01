@@ -16,6 +16,7 @@ import {
   COACH_ROLES,
   VENDOR_ADMIN,
   TRAINING_ORGANISATION_MANAGER,
+  COURSE,
 } from '@data/constants';
 import { upperCaseFirstLetter, formatIdentity, sortStrings, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
@@ -109,12 +110,12 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const getPotentialTrainees = async () => {
     try {
-      let query;
-
-      if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
-      else query = { companies: course.value.companies.map(c => c._id) };
-
-      potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
+      const companies = isClientInterface
+        ? get(loggedUser.value, 'company._id')
+        : course.value.companies.map(c => c._id);
+      potentialTrainees.value = !isEmpty(companies)
+        ? Object.freeze(await Users.learnerList({ companies, action: COURSE }))
+        : [];
     } catch (error) {
       potentialTrainees.value = [];
       console.error(error);

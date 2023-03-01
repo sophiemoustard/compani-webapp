@@ -149,6 +149,7 @@ import {
   DEFAULT_AVATAR,
   DD_MM,
   HH_MM,
+  COURSE,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -371,9 +372,13 @@ export default {
         let query;
 
         if (isClientInterface) {
-          query = { companies: get(loggedUser.value, 'company._id'), startDate: CompaniDate().toISO() };
+          query = { companies: get(loggedUser.value, 'company._id'), startDate: CompaniDate().toISO(), action: COURSE };
         } else {
-          query = { companies: course.value.companies.map(c => c._id), startDate: CompaniDate().toISO() };
+          query = {
+            companies: course.value.companies.map(c => c._id),
+            startDate: CompaniDate().toISO(),
+            action: COURSE,
+          };
         }
 
         potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
