@@ -95,7 +95,7 @@
 
 <script>
 import { useStore } from 'vuex';
-import { computed, toRefs, ref, onMounted } from 'vue';
+import { computed, toRefs, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import pick from 'lodash/pick';
@@ -503,13 +503,15 @@ export default {
       $router.push({ name, params: { learnerId: row._id } });
     };
 
-    onMounted(async () => {
+    const created = async () => {
       await Promise.all([
         refreshAttendances({ course: course.value._id }),
         refreshAttendanceSheets(),
         getPotentialTrainees(),
       ]);
-    });
+    };
+
+    created();
 
     return {
       // Data
