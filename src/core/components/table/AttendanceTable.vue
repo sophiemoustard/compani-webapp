@@ -27,21 +27,19 @@
       <template #body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="getDelimiterClass(props.rowIndex)">
-            <div v-if="col.name === 'trainee'">
-              <q-item class="rows">
-                <q-item-section avatar>
-                  <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label v-if="isRofOrAdmin || isCoachOrAdmin" class="ellipsis clickable-name cursor-pointer"
-                    @click="goToLearnerProfile(props.row)">
-                    {{ col.value }}
-                  </q-item-label>
-                  <q-item-label v-else class="ellipsis">{{ col.value }}</q-item-label>
-                  <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
-                </q-item-section>
-              </q-item>
-            </div>
+            <q-item v-if="col.name === 'trainee'" class="rows">
+              <q-item-section avatar>
+                <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
+              </q-item-section>
+              <q-item-section>
+                <q-item-label v-if="canAccessLearnerProfile" class="ellipsis clickable-name cursor-pointer"
+                  @click="goToLearnerProfile(props.row)">
+                  {{ col.value }}
+                </q-item-label>
+                <q-item-label v-else class="ellipsis">{{ col.value }}</q-item-label>
+                <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
+              </q-item-section>
+            </q-item>
             <q-checkbox v-else :model-value="attendanceCheckboxValue(col.value, col.slot)" dense size="sm"
               @update:model-value="updateAttendanceCheckbox(col.value, col.slot)" :disable="disableCheckbox" />
           </q-td>
@@ -129,7 +127,6 @@ import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions, sor
 import { defineAbilitiesFor } from '@helpers/ability';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
-import { useCourses } from '@composables/courses';
 import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
@@ -178,13 +175,10 @@ export default {
     const pagination = ref({ page: 1, rowsPerPage: 15 });
     const potentialTrainees = ref([]);
 
-    const { isClientInterface } = useCourses(course);
+    const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
 
     const rules = computed(() => ({
-      newTraineeAttendance: {
-        trainee: { required },
-        attendances: { minArrayLength: minArrayLength(1) },
-      },
+      newTraineeAttendance: { trainee: { required }, attendances: { minArrayLength: minArrayLength(1) } },
       newAttendanceSheet: {
         file: { required },
         trainee: { required: requiredIf(course.value.type !== INTRA) },
@@ -198,11 +192,10 @@ export default {
 
     const clientRole = computed(() => $store.getters['main/getClientRole']);
 
-    const isCoachOrAdmin = computed(() => COACH_ROLES.includes(clientRole.value));
-
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
-    const isRofOrAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+    const canAccessLearnerProfile = computed(() => COACH_ROLES.includes(clientRole.value) ||
+      [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
     const attendanceColumns = computed(() => {
       const columns = [{
@@ -520,7 +513,6 @@ export default {
 
     return {
       // Data
-      formatIdentity,
       DEFAULT_AVATAR,
       loading,
       modalLoading,
@@ -528,23 +520,17 @@ export default {
       traineeAdditionModal,
       newTraineeAttendance,
       attendanceSheetAdditionModal,
-      attendanceSheets,
       newAttendanceSheet,
       attendanceSheetColumns,
       pagination,
-      potentialTrainees,
-      isClientInterface,
       // Computed
-      loggedUser,
-      isCoachOrAdmin,
-      isRofOrAdmin,
+      canAccessLearnerProfile,
       attendanceColumns,
       attendanceSheetVisibleColumns,
       noTrainees,
       courseHasSlot,
       traineesWithAttendance,
       formattedAttendanceSheets,
-      unsubscribedTrainees,
       traineeFilterOptions,
       canUpdate,
       disableCheckbox,
@@ -553,15 +539,10 @@ export default {
       attendanceCheckboxValue,
       disableSheetDeletion,
       traineesCount,
-      getPotentialTrainees,
-      refreshAttendanceSheets,
       openAttendanceSheetAdditionModal,
       resetAttendanceSheetAdditionModal,
-      formatPayload,
       addAttendanceSheet,
       validateAttendanceSheetDeletion,
-      deleteAttendanceSheet,
-      refreshAttendances,
       updateAttendanceCheckbox,
       addTrainee,
       resetNewTraineeAttendance,
