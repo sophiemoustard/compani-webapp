@@ -403,7 +403,10 @@ export default {
     },
     async updateAttendanceCheckbox (traineeId, slotId) {
       try {
-        if (!this.canUpdate) return NotifyNegative('Impossible de modifier l\'émargement.');
+        if (!this.canUpdate) {
+          NotifyNegative('Impossible de modifier l\'émargement.');
+          return false;
+        }
 
         this.loading = true;
         if (this.attendanceCheckboxValue(traineeId, slotId)) {
