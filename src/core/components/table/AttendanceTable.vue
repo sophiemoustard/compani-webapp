@@ -403,7 +403,10 @@ export default {
     },
     async updateAttendanceCheckbox (traineeId, slotId) {
       try {
-        if (!this.canUpdate) return NotifyNegative('Impossible de modifier l\'émargement.');
+        if (!this.canUpdate) {
+          NotifyNegative('Impossible de modifier l\'émargement.');
+          return false;
+        }
 
         this.loading = true;
         if (this.attendanceCheckboxValue(traineeId, slotId)) {
@@ -413,9 +416,11 @@ export default {
         }
 
         await this.refreshAttendances({ courseSlot: slotId });
+        return true;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'émargement.');
+        return false;
       } finally {
         this.loading = false;
       }
@@ -427,10 +432,10 @@ export default {
         this.v$.newTraineeAttendance.$touch();
         if (this.v$.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
-        this.newTraineeAttendance.attendances
-          .map(s => this.updateAttendanceCheckbox(this.newTraineeAttendance.trainee, s));
+        const promises = await Promise.all(this.newTraineeAttendance.attendances
+          .map(s => this.updateAttendanceCheckbox(this.newTraineeAttendance.trainee, s)));
         this.traineeAdditionModal = false;
-        NotifyPositive('Participant(e) ajouté(e).');
+        if (promises.some(p => !!p)) NotifyPositive('Participant(e) ajouté(e).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout du/de la participant(e).');
