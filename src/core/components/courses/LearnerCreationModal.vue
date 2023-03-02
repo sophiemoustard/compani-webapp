@@ -13,7 +13,7 @@
         <ni-input in-modal :model-value="newUser.identity.lastname" :error="validations.identity.lastname.$error"
           required-field @blur="validations.identity.lastname.$touch" caption="Nom"
           @update:model-value="update($event, 'identity.lastname')" :disable="disableUserInfo" />
-        <ni-input in-modal :model-value="newUser.contact.phone" required-field
+        <ni-input in-modal :model-value="newUser.contact.phone" :required-field="!disableUserInfo"
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" @update:model-value="update($event.trim(), 'contact.phone')"
           :disable="disableUserInfo" />

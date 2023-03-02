@@ -67,7 +67,7 @@ export const useLearners = (
     newLearner: {
       identity: { lastname: { required } },
       local: { email: { required, email } },
-      contact: { phone: { required, frPhoneNumber } },
+      contact: { phone: { required: requiredIf(!disableUserInfoEdition.value), frPhoneNumber } },
       company: { required },
       userCompanyStartDate: { required },
     },
