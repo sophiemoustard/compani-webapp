@@ -90,7 +90,7 @@
 
   <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
       @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
-      :validations="v$.newAttendanceSheet" :course="course" />
+      :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" />
 </div>
 </template>
 
@@ -98,30 +98,16 @@
 import { useStore } from 'vuex';
 import { computed, toRefs, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useQuasar } from 'quasar';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import useVuelidate from '@vuelidate/core';
-import { required, requiredIf } from '@vuelidate/validators';
-import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import {
-  DEFAULT_AVATAR,
-  INTRA,
-  INTER_B2B,
-  DD_MM_YYYY,
-  COACH_ROLES,
-  VENDOR_ADMIN,
-  TRAINING_ORGANISATION_MANAGER,
-} from '@data/constants';
-import CompaniDate from '@helpers/dates/companiDates';
-import { formatIdentity } from '@helpers/utils';
+import { DEFAULT_AVATAR, COACH_ROLES, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
-import { useAttendances } from './Composables/Attendance';
+import { useAttendances } from './Composables/Attendances';
+import { useAttendanceSheets } from './Composables/AttendanceSheets';
 
 export default {
   name: 'AttendanceTable',
@@ -138,29 +124,8 @@ export default {
     const { course } = toRefs(props);
     const $router = useRouter();
     const $store = useStore();
-    const $q = useQuasar();
 
     const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
-    const attendanceSheetTableLoading = ref(false);
-    const attendanceSheetAdditionModal = ref(false);
-    const attendanceSheets = ref([]);
-    const newAttendanceSheet = ref({ course: course.value._id });
-    const attendanceSheetColumns = ref([
-      {
-        name: 'date',
-        label: 'Date',
-        align: 'left',
-        field: 'date',
-        format: value => CompaniDate(value).format(DD_MM_YYYY),
-      },
-      {
-        name: 'trainee',
-        label: 'Participant(e)',
-        align: 'left',
-        field: row => formatIdentity(get(row, 'trainee.identity'), 'FL'),
-      },
-      { name: 'actions', label: '', align: 'left' },
-    ]);
     const pagination = ref({ page: 1, rowsPerPage: 15 });
 
     const clientRole = computed(() => $store.getters['main/getClientRole']);
@@ -173,15 +138,8 @@ export default {
       return ability.can('update', 'course_trainee_follow_up');
     });
 
-    const rules = computed(() => ({
-      newAttendanceSheet: {
-        file: { required },
-        trainee: { required: requiredIf(course.value.type !== INTRA) },
-        date: { required: requiredIf(course.value.type === INTRA) },
-      },
-    }));
-
-    const v$ = useVuelidate(rules, { newAttendanceSheet });
+    const canAccessLearnerProfile = computed(() => COACH_ROLES.includes(clientRole.value) ||
+      [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
     const {
       // Data
@@ -189,6 +147,7 @@ export default {
       loading,
       modalLoading,
       newTraineeAttendance,
+      potentialTrainees,
       // Computed
       attendanceColumns,
       traineesWithAttendance,
@@ -212,114 +171,25 @@ export default {
       attendanceValidations,
     } = useAttendances(course, isClientInterface, canUpdate, loggedUser);
 
-    const canAccessLearnerProfile = computed(() => COACH_ROLES.includes(clientRole.value) ||
-      [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
-
-    const attendanceSheetVisibleColumns = computed(() => (course.value.type === INTRA
-      ? ['date', 'actions']
-      : ['trainee', 'actions']));
-
-    const formattedAttendanceSheets = computed(() => {
-      if (course.value.type === INTER_B2B) {
-        return attendanceSheets.value.map(as => ({
-          ...as,
-          trainee: traineesWithAttendance.value.find(trainee => trainee._id === as.trainee._id),
-        }));
-      }
-
-      return attendanceSheets.value;
-    });
-
-    const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
-
-    const refreshAttendanceSheets = async () => {
-      try {
-        attendanceSheetTableLoading.value = true;
-        const attendanceSheetList = await AttendanceSheets.list({ course: course.value._id });
-
-        if (course.value.type === INTER_B2B && isClientInterface) {
-          attendanceSheets.value = attendanceSheetList.filter(a => a.company === loggedUser.value.company._id);
-        } else attendanceSheets.value = attendanceSheetList;
-      } catch (e) {
-        console.error(e);
-        attendanceSheets.value = [];
-        NotifyNegative('Erreur lors de la récupération des feuilles d\'émargement.');
-      } finally {
-        attendanceSheetTableLoading.value = false;
-      }
-    };
-
-    const openAttendanceSheetAdditionModal = () => {
-      if (course.value.archivedAt) {
-        return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
-      }
-
-      attendanceSheetAdditionModal.value = true;
-    };
-
-    const resetAttendanceSheetAdditionModal = () => {
-      v$.value.newAttendanceSheet.$reset();
-      newAttendanceSheet.value = { course: course.value._id };
-    };
-
-    const formatPayload = () => {
-      const { course: newAttendanceSheetCourse, file, trainee, date } = newAttendanceSheet.value;
-      const form = new FormData();
-      course.value.type === INTRA ? form.append('date', date) : form.append('trainee', trainee);
-      form.append('course', newAttendanceSheetCourse);
-      form.append('file', file);
-
-      return form;
-    };
-
-    const addAttendanceSheet = async () => {
-      try {
-        if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter une feuille d\'émargement.');
-
-        v$.value.newAttendanceSheet.$touch();
-        if (v$.value.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
-        modalLoading.value = true;
-
-        await AttendanceSheets.create(formatPayload());
-
-        attendanceSheetAdditionModal.value = false;
-        NotifyPositive('Feuille d\'émargement ajoutée.');
-        await refreshAttendanceSheets();
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
-      } finally {
-        modalLoading.value = false;
-      }
-    };
-
-    const validateAttendanceSheetDeletion = (attendanceSheet) => {
-      if (!canUpdate.value) return NotifyNegative('Impossible de supprimer la feuille d\'émargement.');
-
-      $q.dialog({
-        title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer cette feuille d\'émargement&nbsp;?',
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => deleteAttendanceSheet(attendanceSheet._id))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
-    };
-
-    const deleteAttendanceSheet = async (attendanceSheetId) => {
-      try {
-        $q.loading.show();
-        await AttendanceSheets.delete(attendanceSheetId);
-
-        NotifyPositive('Feuille d\'émargement supprimée.');
-        await refreshAttendanceSheets();
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppresion de la feuille d\'émargement.');
-      } finally {
-        $q.loading.hide();
-      }
-    };
+    const {
+      // Data
+      attendanceSheetTableLoading,
+      attendanceSheetAdditionModal,
+      newAttendanceSheet,
+      attendanceSheetColumns,
+      // Computed
+      attendanceSheetVisibleColumns,
+      formattedAttendanceSheets,
+      // Methods
+      disableSheetDeletion,
+      refreshAttendanceSheets,
+      openAttendanceSheetAdditionModal,
+      resetAttendanceSheetAdditionModal,
+      addAttendanceSheet,
+      validateAttendanceSheetDeletion,
+      // Validations
+      attendanceSheetValidations,
+    } = useAttendanceSheets(course, isClientInterface, canUpdate, loggedUser, potentialTrainees, modalLoading);
 
     const getDelimiterClass = (index) => {
       if (index === course.value.trainees.length) return 'unsubscribed-delimiter';
@@ -377,7 +247,7 @@ export default {
       getDelimiterClass,
       goToLearnerProfile,
       // Validations
-      v$,
+      attendanceSheetValidations,
       attendanceValidations,
     };
   },
