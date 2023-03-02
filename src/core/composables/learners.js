@@ -266,6 +266,7 @@ export const useLearners = (
     newLearner.value = { ...clear(newLearner.value), userCompanyStartDate: CompaniDate().startOf(DAY).toISO() };
     learnerValidation.value.newLearner.$reset();
     learnerAlreadyExists.value = false;
+    disableUserInfoEdition.value = false;
   };
 
   const updateSearch = (value) => {
