@@ -67,7 +67,7 @@ export const useLearners = (
     newLearner: {
       identity: { lastname: { required } },
       local: { email: { required, email } },
-      contact: { phone: { required, frPhoneNumber } },
+      contact: { phone: { required: requiredIf(!disableUserInfoEdition.value), frPhoneNumber } },
       company: { required },
       userCompanyStartDate: { required },
     },
@@ -266,6 +266,7 @@ export const useLearners = (
     newLearner.value = { ...clear(newLearner.value), userCompanyStartDate: CompaniDate().startOf(DAY).toISO() };
     learnerValidation.value.newLearner.$reset();
     learnerAlreadyExists.value = false;
+    disableUserInfoEdition.value = false;
   };
 
   const updateSearch = (value) => {
