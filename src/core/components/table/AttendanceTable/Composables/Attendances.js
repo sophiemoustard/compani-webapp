@@ -213,6 +213,8 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
   };
 
   const goToLearnerProfile = (row) => {
+    if (!canAccessLearnerProfile.value) return;
+
     const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
     $router.push({ name, params: { learnerId: row._id } });
   };

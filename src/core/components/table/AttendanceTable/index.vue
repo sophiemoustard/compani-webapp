@@ -32,11 +32,10 @@
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label v-if="canAccessLearnerProfile" class="ellipsis clickable-name cursor-pointer"
+                  <q-item-label :class="['ellipsis', canAccessLearnerProfile && 'clickable-name cursor-pointer']"
                     @click="goToLearnerProfile(props.row)">
                     {{ col.value }}
                   </q-item-label>
-                  <q-item-label v-else class="ellipsis">{{ col.value }}</q-item-label>
                   <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
                 </q-item-section>
               </q-item>
@@ -56,7 +55,7 @@
         label="Ajouter un(e) participant(e) non inscrit(e)" @click="openTraineeAttendanceAdditionModal" />
     </q-card>
 
-    <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" v-model:pagination="pagination"
+    <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns"
       :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -128,7 +127,6 @@ export default {
     const $store = useStore();
 
     const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
-    const pagination = ref({ page: 1, rowsPerPage: 15 });
     const modalLoading = ref(false);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
@@ -228,7 +226,6 @@ export default {
       attendanceSheetAdditionModal,
       newAttendanceSheet,
       attendanceSheetColumns,
-      pagination,
       // Computed
       canAccessLearnerProfile,
       attendanceColumns,
