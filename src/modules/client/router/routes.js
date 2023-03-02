@@ -532,7 +532,7 @@ const routes = [
       },
       // All profiles
       {
-        path: 'account',
+        path: 'account/:id',
         name: 'account client',
         component: () => import('src/core/pages/AccountInfo'),
         meta: {

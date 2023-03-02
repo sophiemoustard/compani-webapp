@@ -253,7 +253,7 @@ const routes = [
         },
       },
       {
-        path: 'account',
+        path: 'account/:id',
         name: 'account vendor',
         component: () => import('src/core/pages/AccountInfo'),
         meta: {
