@@ -99,8 +99,6 @@ import { computed, toRefs, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
-import Users from '@api/Users';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import Button from '@components/Button';
@@ -142,7 +140,6 @@ export default {
       traineeAdditionModal,
       loading,
       newTraineeAttendance,
-      potentialTrainees,
       // Computed
       attendanceColumns,
       traineesWithAttendance,
@@ -153,6 +150,7 @@ export default {
       canAccessLearnerProfile,
       // Methods
       traineesCount,
+      getPotentialTrainees,
       attendanceCheckboxValue,
       refreshAttendances,
       updateAttendanceCheckbox,
@@ -185,20 +183,6 @@ export default {
       // Validations
       attendanceSheetValidations,
     } = useAttendanceSheets(course, isClientInterface, canUpdate, loggedUser, modalLoading);
-
-    const getPotentialTrainees = async () => {
-      try {
-        let query;
-
-        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
-        else query = { companies: course.value.companies.map(c => c._id) };
-
-        potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
-      } catch (error) {
-        potentialTrainees.value = [];
-        console.error(error);
-      }
-    };
 
     const getDelimiterClass = (index) => {
       if (index === course.value.trainees.length) return 'unsubscribed-delimiter';

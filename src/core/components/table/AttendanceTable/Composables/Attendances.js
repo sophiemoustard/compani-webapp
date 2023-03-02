@@ -2,9 +2,12 @@ import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Attendances from '@api/Attendances';
+import Users from '@api/Users';
 import {
   HH_MM,
   DAY_OF_WEEK_SHORT,
@@ -103,6 +106,20 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
     [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
   const traineesCount = slotId => attendances.value.filter(a => a.courseSlot === slotId).length;
+
+  const getPotentialTrainees = async () => {
+    try {
+      let query;
+
+      if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
+      else query = { companies: course.value.companies.map(c => c._id) };
+
+      potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
+    } catch (error) {
+      potentialTrainees.value = [];
+      console.error(error);
+    }
+  };
 
   const attendanceCheckboxValue = (traineeId, slotId) => {
     if (attendances.value.length) {
@@ -236,6 +253,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
     canAccessLearnerProfile,
     // Methods
     traineesCount,
+    getPotentialTrainees,
     attendanceCheckboxValue,
     refreshAttendances,
     updateAttendanceCheckbox,
