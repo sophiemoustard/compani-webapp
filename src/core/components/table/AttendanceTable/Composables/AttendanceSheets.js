@@ -1,20 +1,19 @@
 import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
 import { INTRA, INTER_B2B, DD_MM_YYYY } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import useVuelidate from '@vuelidate/core';
-import { required, requiredIf } from '@vuelidate/validators';
 
 export const useAttendanceSheets = (
   course,
   isClientInterface,
   canUpdate,
   loggedUser,
-  potentialTrainees,
   modalLoading
 ) => {
   const $q = useQuasar();

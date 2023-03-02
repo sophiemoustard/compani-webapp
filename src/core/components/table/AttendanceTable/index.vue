@@ -1,97 +1,97 @@
 <template>
-<div>
-  <q-card flat>
-    <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
-      separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
-      <template #header="props">
-        <q-tr :props="props">
-          <q-th v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="/(slot)/.test(col.name)">
-              <div class="text-primary date">{{ col.month }}</div>
-              <div class="number">{{ col.day }}</div>
-              <div class="text-weight-bold date">{{ col.weekDay }}</div>
-              <div class="text-copper-grey-400">
-                <div>{{ col.startHour }}</div>
-                <div>{{ col.endHour }}</div>
+  <div>
+    <q-card flat>
+      <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
+        separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
+        <template #header="props">
+          <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props">
+              <div v-if="/(slot)/.test(col.name)">
+                <div class="text-primary date">{{ col.month }}</div>
+                <div class="number">{{ col.day }}</div>
+                <div class="text-weight-bold date">{{ col.weekDay }}</div>
+                <div class="text-copper-grey-400">
+                  <div>{{ col.startHour }}</div>
+                  <div>{{ col.endHour }}</div>
+                </div>
+                <div class="text-copper-grey-800">
+                  <q-icon name="supervisor_account" />
+                  {{ traineesCount(col.slot) }}
+                </div>
+                <q-checkbox v-if="canUpdate && course.trainees.length" :model-value="slotCheckboxValue(col.slot)"
+                  dense size="sm" @update:model-value="updateSlotCheckbox(col.slot)" :disable="disableCheckbox" />
               </div>
-              <div class="text-copper-grey-800">
-                <q-icon name="supervisor_account" />
-                {{ traineesCount(col.slot) }}
-              </div>
-              <q-checkbox v-if="canUpdate && course.trainees.length" :model-value="slotCheckboxValue(col.slot)"
-                dense size="sm" @update:model-value="updateSlotCheckbox(col.slot)" :disable="disableCheckbox" />
-            </div>
-          </q-th>
-        </q-tr>
-      </template>
-      <template #body="props">
+            </q-th>
+          </q-tr>
+        </template>
+        <template #body="props">
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="getDelimiterClass(props.rowIndex)">
+              <q-item v-if="col.name === 'trainee'" class="rows">
+                <q-item-section avatar>
+                  <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label v-if="canAccessLearnerProfile" class="ellipsis clickable-name cursor-pointer"
+                    @click="goToLearnerProfile(props.row)">
+                    {{ col.value }}
+                  </q-item-label>
+                  <q-item-label v-else class="ellipsis">{{ col.value }}</q-item-label>
+                  <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-checkbox v-else :model-value="attendanceCheckboxValue(col.value, col.slot)" dense size="sm"
+                @update:model-value="updateAttendanceCheckbox(col.value, col.slot)" :disable="disableCheckbox" />
+            </q-td>
+          </q-tr>
+        </template>
+        <template #no-data>
+          <div class="text-center text-italic">Aucun(e) stagiaire n'a été ajouté(e) à cette formation</div>
+        </template>
+      </q-table>
+      <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
+        Aucun créneau n'a été ajouté à cette formation
+      </div>
+      <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm" :disable="loading"
+        label="Ajouter un(e) participant(e) non inscrit(e)" @click="openTraineeAttendanceAdditionModal" />
+    </q-card>
+
+    <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" v-model:pagination="pagination"
+      :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
+      <template #body="{ props }">
         <q-tr :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="getDelimiterClass(props.rowIndex)">
-            <q-item v-if="col.name === 'trainee'" class="rows">
-              <q-item-section avatar>
-                <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
-              </q-item-section>
-              <q-item-section>
-                <q-item-label v-if="canAccessLearnerProfile" class="ellipsis clickable-name cursor-pointer"
-                  @click="goToLearnerProfile(props.row)">
-                  {{ col.value }}
-                </q-item-label>
-                <q-item-label v-else class="ellipsis">{{ col.value }}</q-item-label>
-                <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-checkbox v-else :model-value="attendanceCheckboxValue(col.value, col.slot)" dense size="sm"
-              @update:model-value="updateAttendanceCheckbox(col.value, col.slot)" :disable="disableCheckbox" />
+          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'actions'">
+              <div class="row no-wrap table-actions justify-end">
+                <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
+                  :disable="!props.row.file.link" />
+                <ni-button v-if="canUpdate" icon="delete" color="primary"
+                  @click="validateAttendanceSheetDeletion(props.row)" :disable="disableSheetDeletion(props.row)" />
+              </div>
+            </template>
+            <template v-else>
+              {{ col.value }}
+              <div v-if="get(props.row, 'trainee.external')" class="unsubscribed text-primary">Pas inscrit</div>
+            </template>
           </q-td>
         </q-tr>
       </template>
-      <template #no-data>
-        <div class="text-center text-italic">Aucun(e) stagiaire n'a été ajouté(e) à cette formation</div>
-      </template>
-    </q-table>
-    <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
-      Aucun créneau n'a été ajouté à cette formation
+    </ni-simple-table>
+    <div class="flex justify-end">
+      <ni-button v-if="canUpdate" class="bg-primary" color="white" icon="add"
+        label="Ajouter une feuille d'émargement" @click="openAttendanceSheetAdditionModal" />
     </div>
-    <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm" :disable="loading"
-      label="Ajouter un(e) participant(e) non inscrit(e)" @click="openTraineeAttendanceAdditionModal" />
-  </q-card>
 
-  <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" v-model:pagination="pagination"
-    :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
-    <template #body="{ props }">
-      <q-tr :props="props">
-        <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
-          :style="col.style">
-          <template v-if="col.name === 'actions'">
-            <div class="row no-wrap table-actions justify-end">
-              <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
-                :disable="!props.row.file.link" />
-              <ni-button v-if="canUpdate" icon="delete" color="primary"
-                @click="validateAttendanceSheetDeletion(props.row)" :disable="disableSheetDeletion(props.row)" />
-            </div>
-          </template>
-          <template v-else>
-            {{ col.value }}
-            <div v-if="get(props.row, 'trainee.external')" class="unsubscribed text-primary">Pas inscrit</div>
-          </template>
-        </q-td>
-      </q-tr>
-    </template>
-  </ni-simple-table>
-  <div class="flex justify-end">
-    <ni-button v-if="canUpdate" class="bg-primary" color="white" icon="add"
-      label="Ajouter une feuille d'émargement" @click="openAttendanceSheetAdditionModal" />
+    <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
+      :loading="modalLoading" :validation="attendanceValidations.newTraineeAttendance"
+      :trainee-filter-options="traineeFilterOptions" v-model:new-trainee-attendance="newTraineeAttendance"
+      :trainees="traineesWithAttendance" @submit="addTrainee" />
+
+    <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
+        @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
+        :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" />
   </div>
-
-  <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
-    :loading="modalLoading" :validation="attendanceValidations.newTraineeAttendance"
-    :trainee-filter-options="traineeFilterOptions" v-model:new-trainee-attendance="newTraineeAttendance"
-    :trainees="traineesWithAttendance" @submit="addTrainee" />
-
-  <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
-      @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
-      :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" />
-</div>
 </template>
 
 <script>
@@ -100,9 +100,11 @@ import { computed, toRefs, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import Button from '@components/Button';
-import { DEFAULT_AVATAR, COACH_ROLES, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import isEmpty from 'lodash/isEmpty';
+import Users from '@api/Users';
+import { DEFAULT_AVATAR } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
+import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
@@ -127,9 +129,8 @@ export default {
 
     const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
     const pagination = ref({ page: 1, rowsPerPage: 15 });
+    const modalLoading = ref(false);
 
-    const clientRole = computed(() => $store.getters['main/getClientRole']);
-    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const canUpdate = computed(() => {
@@ -138,14 +139,10 @@ export default {
       return ability.can('update', 'course_trainee_follow_up');
     });
 
-    const canAccessLearnerProfile = computed(() => COACH_ROLES.includes(clientRole.value) ||
-      [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
-
     const {
       // Data
       traineeAdditionModal,
       loading,
-      modalLoading,
       newTraineeAttendance,
       potentialTrainees,
       // Computed
@@ -155,10 +152,10 @@ export default {
       courseHasSlot,
       traineeFilterOptions,
       disableCheckbox,
+      canAccessLearnerProfile,
       // Methods
       traineesCount,
       attendanceCheckboxValue,
-      getPotentialTrainees,
       refreshAttendances,
       updateAttendanceCheckbox,
       slotCheckboxValue,
@@ -169,7 +166,7 @@ export default {
       goToLearnerProfile,
       // Validations
       attendanceValidations,
-    } = useAttendances(course, isClientInterface, canUpdate, loggedUser);
+    } = useAttendances(course, isClientInterface, canUpdate, loggedUser, modalLoading);
 
     const {
       // Data
@@ -189,7 +186,21 @@ export default {
       validateAttendanceSheetDeletion,
       // Validations
       attendanceSheetValidations,
-    } = useAttendanceSheets(course, isClientInterface, canUpdate, loggedUser, potentialTrainees, modalLoading);
+    } = useAttendanceSheets(course, isClientInterface, canUpdate, loggedUser, modalLoading);
+
+    const getPotentialTrainees = async () => {
+      try {
+        let query;
+
+        if (isClientInterface) query = { companies: get(loggedUser.value, 'company._id') };
+        else query = { companies: course.value.companies.map(c => c._id) };
+
+        potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
+      } catch (error) {
+        potentialTrainees.value = [];
+        console.error(error);
+      }
+    };
 
     const getDelimiterClass = (index) => {
       if (index === course.value.trainees.length) return 'unsubscribed-delimiter';
