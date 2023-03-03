@@ -369,12 +369,12 @@ export default {
 
     const getPotentialTrainees = async () => {
       try {
-        const query = {
-          companies: isClientInterface ? get(loggedUser.value, 'company._id') : course.value.companies.map(c => c._id),
-        };
+        const companies = isClientInterface
+          ? get(loggedUser.value, 'company._id')
+          : course.value.companies.map(c => c._id);
 
-        potentialTrainees.value = !isEmpty(query.companies)
-          ? Object.freeze(await Users.learnerList({ ...query, startDate: CompaniDate().toISO(), action: COURSE }))
+        potentialTrainees.value = !isEmpty(companies)
+          ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
           : [];
       } catch (error) {
         potentialTrainees.value = [];
