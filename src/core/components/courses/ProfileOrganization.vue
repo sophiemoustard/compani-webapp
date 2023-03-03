@@ -149,6 +149,7 @@ import {
   DEFAULT_AVATAR,
   DD_MM,
   HH_MM,
+  COURSE,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -368,15 +369,13 @@ export default {
 
     const getPotentialTrainees = async () => {
       try {
-        let query;
+        const companies = isClientInterface
+          ? get(loggedUser.value, 'company._id')
+          : course.value.companies.map(c => c._id);
 
-        if (isClientInterface) {
-          query = { companies: get(loggedUser.value, 'company._id'), startDate: CompaniDate().toISO() };
-        } else {
-          query = { companies: course.value.companies.map(c => c._id), startDate: CompaniDate().toISO() };
-        }
-
-        potentialTrainees.value = !isEmpty(query.companies) ? Object.freeze(await Users.learnerList(query)) : [];
+        potentialTrainees.value = !isEmpty(companies)
+          ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
+          : [];
       } catch (error) {
         potentialTrainees.value = [];
         console.error(error);
