@@ -21,20 +21,19 @@ const routes = [
         const canNav = await canNavigate();
         if (!canNav) return logOutAndRedirectToLogin();
 
-        const { loggedUser } = store.state.main;
         const userVendorRole = store.getters['main/getVendorRole'];
         const userClientRole = store.getters['main/getClientRole'];
-        if (!userClientRole && !userVendorRole) return next({ name: 'account client', params: { id: loggedUser._id } });
+        if (!userClientRole && !userVendorRole) return next({ name: 'account client' });
         if (!userClientRole) return next({ path: '/ad' });
 
         const company = store.getters['main/getCompany'];
         if (userClientRole === HELPER) return next({ name: 'customers agenda' });
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
-          return next({ name: 'account client', params: { id: loggedUser._id } });
+          return next({ name: 'account client' });
         }
         if (AUXILIARY_ROLES.includes(userClientRole)) {
           if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries agenda' });
-          return next({ name: 'account client', params: { id: loggedUser._id } });
+          return next({ name: 'account client' });
         }
         if (COACH_ROLES.includes(userClientRole)) {
           if (get(company, 'subscriptions.erp')) return next({ name: 'ni auxiliaries' });
@@ -532,7 +531,7 @@ const routes = [
       },
       // All profiles
       {
-        path: 'account/:id',
+        path: 'account',
         name: 'account client',
         component: () => import('src/core/pages/AccountInfo'),
         meta: {
