@@ -69,8 +69,8 @@ export default {
     goToProfile () {
       if (!/account/.test(this.$route.name)) {
         return /\/ad\//.test(this.$route.path)
-          ? this.$router.push({ name: 'account vendor', params: { id: this.userId } })
-          : this.$router.push({ name: 'account client', params: { id: this.userId } });
+          ? this.$router.push({ name: 'account vendor' })
+          : this.$router.push({ name: 'account client' });
       }
     },
     switchInterface () {
