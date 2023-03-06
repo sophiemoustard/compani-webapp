@@ -14,6 +14,7 @@ import {
   AUXILIARY_WITHOUT_COMPANY,
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
+  DIRECTORY,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import {
@@ -67,7 +68,7 @@ export const useLearners = (
     newLearner: {
       identity: { lastname: { required } },
       local: { email: { required, email } },
-      contact: { phone: { required, frPhoneNumber } },
+      contact: { phone: { required: requiredIf(!disableUserInfoEdition.value), frPhoneNumber } },
       company: { required },
       userCompanyStartDate: { required },
     },
@@ -112,7 +113,7 @@ export const useLearners = (
   const getLearnerList = async (companyId = null) => {
     try {
       tableLoading.value = true;
-      const learners = await Users.learnerList(companyId ? { companies: companyId } : {});
+      const learners = await Users.learnerList({ action: DIRECTORY, ...(companyId && { companies: companyId }) });
       learnerList.value = Object.freeze(learners.map(formatRow));
     } catch (e) {
       console.error(e);
@@ -266,6 +267,7 @@ export const useLearners = (
     newLearner.value = { ...clear(newLearner.value), userCompanyStartDate: CompaniDate().startOf(DAY).toISO() };
     learnerValidation.value.newLearner.$reset();
     learnerAlreadyExists.value = false;
+    disableUserInfoEdition.value = false;
   };
 
   const updateSearch = (value) => {

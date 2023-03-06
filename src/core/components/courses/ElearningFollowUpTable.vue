@@ -121,7 +121,7 @@ export default {
 
       $event.stopPropagation();
       const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
-      $router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
+      $router.push({ name, params: { learnerId: row._id }, query: { defaultTab: 'courses' } });
     };
 
     return {

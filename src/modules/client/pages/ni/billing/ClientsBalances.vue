@@ -299,7 +299,7 @@ export default {
   },
   methods: {
     goToCustomerBillingPage (customerId) {
-      this.$router.push({ name: 'ni customers info', params: { customerId, defaultTab: 'billing' } });
+      this.$router.push({ name: 'ni customers info', params: { customerId }, query: { defaultTab: 'billing' } });
     },
   },
 };
