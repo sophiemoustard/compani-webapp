@@ -107,8 +107,10 @@ export default {
         trainingContractInfosModal.value = false;
       } catch (e) {
         console.error(e);
-        if (e.status === 403) return NotifyNegative(e.data.message);
-        if (e.status === 422) return NotifyNegative(e.data.message);
+        if ([403, 422].includes(e.status)) {
+          const { message } = JSON.parse(Buffer.from(e.data, 'utf8').toString('utf8'));
+          return NotifyNegative(message);
+        }
         NotifyNegative('Erreur lors de la génération de la convention.');
       } finally {
         pdfLoading.value = false;
