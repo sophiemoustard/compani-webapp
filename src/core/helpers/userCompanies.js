@@ -1,5 +1,6 @@
 import compact from 'lodash/compact';
 import uniqBy from 'lodash/uniqBy';
+import has from 'lodash/has';
 import CompaniDate from '@helpers/dates/companiDates';
 
 export const getCurrentAndFutureCompanies = (userCompanyList) => {
@@ -7,5 +8,5 @@ export const getCurrentAndFutureCompanies = (userCompanyList) => {
     .filter(uc => !uc.endDate || CompaniDate().isBefore(uc.endDate))
     .map(uc => uc.company));
 
-  return uniqBy(currentAndFutureCompanies, '_id');
+  return uniqBy(currentAndFutureCompanies, company => (has(company, '_id') ? company._id : company));
 };
