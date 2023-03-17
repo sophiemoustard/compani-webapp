@@ -44,6 +44,7 @@ export default {
         commit('SET_USER_PROFILE', { ...extend(userModel, user) });
       } catch (e) {
         console.error(e);
+        if (e.status === 404) return router.replace({ path: '/404' });
       }
     },
     setUserProfile: ({ commit }, data) => commit('SET_USER_PROFILE', data),
