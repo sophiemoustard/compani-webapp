@@ -80,7 +80,7 @@
           :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <div v-if="isVendorInterface && isIntraCourse">
+    <div v-if="isAdmin && isVendorInterface && isIntraCourse">
       <training-contract-container :course="course" />
     </div>
 
@@ -750,6 +750,7 @@ export default {
       tmpContactId,
       courseHistoryFeed,
       tmpCourse,
+      isIntraCourse,
       // Computed
       course,
       v$,

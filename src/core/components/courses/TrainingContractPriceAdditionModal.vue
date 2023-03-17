@@ -3,10 +3,8 @@
     <template #title>
       Ajouter <span class="text-weight-bold">le prix de la formation</span>
     </template>
-     <ni-input in-modal :caption="'Prix du programme'"
-      :error="validations.$error" type="number" :model-value="price"
-      @blur="validations.$touch" suffix="€" required-field :error-message="errorMessage"
-      @update:model-value="update" />
+     <ni-input in-modal :caption="'Prix du programme'" :error="validations.$error" type="number" :model-value="price"
+      @blur="validations.$touch" suffix="€" required-field :error-message="errorMessage" @update:model-value="update" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter le prix" icon-right="add" color="white"
         @click="submit" />

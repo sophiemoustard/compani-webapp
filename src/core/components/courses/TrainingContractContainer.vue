@@ -2,7 +2,7 @@
   <div class="q-mb-xl">
     <p class="text-weight-bold">Convention de formation</p>
     <div class="q-mb-sm">
-      <ni-banner v-if="missingInfos.length ">
+      <ni-banner v-if="missingInfos.length">
         <template #message>
           Il manque {{ formatQuantity('information', missingInfos.length ) }} pour générer la convention de
           formation : {{ missingInfos.join(', ') }}.
@@ -12,6 +12,7 @@
         :disable="disableDocDownload" @click="trainingContractPriceAdditionModal = true" size="16px" />
     </div>
   </div>
+
   <training-contract-price-addition-modal v-model="trainingContractPriceAdditionModal"
     v-model:price="price" @submit="openTrainingContractInfosModal"
     :validations="validations.price" @hide="resetPrice" :error-message="errorMessage" />
@@ -24,24 +25,24 @@
 import { computed, ref, toRefs } from 'vue';
 import get from 'lodash/get';
 import { required } from '@vuelidate/validators';
+import useVuelidate from '@vuelidate/core';
 import Courses from '@api/Courses';
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
-import { formatQuantity } from '@helpers/utils';
 import TrainingContractPriceAdditionModal from '@components/courses/TrainingContractPriceAdditionModal';
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
 import { NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
 import { REQUIRED_LABEL } from '@data/constants';
-import useVuelidate from '@vuelidate/core';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
+import { formatQuantity, formatDownloadName } from '@helpers/utils';
+import { composeCourseName } from '@helpers/courses';
 
 export default {
   name: 'TrainingContractContainer',
   props: {
     course: { type: Object, default: () => {} },
-
   },
   components: {
     'ni-bi-color-button': BiColorButton,
@@ -93,15 +94,21 @@ export default {
       trainingContractPriceAdditionModal.value = false;
       trainingContractInfosModal.value = true;
     };
+
     const generateTrainingContract = async () => {
       try {
         pdfLoading.value = true;
-        const pdf = await Courses.generate(course.value._id, { price: price.value });
-        const pdfName = `convention_${course.value.subProgram.program.name}_${course.value.companies[0].name}.pdf`;
+        const pdf = await Courses.downloadTrainingContract(course.value._id, { price: price.value });
+        const formattedName = formatDownloadName(
+          `convention_${composeCourseName(course.value)} ${course.value.companies[0].name}`
+        );
+        const pdfName = `${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
         trainingContractInfosModal.value = false;
-      } catch (error) {
-        console.error(error);
+      } catch (e) {
+        console.error(e);
+        if (e.status === 403) return NotifyNegative(e.data.message);
+        if (e.status === 422) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la génération de la convention.');
       } finally {
         pdfLoading.value = false;

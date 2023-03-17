@@ -7,8 +7,8 @@
      <div><span class="text-weight-bold">Nom du programme :</span> {{ course.subProgram.program.name }}</div>
      <div><span class="text-weight-bold">Objectifs :</span> {{ course.subProgram.program.learningGoals }}</div>
      <div>
-      <span class="text-weight-bold">
-      Créneaux :</span> {{ course.slots.length + course.slotsToPlan.length }} créneaux
+      <span class="text-weight-bold">Créneaux :</span>
+      {{ course.slots.length + course.slotsToPlan.length }} créneaux
     </div>
     <div><span class="text-weight-bold">Durée :</span> {{ computeTotalDuration }}</div>
     <div>
@@ -17,14 +17,8 @@
     </div>
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
-    <div>
-      <span class="text-weight-bold">Intervenant(e) :</span>
-      {{ formatIdentity(course.trainer.identity, 'FL') }}
-    </div>
-    <div>
-      <span class="text-weight-bold">
-      Prix :</span> {{ price }} €
-    </div>
+    <div><span class="text-weight-bold">Intervenant(e) :</span>{{ formatIdentity(course.trainer.identity, 'FL') }}</div>
+    <div><span class="text-weight-bold">Prix :</span> {{ price }} €</div>
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Générer la convention" icon-right="add" color="white"
         @click="submit" :loading="loading" />
