@@ -10,6 +10,8 @@
       </ni-banner>
       <ni-bi-color-button icon="file_download" label="Générer la convention de formation"
         :disable="disableDocDownload" @click="trainingContractPriceAdditionModal = true" size="16px" />
+      <ni-file-uploader caption="Convention de formation signée" :extensions="'pdf'" name="signedTrainingContract"
+        :url="signedTrainingContract.link" drive-storage />
     </div>
   </div>
 
@@ -119,6 +121,13 @@ export default {
       }
     };
 
+    const url = computed(() => {
+      const driveId = get(trainingContract.value, 'link');
+      if (!driveId) return '';
+
+      return `${process.env.API_HOSTNAME}/training-contracts//gdrive/${driveId}/upload`;
+    });
+
     return {
       // Data
       price,
@@ -130,6 +139,7 @@ export default {
       disableDocDownload,
       errorMessage,
       validations,
+      url,
       // Methods
       openTrainingContractInfosModal,
       resetPrice,
