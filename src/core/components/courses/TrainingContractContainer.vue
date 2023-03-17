@@ -100,7 +100,7 @@ export default {
         pdfLoading.value = true;
         const pdf = await Courses.downloadTrainingContract(course.value._id, { price: price.value });
         const formattedName = formatDownloadName(
-          `convention_${composeCourseName(course.value)} ${course.value.companies[0].name}`
+          `convention ${composeCourseName(course.value)} ${course.value.companies[0].name}`
         );
         const pdfName = `${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');

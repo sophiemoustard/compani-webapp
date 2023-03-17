@@ -18,7 +18,7 @@
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
     <div><span class="text-weight-bold">Intervenant(e) :</span>{{ formatIdentity(course.trainer.identity, 'FL') }}</div>
-    <div><span class="text-weight-bold">Prix :</span> {{ price }} €</div>
+    <div class="q-mb-md"><span class="text-weight-bold">Prix :</span> {{ price }} €</div>
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Générer la convention" icon-right="add" color="white"
         @click="submit" :loading="loading" />
@@ -54,6 +54,7 @@ export default {
   setup (props, { emit }) {
     const { course } = toRefs(props);
 
+    // make sure code is similar to front part in TrainingContractInfoModal
     const computeLiveDuration = computed(() => {
       if (course.value.slotsToPlan.length) {
         const theoreticalDurationList = course.value.subProgram.steps
