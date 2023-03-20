@@ -67,7 +67,7 @@ export default {
       const infos = [];
       if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
-      else if (!course.value.slots.some(slot => slot.address)) infos.push('mininum 1 adresse');
+      else if (!course.value.slots.some(slot => slot.address || slot.meetingLink)) infos.push('mininum 1 adresse');
 
       return infos;
     });

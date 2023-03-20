@@ -13,7 +13,7 @@
       <span class="text-weight-bold">Créneaux :</span>
       {{ course.slots.length + course.slotsToPlan.length }} créneaux
     </div>
-    <div><span class="text-weight-bold">Durée :</span> {{ computeTotalDuration }}</div>
+    <div><span class="text-weight-bold">Durée :</span> {{ totalDuration }}</div>
     <div>
       <span class="text-weight-bold">Effectif :</span>
       {{ course.misc }} jusqu'à {{ course.maxTrainees }} stagiaires
@@ -42,7 +42,7 @@ import { formatIdentity } from '@helpers/utils';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 import { getISOTotalDuration, ascendingSortBy } from '@helpers/dates/utils';
-import { SHORT_DURATION_H_MM, E_LEARNING, DD_MM_YYYY } from '@data/constants';
+import { SHORT_DURATION_H_MM, E_LEARNING, DD_MM_YYYY, REMOTE } from '@data/constants';
 
 export default {
   name: 'TrainingContractInfosModal',
@@ -61,7 +61,7 @@ export default {
     const { course } = toRefs(props);
 
     // make sure code is similar to back part in TrainingContracts helper
-    const computeLiveDuration = computed(() => {
+    const liveDuration = computed(() => {
       if (course.value.slotsToPlan.length) {
         const theoreticalDurationList = course.value.subProgram.steps
           .filter(step => step.type !== E_LEARNING)
@@ -77,7 +77,7 @@ export default {
       return CompaniDuration(slotsDuration).format(SHORT_DURATION_H_MM);
     });
 
-    const computeElearnigDuration = computed(() => {
+    const elearnigDuration = computed(() => {
       if (!course.value.subProgram.steps.some(step => step.type === E_LEARNING)) return '';
       const elearningDuration = course.value.subProgram.steps
         .filter(step => step.type === E_LEARNING)
@@ -87,12 +87,12 @@ export default {
       return CompaniDuration(elearningDuration).format(SHORT_DURATION_H_MM);
     });
 
-    const computeTotalDuration = computed(() => {
-      if (!computeLiveDuration.value) return 'Certaines étapes n\'ont pas de durée théorique';
-      const elearningDuration = computeElearnigDuration.value
-        ? `(+ ${computeElearnigDuration.value} de e-learning)`
+    const totalDuration = computed(() => {
+      if (!liveDuration.value) return 'Certaines étapes n\'ont pas de durée théorique';
+      const elearningDuration = elearnigDuration.value
+        ? `(+ ${elearnigDuration.value} de e-learning)`
         : '';
-      return computeLiveDuration.value + elearningDuration;
+      return liveDuration.value + elearningDuration;
     });
 
     const dates = computed(() => {
@@ -100,18 +100,17 @@ export default {
         .sort(ascendingSortBy('startDate'))
         .map(slot => CompaniDate(slot.startDate).format(DD_MM_YYYY));
       const uniqDates = [...new Set(slotDatesWithDuplicate)];
-      const formattedDates = uniqDates.flatMap((date, i) => (i < (uniqDates.length - 1) ? `${date} - ` : date));
 
-      return formattedDates.join('');
+      return uniqDates.join(' - ');
     });
 
     const addressList = computed(() => {
+      if (course.value.subProgram.steps.every(step => step.type === REMOTE)) return 'en distanciel';
       const fullAddressList = compact(course.value.slots.map(slot => get(slot, 'address.fullAddress')));
-      if ([...new Set(fullAddressList)].length <= 2) {
-        return [...new Set(fullAddressList)].toString();
-      }
+      if ([...new Set(fullAddressList)].length <= 2) return [...new Set(fullAddressList)].join(', ');
+
       const cityList = compact(course.value.slots.map(slot => get(slot, 'address.city')));
-      return [...new Set(cityList)].toString();
+      return [...new Set(cityList)].join(', ');
     });
 
     const hide = () => emit('hide');
@@ -120,7 +119,7 @@ export default {
 
     return {
       // Computed
-      computeTotalDuration,
+      totalDuration,
       dates,
       addressList,
       // Methods

@@ -80,9 +80,7 @@
           :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <div v-if="isAdmin && isVendorInterface && isIntraCourse">
-      <training-contract-container :course="course" />
-    </div>
+    <training-contract-container v-if="isAdmin && isVendorInterface && isIntraCourse" :course="course" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
