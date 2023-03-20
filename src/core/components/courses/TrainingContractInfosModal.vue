@@ -5,7 +5,10 @@
     </template>
      <div><span class="text-weight-bold">Structure :</span> {{ course.companies[0].name }}</div>
      <div><span class="text-weight-bold">Nom du programme :</span> {{ course.subProgram.program.name }}</div>
-     <div><span class="text-weight-bold">Objectifs :</span> {{ course.subProgram.program.learningGoals }}</div>
+     <div class="learning-goals">
+      <div class="text-weight-bold">Objectifs :</div>
+      {{ course.subProgram.program.learningGoals }}
+    </div>
      <div>
       <span class="text-weight-bold">Créneaux :</span>
       {{ course.slots.length + course.slotsToPlan.length }} créneaux
@@ -17,7 +20,10 @@
     </div>
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
-    <div><span class="text-weight-bold">Intervenant(e) :</span>{{ formatIdentity(course.trainer.identity, 'FL') }}</div>
+    <div>
+      <span class="text-weight-bold">Intervenant(e) :</span>
+      {{ formatIdentity(course.trainer.identity, 'FL') }}
+    </div>
     <div class="q-mb-md"><span class="text-weight-bold">Prix :</span> {{ price }} €</div>
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Générer la convention" icon-right="add" color="white"
@@ -54,7 +60,7 @@ export default {
   setup (props, { emit }) {
     const { course } = toRefs(props);
 
-    // make sure code is similar to front part in TrainingContractInfoModal
+    // make sure code is similar to back part in TrainingContracts helper
     const computeLiveDuration = computed(() => {
       if (course.value.slotsToPlan.length) {
         const theoreticalDurationList = course.value.subProgram.steps
@@ -126,3 +132,8 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.learning-goals
+  white-space: pre-wrap
+</style>
