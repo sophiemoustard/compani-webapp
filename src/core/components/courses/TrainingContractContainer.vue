@@ -11,7 +11,7 @@
       <ni-bi-color-button icon="file_download" label="Générer la convention de formation" :disable="disableDocDownload"
         @click="trainingContractPriceAdditionModal = true" size="16px" />
         <div class="q-mt-md row">
-      <ni-file-uploader caption="Convention de formation signée" :extensions="'pdf'" :url="url"
+      <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
         :custom-fields="customFields" />
         </div>
     </div>
@@ -38,7 +38,7 @@ import TrainingContractPriceAdditionModal from '@components/courses/TrainingCont
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
 import { NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
-import { REQUIRED_LABEL, ON_SITE } from '@data/constants';
+import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import { formatQuantity, formatDownloadName } from '@helpers/utils';
@@ -75,7 +75,7 @@ export default {
       const onSiteSlots = course.value.slots.filter(slot => onSiteSteps.includes(slot.step));
       if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
-      else if (!onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
+      else if (onSiteSlots.length && !onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
 
       return infos;
     });
@@ -138,6 +138,7 @@ export default {
       trainingContractPriceAdditionModal,
       trainingContractInfosModal,
       pdfLoading,
+      DOC_EXTENSIONS,
       // Computed
       missingInfos,
       disableDocDownload,
