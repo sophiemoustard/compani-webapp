@@ -11,7 +11,7 @@
     </div>
      <div>
       <span class="text-weight-bold">Créneaux :</span>
-      {{ course.slots.length + course.slotsToPlan.length }} créneaux
+      {{ formatQuantity('créneau', course.slots.length + course.slotsToPlan.length, 'x') }}
     </div>
     <div><span class="text-weight-bold">Durée :</span> {{ totalDuration }}</div>
     <div>
@@ -38,7 +38,7 @@ import get from 'lodash/get';
 import compact from 'lodash/compact';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatQuantity } from '@helpers/utils';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 import { getISOTotalDuration, ascendingSortBy } from '@helpers/dates/utils';
@@ -66,31 +66,30 @@ export default {
         const theoreticalDurationList = course.value.subProgram.steps
           .filter(step => step.type !== E_LEARNING)
           .map(step => step.theoreticalDuration);
+
         if (theoreticalDurationList.some(duration => !duration)) return '';
 
         return theoreticalDurationList
           .reduce((acc, duration) => acc.add(duration), CompaniDuration())
           .format(SHORT_DURATION_H_MM);
       }
-      const slotsDuration = CompaniDuration(getISOTotalDuration(course.value.slots));
 
-      return CompaniDuration(slotsDuration).format(SHORT_DURATION_H_MM);
+      return CompaniDuration(getISOTotalDuration(course.value.slots)).format(SHORT_DURATION_H_MM);
     });
 
     const elearnigDuration = computed(() => {
       if (!course.value.subProgram.steps.some(step => step.type === E_LEARNING)) return '';
-      const elearningDuration = course.value.subProgram.steps
+
+      return course.value.subProgram.steps
         .filter(step => step.type === E_LEARNING)
         .reduce((acc, step) => acc.add(step.theoreticalDuration), CompaniDuration())
-        .toISO();
-
-      return CompaniDuration(elearningDuration).format(SHORT_DURATION_H_MM);
+        .format(SHORT_DURATION_H_MM);
     });
 
     const totalDuration = computed(() => {
       if (!liveDuration.value) return 'Certaines étapes n\'ont pas de durée théorique';
       const elearningDuration = elearnigDuration.value
-        ? `(+ ${elearnigDuration.value} de e-learning)`
+        ? ` (+ ${elearnigDuration.value} de e-learning)`
         : '';
       return liveDuration.value + elearningDuration;
     });
@@ -127,6 +126,7 @@ export default {
       input,
       submit,
       formatIdentity,
+      formatQuantity,
     };
   },
 };

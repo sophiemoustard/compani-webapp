@@ -33,7 +33,7 @@ import TrainingContractPriceAdditionModal from '@components/courses/TrainingCont
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
 import { NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, ON_SITE } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import { formatQuantity, formatDownloadName } from '@helpers/utils';
@@ -65,9 +65,11 @@ export default {
 
     const missingInfos = computed(() => {
       const infos = [];
+      const onSiteSteps = course.value.subProgram.steps.filter(step => step.type === ON_SITE).map(step => step._id);
+      const onSiteSlots = course.value.slots.filter(slot => onSiteSteps.includes(slot.step));
       if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
-      else if (!course.value.slots.some(slot => slot.address || slot.meetingLink)) infos.push('mininum 1 adresse');
+      else if (!onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
 
       return infos;
     });
