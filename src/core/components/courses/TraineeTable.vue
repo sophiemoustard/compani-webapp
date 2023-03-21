@@ -16,7 +16,8 @@
           :style="col.style" :class="[col.classes, { 'border': props.rowIndex === 0 && !hideHeader}]">
           <template v-if="col.name === 'actions' && canEdit">
             <div>
-              <ni-button icon="edit" @click="openTraineeEditionModal(props.row)" :disable="!!course.archivedAt" />
+              <ni-button icon="edit" @click="openTraineeEditionModal(props.row)"
+                :disable="!!course.archivedAt || !props.row.canEditTrainee" />
               <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
           </template>

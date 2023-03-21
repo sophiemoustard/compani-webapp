@@ -31,16 +31,15 @@
             </q-td>
           </template>
           <template #expanding-row="{ props }">
-            <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
-              :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
-              @refresh="refresh" hide-header />
+            <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit" @refresh="refresh"
+              :trainees="traineesGroupedByCompanies[props.row._id]" hide-header />
             <div class="text-center text-italic no-data" v-else>
               Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
             </div>
           </template>
         </ni-expanding-table>
-        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
-          :loading="loading" table-class="q-pb-md" />
+        <ni-trainee-table v-else :trainees="traineesGroupedByCompanies[course.companies[0]._id]" :can-edit="canEdit"
+          @refresh="refresh" :loading="loading" table-class="q-pb-md" />
       </q-card>
       <q-card-actions align="right" v-if="canEdit">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
@@ -131,6 +130,7 @@ export default {
     const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
 
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+    const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const isTrainer = ref(vendorRole.value === TRAINER);
 
@@ -163,7 +163,19 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
-    const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.company));
+    const traineesGroupedByCompanies = computed(() => {
+      const loggedUserCompany = get(loggedUser.value, 'company._id');
+      const potentialTraineesGroupedByTrainee = groupBy(potentialTrainees.value, '_id');
+
+      const courseTrainees = course.value.trainees.map((ct) => {
+        const canEditTrainee = !isClientInterface || (potentialTraineesGroupedByTrainee[ct._id] &&
+          loggedUserCompany === potentialTraineesGroupedByTrainee[ct._id][0].company._id);
+
+        return ({ ...ct, canEditTrainee });
+      });
+
+      return groupBy(courseTrainees, t => t.company);
+    });
 
     const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
 
