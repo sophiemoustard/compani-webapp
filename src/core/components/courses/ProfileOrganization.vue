@@ -80,6 +80,7 @@
           :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
+    <training-contract-container v-if="isAdmin && isVendorInterface && isIntraCourse" :course="course" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -131,6 +132,7 @@ import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
 import CourseSmsHistoryModal from '@components/courses/CourseSmsHistoryModal';
 import InterlocutorCell from '@components/courses/InterlocutorCell';
+import TrainingContractContainer from '@components/courses/TrainingContractContainer';
 import InterlocutorModal from '@components/courses/InterlocutorModal';
 import CourseContactAdditionModal from '@components/courses/CourseContactAdditionModal';
 import Banner from '@components/Banner';
@@ -180,6 +182,7 @@ export default {
     'interlocutor-cell': InterlocutorCell,
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
+    'training-contract-container': TrainingContractContainer,
   },
   setup (props) {
     const { profileId } = toRefs(props);
@@ -745,6 +748,7 @@ export default {
       tmpContactId,
       courseHistoryFeed,
       tmpCourse,
+      isIntraCourse,
       // Computed
       course,
       v$,

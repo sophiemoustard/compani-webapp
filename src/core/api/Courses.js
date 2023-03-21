@@ -80,4 +80,11 @@ export default {
   async deleteCompany (courseId, companyId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/companies/${companyId}`);
   },
+  async downloadTrainingContract (courseId, payload) {
+    return alenviAxios.post(
+      `${process.env.API_HOSTNAME}/courses/${courseId}/trainingcontracts`,
+      payload,
+      { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
+    );
+  },
 };
