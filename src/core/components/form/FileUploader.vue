@@ -53,6 +53,7 @@ export default {
     driveStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
     docName: { type: String, default: 'download' },
+    customFields: { type: Array, default: () => ([]) },
   },
   components: {
     'ni-button': Button,
@@ -66,6 +67,8 @@ export default {
   },
   computed: {
     additionalFields () {
+      if (this.customFields.length) return this.customFields;
+
       const fields = [{ name: 'fileName', value: removeDiacritics(this.additionalValue) }];
       if (this.driveStorage) fields.push({ name: 'type', value: this.name });
       return fields;

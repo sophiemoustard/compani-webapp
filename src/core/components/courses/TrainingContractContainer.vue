@@ -8,10 +8,12 @@
           formation : {{ missingInfos.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-bi-color-button icon="file_download" label="Générer la convention de formation"
-        :disable="disableDocDownload" @click="trainingContractPriceAdditionModal = true" size="16px" />
-      <ni-file-uploader caption="Convention de formation signée" :extensions="'pdf'" name="signedTrainingContract"
-        :url="signedTrainingContract.link" drive-storage />
+      <ni-bi-color-button icon="file_download" label="Générer la convention de formation" :disable="disableDocDownload"
+        @click="trainingContractPriceAdditionModal = true" size="16px" />
+        <div class="q-mt-md row">
+      <ni-file-uploader caption="Convention de formation signée" :extensions="'pdf'" :url="url"
+        :custom-fields="customFields" />
+        </div>
     </div>
   </div>
 
@@ -31,6 +33,7 @@ import useVuelidate from '@vuelidate/core';
 import Courses from '@api/Courses';
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
+import FileUploader from '@components/form/FileUploader';
 import TrainingContractPriceAdditionModal from '@components/courses/TrainingContractPriceAdditionModal';
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
 import { NotifyWarning, NotifyNegative } from '@components/popup/notify';
@@ -51,6 +54,7 @@ export default {
     'ni-banner': Banner,
     'training-contract-price-addition-modal': TrainingContractPriceAdditionModal,
     'training-contract-infos-modal': TrainingContractInfosModal,
+    'ni-file-uploader': FileUploader,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:training-contract-price'],
   setup (props) {
@@ -85,6 +89,11 @@ export default {
     });
 
     const disableDocDownload = computed(() => !!missingInfos.value.length || pdfLoading.value);
+
+    const customFields = computed(() => [
+      { name: 'course', value: course.value._id },
+      { name: 'company', value: course.value.companies[0]._id },
+    ]);
 
     const resetPrice = () => {
       if (!trainingContractInfosModal.value) price.value = 0;
@@ -121,12 +130,7 @@ export default {
       }
     };
 
-    const url = computed(() => {
-      const driveId = get(trainingContract.value, 'link');
-      if (!driveId) return '';
-
-      return `${process.env.API_HOSTNAME}/training-contracts//gdrive/${driveId}/upload`;
-    });
+    const url = computed(() => `${process.env.API_HOSTNAME}/trainingcontracts`);
 
     return {
       // Data
@@ -140,6 +144,7 @@ export default {
       errorMessage,
       validations,
       url,
+      customFields,
       // Methods
       openTrainingContractInfosModal,
       resetPrice,
