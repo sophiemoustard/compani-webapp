@@ -87,7 +87,6 @@ export default {
     });
 
     const totalDuration = computed(() => {
-      if (!liveDuration.value) return 'Certaines étapes n\'ont pas de durée théorique';
       const elearningDuration = elearnigDuration.value
         ? ` (+ ${elearnigDuration.value} de e-learning)`
         : '';

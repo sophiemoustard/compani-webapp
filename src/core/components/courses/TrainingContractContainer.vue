@@ -38,7 +38,7 @@ import TrainingContractPriceAdditionModal from '@components/courses/TrainingCont
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
 import { NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
-import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS } from '@data/constants';
+import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import { formatQuantity, formatDownloadName } from '@helpers/utils';
@@ -76,7 +76,14 @@ export default {
       if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
       else if (onSiteSlots.length && !onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
-
+      if (course.value.slotsToPlan.length) {
+        const theoreticalDurationList = course.value.subProgram.steps
+          .filter(step => step.type !== E_LEARNING)
+          .map(step => step.theoreticalDuration);
+        if (theoreticalDurationList.some(duration => !duration)) {
+          infos.push('certaines étapes n\'ont pas de durée théorique');
+        }
+      }
       return infos;
     });
 

@@ -67,11 +67,12 @@ export default {
   },
   computed: {
     additionalFields () {
-      if (this.customFields.length) return this.customFields;
+      const fields = [];
+      if (this.customFields.length) fields.push(this.customFields);
 
-      const fields = [{ name: 'fileName', value: removeDiacritics(this.additionalValue) }];
+      if (this.additionalValue) fields.push({ name: 'fileName', value: removeDiacritics(this.additionalValue) });
       if (this.driveStorage) fields.push({ name: 'type', value: this.name });
-      return fields;
+      return fields.flat();
     },
     document () {
       return get(this.entity, this.path);
