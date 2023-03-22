@@ -63,6 +63,7 @@ export default {
     const price = ref(0);
     const trainingContractPriceAdditionModal = ref(false);
     const trainingContractInfosModal = ref(false);
+    const url = `${process.env.API_HOSTNAME}/trainingcontracts`;
 
     const { pdfLoading } = useCourses(course);
 
@@ -80,10 +81,9 @@ export default {
         const theoreticalDurationList = course.value.subProgram.steps
           .filter(step => step.type !== E_LEARNING)
           .map(step => step.theoreticalDuration);
-        if (theoreticalDurationList.some(duration => !duration)) {
-          infos.push('certaines étapes n\'ont pas de durée théorique');
-        }
+        if (theoreticalDurationList.some(duration => !duration)) infos.push('la durée théorique dans certaines étapes');
       }
+
       return infos;
     });
 
@@ -137,21 +137,19 @@ export default {
       }
     };
 
-    const url = computed(() => `${process.env.API_HOSTNAME}/trainingcontracts`);
-
     return {
       // Data
       price,
       trainingContractPriceAdditionModal,
       trainingContractInfosModal,
       pdfLoading,
+      url,
       DOC_EXTENSIONS,
       // Computed
       missingInfos,
       disableDocDownload,
       errorMessage,
       validations,
-      url,
       customFields,
       // Methods
       openTrainingContractInfosModal,

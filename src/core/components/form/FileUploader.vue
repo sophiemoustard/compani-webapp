@@ -72,6 +72,7 @@ export default {
 
       if (this.additionalValue) fields.push({ name: 'fileName', value: removeDiacritics(this.additionalValue) });
       if (this.driveStorage) fields.push({ name: 'type', value: this.name });
+
       return fields.flat();
     },
     document () {
