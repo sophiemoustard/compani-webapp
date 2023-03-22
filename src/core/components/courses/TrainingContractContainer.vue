@@ -10,10 +10,10 @@
       </ni-banner>
       <ni-bi-color-button icon="file_download" label="Générer la convention de formation" :disable="disableDocDownload"
         @click="trainingContractPriceAdditionModal = true" size="16px" />
-        <div class="q-mt-md row">
-      <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
-        :custom-fields="customFields" />
-        </div>
+      <div class="q-mt-md row">
+        <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
+          :custom-fields="customFields" />
+      </div>
     </div>
   </div>
 
