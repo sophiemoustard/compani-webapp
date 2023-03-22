@@ -3,7 +3,7 @@
     <template #title>
       <span class="text-weight-bold">Informations de la convention</span>
     </template>
-     <div><span class="text-weight-bold">Structure :</span> {{ course.companies[0].name }}</div>
+     <div><span class="text-weight-bold">Structure :</span> {{ companyName }}</div>
      <div><span class="text-weight-bold">Nom du programme :</span> {{ course.subProgram.program.name }}</div>
      <div class="learning-goals">
       <div class="text-weight-bold">Objectifs :</div>
@@ -16,7 +16,7 @@
     <div><span class="text-weight-bold">Durée :</span> {{ totalDuration }}</div>
     <div>
       <span class="text-weight-bold">Effectif :</span>
-      {{ course.misc }} jusqu'à {{ course.maxTrainees }} stagiaires
+      {{ course.misc }} {{ isIntraCourse ? 'jusqu\'à' : '' }} {{ formatQuantity('stagiaire', learnerCount) }}
     </div>
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
@@ -24,7 +24,20 @@
       <span class="text-weight-bold">Intervenant(e) :</span>
       {{ formatIdentity(course.trainer.identity, 'FL') }}
     </div>
-    <div class="q-mb-md"><span class="text-weight-bold">Prix :</span> {{ price }} €</div>
+    <div v-if="isIntraCourse" class="q-mb-md">
+      <span class="text-weight-bold">Prix :</span>
+      {{ Number(newTrainingContract.price) }} €
+    </div>
+    <div v-else>
+      <div>
+        <span class="text-weight-bold">Prix par stagiaire :</span>
+        {{ Number(newTrainingContract.price) }} €
+      </div>
+      <div>
+        <span class="text-weight-bold">Prix total :</span>
+        {{ Number(newTrainingContract.price) * learnerCount }} €
+      </div>
+    </div>
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Générer la convention" icon-right="add" color="white"
         @click="submit" :loading="loading" />
@@ -49,8 +62,9 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     course: { type: Object, default: () => ({}) },
-    price: { type: Number, default: () => 0 },
+    newTrainingContract: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    isIntraCourse: { type: Boolean, default: true },
   },
   components: {
     'ni-modal': Modal,
@@ -58,7 +72,7 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit'],
   setup (props, { emit }) {
-    const { course } = toRefs(props);
+    const { course, newTrainingContract, isIntraCourse } = toRefs(props);
 
     // make sure code is similar to back part in TrainingContracts helper
     const liveDuration = computed(() => {
@@ -111,6 +125,15 @@ export default {
       return [...new Set(cityList)].join(', ');
     });
 
+    const learnerCount = computed(() => {
+      if (isIntraCourse.value) return course.value.maxTrainees;
+
+      return course.value.trainees.filter(t => t.company === newTrainingContract.value.company).length;
+    });
+
+    const companyName =
+      computed(() => course.value.companies.find(c => c._id === newTrainingContract.value.company).name);
+
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
@@ -120,6 +143,8 @@ export default {
       totalDuration,
       dates,
       addressList,
+      learnerCount,
+      companyName,
       // Methods
       hide,
       input,
