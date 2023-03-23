@@ -2,7 +2,7 @@
   <div>
     <q-card flat>
       <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
-        separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
+        separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="attendancePagination">
         <template #header="props">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -56,7 +56,8 @@
     </q-card>
 
     <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns"
-      :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
+      v-model:pagination="attendanceSheetPagination" :visible-columns="attendanceSheetVisibleColumns"
+      :loading="attendanceSheetTableLoading">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -125,6 +126,8 @@ export default {
     const $store = useStore();
 
     const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
+    const attendancePagination = ref({ rowsPerPage: 0 });
+    const attendanceSheetPagination = ref({ page: 1, rowsPerPage: 15 });
     const modalLoading = ref(false);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
@@ -210,6 +213,8 @@ export default {
       attendanceSheetAdditionModal,
       newAttendanceSheet,
       attendanceSheetColumns,
+      attendanceSheetPagination,
+      attendancePagination,
       // Computed
       canAccessLearnerProfile,
       attendanceColumns,
