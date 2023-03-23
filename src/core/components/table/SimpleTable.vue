@@ -54,7 +54,7 @@ export default {
   props: {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
-    pagination: { type: Object, default: () => ({ page: 1, rowsPerPage: 15 }) },
+    pagination: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     rowKey: { type: [String, Function], default: 'name' },
     visibleColumns: { type: Array, default: () => [] },
