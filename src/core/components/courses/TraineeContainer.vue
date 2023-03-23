@@ -163,7 +163,7 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
-    const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.company));
+    const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
     const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
 

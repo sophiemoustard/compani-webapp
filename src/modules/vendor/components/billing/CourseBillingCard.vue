@@ -270,14 +270,15 @@ export default {
       .length);
 
     const traineesLength = computed(() => course.value.trainees
-      .filter(trainee => trainee.company === company.value._id)
+      .filter(trainee => trainee.registrationCompany === company.value._id)
       .length);
 
     const courseName = computed(() => `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
       ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
 
     const traineesQuantity = computed(() => {
-      const quantity = get(course, 'value.trainees').filter(trainee => trainee.company === company.value._id).length;
+      const quantity = get(course, 'value.trainees')
+        .filter(trainee => trainee.registrationCompany === company.value._id).length;
 
       return `${formatQuantity('stagiaire', quantity)} de ${get(company, 'value.name')}
         ${quantity > 1 ? 'inscrits' : 'inscrit'} à cette formation`;
