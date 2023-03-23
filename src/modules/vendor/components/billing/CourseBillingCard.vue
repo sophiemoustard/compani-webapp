@@ -276,13 +276,8 @@ export default {
     const courseName = computed(() => `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
       ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
 
-    const traineesQuantity = computed(() => {
-      const quantity = get(course, 'value.trainees')
-        .filter(trainee => trainee.registrationCompany === company.value._id).length;
-
-      return `${formatQuantity('stagiaire', quantity)} de ${get(company, 'value.name')}
-        ${quantity > 1 ? 'inscrits' : 'inscrit'} à cette formation`;
-    });
+    const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)} de
+      ${get(company, 'value.name')} ${traineesLength.value > 1 ? 'inscrits' : 'inscrit'} à cette formation`);
 
     const getBillErrorMessages = (parent) => {
       let price = '';
