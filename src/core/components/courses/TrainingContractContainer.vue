@@ -8,8 +8,12 @@
           formation : {{ missingInfos.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-bi-color-button icon="file_download" label="Générer la convention de formation"
-        :disable="disableDocDownload" @click="trainingContractPriceAdditionModal = true" size="16px" />
+      <ni-bi-color-button icon="file_download" label="Générer la convention de formation" :disable="disableDocDownload"
+        @click="trainingContractPriceAdditionModal = true" size="16px" />
+      <div class="q-mt-md row">
+        <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
+          :custom-fields="customFields" />
+      </div>
     </div>
   </div>
 
@@ -29,11 +33,12 @@ import useVuelidate from '@vuelidate/core';
 import Courses from '@api/Courses';
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
+import FileUploader from '@components/form/FileUploader';
 import TrainingContractPriceAdditionModal from '@components/courses/TrainingContractPriceAdditionModal';
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
 import { NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
-import { REQUIRED_LABEL, ON_SITE } from '@data/constants';
+import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import { formatQuantity, formatDownloadName } from '@helpers/utils';
@@ -49,6 +54,7 @@ export default {
     'ni-banner': Banner,
     'training-contract-price-addition-modal': TrainingContractPriceAdditionModal,
     'training-contract-infos-modal': TrainingContractInfosModal,
+    'ni-file-uploader': FileUploader,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:training-contract-price'],
   setup (props) {
@@ -57,6 +63,7 @@ export default {
     const price = ref(0);
     const trainingContractPriceAdditionModal = ref(false);
     const trainingContractInfosModal = ref(false);
+    const url = `${process.env.API_HOSTNAME}/trainingcontracts`;
 
     const { pdfLoading } = useCourses(course);
 
@@ -69,7 +76,13 @@ export default {
       const onSiteSlots = course.value.slots.filter(slot => onSiteSteps.includes(slot.step));
       if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
-      else if (!onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
+      else if (onSiteSlots.length && !onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
+      if (course.value.slotsToPlan.length) {
+        const theoreticalDurationList = course.value.subProgram.steps
+          .filter(step => step.type !== E_LEARNING)
+          .map(step => step.theoreticalDuration);
+        if (theoreticalDurationList.some(duration => !duration)) infos.push('la durée théorique dans certaines étapes');
+      }
 
       return infos;
     });
@@ -83,6 +96,11 @@ export default {
     });
 
     const disableDocDownload = computed(() => !!missingInfos.value.length || pdfLoading.value);
+
+    const customFields = computed(() => [
+      { name: 'course', value: course.value._id },
+      { name: 'company', value: course.value.companies[0]._id },
+    ]);
 
     const resetPrice = () => {
       if (!trainingContractInfosModal.value) price.value = 0;
@@ -125,11 +143,14 @@ export default {
       trainingContractPriceAdditionModal,
       trainingContractInfosModal,
       pdfLoading,
+      url,
+      DOC_EXTENSIONS,
       // Computed
       missingInfos,
       disableDocDownload,
       errorMessage,
       validations,
+      customFields,
       // Methods
       openTrainingContractInfosModal,
       resetPrice,
