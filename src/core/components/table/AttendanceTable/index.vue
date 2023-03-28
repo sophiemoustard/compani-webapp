@@ -33,8 +33,7 @@
                 </q-item-section>
                 <q-item-section>
                   <q-item-label @click="canAccesOrEditTrainee(props.row) && goToLearnerProfile(props.row)"
-                    :class="['ellipsis', canAccesOrEditTrainee(props.row) && 'clickable-name cursor-pointer']"
-                    >
+                    :class="['ellipsis', canAccesOrEditTrainee(props.row) && 'clickable-name cursor-pointer']">
                     {{ col.value }}
                   </q-item-label>
                   <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
