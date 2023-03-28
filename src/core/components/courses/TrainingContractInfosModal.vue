@@ -16,7 +16,7 @@
     <div><span class="text-weight-bold">Durée :</span> {{ totalDuration }}</div>
     <div>
       <span class="text-weight-bold">Effectif :</span>
-      {{ course.misc }} {{ isIntraCourse ? 'jusqu\'à' : '' }} {{ formatQuantity('stagiaire', learnerCount) }}
+      {{ course.misc }} {{ isIntraCourse ? 'jusqu\'à' : '' }} {{ formatQuantity('stagiaire', learnersCount) }}
     </div>
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
@@ -25,17 +25,17 @@
       {{ formatIdentity(course.trainer.identity, 'FL') }}
     </div>
     <div v-if="isIntraCourse" class="q-mb-md">
-      <span class="text-weight-bold">Prix :</span>
+      <span class="text-weight-bold">Prix du programme :</span>
       {{ Number(newTrainingContract.price) }} €
     </div>
-    <div v-else>
+    <div v-else class="q-mb-md">
       <div>
         <span class="text-weight-bold">Prix par stagiaire :</span>
         {{ Number(newTrainingContract.price) }} €
       </div>
       <div>
         <span class="text-weight-bold">Prix total :</span>
-        {{ Number(newTrainingContract.price) * learnerCount }} €
+        {{ Number(newTrainingContract.price) * learnersCount }} €
       </div>
     </div>
     <template #footer>
@@ -125,14 +125,14 @@ export default {
       return [...new Set(cityList)].join(', ');
     });
 
-    const learnerCount = computed(() => {
+    const learnersCount = computed(() => {
       if (isIntraCourse.value) return course.value.maxTrainees;
 
       return course.value.trainees.filter(t => t.registrationCompany === newTrainingContract.value.company).length;
     });
 
-    const companyName =
-      computed(() => course.value.companies.find(c => c._id === newTrainingContract.value.company).name);
+    const companyName = computed(() => course.value.companies
+      .find(c => c._id === newTrainingContract.value.company).name);
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
@@ -143,7 +143,7 @@ export default {
       totalDuration,
       dates,
       addressList,
-      learnerCount,
+      learnersCount,
       companyName,
       // Methods
       hide,

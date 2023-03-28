@@ -8,8 +8,14 @@
           formation : {{ missingInfos.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-bi-color-button v-if="isIntraCourse" icon="file_download" label="Générer la convention de formation"
-        :disable="disableDocDownload" @click="trainingContractPriceAdditionModal = true" size="16px" />
+      <div v-if="isIntraCourse">
+        <ni-bi-color-button icon="file_download" label="Générer la convention de formation"
+          :disable="disableDocDownload" @click="trainingContractPriceAdditionModal = true" size="16px" />
+        <div class="q-mt-md row">
+          <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
+            :custom-fields="customFields" />
+        </div>
+      </div>
       <div v-else class="row">
         <q-card>
           <q-card-actions align="right">
@@ -17,10 +23,6 @@
               label="Générer une convention de formation" @click="trainingContractPriceAdditionModal = true" />
           </q-card-actions>
         </q-card>
-      </div>
-      <div class="q-mt-md row">
-        <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
-          :custom-fields="customFields" />
       </div>
     </div>
   </div>
@@ -129,10 +131,8 @@ export default {
       validations.value.newTrainingContract.$touch();
       if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-      if (!isIntraCourse.value) {
-        if (!course.value.trainees.some(t => t.company === newTrainingContract.value.company)) {
-          return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
-        }
+      if (!isIntraCourse.value && !course.value.trainees.some(t => t.company === newTrainingContract.value.company)) {
+        return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
       }
 
       trainingContractPriceAdditionModal.value = false;
