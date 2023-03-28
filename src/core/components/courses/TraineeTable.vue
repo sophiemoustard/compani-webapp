@@ -16,7 +16,8 @@
           :style="col.style" :class="[col.classes, { 'border': props.rowIndex === 0 && !hideHeader}]">
           <template v-if="col.name === 'actions' && canEdit">
             <div>
-              <ni-button icon="edit" @click="openTraineeEditionModal(props.row)" :disable="!!course.archivedAt" />
+              <ni-button icon="edit" @click="openTraineeEditionModal(props.row)"
+                :disable="!canEditTrainee(props.row)" />
               <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
           </template>
@@ -33,6 +34,7 @@
 <script>
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -47,6 +49,7 @@ import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 
 export default {
   name: 'TraineeTable',
@@ -68,6 +71,7 @@ export default {
 
     const $q = useQuasar();
     const $store = useStore();
+    const $router = useRouter();
 
     const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
@@ -172,6 +176,19 @@ export default {
       }
     };
 
+    const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+    const isRofOrAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN]
+      .includes(get(loggedUser.value, 'role.vendor.name')));
+
+    const canEditTrainee = (trainee) => {
+      const loggedUserCompany = get(loggedUser.value, 'company._id');
+      const traineeCurrentCompany = trainee.company;
+
+      return !course.value.archivedAt &&
+        ((isVendorInterface && isRofOrAdmin) || (!isVendorInterface && loggedUserCompany === traineeCurrentCompany));
+    };
+
     return {
       // Data
       traineeColumns,
@@ -189,6 +206,7 @@ export default {
       resetTraineeEditionForm,
       updateTrainee,
       validateTraineeDeletion,
+      canEditTrainee,
     };
   },
 };
