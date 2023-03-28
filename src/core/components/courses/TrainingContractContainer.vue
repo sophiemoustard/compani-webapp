@@ -142,8 +142,7 @@ export default {
     const generateTrainingContract = async () => {
       try {
         pdfLoading.value = true;
-        const pdf = await Courses
-          .downloadTrainingContract(course.value._id, { price: newTrainingContract.value.price });
+        const pdf = await Courses.downloadTrainingContract(course.value._id, newTrainingContract.value);
         const formattedName = formatDownloadName(
           `convention ${composeCourseName(course.value)} ${course.value.companies[0].name}`
         );

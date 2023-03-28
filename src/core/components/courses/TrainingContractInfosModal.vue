@@ -128,7 +128,7 @@ export default {
     const learnerCount = computed(() => {
       if (isIntraCourse.value) return course.value.maxTrainees;
 
-      return course.value.trainees.filter(t => t.company === newTrainingContract.value.company).length;
+      return course.value.trainees.filter(t => t.registrationCompany === newTrainingContract.value.company).length;
     });
 
     const companyName =

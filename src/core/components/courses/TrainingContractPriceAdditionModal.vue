@@ -4,11 +4,11 @@
       Ajouter <span class="text-weight-bold">le prix de la formation</span>
     </template>
      <ni-input in-modal :caption="isIntraCourse ? 'Prix du programme' : 'Prix par stagiaire'" suffix="€"
-      :error="validations.$error" type="number" :model-value="newTrainingContract.price" @blur="validations.$touch"
-      required-field :error-message="errorMessage" @update:model-value="update($event, 'price')" />
+      :error="validations.price.$error" type="number" :model-value="newTrainingContract.price" required-field
+      @blur="validations.price.$touch" :error-message="errorMessage" @update:model-value="update($event, 'price')" />
     <ni-select v-if="!isIntraCourse" in-modal :model-value="newTrainingContract.company"
         @update:model-value="update($event, 'company')" caption="Structure" :options="companyOptions" required-field
-        :error="validations.company.$error" />
+        :error="validations.company.$error" @blur="validations.company.$touch" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter le prix" icon-right="add" color="white"
         @click="submit" />
