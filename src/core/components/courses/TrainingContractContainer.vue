@@ -132,7 +132,8 @@ export default {
       validations.value.newTrainingContract.$touch();
       if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-      if (!isIntraCourse.value && !course.value.trainees.some(t => t.company === newTrainingContract.value.company)) {
+      if (!isIntraCourse.value &&
+        !course.value.trainees.some(t => t.registrationCompany === newTrainingContract.value.company)) {
         return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
       }
 
