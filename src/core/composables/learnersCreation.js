@@ -28,7 +28,7 @@ import {
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (
+export const useLearnersCreation = (
   refresh,
   isClientInterface,
   isDirectory,
@@ -274,6 +274,13 @@ export const useLearners = (
     searchStr.value = value;
   };
 
+  const canAccesOrEditLearner = (learner) => {
+    const loggedUserCompany = get(loggedUser.value, 'company._id');
+    const traineeCurrentCompany = learner.company;
+
+    return (!isClientInterface && isRofOrAdmin) || (isClientInterface && loggedUserCompany === traineeCurrentCompany);
+  };
+
   return {
     // Data
     searchStr,
@@ -300,5 +307,6 @@ export const useLearners = (
     submitLearnerCreationModal,
     resetLearnerCreationModal,
     nextStepLearnerCreationModal,
+    canAccesOrEditLearner,
   };
 };
