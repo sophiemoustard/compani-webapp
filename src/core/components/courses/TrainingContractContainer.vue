@@ -19,7 +19,7 @@
       <div v-else class="row">
         <q-card>
           <q-card-actions align="right">
-            <ni-button v-if="!isIntraCourse" color="primary" icon="file_download" :disable="disableDocDownload"
+            <ni-button color="primary" icon="file_download" :disable="disableDocDownload"
               label="Générer une convention de formation" @click="trainingContractPriceAdditionModal = true" />
           </q-card-actions>
         </q-card>
@@ -87,7 +87,8 @@ export default {
     const missingInfos = computed(() => {
       const infos = [];
       const onSiteSteps = course.value.subProgram.steps.filter(step => step.type === ON_SITE).map(step => step._id);
-      const onSiteSlots = course.value.slots.filter(slot => onSiteSteps.includes(slot.step));
+      const onSiteSlots = [...course.value.slots, ...course.value.slotsToPlan]
+        .filter(slot => onSiteSteps.includes(slot.step));
       if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
       else if (onSiteSlots.length && !onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
