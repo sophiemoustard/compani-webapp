@@ -32,8 +32,9 @@
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label :class="['ellipsis', canAccessLearnerProfile && 'clickable-name cursor-pointer']"
-                    @click="goToLearnerProfile(props.row)">
+                  <q-item-label @click="canAccesOrEditTrainee(props.row) && goToLearnerProfile(props.row)"
+                    :class="['ellipsis', canAccesOrEditTrainee(props.row) && 'clickable-name cursor-pointer']"
+                    >
                     {{ col.value }}
                   </q-item-label>
                   <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
@@ -105,6 +106,7 @@ import { defineAbilitiesFor } from '@helpers/ability';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
+import { useLearnersEdition } from '@composables/learnersEdition';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
@@ -137,6 +139,8 @@ export default {
 
       return ability.can('update', 'course_trainee_follow_up');
     });
+
+    const { canAccesOrEditTrainee } = useLearnersEdition();
 
     const {
       // Data
@@ -243,6 +247,7 @@ export default {
       updateSlotCheckbox,
       getDelimiterClass,
       goToLearnerProfile,
+      canAccesOrEditTrainee,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,
