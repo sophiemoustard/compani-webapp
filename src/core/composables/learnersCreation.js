@@ -274,13 +274,6 @@ export const useLearnersCreation = (
     searchStr.value = value;
   };
 
-  const canAccesOrEditLearner = (learner) => {
-    const loggedUserCompany = get(loggedUser.value, 'company._id');
-    const traineeCurrentCompany = learner.company;
-
-    return (!isClientInterface && isRofOrAdmin) || (isClientInterface && loggedUserCompany === traineeCurrentCompany);
-  };
-
   return {
     // Data
     searchStr,
@@ -307,6 +300,5 @@ export const useLearnersCreation = (
     submitLearnerCreationModal,
     resetLearnerCreationModal,
     nextStepLearnerCreationModal,
-    canAccesOrEditLearner,
   };
 };
