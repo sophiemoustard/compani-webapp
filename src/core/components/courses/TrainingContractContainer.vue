@@ -132,8 +132,9 @@ export default {
       validations.value.newTrainingContract.$touch();
       if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-      if (!isIntraCourse.value &&
-        !course.value.trainees.some(t => t.registrationCompany === newTrainingContract.value.company)) {
+      const noTraineeFromCompany = !course.value.trainees
+        .some(t => t.registrationCompany === newTrainingContract.value.company);
+      if (!isIntraCourse.value && noTraineeFromCompany) {
         return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
       }
 
