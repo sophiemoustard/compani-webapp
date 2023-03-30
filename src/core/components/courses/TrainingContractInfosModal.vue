@@ -16,7 +16,8 @@
     <div><span class="text-weight-bold">Durée :</span> {{ totalDuration }}</div>
     <div>
       <span class="text-weight-bold">Effectif :</span>
-      {{ course.misc }} {{ isIntraCourse ? 'jusqu\'à' : '' }} {{ formatQuantity('stagiaire', learnersCount) }}
+      {{ course.misc ? `${course.misc}, ` : '' }}{{ isIntraCourse ? 'jusqu\'à ' : '' }}
+      {{ formatQuantity('stagiaire', learnersCount) }}
     </div>
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
