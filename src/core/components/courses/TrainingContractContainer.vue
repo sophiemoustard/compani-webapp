@@ -24,9 +24,10 @@
         </div>
       </div>
       <div v-if="isIntraCourse" class="q-mt-md row">
-        <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
+        <ni-file-uploader caption="Convention de formation signée" :extensions="extensions" :url="url"
           :custom-fields="customFields" :entity="trainingContracts[0]" path="file" :disable="!!course.archivedAt"
-          @uploaded="refreshTrainingContracts" hide-image :can-delete="isVendorInterface" />
+          @uploaded="refreshTrainingContracts" hide-image :can-delete="isVendorInterface"
+          @delete="validateDocumentDeletion(trainingContracts[0]._id)" />
       </div>
     </div>
   </div>
@@ -42,6 +43,7 @@
 
 <script>
 import { useStore } from 'vuex';
+import { useQuasar } from 'quasar';
 import { computed, ref, toRefs } from 'vue';
 import get from 'lodash/get';
 import { required } from '@vuelidate/validators';
@@ -54,9 +56,9 @@ import Banner from '@components/Banner';
 import FileUploader from '@components/form/FileUploader';
 import TrainingContractPriceAdditionModal from '@components/courses/TrainingContractPriceAdditionModal';
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
-import { NotifyWarning, NotifyNegative } from '@components/popup/notify';
+import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
-import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING, INTER_B2B } from '@data/constants';
+import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING, INTER_B2B, IMAGE_EXTENSIONS } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import { formatQuantity, formatDownloadName, formatAndSortOptions } from '@helpers/utils';
@@ -79,6 +81,7 @@ export default {
   setup (props) {
     const { course } = toRefs(props);
     const $store = useStore();
+    const $q = useQuasar();
 
     const { pdfLoading, isIntraCourse, isVendorInterface } = useCourses(course);
 
@@ -87,6 +90,7 @@ export default {
     const trainingContractPriceAdditionModal = ref(false);
     const trainingContractInfosModal = ref(false);
     const url = TrainingContracts.getTrainingContractUploadURL();
+    const extensions = [DOC_EXTENSIONS, IMAGE_EXTENSIONS].join();
     const trainingContractTableLoading = ref(false);
 
     const rules = computed(() => ({
@@ -195,6 +199,29 @@ export default {
       }
     };
 
+    const validateDocumentDeletion = (trainingContractId) => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document&nbsp;?',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => deleteDocument(trainingContractId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    };
+
+    const deleteDocument = async (trainingContractId) => {
+      try {
+        await TrainingContracts.delete(trainingContractId);
+
+        await refreshTrainingContracts();
+        NotifyPositive('Document supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du document.');
+      }
+    };
+
     const created = async () => {
       await refreshTrainingContracts();
     };
@@ -208,7 +235,7 @@ export default {
       trainingContractInfosModal,
       pdfLoading,
       url,
-      DOC_EXTENSIONS,
+      extensions,
       trainingContractTableLoading,
       trainingContracts,
       // Computed
@@ -226,6 +253,7 @@ export default {
       generateTrainingContract,
       formatQuantity,
       refreshTrainingContracts,
+      validateDocumentDeletion,
     };
   },
 };
