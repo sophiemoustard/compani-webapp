@@ -8,21 +8,32 @@
           formation : {{ missingInfos.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-bi-color-button icon="file_download" label="Générer la convention de formation" :disable="disableDocDownload"
-        @click="trainingContractPriceAdditionModal = true" size="16px" />
-      <div class="q-mt-md row">
-        <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
-          :custom-fields="customFields" />
+      <div v-if="isIntraCourse">
+        <ni-bi-color-button icon="file_download" label="Générer la convention de formation"
+          :disable="disableDocDownload" @click="trainingContractPriceAdditionModal = true" size="16px" />
+        <div class="q-mt-md row">
+          <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
+            :custom-fields="customFields" />
+        </div>
+      </div>
+      <div v-else class="row">
+        <q-card>
+          <q-card-actions align="right">
+            <ni-button color="primary" icon="file_download" :disable="disableDocDownload"
+              label="Générer une convention de formation" @click="trainingContractPriceAdditionModal = true" />
+          </q-card-actions>
+        </q-card>
       </div>
     </div>
   </div>
 
-  <training-contract-price-addition-modal v-model="trainingContractPriceAdditionModal"
-    v-model:price="price" @submit="openTrainingContractInfosModal"
-    :validations="validations.price" @hide="resetPrice" :error-message="errorMessage" />
+  <training-contract-price-addition-modal v-model="trainingContractPriceAdditionModal" :company-options="companyOptions"
+    v-model:new-training-contract="newTrainingContract" @submit="openTrainingContractInfosModal" @hide="resetPrice"
+    :is-intra-course="isIntraCourse" :validations="validations.newTrainingContract" :error-message="errorMessage" />
 
   <training-contract-infos-modal v-model="trainingContractInfosModal" :course="course" @hide="resetPrice"
-    @submit="generateTrainingContract" :loading="pdfLoading" :price="price" />
+    @submit="generateTrainingContract" :loading="pdfLoading" :new-training-contract="newTrainingContract"
+    :is-intra-course="isIntraCourse" />
 </template>
 
 <script>
@@ -32,6 +43,7 @@ import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import Courses from '@api/Courses';
 import BiColorButton from '@components/BiColorButton';
+import Button from '@components/Button';
 import Banner from '@components/Banner';
 import FileUploader from '@components/form/FileUploader';
 import TrainingContractPriceAdditionModal from '@components/courses/TrainingContractPriceAdditionModal';
@@ -41,7 +53,7 @@ import { useCourses } from '@composables/courses';
 import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
-import { formatQuantity, formatDownloadName } from '@helpers/utils';
+import { formatQuantity, formatDownloadName, formatAndSortOptions } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 
 export default {
@@ -51,29 +63,32 @@ export default {
   },
   components: {
     'ni-bi-color-button': BiColorButton,
+    'ni-button': Button,
     'ni-banner': Banner,
     'training-contract-price-addition-modal': TrainingContractPriceAdditionModal,
     'training-contract-infos-modal': TrainingContractInfosModal,
     'ni-file-uploader': FileUploader,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:training-contract-price'],
   setup (props) {
     const { course } = toRefs(props);
 
-    const price = ref(0);
+    const { pdfLoading, isIntraCourse } = useCourses(course);
+
+    const newTrainingContract = ref({ price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' });
     const trainingContractPriceAdditionModal = ref(false);
     const trainingContractInfosModal = ref(false);
     const url = `${process.env.API_HOSTNAME}/trainingcontracts`;
 
-    const { pdfLoading } = useCourses(course);
-
-    const rules = computed(() => ({ price: { required, strictPositiveNumber } }));
-    const validations = useVuelidate(rules, { price });
+    const rules = computed(() => ({
+      newTrainingContract: { price: { required, strictPositiveNumber }, company: { required } },
+    }));
+    const validations = useVuelidate(rules, { newTrainingContract });
 
     const missingInfos = computed(() => {
       const infos = [];
       const onSiteSteps = course.value.subProgram.steps.filter(step => step.type === ON_SITE).map(step => step._id);
-      const onSiteSlots = course.value.slots.filter(slot => onSiteSteps.includes(slot.step));
+      const onSiteSlots = [...course.value.slots, ...course.value.slotsToPlan]
+        .filter(slot => onSiteSteps.includes(slot.step));
       if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
       else if (onSiteSlots.length && !onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
@@ -89,8 +104,10 @@ export default {
 
     const errorMessage = computed(() => {
       const message = '';
-      if (get(validations, 'value.price.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'value.price.strictPositiveNumber.$response') === false) return 'Prix non valide';
+      if (get(validations, 'value.newTrainingContract.price.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations, 'value.newTrainingContract.price.strictPositiveNumber.$response') === false) {
+        return 'Prix non valide';
+      }
 
       return message;
     });
@@ -102,14 +119,24 @@ export default {
       { name: 'company', value: course.value.companies[0]._id },
     ]);
 
+    const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
+
     const resetPrice = () => {
-      if (!trainingContractInfosModal.value) price.value = 0;
-      validations.value.price.$reset();
+      if (!trainingContractInfosModal.value) {
+        newTrainingContract.value = { price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' };
+      }
+      validations.value.newTrainingContract.$reset();
     };
 
     const openTrainingContractInfosModal = () => {
-      validations.value.price.$touch();
-      if (validations.value.price.$error) return NotifyWarning('Champ(s) invalide(s)');
+      validations.value.newTrainingContract.$touch();
+      if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      const noTraineeFromCompany = !course.value.trainees
+        .some(t => t.registrationCompany === newTrainingContract.value.company);
+      if (!isIntraCourse.value && noTraineeFromCompany) {
+        return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
+      }
 
       trainingContractPriceAdditionModal.value = false;
       trainingContractInfosModal.value = true;
@@ -118,7 +145,7 @@ export default {
     const generateTrainingContract = async () => {
       try {
         pdfLoading.value = true;
-        const pdf = await Courses.downloadTrainingContract(course.value._id, { price: price.value });
+        const pdf = await Courses.downloadTrainingContract(course.value._id, newTrainingContract.value);
         const formattedName = formatDownloadName(
           `convention ${composeCourseName(course.value)} ${course.value.companies[0].name}`
         );
@@ -139,7 +166,7 @@ export default {
 
     return {
       // Data
-      price,
+      newTrainingContract,
       trainingContractPriceAdditionModal,
       trainingContractInfosModal,
       pdfLoading,
@@ -151,6 +178,8 @@ export default {
       errorMessage,
       validations,
       customFields,
+      companyOptions,
+      isIntraCourse,
       // Methods
       openTrainingContractInfosModal,
       resetPrice,
