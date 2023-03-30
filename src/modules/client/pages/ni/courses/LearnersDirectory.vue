@@ -33,7 +33,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
-import { useLearners } from '@composables/learners';
+import { useLearnersCreation } from '@composables/learnersCreation';
 
 export default {
   name: 'LearnersDirectory',
@@ -69,7 +69,7 @@ export default {
       getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    } = useLearners(refresh, true, true, companies);
+    } = useLearnersCreation(refresh, true, true, companies);
 
     onMounted(async () => { await refresh(); });
 

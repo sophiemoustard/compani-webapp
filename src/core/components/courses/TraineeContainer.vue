@@ -86,7 +86,7 @@ import TraineeTable from '@components/courses/TraineeTable';
 import ExpandingTable from '@components/table/ExpandingTable';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { useLearners } from '@composables/learners';
+import { useLearnersCreation } from '@composables/learnersCreation';
 import { useCourses } from '@composables/courses';
 import { useCompaniesCoursesLink } from '@composables/companiesCoursesLink';
 
@@ -202,7 +202,7 @@ export default {
       resetLearnerCreationModal,
       tableLoading,
       disableUserInfoEdition,
-    } = useLearners(refresh, isClientInterface, false, courseCompanyIds, !isIntraCourse.value);
+    } = useLearnersCreation(refresh, isClientInterface, false, courseCompanyIds, !isIntraCourse.value);
 
     const {
       selectedCompany,
