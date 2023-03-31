@@ -77,7 +77,7 @@
       </div>
       <div v-if="isIntraOrVendor">
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
-          :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
+          :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
     <training-contract-container :course="course" :is-admin="isAdmin" />
