@@ -181,7 +181,9 @@ export default {
 
         if (course.value.type === INTER_B2B && !isVendorInterface) {
           trainingContracts.value = trainingContractList.filter(tc => tc.company === loggedUser.value.company._id);
-        } else trainingContracts.value = trainingContractList;
+        } else {
+          trainingContracts.value = trainingContractList;
+        }
       } catch (e) {
         console.error(e);
         trainingContracts.value = [];
