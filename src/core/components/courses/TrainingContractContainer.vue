@@ -86,7 +86,7 @@ export default {
     const newTrainingContract = ref({ price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' });
     const trainingContractPriceAdditionModal = ref(false);
     const trainingContractInfosModal = ref(false);
-    const url = TrainingContracts.upload();
+    const url = TrainingContracts.getTrainingContractUploadURL();
     const trainingContractTableLoading = ref(false);
 
     const rules = computed(() => ({
