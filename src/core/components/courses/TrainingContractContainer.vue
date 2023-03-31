@@ -2,29 +2,31 @@
   <div v-if="(isVendorInterface && isAdmin) || (!isVendorInterface && !!trainingContracts.length)" class="q-mb-xl">
     <p class="text-weight-bold">Convention de formation</p>
     <div class="q-mb-sm">
-      <ni-banner v-if="missingInfos.length && trainingContracts.length < course.companies.length">
-        <template #message>
-          Il manque {{ formatQuantity('information', missingInfos.length ) }} pour générer la convention de
-          formation : {{ missingInfos.join(', ') }}.
-        </template>
-      </ni-banner>
-      <div v-if="isIntraCourse">
-        <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" size="16px"
-          :disable="disableDocDownload || !!course.archivedAt" label="Générer la convention de formation"
-          @click="trainingContractPriceAdditionModal = true" />
-        <div class="q-mt-md row">
-          <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
-            :custom-fields="customFields" :entity="trainingContracts[0]" path="file" :disable="!!course.archivedAt"
-            @uploaded="refreshTrainingContracts" hide-image :can-delete="isVendorInterface" />
+      <div v-if="isVendorInterface">
+        <ni-banner v-if="missingInfos.length && trainingContracts.length < course.companies.length">
+          <template #message>
+            Il manque {{ formatQuantity('information', missingInfos.length ) }} pour générer la convention de
+            formation : {{ missingInfos.join(', ') }}.
+          </template>
+        </ni-banner>
+        <div v-if="isIntraCourse">
+          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" size="16px"
+            :disable="disableDocDownload || !!course.archivedAt" label="Générer la convention de formation"
+            @click="trainingContractPriceAdditionModal = true" />
+        </div>
+        <div v-else class="row">
+          <q-card>
+            <q-card-actions align="right">
+              <ni-button color="primary" icon="file_download" :disable="disableDocDownload || !!course.archivedAt"
+                label="Générer une convention de formation" @click="trainingContractPriceAdditionModal = true" />
+            </q-card-actions>
+          </q-card>
         </div>
       </div>
-      <div v-else class="row">
-        <q-card>
-          <q-card-actions align="right">
-            <ni-button color="primary" icon="file_download" :disable="disableDocDownload || !!course.archivedAt"
-              label="Générer une convention de formation" @click="trainingContractPriceAdditionModal = true" />
-          </q-card-actions>
-        </q-card>
+      <div v-if="isIntraCourse" class="q-mt-md row">
+        <ni-file-uploader caption="Convention de formation signée" :extensions="DOC_EXTENSIONS" :url="url"
+          :custom-fields="customFields" :entity="trainingContracts[0]" path="file" :disable="!!course.archivedAt"
+          @uploaded="refreshTrainingContracts" hide-image :can-delete="isVendorInterface" />
       </div>
     </div>
   </div>
