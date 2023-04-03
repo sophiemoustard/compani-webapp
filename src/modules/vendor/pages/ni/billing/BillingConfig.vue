@@ -13,6 +13,9 @@
           <ni-input caption="SIRET" v-model="vendorCompany.siret" @focus="saveTmp('siret')"
             @blur="updateVendorCompany('siret')" :error="validations.vendorCompany.siret.$error"
             :error-message="siretErrorMessage" />
+          <ni-input caption="Numéro de déclaration d'activité" v-model="vendorCompany.activityDeclarationNumber"
+            @focus="saveTmp('activityDeclarationNumber')" @blur="updateVendorCompany('activityDeclarationNumber')"
+            :error="validations.vendorCompany.activityDeclarationNumber.$error" :error-message="REQUIRED_LABEL" />
         </div>
       </div>
       <p class="text-weight-bold">Financeurs</p>
@@ -123,6 +126,7 @@ export default {
         name: { required },
         siret: { required, validSiret },
         address: { fullAddress: { required, frAddress } },
+        activityDeclarationNumber: { required },
       },
     };
     const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany });
@@ -302,6 +306,7 @@ export default {
       vendorCompany,
       newOrganisation,
       newItem,
+      REQUIRED_LABEL,
       // Computed
       validations,
       siretErrorMessage,
