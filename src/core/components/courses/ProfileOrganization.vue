@@ -77,10 +77,10 @@
       </div>
       <div v-if="isIntraOrVendor">
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
-          :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
+          :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container v-if="isAdmin && isVendorInterface" :course="course" />
+    <training-contract-container :course="course" :is-admin="isAdmin" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"

@@ -10,7 +10,7 @@
           </template>
         </ni-banner>
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
-          :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
+          :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
       <attendance-table :course="course" />
     </div>
@@ -116,6 +116,7 @@ export default {
       isClientInterface,
       pdfLoading,
       isIntraOrVendor,
+      isArchived,
       disableDocDownload,
       followUpDisabled,
       followUpMissingInfo,
@@ -220,6 +221,7 @@ export default {
       followUpDisabled,
       followUpMissingInfo,
       disableDocDownload,
+      isArchived,
       // Methods
       get,
       formatQuantity,
