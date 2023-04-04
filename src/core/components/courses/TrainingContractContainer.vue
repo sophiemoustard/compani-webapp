@@ -12,13 +12,13 @@
         <div v-if="isIntraCourse">
           <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" size="16px"
             :disable="disableDocDownload || !!course.archivedAt" label="Générer la convention de formation"
-            @click="trainingContractPriceAdditionModal = true" />
+            @click="trainingContractGenerationModal = true" />
         </div>
         <div v-else class="row">
           <q-card>
             <q-card-actions align="right">
               <ni-button color="primary" icon="file_download" :disable="disableDocDownload || !!course.archivedAt"
-                label="Générer une convention de formation" @click="trainingContractPriceAdditionModal = true" />
+                label="Générer une convention de formation" @click="trainingContractGenerationModal = true" />
             </q-card-actions>
           </q-card>
         </div>
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <training-contract-price-addition-modal v-model="trainingContractPriceAdditionModal" :company-options="companyOptions"
+  <training-contract-generation-modal v-model="trainingContractGenerationModal" :company-options="companyOptions"
     v-model:new-training-contract="newTrainingContract" @submit="openTrainingContractInfosModal" @hide="resetPrice"
     :is-intra-course="isIntraCourse" :validations="validations.newTrainingContract" :error-message="errorMessage" />
 
@@ -54,7 +54,7 @@ import BiColorButton from '@components/BiColorButton';
 import Button from '@components/Button';
 import Banner from '@components/Banner';
 import FileUploader from '@components/form/FileUploader';
-import TrainingContractPriceAdditionModal from '@components/courses/TrainingContractPriceAdditionModal';
+import TrainingContractGenerationModal from '@components/courses/TrainingContractGenerationModal';
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
@@ -74,7 +74,7 @@ export default {
     'ni-bi-color-button': BiColorButton,
     'ni-button': Button,
     'ni-banner': Banner,
-    'training-contract-price-addition-modal': TrainingContractPriceAdditionModal,
+    'training-contract-generation-modal': TrainingContractGenerationModal,
     'training-contract-infos-modal': TrainingContractInfosModal,
     'ni-file-uploader': FileUploader,
   },
@@ -87,7 +87,7 @@ export default {
 
     const trainingContracts = ref([]);
     const newTrainingContract = ref({ price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' });
-    const trainingContractPriceAdditionModal = ref(false);
+    const trainingContractGenerationModal = ref(false);
     const trainingContractInfosModal = ref(false);
     const url = TrainingContracts.getTrainingContractUploadURL();
     const extensions = [DOC_EXTENSIONS, IMAGE_EXTENSIONS].join();
@@ -154,7 +154,7 @@ export default {
         return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
       }
 
-      trainingContractPriceAdditionModal.value = false;
+      trainingContractGenerationModal.value = false;
       trainingContractInfosModal.value = true;
     };
 
@@ -231,7 +231,7 @@ export default {
     return {
       // Data
       newTrainingContract,
-      trainingContractPriceAdditionModal,
+      trainingContractGenerationModal,
       trainingContractInfosModal,
       pdfLoading,
       url,

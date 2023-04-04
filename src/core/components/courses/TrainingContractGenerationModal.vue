@@ -25,7 +25,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 
 export default {
-  name: 'TrainingContractPriceAdditionModal',
+  name: 'TrainingContractGenerationModal',
   props: {
     modelValue: { type: Boolean, default: false },
     errorMessage: { type: String, default: () => '' },
