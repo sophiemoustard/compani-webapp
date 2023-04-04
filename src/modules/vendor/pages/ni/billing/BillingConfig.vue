@@ -15,7 +15,7 @@
             :error-message="siretErrorMessage" />
           <ni-input caption="Numéro de déclaration d'activité" v-model="vendorCompany.activityDeclarationNumber"
             @focus="saveTmp('activityDeclarationNumber')" @blur="updateVendorCompany('activityDeclarationNumber')"
-            :error="validations.vendorCompany.activityDeclarationNumber.$error" :error-message="REQUIRED_LABEL" />
+            :error="validations.vendorCompany.activityDeclarationNumber.$error" />
         </div>
       </div>
       <p class="text-weight-bold">Financeurs</p>
@@ -306,7 +306,6 @@ export default {
       vendorCompany,
       newOrganisation,
       newItem,
-      REQUIRED_LABEL,
       // Computed
       validations,
       siretErrorMessage,
