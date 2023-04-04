@@ -11,4 +11,7 @@ export default {
   async delete (trainingContractId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/trainingcontracts/${trainingContractId}`);
   },
+  async create (payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/trainingcontracts`, payload);
+  },
 };
