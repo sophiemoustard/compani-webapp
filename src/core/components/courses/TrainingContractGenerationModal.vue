@@ -3,10 +3,10 @@
     <template #title>
       Ajouter <span class="text-weight-bold">le prix de la formation</span>
     </template>
-    <ni-input in-modal :caption="isIntraCourse ? 'Prix du programme' : 'Prix par stagiaire'" suffix="€"
-      :error="validations.price.$error" type="number" :model-value="newTrainingContract.price" required-field
+    <ni-input in-modal :caption="isIntraCourse ? 'Prix du programme' : 'Prix par stagiaire'" suffix="€" required-field
+      :error="validations.price.$error" type="number" :model-value="newGeneratedTrainingContractInfos.price"
       @blur="validations.price.$touch" :error-message="errorMessage" @update:model-value="update($event, 'price')" />
-    <ni-select v-if="!isIntraCourse" in-modal :model-value="newTrainingContract.company"
+    <ni-select v-if="!isIntraCourse" in-modal :model-value="newGeneratedTrainingContractInfos.company"
       @update:model-value="update($event, 'company')" caption="Structure" :options="companyOptions" required-field
       :error="validations.company.$error" @blur="validations.company.$touch" />
     <template #footer>
@@ -32,7 +32,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
     isIntraCourse: { type: Boolean, default: true },
-    newTrainingContract: { type: Object, default: () => ({}) },
+    newGeneratedTrainingContractInfos: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -40,15 +40,18 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:new-training-contract'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:new-generated-training-contract-infos'],
   setup (props, { emit }) {
-    const { newTrainingContract } = toRefs(props);
+    const { newGeneratedTrainingContractInfos } = toRefs(props);
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
     const update = (event, path) => {
-      emit('update:new-training-contract', set({ ...newTrainingContract.value }, path, event));
+      emit(
+        'update:new-generated-training-contract-infos',
+        set({ ...newGeneratedTrainingContractInfos.value }, path, event)
+      );
     };
 
     return {

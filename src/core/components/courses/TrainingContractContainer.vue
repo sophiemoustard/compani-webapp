@@ -33,12 +33,13 @@
   </div>
 
   <training-contract-generation-modal v-model="trainingContractGenerationModal" :company-options="companyOptions"
-    v-model:new-training-contract="newTrainingContract" @submit="openTrainingContractInfosModal" @hide="resetPrice"
-    :is-intra-course="isIntraCourse" :validations="validations.newTrainingContract" :error-message="errorMessage" />
+    v-model:new-generated-training-contract-infos="newGeneratedTrainingContractInfos"
+    @submit="openTrainingContractInfosModal" @hide="resetPrice" :is-intra-course="isIntraCourse"
+    :validations="validations.newGeneratedTrainingContractInfos" :error-message="errorMessage" />
 
   <training-contract-infos-modal v-model="trainingContractInfosModal" :course="course" @hide="resetPrice"
-    @submit="generateTrainingContract" :loading="pdfLoading" :new-training-contract="newTrainingContract"
-    :is-intra-course="isIntraCourse" />
+    @submit="generateTrainingContract" :loading="pdfLoading"
+    :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse" />
 </template>
 
 <script>
@@ -86,7 +87,10 @@ export default {
     const { pdfLoading, isIntraCourse, isVendorInterface } = useCourses(course);
 
     const trainingContracts = ref([]);
-    const newTrainingContract = ref({ price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' });
+    const newGeneratedTrainingContractInfos = ref({
+      price: 0,
+      company: isIntraCourse.value ? course.value.companies[0]._id : '',
+    });
     const trainingContractGenerationModal = ref(false);
     const trainingContractInfosModal = ref(false);
     const url = TrainingContracts.getTrainingContractUploadURL();
@@ -94,9 +98,9 @@ export default {
     const trainingContractTableLoading = ref(false);
 
     const rules = computed(() => ({
-      newTrainingContract: { price: { required, strictPositiveNumber }, company: { required } },
+      newGeneratedTrainingContractInfos: { price: { required, strictPositiveNumber }, company: { required } },
     }));
-    const validations = useVuelidate(rules, { newTrainingContract });
+    const validations = useVuelidate(rules, { newGeneratedTrainingContractInfos });
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -120,8 +124,10 @@ export default {
 
     const errorMessage = computed(() => {
       const message = '';
-      if (get(validations, 'value.newTrainingContract.price.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'value.newTrainingContract.price.strictPositiveNumber.$response') === false) {
+      if (get(validations, 'value.newGeneratedTrainingContractInfos.price.required.$response') === false) {
+        return REQUIRED_LABEL;
+      }
+      if (get(validations, 'value.newGeneratedTrainingContractInfos.price.strictPositiveNumber.$response') === false) {
         return 'Prix non valide';
       }
 
@@ -139,17 +145,20 @@ export default {
 
     const resetPrice = () => {
       if (!trainingContractInfosModal.value) {
-        newTrainingContract.value = { price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' };
+        newGeneratedTrainingContractInfos.value = {
+          price: 0,
+          company: isIntraCourse.value ? course.value.companies[0]._id : '',
+        };
       }
-      validations.value.newTrainingContract.$reset();
+      validations.value.newGeneratedTrainingContractInfos.$reset();
     };
 
     const openTrainingContractInfosModal = () => {
-      validations.value.newTrainingContract.$touch();
-      if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+      validations.value.newGeneratedTrainingContractInfos.$touch();
+      if (validations.value.newGeneratedTrainingContractInfos.$error) return NotifyWarning('Champ(s) invalide(s)');
 
       const noTraineeFromCompany = !course.value.trainees
-        .some(t => t.registrationCompany === newTrainingContract.value.company);
+        .some(t => t.registrationCompany === newGeneratedTrainingContractInfos.value.company);
       if (!isIntraCourse.value && noTraineeFromCompany) {
         return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
       }
@@ -161,7 +170,7 @@ export default {
     const generateTrainingContract = async () => {
       try {
         pdfLoading.value = true;
-        const pdf = await Courses.downloadTrainingContract(course.value._id, newTrainingContract.value);
+        const pdf = await Courses.downloadTrainingContract(course.value._id, newGeneratedTrainingContractInfos.value);
         const formattedName = formatDownloadName(
           `convention ${composeCourseName(course.value)} ${course.value.companies[0].name}`
         );
@@ -230,7 +239,7 @@ export default {
 
     return {
       // Data
-      newTrainingContract,
+      newGeneratedTrainingContractInfos,
       trainingContractGenerationModal,
       trainingContractInfosModal,
       pdfLoading,
