@@ -12,12 +12,12 @@
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
           :style="col.style" :class="[{ 'border': props.rowIndex === 0 }]">
-          <template v-if="col.name === 'download'">
+          <template v-if="col.name === 'actions'">
+            <div>
               <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
                 :disable="!props.row.file.link" />
-          </template>
-          <template v-if="col.name === 'deletion'">
               <ni-button icon="delete" @click="deleteTrainingContract(props.row._id)" :disable="isArchived" />
+            </div>
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -55,8 +55,7 @@ export default {
         align: 'left',
         field: row => companyOptions.value.find(option => get(row, 'company') === option.value).label || '',
       },
-      { name: 'download', label: '', align: 'center', field: '' },
-      { name: 'deletion', label: '', align: 'right', field: '' },
+      { name: 'actions', label: '', align: 'right', field: '' },
     ]);
 
     const deleteTrainingContract = trainingContractId => emit('delete', trainingContractId);

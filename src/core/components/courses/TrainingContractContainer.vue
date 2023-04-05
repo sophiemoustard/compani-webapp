@@ -142,7 +142,7 @@ export default {
     });
 
     const areAllTrainingContractsUploaded = computed(() => !!course.value.companies.length &&
-    trainingContracts.value.length === course.value.companies.length);
+      trainingContracts.value.length === course.value.companies.length);
 
     const errorMessage = computed(() => {
       const message = '';
