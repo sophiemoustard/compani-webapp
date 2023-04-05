@@ -1,13 +1,6 @@
 <template>
   <ni-responsive-table :data="trainingContracts" :columns="columns" v-model:pagination="pagination" separator="none"
     :loading="loading">
-    <template #header="{ props }">
-      <q-tr :props="props">
-        <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-          {{ col.label }}
-        </q-th>
-      </q-tr>
-    </template>
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"

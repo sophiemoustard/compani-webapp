@@ -10,7 +10,7 @@
           </template>
         </ni-banner>
         <template v-if="isIntraCourse">
-          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableButton()"
+          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableButton"
             label="Générer la convention de formation" @click="trainingContractGenerationModal = true" size="16px" />
         </template>
         <template v-else>
@@ -20,12 +20,12 @@
               :loading="trainingContractTableLoading" :company-options="companyOptions" />
             <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
           </q-card>
-          <q-card-actions align="right">
-            <ni-button color="primary" icon="file_download" :disable="disableButton()" label="Générer une convention"
+          <div align="right" class="q-pa-sm">
+            <ni-button color="primary" icon="file_download" :disable="disableButton" label="Générer une convention"
               @click="trainingContractGenerationModal = true" />
             <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
-              icon="add" :disable="disableButton(trainingContracts.length === course.companies.length)" />
-          </q-card-actions>
+              icon="add" :disable="disableButton || trainingContracts.length === course.companies.length" />
+          </div>
         </template>
       </div>
       <div v-if="isIntraCourse || (!isVendorInterface && !!trainingContracts.length)" class="q-mt-md row">
@@ -163,6 +163,8 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
+    const disableButton = computed(() => disableDocDownload.value || !!course.value.archivedAt);
+
     const resetGeneratedTrainingContractInfos = () => {
       if (!trainingContractInfosModal.value) {
         newGeneratedTrainingContractInfos.value = {
@@ -295,10 +297,6 @@ export default {
       }
     };
 
-    const disableButton = (additionalCondition = false) => (
-      disableDocDownload.value || !!course.value.archivedAt || additionalCondition
-    );
-
     const created = async () => {
       if (isAdmin.value) await refreshTrainingContracts();
     };
@@ -327,6 +325,7 @@ export default {
       isIntraCourse,
       isVendorInterface,
       areAllTrainingContractsUploaded,
+      disableButton,
       // Methods
       openTrainingContractInfosModal,
       resetGeneratedTrainingContractInfos,
@@ -336,7 +335,6 @@ export default {
       validateDocumentDeletion,
       createTrainingContract,
       resetNewTrainingContract,
-      disableButton,
     };
   },
 };
