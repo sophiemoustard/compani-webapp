@@ -1,16 +1,16 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
-      Uploader <span class="text-weight-bold">une convention de formation</span>
+      Téléverser <span class="text-weight-bold">une convention de formation</span>
     </template>
     <ni-select in-modal :model-value="newTrainingContract.company"
       @update:model-value="update($event, 'company')" caption="Structure" :options="companyOptions" required-field
       :error="validations.company.$error" @blur="validations.company.$touch" />
     <ni-input in-modal caption="Convention de formation" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newTrainingContract.file" @update:model-value="update($event, 'file')"
-      :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
+      :extensions="extensions" :error="validations.file.$error" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" label="Uploader la convention" icon-right="add" color="white"
+      <ni-button class="full-width modal-btn bg-primary" label="Téléverser la convention" icon-right="add" color="white"
         @click="submit" />
     </template>
   </ni-modal>
@@ -42,6 +42,7 @@ export default {
   emits: ['hide', 'update:model-value', 'submit', 'update:new-training-contract'],
   setup (props, { emit }) {
     const { newTrainingContract } = toRefs(props);
+    const extensions = [DOC_EXTENSIONS, IMAGE_EXTENSIONS].join();
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
@@ -52,8 +53,7 @@ export default {
 
     return {
       // Data
-      DOC_EXTENSIONS,
-      IMAGE_EXTENSIONS,
+      extensions,
       // Methods
       hide,
       input,

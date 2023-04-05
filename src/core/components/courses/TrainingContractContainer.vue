@@ -3,7 +3,7 @@
     <p class="text-weight-bold">Convention de formation</p>
     <div class="q-mb-sm">
       <div v-if="isVendorInterface">
-        <ni-banner v-if="missingInfos.length && trainingContracts.length < course.companies.length">
+        <ni-banner v-if="missingInfos.length && !areAllTrainingContractsUploaded">
           <template #message>
             Il manque {{ formatQuantity('information', missingInfos.length ) }} pour générer la convention de
             formation : {{ missingInfos.join(', ') }}.
@@ -16,14 +16,15 @@
         </div>
         <div v-else>
           <q-card>
-            <training-contract-table @delete="validateDocumentDeletion" :is-archived="!!course.archivedAt"
-              :training-contracts="trainingContracts" :loading="trainingContractTableLoading"
-              :company-options="companyOptions" />
+            <training-contract-table v-if="trainingContracts.length" @delete="validateDocumentDeletion"
+              :is-archived="!!course.archivedAt" :training-contracts="trainingContracts"
+              :loading="trainingContractTableLoading" :company-options="companyOptions" />
+            <div v-else class="text-center text-italic q-pa-sm">Aucune convention de formation téléversées</div>
           </q-card>
           <q-card-actions align="right">
             <ni-button color="primary" icon="file_download" :disable="disableDocDownload || !!course.archivedAt"
               label="Générer une convention" @click="trainingContractGenerationModal = true" />
-            <ni-button label="Uploader une convention" @click="trainingContractCreationModal = true" color="primary"
+            <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
               icon="add" :disable="disableDocDownload || !!course.archivedAt
                 || trainingContracts.length === course.companies.length" />
           </q-card-actions>
@@ -135,9 +136,13 @@ export default {
           .map(step => step.theoreticalDuration);
         if (theoreticalDurationList.some(duration => !duration)) infos.push('la durée théorique dans certaines étapes');
       }
+      if (!course.value.companies.length) infos.push('minimum une structure');
 
       return infos;
     });
+
+    const areAllTrainingContractsUploaded = computed(() => !!course.value.companies.length &&
+    trainingContracts.value.length === course.value.companies.length);
 
     const errorMessage = computed(() => {
       const message = '';
@@ -228,6 +233,7 @@ export default {
         pdfLoading.value = true;
 
         await TrainingContracts.create(formatPayload());
+
         trainingContractCreationModal.value = false;
         NotifyPositive('Convention de formation ajoutée.');
         await refreshTrainingContracts();
@@ -284,7 +290,7 @@ export default {
 
     const uploaded = async () => {
       try {
-        NotifyPositive('oui');
+        NotifyPositive('Convention de formation ajoutée.');
         await refreshTrainingContracts();
       } catch (error) {
         console.error(error);
@@ -318,6 +324,7 @@ export default {
       companyOptions,
       isIntraCourse,
       isVendorInterface,
+      areAllTrainingContractsUploaded,
       // Methods
       openTrainingContractInfosModal,
       resetGeneratedTrainingContractInfos,
