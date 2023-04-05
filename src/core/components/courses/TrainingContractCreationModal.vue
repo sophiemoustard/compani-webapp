@@ -8,7 +8,7 @@
       :error="validations.company.$error" @blur="validations.company.$touch" />
     <ni-input in-modal caption="Convention de formation" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newTrainingContract.file" @update:model-value="update($event, 'file')"
-      :extensions="extensions" :error="validations.file.$error" />
+      :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Téléverser la convention" icon-right="add" color="white"
         @click="submit" />
@@ -42,7 +42,6 @@ export default {
   emits: ['hide', 'update:model-value', 'submit', 'update:new-training-contract'],
   setup (props, { emit }) {
     const { newTrainingContract } = toRefs(props);
-    const extensions = [DOC_EXTENSIONS, IMAGE_EXTENSIONS].join();
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
@@ -53,7 +52,8 @@ export default {
 
     return {
       // Data
-      extensions,
+      DOC_EXTENSIONS,
+      IMAGE_EXTENSIONS,
       // Methods
       hide,
       input,

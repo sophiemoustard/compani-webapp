@@ -13,11 +13,9 @@
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
           :style="col.style" :class="[{ 'border': props.rowIndex === 0 }]">
           <template v-if="col.name === 'actions'">
-            <div>
-              <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
-                :disable="!props.row.file.link" />
-              <ni-button icon="delete" @click="deleteTrainingContract(props.row._id)" :disable="isArchived" />
-            </div>
+            <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
+              :disable="!props.row.file.link" />
+            <ni-button icon="delete" @click="deleteTrainingContract(props.row._id)" :disable="isArchived" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -28,7 +26,6 @@
 
 <script>
 import { ref, toRefs } from 'vue';
-import get from 'lodash/get';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 
@@ -53,7 +50,8 @@ export default {
         name: 'company',
         label: 'Structure',
         align: 'left',
-        field: row => companyOptions.value.find(option => get(row, 'company') === option.value).label || '',
+        field: 'company',
+        format: value => companyOptions.value.find(option => value === option.value).label || '',
       },
       { name: 'actions', label: '', align: 'right', field: '' },
     ]);
@@ -71,8 +69,6 @@ export default {
 };
 </script>
 <style lang="sass" scoped>
-.q-table tbody td
-  height: 35px
 .border
   @media screen and (min-width: 767px)
     border-top: 1px solid $copper-grey-200

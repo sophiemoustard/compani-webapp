@@ -9,26 +9,24 @@
             formation : {{ missingInfos.join(', ') }}.
           </template>
         </ni-banner>
-        <div v-if="isIntraCourse">
-          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" size="16px"
-            :disable="disableDocDownload || !!course.archivedAt" label="Générer la convention de formation"
-            @click="trainingContractGenerationModal = true" />
-        </div>
-        <div v-else>
+        <template v-if="isIntraCourse">
+          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableButton()"
+            label="Générer la convention de formation" @click="trainingContractGenerationModal = true" size="16px" />
+        </template>
+        <template v-else>
           <q-card>
             <training-contract-table v-if="trainingContracts.length" @delete="validateDocumentDeletion"
               :is-archived="!!course.archivedAt" :training-contracts="trainingContracts"
               :loading="trainingContractTableLoading" :company-options="companyOptions" />
-            <div v-else class="text-center text-italic q-pa-sm">Aucune convention de formation téléversées</div>
+            <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
           </q-card>
           <q-card-actions align="right">
-            <ni-button color="primary" icon="file_download" :disable="disableDocDownload || !!course.archivedAt"
-              label="Générer une convention" @click="trainingContractGenerationModal = true" />
+            <ni-button color="primary" icon="file_download" :disable="disableButton()" label="Générer une convention"
+              @click="trainingContractGenerationModal = true" />
             <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
-              icon="add" :disable="disableDocDownload || !!course.archivedAt
-                || trainingContracts.length === course.companies.length" />
+              icon="add" :disable="disableButton(trainingContracts.length === course.companies.length)" />
           </q-card-actions>
-        </div>
+        </template>
       </div>
       <div v-if="isIntraCourse || (!isVendorInterface && !!trainingContracts.length)" class="q-mt-md row">
         <ni-file-uploader caption="Convention de formation signée" :extensions="extensions" :url="url"
@@ -49,7 +47,7 @@
     :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse" />
 
   <training-contract-creation-modal v-model="trainingContractCreationModal" :company-options="companyOptions"
-    v-model:new-training-contract="newTrainingContract" @submit="uploadInterSignedContract"
+    v-model:new-training-contract="newTrainingContract" @submit="createTrainingContract"
     @hide="resetNewTrainingContract" :validations="validations.newTrainingContract" />
 </template>
 
@@ -226,7 +224,7 @@ export default {
       return form;
     };
 
-    const uploadInterSignedContract = async () => {
+    const createTrainingContract = async () => {
       try {
         validations.value.newTrainingContract.$touch();
         if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -297,6 +295,10 @@ export default {
       }
     };
 
+    const disableButton = (additionalCondition = false) => (
+      disableDocDownload.value || !!course.value.archivedAt || additionalCondition
+    );
+
     const created = async () => {
       if (isAdmin.value) await refreshTrainingContracts();
     };
@@ -332,8 +334,9 @@ export default {
       formatQuantity,
       uploaded,
       validateDocumentDeletion,
-      uploadInterSignedContract,
+      createTrainingContract,
       resetNewTrainingContract,
+      disableButton,
     };
   },
 };
