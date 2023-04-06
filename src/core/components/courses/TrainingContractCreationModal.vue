@@ -1,16 +1,16 @@
 <template>
   <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
-      Ajouter <span class="text-weight-bold">le prix de la formation</span>
+      Téléverser <span class="text-weight-bold">une convention de formation</span>
     </template>
-    <ni-input in-modal :caption="isIntraCourse ? 'Prix du programme' : 'Prix par stagiaire'" suffix="€"
-      :error="validations.price.$error" type="number" :model-value="newTrainingContract.price" required-field
-      @blur="validations.price.$touch" :error-message="errorMessage" @update:model-value="update($event, 'price')" />
-    <ni-select v-if="!isIntraCourse" in-modal :model-value="newTrainingContract.company"
+    <ni-select in-modal :model-value="newTrainingContract.company"
       @update:model-value="update($event, 'company')" caption="Structure" :options="companyOptions" required-field
       :error="validations.company.$error" @blur="validations.company.$touch" />
+    <ni-input in-modal caption="Convention de formation" type="file" @blur="validations.file.$touch" last required-field
+      :model-value="newTrainingContract.file" @update:model-value="update($event, 'file')"
+      :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
     <template #footer>
-      <ni-button class="full-width modal-btn bg-primary" label="Ajouter le prix" icon-right="add" color="white"
+      <ni-button class="full-width modal-btn bg-primary" label="Téléverser la convention" icon-right="add" color="white"
         @click="submit" />
     </template>
   </ni-modal>
@@ -23,15 +23,14 @@ import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
+import { DOC_EXTENSIONS, IMAGE_EXTENSIONS } from '@data/constants';
 
 export default {
-  name: 'TrainingContractPriceAdditionModal',
+  name: 'TrainingContractGenerationModal',
   props: {
     modelValue: { type: Boolean, default: false },
-    errorMessage: { type: String, default: () => '' },
     validations: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
-    isIntraCourse: { type: Boolean, default: true },
     newTrainingContract: { type: Object, default: () => ({}) },
   },
   components: {
@@ -52,6 +51,9 @@ export default {
     };
 
     return {
+      // Data
+      DOC_EXTENSIONS,
+      IMAGE_EXTENSIONS,
       // Methods
       hide,
       input,

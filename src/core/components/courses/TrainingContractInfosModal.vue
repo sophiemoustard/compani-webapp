@@ -27,16 +27,16 @@
     </div>
     <div v-if="isIntraCourse" class="q-mb-md">
       <span class="text-weight-bold">Prix du programme :</span>
-      {{ Number(newTrainingContract.price) }} €
+      {{ Number(newGeneratedTrainingContractInfos.price) }} €
     </div>
     <div v-else class="q-mb-md">
       <div>
         <span class="text-weight-bold">Prix par stagiaire :</span>
-        {{ Number(newTrainingContract.price) }} €
+        {{ Number(newGeneratedTrainingContractInfos.price) }} €
       </div>
       <div>
         <span class="text-weight-bold">Prix total :</span>
-        {{ Number(newTrainingContract.price) * learnersCount }} €
+        {{ Number(newGeneratedTrainingContractInfos.price) * learnersCount }} €
       </div>
     </div>
     <template #footer>
@@ -63,7 +63,7 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     course: { type: Object, default: () => ({}) },
-    newTrainingContract: { type: Object, default: () => ({}) },
+    newGeneratedTrainingContractInfos: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     isIntraCourse: { type: Boolean, default: true },
   },
@@ -73,7 +73,7 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit'],
   setup (props, { emit }) {
-    const { course, newTrainingContract, isIntraCourse } = toRefs(props);
+    const { course, newGeneratedTrainingContractInfos, isIntraCourse } = toRefs(props);
 
     // make sure code is similar to back part in TrainingContracts helper
     const liveDuration = computed(() => {
@@ -129,11 +129,12 @@ export default {
     const learnersCount = computed(() => {
       if (isIntraCourse.value) return course.value.maxTrainees;
 
-      return course.value.trainees.filter(t => t.registrationCompany === newTrainingContract.value.company).length;
+      return course.value.trainees
+        .filter(t => t.registrationCompany === newGeneratedTrainingContractInfos.value.company).length;
     });
 
     const companyName = computed(() => course.value.companies
-      .find(c => c._id === newTrainingContract.value.company).name);
+      .find(c => c._id === newGeneratedTrainingContractInfos.value.company).name);
 
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);

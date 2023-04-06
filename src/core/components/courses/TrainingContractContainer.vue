@@ -3,42 +3,52 @@
     <p class="text-weight-bold">Convention de formation</p>
     <div class="q-mb-sm">
       <div v-if="isVendorInterface">
-        <ni-banner v-if="missingInfos.length && trainingContracts.length < course.companies.length">
+        <ni-banner v-if="missingInfos.length && !areAllTrainingContractsUploaded">
           <template #message>
             Il manque {{ formatQuantity('information', missingInfos.length ) }} pour générer la convention de
             formation : {{ missingInfos.join(', ') }}.
           </template>
         </ni-banner>
-        <div v-if="isIntraCourse">
-          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" size="16px"
-            :disable="disableDocDownload || !!course.archivedAt" label="Générer la convention de formation"
-            @click="trainingContractPriceAdditionModal = true" />
-        </div>
-        <div v-else class="row">
+        <template v-if="isIntraCourse">
+          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableButton"
+            label="Générer la convention de formation" @click="trainingContractGenerationModal = true" size="16px" />
+        </template>
+        <template v-else>
           <q-card>
-            <q-card-actions align="right">
-              <ni-button color="primary" icon="file_download" :disable="disableDocDownload || !!course.archivedAt"
-                label="Générer une convention de formation" @click="trainingContractPriceAdditionModal = true" />
-            </q-card-actions>
+            <training-contract-table v-if="trainingContracts.length" @delete="validateDocumentDeletion"
+              :is-archived="!!course.archivedAt" :training-contracts="trainingContracts"
+              :loading="trainingContractTableLoading" :company-options="companyOptions" />
+            <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
           </q-card>
-        </div>
+          <div align="right" class="q-pa-sm">
+            <ni-button color="primary" icon="file_download" :disable="disableButton" label="Générer une convention"
+              @click="trainingContractGenerationModal = true" />
+            <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
+              icon="add" :disable="disableButton || trainingContracts.length === course.companies.length" />
+          </div>
+        </template>
       </div>
-      <div v-if="isIntraCourse" class="q-mt-md row">
+      <div v-if="isIntraCourse || (!isVendorInterface && !!trainingContracts.length)" class="q-mt-md row">
         <ni-file-uploader caption="Convention de formation signée" :extensions="extensions" :url="url"
           :custom-fields="customFields" :entity="trainingContracts[0]" path="file" :disable="!!course.archivedAt"
-          @uploaded="refreshTrainingContracts" hide-image :can-delete="isVendorInterface"
+          @uploaded="uploaded" hide-image :can-delete="isVendorInterface"
           @delete="validateDocumentDeletion(trainingContracts[0]._id)" />
       </div>
     </div>
   </div>
 
-  <training-contract-price-addition-modal v-model="trainingContractPriceAdditionModal" :company-options="companyOptions"
-    v-model:new-training-contract="newTrainingContract" @submit="openTrainingContractInfosModal" @hide="resetPrice"
-    :is-intra-course="isIntraCourse" :validations="validations.newTrainingContract" :error-message="errorMessage" />
+  <training-contract-generation-modal v-model="trainingContractGenerationModal" :company-options="companyOptions"
+    v-model:new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse"
+    @submit="openTrainingContractInfosModal" @hide="resetGeneratedTrainingContractInfos" :error-message="errorMessage"
+    :validations="validations.newGeneratedTrainingContractInfos" />
 
-  <training-contract-infos-modal v-model="trainingContractInfosModal" :course="course" @hide="resetPrice"
-    @submit="generateTrainingContract" :loading="pdfLoading" :new-training-contract="newTrainingContract"
-    :is-intra-course="isIntraCourse" />
+  <training-contract-infos-modal v-model="trainingContractInfosModal" :course="course"
+    @submit="generateTrainingContract" :loading="pdfLoading" @hide="resetGeneratedTrainingContractInfos"
+    :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse" />
+
+  <training-contract-creation-modal v-model="trainingContractCreationModal" :company-options="companyOptions"
+    v-model:new-training-contract="newTrainingContract" @submit="createTrainingContract"
+    @hide="resetNewTrainingContract" :validations="validations.newTrainingContract" />
 </template>
 
 <script>
@@ -54,8 +64,10 @@ import BiColorButton from '@components/BiColorButton';
 import Button from '@components/Button';
 import Banner from '@components/Banner';
 import FileUploader from '@components/form/FileUploader';
-import TrainingContractPriceAdditionModal from '@components/courses/TrainingContractPriceAdditionModal';
+import TrainingContractGenerationModal from '@components/courses/TrainingContractGenerationModal';
 import TrainingContractInfosModal from '@components/courses/TrainingContractInfosModal';
+import TrainingContractCreationModal from '@components/courses/TrainingContractCreationModal';
+import TrainingContractTable from '@components/courses/TrainingContractTable';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
 import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING, INTER_B2B, IMAGE_EXTENSIONS } from '@data/constants';
@@ -74,29 +86,37 @@ export default {
     'ni-bi-color-button': BiColorButton,
     'ni-button': Button,
     'ni-banner': Banner,
-    'training-contract-price-addition-modal': TrainingContractPriceAdditionModal,
+    'training-contract-generation-modal': TrainingContractGenerationModal,
     'training-contract-infos-modal': TrainingContractInfosModal,
+    'training-contract-creation-modal': TrainingContractCreationModal,
+    'training-contract-table': TrainingContractTable,
     'ni-file-uploader': FileUploader,
   },
   setup (props) {
-    const { course } = toRefs(props);
+    const { course, isAdmin } = toRefs(props);
     const $store = useStore();
     const $q = useQuasar();
 
     const { pdfLoading, isIntraCourse, isVendorInterface } = useCourses(course);
 
     const trainingContracts = ref([]);
-    const newTrainingContract = ref({ price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' });
-    const trainingContractPriceAdditionModal = ref(false);
+    const newGeneratedTrainingContractInfos = ref({
+      price: 0,
+      company: isIntraCourse.value ? course.value.companies[0]._id : '',
+    });
+    const newTrainingContract = ref({ company: '' });
+    const trainingContractGenerationModal = ref(false);
     const trainingContractInfosModal = ref(false);
+    const trainingContractCreationModal = ref(false);
     const url = TrainingContracts.getTrainingContractUploadURL();
     const extensions = [DOC_EXTENSIONS, IMAGE_EXTENSIONS].join();
     const trainingContractTableLoading = ref(false);
 
     const rules = computed(() => ({
-      newTrainingContract: { price: { required, strictPositiveNumber }, company: { required } },
+      newGeneratedTrainingContractInfos: { price: { required, strictPositiveNumber }, company: { required } },
+      newTrainingContract: { file: { required }, company: { required } },
     }));
-    const validations = useVuelidate(rules, { newTrainingContract });
+    const validations = useVuelidate(rules, { newGeneratedTrainingContractInfos, newTrainingContract });
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -114,14 +134,20 @@ export default {
           .map(step => step.theoreticalDuration);
         if (theoreticalDurationList.some(duration => !duration)) infos.push('la durée théorique dans certaines étapes');
       }
+      if (!course.value.companies.length) infos.push('minimum une structure');
 
       return infos;
     });
 
+    const areAllTrainingContractsUploaded = computed(() => !!course.value.companies.length &&
+      trainingContracts.value.length === course.value.companies.length);
+
     const errorMessage = computed(() => {
       const message = '';
-      if (get(validations, 'value.newTrainingContract.price.required.$response') === false) return REQUIRED_LABEL;
-      if (get(validations, 'value.newTrainingContract.price.strictPositiveNumber.$response') === false) {
+      if (get(validations, 'value.newGeneratedTrainingContractInfos.price.required.$response') === false) {
+        return REQUIRED_LABEL;
+      }
+      if (get(validations, 'value.newGeneratedTrainingContractInfos.price.strictPositiveNumber.$response') === false) {
         return 'Prix non valide';
       }
 
@@ -137,31 +163,41 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
-    const resetPrice = () => {
+    const disableButton = computed(() => disableDocDownload.value || !!course.value.archivedAt);
+
+    const resetGeneratedTrainingContractInfos = () => {
       if (!trainingContractInfosModal.value) {
-        newTrainingContract.value = { price: 0, company: isIntraCourse.value ? course.value.companies[0]._id : '' };
+        newGeneratedTrainingContractInfos.value = {
+          price: 0,
+          company: isIntraCourse.value ? course.value.companies[0]._id : '',
+        };
       }
+      validations.value.newGeneratedTrainingContractInfos.$reset();
+    };
+
+    const resetNewTrainingContract = () => {
+      newTrainingContract.value = { company: '' };
       validations.value.newTrainingContract.$reset();
     };
 
     const openTrainingContractInfosModal = () => {
-      validations.value.newTrainingContract.$touch();
-      if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+      validations.value.newGeneratedTrainingContractInfos.$touch();
+      if (validations.value.newGeneratedTrainingContractInfos.$error) return NotifyWarning('Champ(s) invalide(s)');
 
       const noTraineeFromCompany = !course.value.trainees
-        .some(t => t.registrationCompany === newTrainingContract.value.company);
+        .some(t => t.registrationCompany === newGeneratedTrainingContractInfos.value.company);
       if (!isIntraCourse.value && noTraineeFromCompany) {
         return NotifyWarning('Il n\'y a aucun(e) stagiaire rattaché(e) à la formation pour cette structure.');
       }
 
-      trainingContractPriceAdditionModal.value = false;
+      trainingContractGenerationModal.value = false;
       trainingContractInfosModal.value = true;
     };
 
     const generateTrainingContract = async () => {
       try {
         pdfLoading.value = true;
-        const pdf = await Courses.downloadTrainingContract(course.value._id, newTrainingContract.value);
+        const pdf = await Courses.downloadTrainingContract(course.value._id, newGeneratedTrainingContractInfos.value);
         const formattedName = formatDownloadName(
           `convention ${composeCourseName(course.value)} ${course.value.companies[0].name}`
         );
@@ -175,6 +211,36 @@ export default {
           return NotifyNegative(message);
         }
         NotifyNegative('Erreur lors de la génération de la convention.');
+      } finally {
+        pdfLoading.value = false;
+      }
+    };
+
+    const formatPayload = () => {
+      const { company, file } = newTrainingContract.value;
+      const form = new FormData();
+      form.append('course', course.value._id);
+      form.append('file', file);
+      form.append('company', company);
+
+      return form;
+    };
+
+    const createTrainingContract = async () => {
+      try {
+        validations.value.newTrainingContract.$touch();
+        if (validations.value.newTrainingContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+        pdfLoading.value = true;
+
+        await TrainingContracts.create(formatPayload());
+
+        trainingContractCreationModal.value = false;
+        NotifyPositive('Convention de formation ajoutée.');
+        await refreshTrainingContracts();
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 403) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout de la convention.');
       } finally {
         pdfLoading.value = false;
       }
@@ -222,22 +288,33 @@ export default {
       }
     };
 
+    const uploaded = async () => {
+      try {
+        NotifyPositive('Convention de formation ajoutée.');
+        await refreshTrainingContracts();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     const created = async () => {
-      await refreshTrainingContracts();
+      if (isAdmin.value) await refreshTrainingContracts();
     };
 
     created();
 
     return {
       // Data
-      newTrainingContract,
-      trainingContractPriceAdditionModal,
+      newGeneratedTrainingContractInfos,
+      trainingContractGenerationModal,
       trainingContractInfosModal,
       pdfLoading,
       url,
       extensions,
       trainingContractTableLoading,
       trainingContracts,
+      newTrainingContract,
+      trainingContractCreationModal,
       // Computed
       missingInfos,
       disableDocDownload,
@@ -247,13 +324,17 @@ export default {
       companyOptions,
       isIntraCourse,
       isVendorInterface,
+      areAllTrainingContractsUploaded,
+      disableButton,
       // Methods
       openTrainingContractInfosModal,
-      resetPrice,
+      resetGeneratedTrainingContractInfos,
       generateTrainingContract,
       formatQuantity,
-      refreshTrainingContracts,
+      uploaded,
       validateDocumentDeletion,
+      createTrainingContract,
+      resetNewTrainingContract,
     };
   },
 };

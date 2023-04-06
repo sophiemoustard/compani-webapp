@@ -42,12 +42,12 @@
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
           :loading="loading" table-class="q-pb-md" />
       </q-card>
-      <q-card-actions align="right" v-if="canEdit">
+      <div align="right" v-if="canEdit" class="q-pa-sm">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
           @click="openCompanyAdditionModal" />
         <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
           @click="openTraineeCreationModal" />
-      </q-card-actions>
+      </div>
     </div>
 
     <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee-registration="newTraineeRegistration"
