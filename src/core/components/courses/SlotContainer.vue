@@ -10,7 +10,7 @@
           <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
         </q-item-section>
       </q-item>
-      <div v-if="!course.slots.length && isVendorInterface && isAdmin" class="row gutter-profile">
+      <div v-if="!course.slots.length && isVendorInterface && isRofOrVendorAdmin" class="row gutter-profile">
         <ni-date-input class="col-xs-12 col-md-6" caption="Date de démarrage souhaitée"
           :model-value="estimatedStartDate" @update:model-value="inputTmpEstimatedStartDate($event)"
           @blur="updateEstimatedStartDate" />
@@ -54,7 +54,7 @@
                   <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                 </div>
               </div>
-              <div class="q-mt-sm" v-if="canEdit && isAdmin && isVendorInterface" align="right">
+              <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
                 <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
                   :disable="addDateToPlanLoading" />
               </div>
@@ -66,8 +66,9 @@
 
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-types="stepTypes"
       :validations="v$.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
-      @submit="updateCourseSlot" @update="setCourseSlot" :is-admin="isAdmin" :is-vendor-interface="isVendorInterface"
-      :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot" @unplan-slot="unplanSlot" />
+      @submit="updateCourseSlot" @update="setCourseSlot" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
+      :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
+      @unplan-slot="unplanSlot" />
   </div>
 </template>
 
@@ -102,7 +103,7 @@ export default {
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
-    isAdmin: { type: Boolean, default: false },
+    isRofOrVendorAdmin: { type: Boolean, default: false },
     estimatedStartDate: { type: String, default: '' },
   },
   components: {
