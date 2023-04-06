@@ -11,7 +11,7 @@
           </template>
         </ni-banner>
         <template v-if="isIntraCourse">
-          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableButton"
+          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableGenerationButton"
             label="Générer la convention de formation" @click="trainingContractGenerationModal = true" size="16px" />
         </template>
         <template v-else>
@@ -22,8 +22,8 @@
             <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
           </q-card>
           <div align="right" class="q-pa-sm">
-            <ni-button color="primary" icon="file_download" :disable="disableButton" label="Générer une convention"
-              @click="trainingContractGenerationModal = true" />
+            <ni-button color="primary" icon="file_download" :disable="disableGenerationButton"
+              label="Générer une convention" @click="trainingContractGenerationModal = true" />
             <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
               icon="add" :disable="disableUploadButton" />
           </div>
@@ -155,8 +155,6 @@ export default {
       return message;
     });
 
-    const disableDocDownload = computed(() => !!missingInfos.value.length || pdfLoading.value);
-
     const customFields = computed(() => [
       { name: 'course', value: course.value._id },
       { name: 'company', value: course.value.companies[0]._id },
@@ -164,7 +162,8 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
-    const disableButton = computed(() => disableDocDownload.value || !!course.value.archivedAt);
+    const disableGenerationButton = computed(() => !!missingInfos.value.length || pdfLoading.value ||
+      !!course.value.archivedAt);
 
     const disableUploadButton = computed(() => pdfLoading.value || !!course.value.archivedAt ||
       trainingContracts.value.length === course.value.companies.length);
@@ -321,7 +320,6 @@ export default {
       trainingContractCreationModal,
       // Computed
       missingInfos,
-      disableDocDownload,
       errorMessage,
       validations,
       customFields,
@@ -329,7 +327,7 @@ export default {
       isIntraCourse,
       isVendorInterface,
       areAllTrainingContractsUploaded,
-      disableButton,
+      disableGenerationButton,
       disableUploadButton,
       // Methods
       openTrainingContractInfosModal,
