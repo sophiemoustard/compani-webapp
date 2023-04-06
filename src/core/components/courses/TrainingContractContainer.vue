@@ -55,7 +55,7 @@
 <script>
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
-import { computed, ref, toRefs } from 'vue';
+import { defineComponent, computed, ref, toRefs } from 'vue';
 import get from 'lodash/get';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
@@ -77,7 +77,7 @@ import { downloadFile } from '@helpers/file';
 import { formatQuantity, formatDownloadName, formatAndSortOptions } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 
-export default {
+export default defineComponent({
   name: 'TrainingContractContainer',
   props: {
     course: { type: Object, default: () => {} },
@@ -93,7 +93,7 @@ export default {
     'training-contract-table': TrainingContractTable,
     'ni-file-uploader': FileUploader,
   },
-  setup (props) {
+  setup (props, context) {
     const { course, isRofOrVendorAdmin } = toRefs(props);
     const $store = useStore();
     const $q = useQuasar();
@@ -306,6 +306,8 @@ export default {
 
     created();
 
+    context.expose({ refreshTrainingContracts });
+
     return {
       // Data
       newGeneratedTrainingContractInfos,
@@ -340,5 +342,5 @@ export default {
       resetNewTrainingContract,
     };
   },
-};
+});
 </script>

@@ -81,7 +81,8 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin" />
+    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
+      ref="trainingContractContainerRef" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -189,6 +190,8 @@ export default {
     const { profileId } = toRefs(props);
 
     const $store = useStore();
+
+    const trainingContractContainerRef = ref();
 
     const trainerOptions = ref([]);
     const salesRepresentativeOptions = ref([]);
@@ -390,6 +393,7 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
+        trainingContractContainerRef.value.refreshTrainingContracts();
         if (displayHistory.value) {
           await getCourseHistories();
           courseHistoryFeed.value.resumeScroll();
@@ -750,6 +754,7 @@ export default {
       courseHistoryFeed,
       tmpCourse,
       isIntraCourse,
+      trainingContractContainerRef,
       // Computed
       course,
       v$,
