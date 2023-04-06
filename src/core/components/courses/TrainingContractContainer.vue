@@ -1,5 +1,6 @@
 <template>
-  <div v-if="(isVendorInterface && isAdmin) || (!isVendorInterface && !!trainingContracts.length)" class="q-mb-xl">
+  <div v-if="(isVendorInterface && isRofOrVendorAdmin) || (!isVendorInterface && !!trainingContracts.length)"
+    class="q-mb-xl">
     <p class="text-weight-bold">Convention de formation</p>
     <div class="q-mb-sm">
       <div v-if="isVendorInterface">
@@ -10,7 +11,7 @@
           </template>
         </ni-banner>
         <template v-if="isIntraCourse">
-          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableButton"
+          <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableGenerationButton"
             label="Générer la convention de formation" @click="trainingContractGenerationModal = true" size="16px" />
         </template>
         <template v-else>
@@ -21,10 +22,10 @@
             <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
           </q-card>
           <div align="right" class="q-pa-sm">
-            <ni-button color="primary" icon="file_download" :disable="disableButton" label="Générer une convention"
-              @click="trainingContractGenerationModal = true" />
+            <ni-button color="primary" icon="file_download" :disable="disableGenerationButton"
+              label="Générer une convention" @click="trainingContractGenerationModal = true" />
             <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
-              icon="add" :disable="disableButton || trainingContracts.length === course.companies.length" />
+              icon="add" :disable="disableUploadButton" />
           </div>
         </template>
       </div>
@@ -80,7 +81,7 @@ export default {
   name: 'TrainingContractContainer',
   props: {
     course: { type: Object, default: () => {} },
-    isAdmin: { type: Boolean, default: false },
+    isRofOrVendorAdmin: { type: Boolean, default: false },
   },
   components: {
     'ni-bi-color-button': BiColorButton,
@@ -93,7 +94,7 @@ export default {
     'ni-file-uploader': FileUploader,
   },
   setup (props) {
-    const { course, isAdmin } = toRefs(props);
+    const { course, isRofOrVendorAdmin } = toRefs(props);
     const $store = useStore();
     const $q = useQuasar();
 
@@ -154,8 +155,6 @@ export default {
       return message;
     });
 
-    const disableDocDownload = computed(() => !!missingInfos.value.length || pdfLoading.value);
-
     const customFields = computed(() => [
       { name: 'course', value: course.value._id },
       { name: 'company', value: course.value.companies[0]._id },
@@ -163,7 +162,11 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
-    const disableButton = computed(() => disableDocDownload.value || !!course.value.archivedAt);
+    const disableGenerationButton = computed(() => !!missingInfos.value.length || pdfLoading.value ||
+      !!course.value.archivedAt);
+
+    const disableUploadButton = computed(() => pdfLoading.value || !!course.value.archivedAt ||
+      trainingContracts.value.length === course.value.companies.length);
 
     const resetGeneratedTrainingContractInfos = () => {
       if (!trainingContractInfosModal.value) {
@@ -298,7 +301,7 @@ export default {
     };
 
     const created = async () => {
-      if (isAdmin.value) await refreshTrainingContracts();
+      if (isRofOrVendorAdmin.value || !isVendorInterface) await refreshTrainingContracts();
     };
 
     created();
@@ -317,7 +320,6 @@ export default {
       trainingContractCreationModal,
       // Computed
       missingInfos,
-      disableDocDownload,
       errorMessage,
       validations,
       customFields,
@@ -325,7 +327,8 @@ export default {
       isIntraCourse,
       isVendorInterface,
       areAllTrainingContractsUploaded,
-      disableButton,
+      disableGenerationButton,
+      disableUploadButton,
       // Methods
       openTrainingContractInfosModal,
       resetGeneratedTrainingContractInfos,

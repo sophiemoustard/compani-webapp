@@ -30,8 +30,9 @@
           :disable="contactModalLoading || isArchived" @click="openContactAdditionModal" />
       </div>
     </div>
-    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
-      @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
+    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
+      :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
+      v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
     <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
@@ -80,7 +81,7 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container :course="course" :is-admin="isAdmin" />
+    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -255,13 +256,13 @@ export default {
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
-    const isAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+    const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
     const isCourseInter = computed(() => course.value.type === INTER_B2B);
 
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
-    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isAdmin.value));
+    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isRofOrVendorAdmin.value));
 
     const isFinished = computed(() => {
       const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
@@ -708,7 +709,7 @@ export default {
         promises.push(refreshSms(), refreshCompanyRepresentatives());
       }
 
-      if (isAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
+      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
@@ -752,7 +753,7 @@ export default {
       // Computed
       course,
       v$,
-      isAdmin,
+      isRofOrVendorAdmin,
       canEditSlots,
       canEditTrainees,
       filteredMessageTypeOptions,
