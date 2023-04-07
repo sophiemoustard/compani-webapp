@@ -53,9 +53,8 @@
 </template>
 
 <script>
-import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
-import { defineComponent, computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import get from 'lodash/get';
 import { required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
@@ -71,17 +70,19 @@ import TrainingContractCreationModal from '@components/courses/TrainingContractC
 import TrainingContractTable from '@components/courses/TrainingContractTable';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
-import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING, INTER_B2B, IMAGE_EXTENSIONS } from '@data/constants';
+import { REQUIRED_LABEL, ON_SITE, DOC_EXTENSIONS, E_LEARNING, IMAGE_EXTENSIONS } from '@data/constants';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { downloadFile } from '@helpers/file';
 import { formatQuantity, formatDownloadName, formatAndSortOptions } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 
-export default defineComponent({
+export default {
   name: 'TrainingContractContainer',
   props: {
     course: { type: Object, default: () => {} },
     isRofOrVendorAdmin: { type: Boolean, default: false },
+    trainingContractTableLoading: { type: Boolean, default: false },
+    trainingContracts: { type: Array, default: () => [] },
   },
   components: {
     'ni-bi-color-button': BiColorButton,
@@ -93,14 +94,13 @@ export default defineComponent({
     'training-contract-table': TrainingContractTable,
     'ni-file-uploader': FileUploader,
   },
-  setup (props, context) {
-    const { course, isRofOrVendorAdmin } = toRefs(props);
-    const $store = useStore();
+  emits: ['refresh'],
+  setup (props, { emit }) {
+    const { course, isRofOrVendorAdmin, trainingContracts } = toRefs(props);
     const $q = useQuasar();
 
     const { pdfLoading, isIntraCourse, isVendorInterface } = useCourses(course);
 
-    const trainingContracts = ref([]);
     const newGeneratedTrainingContractInfos = ref({
       price: 0,
       company: isIntraCourse.value ? course.value.companies[0]._id : '',
@@ -111,15 +111,12 @@ export default defineComponent({
     const trainingContractCreationModal = ref(false);
     const url = TrainingContracts.getTrainingContractUploadURL();
     const extensions = [DOC_EXTENSIONS, IMAGE_EXTENSIONS].join();
-    const trainingContractTableLoading = ref(false);
 
     const rules = computed(() => ({
       newGeneratedTrainingContractInfos: { price: { required, strictPositiveNumber }, company: { required } },
       newTrainingContract: { file: { required }, company: { required } },
     }));
     const validations = useVuelidate(rules, { newGeneratedTrainingContractInfos, newTrainingContract });
-
-    const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const missingInfos = computed(() => {
       const infos = [];
@@ -239,32 +236,13 @@ export default defineComponent({
 
         trainingContractCreationModal.value = false;
         NotifyPositive('Convention de formation ajoutée.');
-        await refreshTrainingContracts();
+        emit('refresh');
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 403) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de la convention.');
       } finally {
         pdfLoading.value = false;
-      }
-    };
-
-    const refreshTrainingContracts = async () => {
-      try {
-        trainingContractTableLoading.value = true;
-        const trainingContractList = await TrainingContracts.list({ course: course.value._id });
-
-        if (course.value.type === INTER_B2B && !isVendorInterface) {
-          trainingContracts.value = trainingContractList.filter(tc => tc.company === loggedUser.value.company._id);
-        } else {
-          trainingContracts.value = trainingContractList;
-        }
-      } catch (e) {
-        console.error(e);
-        trainingContracts.value = [];
-        NotifyNegative('Erreur lors de la récupération des conventions de formation.');
-      } finally {
-        trainingContractTableLoading.value = false;
       }
     };
 
@@ -283,7 +261,7 @@ export default defineComponent({
       try {
         await TrainingContracts.delete(trainingContractId);
 
-        await refreshTrainingContracts();
+        emit('refresh');
         NotifyPositive('Document supprimé.');
       } catch (e) {
         console.error(e);
@@ -294,19 +272,17 @@ export default defineComponent({
     const uploaded = async () => {
       try {
         NotifyPositive('Convention de formation ajoutée.');
-        await refreshTrainingContracts();
+        emit('refresh');
       } catch (error) {
         console.error(error);
       }
     };
 
     const created = async () => {
-      if (isRofOrVendorAdmin.value || !isVendorInterface) await refreshTrainingContracts();
+      if (isRofOrVendorAdmin.value || !isVendorInterface) emit('refresh');
     };
 
     created();
-
-    context.expose({ refreshTrainingContracts });
 
     return {
       // Data
@@ -316,8 +292,6 @@ export default defineComponent({
       pdfLoading,
       url,
       extensions,
-      trainingContractTableLoading,
-      trainingContracts,
       newTrainingContract,
       trainingContractCreationModal,
       // Computed
@@ -342,5 +316,5 @@ export default defineComponent({
       resetNewTrainingContract,
     };
   },
-});
+};
 </script>
