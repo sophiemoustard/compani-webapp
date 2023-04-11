@@ -4,14 +4,15 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <div v-if="document && imageSource" class="row justify-between files-container">
-      <div v-if="!imageHidden" class="doc-thumbnail">
+    <div v-if="document" class="row justify-between files-container">
+      <div v-if="!imageHidden && imageSource" class="doc-thumbnail">
         <ni-custom-img :image-source="imageSource" :alt="caption" />
       </div>
       <div v-else class="document-caption">{{ caption }}</div>
       <div class="self-end">
-        <ni-button icon="save_alt" :disable="loading || !getDocument(document)" @click="downloadDoc(document)" />
-        <ni-button v-if="canDelete" icon="delete" :disable="disable" @click="deleteDocument" />
+        <ni-button icon="save_alt" :disable="loading || !getDocument(document) || !imageSource"
+          @click="downloadDoc(document)" />
+        <ni-button v-if="canDelete" icon="delete" :disable="disable || !imageSource" @click="deleteDocument" />
       </div>
     </div>
     <q-field borderless v-else :error="error" :error-message="errorMessage">
