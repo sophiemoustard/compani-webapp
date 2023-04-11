@@ -711,6 +711,8 @@ export default {
 
     const refreshTrainingContracts = async () => {
       try {
+        if (!isRofOrVendorAdmin.value && isVendorInterface) return;
+
         trainingContractTableLoading.value = true;
         const trainingContractList = await TrainingContracts.list({ course: course.value._id });
 
