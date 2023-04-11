@@ -96,7 +96,7 @@ export default {
   },
   emits: ['refresh'],
   setup (props, { emit }) {
-    const { course, isRofOrVendorAdmin, trainingContracts } = toRefs(props);
+    const { course, trainingContracts } = toRefs(props);
     const $q = useQuasar();
 
     const { pdfLoading, isIntraCourse, isVendorInterface } = useCourses(course);
@@ -278,9 +278,7 @@ export default {
       }
     };
 
-    const created = async () => {
-      if (isRofOrVendorAdmin.value || !isVendorInterface) emit('refresh');
-    };
+    const created = async () => emit('refresh');
 
     created();
 

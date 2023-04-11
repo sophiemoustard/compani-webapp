@@ -395,7 +395,7 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
-        if (isRofOrVendorAdmin.value || !isVendorInterface) await refreshTrainingContracts();
+        await refreshTrainingContracts();
         if (displayHistory.value) {
           await getCourseHistories();
           courseHistoryFeed.value.resumeScroll();
@@ -711,6 +711,8 @@ export default {
 
     const refreshTrainingContracts = async () => {
       try {
+        if (!isRofOrVendorAdmin.value && isVendorInterface) return;
+
         trainingContractTableLoading.value = true;
         const trainingContractList = await TrainingContracts.list({ course: course.value._id });
 
