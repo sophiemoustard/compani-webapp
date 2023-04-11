@@ -2,7 +2,7 @@
   <div>
     <q-card flat>
       <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
-        separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
+        separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="attendancePagination">
         <template #header="props">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -32,8 +32,8 @@
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label :class="['ellipsis', canAccessLearnerProfile && 'clickable-name cursor-pointer']"
-                    @click="goToLearnerProfile(props.row)">
+                  <q-item-label @click="canAccesOrEditTrainee(props.row) && goToLearnerProfile(props.row)"
+                    :class="['ellipsis', canAccesOrEditTrainee(props.row) && 'clickable-name cursor-pointer']">
                     {{ col.value }}
                   </q-item-label>
                   <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
@@ -56,7 +56,8 @@
     </q-card>
 
     <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns"
-      :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
+      v-model:pagination="attendanceSheetPagination" :visible-columns="attendanceSheetVisibleColumns"
+      :loading="attendanceSheetTableLoading">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -104,6 +105,7 @@ import { defineAbilitiesFor } from '@helpers/ability';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
+import { useLearnersEdition } from '@composables/learnersEdition';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
@@ -125,6 +127,8 @@ export default {
     const $store = useStore();
 
     const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
+    const attendancePagination = ref({ rowsPerPage: 0 });
+    const attendanceSheetPagination = ref({ page: 1, rowsPerPage: 15 });
     const modalLoading = ref(false);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
@@ -134,6 +138,8 @@ export default {
 
       return ability.can('update', 'course_trainee_follow_up');
     });
+
+    const { canAccesOrEditTrainee } = useLearnersEdition();
 
     const {
       // Data
@@ -210,6 +216,8 @@ export default {
       attendanceSheetAdditionModal,
       newAttendanceSheet,
       attendanceSheetColumns,
+      attendanceSheetPagination,
+      attendancePagination,
       // Computed
       canAccessLearnerProfile,
       attendanceColumns,
@@ -238,6 +246,7 @@ export default {
       updateSlotCheckbox,
       getDelimiterClass,
       goToLearnerProfile,
+      canAccesOrEditTrainee,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,

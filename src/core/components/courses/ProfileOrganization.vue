@@ -30,8 +30,9 @@
           :disable="contactModalLoading || isArchived" @click="openContactAdditionModal" />
       </div>
     </div>
-    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" :is-admin="isAdmin"
-      @update="updateCourse('estimatedStartDate')" v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
+    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
+      :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
+      v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
     <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
@@ -77,9 +78,12 @@
       </div>
       <div v-if="isIntraOrVendor">
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
-          :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
+          :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
+    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
+      :training-contracts="trainingContracts" :training-contract-table-loading="trainingContractTableLoading"
+      @refresh="refreshTrainingContracts" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -122,6 +126,7 @@ import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
 import Courses from '@api/Courses';
+import TrainingContracts from '@api/TrainingContracts';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import SlotContainer from '@components/courses/SlotContainer';
@@ -131,6 +136,7 @@ import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
 import CourseSmsHistoryModal from '@components/courses/CourseSmsHistoryModal';
 import InterlocutorCell from '@components/courses/InterlocutorCell';
+import TrainingContractContainer from '@components/courses/TrainingContractContainer';
 import InterlocutorModal from '@components/courses/InterlocutorModal';
 import CourseContactAdditionModal from '@components/courses/CourseContactAdditionModal';
 import Banner from '@components/Banner';
@@ -180,6 +186,7 @@ export default {
     'interlocutor-cell': InterlocutorCell,
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
+    'training-contract-container': TrainingContractContainer,
   },
   setup (props) {
     const { profileId } = toRefs(props);
@@ -222,6 +229,8 @@ export default {
     const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
+    const trainingContracts = ref([]);
+    const trainingContractTableLoading = ref(false);
 
     const course = computed(() => $store.state.course.course);
 
@@ -252,13 +261,13 @@ export default {
 
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
-    const isAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+    const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
     const isCourseInter = computed(() => course.value.type === INTER_B2B);
 
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
-    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isAdmin.value));
+    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isRofOrVendorAdmin.value));
 
     const isFinished = computed(() => {
       const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
@@ -386,6 +395,7 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
+        await refreshTrainingContracts();
         if (displayHistory.value) {
           await getCourseHistories();
           courseHistoryFeed.value.resumeScroll();
@@ -699,13 +709,34 @@ export default {
       }
     };
 
+    const refreshTrainingContracts = async () => {
+      try {
+        if (!isRofOrVendorAdmin.value && isVendorInterface) return;
+
+        trainingContractTableLoading.value = true;
+        const trainingContractList = await TrainingContracts.list({ course: course.value._id });
+
+        if (course.value.type === INTER_B2B && !isVendorInterface) {
+          trainingContracts.value = trainingContractList.filter(tc => tc.company === loggedUser.value.company._id);
+        } else {
+          trainingContracts.value = trainingContractList;
+        }
+      } catch (e) {
+        console.error(e);
+        trainingContracts.value = [];
+        NotifyNegative('Erreur lors de la récupération des conventions de formation.');
+      } finally {
+        trainingContractTableLoading.value = false;
+      }
+    };
+
     const created = async () => {
       const promises = [refreshCourse()];
       if (isVendorInterface || isIntraCourse.value) {
         promises.push(refreshSms(), refreshCompanyRepresentatives());
       }
 
-      if (isAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
+      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
@@ -745,10 +776,13 @@ export default {
       tmpContactId,
       courseHistoryFeed,
       tmpCourse,
+      isIntraCourse,
+      trainingContractTableLoading,
+      trainingContracts,
       // Computed
       course,
       v$,
-      isAdmin,
+      isRofOrVendorAdmin,
       canEditSlots,
       canEditTrainees,
       filteredMessageTypeOptions,
@@ -791,6 +825,7 @@ export default {
       copy,
       updateCourse,
       downloadAttendanceSheet,
+      refreshTrainingContracts,
     };
   },
 };

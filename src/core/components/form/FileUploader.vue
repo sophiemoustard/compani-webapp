@@ -5,13 +5,13 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <div v-if="document && imageSource" class="row justify-between files-container">
-      <div v-if="!driveStorage" class="doc-thumbnail">
+      <div v-if="!imageHidden" class="doc-thumbnail">
         <ni-custom-img :image-source="imageSource" :alt="caption" />
       </div>
       <div v-else class="document-caption">{{ caption }}</div>
       <div class="self-end">
         <ni-button icon="save_alt" :disable="loading || !getDocument(document)" @click="downloadDoc(document)" />
-        <ni-button icon="delete" :disable="disable" @click="deleteDocument" />
+        <ni-button v-if="canDelete" icon="delete" :disable="disable" @click="deleteDocument" />
       </div>
     </div>
     <q-field borderless v-else :error="error" :error-message="errorMessage">
@@ -53,6 +53,9 @@ export default {
     driveStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
     docName: { type: String, default: 'download' },
+    customFields: { type: Array, default: () => ([]) },
+    hideImage: { type: Boolean, default: false },
+    canDelete: { type: Boolean, default: true },
   },
   components: {
     'ni-button': Button,
@@ -66,15 +69,22 @@ export default {
   },
   computed: {
     additionalFields () {
-      const fields = [{ name: 'fileName', value: removeDiacritics(this.additionalValue) }];
+      const fields = [];
+      if (this.customFields.length) fields.push(this.customFields);
+
+      if (this.additionalValue) fields.push({ name: 'fileName', value: removeDiacritics(this.additionalValue) });
       if (this.driveStorage) fields.push({ name: 'type', value: this.name });
-      return fields;
+
+      return fields.flat();
     },
     document () {
       return get(this.entity, this.path);
     },
     imageSource () {
       return this.driveStorage ? this.document.driveId : this.document.link;
+    },
+    imageHidden () {
+      return this.hideImage || this.driveStorage;
     },
   },
   methods: {

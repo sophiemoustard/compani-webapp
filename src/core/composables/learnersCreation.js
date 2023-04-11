@@ -28,7 +28,7 @@ import {
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
-export const useLearners = (
+export const useLearnersCreation = (
   refresh,
   isClientInterface,
   isDirectory,

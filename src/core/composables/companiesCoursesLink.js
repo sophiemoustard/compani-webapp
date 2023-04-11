@@ -68,7 +68,8 @@ export const useCompaniesCoursesLink = (course, emit) => {
   const validateCompanyDeletion = (companyId) => {
     $q.dialog({
       title: 'Confirmation',
-      message: 'Êtes-vous sûr(e) de vouloir détacher la structure de la formation&nbsp;?',
+      message: 'Êtes-vous sûr(e) de vouloir détacher la structure de la formation&nbsp;? <br /><br /> Les éventuelles '
+        + 'conventions de formation associées seront supprimées.',
       html: true,
       ok: true,
       cancel: 'Annuler',

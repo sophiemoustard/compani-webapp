@@ -34,7 +34,7 @@ import { formatAndSortOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
-import { useLearners } from '@composables/learners';
+import { useLearnersCreation } from '@composables/learnersCreation';
 
 export default {
   name: 'LearnersDirectory',
@@ -64,7 +64,7 @@ export default {
       getLearnerList,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
-    } = useLearners(refresh, false, true);
+    } = useLearnersCreation(refresh, false, true);
 
     onMounted(async () => { await refresh(); });
 

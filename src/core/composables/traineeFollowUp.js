@@ -1,6 +1,5 @@
 import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
-import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
@@ -15,14 +14,9 @@ export const useTraineeFollowUp = (profileId) => {
 
   const { isClientInterface } = useCourses();
 
-  const formatRow = (trainee) => {
-    const formattedName = formatIdentity(trainee.identity, 'FL');
-
-    return {
-      ...omit(trainee, 'company'),
-      identity: { ...trainee.identity, fullName: formattedName },
-    };
-  };
+  const formatRow = trainee => (
+    { ...trainee, identity: { ...trainee.identity, fullName: formatIdentity(trainee.identity, 'FL') } }
+  );
 
   const getLearnersList = async () => {
     try {

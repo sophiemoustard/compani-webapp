@@ -42,12 +42,12 @@
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
           :loading="loading" table-class="q-pb-md" />
       </q-card>
-      <q-card-actions align="right" v-if="canEdit">
+      <div align="right" v-if="canEdit" class="q-pa-sm">
         <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
           @click="openCompanyAdditionModal" />
         <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
           @click="openTraineeCreationModal" />
-      </q-card-actions>
+      </div>
     </div>
 
     <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee-registration="newTraineeRegistration"
@@ -86,7 +86,7 @@ import TraineeTable from '@components/courses/TraineeTable';
 import ExpandingTable from '@components/table/ExpandingTable';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { useLearners } from '@composables/learners';
+import { useLearnersCreation } from '@composables/learnersCreation';
 import { useCourses } from '@composables/courses';
 import { useCompaniesCoursesLink } from '@composables/companiesCoursesLink';
 
@@ -163,7 +163,7 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
-    const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.company));
+    const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
     const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
 
@@ -202,7 +202,7 @@ export default {
       resetLearnerCreationModal,
       tableLoading,
       disableUserInfoEdition,
-    } = useLearners(refresh, isClientInterface, false, courseCompanyIds, !isIntraCourse.value);
+    } = useLearnersCreation(refresh, isClientInterface, false, courseCompanyIds, !isIntraCourse.value);
 
     const {
       selectedCompany,

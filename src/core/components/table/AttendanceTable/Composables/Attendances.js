@@ -1,5 +1,4 @@
 import { ref, computed } from 'vue';
-import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
 import get from 'lodash/get';
@@ -8,16 +7,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Attendances from '@api/Attendances';
 import Users from '@api/Users';
-import {
-  HH_MM,
-  DAY_OF_WEEK_SHORT,
-  DAY_OF_MONTH,
-  MONTH_SHORT,
-  COACH_ROLES,
-  VENDOR_ADMIN,
-  TRAINING_ORGANISATION_MANAGER,
-  COURSE,
-} from '@data/constants';
+import { HH_MM, DAY_OF_WEEK_SHORT, DAY_OF_MONTH, MONTH_SHORT, COURSE } from '@data/constants';
 import { upperCaseFirstLetter, formatIdentity, sortStrings, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -26,7 +16,6 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 export const useAttendances = (course, isClientInterface, canUpdate, loggedUser, modalLoading) => {
   const $q = useQuasar();
   const $router = useRouter();
-  const $store = useStore();
 
   const attendances = ref([]);
   const traineeAdditionModal = ref(false);
@@ -98,13 +87,6 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
   });
 
   const disableCheckbox = computed(() => loading.value || !canUpdate.value || !!course.value.archivedAt);
-
-  const clientRole = computed(() => $store.getters['main/getClientRole']);
-
-  const vendorRole = computed(() => $store.getters['main/getVendorRole']);
-
-  const canAccessLearnerProfile = computed(() => COACH_ROLES.includes(clientRole.value) ||
-    [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
   const traineesCount = slotId => attendances.value.filter(a => a.courseSlot === slotId).length;
 
@@ -231,8 +213,6 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
   };
 
   const goToLearnerProfile = (row) => {
-    if (!canAccessLearnerProfile.value) return;
-
     const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
     $router.push({ name, params: { learnerId: row._id } });
   };
@@ -251,7 +231,6 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
     courseHasSlot,
     traineeFilterOptions,
     disableCheckbox,
-    canAccessLearnerProfile,
     // Methods
     traineesCount,
     getPotentialTrainees,
