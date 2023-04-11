@@ -19,6 +19,7 @@
 
 <script>
 import { ref, toRefs } from 'vue';
+import get from 'lodash/get';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 
@@ -44,7 +45,7 @@ export default {
         label: 'Structure',
         align: 'left',
         field: 'company',
-        format: value => companyOptions.value.find(option => value === option.value).label || '',
+        format: value => get(companyOptions.value.find(option => value === option.value), 'label') || '',
       },
       { name: 'actions', label: '', align: 'right', field: '' },
     ]);

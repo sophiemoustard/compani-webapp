@@ -104,7 +104,8 @@ export default {
     const validateCourseDeletion = () => {
       $q.dialog({
         title: 'Confirmation',
-        message: 'Confirmez-vous la suppression&nbsp;?',
+        message: 'Confirmez-vous la suppression&nbsp;? <br /><br /> Les éventuelles conventions de formation associées '
+          + 'seront supprimées.',
         html: true,
         ok: 'OK',
         cancel: 'Annuler',

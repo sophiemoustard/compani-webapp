@@ -81,7 +81,9 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin" />
+    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
+      :training-contracts="trainingContracts" :training-contract-table-loading="trainingContractTableLoading"
+      @refresh="refreshTrainingContracts" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -124,6 +126,7 @@ import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
 import Courses from '@api/Courses';
+import TrainingContracts from '@api/TrainingContracts';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import SlotContainer from '@components/courses/SlotContainer';
@@ -226,6 +229,8 @@ export default {
     const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
+    const trainingContracts = ref([]);
+    const trainingContractTableLoading = ref(false);
 
     const course = computed(() => $store.state.course.course);
 
@@ -390,6 +395,7 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
+        await refreshTrainingContracts();
         if (displayHistory.value) {
           await getCourseHistories();
           courseHistoryFeed.value.resumeScroll();
@@ -703,6 +709,25 @@ export default {
       }
     };
 
+    const refreshTrainingContracts = async () => {
+      try {
+        trainingContractTableLoading.value = true;
+        const trainingContractList = await TrainingContracts.list({ course: course.value._id });
+
+        if (course.value.type === INTER_B2B && !isVendorInterface) {
+          trainingContracts.value = trainingContractList.filter(tc => tc.company === loggedUser.value.company._id);
+        } else {
+          trainingContracts.value = trainingContractList;
+        }
+      } catch (e) {
+        console.error(e);
+        trainingContracts.value = [];
+        NotifyNegative('Erreur lors de la récupération des conventions de formation.');
+      } finally {
+        trainingContractTableLoading.value = false;
+      }
+    };
+
     const created = async () => {
       const promises = [refreshCourse()];
       if (isVendorInterface || isIntraCourse.value) {
@@ -750,6 +775,8 @@ export default {
       courseHistoryFeed,
       tmpCourse,
       isIntraCourse,
+      trainingContractTableLoading,
+      trainingContracts,
       // Computed
       course,
       v$,
@@ -796,6 +823,7 @@ export default {
       copy,
       updateCourse,
       downloadAttendanceSheet,
+      refreshTrainingContracts,
     };
   },
 };
