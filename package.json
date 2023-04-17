@@ -39,7 +39,6 @@
     "quasar": "~2.4.9",
     "vue": "~3.2.37",
     "vue-advanced-cropper": "~2.8.1",
-    "vue-analytics": "~5.22.1",
     "vue-chart-3": "~3.1.8",
     "vue-router": "~4.1.6",
     "vuedraggable": "~4.1.0",
