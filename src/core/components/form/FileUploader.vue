@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <div v-if="document" class="row justify-between files-container">
+    <div v-if="document && document.link !== null" class="row justify-between files-container">
       <div v-if="!imageHidden && imageSource" class="doc-thumbnail">
         <ni-custom-img :image-source="imageSource" :alt="caption" />
       </div>
