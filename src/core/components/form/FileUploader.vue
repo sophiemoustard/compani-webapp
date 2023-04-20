@@ -4,8 +4,8 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <div v-if="document && document.link !== null" class="row justify-between files-container">
-      <div v-if="!imageHidden && imageSource" class="doc-thumbnail">
+    <div v-if="displayedDownloader" class="row justify-between files-container">
+      <div v-if="!hiddenImage && imageSource" class="doc-thumbnail">
         <ni-custom-img :image-source="imageSource" :alt="caption" />
       </div>
       <div v-else class="document-caption">{{ caption }}</div>
@@ -84,8 +84,11 @@ export default {
     imageSource () {
       return this.driveStorage ? this.document.driveId : this.document.link;
     },
-    imageHidden () {
+    hiddenImage () {
       return this.hideImage || this.driveStorage;
+    },
+    displayedDownloader () {
+      return this.document && this.document.link !== null;
     },
   },
   methods: {
