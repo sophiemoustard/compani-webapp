@@ -27,7 +27,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="coursesFiltered" />
+    <ni-trello :courses="coursesWithGroupedSlot" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="openCourseCreationModal" />
 

@@ -1,11 +1,12 @@
 <template>
   <div :class="`course-container ${backgroundClass}`">
-    <div class="text-weight-bold q-mb-sm">{{ title }} ({{ courses.length }})</div>
-    <course-cell class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course" />
+    <div class="text-weight-bold q-mb-sm">{{ title }} ({{ courseCounter }})</div>
+    <course-cell class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course" ref="cellRefs" />
   </div>
 </template>
 
 <script>
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { CLIENT, VENDOR } from '@data/constants';
 import CourseCell from '@components/courses/CourseCell';
@@ -23,9 +24,19 @@ export default {
     const $router = useRouter();
     const interfaceType = /\/ad\//.test($router.currentRoute.value.path) ? VENDOR : CLIENT;
 
+    const cellRefs = ref([]);
+
+    const courseCounter = computed(() => cellRefs.value
+      .flat()
+      .map(t => t.isDisplayed)
+      .reduce((acc, value) => (value ? acc + 1 : acc), 0));
+
     return {
       // Data
       backgroundClass: interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
+      cellRefs,
+      // Computed
+      courseCounter,
     };
   },
 };
