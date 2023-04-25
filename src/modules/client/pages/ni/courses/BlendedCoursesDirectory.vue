@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
+      display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
@@ -57,7 +57,6 @@ export default {
     useMeta(metaInfo);
 
     const coursesWithGroupedSlot = ref([]);
-    const displayArchived = ref(false);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -72,6 +71,7 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
+      displayArchived,
       coursesFiltered,
       updateSelectedTrainer,
       updateSelectedProgram,
@@ -80,9 +80,10 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
       groupByCourses,
-    } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
+    } = useCourseFilters(coursesWithGroupedSlot);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -140,6 +141,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
     };
   },

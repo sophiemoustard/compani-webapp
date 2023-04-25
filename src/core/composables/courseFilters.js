@@ -7,7 +7,7 @@ import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { DD_MM_YYYY, ON_SITE, WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
 
-export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
+export const useCourseFilters = (coursesWithGroupedSlot) => {
   const $store = useStore();
 
   /* TRAINER */
@@ -166,8 +166,13 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
   const filterCoursesByMissingTrainees = courses => courses
     .filter(course => course.type === INTRA && course.maxTrainees !== course.trainees.length);
 
-  /* MAIN */
+  /* ARCHIVED COURSES */
+  const displayArchived = computed(() => $store.state.course.displayArchived);
   const filterArchivedCourses = courses => courses.filter(course => !course.archivedAt);
+
+  const updateDisplayArchived = (isSelected) => {
+    $store.dispatch('course/setDisplayArchived', { isSelected });
+  };
 
   const coursesFiltered = computed(() => {
     let courses = coursesWithGroupedSlot.value;
@@ -224,6 +229,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     selectedType,
     selectedNoAddressInSlots,
     selectedMissingTrainees,
+    displayArchived,
     coursesFiltered,
 
     // Methods
@@ -236,6 +242,7 @@ export const useCourseFilters = (coursesWithGroupedSlot, displayArchived) => {
     updateSelectedType,
     updateSelectedNoAddressInSlots,
     updateSelectedMissingTrainees,
+    updateDisplayArchived,
     resetFilters,
     groupByCourses,
   };

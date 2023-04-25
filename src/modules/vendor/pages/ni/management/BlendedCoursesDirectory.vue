@@ -1,7 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
+      display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
@@ -165,7 +165,6 @@ export default {
 
     /* FILTERS */
     const coursesWithGroupedSlot = ref([]);
-    const displayArchived = ref(false);
 
     const {
       typeFilterOptions,
@@ -182,6 +181,7 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
+      displayArchived,
       coursesFiltered,
       updateSelectedCompany,
       updateSelectedTrainer,
@@ -192,9 +192,10 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
       groupByCourses,
-    } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
+    } = useCourseFilters(coursesWithGroupedSlot);
 
     const refreshCourses = async () => {
       try {
@@ -282,6 +283,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
     };
   },
