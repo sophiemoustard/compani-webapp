@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { useRouter } from 'vue-router';
 import { CLIENT, VENDOR } from '@data/constants';
 import CourseCell from '@components/courses/CourseCell';
 
@@ -18,10 +19,12 @@ export default {
   components: {
     'course-cell': CourseCell,
   },
-  data () {
-    const interfaceType = /\/ad\//.test(this.$route.path) ? VENDOR : CLIENT;
+  setup () {
+    const $router = useRouter();
+    const interfaceType = /\/ad\//.test($router.currentRoute.value.path) ? VENDOR : CLIENT;
 
     return {
+      // Data
       backgroundClass: interfaceType === CLIENT ? 'bg-copper-grey-200' : 'bg-peach-200',
     };
   },
