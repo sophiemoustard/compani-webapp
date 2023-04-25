@@ -72,7 +72,6 @@ export default {
       selectedNoAddressInSlots,
       selectedMissingTrainees,
       displayArchived,
-      coursesFiltered,
       updateSelectedTrainer,
       updateSelectedProgram,
       updateSelectedStartDate,
@@ -132,7 +131,6 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
       // Methods
       updateSelectedTrainer,
       updateSelectedProgram,

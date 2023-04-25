@@ -182,7 +182,6 @@ export default {
       selectedNoAddressInSlots,
       selectedMissingTrainees,
       displayArchived,
-      coursesFiltered,
       updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,
@@ -269,7 +268,6 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
       // Methods
       openCourseCreationModal,
       resetCreationModal,

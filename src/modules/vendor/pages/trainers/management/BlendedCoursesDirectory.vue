@@ -75,7 +75,6 @@ export default {
       selectedNoAddressInSlots,
       selectedMissingTrainees,
       displayArchived,
-      coursesFiltered,
       updateSelectedCompany,
       updateSelectedProgram,
       updateSelectedSalesRepresentative,
@@ -134,7 +133,6 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
       // Methods
       updateSelectedCompany,
       updateSelectedProgram,

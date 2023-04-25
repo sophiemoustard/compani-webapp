@@ -106,7 +106,8 @@ export default {
       const companiesIds = course.value.companies.map(company => company._id);
       if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
 
-      if (selectedSalesRepresentative.value && course.value.salesRepresentative._id !== selectedTrainer.value) {
+      if (selectedSalesRepresentative.value &&
+        course.value.salesRepresentative._id !== selectedSalesRepresentative.value) {
         return false;
       }
 

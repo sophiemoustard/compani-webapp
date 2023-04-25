@@ -2,10 +2,9 @@ import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
 import groupBy from 'lodash/groupBy';
-import get from 'lodash/get';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { DD_MM_YYYY, ON_SITE, WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
+import { DD_MM_YYYY, WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
 
 export const useCourseFilters = (coursesWithGroupedSlot) => {
   const $store = useStore();
@@ -26,10 +25,6 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
 
   const updateSelectedTrainer = trainerId => $store.dispatch('course/setSelectedTrainer', { trainerId });
 
-  const filterCoursesByTrainer = courses => courses.filter(course => (course.trainer
-    ? selectedTrainer.value === course.trainer._id
-    : selectedTrainer.value === WITHOUT_TRAINER));
-
   /* PROGRAM */
   const selectedProgram = computed(() => $store.state.course.selectedProgram);
 
@@ -43,9 +38,6 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
 
   const updateSelectedProgram = programId => $store.dispatch('course/setSelectedProgram', { programId });
 
-  const filterCoursesByProgram = courses => courses
-    .filter(course => course.subProgram.program._id === selectedProgram.value);
-
   /* COMPANY */
   const selectedCompany = computed(() => $store.state.course.selectedCompany);
 
@@ -58,9 +50,6 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
   });
 
   const updateSelectedCompany = companyId => $store.dispatch('course/setSelectedCompany', { companyId });
-
-  const filterCoursesByCompany = courses => courses
-    .filter(course => (course.companies.map(company => company._id)).includes(selectedCompany.value));
 
   /* SALES REPRESENTATIVE */
   const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
@@ -80,10 +69,6 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
     $store.dispatch('course/setSelectedSalesRepresentative', { salesRepresentativeId });
   };
 
-  const filterCoursesBySalesRepresentative = courses => courses.filter(course => (course.salesRepresentative
-    ? selectedSalesRepresentative.value === course.salesRepresentative._id
-    : selectedSalesRepresentative.value === WITHOUT_SALES_REPRESENTATIVE));
-
   /* DATES */
   const selectedStartDate = computed(() => $store.state.course.selectedStartDate);
   const selectedEndDate = computed(() => $store.state.course.selectedEndDate);
@@ -96,37 +81,6 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
     $store.dispatch('course/setSelectedEndDate', { endDate: CompaniDate(endDate).endOf('day').toISO() });
   };
 
-  const filterCoursesByStartDate = courses => courses
-    .filter((course) => {
-      const estimatedDateIsAfter = !course.slots.length && course.estimatedStartDate &&
-          CompaniDate(course.estimatedStartDate).isSameOrAfter(selectedStartDate.value);
-      const someSlotsAreAfter = course.slots
-        .some(slotGroup => slotGroup.some(s => CompaniDate(s.startDate).isSameOrAfter(selectedStartDate.value)));
-
-      return estimatedDateIsAfter || someSlotsAreAfter;
-    });
-
-  const filterCoursesByEndDate = courses => courses
-    .filter((course) => {
-      const estimatedDateIsBefore = !course.slots.length && course.estimatedStartDate &&
-          CompaniDate(course.estimatedStartDate).isSameOrBefore(selectedEndDate.value);
-      const someSlotsAreBefore = course.slots
-        .some(slotGroup => slotGroup.some(s => CompaniDate(s.endDate).isSameOrBefore(selectedEndDate.value)));
-
-      return estimatedDateIsBefore || someSlotsAreBefore;
-    });
-
-  const filterCoursesByStartDateAndEndDate = courses => courses
-    .filter((course) => {
-      const hasEstimationInRange = !course.slots.length && course.estimatedStartDate &&
-          CompaniDate(course.estimatedStartDate).isSameOrBetween(selectedStartDate.value, selectedEndDate.value);
-      const hasSlotsInRange = course.slots
-        .some(slotGroup => slotGroup
-          .some(s => CompaniDate(s.endDate).isSameOrBetween(selectedStartDate.value, selectedEndDate.value)));
-
-      return hasEstimationInRange || hasSlotsInRange;
-    });
-
   /* TYPE */
   const selectedType = computed(() => $store.state.course.selectedType);
 
@@ -138,23 +92,12 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
 
   const updateSelectedType = type => $store.dispatch('course/setSelectedType', { type });
 
-  const filterCoursesByType = courses => courses.filter(course => selectedType.value === course.type);
-
   /* NO ADDRESS IN SLOTS */
   const selectedNoAddressInSlots = computed(() => $store.state.course.selectedNoAddressInSlots);
 
   const updateSelectedNoAddressInSlots = (isSelected) => {
     $store.dispatch('course/setSelectedNoAddressInSlots', { isSelected });
   };
-
-  const filterCoursesByNoAddressInSlots = courses => courses
-    .filter((course) => {
-      const onSiteSlots = course.slots
-        .filter(slotGroup => slotGroup.some(slot => get(slot, 'step.type') === ON_SITE));
-      const hasNoAddressInOnSiteSlots = onSiteSlots.every(slotGroup => slotGroup.every(slot => !slot.address));
-
-      return !!onSiteSlots.length && hasNoAddressInOnSiteSlots;
-    });
 
   /* MISSING TRAINEES */
   const selectedMissingTrainees = computed(() => $store.state.course.selectedMissingTrainees);
@@ -163,43 +106,12 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
     $store.dispatch('course/setSelectedMissingTrainees', { isSelected });
   };
 
-  const filterCoursesByMissingTrainees = courses => courses
-    .filter(course => course.type === INTRA && course.maxTrainees !== course.trainees.length);
-
   /* ARCHIVED COURSES */
   const displayArchived = computed(() => $store.state.course.displayArchived);
-  const filterArchivedCourses = courses => courses.filter(course => !course.archivedAt);
 
   const updateDisplayArchived = (isSelected) => {
     $store.dispatch('course/setDisplayArchived', { isSelected });
   };
-
-  const coursesFiltered = computed(() => {
-    let courses = coursesWithGroupedSlot.value;
-    if (selectedProgram.value) courses = filterCoursesByProgram(courses);
-
-    if (selectedTrainer.value) courses = filterCoursesByTrainer(courses);
-
-    if (selectedCompany.value) courses = filterCoursesByCompany(courses);
-
-    if (selectedSalesRepresentative.value) courses = filterCoursesBySalesRepresentative(courses);
-
-    if (!displayArchived.value) courses = filterArchivedCourses(courses);
-
-    if (selectedStartDate.value && !selectedEndDate.value) courses = filterCoursesByStartDate(courses);
-
-    if (selectedEndDate.value && !selectedStartDate.value) courses = filterCoursesByEndDate(courses);
-
-    if (selectedEndDate.value && selectedStartDate.value) courses = filterCoursesByStartDateAndEndDate(courses);
-
-    if (selectedType.value) courses = filterCoursesByType(courses);
-
-    if (selectedNoAddressInSlots.value) courses = filterCoursesByNoAddressInSlots(courses);
-
-    if (selectedMissingTrainees.value) courses = filterCoursesByMissingTrainees(courses);
-
-    return courses;
-  });
 
   const resetFilters = () => $store.dispatch('course/resetFilters');
 
@@ -230,7 +142,6 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
     selectedNoAddressInSlots,
     selectedMissingTrainees,
     displayArchived,
-    coursesFiltered,
 
     // Methods
     updateSelectedTrainer,

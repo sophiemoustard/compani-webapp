@@ -1,7 +1,7 @@
 <template>
   <div :class="`course-container ${backgroundClass}`">
     <div class="text-weight-bold q-mb-sm">{{ title }} ({{ courseCounter }})</div>
-    <course-cell class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course" ref="cellRefs" />
+    <course-cell class="q-mb-sm" v-for="(course) in courses" :key="course._id" :course="course" ref="cellRefs" />
   </div>
 </template>
 
