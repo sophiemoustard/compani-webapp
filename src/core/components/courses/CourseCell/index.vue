@@ -14,8 +14,8 @@
         </div>
         <forthcoming-section v-if="course.status === FORTHCOMING" :course="course" />
       </q-card-section>
-      <in-progress-section v-if="course.status === IN_PROGRESS" :course="course" />
     </router-link>
+    <in-progress-section v-if="course.status === IN_PROGRESS" :course="course" />
   </q-card>
 </template>
 
@@ -141,10 +141,4 @@ export default {
 .infos-course-nearest-date
   color: $copper-grey-900 !important
   font-size: 14px
-:deep(.additional-infos)
-  color: $primary
-  font-size: 12px
-  align-items: flex-end
-:deep(.to-plan)
-  color: $secondary
 </style>
