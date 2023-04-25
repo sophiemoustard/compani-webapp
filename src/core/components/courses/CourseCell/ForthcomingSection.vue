@@ -1,5 +1,5 @@
 <template>
-  <div v-if="course.status === FORTHCOMING" class="additional-infos-container">
+  <div class="additional-infos-container">
     <q-item class="infos-course-container">
       <q-item-section :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
         <q-icon size="12px" name="mdi-calendar-range" />
@@ -18,7 +18,7 @@
 <script>
 import get from 'lodash/get';
 import { computed, toRefs } from 'vue';
-import { FORTHCOMING, SHORT_DURATION_H_MM } from '@data/constants';
+import { SHORT_DURATION_H_MM } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { getISOTotalDuration } from '@helpers/dates/utils';
@@ -53,8 +53,6 @@ export default {
     });
 
     return {
-      // Data
-      FORTHCOMING,
       // Computed
       traineesCount,
       formatCourseSlotsInfos,

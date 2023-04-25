@@ -1,5 +1,5 @@
 <template>
-  <q-card flat>
+  <q-card flat class="course-card">
     <router-link :to="goToBlendedCourseProfile">
       <q-card-section>
         <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
@@ -12,16 +12,16 @@
             <q-item-section>{{ info.label }}</q-item-section>
           </q-item>
         </div>
-        <forthcoming-section :course="course" />
+        <forthcoming-section v-if="course.status === FORTHCOMING" :course="course" />
       </q-card-section>
+      <in-progress-section v-if="course.status === IN_PROGRESS" :course="course" />
     </router-link>
-    <in-progress-section :course="course" />
   </q-card>
 </template>
 
 <script>
 import { computed, toRefs } from 'vue';
-import { FORTHCOMING, COMPLETED, TRAINER } from '@data/constants';
+import { FORTHCOMING, COMPLETED, IN_PROGRESS, TRAINER } from '@data/constants';
 import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -112,6 +112,9 @@ export default {
     });
 
     return {
+      // Data
+      FORTHCOMING,
+      IN_PROGRESS,
       // Computed
       courseName,
       formatNearestDate,
@@ -125,12 +128,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-:deep(.q-card__section)
-  height: fit-content
-  :deep(&:hover)
-    cursor: pointer
-:deep(.q-card__section--vert)
-  padding: 10px
 .title-text
   font-size: 14px
   color: $copper-grey-700
@@ -141,13 +138,6 @@ export default {
   color: $copper-grey-600
 .item-section-container
   display: flex
-:deep(.q-item__section--side)
-  padding: 0px
-  margin-right: 5px
-:deep(.q-item)
-  padding: 0px
-  min-height: auto
-  margin-right: 10px
 .infos-course-nearest-date
   color: $copper-grey-900 !important
   font-size: 14px

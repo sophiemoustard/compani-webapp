@@ -1,5 +1,5 @@
 <template>
-  <q-card-section v-if="course.status === IN_PROGRESS" class="slots-timeline-container">
+  <div class="slots-timeline-container">
     <div :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
       {{ slotsHappened }} / {{ course.slots.length + course.slotsToPlan.length }}
       {{ course.slotsToPlan.length ? ` - ${course.slotsToPlan.length} à planifier` : '' }}
@@ -14,7 +14,7 @@
         </div>
       </q-item-section>
     </q-item>
-  </q-card-section>
+  </div>
 </template>
 
 <script>
