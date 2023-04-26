@@ -1,5 +1,5 @@
 <template>
-  <q-card flat class="course-card">
+  <q-card v-show="isDisplayed" flat class="course-card">
     <router-link :to="goToBlendedCourseProfile">
       <q-card-section>
         <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
@@ -21,7 +21,9 @@
 
 <script>
 import { computed, toRefs } from 'vue';
-import { FORTHCOMING, COMPLETED, IN_PROGRESS, TRAINER } from '@data/constants';
+import get from 'lodash/get';
+import { useStore } from 'vuex';
+import { FORTHCOMING, COMPLETED, IN_PROGRESS, TRAINER, ON_SITE, INTRA } from '@data/constants';
 import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -41,9 +43,90 @@ export default {
   },
   emits: ['click'],
   setup (props) {
+    const $store = useStore();
     const { course } = toRefs(props);
 
     const { headerInfo, isVendorInterface, vendorRole } = useCourses(course);
+
+    const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
+    const selectedProgram = computed(() => $store.state.course.selectedProgram);
+    const selectedCompany = computed(() => $store.state.course.selectedCompany);
+    const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
+    const selectedStartDate = computed(() => $store.state.course.selectedStartDate);
+    const selectedEndDate = computed(() => $store.state.course.selectedEndDate);
+    const selectedType = computed(() => $store.state.course.selectedType);
+    const selectedNoAddressInSlots = computed(() => $store.state.course.selectedNoAddressInSlots);
+    const selectedMissingTrainees = computed(() => $store.state.course.selectedMissingTrainees);
+    const displayArchived = computed(() => $store.state.course.displayArchived);
+
+    const isCourseAfterStartDate = computed(() => {
+      const estimatedDateIsAfter = !course.value.slots.length && course.value.estimatedStartDate &&
+          CompaniDate(course.value.estimatedStartDate).isSameOrAfter(selectedStartDate.value);
+      const someSlotsAreAfter = course.value.slots
+        .some(slotGroup => slotGroup.some(s => CompaniDate(s.startDate).isSameOrAfter(selectedStartDate.value)));
+
+      return estimatedDateIsAfter || someSlotsAreAfter;
+    });
+
+    const isCourseBeforeEndDate = computed(() => {
+      const estimatedDateIsBefore = !course.value.slots.length && course.value.estimatedStartDate &&
+          CompaniDate(course.value.estimatedStartDate).isSameOrBefore(selectedEndDate.value);
+      const someSlotsAreBefore = course.value.slots
+        .some(slotGroup => slotGroup.some(s => CompaniDate(s.endDate).isSameOrBefore(selectedEndDate.value)));
+
+      return estimatedDateIsBefore || someSlotsAreBefore;
+    });
+
+    const isCourseBetweenStartDateAndEndDate = computed(() => {
+      const hasEstimationInRange = !course.value.slots.length && course.value.estimatedStartDate &&
+          CompaniDate(course.value.estimatedStartDate).isSameOrBetween(selectedStartDate.value, selectedEndDate.value);
+      const hasSlotsInRange = course.value.slots
+        .some(slotGroup => slotGroup
+          .some(s => CompaniDate(s.endDate).isSameOrBetween(selectedStartDate.value, selectedEndDate.value)));
+
+      return hasEstimationInRange || hasSlotsInRange;
+    });
+
+    const hasCourseNoAddressInOnSiteSlots = computed(() => {
+      const onSiteSlots = course.value.slots
+        .filter(slotGroup => slotGroup.some(slot => get(slot, 'step.type') === ON_SITE));
+      const hasNoAddressInOnSiteSlots = onSiteSlots.every(slotGroup => slotGroup.every(slot => !slot.address));
+
+      return !!onSiteSlots.length && hasNoAddressInOnSiteSlots;
+    });
+
+    const doesCourseMissTrainees = computed(() => course.value.type === INTRA &&
+      course.value.maxTrainees !== course.value.trainees.length);
+
+    const isDisplayed = computed(() => {
+      if (selectedProgram.value && course.value.subProgram.program._id !== selectedProgram.value) return false;
+
+      if (selectedTrainer.value && get(course.value, 'trainer._id') !== selectedTrainer.value) return false;
+
+      const companiesIds = course.value.companies.map(company => company._id);
+      if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
+
+      if (selectedSalesRepresentative.value &&
+        course.value.salesRepresentative._id !== selectedSalesRepresentative.value) {
+        return false;
+      }
+
+      if (!displayArchived.value && course.value.archivedAt) return false;
+
+      if (selectedStartDate.value && !selectedEndDate.value && !isCourseAfterStartDate.value) return false;
+
+      if (selectedEndDate.value && !selectedStartDate.value && !isCourseBeforeEndDate.value) return false;
+
+      if (selectedEndDate.value && selectedStartDate.value && !isCourseBetweenStartDateAndEndDate.value) return false;
+
+      if (selectedType.value && course.value.type !== selectedType.value) return false;
+
+      if (selectedNoAddressInSlots.value && !hasCourseNoAddressInOnSiteSlots.value) return false;
+
+      if (selectedMissingTrainees.value && !doesCourseMissTrainees.value) return false;
+
+      return true;
+    });
 
     const courseName = computed(() => composeCourseName(course.value, isVendorInterface));
 
@@ -120,6 +203,7 @@ export default {
       formatNearestDate,
       headerInfo,
       goToBlendedCourseProfile,
+      isDisplayed,
       // Methods
       happened,
     };

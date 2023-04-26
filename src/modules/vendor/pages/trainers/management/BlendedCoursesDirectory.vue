@@ -1,7 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
+      display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
@@ -25,7 +25,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="coursesFiltered" />
+    <ni-trello :courses="coursesWithGroupedSlot" />
   </q-page>
 </template>
 
@@ -58,7 +58,6 @@ export default {
     useMeta(metaInfo);
 
     const coursesWithGroupedSlot = ref([]);
-    const displayArchived = ref(false);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -75,7 +74,7 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
+      displayArchived,
       updateSelectedCompany,
       updateSelectedProgram,
       updateSelectedSalesRepresentative,
@@ -84,9 +83,10 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
       groupByCourses,
-    } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
+    } = useCourseFilters(coursesWithGroupedSlot);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -133,7 +133,6 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
       // Methods
       updateSelectedCompany,
       updateSelectedProgram,
@@ -143,6 +142,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
     };
   },

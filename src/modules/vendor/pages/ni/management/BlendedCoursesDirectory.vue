@@ -1,7 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
+      display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
@@ -27,7 +27,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="coursesFiltered" />
+    <ni-trello :courses="coursesWithGroupedSlot" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="openCourseCreationModal" />
 
@@ -165,7 +165,6 @@ export default {
 
     /* FILTERS */
     const coursesWithGroupedSlot = ref([]);
-    const displayArchived = ref(false);
 
     const {
       typeFilterOptions,
@@ -182,7 +181,7 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
+      displayArchived,
       updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,
@@ -192,9 +191,10 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
       groupByCourses,
-    } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
+    } = useCourseFilters(coursesWithGroupedSlot);
 
     const refreshCourses = async () => {
       try {
@@ -268,7 +268,6 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
       // Methods
       openCourseCreationModal,
       resetCreationModal,
@@ -282,6 +281,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
     };
   },
