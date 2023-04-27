@@ -25,7 +25,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="coursesWithGroupedSlot" />
+    <ni-trello :courses="courses" />
   </q-page>
 </template>
 
@@ -57,7 +57,7 @@ export default {
     const metaInfo = { title: 'Kanban formations mixtes' };
     useMeta(metaInfo);
 
-    const coursesWithGroupedSlot = ref([]);
+    const courses = ref([]);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -85,8 +85,7 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-      groupByCourses,
-    } = useCourseFilters(coursesWithGroupedSlot);
+    } = useCourseFilters(courses);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -96,11 +95,11 @@ export default {
 
     const refreshCourses = async () => {
       try {
-        const courses = await Courses.list({ trainer: loggedUser.value._id, format: BLENDED, action: OPERATIONS });
-        coursesWithGroupedSlot.value = groupByCourses(courses);
+        const courseList = await Courses.list({ trainer: loggedUser.value._id, format: BLENDED, action: OPERATIONS });
+        courses.value = courseList;
       } catch (e) {
         console.error(e);
-        coursesWithGroupedSlot.value = [];
+        courses.value = [];
       }
     };
 
@@ -118,7 +117,7 @@ export default {
       // Validation
       v$,
       // Data
-      coursesWithGroupedSlot,
+      courses,
       displayArchived,
       typeFilterOptions,
       // Computed

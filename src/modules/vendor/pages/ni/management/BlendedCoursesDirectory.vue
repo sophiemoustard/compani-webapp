@@ -27,7 +27,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="coursesWithGroupedSlot" />
+    <ni-trello :courses="courses" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="openCourseCreationModal" />
 
@@ -164,7 +164,7 @@ export default {
     };
 
     /* FILTERS */
-    const coursesWithGroupedSlot = ref([]);
+    const courses = ref([]);
 
     const {
       typeFilterOptions,
@@ -193,16 +193,15 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-      groupByCourses,
-    } = useCourseFilters(coursesWithGroupedSlot);
+    } = useCourseFilters(courses);
 
     const refreshCourses = async () => {
       try {
-        const courses = await Courses.list({ format: BLENDED, action: OPERATIONS });
-        coursesWithGroupedSlot.value = groupByCourses(courses);
+        const courseList = await Courses.list({ format: BLENDED, action: OPERATIONS });
+        courses.value = courseList;
       } catch (e) {
         console.error(e);
-        coursesWithGroupedSlot.value = [];
+        courses.value = [];
       }
     };
 
@@ -250,7 +249,7 @@ export default {
       companyOptions,
       programs,
       salesRepresentativeOptions,
-      coursesWithGroupedSlot,
+      courses,
       displayArchived,
       typeFilterOptions,
       // Computed
