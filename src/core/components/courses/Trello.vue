@@ -84,9 +84,8 @@ export default {
             slots: Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY))),
           };
           if (isForthcoming(groupedCourse)) forthcomingCourses.push({ ...groupedCourse, status: FORTHCOMING });
-          else if (isInProgress(groupedCourse)) {
-            inProgressCourses.push({ ...groupedCourse, status: IN_PROGRESS });
-          } else { completedCourses.push({ ...groupedCourse, status: COMPLETED }); }
+          else if (isInProgress(groupedCourse)) inProgressCourses.push({ ...groupedCourse, status: IN_PROGRESS });
+          else completedCourses.push({ ...groupedCourse, status: COMPLETED });
         } else {
           forthcomingCourses.push({ ...course, status: FORTHCOMING });
         }
