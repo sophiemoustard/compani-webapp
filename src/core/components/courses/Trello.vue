@@ -23,15 +23,17 @@ export default {
   setup (props) {
     const { courses } = toRefs(props);
 
-    const forthcomingCourseList = ref([]);
-    const inProgressCourseList = ref([]);
-    const completedCourseList = ref([]);
+    const forthcomingCourseSortedList = ref([]);
+    const inProgressCourseSortedList = ref([]);
+    const completedCourseSortedList = ref([]);
 
     const trello = computed(() => [
-      { title: 'À venir', courses: forthcomingCourseList.value },
-      { title: 'En cours', courses: inProgressCourseList.value },
-      { title: 'Terminées', courses: completedCourseList.value },
+      { title: 'À venir', courses: forthcomingCourseSortedList.value },
+      { title: 'En cours', courses: inProgressCourseSortedList.value },
+      { title: 'Terminées', courses: completedCourseSortedList.value },
     ]);
+
+    const happened = sameDaySlots => CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
 
     const isForthcoming = (course) => {
       const noSlot = !course.slots.length;
@@ -46,8 +48,6 @@ export default {
 
       return !isForthcoming(course) && (notEverySlotsHappened || slotsToPlan);
     };
-
-    const happened = sameDaySlots => CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
 
     const getDurationTodayToStartCourse = (course) => {
       if (!course.slots.length && course.estimatedStartDate) {
@@ -73,29 +73,30 @@ export default {
     };
 
     const groupCoursesByTemporalState = () => {
-      const forthcomingCourses = [];
-      const inProgressCourses = [];
-      const completedCourses = [];
+      const forthcomingCourseList = [];
+      const inProgressCourseList = [];
+      const completedCourseList = [];
 
       courses.value.forEach((course) => {
         if (course.slots.length) {
-          const groupedCourse = {
+          const courseWithGroupedSlots = {
             ...course,
             slots: Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY))),
           };
-          if (isForthcoming(groupedCourse)) forthcomingCourses.push({ ...groupedCourse, status: FORTHCOMING });
-          else if (isInProgress(groupedCourse)) inProgressCourses.push({ ...groupedCourse, status: IN_PROGRESS });
-          else completedCourses.push({ ...groupedCourse, status: COMPLETED });
-        } else {
-          forthcomingCourses.push({ ...course, status: FORTHCOMING });
-        }
+          if (isForthcoming(courseWithGroupedSlots)) {
+            forthcomingCourseList.push({ ...courseWithGroupedSlots, status: FORTHCOMING });
+          } else if (isInProgress(courseWithGroupedSlots)) {
+            inProgressCourseList.push({ ...courseWithGroupedSlots, status: IN_PROGRESS });
+          } else completedCourseList.push({ ...courseWithGroupedSlots, status: COMPLETED });
+        } else forthcomingCourseList.push({ ...course, status: FORTHCOMING });
       });
 
-      forthcomingCourseList.value = forthcomingCourses
+      forthcomingCourseSortedList.value = forthcomingCourseList
         .sort(
           (a, b) => durationAscendingSort(getDurationTodayToStartCourse(a), getDurationTodayToStartCourse(b))
         );
-      inProgressCourseList.value = inProgressCourses
+
+      inProgressCourseSortedList.value = inProgressCourseList
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
@@ -103,7 +104,7 @@ export default {
           return durationAscendingSort(getDurationTodayToNextSlot(a), getDurationTodayToNextSlot(b));
         });
 
-      completedCourseList.value = completedCourses
+      completedCourseSortedList.value = completedCourseList
         .sort(
           (a, b) => durationAscendingSort(getDurationTodayToEndCourse(a), getDurationTodayToEndCourse(b))
         );
