@@ -84,16 +84,36 @@ export default {
             slots: Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY))),
           };
           if (isForthcoming(courseWithGroupedSlots)) {
-            forthcomingCourseList.push({ ...courseWithGroupedSlots, status: FORTHCOMING });
+            forthcomingCourseList.push({
+              ...courseWithGroupedSlots,
+              status: FORTHCOMING,
+              durationToStartCourse: getDurationTodayToStartCourse(courseWithGroupedSlots),
+            });
           } else if (isInProgress(courseWithGroupedSlots)) {
-            inProgressCourseList.push({ ...courseWithGroupedSlots, status: IN_PROGRESS });
-          } else completedCourseList.push({ ...courseWithGroupedSlots, status: COMPLETED });
-        } else forthcomingCourseList.push({ ...course, status: FORTHCOMING });
+            inProgressCourseList.push({
+              ...courseWithGroupedSlots,
+              status: IN_PROGRESS,
+              durationToNextSlot: getDurationTodayToNextSlot(courseWithGroupedSlots),
+            });
+          } else {
+            completedCourseList.push({
+              ...courseWithGroupedSlots,
+              status: COMPLETED,
+              durationToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots),
+            });
+          }
+        } else {
+          forthcomingCourseList.push({
+            ...course,
+            status: FORTHCOMING,
+            durationToStartCourse: getDurationTodayToStartCourse(course),
+          });
+        }
       });
 
       forthcomingCourseSortedList.value = forthcomingCourseList
         .sort(
-          (a, b) => durationAscendingSort(getDurationTodayToStartCourse(a), getDurationTodayToStartCourse(b))
+          (a, b) => durationAscendingSort(a.durationToStartCourse, b.durationToStartCourse)
         );
 
       inProgressCourseSortedList.value = inProgressCourseList
@@ -101,12 +121,12 @@ export default {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
 
-          return durationAscendingSort(getDurationTodayToNextSlot(a), getDurationTodayToNextSlot(b));
+          return durationAscendingSort(a.durationToNextSlot, b.durationToNextSlot);
         });
 
       completedCourseSortedList.value = completedCourseList
         .sort(
-          (a, b) => durationAscendingSort(getDurationTodayToEndCourse(a), getDurationTodayToEndCourse(b))
+          (a, b) => durationAscendingSort(a.durationToEndCourse, b.durationToEndCourse)
         );
     };
 
