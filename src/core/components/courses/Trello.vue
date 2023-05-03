@@ -87,33 +87,33 @@ export default {
             forthcomingCourseList.push({
               ...courseWithGroupedSlots,
               status: FORTHCOMING,
-              durationToStartCourse: getDurationTodayToStartCourse(courseWithGroupedSlots),
+              durationTodayToStartCourse: getDurationTodayToStartCourse(courseWithGroupedSlots),
             });
           } else if (isInProgress(courseWithGroupedSlots)) {
             inProgressCourseList.push({
               ...courseWithGroupedSlots,
               status: IN_PROGRESS,
-              durationToNextSlot: getDurationTodayToNextSlot(courseWithGroupedSlots),
+              durationTodayToNextSlot: getDurationTodayToNextSlot(courseWithGroupedSlots),
             });
           } else {
             completedCourseList.push({
               ...courseWithGroupedSlots,
               status: COMPLETED,
-              durationToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots),
+              durationTodayToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots),
             });
           }
         } else {
           forthcomingCourseList.push({
             ...course,
             status: FORTHCOMING,
-            durationToStartCourse: getDurationTodayToStartCourse(course),
+            durationTodayToStartCourse: getDurationTodayToStartCourse(course),
           });
         }
       });
 
       forthcomingCourseSortedList.value = forthcomingCourseList
         .sort(
-          (a, b) => durationAscendingSort(a.durationToStartCourse, b.durationToStartCourse)
+          (a, b) => durationAscendingSort(a.durationTodayToStartCourse, b.durationTodayToStartCourse)
         );
 
       inProgressCourseSortedList.value = inProgressCourseList
@@ -121,12 +121,12 @@ export default {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
 
-          return durationAscendingSort(a.durationToNextSlot, b.durationToNextSlot);
+          return durationAscendingSort(a.durationTodayToNextSlot, b.durationTodayToNextSlot);
         });
 
       completedCourseSortedList.value = completedCourseList
         .sort(
-          (a, b) => durationAscendingSort(a.durationToEndCourse, b.durationToEndCourse)
+          (a, b) => durationAscendingSort(a.durationTodayToEndCourse, b.durationTodayToEndCourse)
         );
     };
 
