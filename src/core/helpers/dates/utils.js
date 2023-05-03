@@ -35,9 +35,6 @@ export const getISOTotalDuration = timePeriods => timePeriods
   .reduce((acc, tp) => acc.add(getISODuration(tp)), CompaniDuration())
   .toISO();
 
-export const getRoundedDiffInDays = (date, otherDate) => Math
-  .round(CompaniDuration(CompaniDate(date).diff(CompaniDate(otherDate), 'days')).asDays());
-
 export const formatIntervalHourly = slot => `${CompaniDate(slot.startDate).format(HH_MM)} - `
   + `${CompaniDate(slot.endDate).format(HH_MM)}`;
 

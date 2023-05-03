@@ -1,19 +1,18 @@
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
-import groupBy from 'lodash/groupBy';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { DD_MM_YYYY, WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
+import { WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
 
-export const useCourseFilters = (coursesWithGroupedSlot) => {
+export const useCourseFilters = (courses) => {
   const $store = useStore();
 
   /* TRAINER */
   const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
 
   const trainerFilterOptions = computed(() => {
-    const filteredCourses = coursesWithGroupedSlot.value.filter(course => !!course.trainer);
+    const filteredCourses = courses.value.filter(course => !!course.trainer);
     const trainers = formatAndSortIdentityOptions(filteredCourses, 'trainer');
 
     return [
@@ -29,7 +28,7 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
   const selectedProgram = computed(() => $store.state.course.selectedProgram);
 
   const programFilterOptions = computed(() => {
-    const programs = coursesWithGroupedSlot.value
+    const programs = courses.value
       .map(course => ({ label: course.subProgram.program.name, value: course.subProgram.program._id }))
       .sort((a, b) => a.label.localeCompare(b.label));
 
@@ -42,7 +41,7 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
   const selectedCompany = computed(() => $store.state.course.selectedCompany);
 
   const companyFilterOptions = computed(() => {
-    const companies = coursesWithGroupedSlot.value
+    const companies = courses.value
       .flatMap(course => course.companies.map(company => ({ label: company.name, value: company._id })))
       .sort((a, b) => a.label.localeCompare(b.label));
 
@@ -55,7 +54,7 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
   const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
 
   const salesRepresentativeFilterOptions = computed(() => {
-    const filteredCourses = coursesWithGroupedSlot.value.filter(course => !!course.salesRepresentative);
+    const filteredCourses = courses.value.filter(course => !!course.salesRepresentative);
     const salesRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'salesRepresentative');
 
     return [
@@ -115,15 +114,6 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
 
   const resetFilters = () => $store.dispatch('course/resetFilters');
 
-  const groupByCourses = courses => courses
-    .map(course => ({
-      ...course,
-      slots: course.slots.length
-        ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
-        : [],
-      slotsToPlan: course.slotsToPlan || [],
-    }));
-
   return {
     // data
     typeFilterOptions,
@@ -155,6 +145,5 @@ export const useCourseFilters = (coursesWithGroupedSlot) => {
     updateSelectedMissingTrainees,
     updateDisplayArchived,
     resetFilters,
-    groupByCourses,
   };
 };
