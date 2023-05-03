@@ -88,7 +88,7 @@ export default {
       return this.hideImage || this.driveStorage;
     },
     displayedDownloader () {
-      return this.document && this.document.link !== null;
+      return this.document && this.document.link !== null && (!this.document.type || this.document.link);
     },
   },
   methods: {
