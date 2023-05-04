@@ -23,7 +23,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="courses" />
+    <ni-trello :courses="courses" :archived-courses="archivedCourses" />
   </q-page>
 </template>
 
@@ -57,6 +57,7 @@ export default {
     useMeta(metaInfo);
 
     const courses = ref([]);
+    const archivedCourses = ref([]);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -98,6 +99,14 @@ export default {
           isArchived: false,
         });
         courses.value = courseList;
+
+        const archivedCourseList = await Courses.list({
+          company: get(loggedUser.value, 'company._id') || '',
+          format: BLENDED,
+          action: OPERATIONS,
+          isArchived: true,
+        });
+        archivedCourses.value = archivedCourseList;
       } catch (e) {
         console.error(e);
         courses.value = [];
@@ -119,6 +128,7 @@ export default {
       v$,
       // Data
       courses,
+      archivedCourses,
       displayArchived,
       typeFilterOptions,
       // Computed
