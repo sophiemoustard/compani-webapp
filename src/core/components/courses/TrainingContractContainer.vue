@@ -33,6 +33,7 @@
         <ni-file-uploader caption="Convention de formation signée" :extensions="extensions" :url="url"
           :custom-fields="customFields" :entity="trainingContracts[0]" path="file" :disable="!!course.archivedAt"
           @uploaded="uploaded" hide-image :can-delete="isVendorInterface"
+          :no-link-in-file="trainingContracts[0] && !get(trainingContracts[0], 'file.link')"
           @delete="validateDocumentDeletion(trainingContracts[0]._id)" />
       </div>
     </div>
@@ -312,6 +313,7 @@ export default {
       validateDocumentDeletion,
       createTrainingContract,
       resetNewTrainingContract,
+      get,
     };
   },
 };
