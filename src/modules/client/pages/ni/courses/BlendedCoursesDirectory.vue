@@ -95,6 +95,7 @@ export default {
           company: get(loggedUser.value, 'company._id') || '',
           format: BLENDED,
           action: OPERATIONS,
+          isArchived: false,
         });
         courses.value = courseList;
       } catch (e) {

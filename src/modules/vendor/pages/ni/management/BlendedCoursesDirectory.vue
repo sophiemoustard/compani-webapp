@@ -197,7 +197,7 @@ export default {
 
     const refreshCourses = async () => {
       try {
-        const courseList = await Courses.list({ format: BLENDED, action: OPERATIONS });
+        const courseList = await Courses.list({ format: BLENDED, action: OPERATIONS, isArchived: false });
         courses.value = courseList;
       } catch (e) {
         console.error(e);
