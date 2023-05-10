@@ -206,6 +206,7 @@ export default {
       } catch (e) {
         console.error(e);
         courses.value = [];
+        archivedCourses.value = [];
       }
     };
 
