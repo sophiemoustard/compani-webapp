@@ -72,17 +72,29 @@ export default {
       return CompaniDate().startOf(DAY).diff(CompaniDate(lastSlot[0].startDate), SECOND);
     };
 
+    const getDurationTodayToCreation = course => CompaniDate().startOf(DAY).diff(CompaniDate(course.createdAt), SECOND);
+
     const groupCoursesByTemporalState = () => {
       const forthcomingCourseList = [];
       const inProgressCourseList = [];
       const completedCourseList = [];
 
       courses.value.forEach((course) => {
-        if (course.slots.length) {
-          const courseWithGroupedSlots = {
-            ...course,
-            slots: Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY))),
-          };
+        const courseWithGroupedSlots = {
+          ...course,
+          slots: course.slots.length
+            ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
+            : [],
+        };
+        if (courseWithGroupedSlots.archivedAt) {
+          completedCourseList.push({
+            ...courseWithGroupedSlots,
+            status: COMPLETED,
+            ...(courseWithGroupedSlots.slots.length
+              ? { durationTodayToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots) }
+              : { durationTodayToCreation: getDurationTodayToCreation(courseWithGroupedSlots) }),
+          });
+        } else if (courseWithGroupedSlots.slots.length) {
           if (isForthcoming(courseWithGroupedSlots)) {
             forthcomingCourseList.push({
               ...courseWithGroupedSlots,
@@ -104,9 +116,9 @@ export default {
           }
         } else {
           forthcomingCourseList.push({
-            ...course,
+            ...courseWithGroupedSlots,
             status: FORTHCOMING,
-            durationTodayToStartCourse: getDurationTodayToStartCourse(course),
+            durationTodayToStartCourse: getDurationTodayToStartCourse(courseWithGroupedSlots),
           });
         }
       });
@@ -125,9 +137,11 @@ export default {
         });
 
       completedCourseSortedList.value = completedCourseList
-        .sort(
-          (a, b) => durationAscendingSort(a.durationTodayToEndCourse, b.durationTodayToEndCourse)
-        );
+        .sort((a, b) => {
+          const durationA = a.durationTodayToEndCourse || a.durationTodayToCreation;
+          const durationB = b.durationTodayToEndCourse || b.durationTodayToCreation;
+          return durationAscendingSort(durationA, durationB);
+        });
     };
 
     watch(courses, () => {
