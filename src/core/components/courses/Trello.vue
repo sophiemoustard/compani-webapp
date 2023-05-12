@@ -18,11 +18,11 @@ export default {
     'course-container': CourseContainer,
   },
   props: {
-    courses: { type: Array, default: () => [] },
+    activeCourses: { type: Array, default: () => [] },
     archivedCourses: { type: Array, default: () => [] },
   },
   setup (props) {
-    const { courses, archivedCourses } = toRefs(props);
+    const { activeCourses, archivedCourses } = toRefs(props);
 
     const forthcomingCourseSortedList = ref([]);
     const inProgressCourseSortedList = ref([]);
@@ -105,7 +105,7 @@ export default {
       const forthcomingCourseList = [];
       const inProgressCourseList = [];
 
-      courses.value.forEach((course) => {
+      activeCourses.value.forEach((course) => {
         if (course.slots.length) {
           const courseWithGroupedSlots = {
             ...course,
@@ -153,7 +153,7 @@ export default {
         });
     };
 
-    watch(courses, () => {
+    watch(activeCourses, () => {
       groupCoursesByTemporalState();
     });
 

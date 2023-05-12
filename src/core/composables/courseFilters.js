@@ -5,8 +5,10 @@ import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
 
-export const useCourseFilters = (courses) => {
+export const useCourseFilters = (activeCourses, archivedCourses) => {
   const $store = useStore();
+
+  const courses = computed(() => [...activeCourses.value, ...archivedCourses.value]);
 
   /* TRAINER */
   const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
