@@ -133,6 +133,21 @@ export default {
     const courseSlotsCount = computed(() => course.value.slots.length);
 
     const formatNearestDate = computed(() => {
+      if (course.value.status === COMPLETED) {
+        if (course.value.durationTodayToCreation) {
+          const rangeToCreation = Math.ceil(CompaniDuration(course.value.durationTodayToCreation).asDays());
+
+          return rangeToCreation
+            ? `Créée il y a ${formatQuantity('jour', rangeToCreation)}`
+            : 'Créée aujourd’hui';
+        }
+
+        const rangeToLastDate = Math.ceil(CompaniDuration(course.value.durationTodayToEndCourse).asDays());
+
+        return rangeToLastDate
+          ? `Dernière date il y a ${formatQuantity('jour', rangeToLastDate)}`
+          : 'Dernière date aujourd’hui';
+      }
       if (!courseSlotsCount.value && course.value.estimatedStartDate) {
         const rangeToEstimatedStartDate = Math.floor(CompaniDuration(course.value.durationTodayToStartCourse).asDays());
         if (rangeToEstimatedStartDate < 0) {
@@ -151,14 +166,6 @@ export default {
         const rangeToNextDate = Math.floor(CompaniDuration(course.value.durationTodayToStartCourse).asDays());
 
         return rangeToNextDate ? `Commence dans ${formatQuantity('jour', rangeToNextDate)}` : 'Commence aujourd’hui';
-      }
-
-      if (course.value.status === COMPLETED) {
-        const rangeToLastDate = Math.ceil(CompaniDuration(course.value.durationTodayToEndCourse).asDays());
-
-        return rangeToLastDate
-          ? `Dernière date il y a ${formatQuantity('jour', rangeToLastDate)}`
-          : 'Dernière date aujourd’hui';
       }
 
       const nextSlot = course.value.slots.filter(daySlots => !happened(daySlots))[0];

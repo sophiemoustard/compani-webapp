@@ -18,14 +18,41 @@ export default {
     'course-container': CourseContainer,
   },
   props: {
-    courses: { type: Array, default: () => [] },
+    activeCourses: { type: Array, default: () => [] },
+    archivedCourses: { type: Array, default: () => [] },
   },
   setup (props) {
-    const { courses } = toRefs(props);
+    const { activeCourses, archivedCourses } = toRefs(props);
 
     const forthcomingCourseSortedList = ref([]);
     const inProgressCourseSortedList = ref([]);
-    const completedCourseSortedList = ref([]);
+    const unarchivedCompletedCourseList = ref([]);
+
+    const completedCourseSortedList = computed(() => {
+      const archivedFormattedCourses = archivedCourses.value.map((course) => {
+        const courseWithGroupedSlots = {
+          ...course,
+          slots: course.slots.length
+            ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
+            : [],
+        };
+
+        return {
+          ...courseWithGroupedSlots,
+          status: COMPLETED,
+          ...(courseWithGroupedSlots.slots.length
+            ? { durationTodayToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots) }
+            : { durationTodayToCreation: getDurationTodayToCreation(courseWithGroupedSlots) }),
+        };
+      });
+
+      return [...unarchivedCompletedCourseList.value, ...archivedFormattedCourses]
+        .sort((a, b) => {
+          const durationA = a.durationTodayToEndCourse || a.durationTodayToCreation;
+          const durationB = b.durationTodayToEndCourse || b.durationTodayToCreation;
+          return durationAscendingSort(durationA, durationB);
+        });
+    });
 
     const trello = computed(() => [
       { title: 'À venir', courses: forthcomingCourseSortedList.value },
@@ -72,12 +99,13 @@ export default {
       return CompaniDate().startOf(DAY).diff(CompaniDate(lastSlot[0].startDate), SECOND);
     };
 
+    const getDurationTodayToCreation = course => CompaniDate().startOf(DAY).diff(CompaniDate(course.createdAt), SECOND);
+
     const groupCoursesByTemporalState = () => {
       const forthcomingCourseList = [];
       const inProgressCourseList = [];
-      const completedCourseList = [];
 
-      courses.value.forEach((course) => {
+      activeCourses.value.forEach((course) => {
         if (course.slots.length) {
           const courseWithGroupedSlots = {
             ...course,
@@ -96,7 +124,7 @@ export default {
               durationTodayToNextSlot: getDurationTodayToNextSlot(courseWithGroupedSlots),
             });
           } else {
-            completedCourseList.push({
+            unarchivedCompletedCourseList.value.push({
               ...courseWithGroupedSlots,
               status: COMPLETED,
               durationTodayToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots),
@@ -123,14 +151,9 @@ export default {
 
           return durationAscendingSort(a.durationTodayToNextSlot, b.durationTodayToNextSlot);
         });
-
-      completedCourseSortedList.value = completedCourseList
-        .sort(
-          (a, b) => durationAscendingSort(a.durationTodayToEndCourse, b.durationTodayToEndCourse)
-        );
     };
 
-    watch(courses, () => {
+    watch(activeCourses, () => {
       groupCoursesByTemporalState();
     });
 

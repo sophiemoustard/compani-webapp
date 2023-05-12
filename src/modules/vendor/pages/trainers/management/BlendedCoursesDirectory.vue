@@ -25,7 +25,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="courses" />
+    <ni-trello :active-courses="activeCourses" :archived-courses="archivedCourses" />
   </q-page>
 </template>
 
@@ -57,7 +57,8 @@ export default {
     const metaInfo = { title: 'Kanban formations mixtes' };
     useMeta(metaInfo);
 
-    const courses = ref([]);
+    const activeCourses = ref([]);
+    const archivedCourses = ref([]);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -85,7 +86,7 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-    } = useCourseFilters(courses);
+    } = useCourseFilters(activeCourses, archivedCourses);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -95,11 +96,25 @@ export default {
 
     const refreshCourses = async () => {
       try {
-        const courseList = await Courses.list({ trainer: loggedUser.value._id, format: BLENDED, action: OPERATIONS });
-        courses.value = courseList;
+        const courseList = await Courses.list({
+          trainer: loggedUser.value._id,
+          format: BLENDED,
+          action: OPERATIONS,
+          isArchived: false,
+        });
+        activeCourses.value = courseList;
+
+        const archivedCourseList = await Courses.list({
+          trainer: loggedUser.value._id,
+          format: BLENDED,
+          action: OPERATIONS,
+          isArchived: true,
+        });
+        archivedCourses.value = archivedCourseList;
       } catch (e) {
         console.error(e);
-        courses.value = [];
+        activeCourses.value = [];
+        archivedCourses.value = [];
       }
     };
 
@@ -117,7 +132,8 @@ export default {
       // Validation
       v$,
       // Data
-      courses,
+      activeCourses,
+      archivedCourses,
       displayArchived,
       typeFilterOptions,
       // Computed

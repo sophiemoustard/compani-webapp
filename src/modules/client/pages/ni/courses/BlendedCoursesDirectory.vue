@@ -23,7 +23,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="courses" />
+    <ni-trello :active-courses="activeCourses" :archived-courses="archivedCourses" />
   </q-page>
 </template>
 
@@ -56,7 +56,8 @@ export default {
     const metaInfo = { title: 'Kanban formations mixtes' };
     useMeta(metaInfo);
 
-    const courses = ref([]);
+    const activeCourses = ref([]);
+    const archivedCourses = ref([]);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -81,7 +82,7 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-    } = useCourseFilters(courses);
+    } = useCourseFilters(activeCourses, archivedCourses);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -95,11 +96,21 @@ export default {
           company: get(loggedUser.value, 'company._id') || '',
           format: BLENDED,
           action: OPERATIONS,
+          isArchived: false,
         });
-        courses.value = courseList;
+        activeCourses.value = courseList;
+
+        const archivedCourseList = await Courses.list({
+          company: get(loggedUser.value, 'company._id') || '',
+          format: BLENDED,
+          action: OPERATIONS,
+          isArchived: true,
+        });
+        archivedCourses.value = archivedCourseList;
       } catch (e) {
         console.error(e);
-        courses.value = [];
+        activeCourses.value = [];
+        archivedCourses.value = [];
       }
     };
 
@@ -117,7 +128,8 @@ export default {
       // Validation
       v$,
       // Data
-      courses,
+      activeCourses,
+      archivedCourses,
       displayArchived,
       typeFilterOptions,
       // Computed

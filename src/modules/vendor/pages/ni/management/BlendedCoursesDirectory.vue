@@ -27,7 +27,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="courses" />
+    <ni-trello :active-courses="activeCourses" :archived-courses="archivedCourses" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="openCourseCreationModal" />
 
@@ -164,7 +164,8 @@ export default {
     };
 
     /* FILTERS */
-    const courses = ref([]);
+    const activeCourses = ref([]);
+    const archivedCourses = ref([]);
 
     const {
       typeFilterOptions,
@@ -193,15 +194,18 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-    } = useCourseFilters(courses);
+    } = useCourseFilters(activeCourses, archivedCourses);
 
     const refreshCourses = async () => {
       try {
-        const courseList = await Courses.list({ format: BLENDED, action: OPERATIONS });
-        courses.value = courseList;
+        const courseList = await Courses.list({ format: BLENDED, action: OPERATIONS, isArchived: false });
+        activeCourses.value = courseList;
+        const archivedCourseList = await Courses.list({ format: BLENDED, action: OPERATIONS, isArchived: true });
+        archivedCourses.value = archivedCourseList;
       } catch (e) {
         console.error(e);
-        courses.value = [];
+        activeCourses.value = [];
+        archivedCourses.value = [];
       }
     };
 
@@ -249,7 +253,8 @@ export default {
       companyOptions,
       programs,
       salesRepresentativeOptions,
-      courses,
+      activeCourses,
+      archivedCourses,
       displayArchived,
       typeFilterOptions,
       // Computed
