@@ -33,7 +33,7 @@
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
-    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
+    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshPotentialTrainees"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
@@ -376,7 +376,7 @@ export default {
       return done(!olderCourseHistories.length);
     };
 
-    const getPotentialTrainees = async () => {
+    const refreshPotentialTrainees = async () => {
       try {
         const companies = isClientInterface
           ? get(loggedUser.value, 'company._id')
@@ -400,7 +400,6 @@ export default {
           await getCourseHistories();
           courseHistoryFeed.value.resumeScroll();
         }
-        await getPotentialTrainees();
       } catch (e) {
         console.error(e);
       } finally {
@@ -732,15 +731,14 @@ export default {
 
     const created = async () => {
       const promises = [refreshCourse()];
-      if (isVendorInterface || isIntraCourse.value) {
-        promises.push(refreshSms(), refreshCompanyRepresentatives());
+      if (isRofOrVendorAdmin.value || isIntraCourse.value) {
+        promises.push(refreshSms(), refreshCompanyRepresentatives(), refreshPotentialTrainees());
       }
 
       if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
-      promises.push(getPotentialTrainees());
 
       await Promise.all(promises);
     };
