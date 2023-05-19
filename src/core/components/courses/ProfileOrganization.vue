@@ -33,7 +33,7 @@
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
-    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshPotentialTrainees"
+    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshTraineeTable"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
@@ -347,6 +347,13 @@ export default {
       else courseHistories.value = [];
     };
 
+    const refreshCourseHistories = async () => {
+      if (displayHistory.value) {
+        await getCourseHistories();
+        courseHistoryFeed.value.resumeScroll();
+      }
+    };
+
     const getCourseHistories = async (createdAt = null) => {
       const courseHistoriesTmp = cloneDeep(courseHistories.value);
       try {
@@ -395,16 +402,17 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
-        await refreshTrainingContracts();
-        if (displayHistory.value) {
-          await getCourseHistories();
-          courseHistoryFeed.value.resumeScroll();
-        }
+        await refreshCourseHistories();
       } catch (e) {
         console.error(e);
       } finally {
         courseLoading.value = false;
       }
+    };
+
+    const refreshTraineeTable = async () => {
+      await refreshCourse();
+      await refreshPotentialTrainees();
     };
 
     const formatInterlocutorOption = interlocutor => ({
@@ -735,7 +743,7 @@ export default {
         promises.push(refreshSms(), refreshCompanyRepresentatives(), refreshPotentialTrainees());
       }
 
-      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
+      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
@@ -823,6 +831,7 @@ export default {
       copy,
       updateCourse,
       downloadAttendanceSheet,
+      refreshTraineeTable,
       refreshTrainingContracts,
     };
   },
