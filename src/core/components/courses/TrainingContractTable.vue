@@ -8,7 +8,8 @@
           <template v-if="col.name === 'actions'">
             <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
               :disable="!props.row.file.link" />
-            <ni-button icon="delete" @click="deleteTrainingContract(props.row._id)" :disable="isArchived" />
+            <ni-button icon="delete" @click="deleteTrainingContract(props.row._id)"
+              :disable="isArchived || !props.row.file.link" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>

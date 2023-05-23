@@ -71,7 +71,7 @@ export const payMixin = {
           name: 'absencesHours',
           label: 'Heures d\'absences',
           align: 'center',
-          field: row => row.absencesHours - (get(row, 'diff.absencesHours') || 0),
+          field: row => this.computeHoursWithDiff(row, 'absencesHours'),
           format: value => formatHours(value),
         },
         {
@@ -85,49 +85,49 @@ export const payMixin = {
           name: 'workedHours',
           label: 'Heures travaillées',
           align: 'center',
-          field: row => row.workedHours + (get(row, 'diff.workedHours') || 0),
+          field: row => this.computeHoursWithDiff(row, 'workedHours'),
           format: value => formatHours(value),
         },
         {
           name: 'notSurchargedAndExempt',
           label: 'Dont exo non majo',
           align: 'center',
-          field: row => row.notSurchargedAndExempt + (get(row, 'diff.notSurchargedAndExempt') || 0),
+          field: row => this.computeHoursWithDiff(row, 'notSurchargedAndExempt'),
           format: value => formatHours(value),
         },
         {
           name: 'surchargedAndExempt',
           label: 'Dont exo et majo',
           align: 'center',
-          field: row => row.surchargedAndExempt + (get(row, 'diff.surchargedAndExempt') || 0),
+          field: row => this.computeHoursWithDiff(row, 'surchargedAndExempt'),
           format: value => formatHours(value),
         },
         {
           name: 'notSurchargedAndNotExempt',
           label: 'Dont non exo et non majo ',
           align: 'center',
-          field: row => row.notSurchargedAndNotExempt + (get(row, 'diff.notSurchargedAndNotExempt') || 0),
+          field: row => this.computeHoursWithDiff(row, 'notSurchargedAndNotExempt'),
           format: value => formatHours(value),
         },
         {
           name: 'surchargedAndNotExempt',
           label: 'Dont non exo et majo',
           align: 'center',
-          field: row => row.surchargedAndNotExempt + (get(row, 'diff.surchargedAndNotExempt') || 0),
+          field: row => this.computeHoursWithDiff(row, 'surchargedAndNotExempt'),
           format: value => formatHours(value),
         },
         {
           name: 'paidTransportHours',
           label: 'Temps de transport',
           align: 'center',
-          field: row => row.paidTransportHours - (get(row, 'diff.paidTransportHours') || 0),
+          field: row => this.computeHoursWithDiff(row, 'paidTransportHours'),
           format: value => formatHours(value),
         },
         {
           name: 'hoursBalance',
           label: 'Solde heures',
           align: 'center',
-          field: row => row.hoursBalance + (get(row, 'diff.hoursBalance') || 0),
+          field: row => this.computeHoursWithDiff(row, 'hoursBalance'),
           format: value => formatHours(value),
         },
         {
@@ -249,11 +249,11 @@ export const payMixin = {
 
       return formattedPlans.join('\r\n');
     },
-    formatHoursWithDiff (pay, key) {
+    computeHoursWithDiff (pay, key) {
       let hours = pay[key];
       if (pay.diff && pay.diff[key]) hours += pay.diff[key];
 
-      return formatNumberForCSV(hours);
+      return hours;
     },
     setSelectedPeriod (offset) {
       this.dates = {
@@ -299,17 +299,17 @@ export const payMixin = {
           startDate ? moment(startDate).format('DD/MM/YYYY') : '',
           endDate ? moment(endDate).format('DD/MM/YYYY') : '',
           formatNumberForCSV(draftPay.contractHours),
-          this.formatHoursWithDiff(draftPay, 'absencesHours'),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'absencesHours')),
           formatNumberForCSV(draftPay.hoursToWork - draftPay.diff.absencesHours),
-          this.formatHoursWithDiff(draftPay, 'workedHours'),
-          this.formatHoursWithDiff(draftPay, 'notSurchargedAndExempt'),
-          this.formatHoursWithDiff(draftPay, 'surchargedAndExempt'),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'workedHours')),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'notSurchargedAndExempt')),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'surchargedAndExempt')),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndExemptDetails)}"` || '',
-          this.formatHoursWithDiff(draftPay, 'notSurchargedAndNotExempt'),
-          this.formatHoursWithDiff(draftPay, 'surchargedAndNotExempt'),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'notSurchargedAndNotExempt')),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'surchargedAndNotExempt')),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndNotExemptDetails)}"` || '',
-          this.formatHoursWithDiff(draftPay, 'paidTransportHours'),
-          this.formatHoursWithDiff(draftPay, 'hoursBalance'),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'paidTransportHours')),
+          formatNumberForCSV(this.computeHoursWithDiff(draftPay, 'hoursBalance')),
           get(draftPay, 'diff.hoursBalance') ? formatNumberForCSV(draftPay.diff.hoursBalance) : '0,00',
           formatNumberForCSV(draftPay.hoursCounter),
           formatNumberForCSV(draftPay.overtimeHours),

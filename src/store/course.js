@@ -16,6 +16,7 @@ export default {
     selectedType: '',
     selectedNoAddressInSlots: false,
     selectedMissingTrainees: false,
+    displayArchived: false,
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = data ? ({ ...data }) : data; },
@@ -28,6 +29,7 @@ export default {
     SET_SELECTED_TYPE: (state, data) => { state.selectedType = data; },
     SET_SELECTED_NO_ADDRESS_IN_SLOTS: (state, data) => { state.selectedNoAddressInSlots = data; },
     SET_SELECTED_MISSING_TRAINEES: (state, data) => { state.selectedMissingTrainees = data; },
+    SET_DISPLAY_ARCHIVED: (state, data) => { state.displayArchived = data; },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {
@@ -62,6 +64,7 @@ export default {
     setSelectedType: ({ commit }, params) => { commit('SET_SELECTED_TYPE', params.type); },
     setSelectedNoAddressInSlots: ({ commit }, params) => commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', params.isSelected),
     setSelectedMissingTrainees: ({ commit }, params) => commit('SET_SELECTED_MISSING_TRAINEES', params.isSelected),
+    setDisplayArchived: ({ commit }, params) => commit('SET_DISPLAY_ARCHIVED', params.isSelected),
     resetFilters: ({ commit }) => {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
@@ -72,6 +75,7 @@ export default {
       commit('SET_SELECTED_TYPE', '');
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
       commit('SET_SELECTED_MISSING_TRAINEES', false);
+      commit('SET_DISPLAY_ARCHIVED', false);
     },
   },
   getters: {},

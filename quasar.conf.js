@@ -5,9 +5,6 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const { configure } = require('quasar/wrappers');
 
 module.exports = configure(ctx => ({
-  boot: [
-    // process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
-  ],
   css: ['app.sass', 'colors.sass'],
   extras: ['material-icons', 'mdi-v3', 'ionicons-v4', 'fontawesome-v5'],
   framework: {

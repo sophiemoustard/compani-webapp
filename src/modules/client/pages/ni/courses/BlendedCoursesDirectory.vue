@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="displayArchived = !displayArchived" :display-search-bar="false" />
+      display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
@@ -23,7 +23,7 @@
       <q-checkbox dense :model-value="selectedMissingTrainees" color="primary" label="Apprenant(s) manquant(s) (INTRA)"
         @update:model-value="updateSelectedMissingTrainees" />
     </div>
-    <ni-trello :courses="coursesFiltered" />
+    <ni-trello :active-courses="activeCourses" :archived-courses="archivedCourses" />
   </q-page>
 </template>
 
@@ -56,8 +56,8 @@ export default {
     const metaInfo = { title: 'Kanban formations mixtes' };
     useMeta(metaInfo);
 
-    const coursesWithGroupedSlot = ref([]);
-    const displayArchived = ref(false);
+    const activeCourses = ref([]);
+    const archivedCourses = ref([]);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -72,7 +72,7 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
+      displayArchived,
       updateSelectedTrainer,
       updateSelectedProgram,
       updateSelectedStartDate,
@@ -80,9 +80,9 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
-      groupByCourses,
-    } = useCourseFilters(coursesWithGroupedSlot, displayArchived);
+    } = useCourseFilters(activeCourses, archivedCourses);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -92,15 +92,25 @@ export default {
 
     const refreshCourses = async () => {
       try {
-        const courses = await Courses.list({
+        const courseList = await Courses.list({
           company: get(loggedUser.value, 'company._id') || '',
           format: BLENDED,
           action: OPERATIONS,
+          isArchived: false,
         });
-        coursesWithGroupedSlot.value = groupByCourses(courses);
+        activeCourses.value = courseList;
+
+        const archivedCourseList = await Courses.list({
+          company: get(loggedUser.value, 'company._id') || '',
+          format: BLENDED,
+          action: OPERATIONS,
+          isArchived: true,
+        });
+        archivedCourses.value = archivedCourseList;
       } catch (e) {
         console.error(e);
-        coursesWithGroupedSlot.value = [];
+        activeCourses.value = [];
+        archivedCourses.value = [];
       }
     };
 
@@ -118,7 +128,8 @@ export default {
       // Validation
       v$,
       // Data
-      coursesWithGroupedSlot,
+      activeCourses,
+      archivedCourses,
       displayArchived,
       typeFilterOptions,
       // Computed
@@ -131,7 +142,6 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      coursesFiltered,
       // Methods
       updateSelectedTrainer,
       updateSelectedProgram,
@@ -140,6 +150,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
+      updateDisplayArchived,
       resetFilters,
     };
   },
