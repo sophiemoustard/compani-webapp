@@ -643,6 +643,5 @@ export const DAY_OF_WEEK_SHORT = 'ccc';
 export const DIRECTORY = 'directory';
 
 // BUTTONS TYPES
-export const DEFAULT = 'default';
 export const FLOATING = 'floating';
 export const MODAL = 'modal';
