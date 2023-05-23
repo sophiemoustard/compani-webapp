@@ -1,0 +1,138 @@
+<template>
+  <q-page class="vendor-background" padding>
+    <ni-directory-header title="Répertoire sociétés mères" search-placeholder="Rechercher une société mère"
+      @update-search="updateSearch" :search="searchStr" />
+    <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading"
+      v-model:pagination="pagination" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une société mère"
+      @click="holdingCreationModal = true" :disable="tableLoading" />
+
+    <holding-creation-modal v-model="holdingCreationModal" v-model:new-holding="newHolding" :validations="v$.newHolding"
+      :loading="modalLoading" @hide="resetCreationModal" @submit="createHolding" />
+  </q-page>
+</template>
+
+<script>
+import { useMeta } from 'quasar';
+import get from 'lodash/get';
+import { computed, ref } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required, requiredIf } from '@vuelidate/validators';
+import { frAddress } from '@helpers/vuelidateCustomVal';
+import Holdings from '@api/Holdings';
+import escapeRegExp from 'lodash/escapeRegExp';
+import DirectoryHeader from '@components/DirectoryHeader';
+import TableList from '@components/table/TableList';
+import HoldingCreationModal from 'src/modules/vendor/components/holdings/HoldingCreationModal';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { removeDiacritics } from '@helpers/utils';
+
+export default {
+  name: 'HoldingsDirectory',
+  components: {
+    'ni-directory-header': DirectoryHeader,
+    'ni-table-list': TableList,
+    'holding-creation-modal': HoldingCreationModal,
+  },
+  setup () {
+    const metaInfo = { title: 'Répertoire structures' };
+    useMeta(metaInfo);
+
+    const holdings = ref([]);
+    const tableLoading = ref(false);
+    const columns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }];
+    const pagination = { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 };
+    const searchStr = ref('');
+    const holdingCreationModal = ref(false);
+    const newHolding = ref({ name: '', address: {} });
+    const modalLoading = ref(false);
+
+    const filteredHoldings = computed(() => {
+      const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
+      return holdings.value.filter(holding => holding.noDiacriticsName.match(new RegExp(formattedString, 'i')));
+    });
+
+    const rules = computed(() => ({
+      newHolding: {
+        name: { required },
+        address: {
+          zipCode: { required: requiredIf(get(newHolding.value, 'address.fullAddress')) },
+          street: { required: requiredIf(get(newHolding.value, 'address.fullAddress')) },
+          city: { required: requiredIf(get(newHolding.value, 'address.fullAddress')) },
+          fullAddress: { frAddress },
+        },
+      },
+    }));
+
+    const v$ = useVuelidate(rules, { newHolding });
+
+    const updateSearch = (value) => {
+      searchStr.value = value;
+    };
+
+    const refreshHoldings = async () => {
+      try {
+        tableLoading.value = true;
+        const holdingList = await Holdings.list();
+
+        holdings.value = holdingList.map(h => ({ ...h, noDiacriticsName: removeDiacritics(h.name) }));
+      } catch (e) {
+        console.error(e);
+        holdings.value = [];
+        NotifyNegative('Erreur lors de la récupération des sociétés mères.');
+      } finally {
+        tableLoading.value = false;
+      }
+    };
+
+    const resetCreationModal = () => {
+      newHolding.value = { name: '', address: {} };
+      v$.value.newHolding.$reset();
+    };
+
+    const createHolding = async () => {
+      try {
+        v$.value.newHolding.$touch();
+        if (v$.value.newHolding.$error) return NotifyWarning('Champ(s) invalide(s)');
+        modalLoading.value = true;
+        await Holdings.create({ ...newHolding.value });
+
+        holdingCreationModal.value = false;
+        NotifyPositive('Société mère créée.');
+        await refreshHoldings();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de la création de la structure.');
+      } finally {
+        modalLoading.value = false;
+      }
+    };
+
+    const created = async () => {
+      await refreshHoldings();
+    };
+
+    created();
+
+    return {
+      // Data
+      searchStr,
+      columns,
+      tableLoading,
+      pagination,
+      holdingCreationModal,
+      modalLoading,
+      newHolding,
+      // Computed
+      filteredHoldings,
+      v$,
+      // Methods
+      updateSearch,
+      resetCreationModal,
+      createHolding,
+    };
+  },
+
+};
+</script>

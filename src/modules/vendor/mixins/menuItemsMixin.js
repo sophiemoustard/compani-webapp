@@ -25,8 +25,9 @@ export const menuItemsMixin = {
           ref: 'users',
           label: 'Utilisateurs',
           children: [
+            { name: 'ni users holdings', icon: 'account_balance', label: 'Sociétés mères' },
             { name: 'ni users companies', icon: 'apartment', label: 'Structures' },
-            { name: 'ni users trainers', icon: 'contacts', label: 'Formateurs' },
+            { name: 'ni users trainers', icon: 'school', label: 'Formateurs' },
             { name: 'ni users learners', icon: 'contacts', label: 'Apprenants' },
           ],
         },
