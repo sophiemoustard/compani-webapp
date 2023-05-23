@@ -27,8 +27,8 @@ export default {
 
     const selectedTab = ref(null);
 
-    watch(selectedTab, () => {
-      emit('refresh');
+    watch(selectedTab, (_, oldValue) => {
+      if (oldValue) emit('refresh');
     });
 
     const alert = tab => (tab.notification && notifications.value && notifications.value[tab.notification]
