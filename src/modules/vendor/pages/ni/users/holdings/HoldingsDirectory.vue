@@ -4,8 +4,8 @@
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading"
       v-model:pagination="pagination" />
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une société mère"
-      @click="holdingCreationModal = true" :disable="tableLoading" />
+    <ni-primary-button icon="add" label="Ajouter une société mère" @click="holdingCreationModal = true"
+      :disable="tableLoading" :type="FLOATING" />
 
     <holding-creation-modal v-model="holdingCreationModal" v-model:new-holding="newHolding" :validations="v$.newHolding"
       :loading="modalLoading" @hide="resetCreationModal" @submit="createHolding" />
@@ -15,17 +15,19 @@
 <script>
 import { useMeta } from 'quasar';
 import get from 'lodash/get';
+import escapeRegExp from 'lodash/escapeRegExp';
 import { computed, ref } from 'vue';
+import Holdings from '@api/Holdings';
+import PrimaryButton from '@components/PrimaryButton';
+import DirectoryHeader from '@components/DirectoryHeader';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import TableList from '@components/table/TableList';
+import { FLOATING } from '@data/constants';
+import { frAddress } from '@helpers/vuelidateCustomVal';
+import { removeDiacritics } from '@helpers/utils';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
-import { frAddress } from '@helpers/vuelidateCustomVal';
-import Holdings from '@api/Holdings';
-import escapeRegExp from 'lodash/escapeRegExp';
-import DirectoryHeader from '@components/DirectoryHeader';
-import TableList from '@components/table/TableList';
 import HoldingCreationModal from 'src/modules/vendor/components/holdings/HoldingCreationModal';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { removeDiacritics } from '@helpers/utils';
 
 export default {
   name: 'HoldingsDirectory',
@@ -33,6 +35,7 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
     'holding-creation-modal': HoldingCreationModal,
+    'ni-primary-button': PrimaryButton,
   },
   setup () {
     const metaInfo = { title: 'Répertoire structures' };
@@ -124,6 +127,7 @@ export default {
       holdingCreationModal,
       modalLoading,
       newHolding,
+      FLOATING,
       // Computed
       filteredHoldings,
       v$,

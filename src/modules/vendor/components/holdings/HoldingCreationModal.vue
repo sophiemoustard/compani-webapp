@@ -9,8 +9,7 @@
       @blur="validations.address.$touch" :error="validations.address.$error"
       @update:model-value="update($event, 'address')" />
     <template #footer>
-      <q-btn no-caps class="full-width modal-btn" label="Créer la société mère" color="primary" :loading="loading"
-        icon-right="add" @click="submit" />
+      <ni-primary-button icon="add" label="Créer la société mère" @click="submit" :loading="loading" :type="MODAL" />
     </template>
   </ni-modal>
 </template>
@@ -19,8 +18,10 @@
 import { toRefs } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
+import PrimaryButton from '@components/PrimaryButton';
 import Input from '@components/form/Input';
 import SearchAddress from '@components/form/SearchAddress';
+import { MODAL } from '@data/constants';
 
 export default {
   name: 'HoldingCreationModal',
@@ -34,6 +35,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
     'ni-search-address': SearchAddress,
+    'ni-primary-button': PrimaryButton,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-holding'],
   setup (props, { emit }) {
@@ -47,6 +49,8 @@ export default {
     };
 
     return {
+      // Data
+      MODAL,
       // Methods
       hide,
       input,

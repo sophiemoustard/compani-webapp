@@ -25,8 +25,7 @@
         <div class="q-my-lg buttons">
           <ni-button @click="$router.push({ name: 'forgotPassword' })" color="primary" class="firstLoginBtn"
             label="C'est ma première connexion" />
-          <ni-button data-cy="login" label="Me connecter" icon="ion-log-in" @click="submit"
-            color="primary" :flat="false" />
+          <ni-primary-button data-cy="login" label="Me connecter" icon="ion-log-in" @click="submit" />
         </div>
       </div>
     </div>
@@ -42,6 +41,7 @@ import { required, email } from '@vuelidate/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
+import PrimaryButton from '@components/PrimaryButton';
 import { NotifyNegative } from '@components/popup/notify';
 import { AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY, REQUIRED_LABEL } from '@data/constants';
 import { isUserLogged } from '@helpers/alenvi';
@@ -53,6 +53,7 @@ export default {
     'compani-header': CompaniHeader,
     'ni-input': Input,
     'ni-button': Button,
+    'ni-primary-button': PrimaryButton,
   },
   mixins: [logInMixin],
   data () {
