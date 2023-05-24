@@ -3,12 +3,11 @@
     :disable="disable" :label="label" @click="click" :loading="loading" />
   <q-btn v-else-if="type === MODAL" no-caps class="full-width modal-btn" :label="label" color="primary"
     :loading="loading" :icon-right="icon" @click="click" :disable="disable" />
-  <ni-button v-else :label="label" :icon="icon" @click="click" color="primary" :flat="false" :loading="loading"
+  <q-btn v-else no-caps :label="label" :icon="icon" @click="click" color="primary" :loading="loading"
     :disable="disable" />
 </template>
 
 <script>
-import Button from '@components/Button';
 import { FLOATING, MODAL } from '@data/constants';
 
 export default {
@@ -20,11 +19,8 @@ export default {
     loading: { type: Boolean, default: false },
     type: { type: String, default: '' },
   },
-  components: {
-    'ni-button': Button,
-  },
   emits: ['click'],
-  setup (props, { emit }) {
+  setup (_, { emit }) {
     const click = (event) => { emit('click', event); };
 
     return {

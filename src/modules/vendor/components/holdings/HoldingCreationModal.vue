@@ -5,11 +5,10 @@
     </template>
     <ni-input in-modal :model-value="newHolding.name" @update:model-value="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Raison sociale" :error="validations.name.$error" />
-    <ni-search-address :model-value="newHolding.address" error-message="Adresse non valide" in-modal last
-      @blur="validations.address.$touch" :error="validations.address.$error"
+    <ni-input in-modal last caption="Adresse" :model-value="newHolding.address"
       @update:model-value="update($event, 'address')" />
     <template #footer>
-      <ni-primary-button icon="add" label="Créer la société mère" @click="submit" :loading="loading" :type="MODAL" />
+      <ni-primary-button icon="add" label="Créer la société mère" @click="submit" :loading="loading" :mode="MODAL" />
     </template>
   </ni-modal>
 </template>
@@ -20,7 +19,6 @@ import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import PrimaryButton from '@components/PrimaryButton';
 import Input from '@components/form/Input';
-import SearchAddress from '@components/form/SearchAddress';
 import { MODAL } from '@data/constants';
 
 export default {
@@ -34,7 +32,6 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
-    'ni-search-address': SearchAddress,
     'ni-primary-button': PrimaryButton,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-holding'],

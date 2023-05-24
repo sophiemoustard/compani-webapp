@@ -5,7 +5,7 @@
     <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading"
       v-model:pagination="pagination" />
     <ni-primary-button icon="add" label="Ajouter une société mère" @click="holdingCreationModal = true"
-      :disable="tableLoading" :type="FLOATING" />
+      :disable="tableLoading" :mode="FLOATING" />
 
     <holding-creation-modal v-model="holdingCreationModal" v-model:new-holding="newHolding" :validations="v$.newHolding"
       :loading="modalLoading" @hide="resetCreationModal" @submit="createHolding" />
@@ -14,7 +14,6 @@
 
 <script>
 import { useMeta } from 'quasar';
-import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
 import { computed, ref } from 'vue';
 import Holdings from '@api/Holdings';
@@ -23,10 +22,9 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TableList from '@components/table/TableList';
 import { FLOATING } from '@data/constants';
-import { frAddress } from '@helpers/vuelidateCustomVal';
-import { removeDiacritics } from '@helpers/utils';
+import { removeDiacritics, removeEmptyProps } from '@helpers/utils';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import HoldingCreationModal from 'src/modules/vendor/components/holdings/HoldingCreationModal';
 
 export default {
@@ -38,7 +36,7 @@ export default {
     'ni-primary-button': PrimaryButton,
   },
   setup () {
-    const metaInfo = { title: 'Répertoire structures' };
+    const metaInfo = { title: 'Répertoire sociétés mères' };
     useMeta(metaInfo);
 
     const holdings = ref([]);
@@ -47,7 +45,7 @@ export default {
     const pagination = { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 };
     const searchStr = ref('');
     const holdingCreationModal = ref(false);
-    const newHolding = ref({ name: '', address: {} });
+    const newHolding = ref({ name: '', address: '' });
     const modalLoading = ref(false);
 
     const filteredHoldings = computed(() => {
@@ -58,12 +56,6 @@ export default {
     const rules = computed(() => ({
       newHolding: {
         name: { required },
-        address: {
-          zipCode: { required: requiredIf(get(newHolding.value, 'address.fullAddress')) },
-          street: { required: requiredIf(get(newHolding.value, 'address.fullAddress')) },
-          city: { required: requiredIf(get(newHolding.value, 'address.fullAddress')) },
-          fullAddress: { frAddress },
-        },
       },
     }));
 
@@ -89,7 +81,7 @@ export default {
     };
 
     const resetCreationModal = () => {
-      newHolding.value = { name: '', address: {} };
+      newHolding.value = { name: '', address: '' };
       v$.value.newHolding.$reset();
     };
 
@@ -98,7 +90,8 @@ export default {
         v$.value.newHolding.$touch();
         if (v$.value.newHolding.$error) return NotifyWarning('Champ(s) invalide(s)');
         modalLoading.value = true;
-        await Holdings.create({ ...newHolding.value });
+        const payload = removeEmptyProps(newHolding.value);
+        await Holdings.create(payload);
 
         holdingCreationModal.value = false;
         NotifyPositive('Société mère créée.');
