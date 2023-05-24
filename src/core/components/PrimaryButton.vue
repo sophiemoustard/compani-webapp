@@ -1,13 +1,10 @@
 <template>
-  <q-btn v-if="type === FLOATING" class="fixed fab-custom" no-caps rounded color="primary" :icon="icon"
-    :disable="disable" :label="label" @click="click" :loading="loading" />
-  <q-btn v-else-if="type === MODAL" no-caps class="full-width modal-btn" :label="label" color="primary"
-    :loading="loading" :icon-right="icon" @click="click" :disable="disable" />
-  <q-btn v-else no-caps :label="label" :icon="icon" @click="click" color="primary" :loading="loading"
-    :disable="disable" />
+  <q-btn no-caps color="primary" :class="buttonClass" :label="label" :icon="buttonIcon" :icon-right="iconRight"
+    @click="click" :rounded="rounded" :disable="disable" :loading="loading" />
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
 import { FLOATING, MODAL } from '@data/constants';
 
 export default {
@@ -17,16 +14,44 @@ export default {
     icon: { type: String, default: undefined },
     label: { type: String, default: '' },
     loading: { type: Boolean, default: false },
-    type: { type: String, default: '' },
+    mode: { type: String, default: '' },
   },
   emits: ['click'],
-  setup (_, { emit }) {
+  setup (props, { emit }) {
+    const { mode, icon } = toRefs(props);
+
     const click = (event) => { emit('click', event); };
+
+    const buttonClass = computed(() => {
+      if (mode.value === FLOATING) return 'fixed fab-custom';
+      if (mode.value === MODAL) return 'full-width modal-btn';
+
+      return '';
+    });
+
+    const rounded = computed(() => mode.value === FLOATING);
+
+    const iconRight = computed(() => {
+      if (mode.value === MODAL) return icon.value;
+
+      return undefined;
+    });
+
+    const buttonIcon = computed(() => {
+      if (!iconRight.value) return icon.value;
+
+      return undefined;
+    });
 
     return {
       // Data
       FLOATING,
       MODAL,
+      // Computed
+      buttonClass,
+      buttonIcon,
+      iconRight,
+      rounded,
       // Methods
       click,
     };
