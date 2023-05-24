@@ -154,7 +154,8 @@ export default {
 
         courseCreationModal.value = false;
         NotifyPositive('Formation créée.');
-        await refreshCourses();
+
+        await refreshActiveCourses();
       } catch (e) {
         console.error(e);
         NotifyNegative('Impossible de créer la formation.');
@@ -196,15 +197,22 @@ export default {
       resetFilters,
     } = useCourseFilters(activeCourses, archivedCourses);
 
-    const refreshCourses = async () => {
+    const refreshActiveCourses = async () => {
       try {
         const courseList = await Courses.list({ format: BLENDED, action: OPERATIONS, isArchived: false });
         activeCourses.value = courseList;
+      } catch (e) {
+        console.error(e);
+        activeCourses.value = [];
+      }
+    };
+
+    const refreshArchivedCourses = async () => {
+      try {
         const archivedCourseList = await Courses.list({ format: BLENDED, action: OPERATIONS, isArchived: true });
         archivedCourses.value = archivedCourseList;
       } catch (e) {
         console.error(e);
-        activeCourses.value = [];
         archivedCourses.value = [];
       }
     };
@@ -234,7 +242,8 @@ export default {
 
     const created = async () => {
       await Promise.all([
-        refreshCourses(),
+        refreshActiveCourses(),
+        refreshArchivedCourses(),
         refreshPrograms(),
         refreshCompanies(),
         refreshSalesRepresentatives(),
