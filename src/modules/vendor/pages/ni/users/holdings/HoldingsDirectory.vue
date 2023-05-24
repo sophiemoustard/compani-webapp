@@ -42,7 +42,7 @@ export default {
     const holdings = ref([]);
     const tableLoading = ref(false);
     const columns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }];
-    const pagination = { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 };
+    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
     const searchStr = ref('');
     const holdingCreationModal = ref(false);
     const newHolding = ref({ name: '', address: '' });
