@@ -29,22 +29,7 @@ export default {
     const unarchivedCompletedCourseList = ref([]);
 
     const completedCourseSortedList = computed(() => {
-      const archivedFormattedCourses = archivedCourses.value.map((course) => {
-        const courseWithGroupedSlots = {
-          ...course,
-          slots: course.slots.length
-            ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
-            : [],
-        };
-
-        return {
-          ...courseWithGroupedSlots,
-          status: COMPLETED,
-          ...(courseWithGroupedSlots.slots.length
-            ? { durationTodayToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots) }
-            : { durationTodayToCreation: getDurationTodayToCreation(courseWithGroupedSlots) }),
-        };
-      });
+      const archivedFormattedCourses = archivedCourses.value.map(formatArchivedCourses);
 
       return [...unarchivedCompletedCourseList.value, ...archivedFormattedCourses]
         .sort((a, b) => {
@@ -59,6 +44,23 @@ export default {
       { title: 'En cours', courses: inProgressCourseSortedList.value },
       { title: 'Terminées', courses: completedCourseSortedList.value },
     ]);
+
+    const formatArchivedCourses = (course) => {
+      const courseWithGroupedSlots = {
+        ...course,
+        slots: course.slots.length
+          ? Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY)))
+          : [],
+      };
+
+      return {
+        ...courseWithGroupedSlots,
+        status: COMPLETED,
+        ...(courseWithGroupedSlots.slots.length
+          ? { durationTodayToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots) }
+          : { durationTodayToCreation: getDurationTodayToCreation(courseWithGroupedSlots) }),
+      };
+    };
 
     const happened = sameDaySlots => CompaniDate().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
 
@@ -104,45 +106,28 @@ export default {
     const groupCoursesByTemporalState = () => {
       const forthcomingCourseList = [];
       const inProgressCourseList = [];
+      const completedCourseList = [];
 
       activeCourses.value.forEach((course) => {
-        if (course.slots.length) {
+        if (!course.slots.length) forthcomingCourseList.push(formatCoursesWithTemporalState(course, FORTHCOMING));
+        else {
           const courseWithGroupedSlots = {
             ...course,
             slots: Object.values(groupBy(course.slots, s => CompaniDate(s.startDate).format(DD_MM_YYYY))),
           };
+
           if (isForthcoming(courseWithGroupedSlots)) {
-            forthcomingCourseList.push({
-              ...courseWithGroupedSlots,
-              status: FORTHCOMING,
-              durationTodayToStartCourse: getDurationTodayToStartCourse(courseWithGroupedSlots),
-            });
+            forthcomingCourseList.push(formatCoursesWithTemporalState(courseWithGroupedSlots, FORTHCOMING));
           } else if (isInProgress(courseWithGroupedSlots)) {
-            inProgressCourseList.push({
-              ...courseWithGroupedSlots,
-              status: IN_PROGRESS,
-              durationTodayToNextSlot: getDurationTodayToNextSlot(courseWithGroupedSlots),
-            });
+            inProgressCourseList.push(formatCoursesWithTemporalState(courseWithGroupedSlots, IN_PROGRESS));
           } else {
-            unarchivedCompletedCourseList.value.push({
-              ...courseWithGroupedSlots,
-              status: COMPLETED,
-              durationTodayToEndCourse: getDurationTodayToEndCourse(courseWithGroupedSlots),
-            });
+            completedCourseList.push(formatCoursesWithTemporalState(courseWithGroupedSlots, COMPLETED));
           }
-        } else {
-          forthcomingCourseList.push({
-            ...course,
-            status: FORTHCOMING,
-            durationTodayToStartCourse: getDurationTodayToStartCourse(course),
-          });
         }
       });
 
       forthcomingCourseSortedList.value = forthcomingCourseList
-        .sort(
-          (a, b) => durationAscendingSort(a.durationTodayToStartCourse, b.durationTodayToStartCourse)
-        );
+        .sort((a, b) => durationAscendingSort(a.durationTodayToStartCourse, b.durationTodayToStartCourse));
 
       inProgressCourseSortedList.value = inProgressCourseList
         .sort((a, b) => {
@@ -151,11 +136,23 @@ export default {
 
           return durationAscendingSort(a.durationTodayToNextSlot, b.durationTodayToNextSlot);
         });
+
+      unarchivedCompletedCourseList.value = completedCourseList;
     };
 
-    watch(activeCourses, () => {
-      groupCoursesByTemporalState();
-    });
+    const formatCoursesWithTemporalState = (course, status) => {
+      if (status === FORTHCOMING) {
+        return { ...course, status, durationTodayToStartCourse: getDurationTodayToStartCourse(course) };
+      }
+
+      if (status === IN_PROGRESS) {
+        return { ...course, status, durationTodayToNextSlot: getDurationTodayToNextSlot(course) };
+      }
+
+      return { ...course, status, durationTodayToEndCourse: getDurationTodayToEndCourse(course) };
+    };
+
+    watch(activeCourses, () => { groupCoursesByTemporalState(); });
 
     return {
       // Computed
