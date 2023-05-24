@@ -1,6 +1,6 @@
 <template>
   <q-btn no-caps color="primary" :class="buttonClass" :label="label" :icon="buttonIcon" :icon-right="iconRight"
-    @click="click" :rounded="rounded" :disable="disable" :loading="loading" />
+    @click="click" :rounded="floatingButton" :disable="disable" :loading="loading" :unelevated="!floatingButton" />
 </template>
 
 <script>
@@ -29,7 +29,7 @@ export default {
       return '';
     });
 
-    const rounded = computed(() => mode.value === FLOATING);
+    const floatingButton = computed(() => mode.value === FLOATING);
 
     const iconRight = computed(() => {
       if (mode.value === MODAL) return icon.value;
@@ -51,7 +51,7 @@ export default {
       buttonClass,
       buttonIcon,
       iconRight,
-      rounded,
+      floatingButton,
       // Methods
       click,
     };
