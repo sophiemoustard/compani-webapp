@@ -88,6 +88,7 @@ const helperRoutes = [
 ];
 const trainingOrganisationManagerRoutes = [
   { name: 'ni users companies' },
+  { name: 'ni users holdings' },
   { name: 'ni users companies info' },
   { name: 'ni users trainers' },
   { name: 'ni users trainers info' },

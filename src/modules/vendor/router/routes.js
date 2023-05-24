@@ -34,6 +34,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/users/holdings',
+        name: 'ni users holdings',
+        component: () => import('src/modules/vendor/pages/ni/users/holdings/HoldingsDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
         path: 'ni/users/companies/:companyId',
         name: 'ni users companies info',
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompanyProfile'),
