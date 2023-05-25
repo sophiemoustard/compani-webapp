@@ -33,7 +33,7 @@
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
-    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
+    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshTraineeTable"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
@@ -334,9 +334,15 @@ export default {
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
     });
 
-    watch(course, () => {
+    watch(course, async (newValue, oldValue) => {
       const phoneValidation = get(v$.value, 'course.contact.contact.phone');
       if (phoneValidation) phoneValidation.$touch();
+
+      if (newValue.companies.length !== oldValue.companies.length) await refreshTrainingContracts();
+      else {
+        const oldValueCompaniesIds = oldValue.companies.map(c => c._id);
+        if (!newValue.companies.every(c => oldValueCompaniesIds.includes(c._id))) await refreshTrainingContracts();
+      }
 
       tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
     });
@@ -345,6 +351,13 @@ export default {
       displayHistory.value = !displayHistory.value;
       if (displayHistory.value) await getCourseHistories();
       else courseHistories.value = [];
+    };
+
+    const refreshCourseHistories = async () => {
+      if (displayHistory.value) {
+        await getCourseHistories();
+        courseHistoryFeed.value.resumeScroll();
+      }
     };
 
     const getCourseHistories = async (createdAt = null) => {
@@ -376,7 +389,7 @@ export default {
       return done(!olderCourseHistories.length);
     };
 
-    const getPotentialTrainees = async () => {
+    const refreshPotentialTrainees = async () => {
       try {
         const companies = isClientInterface
           ? get(loggedUser.value, 'company._id')
@@ -395,17 +408,17 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
-        await refreshTrainingContracts();
-        if (displayHistory.value) {
-          await getCourseHistories();
-          courseHistoryFeed.value.resumeScroll();
-        }
-        await getPotentialTrainees();
+        await refreshCourseHistories();
       } catch (e) {
         console.error(e);
       } finally {
         courseLoading.value = false;
       }
+    };
+
+    const refreshTraineeTable = async () => {
+      await refreshCourse();
+      await refreshPotentialTrainees();
     };
 
     const formatInterlocutorOption = interlocutor => ({
@@ -731,16 +744,14 @@ export default {
     };
 
     const created = async () => {
-      const promises = [refreshCourse()];
-      if (isVendorInterface || isIntraCourse.value) {
-        promises.push(refreshSms(), refreshCompanyRepresentatives());
-      }
+      const promises = [];
+      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
+      if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
 
-      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
+      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
-      promises.push(getPotentialTrainees());
 
       await Promise.all(promises);
     };
@@ -825,6 +836,7 @@ export default {
       copy,
       updateCourse,
       downloadAttendanceSheet,
+      refreshTraineeTable,
       refreshTrainingContracts,
     };
   },

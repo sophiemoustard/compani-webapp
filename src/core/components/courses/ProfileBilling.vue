@@ -171,7 +171,7 @@ export default {
     };
 
     const created = async () => {
-      await Promise.all([refreshCourseBills(), refreshPayers(), refreshBillingItems(), refreshCourse()]);
+      await Promise.all([refreshCourseBills(), refreshPayers(), refreshBillingItems()]);
     };
 
     created();
