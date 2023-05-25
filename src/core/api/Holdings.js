@@ -13,7 +13,6 @@ export default {
     return holding.data.data.holding;
   },
   async update (holdingId, data) {
-    const updatedHolding = await alenviAxios.put(`${process.env.API_HOSTNAME}/holdings/${holdingId}`, data);
-    return updatedHolding;
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/holdings/${holdingId}`, data);
   },
 };

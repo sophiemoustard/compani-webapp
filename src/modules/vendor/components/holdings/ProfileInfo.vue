@@ -2,11 +2,12 @@
   <div v-if="holding">
     <p class="text-weight-bold q-mt-lg">Structures rattachées</p>
     <q-card>
-      <ni-responsive-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination">
+      <ni-simple-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination"
+        :rows-per-page="[15, 50, 100]">
         <template #header="{ props }">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-              :class="'table-actions-responsive'">
+              :class="'table-actions-responsive bg-white'">
               {{ col.label }}
             </q-th>
           </q-tr>
@@ -22,7 +23,7 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-responsive-table>
+      </ni-simple-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" class="q-ml-sm" label="Rattacher une structure"
           @click="openCompanyLinkModal" />
@@ -45,7 +46,7 @@ import Companies from '@api/Companies';
 import Holdings from '@api/Holdings';
 import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
-import ResponsiveTable from '@components/table/ResponsiveTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { formatAndSortOptions } from '@helpers/utils';
 
@@ -55,7 +56,7 @@ export default {
     profileId: { type: String, required: true },
   },
   components: {
-    'ni-responsive-table': ResponsiveTable,
+    'ni-simple-table': SimpleTable,
     'company-addition-modal': CompanyAdditionModal,
     'ni-button': Button,
   },
@@ -64,15 +65,8 @@ export default {
     const $store = useStore();
     const $router = useRouter();
 
-    const columns = ref([
-      {
-        name: 'name',
-        label: 'Nom',
-        align: 'left',
-        field: row => row.name,
-      },
-    ]);
-    const pagination = ref({ rowsPerPage: 0, sortBy: 'name' });
+    const columns = ref([{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }]);
+    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
     const companyOptions = ref([]);
     const companyLinkModal = ref(false);
     const newCompanyLink = ref('');
@@ -94,7 +88,7 @@ export default {
 
     const openCompanyLinkModal = async () => {
       try {
-        const companies = await Companies.list({ hasHolding: true });
+        const companies = await Companies.list({ noHolding: true });
 
         companyOptions.value = formatAndSortOptions(companies, 'name');
         companyLinkModal.value = true;
@@ -117,10 +111,7 @@ export default {
         if (v$.value.newCompanyLink.$error) return NotifyWarning('Une structure est requise.');
 
         modalLoading.value = true;
-        await Holdings.update(
-          holding.value._id,
-          { company: newCompanyLink.value }
-        );
+        await Holdings.update(holding.value._id, { company: newCompanyLink.value });
 
         companyLinkModal.value = false;
         NotifyPositive('Rattachement à la société mère effectué.');
@@ -138,12 +129,6 @@ export default {
     const goToCompanyProfile = (row) => {
       $router.push({ name: 'ni users companies info', params: { companyId: row._id } });
     };
-
-    const created = async () => {
-      if (!holding.value) await refreshHolding();
-    };
-
-    created();
 
     return {
       // Data

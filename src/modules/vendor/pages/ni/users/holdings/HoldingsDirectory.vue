@@ -2,8 +2,8 @@
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire sociétés mères" search-placeholder="Rechercher une société mère"
       @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading"
-      v-model:pagination="pagination" @go-to="goToHoldingProfile" />
+    <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
+      @go-to="goToHoldingProfile" />
     <ni-primary-button icon="add" label="Ajouter une société mère" @click="holdingCreationModal = true"
       :disable="tableLoading" :mode="FLOATING" />
 
