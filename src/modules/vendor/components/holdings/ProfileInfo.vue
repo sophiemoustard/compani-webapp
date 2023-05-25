@@ -15,7 +15,10 @@
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :style="col.style"
               :class="col.name">
-              {{ col.value }}
+              <q-item-label @click="goToCompanyProfile(props.row)"
+                :class="['ellipsis', 'clickable-name cursor-pointer']">
+                {{ col.value }}
+              </q-item-label>
             </q-td>
           </q-tr>
         </template>
@@ -35,6 +38,7 @@
 <script>
 import { computed, toRefs, ref } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
@@ -58,6 +62,7 @@ export default {
   setup (props) {
     const { profileId } = toRefs(props);
     const $store = useStore();
+    const $router = useRouter();
 
     const columns = ref([
       {
@@ -130,6 +135,10 @@ export default {
       }
     };
 
+    const goToCompanyProfile = (row) => {
+      $router.push({ name: 'ni users companies info', params: { companyId: row._id } });
+    };
+
     const created = async () => {
       if (!holding.value) await refreshHolding();
     };
@@ -151,6 +160,7 @@ export default {
       openCompanyLinkModal,
       resetCompanyLinkModal,
       linkCompanyToHolding,
+      goToCompanyProfile,
     };
   },
 };
