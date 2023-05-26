@@ -3,7 +3,7 @@
     <p class="text-weight-bold q-mt-lg">Structures rattachées</p>
     <q-card>
       <ni-simple-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination"
-        :rows-per-page="[15, 50, 100]">
+        :rows-per-page="[15, 50, 100]" class="q-px-md">
         <template #header="{ props }">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
