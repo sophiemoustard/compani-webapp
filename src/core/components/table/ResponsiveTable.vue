@@ -21,6 +21,10 @@
           </q-tr>
         </slot>
       </template>
+      <template #bottom="props">
+        <ni-pagination :props="props" :pagination="pagination" :data="data" :options="paginationOptions"
+          @update:pagination="update($event)" />
+      </template>
       <template #no-data>
         <div class="full-width row text-copper-grey-800 justify-center">
           <span class="text-italic q-pb-sm" style="font-size: 0.8rem">{{ noDataLabel }}</span>
@@ -36,6 +40,8 @@
 </template>
 
 <script>
+import Pagination from '@components/table/Pagination';
+
 export default {
   name: 'ResponsiveTable',
   props: {
@@ -51,10 +57,21 @@ export default {
     noDataLabel: { type: String, default: '' },
     hideHeader: { type: Boolean, default: false },
   },
+  components: {
+    'ni-pagination': Pagination,
+  },
   emits: ['update:pagination', 'row-click'],
   computed: {
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
+    },
+    paginationOptions () {
+      return this.rowsPerPageOptions.filter(o => o <= this.data.length);
+    },
+  },
+  methods: {
+    update (event) {
+      this.$emit('update:pagination', event);
     },
   },
 };

@@ -64,6 +64,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/users/holdings/:holdingId',
+        name: 'ni users holdings info',
+        component: () => import('src/modules/vendor/pages/ni/users/holdings/HoldingProfile'),
+        props: route => ({ ...route.query, ...route.params }),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
         path: 'ni/users/trainers',
         name: 'ni users trainers',
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainersDirectory'),

@@ -2,8 +2,8 @@
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire sociétés mères" search-placeholder="Rechercher une société mère"
       @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading"
-      v-model:pagination="pagination" />
+    <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
+      @go-to="goToHoldingProfile" />
     <ni-primary-button icon="add" label="Ajouter une société mère" @click="holdingCreationModal = true"
       :disable="tableLoading" :mode="FLOATING" />
 
@@ -14,6 +14,7 @@
 
 <script>
 import { useMeta } from 'quasar';
+import { useRouter } from 'vue-router';
 import escapeRegExp from 'lodash/escapeRegExp';
 import { computed, ref } from 'vue';
 import Holdings from '@api/Holdings';
@@ -38,6 +39,8 @@ export default {
   setup () {
     const metaInfo = { title: 'Répertoire sociétés mères' };
     useMeta(metaInfo);
+
+    const $router = useRouter();
 
     const holdings = ref([]);
     const tableLoading = ref(false);
@@ -105,6 +108,10 @@ export default {
       }
     };
 
+    const goToHoldingProfile = (row) => {
+      $router.push({ name: 'ni users holdings info', params: { holdingId: row._id } });
+    };
+
     const created = async () => {
       await refreshHoldings();
     };
@@ -128,6 +135,7 @@ export default {
       updateSearch,
       resetCreationModal,
       createHolding,
+      goToHoldingProfile,
     };
   },
 
