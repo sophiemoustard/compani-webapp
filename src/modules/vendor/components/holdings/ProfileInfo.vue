@@ -2,11 +2,11 @@
   <div v-if="holding">
     <p class="text-weight-bold q-mt-lg">Structures rattachées</p>
     <q-card>
-      <ni-simple-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination" class="q-px-md">
+      <ni-responsive-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination"
+        :hide-bottom="false">
         <template #header="{ props }">
           <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-              :class="'bg-white'">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
               {{ col.label }}
             </q-th>
           </q-tr>
@@ -15,14 +15,13 @@
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :style="col.style"
               :class="col.name">
-              <div @click="goToCompanyProfile(props.row)"
-                :class="['ellipsis', 'clickable-name cursor-pointer']">
+              <div @click="goToCompanyProfile(props.row)" :class="['ellipsis', 'clickable-name cursor-pointer']">
                 {{ col.value }}
               </div>
             </q-td>
           </q-tr>
         </template>
-      </ni-simple-table>
+      </ni-responsive-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" class="q-ml-sm" label="Rattacher une structure"
           @click="openCompanyLinkModal" />
@@ -45,7 +44,7 @@ import Companies from '@api/Companies';
 import Holdings from '@api/Holdings';
 import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
-import SimpleTable from '@components/table/SimpleTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { formatAndSortOptions } from '@helpers/utils';
 
@@ -55,7 +54,7 @@ export default {
     profileId: { type: String, required: true },
   },
   components: {
-    'ni-simple-table': SimpleTable,
+    'ni-responsive-table': ResponsiveTable,
     'company-addition-modal': CompanyAdditionModal,
     'ni-button': Button,
   },
