@@ -2,12 +2,11 @@
   <div v-if="holding">
     <p class="text-weight-bold q-mt-lg">Structures rattachées</p>
     <q-card>
-      <ni-simple-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination"
-        :rows-per-page="[15, 50, 100]" class="q-px-md">
+      <ni-simple-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination" class="q-px-md">
         <template #header="{ props }">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-              :class="'table-actions-responsive bg-white'">
+              :class="'bg-white'">
               {{ col.label }}
             </q-th>
           </q-tr>
@@ -16,10 +15,10 @@
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :style="col.style"
               :class="col.name">
-              <q-item-label @click="goToCompanyProfile(props.row)"
+              <div @click="goToCompanyProfile(props.row)"
                 :class="['ellipsis', 'clickable-name cursor-pointer']">
                 {{ col.value }}
-              </q-item-label>
+              </div>
             </q-td>
           </q-tr>
         </template>
@@ -76,7 +75,7 @@ export default {
     const v$ = useVuelidate(rules, { newCompanyLink });
 
     const holding = computed(() => $store.state.holding.holding);
-    const companyHoldings = computed(() => holding.value.companyHoldingList.map(ch => ch.company));
+    const companyHoldings = computed(() => holding.value.companyHoldings.map(ch => ch.company));
 
     const refreshHolding = async () => {
       try {
