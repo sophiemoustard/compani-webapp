@@ -2,7 +2,7 @@
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :rows="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
       binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="data.length ? separator : 'none'"
-      :hide-bottom="hideBottom" :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm"
+      :hide-bottom="shouldHideBottom" :rows-per-page-options="rowsPerPage" class="table-responsive q-pa-sm"
       @update:pagination="$emit('update:pagination', $event)" @row-click="$emit('row-click')" :hide-header="hideHeader">
       <template #header="props">
         <slot name="header" :props="props">
@@ -49,7 +49,7 @@ export default {
     columns: { type: Array, default: () => [] },
     pagination: { type: Object, default: () => ({ page: 1, rowsPerPage: 15 }) },
     rowKey: { type: String, default: 'name' },
-    rowsPerPageOptions: { type: Array, default: () => [15, 25, 35] },
+    rowsPerPage: { type: Array, default: () => [15, 25, 35] },
     visibleColumns: { type: Array, default: () => [] },
     separator: { type: String, default: 'horizontal' },
     loading: { type: Boolean, default: false },
@@ -62,11 +62,14 @@ export default {
   },
   emits: ['update:pagination', 'row-click'],
   computed: {
+    shouldHideBottom () {
+      return this.hideBottom || (!!this.data.length && this.data.length <= this.rowsPerPage[0]);
+    },
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
     },
     paginationOptions () {
-      return this.rowsPerPageOptions.filter(o => o <= this.data.length);
+      return this.rowsPerPage.filter(o => o <= this.data.length);
     },
   },
   methods: {
