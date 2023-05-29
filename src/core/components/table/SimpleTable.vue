@@ -1,6 +1,6 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" flat :columns="columns" binary-state-sort :selection="selection"
+    <q-table v-if="!loading" flat :columns="columns" :pagination="pagination" binary-state-sort :selection="selection"
       :rows="data" :separator="separator" :selected="selected" @update:expanded="$emit('update:expanded', $event)"
       :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom" @row-click="$emit('row-click', $event)"
       @update:pagination="$emit('update:pagination', $event)" @update:selected="$emit('update:selected', $event)"
