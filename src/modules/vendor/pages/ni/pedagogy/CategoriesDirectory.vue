@@ -2,7 +2,7 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Catégories" class="q-mb-xl" />
     <q-card>
-      <ni-responsive-table :data="categories" :columns="columns" v-model:pagination="pagination"
+      <ni-responsive-table :data="categories" :columns="columns" v-model:pagination="pagination" :hide-bottom="false"
         :loading="tableLoading">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -81,7 +81,7 @@ export default {
       ],
       categoryCreationModal: false,
       categoryEditionModal: false,
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
+      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
     };
   },
   validations () {
