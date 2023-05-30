@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToUserProfile" :rows-per-page-options="[15, 50, 100, 200]">
+      @go-to="goToUserProfile">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>

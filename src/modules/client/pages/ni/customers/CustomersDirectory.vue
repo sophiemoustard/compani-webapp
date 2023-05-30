@@ -2,7 +2,7 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" v-model:pagination="pagination"
-      @go-to="goToCustomerProfile" :loading="tableLoading" :rows-per-page-options="[15, 50, 100, 200]">
+      @go-to="goToCustomerProfile" :loading="tableLoading">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>

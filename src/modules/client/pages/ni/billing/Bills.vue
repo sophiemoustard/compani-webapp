@@ -96,7 +96,7 @@ export default {
       },
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'date', descending: true });
-    const rowsPerPage = ref([1, 5, 15, 50, 100, 200, 300]);
+    const rowsPerPageOptions = ref([1, 5, 15, 50, 100, 200, 300]);
     const tableLoading = ref(false);
     const pdfLoading = ref(false);
 
@@ -179,7 +179,7 @@ export default {
       bills,
       columns,
       pagination,
-      rowsPerPage,
+      rowsPerPageOptions,
       tableLoading,
       pdfLoading,
       // Methods

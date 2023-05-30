@@ -3,8 +3,7 @@
     <ni-directory-header title="Structures partenaires" search-placeholder="Rechercher une structure"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredPartnerOrganizations" :columns="columns" :visible-columns="visibleColumns"
-      v-model:pagination="pagination" :rows-per-page-options="[15, 50]" :loading="tableLoading"
-      @go-to="goToPartnerOrganizationProfile" />
+      v-model:pagination="pagination" :loading="tableLoading" @go-to="goToPartnerOrganizationProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="partnerOrganizationCreationModal = true" />
 
