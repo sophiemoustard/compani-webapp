@@ -2,7 +2,7 @@
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToLearnerProfile" :rows-per-page="[15, 50, 100, 200]">
+      @go-to="goToLearnerProfile" :rows-per-page-options="[15, 50, 100, 200]">
       <template #body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>

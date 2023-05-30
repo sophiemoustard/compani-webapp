@@ -9,7 +9,7 @@
       </template>
     </ni-title-header>
     <ni-simple-table :columns="columns" v-model:pagination="pagination" :data="bills" :loading="tableLoading"
-      :rows-per-page="rowsPerPage">
+      :rows-per-page-options="rowsPerPageOptions">
      <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"

@@ -2,7 +2,7 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Factures manuelles" padding />
     <ni-simple-table :columns="columns" v-model:pagination="pagination" :data="manualBills"
-      :loading="tableLoading" :rows-per-page="rowsPerPage" separator="none">
+      :loading="tableLoading" :rows-per-page-options="rowsPerPageOptions" separator="none">
       <template #body="{ props }">
         <template v-for="(billingItem, index) of props.row.billingItemList" :key="`${props.row._id}-${index}`">
           <q-tr :props="props" :class="{ 'border-top': index === 0 }">
@@ -85,7 +85,7 @@ export default {
       netInclTaxes: 0,
       shouldBeSent: false,
     });
-    const rowsPerPage = ref([1, 5, 15, 50, 100, 200, 300]);
+    const rowsPerPageOptions = ref([1, 5, 15, 50, 100, 200, 300]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'date', descending: true });
     const billingItems = ref([]);
     const customers = ref([]);
@@ -238,7 +238,7 @@ export default {
       manualBills,
       manualBillCreationModal,
       newManualBill,
-      rowsPerPage,
+      rowsPerPageOptions,
       pagination,
       customers,
       billingItems,

@@ -49,7 +49,7 @@ export default {
     columns: { type: Array, default: () => [] },
     pagination: { type: Object, default: () => ({ page: 1, rowsPerPage: 15 }) },
     rowKey: { type: String, default: 'name' },
-    rowsPerPage: { type: Array, default: () => [15, 25, 35] },
+    rowsPerPageOptions: { type: Array, default: () => [15, 25, 35] },
     visibleColumns: { type: Array, default: () => [] },
     separator: { type: String, default: 'horizontal' },
     loading: { type: Boolean, default: false },
@@ -63,13 +63,13 @@ export default {
   emits: ['update:pagination', 'row-click'],
   computed: {
     shouldHideBottom () {
-      return this.hideBottom || (!!this.data.length && this.data.length <= this.rowsPerPage[0]);
+      return this.hideBottom || (!!this.data.length && this.data.length <= this.rowsPerPageOptions[0]);
     },
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
     },
     paginationOptions () {
-      return this.rowsPerPage.filter(o => o <= this.data.length);
+      return this.rowsPerPageOptions.filter(o => o <= this.data.length);
     },
   },
   methods: {
