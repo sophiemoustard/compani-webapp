@@ -59,7 +59,8 @@
         <p class="text-weight-bold">Aidants</p>
       </div>
       <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
-        :loading="helpersLoading" :rows-per-page="rowsPerPage" v-model:pagination="pagination">
+        :loading="helpersLoading" :rows-per-page-options="rowsPerPageOptions"
+        v-model:pagination="sortedHelpersPagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -77,8 +78,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Partenaires</p>
       <q-card>
-        <ni-responsive-table :data="partners" :columns="partnersColumns" v-model:pagination="pagination"
-          class="q-mb-md" :loading="partnersLoading">
+        <ni-responsive-table :data="partners" :columns="partnersColumns" v-model:pagination="partnersPagination"
+          class="q-mb-md" :loading="partnersLoading" :hide-bottom="false" :rows-per-page-options="rowsPerPageOptions">
           <template #header="{ props }">
             <q-tr :props="props">
               <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
@@ -114,14 +115,14 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
-        :rows-per-page="rowsPerPage" v-model:pagination="pagination" />
+        :rows-per-page-options="rowsPerPageOptions" v-model:pagination="fundingsMonitoringPagination" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
       <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :loading="followUpLoading"
-        :rows-per-page="rowsPerPage" v-model:pagination="pagination">
+        :rows-per-page-options="rowsPerPageOptions" v-model:pagination="followUpPagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -215,8 +216,11 @@ export default {
   setup () { return { v$: useVuelidate() }; },
   data () {
     return {
-      rowsPerPage: [5, 10, 15, 20],
-      pagination: { page: 1, rowsPerPage: 5 },
+      rowsPerPageOptions: [5, 10, 15, 20],
+      sortedHelpersPagination: { page: 1, rowsPerPage: 5 },
+      partnersPagination: { page: 1, rowsPerPage: 5 },
+      fundingsMonitoringPagination: { page: 1, rowsPerPage: 5 },
+      followUpPagination: { page: 1, rowsPerPage: 5 },
       auxiliaries: [],
       isLoaded: false,
       tmpInput: '',

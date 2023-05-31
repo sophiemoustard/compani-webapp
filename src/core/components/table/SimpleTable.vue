@@ -62,7 +62,7 @@ export default {
     selected: { type: Array, default: () => [] },
     separator: { type: String, default: 'horizontal' },
     hideBottom: { type: Boolean, default: false },
-    rowsPerPage: { type: Array, default: () => [15, 50, 100, 200, 300] },
+    rowsPerPageOptions: { type: Array, default: () => [15, 50, 100, 200, 300] },
   },
   emits: ['update:pagination', 'update:selected', 'row-click', 'update:expanded'],
   components: {
@@ -77,10 +77,10 @@ export default {
   },
   computed: {
     shouldHideBottom () {
-      return this.hideBottom || (!!this.data.length && this.data.length <= this.rowsPerPage[0]);
+      return this.hideBottom || (!!this.data.length && this.data.length <= this.rowsPerPageOptions[0]);
     },
     paginationOptions () {
-      return this.rowsPerPage.filter(o => o <= this.data.length);
+      return this.rowsPerPageOptions.filter(o => o <= this.data.length);
     },
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);

@@ -3,7 +3,7 @@
     <p class="text-weight-bold">Règle d'accès</p>
     <q-card>
       <ni-responsive-table :data="accessRules" :columns="columns" v-model:pagination="pagination"
-        no-data-label="Pas de règle - la formation est en libre accès" :hide-bottom="!!accessRules.length">
+        no-data-label="Pas de règle - la formation est en libre accès" :hide-bottom="false">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -62,7 +62,7 @@ export default {
         { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 92%' },
         { name: 'actions', label: '', field: '_id' },
       ],
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
+      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       newAccessRule: '',
       companyOptions: [],
       accessRuleCreationModal: false,
