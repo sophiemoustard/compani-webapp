@@ -50,7 +50,7 @@ export const useLearnersCreation = (
   const tableLoading = ref(false);
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
-  const newTraineeRegistration = ref({ trainee: '', ...(isInterCourse && { company: '' }) });
+  const newTraineeRegistration = ref({ user: '', ...(isInterCourse && { company: '' }) });
   const disableUserInfoEdition = ref(false);
 
   const $store = useStore();
@@ -74,7 +74,7 @@ export const useLearnersCreation = (
     },
   }));
   const traineeRules = {
-    newTraineeRegistration: { trainee: { required }, company: { required: requiredIf(isInterCourse) } },
+    newTraineeRegistration: { user: { required }, company: { required: requiredIf(isInterCourse) } },
   };
 
   const learnerValidation = useVuelidate(learnerRules, { newLearner });
@@ -246,8 +246,8 @@ export const useLearnersCreation = (
 
     try {
       learnerCreationModalLoading.value = true;
-      if (learnerAlreadyExists.value) newTraineeRegistration.value = { trainee: await updateLearner() };
-      else newTraineeRegistration.value = { trainee: await createLearner() };
+      if (learnerAlreadyExists.value) newTraineeRegistration.value = { user: await updateLearner() };
+      else newTraineeRegistration.value = { user: await createLearner() };
 
       if (isInterCourse) newTraineeRegistration.value.company = newLearner.value.company;
 

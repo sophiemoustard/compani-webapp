@@ -50,11 +50,11 @@
       </div>
     </div>
 
-    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee-registration="newTraineeRegistration"
+    <user-addition-modal v-model="traineeAdditionModal" v-model:new-user-registration="newTraineeRegistration"
       @submit="addTrainee" :validations="traineeRegistrationValidation.newTraineeRegistration"
-      :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :trainees-options="traineesOptions"
-      @open-learner-creation-modal="openLearnerCreationModal" :trainees-company-options="traineesCompanyOptions"
-      :display-company-select="!isIntraCourse" />
+      :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :users-options="traineesOptions"
+      @open-user-creation-modal="openLearnerCreationModal" :users-company-options="traineesCompanyOptions"
+      :display-company-select="!isIntraCourse" no-options label="Stagiaire" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -80,7 +80,7 @@ import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
-import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
+import UserAdditionModal from '@components/courses/UserAdditionModal';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeTable from '@components/courses/TraineeTable';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -103,7 +103,7 @@ export default {
     'ni-button': Button,
     'ni-input': Input,
     'ni-trainee-table': TraineeTable,
-    'trainee-addition-modal': TraineeAdditionModal,
+    'user-addition-modal': UserAdditionModal,
     'learner-creation-modal': LearnerCreationModal,
     'ni-expanding-table': ExpandingTable,
     'company-addition-modal': CompanyAdditionModal,
@@ -229,9 +229,10 @@ export default {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const payload = isIntraCourse.value
-          ? { trainee: newTraineeRegistration.value.trainee }
-          : newTraineeRegistration.value;
+        const payload = {
+          trainee: newTraineeRegistration.value.user,
+          ...(!isIntraCourse.value && { company: newTraineeRegistration.value.company }),
+        };
         await Courses.addTrainee(course.value._id, payload);
 
         traineeAdditionModal.value = false;
