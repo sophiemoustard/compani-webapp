@@ -20,7 +20,7 @@
           </q-item>
         </template>
         <template #no-option>
-          <ni-button v-if="noOptions" color="primary" icon="add" label="Créer un nouveau compte"
+          <ni-button v-if="displayNoOptionsSlot" color="primary" icon="add" label="Créer un nouveau compte"
             @click="openUserCreationModal" />
         </template>
       </ni-select>
@@ -53,7 +53,7 @@ export default {
     usersCompanyOptions: { type: Object, default: () => ({}) },
     displayCompanySelect: { type: Boolean, default: false },
     label: { type: String, default: '' },
-    noOptions: { type: Boolean, default: false },
+    displayNoOptionsSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,

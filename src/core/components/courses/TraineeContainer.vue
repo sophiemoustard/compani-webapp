@@ -54,7 +54,7 @@
       @submit="addTrainee" :validations="traineeRegistrationValidation.newTraineeRegistration"
       :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :users-options="traineesOptions"
       @open-user-creation-modal="openLearnerCreationModal" :users-company-options="traineesCompanyOptions"
-      :display-company-select="!isIntraCourse" no-options label="Stagiaire" />
+      :display-company-select="!isIntraCourse" display-no-options-slot label="Stagiaire" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -75,8 +75,8 @@ import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
-import { TRAINER, DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { TRAINER } from '@data/constants';
+import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -142,16 +142,7 @@ export default {
       ? `Stagiaires (${traineesNumber.value})`
       : `Stagiaires de votre structure (${traineesNumber.value})`));
 
-    const traineesOptions = computed(() => potentialTrainees.value
-      .map(pt => ({
-        value: pt._id,
-        label: formatIdentity(pt.identity, 'FL'),
-        email: pt.local.email || '',
-        picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
-        ...(!isIntraCourse.value && { company: get(pt, 'company.name') || '' }),
-        additionalFilters: [pt.local.email],
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label)));
+    const traineesOptions = computed(() => formatAndSortUserOptions(potentialTrainees.value, !isIntraCourse.value));
 
     const maxTraineesErrorMessage = computed(() => {
       if (get(validations.value, 'maxTrainees.strictPositiveNumber.$response') === false ||
