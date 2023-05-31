@@ -335,6 +335,10 @@ export default {
     });
 
     watch(course, async (newValue, oldValue) => {
+      tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
+
+      if (!oldValue) return;
+
       const phoneValidation = get(v$.value, 'course.contact.contact.phone');
       if (phoneValidation) phoneValidation.$touch();
 
@@ -343,9 +347,7 @@ export default {
         const oldValueCompaniesIds = oldValue.companies.map(c => c._id);
         if (!newValue.companies.every(c => oldValueCompaniesIds.includes(c._id))) await refreshTrainingContracts();
       }
-
-      tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
-    });
+    }, { immediate: true });
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
