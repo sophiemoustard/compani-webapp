@@ -2,15 +2,8 @@
   <div v-if="holding">
     <p class="text-weight-bold q-mt-lg">Structures rattachées</p>
     <q-card>
-      <ni-responsive-table :data="companyHoldings" :columns="columns" v-model:pagination="pagination"
+      <ni-responsive-table :data="holding.companies" :columns="companyColumns" v-model:pagination="companyPagination"
         :hide-bottom="false">
-        <template #header="{ props }">
-          <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-              {{ col.label }}
-            </q-th>
-          </q-tr>
-        </template>
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :style="col.style"
@@ -27,10 +20,23 @@
           @click="openCompanyLinkModal" />
       </q-card-actions>
     </q-card>
+    <p class="text-weight-bold q-mt-lg">Utilisateurs</p>
+    <q-card>
+      <ni-responsive-table :data="holding.users" :columns="userColumns" v-model:pagination="userPagination"
+        :hide-bottom="false" />
+      <q-card-actions align="right">
+        <ni-button color="primary" icon="add" class="q-ml-sm" label="Rattacher une personne"
+          @click="openUserAdditionModal" />
+      </q-card-actions>
+    </q-card>
 
     <company-addition-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkCompanyToHolding"
       :validations="v$.newCompanyLink" @hide="resetCompanyLinkModal" v-model:selected-company="newCompanyLink"
       :company-options="companyOptions" />
+
+    <user-addition-modal v-model="userAdditionModal" v-model:new-user-registration="newUserRegistration"
+      @submit="addUser" :validations="v$.newUserRegistration" :loading="userModalLoading" @hide="resetUserAdditionForm"
+      :users-options="usersOptions" label="Utilisateur" />
   </div>
 </template>
 
@@ -38,15 +44,19 @@
 import { computed, toRefs, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
 import Holdings from '@api/Holdings';
+import Users from '@api/Users';
 import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
+import UserAdditionModal from '@components/courses/UserAdditionModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { formatAndSortOptions } from '@helpers/utils';
+import { COACH, CLIENT_ADMIN } from '@data/constants';
+import { formatAndSortOptions, formatPhone, formatAndSortUserOptions } from '@helpers/utils';
 
 export default {
   name: 'ProfileInfo',
@@ -57,24 +67,53 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'company-addition-modal': CompanyAdditionModal,
     'ni-button': Button,
+    'user-addition-modal': UserAdditionModal,
   },
   setup (props) {
     const { profileId } = toRefs(props);
     const $store = useStore();
     const $router = useRouter();
 
-    const columns = ref([{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }]);
-    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+    const companyColumns = ref([{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }]);
+    const userColumns = ref([
+      {
+        name: 'firstname',
+        label: 'Prénom',
+        align: 'left',
+        field: row => get(row, 'identity.firstname') || '',
+        classes: 'text-capitalize',
+      },
+      {
+        name: 'lastname',
+        label: 'Nom',
+        align: 'left',
+        field: row => get(row, 'identity.lastname') || '',
+        classes: 'text-capitalize',
+      },
+      { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '', classes: 'email' },
+      {
+        name: 'phone',
+        label: 'Téléphone',
+        align: 'left',
+        field: row => get(row, 'contact.phone') || '',
+        format: formatPhone,
+      },
+    ]);
+    const companyPagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+    const userPagination = ref({ sortBy: 'lastname', ascending: true, page: 1, rowsPerPage: 15 });
     const companyOptions = ref([]);
+    const usersOptions = ref([]);
     const companyLinkModal = ref(false);
     const newCompanyLink = ref('');
     const modalLoading = ref(false);
+    const userAdditionModal = ref(false);
+    const newUserRegistration = ref({ user: '' });
+    const userModalLoading = ref(false);
 
-    const rules = { newCompanyLink: { required } };
-    const v$ = useVuelidate(rules, { newCompanyLink });
+    const rules = { newCompanyLink: { required }, newUserRegistration: { user: { required } } };
+    const v$ = useVuelidate(rules, { newCompanyLink, newUserRegistration });
 
     const holding = computed(() => $store.state.holding.holding);
-    const companyHoldings = computed(() => holding.value.companyHoldings.map(ch => ch.company));
 
     const refreshHolding = async () => {
       try {
@@ -128,22 +167,69 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId: row._id } });
     };
 
+    const openUserAdditionModal = async () => {
+      try {
+        const users = await Users.list({ holding: holding.value._id, role: [COACH, CLIENT_ADMIN] });
+        const displayCompany = true;
+        usersOptions.value = formatAndSortUserOptions(users, displayCompany);
+        userAdditionModal.value = true;
+      } catch (e) {
+        console.error(e);
+        userAdditionModal.value = false;
+        usersOptions.value = [];
+      }
+    };
+
+    const resetUserAdditionForm = () => {
+      newUserRegistration.value = {};
+      v$.value.newUserRegistration.$reset();
+    };
+
+    const addUser = async () => {
+      try {
+        userModalLoading.value = true;
+        v$.value.newUserRegistration.$touch();
+        if (v$.value.newUserRegistration.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Users.updateById(newUserRegistration.value.user, { holding: holding.value._id });
+
+        userAdditionModal.value = false;
+        refreshHolding();
+        NotifyPositive('Personne ajoutée.');
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        if (e.status === 403) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout de la personne.');
+      } finally {
+        userModalLoading.value = false;
+      }
+    };
+
     return {
       // Data
-      columns,
-      pagination,
+      companyColumns,
+      userColumns,
+      companyPagination,
+      userPagination,
       companyOptions,
       companyLinkModal,
       newCompanyLink,
       modalLoading,
+      userModalLoading,
+      userAdditionModal,
+      newUserRegistration,
+      usersOptions,
       // Computed
       holding,
-      companyHoldings,
       v$,
       openCompanyLinkModal,
       resetCompanyLinkModal,
       linkCompanyToHolding,
       goToCompanyProfile,
+      resetUserAdditionForm,
+      addUser,
+      openUserAdditionModal,
     };
   },
 };

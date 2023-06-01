@@ -5,6 +5,7 @@ import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
 import { descendingSort } from '@helpers/date';
 import { toFixedToFloat } from '@helpers/numbers';
+import { DEFAULT_AVATAR } from '@data/constants';
 
 export const extend = (...sources) => {
   const sourcesCopy = cloneDeep(sources);
@@ -134,6 +135,17 @@ export const formatAndSortIdentityOptions = (array, field = null) => array
   .map(element => ({
     label: formatIdentity(get(element, field ? `${field}.identity` : 'identity'), 'FL'),
     value: get(element, field ? `${field}._id` : '_id'),
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+export const formatAndSortUserOptions = (array, displayCompany) => array
+  .map(el => ({
+    value: el._id,
+    label: formatIdentity(el.identity, 'FL'),
+    email: el.local.email || '',
+    picture: get(el, 'picture.link') || DEFAULT_AVATAR,
+    ...(displayCompany && { company: get(el, 'company.name') || '' }),
+    additionalFilters: [el.local.email],
   }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
