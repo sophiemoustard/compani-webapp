@@ -9,7 +9,7 @@ describe('Auxiliary agenda - display', () => {
 
   it('should display correctly auxiliary agenda', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=agenda-search]').eq(1).click();
+    cy.get('[data-cy=agenda-search]').eq(0).click();
     cy.get('[data-cy=agenda-event]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
 
@@ -27,8 +27,8 @@ describe('Auxiliary agenda - display', () => {
     cy.get('[data-cy=event-start-hour]').eq(1).should('contain', UtilsHelper.applyOffset(18, '15'));
     cy.get('[data-cy=event-end-hour]').eq(1).should('contain', UtilsHelper.applyOffset(20, '30'));
 
-    cy.get('[data-cy=agenda-search]').eq(1).click();
-    cy.get('[data-cy=agenda-search]').eq(1).type('Customer referent{downarrow}{enter}');
+    cy.get('[data-cy=agenda-search]').eq(0).click();
+    cy.get('[data-cy=agenda-search]').eq(0).type('Customer referent{downarrow}{enter}');
     cy.get('[data-cy=agenda-event]').should('have.length', 1);
   });
 
