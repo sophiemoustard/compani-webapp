@@ -2,15 +2,8 @@
   <div v-if="holding">
     <p class="text-weight-bold q-mt-lg">Structures rattachées</p>
     <q-card>
-      <ni-responsive-table :data="companyHoldings" :columns="companyColumns" v-model:pagination="companiesPagination"
+      <ni-responsive-table :data="holding.companies" :columns="companyColumns" v-model:pagination="companyPagination"
         :hide-bottom="false">
-        <template #header="{ props }">
-          <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-              {{ col.label }}
-            </q-th>
-          </q-tr>
-        </template>
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :style="col.style"
@@ -29,24 +22,8 @@
     </q-card>
     <p class="text-weight-bold q-mt-lg">Utilisateurs</p>
     <q-card>
-      <ni-responsive-table :data="userHoldings" :columns="userColumns" v-model:pagination="usersPagination"
-        :hide-bottom="false">
-        <template #header="{ props }">
-          <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-              {{ col.label }}
-            </q-th>
-          </q-tr>
-        </template>
-        <template #body="{ props }">
-          <q-tr :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :style="col.style"
-              :class="col.name">
-              {{ col.value }}
-            </q-td>
-          </q-tr>
-        </template>
-      </ni-responsive-table>
+      <ni-responsive-table :data="holding.users" :columns="userColumns" v-model:pagination="userPagination"
+        :hide-bottom="false" />
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" class="q-ml-sm" label="Rattacher une personne"
           @click="openUserAdditionModal" />
@@ -122,8 +99,8 @@ export default {
         format: formatPhone,
       },
     ]);
-    const companiesPagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
-    const usersPagination = ref({ sortBy: 'lastname', ascending: true, page: 1, rowsPerPage: 15 });
+    const companyPagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+    const userPagination = ref({ sortBy: 'lastname', ascending: true, page: 1, rowsPerPage: 15 });
     const companyOptions = ref([]);
     const usersOptions = ref([]);
     const companyLinkModal = ref(false);
@@ -137,8 +114,6 @@ export default {
     const v$ = useVuelidate(rules, { newCompanyLink, newUserRegistration });
 
     const holding = computed(() => $store.state.holding.holding);
-    const companyHoldings = computed(() => holding.value.companyHoldings.map(ch => ch.company));
-    const userHoldings = computed(() => holding.value.userHoldings.map(uh => uh.user));
 
     const refreshHolding = async () => {
       try {
@@ -235,8 +210,8 @@ export default {
       // Data
       companyColumns,
       userColumns,
-      companiesPagination,
-      usersPagination,
+      companyPagination,
+      userPagination,
       companyOptions,
       companyLinkModal,
       newCompanyLink,
@@ -247,8 +222,6 @@ export default {
       usersOptions,
       // Computed
       holding,
-      companyHoldings,
-      userHoldings,
       v$,
       openCompanyLinkModal,
       resetCompanyLinkModal,
