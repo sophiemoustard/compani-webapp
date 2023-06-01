@@ -339,9 +339,6 @@ export default {
 
       if (!oldValue) return;
 
-      const phoneValidation = get(v$.value, 'course.contact.contact.phone');
-      if (phoneValidation) phoneValidation.$touch();
-
       if (newValue.companies.length !== oldValue.companies.length) await refreshTrainingContracts();
       else {
         const oldValueCompaniesIds = oldValue.companies.map(c => c._id);
