@@ -195,8 +195,8 @@ export default {
     const openUserAdditionModal = async () => {
       try {
         const users = await Users.list({ holding: holding.value._id, role: [COACH, CLIENT_ADMIN] });
-
-        usersOptions.value = formatAndSortUserOptions(users, true);
+        const displayCompany = true;
+        usersOptions.value = formatAndSortUserOptions(users, displayCompany);
         userAdditionModal.value = true;
       } catch (e) {
         console.error(e);
