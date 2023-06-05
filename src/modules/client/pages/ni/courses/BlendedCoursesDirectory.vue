@@ -4,6 +4,8 @@
       display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
+      <ni-select v-if="companyFilterOptions.length > 2" :options="companyFilterOptions" :model-value="selectedCompany"
+        clearable @update:model-value="updateSelectedCompany" />
       <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
@@ -62,17 +64,20 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const {
+      companyFilterOptions,
       typeFilterOptions,
       selectedTrainer,
       trainerFilterOptions,
       selectedProgram,
       programFilterOptions,
+      selectedCompany,
       selectedStartDate,
       selectedEndDate,
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
       displayArchived,
+      updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,
       updateSelectedStartDate,
@@ -82,7 +87,7 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-    } = useCourseFilters(activeCourses, archivedCourses);
+    } = useCourseFilters(activeCourses, archivedCourses, false, loggedUser);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -93,18 +98,24 @@ export default {
     const refreshCourses = async () => {
       try {
         const courseList = await Courses.list({
-          company: get(loggedUser.value, 'company._id') || '',
           format: BLENDED,
           action: OPERATIONS,
           isArchived: false,
+          ...(get(loggedUser.value, 'role.holding')
+            ? { holding: loggedUser.value.holding._id }
+            : { company: get(loggedUser.value, 'company._id') || '' }
+          ),
         });
         activeCourses.value = courseList;
 
         const archivedCourseList = await Courses.list({
-          company: get(loggedUser.value, 'company._id') || '',
           format: BLENDED,
           action: OPERATIONS,
           isArchived: true,
+          ...(get(loggedUser.value, 'role.holding')
+            ? { holding: loggedUser.value.holding._id }
+            : { company: get(loggedUser.value, 'company._id') || '' }
+          ),
         });
         archivedCourses.value = archivedCourseList;
       } catch (e) {
@@ -142,6 +153,9 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
+      selectedCompany,
+      companyFilterOptions,
+      loggedUser,
       // Methods
       updateSelectedTrainer,
       updateSelectedProgram,
@@ -151,6 +165,7 @@ export default {
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
       updateDisplayArchived,
+      updateSelectedCompany,
       resetFilters,
     };
   },

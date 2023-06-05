@@ -5,7 +5,7 @@ import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
 
-export const useCourseFilters = (activeCourses, archivedCourses) => {
+export const useCourseFilters = (activeCourses, archivedCourses, isVendorInterface, loggedUser) => {
   const $store = useStore();
 
   const courses = computed(() => [...activeCourses.value, ...archivedCourses.value]);
@@ -44,7 +44,16 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
 
   const companyFilterOptions = computed(() => {
     const companies = courses.value
-      .flatMap(course => course.companies.map(company => ({ label: company.name, value: company._id })))
+      .flatMap((course) => {
+        if (isVendorInterface) return course.companies.map(company => ({ label: company.name, value: company._id }));
+
+        if (loggedUser.value.role.holding) {
+          return course.companies
+            .filter(company => loggedUser.value.holding.companies.includes(company._id))
+            .map(company => ({ label: company.name, value: company._id }));
+        }
+        return [];
+      })
       .sort((a, b) => a.label.localeCompare(b.label));
 
     return [{ label: 'Toutes les structures', value: '' }, ...sortedUniqBy(companies, 'value')];
