@@ -48,6 +48,10 @@ export default {
 
     const { headerInfo, isVendorInterface, vendorRole } = useCourses(course);
 
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const attachCompany = computed(() => isVendorInterface || loggedUser.value.role.holding);
+
     const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
     const selectedProgram = computed(() => $store.state.course.selectedProgram);
     const selectedCompany = computed(() => $store.state.course.selectedCompany);
@@ -128,7 +132,7 @@ export default {
       return true;
     });
 
-    const courseName = computed(() => composeCourseName(course.value, isVendorInterface));
+    const courseName = computed(() => composeCourseName(course.value, attachCompany.value));
 
     const courseSlotsCount = computed(() => course.value.slots.length);
 
