@@ -195,7 +195,7 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-    } = useCourseFilters(activeCourses, archivedCourses, true);
+    } = useCourseFilters(activeCourses, archivedCourses);
 
     const refreshActiveCourses = async () => {
       try {

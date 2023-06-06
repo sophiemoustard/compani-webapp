@@ -1,12 +1,18 @@
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
 
-export const useCourseFilters = (activeCourses, archivedCourses, isVendorInterface, loggedUser) => {
+export const useCourseFilters = (activeCourses, archivedCourses) => {
   const $store = useStore();
+  const $router = useRouter();
+
+  const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
+
+  const loggedUser = computed(() => $store.state.main.loggedUser);
 
   const courses = computed(() => [...activeCourses.value, ...archivedCourses.value]);
 

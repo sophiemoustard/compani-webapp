@@ -87,7 +87,7 @@ export default {
       updateSelectedMissingTrainees,
       updateDisplayArchived,
       resetFilters,
-    } = useCourseFilters(activeCourses, archivedCourses, false, loggedUser);
+    } = useCourseFilters(activeCourses, archivedCourses);
 
     const rules = computed(() => ({
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
@@ -102,7 +102,7 @@ export default {
           action: OPERATIONS,
           isArchived: false,
           ...(get(loggedUser.value, 'role.holding')
-            ? { holding: loggedUser.value.holding._id }
+            ? { holding: get(loggedUser.value, 'holding._id') }
             : { company: get(loggedUser.value, 'company._id') || '' }
           ),
         });
