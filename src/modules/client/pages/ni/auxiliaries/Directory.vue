@@ -24,10 +24,10 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="auxiliaryCreationModal = true" :disable="tableLoading" />
 
-    <auxiliary-creation-modal v-model="auxiliaryCreationModal" :new-user="newUser"
-      :validations="v$.newUser" :company-id="company._id" :loading="loading" :email-error="emailError(v$.newUser)"
-      :first-step="firstStep" v-model:send-welcome-msg="sendWelcomeMsg" :civility-options="civilityOptions"
-      @hide="resetForm" @submit="submit" @go-to-next-step="nextStep" @update-new-user="setNewUser" />
+    <auxiliary-creation-modal v-model="auxiliaryCreationModal" v-model:send-welcome-msg="sendWelcomeMsg"
+      :loading="loading" :email-error="emailError(v$.newUser)" :new-user="newUser" :validations="v$.newUser"
+      :first-step="firstStep" :civility-options="civilityOptions" @hide="resetForm" @submit="submit"
+      @go-to-next-step="nextStep" @update-new-user="setNewUser" />
   </q-page>
 </template>
 
@@ -43,6 +43,7 @@ import orderBy from 'lodash/orderBy';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Roles from '@api/Roles';
 import Sms from '@api/Sms';
+import UserCompanies from '@api/UserCompanies';
 import Users from '@api/Users';
 import Authentication from '@api/Authentication';
 import TableList from '@components/table/TableList';
@@ -302,7 +303,6 @@ export default {
         const value = get(user, path);
         if (value) set(this.newUser, path, value);
       });
-      if (!alreadyHasCompany) this.newUser.company = this.company._id;
     },
     async nextStep () {
       try {
@@ -351,10 +351,11 @@ export default {
         const payload = await this.formatUserPayload();
 
         if (this.fetchedUser._id) {
+          await UserCompanies.create({ user: this.fetchedUser._id, company: this.company._id });
           await Users.updateById(this.fetchedUser._id, payload);
           editedUser = { ...this.fetchedUser, contact: { phone: get(payload, 'contact.phone') || '' } };
         } else {
-          editedUser = await Users.create(payload);
+          editedUser = await Users.create({ ...payload, company: this.company._id });
         }
         await Users.createDriveFolder(editedUser._id);
         await this.getUserList();
