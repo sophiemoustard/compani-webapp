@@ -124,8 +124,19 @@ export const useLearnersCreation = (
     }
   };
 
-  const formatUserPayload = () => {
-    const payload = removeEmptyProps(pick(newLearner.value, ['identity', 'local', 'contact']));
+  const formatUserCreationPayload = () => {
+    const payload = removeEmptyProps(
+      pick(newLearner.value, ['identity', 'local', 'contact', 'company', 'userCompanyStartDate'])
+    );
+    if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(newLearner.value.contact.phone);
+
+    return payload;
+  };
+
+  const formatUserEditionPayload = () => {
+    const payload = removeEmptyProps(
+      pick(newLearner.value, ['identity', 'local', 'contact'])
+    );
     if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(newLearner.value.contact.phone);
 
     return payload;
@@ -212,7 +223,7 @@ export const useLearnersCreation = (
 
   const createLearner = async () => {
     try {
-      const payload = formatUserPayload();
+      const payload = formatUserCreationPayload();
       const user = await Users.create(payload);
       NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
 
@@ -233,7 +244,7 @@ export const useLearnersCreation = (
     });
     if (disableUserInfoEdition.value) return;
 
-    const payload = formatUserPayload();
+    const payload = formatUserEditionPayload();
 
     await Users.updateById(newLearner.value._id, payload);
     NotifyPositive('Apprenant(e) modifié(e).');
