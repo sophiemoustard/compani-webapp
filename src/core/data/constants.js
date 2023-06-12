@@ -359,6 +359,8 @@ export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
 export const OPERATIONS = 'operations';
 export const PEDAGOGY = 'pedagogy';
+export const ARCHIVED_COURSES = 'archived_courses';
+export const UNARCHIVED_COURSES = 'unarchived_courses';
 
 // SUBPROGRAM
 export const PUBLISHED = 'published';

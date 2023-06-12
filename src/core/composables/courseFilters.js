@@ -5,6 +5,7 @@ import sortedUniqBy from 'lodash/sortedUniqBy';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
+import { ARCHIVED_COURSES, UNARCHIVED_COURSES } from '../data/constants';
 
 export const useCourseFilters = (activeCourses, archivedCourses) => {
   const $store = useStore();
@@ -123,10 +124,15 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
   };
 
   /* ARCHIVED COURSES */
-  const displayArchived = computed(() => $store.state.course.displayArchived);
+  const archiveStatusOptions = ref([
+    { label: 'Toutes les formations', value: '' },
+    { label: 'Formations archivées', value: ARCHIVED_COURSES },
+    { label: 'Formations non-archivées', value: UNARCHIVED_COURSES },
+  ]);
+  const selectedArchiveStatus = computed(() => $store.state.course.selectedArchiveStatus);
 
-  const updateDisplayArchived = (isSelected) => {
-    $store.dispatch('course/setDisplayArchived', { isSelected });
+  const updateSelectedArchiveStatus = (status) => {
+    $store.dispatch('course/setSelectedArchiveStatus', { status });
   };
 
   const resetFilters = () => $store.dispatch('course/resetFilters');
@@ -134,6 +140,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
   return {
     // data
     typeFilterOptions,
+    archiveStatusOptions,
     // Computed
     selectedTrainer,
     trainerFilterOptions,
@@ -148,7 +155,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     selectedType,
     selectedNoAddressInSlots,
     selectedMissingTrainees,
-    displayArchived,
+    selectedArchiveStatus,
 
     // Methods
     updateSelectedTrainer,
@@ -160,7 +167,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     updateSelectedType,
     updateSelectedNoAddressInSlots,
     updateSelectedMissingTrainees,
-    updateDisplayArchived,
+    updateSelectedArchiveStatus,
     resetFilters,
   };
 };

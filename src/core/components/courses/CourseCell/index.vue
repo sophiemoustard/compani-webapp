@@ -31,6 +31,7 @@ import CompaniDuration from '@helpers/dates/companiDurations';
 import { useCourses } from '@composables/courses';
 import ForthcomingSection from './ForthcomingSection';
 import InProgressSection from './InProgressSection';
+import { ARCHIVED_COURSES, UNARCHIVED_COURSES } from '../../../data/constants';
 
 export default {
   name: 'CourseDetail',
@@ -61,7 +62,7 @@ export default {
     const selectedType = computed(() => $store.state.course.selectedType);
     const selectedNoAddressInSlots = computed(() => $store.state.course.selectedNoAddressInSlots);
     const selectedMissingTrainees = computed(() => $store.state.course.selectedMissingTrainees);
-    const displayArchived = computed(() => $store.state.course.displayArchived);
+    const selectedArchiveStatus = computed(() => $store.state.course.selectedArchiveStatus);
 
     const isCourseAfterStartDate = computed(() => {
       const estimatedDateIsAfter = !course.value.slots.length && course.value.estimatedStartDate &&
@@ -115,7 +116,9 @@ export default {
         return false;
       }
 
-      if (!displayArchived.value && course.value.archivedAt) return false;
+      if (selectedArchiveStatus.value === UNARCHIVED_COURSES && course.value.archivedAt) return false;
+
+      if (selectedArchiveStatus.value === ARCHIVED_COURSES && !course.value.archivedAt) return false;
 
       if (selectedStartDate.value && !selectedEndDate.value && !isCourseAfterStartDate.value) return false;
 
