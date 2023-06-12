@@ -27,6 +27,7 @@ import {
 } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import UserCompanies from '../api/UserCompanies';
 
 export const useLearnersCreation = (
   refresh,
@@ -124,14 +125,7 @@ export const useLearnersCreation = (
   };
 
   const formatUserPayload = () => {
-    if (disableUserInfoEdition.value) {
-      return removeEmptyProps(pick(newLearner.value, ['company', 'userCompanyStartDate']));
-    }
-
-    const payload = removeEmptyProps(pick(
-      newLearner.value,
-      ['identity', 'local', 'contact', 'company', 'userCompanyStartDate']
-    ));
+    const payload = removeEmptyProps(pick(newLearner.value, ['identity', 'local', 'contact']));
     if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(newLearner.value.contact.phone);
 
     return payload;
@@ -232,6 +226,13 @@ export const useLearnersCreation = (
   };
 
   const updateLearner = async () => {
+    await UserCompanies.create({
+      company: newLearner.value.company,
+      user: newLearner.value._id,
+      startDate: newLearner.value.userCompanyStartDate,
+    });
+    if (disableUserInfoEdition.value) return;
+
     const payload = formatUserPayload();
 
     await Users.updateById(newLearner.value._id, payload);
