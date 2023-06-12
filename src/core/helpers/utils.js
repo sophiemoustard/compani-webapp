@@ -176,3 +176,13 @@ export const formatIdentityAndDocType = (identity, type) => `${identity.lastname
 export const toCents = value => parseFloat(value).toFixed(2) * 100;
 
 export const toEuros = value => value / 100;
+
+export const hasUserAccessToCompany = (loggedUser, company) => {
+  const loggedUserCompany = get(loggedUser, 'company._id');
+  if (loggedUserCompany && loggedUserCompany === company) return true;
+
+  const holdingCompanies = get(loggedUser, 'holding.companies') || [];
+  if (holdingCompanies.length && loggedUser.holding.companies.includes(company)) return true;
+
+  return false;
+};
