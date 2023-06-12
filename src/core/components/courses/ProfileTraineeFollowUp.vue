@@ -164,9 +164,12 @@ export default {
 
     const getUnsubscribedAttendances = async () => {
       try {
+        const loggedUserHolding = get(loggedUser.value, 'holding._id');
         const query = {
           course: course.value._id,
-          ...(isClientInterface && { company: loggedUser.value.company._id }),
+          ...(isClientInterface && {
+            ...loggedUserHolding ? { holding: loggedUserHolding } : { company: loggedUser.value.company._id },
+          }),
         };
         const unsubscribedAttendancesGroupedByTrainees = await Attendances.listUnsubscribed(query);
         unsubscribedAttendances.value = Object.keys(unsubscribedAttendancesGroupedByTrainees)
