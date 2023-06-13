@@ -50,7 +50,7 @@ export default {
     const traineesByMonth = ref([]);
 
     const { getCountsByMonth, monthAxisLabels } = useCharts();
-    const { learners, learnersLoading, getLearnersList } = useTraineeFollowUp(profileId);
+    const { learners, learnersLoading, getFollowUp } = useTraineeFollowUp(profileId);
 
     const traineesOnGoingCount = computed(() => learners.value.filter(l => l.progress.eLearning !== 1).length);
     const traineesFinishedCount = computed(() => learners.value.length - traineesOnGoingCount.value);
@@ -70,7 +70,7 @@ export default {
     };
 
     const created = async () => {
-      await getLearnersList();
+      await getFollowUp();
       computeChartData();
     };
 
