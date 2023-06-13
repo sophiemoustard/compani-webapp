@@ -182,7 +182,6 @@ export const hasUserAccessToCompany = (loggedUser, company) => {
   if (loggedUserCompany && loggedUserCompany === company) return true;
 
   const holdingCompanies = get(loggedUser, 'holding.companies') || [];
-  if (holdingCompanies.length && loggedUser.holding.companies.includes(company)) return true;
 
-  return false;
+  return holdingCompanies.includes(company);
 };
