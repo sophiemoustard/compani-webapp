@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import Courses from '@api/Courses';
 import router from 'src/router/index';
 import store from 'src/store/index';
+import { hasUserAccessToCompany } from '@helpers/utils';
 
 export default {
   namespaced: true,
@@ -43,8 +44,9 @@ export default {
         // Coachs and client admins with vendor role only see trainees from their companies on client interface
         const userClientRole = store.getters['main/getClientRole'];
         if (userClientRole && !/\/ad\//.test(router.currentRoute.value.path)) {
-          const loggedUserCompany = store.getters['main/getCompany'];
-          course.trainees = course.trainees.filter(t => t.registrationCompany === loggedUserCompany._id);
+          const loggedUser = store.getters['main/getLoggedUser'];
+          course.trainees = course.trainees.filter(t => hasUserAccessToCompany(loggedUser, t.registrationCompany));
+          course.companies = course.companies.filter(company => hasUserAccessToCompany(loggedUser, company._id));
         }
 
         commit('SET_COURSE', course);

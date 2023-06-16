@@ -14,7 +14,7 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface" :data="course.companies"
+        <ni-expanding-table v-else-if="displayCompanyNames" :data="course.companies"
           :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
           separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
           <template #row="{ props }">
@@ -173,6 +173,11 @@ export default {
       return options;
     });
 
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const displayCompanyNames =
+      computed(() => !isIntraCourse.value && (!isClientInterface || !!loggedUser.value.role.holding));
+
     const refresh = () => emit('refresh');
 
     const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
@@ -300,6 +305,7 @@ export default {
       courseCompanyIds,
       hasLinkedCompanies,
       traineesCompanyOptions,
+      displayCompanyNames,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
