@@ -36,6 +36,7 @@ import { useMeta } from 'quasar';
 import { mapState, mapGetters } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf, email } from '@vuelidate/validators';
+import omit from 'lodash/omit';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
@@ -256,7 +257,7 @@ export default {
       if (roles.length === 0) throw new Error('Role not found');
 
       const payload = {
-        ...cloneDeep(this.newUser),
+        ...omit(this.newUser, ['alreadyHasCompany', 'contact', 'local']),
         local: { email: this.newUser.local.email },
         contact: { ...this.newUser.contact, phone: formatPhoneForPayload(get(this.newUser, 'contact.phone')) },
         role: roles[0]._id,
@@ -303,6 +304,7 @@ export default {
         const value = get(user, path);
         if (value) set(this.newUser, path, value);
       });
+      set(this.newUser, 'alreadyHasCompany', alreadyHasCompany);
     },
     async nextStep () {
       try {
@@ -351,7 +353,10 @@ export default {
         const payload = await this.formatUserPayload();
 
         if (this.fetchedUser._id) {
-          await UserCompanies.create({ user: this.fetchedUser._id, company: this.company._id });
+          if (!this.newUser.alreadyHasCompany) {
+            await UserCompanies.create({ user: this.fetchedUser._id, company: this.company._id });
+          }
+
           await Users.updateById(this.fetchedUser._id, payload);
           editedUser = { ...this.fetchedUser, contact: { phone: get(payload, 'contact.phone') || '' } };
         } else {

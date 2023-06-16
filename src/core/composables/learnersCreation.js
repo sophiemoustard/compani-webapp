@@ -7,6 +7,7 @@ import pick from 'lodash/pick';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import Email from '@api/Email';
+import UserCompanies from '@api/UserCompanies';
 import {
   TRAINEE,
   DAY,
@@ -27,7 +28,6 @@ import {
 } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import UserCompanies from '../api/UserCompanies';
 
 export const useLearnersCreation = (
   refresh,
