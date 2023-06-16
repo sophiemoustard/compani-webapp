@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { useMeta } from 'quasar';
 import { onBeforeUnmount, computed, ref, toRefs, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -56,10 +57,12 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
     const { headerInfo } = useCourses(course);
 
     watch(course, () => {
-      courseName.value = composeCourseName(course.value);
+      courseName.value = composeCourseName(course.value, get(loggedUser.value, 'role.holding'));
     });
 
     const refreshCourse = async () => {
@@ -72,7 +75,7 @@ export default {
 
     const created = async () => {
       if (!course.value) await refreshCourse();
-      courseName.value = composeCourseName(course.value);
+      courseName.value = composeCourseName(course.value, get(loggedUser.value, 'role.holding'));
     };
 
     created();

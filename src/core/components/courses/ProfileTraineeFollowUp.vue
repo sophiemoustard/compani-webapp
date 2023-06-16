@@ -122,7 +122,7 @@ export default {
       followUpMissingInfo,
       downloadAttendanceSheet,
     } = useCourses(course);
-    const { learners, getLearnersList, learnersLoading } = useTraineeFollowUp(profileId);
+    const { learners, getFollowUp, learnersLoading } = useTraineeFollowUp(profileId);
 
     const areQuestionnaireAnswersVisible = computed(() => !isClientInterface && questionnaires.value.length);
 
@@ -196,7 +196,7 @@ export default {
     };
 
     const created = async () => {
-      const promises = [getLearnersList(), getUnsubscribedAttendances()];
+      const promises = [getFollowUp(), getUnsubscribedAttendances()];
       if (!isClientInterface) promises.push(refreshQuestionnaires());
 
       await Promise.all(promises);

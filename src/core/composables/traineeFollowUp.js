@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
 import Courses from '@api/Courses';
@@ -12,19 +13,22 @@ export const useTraineeFollowUp = (profileId) => {
 
   const company = computed(() => $store.getters['main/getCompany']);
 
+  const loggedUser = computed(() => $store.state.main.loggedUser);
+
   const { isClientInterface } = useCourses();
 
   const formatRow = trainee => (
     { ...trainee, identity: { ...trainee.identity, fullName: formatIdentity(trainee.identity, 'FL') } }
   );
 
-  const getLearnersList = async () => {
+  const getFollowUp = async () => {
     try {
       learnersLoading.value = true;
-      const course = await Courses.getFollowUp(
-        profileId.value,
-        isClientInterface ? { company: company.value._id } : null
-      );
+      const loggedUserHolding = get(loggedUser.value, 'holding._id') || null;
+      const query = isClientInterface
+        ? { ...loggedUserHolding ? { holding: loggedUserHolding } : { company: company.value._id } }
+        : null;
+      const course = await Courses.getFollowUp(profileId.value, query);
 
       if (course) learners.value = Object.freeze(course.trainees.map(formatRow));
     } catch (e) {
@@ -41,6 +45,6 @@ export const useTraineeFollowUp = (profileId) => {
     learners,
     learnersLoading,
     // Methods
-    getLearnersList,
+    getFollowUp,
   };
 };
