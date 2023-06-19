@@ -242,12 +242,13 @@ export const useLearnersCreation = (
       user: newLearner.value._id,
       startDate: newLearner.value.userCompanyStartDate,
     });
-    if (disableUserInfoEdition.value) return;
 
-    const payload = formatUserEditionPayload();
+    if (!disableUserInfoEdition.value) {
+      const payload = formatUserEditionPayload();
 
-    await Users.updateById(newLearner.value._id, payload);
-    NotifyPositive('Apprenant(e) modifié(e).');
+      await Users.updateById(newLearner.value._id, payload);
+      NotifyPositive('Apprenant(e) modifié(e).');
+    }
 
     return newLearner.value._id;
   };
