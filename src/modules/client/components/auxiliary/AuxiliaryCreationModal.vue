@@ -23,8 +23,7 @@
         @blur="validations.contact.address.$touch" :error="validations.contact.address.$error" in-modal inverted-light
          @update:model-value="updateUser($event, 'contact.address')" />
       <ni-select-sector :model-value="newUser.sector" @blur="validations.sector.$touch" :error-message="REQUIRED_LABEL"
-        :company-id="companyId" :error="validations.sector.$error" @update:model-value="updateUser($event, 'sector')"
-        required-field in-modal />
+        :error="validations.sector.$error" @update:model-value="updateUser($event, 'sector')" required-field in-modal />
       <div class="row margin-input last">
         <q-checkbox :model-value="sendWelcomeMsg" label="Envoyer SMS d'accueil" @update:model-value="updateSendWelcome"
           dense />
@@ -59,7 +58,6 @@ export default {
     firstStep: { type: Boolean, default: false },
     sendWelcomeMsg: { type: Boolean, default: false },
     emailError: { type: String, default: '' },
-    companyId: { type: String, default: '' },
   },
   components: {
     'ni-search-address': SearchAddress,

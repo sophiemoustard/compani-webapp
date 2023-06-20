@@ -7,6 +7,7 @@ import Roles from '@api/Roles';
 import Users from '@api/Users';
 import Email from '@api/Email';
 import Helpers from '@api/Helpers';
+import UserCompanies from '@api/UserCompanies';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
@@ -152,7 +153,7 @@ export const helperMixin = {
           if (roles.length === 0) throw new Error('Role not found');
 
           const payload = { role: roles[0]._id, customer: this.customer._id };
-          if (!user.company) payload.company = this.customer.company;
+          if (!user.company) await UserCompanies.create({ user: user._id, company: this.customer.company });
 
           await Users.updateById(user._id, payload);
           NotifyPositive('Aidant(e) créé(e)');

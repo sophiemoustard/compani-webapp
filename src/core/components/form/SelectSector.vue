@@ -16,7 +16,6 @@ export default {
     modelValue: { type: String, default: '' },
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
-    companyId: { type: String, default: '' },
     allowNullOption: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },

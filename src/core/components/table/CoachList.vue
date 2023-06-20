@@ -52,6 +52,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import Roles from '@api/Roles';
 import Email from '@api/Email';
 import Users from '@api/Users';
+import UserCompanies from '@api/UserCompanies';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import CoachCreationModal from '@components/table/CoachCreationModal';
@@ -171,7 +172,7 @@ export default {
 
         if (userInfo.exists) {
           const payload = { role: this.newCoach.role };
-          if (!user.company) payload.company = this.company._id;
+          if (!user.company) await UserCompanies.create({ user: userInfo.user._id, company: this.company._id });
 
           await Users.updateById(userInfo.user._id, payload);
 

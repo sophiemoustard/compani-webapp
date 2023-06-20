@@ -12,7 +12,7 @@
       <profile-tabs :profile-id="learnerId" :tabs-content="tabsContent" />
     </div>
 
-    <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkUserToCompany"
+    <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="createUserCompany"
       :validations="v$.newCompanyLink" @hide="resetCompanyLinkModal" v-model:new-company-link="newCompanyLink"
       :company-options="companyOptions" />
 
@@ -31,7 +31,7 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
-import Users from '@api/Users';
+import UserCompanies from '@api/UserCompanies';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
@@ -129,16 +129,13 @@ export default {
       v$.value.newCompanyLink.$reset();
     };
 
-    const linkUserToCompany = async () => {
+    const createUserCompany = async () => {
       try {
         v$.value.newCompanyLink.$touch();
         if (v$.value.newCompanyLink.$error) return NotifyWarning('Une structure est requise.');
 
         modalLoading.value = true;
-        await Users.updateById(
-          userProfile.value._id,
-          { company: newCompanyLink.value.company, userCompanyStartDate: newCompanyLink.value.startDate }
-        );
+        await UserCompanies.create({ user: userProfile.value._id, ...newCompanyLink.value });
 
         companyLinkModal.value = false;
         NotifyPositive('Rattachement à la structure effectué.');
@@ -186,7 +183,7 @@ export default {
       get,
       openCompanyLinkModal,
       resetCompanyLinkModal,
-      linkUserToCompany,
+      createUserCompany,
       openCompanyDetachModal,
       validateCompanyDetachement,
       resetDetachmentModal,

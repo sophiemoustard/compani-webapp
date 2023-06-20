@@ -7,6 +7,7 @@ import pick from 'lodash/pick';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import Email from '@api/Email';
+import UserCompanies from '@api/UserCompanies';
 import {
   TRAINEE,
   DAY,
@@ -123,15 +124,19 @@ export const useLearnersCreation = (
     }
   };
 
-  const formatUserPayload = () => {
-    if (disableUserInfoEdition.value) {
-      return removeEmptyProps(pick(newLearner.value, ['company', 'userCompanyStartDate']));
-    }
+  const formatUserCreationPayload = () => {
+    const payload = removeEmptyProps(
+      pick(newLearner.value, ['identity', 'local', 'contact', 'company', 'userCompanyStartDate'])
+    );
+    if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(newLearner.value.contact.phone);
 
-    const payload = removeEmptyProps(pick(
-      newLearner.value,
-      ['identity', 'local', 'contact', 'company', 'userCompanyStartDate']
-    ));
+    return payload;
+  };
+
+  const formatUserEditionPayload = () => {
+    const payload = removeEmptyProps(
+      pick(newLearner.value, ['identity', 'local', 'contact'])
+    );
     if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(newLearner.value.contact.phone);
 
     return payload;
@@ -218,7 +223,7 @@ export const useLearnersCreation = (
 
   const createLearner = async () => {
     try {
-      const payload = formatUserPayload();
+      const payload = formatUserCreationPayload();
       const user = await Users.create(payload);
       NotifyPositive('Apprenant(e) ajouté(e) avec succès.');
 
@@ -232,10 +237,18 @@ export const useLearnersCreation = (
   };
 
   const updateLearner = async () => {
-    const payload = formatUserPayload();
+    await UserCompanies.create({
+      company: newLearner.value.company,
+      user: newLearner.value._id,
+      startDate: newLearner.value.userCompanyStartDate,
+    });
 
-    await Users.updateById(newLearner.value._id, payload);
-    NotifyPositive('Apprenant(e) modifié(e).');
+    if (!disableUserInfoEdition.value) {
+      const payload = formatUserEditionPayload();
+
+      await Users.updateById(newLearner.value._id, payload);
+      NotifyPositive('Apprenant(e) modifié(e).');
+    }
 
     return newLearner.value._id;
   };
