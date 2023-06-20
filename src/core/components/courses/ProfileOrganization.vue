@@ -390,9 +390,13 @@ export default {
 
     const refreshPotentialTrainees = async () => {
       try {
-        const companies = isClientInterface
-          ? get(loggedUser.value, 'company._id')
-          : course.value.companies.map(c => c._id);
+        const companies = [];
+        if (isClientInterface) {
+          if (get(loggedUser.value, 'role.holding')) companies.push(...get(loggedUser.value, 'holding.companies'));
+          else companies.push(get(loggedUser.value, 'company._id'));
+        } else {
+          companies.push(...course.value.companies.map(c => c._id));
+        }
 
         potentialTrainees.value = !isEmpty(companies)
           ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
