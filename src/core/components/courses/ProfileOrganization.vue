@@ -390,13 +390,8 @@ export default {
 
     const refreshPotentialTrainees = async () => {
       try {
-        const companies = [];
-        if (isClientInterface) {
-          if (get(loggedUser.value, 'role.holding')) companies.push(...get(loggedUser.value, 'holding.companies'));
-          else companies.push(get(loggedUser.value, 'company._id'));
-        } else {
-          companies.push(...course.value.companies.map(c => c._id));
-        }
+        if (isClientInterface && course.value.type === INTER_B2B) return;
+        const companies = course.value.companies.map(c => c._id);
 
         potentialTrainees.value = !isEmpty(companies)
           ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
