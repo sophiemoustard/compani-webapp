@@ -71,7 +71,7 @@ export default {
     const $q = useQuasar();
     const $store = useStore();
 
-    const { canAccesOrEditTrainee } = useLearnersEdition();
+    const { canAccessOrEditTrainee } = useLearnersEdition();
 
     const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
@@ -176,7 +176,7 @@ export default {
       }
     };
 
-    const canEditTrainee = trainee => canAccesOrEditTrainee(trainee) && !course.value.archivedAt;
+    const canEditTrainee = trainee => canAccessOrEditTrainee(trainee) && !course.value.archivedAt;
 
     return {
       // Data

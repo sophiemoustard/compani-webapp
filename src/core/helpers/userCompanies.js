@@ -1,4 +1,5 @@
 import compact from 'lodash/compact';
+import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import has from 'lodash/has';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -9,4 +10,13 @@ export const getCurrentAndFutureCompanies = (userCompanyList) => {
     .map(uc => uc.company));
 
   return uniqBy(currentAndFutureCompanies, company => (has(company, '_id') ? company._id : company));
+};
+
+export const hasUserAccessToCompany = (loggedUser, company) => {
+  const loggedUserCompany = get(loggedUser, 'company._id');
+  if (loggedUserCompany && loggedUserCompany === company) return true;
+
+  const holdingCompanies = get(loggedUser, 'holding.companies') || [];
+
+  return holdingCompanies.includes(company);
 };
