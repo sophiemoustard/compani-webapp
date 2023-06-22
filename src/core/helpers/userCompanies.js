@@ -13,10 +13,8 @@ export const getCurrentAndFutureCompanies = (userCompanyList) => {
 };
 
 export const hasUserAccessToCompany = (loggedUser, company) => {
-  const loggedUserCompany = get(loggedUser, 'company._id');
-  if (loggedUserCompany && loggedUserCompany === company) return true;
-
+  const loggedUserCompany = get(loggedUser, 'company._id') || '';
   const holdingCompanies = get(loggedUser, 'holding.companies') || [];
 
-  return holdingCompanies.includes(company);
+  return loggedUserCompany === company || holdingCompanies.includes(company);
 };
