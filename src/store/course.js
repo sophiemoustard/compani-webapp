@@ -2,7 +2,7 @@ import get from 'lodash/get';
 import Courses from '@api/Courses';
 import router from 'src/router/index';
 import store from 'src/store/index';
-import { hasUserAccessToCompany } from '@helpers/utils';
+import { hasUserAccessToCompany } from '@helpers/userCompanies';
 import { UNARCHIVED_COURSES } from '../core/data/constants';
 
 export default {
