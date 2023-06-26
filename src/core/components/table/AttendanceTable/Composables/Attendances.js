@@ -67,7 +67,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
     return unsubscribedTraineesId
       .reduce((acc, traineeId) => {
         const trainee = potentialTrainees.value.find(t => (t._id === traineeId));
-        if (trainee) acc.push({ ...trainee, external: true });
+        if (trainee) acc.push({ ...trainee, company: trainee.company._id, external: true });
 
         return acc;
       }, [])
@@ -92,9 +92,14 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const getPotentialTrainees = async () => {
     try {
-      const companies = isClientInterface
-        ? get(loggedUser.value, 'company._id')
-        : course.value.companies.map(c => c._id);
+      const companies = [];
+      if (isClientInterface) {
+        if (get(loggedUser.value, 'role.holding')) companies.push(...get(loggedUser.value, 'holding.companies'));
+        else companies.push(get(loggedUser.value, 'company._id'));
+      } else {
+        companies.push(...course.value.companies.map(c => c._id));
+      }
+
       potentialTrainees.value = !isEmpty(companies)
         ? Object.freeze(await Users.learnerList({ companies, action: COURSE }))
         : [];
