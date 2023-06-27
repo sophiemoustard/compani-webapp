@@ -4,9 +4,9 @@ export const menuItemsMixin = {
       adminActiveRoutes: {
         management: { open: false },
         users: { open: false },
-        billing: { open: false },
         pedagogy: { open: false },
         exports: { open: false },
+        configuration: { open: false },
       },
       trainerActiveRoutes: {
         administrative: { open: false },
@@ -32,13 +32,6 @@ export const menuItemsMixin = {
           ],
         },
         {
-          ref: 'billing',
-          label: 'Facturation',
-          children: [
-            { name: 'ni billing config vendor', icon: 'settings', label: 'Configuration' },
-          ],
-        },
-        {
           ref: 'pedagogy',
           label: 'Pédagogie',
           children: [
@@ -52,6 +45,13 @@ export const menuItemsMixin = {
           label: 'Exports',
           children: [
             { name: 'ni exports history vendor', icon: 'history', label: 'Historique' },
+          ],
+        },
+        {
+          ref: 'configuration',
+          label: 'Configuration',
+          children: [
+            { name: 'ni config main', icon: 'settings', label: 'Configuration générale' },
           ],
         },
       ],
