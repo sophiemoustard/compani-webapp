@@ -280,12 +280,12 @@ const routes = [
         },
       },
       {
-        path: 'ni/billing/config',
-        name: 'ni billing config vendor',
-        component: () => import('src/modules/vendor/pages/ni/billing/BillingConfig'),
+        path: 'ni/config/main',
+        name: 'ni config main',
+        component: () => import('src/modules/vendor/pages/ni/config/MainConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
+          parent: 'configuration',
         },
       },
       {

@@ -108,7 +108,7 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni management questionnaire answers' },
   { name: 'account vendor' },
   { name: 'ni exports history vendor' },
-  { name: 'ni billing config vendor' },
+  { name: 'ni config main' },
 ];
 const vendorAdminRoutes = [...trainingOrganisationManagerRoutes];
 const trainerRoutes = [
