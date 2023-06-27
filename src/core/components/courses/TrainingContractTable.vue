@@ -8,7 +8,7 @@
           <template v-if="col.name === 'actions'">
             <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
               :disable="!props.row.file.link" />
-            <ni-button icon="delete" @click="deleteTrainingContract(props.row._id)"
+            <ni-button v-if="isVendorInterface" icon="delete" @click="deleteTrainingContract(props.row._id)"
               :disable="isArchived || !props.row.file.link" />
           </template>
           <template v-else>{{ col.value }}</template>
@@ -23,6 +23,7 @@ import { ref, toRefs } from 'vue';
 import get from 'lodash/get';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import { useCourses } from '@composables/courses';
 
 export default {
   name: 'TrainingContractTable',
@@ -51,12 +52,15 @@ export default {
       { name: 'actions', label: '', align: 'right', field: '' },
     ]);
 
+    const { isVendorInterface } = useCourses();
+
     const deleteTrainingContract = trainingContractId => emit('delete', trainingContractId);
 
     return {
       // Data
       columns,
       pagination,
+      isVendorInterface,
       // Methods
       deleteTrainingContract,
     };

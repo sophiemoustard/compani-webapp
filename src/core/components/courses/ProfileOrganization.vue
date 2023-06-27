@@ -83,7 +83,7 @@
     </div>
     <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
       :training-contracts="trainingContracts" :training-contract-table-loading="trainingContractTableLoading"
-      @refresh="refreshTrainingContracts" />
+      @refresh="refreshTrainingContracts" :has-holding-role="hasHoldingRole" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -262,6 +262,8 @@ export default {
     const isTrainer = computed(() => vendorRole.value === TRAINER);
 
     const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
+
+    const hasHoldingRole = computed(() => !!get(loggedUser.value, 'role.holding'));
 
     const isCourseInter = computed(() => course.value.type === INTER_B2B);
 
@@ -725,13 +727,15 @@ export default {
         if (!isRofOrVendorAdmin.value && isVendorInterface) return;
 
         trainingContractTableLoading.value = true;
-        const trainingContractList = await TrainingContracts.list({ course: course.value._id });
+        const loggedUserHolding = get(loggedUser.value, 'holding._id');
+        const trainingContractList = await TrainingContracts.list({
+          course: course.value._id,
+          ...(isClientInterface && {
+            ...loggedUserHolding ? { holding: loggedUserHolding } : { company: loggedUser.value.company._id },
+          }),
+        });
 
-        if (course.value.type === INTER_B2B && !isVendorInterface) {
-          trainingContracts.value = trainingContractList.filter(tc => tc.company === loggedUser.value.company._id);
-        } else {
-          trainingContracts.value = trainingContractList;
-        }
+        trainingContracts.value = trainingContractList;
       } catch (e) {
         console.error(e);
         trainingContracts.value = [];
@@ -792,6 +796,7 @@ export default {
       course,
       v$,
       isRofOrVendorAdmin,
+      hasHoldingRole,
       canEditSlots,
       canEditTrainees,
       filteredMessageTypeOptions,
