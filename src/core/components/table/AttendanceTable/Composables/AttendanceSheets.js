@@ -6,7 +6,6 @@ import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
 import { INTRA, INTER_B2B, DD_MM_YYYY } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
-import { hasUserAccessToCompany } from '@helpers/userCompanies';
 import CompaniDate from '@helpers/dates/companiDates';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
@@ -84,11 +83,15 @@ export const useAttendanceSheets = (
   const refreshAttendanceSheets = async () => {
     try {
       attendanceSheetTableLoading.value = true;
-      const attendanceSheetList = await AttendanceSheets.list({ course: course.value._id });
+      const loggedUserHolding = get(loggedUser.value, 'holding._id');
+      const attendanceSheetList = await AttendanceSheets.list({
+        course: course.value._id,
+        ...(isClientInterface && {
+          ...loggedUserHolding ? { holding: loggedUserHolding } : { company: loggedUser.value.company._id },
+        }),
+      });
 
-      if (course.value.type === INTER_B2B && isClientInterface) {
-        attendanceSheets.value = attendanceSheetList.filter(a => hasUserAccessToCompany(loggedUser.value, a.company));
-      } else attendanceSheets.value = attendanceSheetList;
+      attendanceSheets.value = attendanceSheetList;
     } catch (e) {
       console.error(e);
       attendanceSheets.value = [];
