@@ -83,11 +83,15 @@ export const useAttendanceSheets = (
   const refreshAttendanceSheets = async () => {
     try {
       attendanceSheetTableLoading.value = true;
-      const attendanceSheetList = await AttendanceSheets.list({ course: course.value._id });
+      const loggedUserHolding = get(loggedUser.value, 'holding._id');
+      const attendanceSheetList = await AttendanceSheets.list({
+        course: course.value._id,
+        ...(isClientInterface && {
+          ...loggedUserHolding ? { holding: loggedUserHolding } : { company: loggedUser.value.company._id },
+        }),
+      });
 
-      if (course.value.type === INTER_B2B && isClientInterface) {
-        attendanceSheets.value = attendanceSheetList.filter(a => a.company === loggedUser.value.company._id);
-      } else attendanceSheets.value = attendanceSheetList;
+      attendanceSheets.value = attendanceSheetList;
     } catch (e) {
       console.error(e);
       attendanceSheets.value = [];
