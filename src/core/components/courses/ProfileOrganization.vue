@@ -13,15 +13,14 @@
           :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
           :loading="salesRepresentativeEditionModal" @open-modal="openSalesRepresentativeModal" />
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant(e)" :contact="course.contact"
-          :can-update="canUpdateInterlocutor" label="Ajouter un(e) intervenant(e)"
-          :disable="isArchived" :loading="trainerModal" @open-modal="(value) => openTrainerModal(value)" />
+          :can-update="canUpdateInterlocutor" label="Ajouter un(e) intervenant(e)" :disable="isArchived"
+          :loading="trainerModal" @open-modal="openTrainerModal" />
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Référent structure"
           :contact="course.contact" :can-update="(canUpdateInterlocutor || isClientInterface) && course.type === INTRA"
           label="Ajouter un référent structure" :disable="isArchived" :loading="companyRepresentativeModal"
-          @open-modal="(value) => openCompanyRepresentativeModal(value)" />
-        <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor"
-          label="Définir un contact pour la formation" :disable="isArchived" :loading="contactAdditionModal"
-          @click="openContactAdditionModal" />
+          @open-modal="openCompanyRepresentativeModal" />
+        <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :loading="contactAdditionModal"
+          :disable="isArchived" label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"

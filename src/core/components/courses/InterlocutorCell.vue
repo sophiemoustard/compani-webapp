@@ -49,7 +49,7 @@ export default {
     'ni-button': Button,
     'ni-secondary-button': SecondaryButton,
   },
-  emits: ['open-modal', 'open-edition-modal'],
+  emits: ['open-modal'],
   setup (_, { emit }) {
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
 
