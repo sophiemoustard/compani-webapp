@@ -18,8 +18,8 @@
       <template v-if="!isIntraCourse && (isVendorInterface || hasHoldingRole)">
         <q-card>
           <training-contract-table v-if="trainingContracts.length" @delete="validateDocumentDeletion"
-            :is-archived="!!course.archivedAt" :training-contracts="trainingContracts"
-            :loading="trainingContractTableLoading" :company-options="companyOptions" />
+            :is-archived="!!course.archivedAt" :training-contracts="trainingContracts" :company-options="companyOptions"
+            :show-delete-button="isVendorInterface" :loading="trainingContractTableLoading" />
           <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
         </q-card>
         <div v-if="isVendorInterface" align="right" class="q-pa-sm">
