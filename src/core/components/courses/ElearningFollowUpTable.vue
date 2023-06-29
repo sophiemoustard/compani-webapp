@@ -15,8 +15,8 @@
             <connected-dot v-if="col.value" />
           </template>
           <template v-else>
-            <div :class="['name', canAccessOrEditTrainee(props.row) && 'clickable-name']"
-              @click="canAccessOrEditTrainee(props.row) && goToLearnerProfile(props.row, $event)">
+            <div :class="['name', canAccessTrainee(props.row) && 'clickable-name']"
+              @click="canAccessTrainee(props.row) && goToLearnerProfile(props.row, $event)">
               {{ col.value }}
             </div>
           </template>
@@ -74,7 +74,7 @@ export default {
     const { isBlended } = toRefs(props);
 
     const { isClientInterface } = useCourses();
-    const { canAccessOrEditTrainee } = useLearnersEdition();
+    const { canAccessTrainee } = useLearnersEdition();
 
     const columns = ref([
       {
@@ -134,7 +134,7 @@ export default {
       // Methods
       goToLearnerProfile,
       getStepTypeIcon,
-      canAccessOrEditTrainee,
+      canAccessTrainee,
     };
   },
 };
