@@ -11,20 +11,17 @@
       <div class="interlocutor-container">
         <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
           :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
-          :loading="interlocutorModalLoading" @open-edition-modal="openSalesRepresentativeModal" />
+          :loading="salesRepresentativeEditionModal" @open-modal="openSalesRepresentativeModal" />
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant(e)" :contact="course.contact"
           :can-update="canUpdateInterlocutor" label="Ajouter un(e) intervenant(e)"
-          :disable="isArchived" :loading="interlocutorModalLoading"
-          @open-edition-modal="() => openTrainerModal('Modifier l\'')"
-          @open-creation-modal="() => openTrainerModal('Ajouter un(e) ')" />
+          :disable="isArchived" :loading="trainerModal" @open-modal="(value) => openTrainerModal(value)" />
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Référent structure"
           :contact="course.contact" :can-update="canUpdateInterlocutor || isClientInterface"
-          label="Ajouter un référent structure" :disable="isArchived" :loading="interlocutorModalLoading"
-          @open-edition-modal="() => openCompanyRepresentativeModal('Modifier le ')"
-          @open-creation-modal="() => openCompanyRepresentativeModal('Ajouter un ')" />
+          label="Ajouter un référent structure" :disable="isArchived" :loading="companyRepresentativeModal"
+          @open-modal="(value) => openCompanyRepresentativeModal(value)" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor"
-          label="Définir un contact pour la formation" :disable="isArchived"
-          @click="openContactAdditionModal" :loading="contactModalLoading" />
+          label="Définir un contact pour la formation" :disable="isArchived" :loading="contactAdditionModal"
+          @click="openContactAdditionModal" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
@@ -662,7 +659,9 @@ export default {
       v$.value.tmpInterlocutor.$reset();
     };
 
-    const openTrainerModal = (action) => {
+    const openTrainerModal = (value) => {
+      const action = value === 'edition' ? 'Modifier l\'' : 'Ajouter un(e) ';
+
       tmpInterlocutor.value = {
         _id: course.value.trainer._id,
         isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
@@ -671,7 +670,9 @@ export default {
       trainerModal.value = true;
     };
 
-    const openCompanyRepresentativeModal = (action) => {
+    const openCompanyRepresentativeModal = (value) => {
+      const action = value === 'edition' ? 'Modifier le ' : 'Ajouter un ';
+
       tmpInterlocutor.value = {
         _id: course.value.companyRepresentative._id,
         isContact: !!course.value.companyRepresentative._id &&

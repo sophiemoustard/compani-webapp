@@ -20,10 +20,10 @@
           </div>
         </div>
       </div>
-      <ni-button v-if="canUpdate" icon="edit" :disable="disable" :loading="loading" @click="openEditionModal" />
+      <ni-button v-if="canUpdate" icon="edit" :disable="disable" @click="openModal('edition')" />
     </q-card>
   </div>
-  <ni-secondary-button v-else :label="label" :disable="disable" :loading="loading" @click="openCreationModal" />
+  <ni-secondary-button v-else :label="label" :disable="disable" :loading="loading" @click="openModal('creation')" />
 </template>
 
 <script>
@@ -48,12 +48,12 @@ export default {
     'ni-button': Button,
     'ni-secondary-button': SecondaryButton,
   },
-  emits: ['open-creation-modal', 'open-edition-modal'],
+  emits: ['open-modal', 'open-edition-modal'],
   setup (_, { emit }) {
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
 
-    const openCreationModal = () => emit('open-creation-modal');
-    const openEditionModal = () => emit('open-edition-modal');
+    const openModal = value => emit('open-modal', value);
+
     return {
       // Data
       DEFAULT_AVATAR,
@@ -62,8 +62,7 @@ export default {
       formatPhone,
       getAvatar,
       get,
-      openCreationModal,
-      openEditionModal,
+      openModal,
     };
   },
 };
