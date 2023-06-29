@@ -16,7 +16,7 @@
           :can-update="canUpdateInterlocutor" label="Ajouter un(e) intervenant(e)"
           :disable="isArchived" :loading="trainerModal" @open-modal="(value) => openTrainerModal(value)" />
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Référent structure"
-          :contact="course.contact" :can-update="canUpdateInterlocutor || isClientInterface"
+          :contact="course.contact" :can-update="(canUpdateInterlocutor || isClientInterface) && course.type === INTRA"
           label="Ajouter un référent structure" :disable="isArchived" :loading="companyRepresentativeModal"
           @open-modal="(value) => openCompanyRepresentativeModal(value)" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor"

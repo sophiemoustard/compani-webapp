@@ -23,7 +23,8 @@
       <ni-button v-if="canUpdate" icon="edit" :disable="disable" @click="openModal('edition')" />
     </q-card>
   </div>
-  <ni-secondary-button v-else :label="label" :disable="disable" :loading="loading" @click="openModal('creation')" />
+  <ni-secondary-button v-else-if="canUpdate" :label="label" :disable="disable" :loading="loading"
+    @click="openModal('creation')" />
 </template>
 
 <script>
