@@ -1,5 +1,5 @@
 <template>
-  <div class="cell-container q-mx-sm">
+  <div v-if="get(interlocutor, '_id')" class="cell-container q-mx-sm">
     <p class="input-caption">{{ caption }}</p>
     <q-card class="interlocutor-cell row justify-between items-start">
       <div class="row">
@@ -20,14 +20,16 @@
           </div>
         </div>
       </div>
-      <ni-button v-if="canUpdate" icon="edit" @click="openEditionModal()" :disable="disable" />
+      <ni-button v-if="canUpdate" icon="edit" :disable="disable" @click="openModal(EDITION)" />
     </q-card>
   </div>
+  <ni-secondary-button v-else-if="canUpdate" :label="label" :disable="disable" @click="openModal(CREATION)" />
 </template>
 
 <script>
 import get from 'lodash/get';
 import Button from '@components/Button';
+import SecondaryButton from '@components/SecondaryButton';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity, formatPhone } from '@helpers/utils';
 
@@ -37,15 +39,20 @@ export default {
     interlocutor: { type: Object, default: () => ({}) },
     contact: { type: Object, default: () => ({}) },
     caption: { type: String, default: '' },
-    openEditionModal: { type: Function, default: () => {} },
     canUpdate: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
+    label: { type: String, default: '' },
   },
   components: {
     'ni-button': Button,
+    'ni-secondary-button': SecondaryButton,
   },
-  setup () {
+  emits: ['open-modal'],
+  setup (_, { emit }) {
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
+
+    const openModal = value => emit('open-modal', value);
+
     return {
       // Data
       DEFAULT_AVATAR,
@@ -54,6 +61,7 @@ export default {
       formatPhone,
       getAvatar,
       get,
+      openModal,
     };
   },
 };
