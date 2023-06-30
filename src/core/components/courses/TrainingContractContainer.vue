@@ -14,22 +14,23 @@
           <ni-bi-color-button v-if="!trainingContracts.length" icon="file_download" :disable="disableGenerationButton"
             label="Générer la convention de formation" @click="trainingContractGenerationModal = true" size="16px" />
         </template>
-        <template v-else>
-          <q-card>
-            <training-contract-table v-if="trainingContracts.length" @delete="validateDocumentDeletion"
-              :is-archived="!!course.archivedAt" :training-contracts="trainingContracts"
-              :loading="trainingContractTableLoading" :company-options="companyOptions" />
-            <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
-          </q-card>
-          <div align="right" class="q-pa-sm">
-            <ni-button color="primary" icon="file_download" :disable="disableGenerationButton"
-              label="Générer une convention" @click="trainingContractGenerationModal = true" />
-            <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
-              icon="add" :disable="disableUploadButton" />
-          </div>
-        </template>
       </div>
-      <div v-if="isIntraCourse || (!isVendorInterface && !!trainingContracts.length)" class="q-mt-md row">
+      <template v-if="!isIntraCourse && (isVendorInterface || hasHoldingRole)">
+        <q-card>
+          <training-contract-table v-if="trainingContracts.length" @delete="validateDocumentDeletion"
+            :is-archived="!!course.archivedAt" :training-contracts="trainingContracts" :company-options="companyOptions"
+            :show-delete-button="isVendorInterface" :loading="trainingContractTableLoading" />
+          <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
+        </q-card>
+        <div v-if="isVendorInterface" align="right" class="q-pa-sm">
+          <ni-button color="primary" icon="file_download" :disable="disableGenerationButton"
+            label="Générer une convention" @click="trainingContractGenerationModal = true" />
+          <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
+            icon="add" :disable="disableUploadButton" />
+        </div>
+      </template>
+      <div v-if="isIntraCourse || (!isVendorInterface && !!trainingContracts.length && !hasHoldingRole)"
+        class="q-mt-md row">
         <ni-file-uploader caption="Convention de formation signée" :extensions="extensions" :url="url"
           :custom-fields="customFields" :entity="trainingContracts[0]" path="file" :disable="!!course.archivedAt"
           @uploaded="uploaded" hide-image :can-delete="isVendorInterface"
@@ -49,7 +50,7 @@
     :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse" />
 
   <training-contract-creation-modal v-model="trainingContractCreationModal" :company-options="companyOptions"
-    v-model:new-training-contract="newTrainingContract" @submit="createTrainingContract"
+    v-model:new-training-contract="newTrainingContract" @submit="createTrainingContract" :loading="pdfLoading"
     @hide="resetNewTrainingContract" :validations="validations.newTrainingContract" />
 </template>
 
@@ -82,6 +83,7 @@ export default {
   props: {
     course: { type: Object, default: () => {} },
     isRofOrVendorAdmin: { type: Boolean, default: false },
+    hasHoldingRole: { type: Boolean, default: false },
     trainingContractTableLoading: { type: Boolean, default: false },
     trainingContracts: { type: Array, default: () => [] },
   },
