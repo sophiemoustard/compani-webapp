@@ -15,8 +15,8 @@
             <connected-dot v-if="col.value" />
           </template>
           <template v-else>
-            <div :class="['name', canAccessOrEditTrainee(props.row) && 'clickable-name']"
-              @click="canAccessOrEditTrainee(props.row) && goToLearnerProfile(props.row, $event)">
+            <div :class="['name', canAccessTrainee(props.row) && 'clickable-name']"
+              @click="goToLearnerProfile(props.row, $event)">
               {{ col.value }}
             </div>
           </template>
@@ -74,7 +74,7 @@ export default {
     const { isBlended } = toRefs(props);
 
     const { isClientInterface } = useCourses();
-    const { canAccessOrEditTrainee } = useLearnersEdition();
+    const { canAccessTrainee } = useLearnersEdition();
 
     const columns = ref([
       {
@@ -119,6 +119,8 @@ export default {
       : ['name', 'progress', 'expand']));
 
     const goToLearnerProfile = (row, $event) => {
+      if (!canAccessTrainee(row)) return;
+
       $event.stopPropagation();
       const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
       $router.push({ name, params: { learnerId: row._id }, query: { defaultTab: 'courses' } });
@@ -134,7 +136,7 @@ export default {
       // Methods
       goToLearnerProfile,
       getStepTypeIcon,
-      canAccessOrEditTrainee,
+      canAccessTrainee,
     };
   },
 };

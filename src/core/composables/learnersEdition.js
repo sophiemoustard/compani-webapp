@@ -14,7 +14,14 @@ export const useLearnersEdition = () => {
   const isRofOrAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN]
     .includes(get(loggedUser.value, 'role.vendor.name')));
 
-  const canAccessOrEditTrainee = (trainee) => {
+  const canAccessTrainee = (trainee) => {
+    const loggedUserCompany = get(loggedUser.value, 'company._id');
+    const traineeCurrentCompany = trainee.company;
+
+    return ((isVendorInterface && isRofOrAdmin) || (!isVendorInterface && loggedUserCompany === traineeCurrentCompany));
+  };
+
+  const canEditTrainee = (trainee) => {
     const traineeCurrentCompany = trainee.company;
 
     return ((isVendorInterface && isRofOrAdmin) ||
@@ -23,6 +30,7 @@ export const useLearnersEdition = () => {
 
   return {
     // Methods
-    canAccessOrEditTrainee,
+    canAccessTrainee,
+    canEditTrainee,
   };
 };
