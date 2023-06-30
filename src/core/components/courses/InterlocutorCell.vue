@@ -20,11 +20,10 @@
           </div>
         </div>
       </div>
-      <ni-button v-if="canUpdate" icon="edit" :disable="disable" @click="openModal('edition')" />
+      <ni-button v-if="canUpdate" icon="edit" :disable="disable" @click="openModal(EDITION)" />
     </q-card>
   </div>
-  <ni-secondary-button v-else-if="canUpdate" :label="label" :disable="disable" :loading="loading"
-    @click="openModal('creation')" />
+  <ni-secondary-button v-else-if="canUpdate" :label="label" :disable="disable" @click="openModal(CREATION)" />
 </template>
 
 <script>
@@ -42,7 +41,6 @@ export default {
     caption: { type: String, default: '' },
     canUpdate: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
-    loading: { type: Boolean, default: false },
     label: { type: String, default: '' },
   },
   components: {

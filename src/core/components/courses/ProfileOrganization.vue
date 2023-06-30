@@ -11,16 +11,15 @@
       <div class="interlocutor-container">
         <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
           :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
-          :loading="salesRepresentativeEditionModal" @open-modal="openSalesRepresentativeModal" />
+          @open-modal="openSalesRepresentativeModal" />
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant(e)" :contact="course.contact"
           :can-update="canUpdateInterlocutor" label="Ajouter un(e) intervenant(e)" :disable="isArchived"
-          :loading="trainerModal" @open-modal="openTrainerModal" />
+          @open-modal="openTrainerModal" />
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Référent structure"
           :contact="course.contact" :can-update="(canUpdateInterlocutor || isClientInterface) && course.type === INTRA"
-          label="Ajouter un référent structure" :disable="isArchived" :loading="companyRepresentativeModal"
-          @open-modal="openCompanyRepresentativeModal" />
-        <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :loading="contactAdditionModal"
-          :disable="isArchived" label="Définir un contact pour la formation" @click="openContactAdditionModal" />
+          label="Ajouter un référent structure" :disable="isArchived" @open-modal="openCompanyRepresentativeModal" />
+        <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
+          label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
@@ -151,6 +150,7 @@ import {
   DD_MM,
   HH_MM,
   COURSE,
+  EDITION,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -659,7 +659,7 @@ export default {
     };
 
     const openTrainerModal = (value) => {
-      const action = value === 'edition' ? 'Modifier l\'' : 'Ajouter un(e) ';
+      const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un(e) ';
 
       tmpInterlocutor.value = {
         _id: course.value.trainer._id,
@@ -670,7 +670,7 @@ export default {
     };
 
     const openCompanyRepresentativeModal = (value) => {
-      const action = value === 'edition' ? 'Modifier le ' : 'Ajouter un ';
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
       tmpInterlocutor.value = {
         _id: course.value.companyRepresentative._id,
@@ -851,6 +851,7 @@ export default {
   grid-auto-flow: row
   display: grid
   grid-gap: 24px
+  grid-template-rows: auto
   @media screen and (min-width: 768px)
     grid-auto-rows: 1fr
     grid-template-columns: repeat(2, 1fr)

@@ -130,6 +130,7 @@ export const ABSENCE_TYPES = [
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
 export const CANCELLATION = 'cancellation';
+export const CREATION = 'creation';
 export const DAILY = 'daily';
 export const HALF_DAILY = 'half_daily';
 export const ABSENCE_NATURES = [
