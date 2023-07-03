@@ -30,7 +30,7 @@
 import get from 'lodash/get';
 import Button from '@components/Button';
 import SecondaryButton from '@components/SecondaryButton';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, EDITION, CREATION } from '@data/constants';
 import { formatIdentity, formatPhone } from '@helpers/utils';
 
 export default {
@@ -56,6 +56,8 @@ export default {
     return {
       // Data
       DEFAULT_AVATAR,
+      EDITION,
+      CREATION,
       // Methods
       formatIdentity,
       formatPhone,
