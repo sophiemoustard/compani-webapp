@@ -70,7 +70,7 @@
     <interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
       @submit="updateVendorCompany('billingRepresentative')" :label="billingRepresentativeModalLabel"
       :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
-      @hide="resetBillingRepresentative" />
+      :validations="validations.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
   </div>
 </template>
 
@@ -149,8 +149,9 @@ export default {
         address: { fullAddress: { required, frAddress } },
         activityDeclarationNumber: { required },
       },
+      tmpBillingRepresentative: { _id: required },
     };
-    const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany });
+    const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany, tmpBillingRepresentative });
     const { waitForValidation } = useValidations();
 
     const siretErrorMessage = computed(() => {
@@ -199,7 +200,8 @@ export default {
         let payload;
         if (path === 'billingRepresentative') {
           billingRepresentativeModalLoading.value = true;
-          if (validations.value.$error) return NotifyWarning('Champ(s) invalide(s)');
+          validations.value.tmpBillingRepresentative.$touch();
+          if (validations.value.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           payload = { billingRepresentative: tmpBillingRepresentative.value._id };
         } else {
@@ -210,13 +212,12 @@ export default {
         NotifyPositive('Modification enregistrée.');
 
         await refreshVendorCompany();
+        billingRepresentativeModal.value = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        tmpInput.value = '';
         tmpBillingRepresentative.value = {};
-        billingRepresentativeModal.value = false;
         billingRepresentativeModalLoading.value = false;
       }
     };
@@ -334,6 +335,7 @@ export default {
     const resetBillingRepresentative = () => {
       tmpBillingRepresentative.value = { _id: '' };
       billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
+      validations.value.tmpBillingRepresentative.$reset();
     };
 
     const created = async () => {
