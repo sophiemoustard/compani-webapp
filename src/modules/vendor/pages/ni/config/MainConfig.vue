@@ -21,7 +21,7 @@
       <p class="text-weight-bold">Contacts</p>
         <div class="interlocutor-container q-mb-xl">
           <interlocutor-cell :interlocutor="vendorCompany.billingRepresentative" caption="Chargé(e) de facturation"
-            label="Ajouter un(e) chargée de facturation" :can-update="true"
+            label="Ajouter un(e) chargé(e) de facturation" :can-update="true"
             @open-modal="openBillingRepresentativeModal" />
         </div>
       <p class="text-weight-bold">Financeurs</p>
@@ -322,7 +322,7 @@ export default {
       const action = value === EDITION ? 'Modifier le/la ' : 'Ajouter un(e) ';
 
       tmpBillingRepresentative.value = get(vendorCompany.value, 'billingRepresentative');
-      billingRepresentativeModalLabel.value = { action, interlocutor: 'chargé(e) de facturation' };
+      billingRepresentativeModalLabel.value = { action, interlocutor: 'Chargé(e) de facturation' };
       billingRepresentativeModal.value = true;
     };
 
