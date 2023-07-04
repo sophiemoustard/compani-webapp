@@ -368,6 +368,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/courses/contacts',
+        name: 'ni courses contacts',
+        component: () => import('src/modules/client/pages/ni/courses/ContactProfile'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
+      {
         path: 'ni/users/learners/:learnerId',
         name: 'ni courses learners info',
         component: () => import('src/modules/client/pages/ni/courses/LearnerProfile'),

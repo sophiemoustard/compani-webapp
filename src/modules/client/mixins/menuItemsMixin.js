@@ -132,6 +132,7 @@ export const menuItemsMixin = {
             { name: 'ni elearning courses', icon: 'stay_primary_portrait', label: 'Formations eLearning' },
             { name: 'ni courses learners', icon: 'contacts', label: 'Apprenants' },
             { name: 'ni courses bills', icon: 'receipt', label: 'Factures' },
+            { name: 'ni courses contacts', icon: 'people', label: 'Contacts Compani' },
           ],
         },
         {
