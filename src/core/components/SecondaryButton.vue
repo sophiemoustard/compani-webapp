@@ -29,5 +29,4 @@ export default {
 .button
   justify-self: start
   align-self: end
-  margin-top: 24px
 </style>

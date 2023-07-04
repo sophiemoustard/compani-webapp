@@ -19,11 +19,11 @@
         </div>
       </div>
       <p class="text-weight-bold">Contacts</p>
-        <div class="interlocutor-container q-mb-xl">
-          <interlocutor-cell :interlocutor="vendorCompany.billingRepresentative" caption="Chargé(e) de facturation"
-            label="Ajouter un(e) chargé(e) de facturation" :can-update="true"
-            @open-modal="openBillingRepresentativeModal" />
-        </div>
+      <div class="interlocutor-container q-mb-xl">
+        <interlocutor-cell :interlocutor="vendorCompany.billingRepresentative" caption="Chargé de facturation"
+          label="Ajouter un chargé de facturation" :can-update="true"
+          @open-modal="openBillingRepresentativeModal" />
+      </div>
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
         <ni-responsive-table :data="courseFundingOrganisations" :columns="courseFundingOrganisationColumns"
@@ -319,10 +319,10 @@ export default {
     };
 
     const openBillingRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le/la ' : 'Ajouter un(e) ';
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
       tmpBillingRepresentative.value = get(vendorCompany.value, 'billingRepresentative');
-      billingRepresentativeModalLabel.value = { action, interlocutor: 'Chargé(e) de facturation' };
+      billingRepresentativeModalLabel.value = { action, interlocutor: 'Chargé de facturation' };
       billingRepresentativeModal.value = true;
     };
 
@@ -388,14 +388,3 @@ export default {
   },
 };
 </script>
-<style scoped lang="sass">
-.interlocutor-container
-  flex-direction: row
-  grid-auto-flow: row
-  display: grid
-  grid-gap: 24px
-  grid-template-rows: auto
-  @media screen and (min-width: 768px)
-    grid-auto-rows: 1fr
-    grid-template-columns: repeat(2, 1fr)
-</style>
