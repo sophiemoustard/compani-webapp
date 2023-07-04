@@ -201,9 +201,8 @@ export default {
       try {
         pdfLoading.value = true;
         const pdf = await Courses.downloadTrainingContract(course.value._id, newGeneratedTrainingContractInfos.value);
-        const formattedName = formatDownloadName(
-          `convention ${composeCourseName(course.value)} ${course.value.companies[0].name}`
-        );
+        const company = course.value.companies.find(c => c._id === newGeneratedTrainingContractInfos.value.company);
+        const formattedName = formatDownloadName(`convention ${company.name} ${composeCourseName(course.value)}`);
         const pdfName = `${formattedName}.pdf`;
         downloadFile(pdf, pdfName, 'application/octet-stream');
         trainingContractInfosModal.value = false;
