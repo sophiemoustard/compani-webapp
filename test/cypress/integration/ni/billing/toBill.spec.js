@@ -38,8 +38,8 @@ describe('ToBill', () => {
     cy.dataCy('bill-row').should('have.length', 3);
 
     // should interact correctly with date input and thirdPartyPayer select'
-    cy.dataCy('select-tpp').eq(1).click();
-    cy.dataCy('select-tpp').eq(1).type('{backspace}Avec{downarrow}{enter}');
+    cy.dataCy('select-tpp').eq(0).click();
+    cy.dataCy('select-tpp').eq(0).type('{backspace}Avec{downarrow}{enter}');
     cy.dataCy('bill-row').should('have.length', 1);
     cy.dataCy('col-customer').should('contain', 'YAFFA E.');
     cy.dataCy('col-externalBilling').within(() => {
@@ -49,8 +49,8 @@ describe('ToBill', () => {
       cy.get('.q-checkbox').click();
     });
 
-    cy.dataCy('select-tpp').eq(1).click();
-    cy.dataCy('select-tpp').eq(1).type('{backspace}Sans{downarrow}{enter}');
+    cy.dataCy('select-tpp').eq(0).click();
+    cy.dataCy('select-tpp').eq(0).type('{backspace}Sans{downarrow}{enter}');
     cy.dataCy('bill-row').should('have.length', 2);
 
     cy.get('[data-cy=date-input]  input').eq(0).clear().type('01/01/2019');
@@ -75,8 +75,8 @@ describe('ToBill', () => {
     });
     cy.dataCy('bill-row').should('have.length', 1);
 
-    cy.dataCy('select-tpp').eq(1).click();
-    cy.dataCy('select-tpp').eq(1).type('{backspace}Tous{downarrow}{enter}');
+    cy.dataCy('select-tpp').eq(0).click();
+    cy.dataCy('select-tpp').eq(0).type('{backspace}Tous{downarrow}{enter}');
     cy.get('[data-cy=date-input]  input')
       .eq(1)
       .clear()

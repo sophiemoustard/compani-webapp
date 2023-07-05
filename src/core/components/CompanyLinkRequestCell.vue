@@ -19,7 +19,7 @@ import get from 'lodash/get';
 import { mapState } from 'vuex';
 import Button from '@components/Button';
 import { NotifyPositive } from '@components/popup/notify';
-import Users from '@api/Users';
+import UserCompanies from '@api/UserCompanies';
 import CompanyLinkRequests from '@api/CompanyLinkRequests';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
@@ -46,9 +46,9 @@ export default {
     getAvatar (picture) {
       return (get(picture, 'link')) || DEFAULT_AVATAR;
     },
-    async linkUserToCompany () {
+    async createUserCompany () {
       try {
-        await Users.updateById(this.request.user._id, { company: this.userProfile.company._id });
+        await UserCompanies.create({ user: this.request.user._id, company: this.userProfile.company._id });
         this.$emit('click');
       } catch (e) {
         console.error(e);
@@ -78,7 +78,7 @@ export default {
         ok: 'Rattacher ce compte',
         cancel: 'Annuler',
       })
-        .onOk(this.linkUserToCompany)
+        .onOk(this.createUserCompany)
         .onCancel(() => NotifyPositive('Rattachement à la structure annulé.'));
     },
     validateLinkRequestDeletion () {

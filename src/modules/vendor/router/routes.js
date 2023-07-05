@@ -34,6 +34,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/users/holdings',
+        name: 'ni users holdings',
+        component: () => import('src/modules/vendor/pages/ni/users/holdings/HoldingsDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
         path: 'ni/users/companies/:companyId',
         name: 'ni users companies info',
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompanyProfile'),
@@ -49,6 +58,16 @@ const routes = [
             console.error(e);
           }
         },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
+        path: 'ni/users/holdings/:holdingId',
+        name: 'ni users holdings info',
+        component: () => import('src/modules/vendor/pages/ni/users/holdings/HoldingProfile'),
+        props: route => ({ ...route.query, ...route.params }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'users',
@@ -261,12 +280,12 @@ const routes = [
         },
       },
       {
-        path: 'ni/billing/config',
-        name: 'ni billing config vendor',
-        component: () => import('src/modules/vendor/pages/ni/billing/BillingConfig'),
+        path: 'ni/config/main',
+        name: 'ni config main',
+        component: () => import('src/modules/vendor/pages/ni/config/MainConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
+          parent: 'configuration',
         },
       },
       {

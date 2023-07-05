@@ -8,8 +8,7 @@
           </div>
       </template>
     </ni-title-header>
-    <ni-simple-table :columns="columns" v-model:pagination="pagination" :data="bills" :loading="tableLoading"
-      :rows-per-page="rowsPerPage">
+    <ni-simple-table :columns="columns" v-model:pagination="pagination" :data="bills" :loading="tableLoading">
      <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -96,7 +95,6 @@ export default {
       },
     ]);
     const pagination = ref({ rowsPerPage: 0, sortBy: 'date', descending: true });
-    const rowsPerPage = ref([1, 5, 15, 50, 100, 200, 300]);
     const tableLoading = ref(false);
     const pdfLoading = ref(false);
 
@@ -179,7 +177,6 @@ export default {
       bills,
       columns,
       pagination,
-      rowsPerPage,
       tableLoading,
       pdfLoading,
       // Methods

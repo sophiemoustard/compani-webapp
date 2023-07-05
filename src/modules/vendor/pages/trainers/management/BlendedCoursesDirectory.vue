@@ -1,7 +1,6 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
+    <ni-directory-header title="Formations" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
@@ -18,6 +17,8 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
       <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
         @update:model-value="updateSelectedType" />
+      <ni-select :options="archiveStatusOptions" :model-value="selectedArchiveStatus"
+        @update:model-value="updateSelectedArchiveStatus" />
     </div>
     <div class="q-mb-lg filters-container checkboxes">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
@@ -75,7 +76,8 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      displayArchived,
+      archiveStatusOptions,
+      selectedArchiveStatus,
       updateSelectedCompany,
       updateSelectedProgram,
       updateSelectedSalesRepresentative,
@@ -84,7 +86,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
-      updateDisplayArchived,
+      updateSelectedArchiveStatus,
       resetFilters,
     } = useCourseFilters(activeCourses, archivedCourses);
 
@@ -134,7 +136,7 @@ export default {
       // Data
       activeCourses,
       archivedCourses,
-      displayArchived,
+      archiveStatusOptions,
       typeFilterOptions,
       // Computed
       selectedCompany,
@@ -148,6 +150,7 @@ export default {
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
+      selectedArchiveStatus,
       // Methods
       updateSelectedCompany,
       updateSelectedProgram,
@@ -157,7 +160,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
-      updateDisplayArchived,
+      updateSelectedArchiveStatus,
       resetFilters,
     };
   },

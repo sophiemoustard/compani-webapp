@@ -122,7 +122,7 @@ export default {
       followUpMissingInfo,
       downloadAttendanceSheet,
     } = useCourses(course);
-    const { learners, getLearnersList, learnersLoading } = useTraineeFollowUp(profileId);
+    const { learners, getFollowUp, learnersLoading } = useTraineeFollowUp(profileId);
 
     const areQuestionnaireAnswersVisible = computed(() => !isClientInterface && questionnaires.value.length);
 
@@ -164,9 +164,12 @@ export default {
 
     const getUnsubscribedAttendances = async () => {
       try {
+        const loggedUserHolding = get(loggedUser.value, 'holding._id');
         const query = {
           course: course.value._id,
-          ...(isClientInterface && { company: loggedUser.value.company._id }),
+          ...(isClientInterface && {
+            ...loggedUserHolding ? { holding: loggedUserHolding } : { company: loggedUser.value.company._id },
+          }),
         };
         const unsubscribedAttendancesGroupedByTrainees = await Attendances.listUnsubscribed(query);
         unsubscribedAttendances.value = Object.keys(unsubscribedAttendancesGroupedByTrainees)
@@ -196,7 +199,7 @@ export default {
     };
 
     const created = async () => {
-      const promises = [getLearnersList(), getUnsubscribedAttendances()];
+      const promises = [getFollowUp(), getUnsubscribedAttendances()];
       if (!isClientInterface) promises.push(refreshQuestionnaires());
 
       await Promise.all(promises);

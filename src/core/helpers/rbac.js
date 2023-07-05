@@ -88,7 +88,9 @@ const helperRoutes = [
 ];
 const trainingOrganisationManagerRoutes = [
   { name: 'ni users companies' },
+  { name: 'ni users holdings' },
   { name: 'ni users companies info' },
+  { name: 'ni users holdings info' },
   { name: 'ni users trainers' },
   { name: 'ni users trainers info' },
   { name: 'ni users learners' },
@@ -106,7 +108,7 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni management questionnaire answers' },
   { name: 'account vendor' },
   { name: 'ni exports history vendor' },
-  { name: 'ni billing config vendor' },
+  { name: 'ni config main' },
 ];
 const vendorAdminRoutes = [...trainingOrganisationManagerRoutes];
 const trainerRoutes = [

@@ -130,6 +130,7 @@ export const ABSENCE_TYPES = [
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
 export const CANCELLATION = 'cancellation';
+export const CREATION = 'creation';
 export const DAILY = 'daily';
 export const HALF_DAILY = 'half_daily';
 export const ABSENCE_NATURES = [
@@ -359,6 +360,8 @@ export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
 export const OPERATIONS = 'operations';
 export const PEDAGOGY = 'pedagogy';
+export const ARCHIVED_COURSES = 'archived_courses';
+export const UNARCHIVED_COURSES = 'unarchived_courses';
 
 // SUBPROGRAM
 export const PUBLISHED = 'published';
@@ -641,3 +644,7 @@ export const DAY_OF_WEEK_SHORT = 'ccc';
 
 // LEARNERS
 export const DIRECTORY = 'directory';
+
+// BUTTONS TYPES
+export const FLOATING = 'floating';
+export const MODAL = 'modal';

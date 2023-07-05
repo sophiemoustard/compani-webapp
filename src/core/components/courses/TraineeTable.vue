@@ -17,7 +17,7 @@
           <template v-if="col.name === 'actions' && canEdit">
             <div>
               <ni-button icon="edit" @click="openTraineeEditionModal(props.row)"
-                :disable="!canEditTrainee(props.row)" />
+                :disable="!canEditTrainee(props.row) || !!course.archivedAt" />
               <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
           </template>
@@ -71,7 +71,7 @@ export default {
     const $q = useQuasar();
     const $store = useStore();
 
-    const { canAccesOrEditTrainee } = useLearnersEdition();
+    const { canEditTrainee } = useLearnersEdition();
 
     const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
@@ -175,8 +175,6 @@ export default {
         NotifyNegative('Erreur lors de la suppression du/de la stagiaire.');
       }
     };
-
-    const canEditTrainee = trainee => canAccesOrEditTrainee(trainee) && !course.value.archivedAt;
 
     return {
       // Data

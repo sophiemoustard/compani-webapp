@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { ref, watch, toRefs } from 'vue';
+
 export default {
   name: 'ProfileTabs',
   props: {
@@ -19,21 +21,32 @@ export default {
     profileId: { type: String, default: '' },
     notifications: { type: Object, default: () => ({}) },
   },
-  data () {
-    return {
-      selectedTab: null,
+  emits: ['refresh'],
+  setup (props, { emit }) {
+    const { notifications, profileId, tabsContent } = toRefs(props);
+
+    const selectedTab = ref(null);
+
+    watch(selectedTab, (_, oldValue) => {
+      if (oldValue) emit('refresh');
+    });
+
+    const alert = tab => (tab.notification && notifications.value && notifications.value[tab.notification]
+      ? notifications.value[tab.notification][profileId.value]
+      : false);
+
+    const created = () => {
+      selectedTab.value = tabsContent.value.find(tab => tab.default).name;
     };
-  },
-  mounted () {
-    const selectedTab = this.tabsContent.find(tab => tab.default);
-    this.selectedTab = selectedTab.name;
-  },
-  methods: {
-    alert (tab) {
-      return tab.notification && this.notifications && this.notifications[tab.notification]
-        ? this.notifications[tab.notification][this.profileId]
-        : false;
-    },
+
+    created();
+
+    return {
+      // Data
+      selectedTab,
+      // Methods
+      alert,
+    };
   },
 };
 </script>

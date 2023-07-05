@@ -14,7 +14,7 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="!isIntraCourse && !isClientInterface" :data="course.companies"
+        <ni-expanding-table v-else-if="displayCompanyNames" :data="course.companies"
           :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
           separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
           <template #row="{ props }">
@@ -50,11 +50,11 @@
       </div>
     </div>
 
-    <trainee-addition-modal v-model="traineeAdditionModal" v-model:new-trainee-registration="newTraineeRegistration"
+    <user-addition-modal v-model="traineeAdditionModal" v-model:new-user-registration="newTraineeRegistration"
       @submit="addTrainee" :validations="traineeRegistrationValidation.newTraineeRegistration"
-      :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :trainees-options="traineesOptions"
-      @open-learner-creation-modal="openLearnerCreationModal" :trainees-company-options="traineesCompanyOptions"
-      :display-company-select="!isIntraCourse" />
+      :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :users-options="traineesOptions"
+      @open-user-creation-modal="openLearnerCreationModal" :users-company-options="traineesCompanyOptions"
+      :display-company-select="!isIntraCourse" display-no-options-slot label="Stagiaire" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -75,12 +75,12 @@ import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
-import { TRAINER, DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
+import { TRAINER } from '@data/constants';
+import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
-import TraineeAdditionModal from '@components/courses/TraineeAdditionModal';
+import UserAdditionModal from '@components/courses/UserAdditionModal';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeTable from '@components/courses/TraineeTable';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -103,7 +103,7 @@ export default {
     'ni-button': Button,
     'ni-input': Input,
     'ni-trainee-table': TraineeTable,
-    'trainee-addition-modal': TraineeAdditionModal,
+    'user-addition-modal': UserAdditionModal,
     'learner-creation-modal': LearnerCreationModal,
     'ni-expanding-table': ExpandingTable,
     'company-addition-modal': CompanyAdditionModal,
@@ -142,16 +142,7 @@ export default {
       ? `Stagiaires (${traineesNumber.value})`
       : `Stagiaires de votre structure (${traineesNumber.value})`));
 
-    const traineesOptions = computed(() => potentialTrainees.value
-      .map(pt => ({
-        value: pt._id,
-        label: formatIdentity(pt.identity, 'FL'),
-        email: pt.local.email || '',
-        picture: get(pt, 'picture.link') || DEFAULT_AVATAR,
-        ...(!isIntraCourse.value && { company: get(pt, 'company.name') || '' }),
-        additionalFilters: [pt.local.email],
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label)));
+    const traineesOptions = computed(() => formatAndSortUserOptions(potentialTrainees.value, !isIntraCourse.value));
 
     const maxTraineesErrorMessage = computed(() => {
       if (get(validations.value, 'maxTrainees.strictPositiveNumber.$response') === false ||
@@ -181,6 +172,11 @@ export default {
       }
       return options;
     });
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const displayCompanyNames =
+      computed(() => !isIntraCourse.value && (!isClientInterface || !!loggedUser.value.role.holding));
 
     const refresh = () => emit('refresh');
 
@@ -229,9 +225,10 @@ export default {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const payload = isIntraCourse.value
-          ? { trainee: newTraineeRegistration.value.trainee }
-          : newTraineeRegistration.value;
+        const payload = {
+          trainee: newTraineeRegistration.value.user,
+          ...(!isIntraCourse.value && { company: newTraineeRegistration.value.company }),
+        };
         await Courses.addTrainee(course.value._id, payload);
 
         traineeAdditionModal.value = false;
@@ -308,6 +305,7 @@ export default {
       courseCompanyIds,
       hasLinkedCompanies,
       traineesCompanyOptions,
+      displayCompanyNames,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,

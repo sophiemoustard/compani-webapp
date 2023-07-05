@@ -1,9 +1,10 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-directory-header title="Formations" toggle-label="Archivées" :toggle-value="displayArchived"
-      display-toggle @toggle="updateDisplayArchived" :display-search-bar="false" />
+    <ni-directory-header title="Formations" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
+      <ni-select v-if="companyFilterOptions.length > 2" :options="companyFilterOptions" :model-value="selectedCompany"
+        clearable @update:model-value="updateSelectedCompany" />
       <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
@@ -16,6 +17,8 @@
         error-message="La date de fin doit être postérieure à la date de début" @blur="v$.selectedEndDate.$touch" />
       <ni-select :options="typeFilterOptions" clearable :model-value="selectedType"
         @update:model-value="updateSelectedType" />
+      <ni-select :options="archiveStatusOptions" :model-value="selectedArchiveStatus"
+        @update:model-value="updateSelectedArchiveStatus" />
     </div>
     <div class="q-mb-lg filters-container checkboxes">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
@@ -62,17 +65,21 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const {
+      companyFilterOptions,
       typeFilterOptions,
+      archiveStatusOptions,
       selectedTrainer,
       trainerFilterOptions,
       selectedProgram,
       programFilterOptions,
+      selectedCompany,
       selectedStartDate,
       selectedEndDate,
       selectedType,
       selectedNoAddressInSlots,
       selectedMissingTrainees,
-      displayArchived,
+      selectedArchiveStatus,
+      updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,
       updateSelectedStartDate,
@@ -80,7 +87,7 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
-      updateDisplayArchived,
+      updateSelectedArchiveStatus,
       resetFilters,
     } = useCourseFilters(activeCourses, archivedCourses);
 
@@ -93,18 +100,24 @@ export default {
     const refreshCourses = async () => {
       try {
         const courseList = await Courses.list({
-          company: get(loggedUser.value, 'company._id') || '',
           format: BLENDED,
           action: OPERATIONS,
           isArchived: false,
+          ...(get(loggedUser.value, 'role.holding')
+            ? { holding: get(loggedUser.value, 'holding._id') }
+            : { company: get(loggedUser.value, 'company._id') || '' }
+          ),
         });
         activeCourses.value = courseList;
 
         const archivedCourseList = await Courses.list({
-          company: get(loggedUser.value, 'company._id') || '',
           format: BLENDED,
           action: OPERATIONS,
           isArchived: true,
+          ...(get(loggedUser.value, 'role.holding')
+            ? { holding: loggedUser.value.holding._id }
+            : { company: get(loggedUser.value, 'company._id') || '' }
+          ),
         });
         archivedCourses.value = archivedCourseList;
       } catch (e) {
@@ -130,8 +143,8 @@ export default {
       // Data
       activeCourses,
       archivedCourses,
-      displayArchived,
       typeFilterOptions,
+      archiveStatusOptions,
       // Computed
       selectedTrainer,
       trainerFilterOptions,
@@ -141,7 +154,11 @@ export default {
       selectedEndDate,
       selectedType,
       selectedNoAddressInSlots,
+      selectedArchiveStatus,
       selectedMissingTrainees,
+      selectedCompany,
+      companyFilterOptions,
+      loggedUser,
       // Methods
       updateSelectedTrainer,
       updateSelectedProgram,
@@ -150,7 +167,8 @@ export default {
       updateSelectedType,
       updateSelectedNoAddressInSlots,
       updateSelectedMissingTrainees,
-      updateDisplayArchived,
+      updateSelectedArchiveStatus,
+      updateSelectedCompany,
       resetFilters,
     };
   },

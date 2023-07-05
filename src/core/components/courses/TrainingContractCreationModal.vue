@@ -11,7 +11,7 @@
       :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Téléverser la convention" icon-right="add" color="white"
-        @click="submit" />
+        @click="submit" :loading="loading" />
     </template>
   </ni-modal>
 </template>
@@ -29,6 +29,7 @@ export default {
   name: 'TrainingContractGenerationModal',
   props: {
     modelValue: { type: Boolean, default: false },
+    loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
     newTrainingContract: { type: Object, default: () => ({}) },

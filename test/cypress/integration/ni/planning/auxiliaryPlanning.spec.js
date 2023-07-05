@@ -15,8 +15,8 @@ describe('Auxiliary planning - display', () => {
 
   it('should display correctly auxiliary planning', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary Olait{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(0).click();
+    cy.get('[data-cy=planning-search]').eq(0).type('{backspace}Auxiliary Olait{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 1);
     cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
@@ -35,8 +35,8 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=event-start-hour]').eq(1).should('contain', UtilsHelper.applyOffset(18, '15'));
     cy.get('[data-cy=event-end-hour]').eq(1).should('contain', UtilsHelper.applyOffset(20, '30'));
 
-    cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(0).click();
+    cy.get('[data-cy=planning-search]').eq(0).type('Customer referent{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 2);
   });
 });
@@ -56,8 +56,8 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
 
   it('should create event', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary Olait{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(0).click();
+    cy.get('[data-cy=planning-search]').eq(0).type('{backspace}Auxiliary Olait{downarrow}{enter}');
     cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
 
     cy.get('[data-cy=planning-cell]').eq(0).click('bottom');
@@ -68,8 +68,8 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
 
   it('should update event', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary Olait{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(0).click();
+    cy.get('[data-cy=planning-search]').eq(0).type('{backspace}Auxiliary Olait{downarrow}{enter}');
     cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
     cy.get('[data-cy=planning-event-cell]').click();
 
@@ -83,8 +83,8 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
 
   it('should delete event', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary Olait{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(0).click();
+    cy.get('[data-cy=planning-search]').eq(0).type('{backspace}Auxiliary Olait{downarrow}{enter}');
     cy.get('[data-cy=planning-event-cell]').should('have.length', 1);
 
     cy.get('[data-cy=planning-event-cell]').click();

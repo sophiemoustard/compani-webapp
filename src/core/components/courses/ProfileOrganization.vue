@@ -9,31 +9,23 @@
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div class="interlocutor-container">
-        <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani" :disable="isArchived"
-          :open-edition-modal="openSalesRepresentativeModal" :can-update="canUpdateInterlocutor"
-          :contact="course.contact" />
-        <interlocutor-cell v-if="!!course.trainer._id" :interlocutor="course.trainer" caption="Intervenant(e)"
-          :open-edition-modal="() => openTrainerModal('Modifier l\'')" :disable="isArchived" :contact="course.contact"
-          :can-update="canUpdateInterlocutor" />
-        <ni-button v-else-if="canUpdateInterlocutor" color="primary" icon="add" class="add-interlocutor"
-          label="Ajouter un(e) intervenant(e)" :disable="interlocutorModalLoading || isArchived"
-          @click="() => openTrainerModal('Ajouter un(e) ')" />
-        <interlocutor-cell v-if="!!course.companyRepresentative._id" :interlocutor="course.companyRepresentative"
-          caption="Référent structure" :open-edition-modal="() => openCompanyRepresentativeModal('Modifier le ')"
-          :disable="isArchived" :can-update="canUpdateInterlocutor || isClientInterface"
-          :contact="course.contact" />
-        <ni-button v-else-if="course.type === INTRA" color="primary" icon="add" class="add-interlocutor"
-          label="Ajouter un référent structure" :disable="interlocutorModalLoading || isArchived"
-          @click="() => openCompanyRepresentativeModal('Ajouter un ')" />
-        <ni-button v-if="!course.contact._id && canUpdateInterlocutor" color="primary" icon="add"
-          class="add-interlocutor" label="Définir un contact pour la formation"
-          :disable="contactModalLoading || isArchived" @click="openContactAdditionModal" />
+        <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
+          :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
+          @open-modal="openSalesRepresentativeModal" />
+        <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant(e)" :contact="course.contact"
+          :can-update="canUpdateInterlocutor" label="Ajouter un(e) intervenant(e)" :disable="isArchived"
+          @open-modal="openTrainerModal" />
+        <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Référent structure"
+          :contact="course.contact" :can-update="(canUpdateInterlocutor || isClientInterface) && course.type === INTRA"
+          label="Ajouter un référent structure" :disable="isArchived" @open-modal="openCompanyRepresentativeModal" />
+        <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
+          label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
-    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse"
+    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshTraineeTable"
       @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
@@ -83,7 +75,7 @@
     </div>
     <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
       :training-contracts="trainingContracts" :training-contract-table-loading="trainingContractTableLoading"
-      @refresh="refreshTrainingContracts" />
+      @refresh="refreshTrainingContracts" :has-holding-role="hasHoldingRole" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -141,6 +133,8 @@ import InterlocutorModal from '@components/courses/InterlocutorModal';
 import CourseContactAdditionModal from '@components/courses/CourseContactAdditionModal';
 import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import BiColorButton from '@components/BiColorButton';
+import SecondaryButton from '@components/SecondaryButton';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -156,6 +150,7 @@ import {
   DD_MM,
   HH_MM,
   COURSE,
+  EDITION,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -164,7 +159,6 @@ import { downloadFile } from '@helpers/file';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
-import BiColorButton from '@components/BiColorButton';
 import { useCourses } from '@composables/courses';
 
 export default {
@@ -183,6 +177,7 @@ export default {
     'sms-sending-modal': SmsSendingModal,
     'sms-history-modal': CourseSmsHistoryModal,
     'ni-button': Button,
+    'ni-secondary-button': SecondaryButton,
     'interlocutor-cell': InterlocutorCell,
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
@@ -263,6 +258,8 @@ export default {
 
     const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
+    const hasHoldingRole = computed(() => !!get(loggedUser.value, 'role.holding'));
+
     const isCourseInter = computed(() => course.value.type === INTER_B2B);
 
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
@@ -334,17 +331,29 @@ export default {
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
     });
 
-    watch(course, () => {
-      const phoneValidation = get(v$.value, 'course.contact.contact.phone');
-      if (phoneValidation) phoneValidation.$touch();
-
+    watch(course, async (newValue, oldValue) => {
       tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
-    });
+
+      if (!oldValue) return;
+
+      if (newValue.companies.length !== oldValue.companies.length) await refreshTrainingContracts();
+      else {
+        const oldValueCompaniesIds = oldValue.companies.map(c => c._id);
+        if (!newValue.companies.every(c => oldValueCompaniesIds.includes(c._id))) await refreshTrainingContracts();
+      }
+    }, { immediate: true });
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
       if (displayHistory.value) await getCourseHistories();
       else courseHistories.value = [];
+    };
+
+    const refreshCourseHistories = async () => {
+      if (displayHistory.value) {
+        await getCourseHistories();
+        courseHistoryFeed.value.resumeScroll();
+      }
     };
 
     const getCourseHistories = async (createdAt = null) => {
@@ -376,11 +385,10 @@ export default {
       return done(!olderCourseHistories.length);
     };
 
-    const getPotentialTrainees = async () => {
+    const refreshPotentialTrainees = async () => {
       try {
-        const companies = isClientInterface
-          ? get(loggedUser.value, 'company._id')
-          : course.value.companies.map(c => c._id);
+        if (isClientInterface && course.value.type === INTER_B2B) return;
+        const companies = course.value.companies.map(c => c._id);
 
         potentialTrainees.value = !isEmpty(companies)
           ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
@@ -395,17 +403,17 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
-        await refreshTrainingContracts();
-        if (displayHistory.value) {
-          await getCourseHistories();
-          courseHistoryFeed.value.resumeScroll();
-        }
-        await getPotentialTrainees();
+        await refreshCourseHistories();
       } catch (e) {
         console.error(e);
       } finally {
         courseLoading.value = false;
       }
+    };
+
+    const refreshTraineeTable = async () => {
+      await refreshCourse();
+      await refreshPotentialTrainees();
     };
 
     const formatInterlocutorOption = interlocutor => ({
@@ -652,7 +660,9 @@ export default {
       v$.value.tmpInterlocutor.$reset();
     };
 
-    const openTrainerModal = (action) => {
+    const openTrainerModal = (value) => {
+      const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un(e) ';
+
       tmpInterlocutor.value = {
         _id: course.value.trainer._id,
         isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
@@ -661,7 +671,9 @@ export default {
       trainerModal.value = true;
     };
 
-    const openCompanyRepresentativeModal = (action) => {
+    const openCompanyRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
       tmpInterlocutor.value = {
         _id: course.value.companyRepresentative._id,
         isContact: !!course.value.companyRepresentative._id &&
@@ -714,13 +726,15 @@ export default {
         if (!isRofOrVendorAdmin.value && isVendorInterface) return;
 
         trainingContractTableLoading.value = true;
-        const trainingContractList = await TrainingContracts.list({ course: course.value._id });
+        const loggedUserHolding = get(loggedUser.value, 'holding._id');
+        const trainingContractList = await TrainingContracts.list({
+          course: course.value._id,
+          ...(isClientInterface && {
+            ...loggedUserHolding ? { holding: loggedUserHolding } : { company: loggedUser.value.company._id },
+          }),
+        });
 
-        if (course.value.type === INTER_B2B && !isVendorInterface) {
-          trainingContracts.value = trainingContractList.filter(tc => tc.company === loggedUser.value.company._id);
-        } else {
-          trainingContracts.value = trainingContractList;
-        }
+        trainingContracts.value = trainingContractList;
       } catch (e) {
         console.error(e);
         trainingContracts.value = [];
@@ -731,16 +745,14 @@ export default {
     };
 
     const created = async () => {
-      const promises = [refreshCourse()];
-      if (isVendorInterface || isIntraCourse.value) {
-        promises.push(refreshSms(), refreshCompanyRepresentatives());
-      }
+      const promises = [];
+      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
+      if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
 
-      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives());
+      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }
-      promises.push(getPotentialTrainees());
 
       await Promise.all(promises);
     };
@@ -783,6 +795,7 @@ export default {
       course,
       v$,
       isRofOrVendorAdmin,
+      hasHoldingRole,
       canEditSlots,
       canEditTrainees,
       filteredMessageTypeOptions,
@@ -825,6 +838,7 @@ export default {
       copy,
       updateCourse,
       downloadAttendanceSheet,
+      refreshTraineeTable,
       refreshTrainingContracts,
     };
   },
@@ -837,16 +851,4 @@ export default {
   flex-direction: column
 .button-history
   align-self: flex-end
-.interlocutor-container
-  flex-direction: row
-  grid-auto-flow: row
-  display: grid
-  grid-gap: 24px
-  @media screen and (min-width: 768px)
-    grid-auto-rows: 1fr
-    grid-template-columns: repeat(2, 1fr)
-.add-interlocutor
-  justify-self: start
-  align-self: end
-  margin-top: 24px
 </style>
