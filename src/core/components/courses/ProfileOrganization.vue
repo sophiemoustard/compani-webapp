@@ -8,6 +8,12 @@
           @blur="updateCourse('misc')" :disable="isArchived" />
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
+      <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">
+        Des questions sur votre parcours de formation ou sur la facturation ? Retrouvez vos contacts Compani sur
+        <a class="clickable-name cursor-pointer" @click="goToContactProfile">
+          la page dédiée .
+        </a>
+      </div>
       <div class="interlocutor-container">
         <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
           :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
@@ -106,6 +112,7 @@
 
 <script>
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { computed, ref, toRefs, watch } from 'vue';
 import { copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
@@ -187,6 +194,7 @@ export default {
     const { profileId } = toRefs(props);
 
     const $store = useStore();
+    const $router = useRouter();
 
     const trainerOptions = ref([]);
     const salesRepresentativeOptions = ref([]);
@@ -744,6 +752,8 @@ export default {
       }
     };
 
+    const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
+
     const created = async () => {
       const promises = [];
       if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
@@ -840,6 +850,7 @@ export default {
       downloadAttendanceSheet,
       refreshTraineeTable,
       refreshTrainingContracts,
+      goToContactProfile,
     };
   },
 };
