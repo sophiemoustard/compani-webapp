@@ -851,17 +851,4 @@ export default {
   flex-direction: column
 .button-history
   align-self: flex-end
-.interlocutor-container
-  flex-direction: row
-  grid-auto-flow: row
-  display: grid
-  grid-gap: 24px
-  grid-template-rows: auto
-  @media screen and (min-width: 768px)
-    grid-auto-rows: 1fr
-    grid-template-columns: repeat(2, 1fr)
-.add-interlocutor
-  justify-self: start
-  align-self: end
-  margin-top: 24px
 </style>

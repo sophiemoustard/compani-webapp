@@ -18,6 +18,11 @@
             :error="validations.vendorCompany.activityDeclarationNumber.$error" />
         </div>
       </div>
+      <p class="text-weight-bold">Contacts</p>
+      <div class="interlocutor-container q-mb-xl">
+        <interlocutor-cell :interlocutor="vendorCompany.billingRepresentative" caption="Chargé de facturation"
+          label="Ajouter un chargé de facturation" can-update @open-modal="openBillingRepresentativeModal" />
+      </div>
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
         <ni-responsive-table :data="courseFundingOrganisations" :columns="courseFundingOrganisationColumns"
@@ -60,6 +65,11 @@
     <ni-item-creation-modal v-model="itemCreationModal" v-model:new-item="newItem"
       @submit="addItem" :validations="validations.newItem" @hide="resetItemAdditionForm"
       :loading="itemsLoading" />
+
+    <interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
+      @submit="updateVendorCompany('billingRepresentative')" :label="billingRepresentativeModalLabel"
+      :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
+      :validations="validations.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
   </div>
 </template>
 
@@ -71,19 +81,22 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import { frAddress, validSiret } from '@helpers/vuelidateCustomVal';
-import { sortStrings } from '@helpers/utils';
+import { sortStrings, formatAndSortUserOptions } from '@helpers/utils';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import VendorCompanies from '@api/VendorCompanies';
 import CourseBillingItems from '@api/CourseBillingItems';
+import Users from '@api/Users';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import TitleHeader from '@components/TitleHeader';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import SearchAddress from '@components/form/SearchAddress';
-import { REQUIRED_LABEL } from '@data/constants';
 import OrganisationCreationModal from 'src/modules/vendor/components/billing/CourseFundingOrganisationCreationModal';
 import ItemCreationModal from 'src/modules/vendor/components/billing/CourseBillingItemCreationModal';
+import InterlocutorCell from '@components/courses/InterlocutorCell';
+import InterlocutorModal from '@components/courses/InterlocutorModal';
+import { REQUIRED_LABEL, EDITION, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { useValidations } from '@composables/validations';
 
 export default {
@@ -96,6 +109,8 @@ export default {
     'ni-button': Button,
     'ni-input': Input,
     'ni-search-address': SearchAddress,
+    'interlocutor-cell': InterlocutorCell,
+    'interlocutor-modal': InterlocutorModal,
   },
   setup () {
     const metaInfo = { title: 'Configuration facturation' };
@@ -109,7 +124,7 @@ export default {
       { name: 'address', label: 'Adresse', align: 'left', field: 'address' },
       { name: 'actions', label: '', align: 'left', field: '_id' },
     ];
-    const vendorCompany = ref({ name: '', address: { fullAddress: '' }, siret: '' });
+    const vendorCompany = ref({ name: '', address: { fullAddress: '' }, siret: '', billingRepresentative: {} });
     const courseBillingItems = ref([]);
     const courseBillingItemColumns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name' }];
     const pagination = { rowsPerPage: 0 };
@@ -118,6 +133,11 @@ export default {
     const newOrganisation = ref({ name: '', address: '' });
     const newItem = ref({ name: '' });
     const tmpInput = ref('');
+    const billingRepresentativeOptions = ref([]);
+    const billingRepresentativeModal = ref(false);
+    const billingRepresentativeModalLoading = ref(false);
+    const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
+    const tmpBillingRepresentative = ref({});
 
     const rules = {
       newOrganisation: { address: { required }, name: { required } },
@@ -128,8 +148,9 @@ export default {
         address: { fullAddress: { required, frAddress } },
         activityDeclarationNumber: { required },
       },
+      tmpBillingRepresentative: { _id: required },
     };
-    const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany });
+    const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany, tmpBillingRepresentative });
     const { waitForValidation } = useValidations();
 
     const siretErrorMessage = computed(() => {
@@ -156,7 +177,7 @@ export default {
         validations.value.vendorCompany.$touch();
       } catch (e) {
         console.error(e);
-        vendorCompany.value = { name: '', address: { fullAddress: '' }, siret: '' };
+        vendorCompany.value = { name: '', address: { fullAddress: '' }, siret: '', billingRepresentative: {} };
         NotifyNegative('Erreur lors de la récupération de la structure.');
       }
     };
@@ -175,16 +196,28 @@ export default {
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const payload = set({}, path, get(vendorCompany.value, path));
+        let payload;
+        if (path === 'billingRepresentative') {
+          billingRepresentativeModalLoading.value = true;
+          validations.value.tmpBillingRepresentative.$touch();
+          if (validations.value.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+          payload = { billingRepresentative: tmpBillingRepresentative.value._id };
+        } else {
+          payload = set({}, path, get(vendorCompany.value, path));
+        }
+
         await VendorCompanies.update(payload);
         NotifyPositive('Modification enregistrée.');
 
         await refreshVendorCompany();
+        billingRepresentativeModal.value = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        tmpInput.value = '';
+        tmpBillingRepresentative.value = {};
+        billingRepresentativeModalLoading.value = false;
       }
     };
 
@@ -284,10 +317,31 @@ export default {
       }
     };
 
+    const openBillingRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+      tmpBillingRepresentative.value = get(vendorCompany.value, 'billingRepresentative');
+      billingRepresentativeModalLabel.value = { action, interlocutor: 'Chargé de facturation' };
+      billingRepresentativeModal.value = true;
+    };
+
+    const refreshBillingRepresentativeOptions = async () => {
+      const vendorUsers = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+
+      billingRepresentativeOptions.value = formatAndSortUserOptions(vendorUsers, false);
+    };
+
+    const resetBillingRepresentative = () => {
+      tmpBillingRepresentative.value = { _id: '' };
+      billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
+      validations.value.tmpBillingRepresentative.$reset();
+    };
+
     const created = async () => {
       refreshVendorCompany();
       refreshCourseFundingOrganisations();
       refreshCourseBillingItems();
+      refreshBillingRepresentativeOptions();
     };
 
     created();
@@ -306,6 +360,11 @@ export default {
       vendorCompany,
       newOrganisation,
       newItem,
+      billingRepresentativeOptions,
+      billingRepresentativeModalLabel,
+      billingRepresentativeModal,
+      billingRepresentativeModalLoading,
+      tmpBillingRepresentative,
       // Computed
       validations,
       siretErrorMessage,
@@ -322,6 +381,8 @@ export default {
       openItemCreationModal,
       saveTmp,
       updateVendorCompany,
+      openBillingRepresentativeModal,
+      resetBillingRepresentative,
     };
   },
 };
