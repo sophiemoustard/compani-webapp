@@ -21,8 +21,7 @@
       <p class="text-weight-bold">Contacts</p>
       <div class="interlocutor-container q-mb-xl">
         <interlocutor-cell :interlocutor="vendorCompany.billingRepresentative" caption="Chargé de facturation"
-          label="Ajouter un chargé de facturation" :can-update="true"
-          @open-modal="openBillingRepresentativeModal" />
+          label="Ajouter un chargé de facturation" can-update @open-modal="openBillingRepresentativeModal" />
       </div>
       <p class="text-weight-bold">Financeurs</p>
       <q-card>
