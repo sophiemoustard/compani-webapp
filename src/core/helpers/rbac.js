@@ -33,6 +33,7 @@ const coachRoutes = [
   { name: 'ni courses info' },
   { name: 'ni courses learners' },
   { name: 'ni courses learners info' },
+  { name: 'ni courses contacts' },
   { name: 'ni elearning courses' },
   { name: 'ni elearning courses info' },
 ];
