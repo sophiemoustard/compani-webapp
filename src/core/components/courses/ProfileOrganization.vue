@@ -10,9 +10,7 @@
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">
         Des questions sur votre parcours de formation ou sur la facturation ? Retrouvez vos contacts Compani sur
-        <a class="clickable-name cursor-pointer" @click="goToContactProfile">
-          la page dédiée .
-        </a>
+        <a class="clickable-name cursor-pointer" @click="goToContactProfile">la page dédiée .</a>
       </div>
       <div class="interlocutor-container">
         <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
