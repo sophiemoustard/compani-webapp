@@ -28,7 +28,7 @@
         </div>
       </div>
       <template #footer>
-        <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor.toLowerCase()}`"
+        <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor}`"
           icon-right="add" color="white" :loading="loading" @click="submit" />
       </template>
     </ni-modal>
