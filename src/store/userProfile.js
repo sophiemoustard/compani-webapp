@@ -4,7 +4,7 @@ import { extend } from '@helpers/utils';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import store from 'src/store/index';
 import router from 'src/router/index';
-import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
+import { getCurrentAndFutureCompanies, hasUserAccessToCompany } from '@helpers/userCompanies';
 
 export default {
   namespaced: true,
@@ -34,9 +34,9 @@ export default {
 
         const userClientRole = store.getters['main/getClientRole'];
         if (userClientRole && !/\/ad\//.test(router.currentRoute.value.path)) {
-          const loggedUserCompany = store.getters['main/getCompany'];
+          const loggedUser = store.getters['main/getLoggedUser'];
           const currentAndFutureCompanies = getCurrentAndFutureCompanies(user.userCompanyList);
-          if (!currentAndFutureCompanies.includes(loggedUserCompany._id)) {
+          if (!currentAndFutureCompanies.some(company => hasUserAccessToCompany(loggedUser, company))) {
             return router.replace({ path: '/404' });
           }
         }
