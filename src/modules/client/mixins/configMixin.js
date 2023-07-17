@@ -70,7 +70,6 @@ export const configMixin = {
         this.tmpInput = '';
         this.tmpBillingRepresentative = {};
         this.billingRepresentativeModalLoading = false;
-        this.resetBillingRepresentative();
       }
     },
     nbrError (path, validations = this.v$) {
