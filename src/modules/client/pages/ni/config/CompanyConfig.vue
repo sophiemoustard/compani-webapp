@@ -172,7 +172,7 @@ export default {
     const billingRepresentativeOptions = ref([]);
     const billingRepresentativeModal = ref(false);
     const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
-    const tmpBillingRepresentative = ref({});
+    const tmpBillingRepresentative = ref({ _id: '' });
 
     const v$ = useVuelidate();
     const $store = useStore();
@@ -324,10 +324,10 @@ export default {
     },
   },
   async mounted () {
-    if (this.canUpdateErpConfig) await Promise.all([this.refreshCompany(), this.getEstablishments()]);
-    else await this.refreshCompany();
+    const promises = [this.refreshCompany(), this.refreshBillingRepresentativeOptions()];
+    if (this.canUpdateErpConfig) promises.push(this.getEstablishments());
 
-    this.refreshBillingRepresentativeOptions();
+    await Promise.all(promises);
   },
   methods: {
     // Establishment

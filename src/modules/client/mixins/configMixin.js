@@ -68,7 +68,7 @@ export const configMixin = {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
-        this.tmpBillingRepresentative = {};
+        this.tmpBillingRepresentative = { _id: '' };
         this.billingRepresentativeModalLoading = false;
       }
     },
