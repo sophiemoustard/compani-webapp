@@ -14,12 +14,15 @@ export const configMixin = {
       legalRepresentative: { firstname: '', lastname: '', position: '' },
       customersConfig: { templates: {}, billFooter: '' },
       rhConfig: { templates: {} },
+      billingRepresentative: {},
     };
+    const billingRepresentativeModalLoading = false;
 
     return {
       tmpInput: '',
       resetCompany: companyModel,
       company: companyModel,
+      billingRepresentativeModalLoading,
     };
   },
   computed: {
@@ -45,16 +48,28 @@ export const configMixin = {
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const payload = set({}, path, get(this.company, path));
+        let payload;
+        if (path === 'billingRepresentative') {
+          this.billingRepresentativeModalLoading = true;
+          this.v$.tmpBillingRepresentative.$touch();
+          if (this.v$.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+          payload = { billingRepresentative: this.tmpBillingRepresentative._id };
+        } else {
+          payload = set({}, path, get(this.company, path));
+        }
         await Companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée.');
 
         await this.refreshCompany();
+        this.billingRepresentativeModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
+        this.tmpBillingRepresentative = { _id: '' };
+        this.billingRepresentativeModalLoading = false;
       }
     },
     nbrError (path, validations = this.v$) {

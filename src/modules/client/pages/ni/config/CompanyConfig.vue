@@ -19,6 +19,14 @@
             :error-message="rcsError" />
         </div>
       </div>
+      <div>
+        <p class="text-weight-bold">Contacts</p>
+        <div class="interlocutor-container q-mb-xl">
+          <interlocutor-cell :interlocutor="company.billingRepresentative" can-update
+            caption="Chargé de facturation dans ma structure" label="Ajouter un chargé de facturation"
+            @open-modal="openBillingRepresentativeModal" />
+        </div>
+      </div>
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Représentant légal</p>
         <div class="row gutter-profile">
@@ -92,12 +100,18 @@
       :validations="v$.editedEstablishment" @hide="resetEstablishmentEditionModal" @submit="updateEstablishment"
       :loading="loading" :work-health-services="workHealthServiceList" :urssaf-codes="urssafCodeList"
       @update="setEstablishment" />
+
+    <interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
+      @submit="updateCompany('billingRepresentative')" :label="billingRepresentativeModalLabel"
+      :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
+      :validations="v$.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
   </q-page>
 </template>
 
 <script>
 import { useMeta } from 'quasar';
-import { mapGetters } from 'vuex';
+import { ref, computed } from 'vue';
+import { mapGetters, useStore } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
@@ -105,13 +119,16 @@ import set from 'lodash/set';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf, maxLength, minLength, email } from '@vuelidate/validators';
 import Establishments from '@api/Establishments';
+import Users from '@api/Users';
 import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANY, ASSOCIATION } from '@data/constants';
+import InterlocutorCell from '@components/courses/InterlocutorCell';
+import InterlocutorModal from '@components/courses/InterlocutorModal';
+import { COMPANY, ASSOCIATION, EDITION, CLIENT_ADMIN } from '@data/constants';
 import { urssafCodes as urssafCodeList } from '@data/urssafCodes';
 import { workHealthServices as workHealthServiceList } from '@data/workHealthServices';
 import {
@@ -126,7 +143,7 @@ import {
   validSiret,
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
-import { formatPhoneForPayload } from '@helpers/utils';
+import { formatPhoneForPayload, formatAndSortUserOptions } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { companyMixin } from '@mixins/companyMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -145,12 +162,55 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'establishment-creation-modal': EstablishmentCreationModal,
     'establishment-edition-modal': EstablishmentEditionModal,
+    'interlocutor-cell': InterlocutorCell,
+    'interlocutor-modal': InterlocutorModal,
   },
   setup () {
     const metaInfo = { title: 'Configuration générale' };
     useMeta(metaInfo);
 
-    return { v$: useVuelidate() };
+    const billingRepresentativeOptions = ref([]);
+    const billingRepresentativeModal = ref(false);
+    const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
+    const tmpBillingRepresentative = ref({ _id: '' });
+
+    const v$ = useVuelidate();
+    const $store = useStore();
+    const company = computed(() => $store.getters['main/getCompany']);
+
+    const openBillingRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+      tmpBillingRepresentative.value = get(company.value, 'billingRepresentative');
+      billingRepresentativeModalLabel.value = { action, interlocutor: 'chargé de facturation de ma structure' };
+      billingRepresentativeModal.value = true;
+    };
+
+    const refreshBillingRepresentativeOptions = async () => {
+      const clientAdminUsers = await Users.list({ role: [CLIENT_ADMIN], company: company.value._id });
+
+      billingRepresentativeOptions.value = formatAndSortUserOptions(clientAdminUsers, false);
+    };
+
+    const resetBillingRepresentative = () => {
+      tmpBillingRepresentative.value = { _id: '' };
+      billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
+      v$.value.tmpBillingRepresentative.$reset();
+    };
+
+    return {
+      // Data
+      billingRepresentativeOptions,
+      billingRepresentativeModal,
+      billingRepresentativeModalLabel,
+      tmpBillingRepresentative,
+      // Computed
+      v$,
+      // Methods
+      openBillingRepresentativeModal,
+      refreshBillingRepresentativeOptions,
+      resetBillingRepresentative,
+    };
   },
   mixins: [configMixin, validationMixin, tableMixin, companyMixin],
   data () {
@@ -252,6 +312,7 @@ export default {
       },
       newEstablishment: this.establishmentValidation,
       editedEstablishment: this.establishmentValidation,
+      tmpBillingRepresentative: { _id: required },
     };
   },
   computed: {
@@ -263,8 +324,10 @@ export default {
     },
   },
   async mounted () {
-    if (this.canUpdateErpConfig) await Promise.all([this.refreshCompany(), this.getEstablishments()]);
-    else await this.refreshCompany();
+    const promises = [this.refreshCompany(), this.refreshBillingRepresentativeOptions()];
+    if (this.canUpdateErpConfig) promises.push(this.getEstablishments());
+
+    await Promise.all(promises);
   },
   methods: {
     // Establishment
