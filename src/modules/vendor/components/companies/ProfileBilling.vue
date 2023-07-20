@@ -1,100 +1,102 @@
 <template>
   <div>
-    <p class="text-weight-bold">Contact</p>
-    <div class="interlocutor-container q-mb-xl">
-      <ni-interlocutor-cell :interlocutor="company.billingRepresentative" can-update
-        caption="Chargé de facturation dans la structure" label="Ajouter un chargé de facturation"
-        @open-modal="openBillingRepresentativeModal" />
+    <div>
+      <p class="text-weight-bold">Contact</p>
+      <div class="interlocutor-container q-mb-xl">
+        <ni-interlocutor-cell :interlocutor="company.billingRepresentative" can-update
+          caption="Chargé de facturation dans la structure" label="Ajouter un chargé de facturation"
+          @open-modal="openBillingRepresentativeModal" />
+      </div>
     </div>
-  </div>
-  <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
-    <div v-for="payer of Object.keys(courseBills)" :key="payer">
-      <div class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</div>
-      <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
-        :hide-bottom="false" :loading="loading">
-        <template #row="{ props }">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <template v-if="col.name === 'number'">
-              <div class="clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
-                {{ col.value }}
+    <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
+      <div v-for="payer of Object.keys(courseBills)" :key="payer">
+        <div class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</div>
+        <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
+          :hide-bottom="false" :loading="loading">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'number'">
+                <div class="clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
+                  {{ col.value }}
+                </div>
+                <div :class="getCourseNameClass(get(props.row, 'course'))"
+                  @click="goToCourse(get(props.row, 'course'))">
+                  <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}&nbsp;</div>
+                  <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
+                </div>
+                <div class="row items-center" v-if="props.row.courseCreditNote">
+                  <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
+                  <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
+                </div>
+              </template>
+              <template v-else-if="col.name === 'progress' && col.value >= 0">
+                <ni-progress class="q-ml-lg" :value="col.value" />
+              </template>
+              <template v-else-if="col.name === 'payment'">
+                <div v-if="canUpdateBilling" class="row justify-center table-actions">
+                  <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
+                    @click="openCoursePaymentCreationModal(props.row)" />
+                </div>
+              </template>
+              <template v-else-if="col.name === 'expand'">
+                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </template>
+          <template #expanding-row="{ props }">
+            <q-td colspan="100%" class="cell">
+              <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote"
+                class="text-italic text-center">
+                Aucun règlement renseigné.
               </div>
-              <div :class="getCourseNameClass(get(props.row, 'course'))"
-                @click="goToCourse(get(props.row, 'course'))">
-                <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}&nbsp;</div>
-                <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
+              <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
+                <div class="date">{{ CompaniDate(item.date).format(DD_MM_YYYY) }}</div>
+                <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
+                <div class="progress" />
+                <div class="formatted-price" />
+                <div v-if="item.netInclTaxes >=0" class="formatted-price">
+                  {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
+                </div>
+                <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
+                <div class="formatted-price" />
+                <div class="formatted-price" />
+                <div v-if="item.netInclTaxes >=0 && canUpdateBilling" class="edit">
+                  <q-icon size="20px" name="edit" color="copper-grey-500"
+                    @click="openCoursePaymentEditionModal(props.row, item)" />
+                </div>
               </div>
-              <div class="row items-center" v-if="props.row.courseCreditNote">
-                <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
-                <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
-              </div>
-            </template>
-            <template v-else-if="col.name === 'progress' && col.value >= 0">
-              <ni-progress class="q-ml-lg" :value="col.value" />
-            </template>
-            <template v-else-if="col.name === 'payment'">
-              <div v-if="canUpdateBilling" class="row justify-center table-actions">
-                <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
-                  @click="openCoursePaymentCreationModal(props.row)" />
-              </div>
-            </template>
-            <template v-else-if="col.name === 'expand'">
-              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </template>
-        <template #expanding-row="{ props }">
-          <q-td colspan="100%" class="cell">
-            <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote"
-              class="text-italic text-center">
-              Aucun règlement renseigné.
-            </div>
-            <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
-              <div class="date">{{ CompaniDate(item.date).format(DD_MM_YYYY) }}</div>
-              <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
-              <div class="progress" />
-              <div class="formatted-price" />
-              <div v-if="item.netInclTaxes >=0" class="formatted-price">
-                {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
-              </div>
-              <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
-              <div class="formatted-price" />
-              <div class="formatted-price" />
-              <div v-if="item.netInclTaxes >=0 && canUpdateBilling" class="edit">
-                <q-icon size="20px" name="edit" color="copper-grey-500"
-                  @click="openCoursePaymentEditionModal(props.row, item)" />
-              </div>
-            </div>
-          </q-td>
-        </template>
-        <template #bottom-row="{ props }">
-          <q-tr class="text-weight-bold" :props="props">
-            <q-td />
-            <q-td />
-            <q-td />
-            <q-td />
-            <q-td><div class="flex justify-end items-center">Total</div></q-td>
-            <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills[payer]) }}</div></q-td>
-            <q-td />
-            <q-td />
-          </q-tr>
-        </template>
-      </ni-expanding-table>
+            </q-td>
+          </template>
+          <template #bottom-row="{ props }">
+            <q-tr class="text-weight-bold" :props="props">
+              <q-td />
+              <q-td />
+              <q-td />
+              <q-td />
+              <q-td><div class="flex justify-end items-center">Total</div></q-td>
+              <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills[payer]) }}</div></q-td>
+              <q-td />
+              <q-td />
+            </q-tr>
+          </template>
+        </ni-expanding-table>
+      </div>
+
+      <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
+        v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
+        :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+
+      <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
+        v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
+        :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
     </div>
-
-    <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
-      v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
-      :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
-
-    <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
-      v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
-      :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+    <div v-else class="text-italic">Pas de factures</div>
+    <ni-interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
+      @submit="updateCompany" :label="billingRepresentativeModalLabel"
+      :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
+      :validations="validations.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
   </div>
-  <div v-else class="text-italic">Pas de factures</div>
-  <ni-interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
-    @submit="updateCompany" :label="billingRepresentativeModalLabel"
-    :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
-    :validations="validations.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
 </template>
 
 <script>
