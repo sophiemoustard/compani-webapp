@@ -10,7 +10,7 @@
     </div>
     <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
       <div v-for="payer of Object.keys(courseBills)" :key="payer">
-        <div class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</div>
+        <p class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</p>
         <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
           :hide-bottom="false" :loading="loading">
           <template #row="{ props }">
