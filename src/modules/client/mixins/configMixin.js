@@ -16,13 +16,11 @@ export const configMixin = {
       rhConfig: { templates: {} },
       billingRepresentative: {},
     };
-    const billingRepresentativeModalLoading = false;
 
     return {
       tmpInput: '',
       resetCompany: companyModel,
       company: companyModel,
-      billingRepresentativeModalLoading,
     };
   },
   computed: {
@@ -68,7 +66,7 @@ export const configMixin = {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
-        this.tmpBillingRepresentative = { _id: '' };
+        this.tmpBillingRepresentative = {};
         this.billingRepresentativeModalLoading = false;
       }
     },
