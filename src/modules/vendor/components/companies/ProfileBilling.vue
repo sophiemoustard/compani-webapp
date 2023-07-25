@@ -213,7 +213,7 @@ export default {
     const billingRepresentativeModal = ref(false);
     const billingRepresentativeModalLoading = ref(false);
     const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
-    const tmpBillingRepresentative = ref({ _id: '' });
+    const tmpBillingRepresentative = ref({});
 
     const rules = {
       newCoursePayment: {
@@ -466,13 +466,13 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        tmpBillingRepresentative.value = { _id: '' };
+        tmpBillingRepresentative.value = {};
         billingRepresentativeModalLoading.value = false;
       }
     };
 
     const resetBillingRepresentative = () => {
-      tmpBillingRepresentative.value = { _id: '' };
+      tmpBillingRepresentative.value = {};
       billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
       validations.value.tmpBillingRepresentative.$reset();
     };
