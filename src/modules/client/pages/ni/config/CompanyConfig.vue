@@ -171,8 +171,9 @@ export default {
 
     const billingRepresentativeOptions = ref([]);
     const billingRepresentativeModal = ref(false);
+    const billingRepresentativeModalLoading = ref(false);
     const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
-    const tmpBillingRepresentative = ref({ _id: '' });
+    const tmpBillingRepresentative = ref({});
 
     const v$ = useVuelidate();
     const $store = useStore();
@@ -193,7 +194,7 @@ export default {
     };
 
     const resetBillingRepresentative = () => {
-      tmpBillingRepresentative.value = { _id: '' };
+      tmpBillingRepresentative.value = {};
       billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
       v$.value.tmpBillingRepresentative.$reset();
     };
@@ -204,6 +205,7 @@ export default {
       billingRepresentativeModal,
       billingRepresentativeModalLabel,
       tmpBillingRepresentative,
+      billingRepresentativeModalLoading,
       // Computed
       v$,
       // Methods
