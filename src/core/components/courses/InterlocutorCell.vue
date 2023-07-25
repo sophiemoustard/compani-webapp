@@ -1,5 +1,5 @@
 <template>
-  <div v-if="get(interlocutor, '_id')" class="cell-container q-mx-sm">
+  <div v-if="get(interlocutor, '_id')" class="cell-container">
     <p class="input-caption">{{ caption }}</p>
     <q-card class="interlocutor-cell row justify-between items-start">
       <div class="row">
