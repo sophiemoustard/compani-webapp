@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div>
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Contact</p>
-      <div class="interlocutor-container q-mb-xl">
+      <div class="interlocutor-container">
         <ni-interlocutor-cell :interlocutor="company.billingRepresentative" can-update
           caption="Chargé de facturation dans la structure" label="Ajouter un chargé de facturation"
           @open-modal="openBillingRepresentativeModal" />
@@ -10,7 +10,7 @@
     </div>
     <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
       <div v-for="payer of Object.keys(courseBills)" :key="payer">
-        <p class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</p>
+        <p class="text-weight-bold">{{ getTableName( courseBills[payer][0].payer) }}</p>
         <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
           :hide-bottom="false" :loading="loading">
           <template #row="{ props }">
