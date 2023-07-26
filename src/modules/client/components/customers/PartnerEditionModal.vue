@@ -29,7 +29,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import { JOB_OPTIONS } from '@data/constants';
-import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
+import { partnerOrganizationMixin } from 'src/modules/client/mixins/partnerOrganizationMixin';
 
 export default {
   name: 'PartnerCreationModal',

@@ -26,7 +26,7 @@ import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
-import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
+import { partnerOrganizationMixin } from 'src/modules/client/mixins/partnerOrganizationMixin';
 
 export default {
   name: 'PartnerOrganizationCreationModal',

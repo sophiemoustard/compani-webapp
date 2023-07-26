@@ -31,11 +31,11 @@
 </template>
 
 <script>
-import { establishmentMixin } from '@mixins/establishmentMixin';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
+import { establishmentMixin } from 'src/modules/client/mixins/establishmentMixin';
 
 export default {
   name: 'EstablishmentCreationModal',

@@ -13,7 +13,7 @@ import Questionnaires from '@api/Questionnaires';
 import ProfileHeader from '@components/ProfileHeader';
 import { NotifyNegative } from '@components/popup/notify';
 import { QUESTIONNAIRE_TYPES } from '@data/constants';
-import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
+import { questionnaireAnswersMixin } from 'src/modules/vendor/mixins/questionnaireAnswersMixin';
 
 export default {
   name: 'QuestionnaireAnswersProfile',

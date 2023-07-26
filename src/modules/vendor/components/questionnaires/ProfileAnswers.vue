@@ -21,7 +21,7 @@ import Programs from '@api/Programs';
 import Select from '@components/form/Select';
 import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
 import { NotifyNegative } from '@components/popup/notify';
-import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
+import { questionnaireAnswersMixin } from 'src/modules/vendor/mixins/questionnaireAnswersMixin';
 import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 
 export default {

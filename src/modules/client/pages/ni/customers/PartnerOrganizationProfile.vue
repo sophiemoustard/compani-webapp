@@ -75,7 +75,7 @@ import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
-import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
+import { partnerOrganizationMixin } from 'src/modules/client/mixins/partnerOrganizationMixin';
 import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
 import PartnerEditionModal from 'src/modules/client/components/customers/PartnerEditionModal';
 import { JOB_OPTIONS } from '@data/constants';

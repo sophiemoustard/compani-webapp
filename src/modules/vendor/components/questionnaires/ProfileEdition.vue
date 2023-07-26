@@ -36,7 +36,7 @@ import { PUBLISHED } from '@data/constants';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
-import { cardMixin } from '@mixins/cardMixin';
+import { cardMixin } from 'src/modules/vendor/mixins/cardMixin';
 
 export default {
   name: 'ProfileEdition',

@@ -10,7 +10,7 @@
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
-import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
+import { questionnaireAnswersMixin } from 'src/modules/vendor/mixins/questionnaireAnswersMixin';
 
 export default {
   name: 'ProfileQuestionnaires',
