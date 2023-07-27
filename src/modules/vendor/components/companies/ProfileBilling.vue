@@ -1,86 +1,102 @@
 <template>
-  <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
-    <div v-for="payer of Object.keys(courseBills)" :key="payer">
-      <div class="text-weight-bold q-mt-lg q-mb-sm">{{ getTableName( courseBills[payer][0].payer) }}</div>
-      <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
-        :hide-bottom="false" :loading="loading">
-        <template #row="{ props }">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <template v-if="col.name === 'number'">
-              <div class="clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
-                {{ col.value }}
-              </div>
-              <div :class="getCourseNameClass(get(props.row, 'course'))" @click="goToCourse(get(props.row, 'course'))">
-                <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}&nbsp;</div>
-                <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
-              </div>
-              <div class="row items-center" v-if="props.row.courseCreditNote">
-                <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
-                <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
-              </div>
-            </template>
-            <template v-else-if="col.name === 'progress' && col.value >= 0">
-              <ni-progress class="q-ml-lg" :value="col.value" />
-            </template>
-            <template v-else-if="col.name === 'payment'">
-              <div v-if="canUpdateBilling" class="row justify-center table-actions">
-                <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
-                  @click="openCoursePaymentCreationModal(props.row)" />
-              </div>
-            </template>
-            <template v-else-if="col.name === 'expand'">
-              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </template>
-        <template #expanding-row="{ props }">
-          <q-td colspan="100%" class="cell">
-            <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote" class="text-italic text-center">
-              Aucun règlement renseigné.
-            </div>
-            <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
-              <div class="date">{{ CompaniDate(item.date).format(DD_MM_YYYY) }}</div>
-              <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
-              <div class="progress" />
-              <div class="formatted-price" />
-              <div v-if="item.netInclTaxes >=0" class="formatted-price">
-                {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
-              </div>
-              <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
-              <div class="formatted-price" />
-              <div class="formatted-price" />
-              <div v-if="item.netInclTaxes >=0 && canUpdateBilling" class="edit">
-                <q-icon size="20px" name="edit" color="copper-grey-500"
-                  @click="openCoursePaymentEditionModal(props.row, item)" />
-              </div>
-            </div>
-          </q-td>
-        </template>
-        <template #bottom-row="{ props }">
-          <q-tr class="text-weight-bold" :props="props">
-            <q-td />
-            <q-td />
-            <q-td />
-            <q-td />
-            <q-td><div class="flex justify-end items-center">Total</div></q-td>
-            <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills[payer]) }}</div></q-td>
-            <q-td />
-            <q-td />
-          </q-tr>
-        </template>
-      </ni-expanding-table>
+  <div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Contact</p>
+      <div class="interlocutor-container">
+        <ni-interlocutor-cell :interlocutor="company.billingRepresentative" can-update
+          caption="Chargé de facturation dans la structure" label="Ajouter un chargé de facturation"
+          @open-modal="openBillingRepresentativeModal" />
+      </div>
     </div>
+    <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
+      <div v-for="payer of Object.keys(courseBills)" :key="payer">
+        <p class="text-weight-bold">{{ getTableName( courseBills[payer][0].payer) }}</p>
+        <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
+          :hide-bottom="false" :loading="loading">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'number'">
+                <div class="clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
+                  {{ col.value }}
+                </div>
+                <div :class="getCourseNameClass(get(props.row, 'course'))"
+                  @click="goToCourse(get(props.row, 'course'))">
+                  <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}&nbsp;</div>
+                  <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
+                </div>
+                <div class="row items-center" v-if="props.row.courseCreditNote">
+                  <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
+                  <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
+                </div>
+              </template>
+              <template v-else-if="col.name === 'progress' && col.value >= 0">
+                <ni-progress class="q-ml-lg" :value="col.value" />
+              </template>
+              <template v-else-if="col.name === 'payment'">
+                <div v-if="canUpdateBilling" class="row justify-center table-actions">
+                  <ni-button icon="add" :disable="paymentCreationLoading" color="white" class="add-payment"
+                    @click="openCoursePaymentCreationModal(props.row)" />
+                </div>
+              </template>
+              <template v-else-if="col.name === 'expand'">
+                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </template>
+          <template #expanding-row="{ props }">
+            <q-td colspan="100%" class="cell">
+              <div v-if="!props.row.coursePayments.length && !props.row.courseCreditNote"
+                class="text-italic text-center">
+                Aucun règlement renseigné.
+              </div>
+              <div v-else v-for="item in getSortedItems(props.row)" :key="item._id" :props="props" class="q-my-sm row">
+                <div class="date">{{ CompaniDate(item.date).format(DD_MM_YYYY) }}</div>
+                <div class="payment">{{ item.number }} ({{ getItemType(item) }})</div>
+                <div class="progress" />
+                <div class="formatted-price" />
+                <div v-if="item.netInclTaxes >=0" class="formatted-price">
+                  {{ item.nature === REFUND ? '-' : '' }}{{ formatPrice(item.netInclTaxes) }}
+                </div>
+                <div v-else class="formatted-price">{{ formatPrice(props.row.netInclTaxes) }}</div>
+                <div class="formatted-price" />
+                <div class="formatted-price" />
+                <div v-if="item.netInclTaxes >=0 && canUpdateBilling" class="edit">
+                  <q-icon size="20px" name="edit" color="copper-grey-500"
+                    @click="openCoursePaymentEditionModal(props.row, item)" />
+                </div>
+              </div>
+            </q-td>
+          </template>
+          <template #bottom-row="{ props }">
+            <q-tr class="text-weight-bold" :props="props">
+              <q-td />
+              <q-td />
+              <q-td />
+              <q-td />
+              <q-td><div class="flex justify-end items-center">Total</div></q-td>
+              <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills[payer]) }}</div></q-td>
+              <q-td />
+              <q-td />
+            </q-tr>
+          </template>
+        </ni-expanding-table>
+      </div>
 
-    <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
-      v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
-      :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+      <ni-course-payment-creation-modal v-model:new-course-payment="newCoursePayment" @submit="createPayment"
+        v-model="coursePaymentCreationModal" :loading="paymentCreationLoading" @hide="resetCoursePaymentCreationModal"
+        :validations="validations.newCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
 
-    <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
-      v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
-      :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+      <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
+        v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
+        :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
+    </div>
+    <div v-else class="text-italic">Pas de factures</div>
+    <ni-interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
+      @submit="updateCompany" :label="billingRepresentativeModalLabel"
+      :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
+      :validations="validations.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
   </div>
-  <div v-else class="text-italic">Pas de factures</div>
 </template>
 
 <script>
@@ -96,15 +112,34 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import CourseBills from '@api/CourseBills';
 import CoursePayments from '@api/CoursePayments';
+import Users from '@api/Users';
+import Companies from '@api/Companies';
 import Button from '@components/Button';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { BALANCE, PAYMENT, PAYMENT_OPTIONS, CREDIT_OPTION, REFUND, DD_MM_YYYY } from '@data/constants.js';
+import InterlocutorCell from '@components/courses/InterlocutorCell';
+import InterlocutorModal from '@components/courses/InterlocutorModal';
+import {
+  BALANCE,
+  PAYMENT,
+  PAYMENT_OPTIONS,
+  CREDIT_OPTION,
+  REFUND,
+  DD_MM_YYYY,
+  CLIENT_ADMIN,
+  EDITION,
+} from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
 import { ascendingSortBy, ascendingSort } from '@helpers/dates/utils';
 import { downloadFile } from '@helpers/file';
-import { formatPrice, formatPriceWithSign, formatDownloadName } from '@helpers/utils';
+import {
+  formatPrice,
+  formatPriceWithSign,
+  formatDownloadName,
+  formatAndSortUserOptions,
+  truncate,
+} from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
@@ -119,6 +154,8 @@ export default {
     'ni-button': Button,
     'ni-course-payment-creation-modal': CoursePaymentCreationModal,
     'ni-course-payment-edition-modal': CoursePaymentEditionModal,
+    'ni-interlocutor-cell': InterlocutorCell,
+    'ni-interlocutor-modal': InterlocutorModal,
   },
   setup () {
     const $store = useStore();
@@ -172,6 +209,11 @@ export default {
       { name: 'expand', classes: 'expand' },
     ]);
     const pagination = ref({ page: 1, rowsPerPage: 15 });
+    const billingRepresentativeOptions = ref([]);
+    const billingRepresentativeModal = ref(false);
+    const billingRepresentativeModalLoading = ref(false);
+    const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
+    const tmpBillingRepresentative = ref({});
 
     const rules = {
       newCoursePayment: {
@@ -185,11 +227,12 @@ export default {
         type: { required },
         date: { required },
       },
+      tmpBillingRepresentative: { _id: required },
     };
 
     const { isVendorInterface } = useCourses();
 
-    const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment });
+    const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment, tmpBillingRepresentative });
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -383,10 +426,62 @@ export default {
       return programName;
     };
 
+    const openBillingRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+      tmpBillingRepresentative.value = get(company.value, 'billingRepresentative');
+      billingRepresentativeModalLabel.value = {
+        action,
+        interlocutor: `chargé de facturation chez ${truncate(company.value.name, 20)}`,
+      };
+      billingRepresentativeModal.value = true;
+    };
+
+    const refreshBillingRepresentativeOptions = async () => {
+      const vendorUsers = await Users.list({ role: [CLIENT_ADMIN], company: company.value._id });
+
+      billingRepresentativeOptions.value = formatAndSortUserOptions(vendorUsers, false);
+    };
+
+    const refreshCompany = async () => {
+      try {
+        await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const updateCompany = async () => {
+      try {
+        billingRepresentativeModalLoading.value = true;
+        validations.value.tmpBillingRepresentative.$touch();
+        if (validations.value.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Companies.updateById(company.value._id, { billingRepresentative: tmpBillingRepresentative.value._id });
+        NotifyPositive('Modification enregistrée.');
+
+        await refreshCompany();
+        billingRepresentativeModal.value = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification.');
+      } finally {
+        tmpBillingRepresentative.value = {};
+        billingRepresentativeModalLoading.value = false;
+      }
+    };
+
+    const resetBillingRepresentative = () => {
+      tmpBillingRepresentative.value = {};
+      billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
+      validations.value.tmpBillingRepresentative.$reset();
+    };
+
     watch(company, async () => { if (!courseBills.value.length && company.value) refreshCourseBills(); });
 
     const created = async () => {
       if (company.value) refreshCourseBills();
+      refreshBillingRepresentativeOptions();
     };
 
     created();
@@ -408,6 +503,12 @@ export default {
       PAYMENT_OPTIONS,
       REFUND,
       DD_MM_YYYY,
+      company,
+      billingRepresentativeModal,
+      billingRepresentativeModalLabel,
+      billingRepresentativeModalLoading,
+      billingRepresentativeOptions,
+      tmpBillingRepresentative,
       // Computed
       validations,
       canUpdateBilling,
@@ -430,6 +531,9 @@ export default {
       getTableName,
       getProgramName,
       CompaniDate,
+      openBillingRepresentativeModal,
+      updateCompany,
+      resetBillingRepresentative,
     };
   },
 };

@@ -1,10 +1,11 @@
 <template>
   <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>
-        {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor.toLowerCase() }}</span>
+        {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor }}</span>
     </template>
       <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')" required-field
-        :caption="label.interlocutor" :options="interlocutorsOptions" option-slot :error="validations.$error">
+        :caption="upperCaseFirstLetter(label.interlocutor)" :options="interlocutorsOptions" option-slot
+        :error="validations.$error">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
             <q-item-section avatar>
@@ -27,7 +28,7 @@
         </div>
       </div>
       <template #footer>
-        <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor.toLowerCase()}`"
+        <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor}`"
           icon-right="add" color="white" :loading="loading" @click="submit" />
       </template>
     </ni-modal>
@@ -38,6 +39,7 @@ import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
+import { upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
   name: 'InterlocutorModal',
@@ -68,6 +70,7 @@ export default {
       input,
       submit,
       update,
+      upperCaseFirstLetter,
     };
   },
 };

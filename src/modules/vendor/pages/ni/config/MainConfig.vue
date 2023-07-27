@@ -321,7 +321,7 @@ export default {
       const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
       tmpBillingRepresentative.value = get(vendorCompany.value, 'billingRepresentative');
-      billingRepresentativeModalLabel.value = { action, interlocutor: 'Chargé de facturation' };
+      billingRepresentativeModalLabel.value = { action, interlocutor: 'chargé de facturation' };
       billingRepresentativeModal.value = true;
     };
 
