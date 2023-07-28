@@ -8,8 +8,8 @@
           @open-modal="openBillingRepresentativeModal" />
       </div>
     </div>
-    <div v-if="Object.keys(courseBills).length" class="q-mb-xl">
-      <div v-for="payer of Object.keys(courseBills)" :key="payer">
+    <template v-if="Object.keys(courseBills).length">
+      <div v-for="payer of Object.keys(courseBills)" :key="payer" class="q-mb-xl">
         <p class="text-weight-bold">{{ getTableName( courseBills[payer][0].payer) }}</p>
         <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
           :hide-bottom="false" :loading="loading">
@@ -90,7 +90,7 @@
       <ni-course-payment-edition-modal v-model:edited-course-payment="editedCoursePayment" @submit="editPayment"
         v-model="coursePaymentEditionModal" :loading="paymentEditionLoading" @hide="resetCoursePaymentEditionModal"
         :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
-    </div>
+    </template>
     <div v-else class="text-italic">Pas de factures</div>
     <ni-interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
       @submit="updateCompany" :label="billingRepresentativeModalLabel"
