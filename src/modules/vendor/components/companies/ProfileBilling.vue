@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="q-mb-xl">
+    <div v-if="company" class="q-mb-xl">
       <p class="text-weight-bold">Contact</p>
       <div class="interlocutor-container">
         <ni-interlocutor-cell :interlocutor="company.billingRepresentative" can-update
@@ -480,8 +480,10 @@ export default {
     watch(company, async () => { if (!courseBills.value.length && company.value) refreshCourseBills(); });
 
     const created = async () => {
-      if (company.value) refreshCourseBills();
-      refreshBillingRepresentativeOptions();
+      if (company.value) {
+        refreshCourseBills();
+        refreshBillingRepresentativeOptions();
+      }
     };
 
     created();
