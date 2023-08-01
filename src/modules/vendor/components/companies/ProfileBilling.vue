@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="company">
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact</p>
       <div class="interlocutor-container">
@@ -477,11 +477,14 @@ export default {
       validations.value.tmpBillingRepresentative.$reset();
     };
 
-    watch(company, async () => { if (!courseBills.value.length && company.value) refreshCourseBills(); });
+    watch(company, async () => {
+      if (!courseBills.value.length && company.value) {
+        await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
+      }
+    });
 
     const created = async () => {
-      if (company.value) refreshCourseBills();
-      refreshBillingRepresentativeOptions();
+      if (company.value) await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
     };
 
     created();
