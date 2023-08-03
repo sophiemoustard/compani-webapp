@@ -9,7 +9,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
@@ -31,13 +31,14 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche formateur' };
     useMeta(metaInfo);
+    const { defaultTab, trainerId } = toRefs(props);
 
     const userIdentity = ref('');
     const tabsContent = [
       {
         label: 'Infos personnelles',
         name: 'info',
-        default: props.defaultTab === 'info',
+        default: defaultTab.value === 'info',
         component: ProfileInfo,
         notification: 'profiles',
       },
@@ -61,7 +62,7 @@ export default {
 
     const created = async () => {
       if (vendorRole.value !== TRAINER) {
-        await $store.dispatch('userProfile/fetchUserProfile', { userId: props.trainerId });
+        await $store.dispatch('userProfile/fetchUserProfile', { userId: trainerId.value });
       }
       userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL');
     };

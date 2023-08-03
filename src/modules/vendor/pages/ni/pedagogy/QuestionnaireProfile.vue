@@ -9,7 +9,7 @@
 
 <script>
 import { createMetaMixin } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
@@ -32,9 +32,11 @@ export default {
   },
   mixins: [createMetaMixin(metaInfo)],
   setup (props) {
+    const { defaultTab, questionnaireId } = toRefs(props);
+
     const tabsContent = [
-      { label: 'Édition', name: 'edition', default: props.defaultTab === 'edition', component: ProfileEdition },
-      { label: 'Réponses', name: 'answers', default: props.defaultTab === 'answers', component: ProfileAnswers },
+      { label: 'Édition', name: 'edition', default: defaultTab.value === 'edition', component: ProfileEdition },
+      { label: 'Réponses', name: 'answers', default: defaultTab.value === 'answers', component: ProfileAnswers },
     ];
     const questionnaireName = ref('');
 
@@ -54,7 +56,7 @@ export default {
     const refreshProgramName = () => { questionnaireName.value = get(questionnaire.value, 'name') || ''; };
 
     const refreshQuestionnaire = async () => {
-      await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: props.questionnaireId });
+      await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: questionnaireId.value });
     };
 
     const created = async () => {
