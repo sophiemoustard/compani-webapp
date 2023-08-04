@@ -5,7 +5,13 @@ module.exports = {
     sourceType: 'module',
   },
   env: { browser: true },
-  extends: ['airbnb-base', 'plugin:cypress/recommended', 'standard', 'plugin:vue/vue3-strongly-recommended'],
+  extends: [
+    'airbnb-base',
+    'plugin:cypress/recommended',
+    'standard',
+    'plugin:vue/vue3-strongly-recommended',
+    'plugin:promise/recommended',
+  ],
   plugins: ['vue', 'cypress'],
   globals: {
     __statics: true,
