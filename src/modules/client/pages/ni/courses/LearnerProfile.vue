@@ -18,7 +18,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
@@ -46,10 +46,11 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche apprenant' };
     useMeta(metaInfo);
+    const { defaultTab, learnerId } = toRefs(props);
 
     const tabsContent = [
-      { label: 'Infos personnelles', name: 'info', default: props.defaultTab === 'info', component: ProfileInfo },
-      { label: 'Formations', name: 'courses', default: props.defaultTab === 'courses', component: ProfileCourses },
+      { label: 'Infos personnelles', name: 'info', default: defaultTab.value === 'info', component: ProfileInfo },
+      { label: 'Formations', name: 'courses', default: defaultTab.value === 'courses', component: ProfileCourses },
     ];
 
     const $store = useStore();
@@ -64,7 +65,7 @@ export default {
 
     const refreshUserProfile = async () => {
       try {
-        await $store.dispatch('userProfile/fetchUserProfile', { userId: props.learnerId });
+        await $store.dispatch('userProfile/fetchUserProfile', { userId: learnerId.value });
       } catch (e) {
         console.error(e);
       }

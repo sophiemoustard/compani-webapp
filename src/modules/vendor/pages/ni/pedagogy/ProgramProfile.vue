@@ -7,7 +7,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount, toRefs } from 'vue';
 import get from 'lodash/get';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
@@ -29,11 +29,12 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche programme' };
     useMeta(metaInfo);
+    const { defaultTab, programId } = toRefs(props);
 
     const programName = ref('');
     const tabsContent = [
-      { label: 'Infos', name: 'infos', default: props.defaultTab === 'infos', component: ProfileInfo },
-      { label: 'Sous-programmes', name: 'content', default: props.defaultTab === 'content', component: ProfileContent },
+      { label: 'Infos', name: 'infos', default: defaultTab.value === 'infos', component: ProfileInfo },
+      { label: 'Sous-programmes', name: 'content', default: defaultTab.value === 'content', component: ProfileContent },
     ];
 
     const $route = useRoute();
@@ -46,7 +47,7 @@ export default {
 
     const refreshProgram = async () => {
       try {
-        await $store.dispatch('program/fetchProgram', { programId: props.programId });
+        await $store.dispatch('program/fetchProgram', { programId: programId.value });
       } catch (e) {
         console.error(e);
       }

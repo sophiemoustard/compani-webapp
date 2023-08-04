@@ -7,7 +7,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, ref, watch, onBeforeUnmount } from 'vue';
+import { computed, ref, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import { COMPANY_TYPES } from '@data/constants';
@@ -30,10 +30,11 @@ export default {
     const metaInfo = { title: 'Fiche structure' };
     useMeta(metaInfo);
     const $store = useStore();
+    const { defaultTab, companyId } = toRefs(props);
 
     const tabsContent = [
-      { label: 'Infos', name: 'infos', default: props.defaultTab === 'infos', component: ProfileInfo },
-      { label: 'Factures', name: 'bills', default: props.defaultTab === 'bills', component: ProfileBilling },
+      { label: 'Infos', name: 'infos', default: defaultTab.value === 'infos', component: ProfileInfo },
+      { label: 'Factures', name: 'bills', default: defaultTab.value === 'bills', component: ProfileBilling },
     ];
     const companyName = ref('');
 
@@ -46,7 +47,7 @@ export default {
 
     const refreshCompany = async () => {
       try {
-        await $store.dispatch('company/fetchCompany', { companyId: props.companyId });
+        await $store.dispatch('company/fetchCompany', { companyId: companyId.value });
       } catch (e) {
         console.error(e);
       }

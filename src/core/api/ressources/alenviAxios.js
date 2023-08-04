@@ -8,6 +8,7 @@ const instance = axios.create({
   paramsSerializer: { serialize: params => qs.stringify(params, { indices: false }) },
 });
 
+// eslint-disable-next-line promise/no-promise-in-callback
 instance.interceptors.request.use(async config => config, err => Promise.reject(err));
 
 instance.interceptors.response.use(

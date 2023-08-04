@@ -53,7 +53,7 @@
 <script>
 import { ref, watch, computed } from 'vue';
 import { useMeta } from 'quasar';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
