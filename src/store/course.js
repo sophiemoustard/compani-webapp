@@ -47,7 +47,9 @@ export default {
         if (userClientRole && !/\/ad\//.test(router.currentRoute.value.path)) {
           const loggedUser = store.getters['main/getLoggedUser'];
           course.trainees = course.trainees.filter(t => hasUserAccessToCompany(loggedUser, t.registrationCompany));
-          course.companies = course.companies.filter(company => hasUserAccessToCompany(loggedUser, company._id));
+          if (course.companies) {
+            course.companies = course.companies.filter(company => hasUserAccessToCompany(loggedUser, company._id));
+          }
         }
 
         commit('SET_COURSE', course);
