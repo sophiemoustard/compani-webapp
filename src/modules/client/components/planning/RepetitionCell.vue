@@ -35,7 +35,7 @@
 </template>
 <script>
 import { computed, toRefs } from 'vue';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import moment from '@helpers/moment';
 import { formatHoursWithMinutes } from '@helpers/date';
 import { formatIdentity, getLastVersion } from '@helpers/utils';

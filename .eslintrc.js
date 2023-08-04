@@ -11,6 +11,7 @@ module.exports = {
     'standard',
     'plugin:vue/vue3-strongly-recommended',
     'plugin:promise/recommended',
+    'plugin:n/recommended',
   ],
   plugins: ['vue', 'cypress'],
   globals: {
@@ -23,6 +24,7 @@ module.exports = {
     indent: ['error', 2, { SwitchCase: 1 }],
     'linebreak-style': ['error', 'unix'],
     'react/display-name': 'off',
+    'n/no-missing-import': 'off',
     'max-len': ['error', { code: 120, tabWidth: 2 }],
     'no-console': process.env.NODE_ENV === 'development'
       ? ['warn', { allow: ['error'] }]
