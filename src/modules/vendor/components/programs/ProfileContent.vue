@@ -27,10 +27,7 @@
                     </div>
                     <published-dot :is-published="isPublished(step)" :status="isStepValid(step)" />
                   </div>
-                  <div class="step-subtitle">
-                    {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
-                     - {{ CompaniDuration(step.theoreticalDuration || PT0S).format(LONG_DURATION_H_MM) }}
-                  </div>
+                  <div class="step-subtitle">{{ getStepSubTitle(step) }}</div>
                 </q-item-section>
               </div>
               <div class="flex align-center">
@@ -459,6 +456,10 @@ export default {
         : PUBLISHED_DOT_WARNING
     );
 
+    const getStepSubTitle = step => `${getStepTypeLabel(step.type)}
+      ${step.type === E_LEARNING ? `- ${formatQuantity('activité', step.activities.length)}` : ''} - 
+      ${CompaniDuration(step.theoreticalDuration || PT0S).format(LONG_DURATION_H_MM)}`;
+
     const created = async () => {
       if (!program.value) await refreshProgram();
       await refreshProgramList();
@@ -552,6 +553,7 @@ export default {
       getStepTypeLabel,
       getStepTypeIcon,
       CompaniDuration,
+      getStepSubTitle,
     };
   },
 };
