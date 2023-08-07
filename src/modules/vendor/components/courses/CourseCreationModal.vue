@@ -44,7 +44,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES, REQUIRED_LABEL, INTRA } from '@data/constants';
+import { COURSE_TYPES, REQUIRED_LABEL, INTRA, PUBLISHED } from '@data/constants';
 import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
@@ -77,7 +77,11 @@ export default {
   computed: {
     programOptions () {
       return this.programs
-        .map(p => ({ label: p.name, value: p._id, disable: !get(p, 'subPrograms.length') }))
+        .map(p => ({
+          label: p.name,
+          value: p._id,
+          disable: !p.subPrograms.find(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED),
+        }))
         .sort((a, b) => a.label.localeCompare(b.label));
     },
     maxTraineesErrorMessage () {
@@ -96,10 +100,14 @@ export default {
   watch: {
     'newCourse.program': function (value) {
       const selectedProgram = this.programs.find(p => p._id === value);
+      const filteredSubPrograms = selectedProgram
+        ? selectedProgram.subPrograms
+          .filter(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED)
+        : [];
 
-      if (get(selectedProgram, 'subPrograms.length')) {
+      if (filteredSubPrograms.length) {
         this.disableSubProgram = false;
-        this.subProgramOptions = formatAndSortOptions(selectedProgram.subPrograms, 'name');
+        this.subProgramOptions = formatAndSortOptions(filteredSubPrograms, 'name');
 
         if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
       } else {
