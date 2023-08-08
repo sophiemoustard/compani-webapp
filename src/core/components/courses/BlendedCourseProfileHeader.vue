@@ -2,8 +2,7 @@
   <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
     <template #title v-if="!isClientInterface">
       <ni-button icon="delete" @click="deleteCourse" />
-      <ni-button :flat="false" v-if="displayArchiveButton" class="q-ml-sm"
-        label="Archiver" @click="validateCourseArchive" />
+      <ni-button :flat="false" v-if="isAdmin" class="q-ml-sm" :label="archiveLabel" @click="validateCourseArchive" />
     </template>
   </ni-profile-header>
 </template>
@@ -40,13 +39,12 @@ export default {
     courseId () {
       return this.course._id;
     },
-    displayArchiveButton () {
+    isAdmin () {
       const vendorRole = this.$store.getters['main/getVendorRole'];
-      const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
-      const areAllCourseSlotsEnded = this.course.slots.every(slot => CompaniDate().isAfter(slot.endDate)) &&
-        !this.course.slotsToPlan.length;
-
-      return !this.course.archivedAt && areAllCourseSlotsEnded && isAdmin;
+      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
+    },
+    archiveLabel () {
+      return !this.course.archivedAt ? 'Archiver' : 'Désarchiver';
     },
   },
   methods: {
@@ -57,26 +55,34 @@ export default {
       this.$emit('refresh');
     },
     validateCourseArchive () {
+      const message = !this.course.archivedAt
+        ? 'Êtes-vous sûr(e) de vouloir archiver cette formation&nbsp;? <br /><br /> Vous ne pourrez plus'
+        + ' modifier des informations, ajouter des émargements ni envoyer des sms.'
+        : 'Êtes-vous sûr(e) de vouloir désarchiver cette formation&nbsp;? <br /><br /> Il sera de nouveau possible de'
+        + ' modifier des informations, ajouter des émargements ou envoyer des sms.';
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir archiver cette formation&nbsp;? <br /><br /> Vous ne pourrez plus'
-        + ' modifier des informations, ajouter des émargements ni envoyer des sms.',
+        message,
         html: true,
         ok: 'Oui',
         cancel: 'Non',
       }).onOk(this.archiveCourse)
-        .onCancel(() => NotifyPositive('Archivage annulé.'));
+        .onCancel(() => NotifyPositive(!this.course.archivedAt ? 'Archivage annulé.' : 'Désarchivage annulé.'));
     },
     async archiveCourse () {
       try {
-        const payload = { archivedAt: CompaniDate().toISO() };
+        const payload = !this.course.archivedAt ? { archivedAt: CompaniDate().toISO() } : { archivedAt: '' };
         await Courses.update(this.course._id, payload);
 
-        NotifyPositive('Formation archivée.');
+        NotifyPositive(!this.course.archivedAt ? 'Formation archivée.' : 'Formation désarchivée.');
         await this.refreshCourse();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'archivage de la formation.');
+        NotifyNegative(
+          !this.course.archivedAt
+            ? 'Erreur lors de l\'archivage de la formation.'
+            : 'Erreur lors du désarchivage de la formation.'
+        );
       }
     },
   },
