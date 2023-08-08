@@ -29,7 +29,6 @@ export const useCourses = (course) => {
     const missingInfo = [];
     if (!course.value.trainer._id) missingInfo.push('l\'intervenant(e)');
     if (!course.value.slots || !course.value.slots.length) missingInfo.push('minimum 1 créneau');
-    if (!course.value.trainees || !course.value.trainees.length) missingInfo.push('minimum 1 stagiaire');
 
     if (!get(course.value, 'contact._id')) missingInfo.push('le contact pour la formation');
     else if (!get(course.value, 'contact.contact.phone')) missingInfo.push('le numéro du contact pour la formation');
