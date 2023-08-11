@@ -200,7 +200,7 @@ export default {
     ]);
     const unsubscribedAttendances = ref([]);
 
-    const company = computed(() => $store.getters['main/getCompany']);
+    const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const userProfile = computed(() => $store.state.userProfile.userProfile);
 
@@ -255,10 +255,14 @@ export default {
     const getUserCourses = async () => {
       try {
         loading.value = true;
+        const loggedUserHolding = get(loggedUser.value, 'holding._id');
+
         const userCourses = await Courses.list({
           trainee: userProfile.value._id,
           action: PEDAGOGY,
-          ...(isClientInterface && { company: company.value._id }),
+          ...(isClientInterface && {
+            ...loggedUserHolding ? { holding: loggedUserHolding } : { company: loggedUser.value.company._id },
+          }),
         });
 
         courses.value = userCourses.map(course => ({
