@@ -20,6 +20,12 @@ const routes = [
     name: '404',
     component: () => import('src/core/pages/404'),
   },
+  {
+    path: '/ni/questionnaire/:questionnaireId',
+    name: 'ni questionnaire',
+    component: () => import('src/modules/notLogged/pages/Questionnaire'),
+    props: route => ({ questionnaireId: route.params.questionnaireId, courseId: route.query.courseId }),
+  },
 ];
 
 export default routes;

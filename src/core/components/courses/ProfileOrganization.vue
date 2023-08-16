@@ -71,6 +71,10 @@
           </template>
         </ni-banner>
         <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
+        <a v-if="isVendorInterface" class="clickable-name cursor-pointer"
+          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)">
+          Répondre au questionnaire de recueuil des attentes
+        </a>
       </div>
       <div v-if="isIntraOrVendor">
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
@@ -123,6 +127,7 @@ import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
 import Courses from '@api/Courses';
+import Questionnaires from '@api/Questionnaires';
 import TrainingContracts from '@api/TrainingContracts';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
@@ -156,6 +161,8 @@ import {
   HH_MM,
   COURSE,
   EDITION,
+  EXPECTATIONS,
+  PUBLISHED,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -232,6 +239,7 @@ export default {
     const potentialTrainees = ref([]);
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
+    const expectationsQuestionnaireId = ref();
 
     const course = computed(() => $store.state.course.course);
 
@@ -752,8 +760,26 @@ export default {
 
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
 
+    const refreshQuestionnaires = async () => {
+      const questionnaireList = await Questionnaires.list();
+      const publishedQuestionnnaires = questionnaireList.filter(q => q.status === PUBLISHED);
+
+      expectationsQuestionnaireId.value = publishedQuestionnnaires.find(q => q.type === EXPECTATIONS)._id;
+    };
+
+    const goToQuestionnaireProfile = (questionnaireId) => {
+      const questionnaire = $router.resolve({
+        name: 'ni questionnaire',
+        params: { questionnaireId },
+        query: { courseId: profileId.value },
+      });
+
+      window.open(questionnaire.href, '_blank');
+    };
+
     const created = async () => {
       const promises = [];
+      if (isVendorInterface) promises.push(refreshQuestionnaires()); // Repasser ici
       if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
       if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
 
@@ -799,6 +825,7 @@ export default {
       isIntraCourse,
       trainingContractTableLoading,
       trainingContracts,
+      expectationsQuestionnaireId,
       // Computed
       course,
       v$,
@@ -849,6 +876,7 @@ export default {
       refreshTraineeTable,
       refreshTrainingContracts,
       goToContactProfile,
+      goToQuestionnaireProfile,
     };
   },
 };
