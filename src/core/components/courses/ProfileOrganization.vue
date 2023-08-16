@@ -71,14 +71,18 @@
           </template>
         </ni-banner>
         <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
-        <a v-if="isVendorInterface" class="clickable-name cursor-pointer"
-          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)">
-          Répondre au questionnaire de recueuil des attentes
-        </a>
       </div>
       <div v-if="isIntraOrVendor">
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
+      </div>
+      <div v-if="isVendorInterface" class="questionnaire-link">
+        <a class="clickable-name cursor-pointer q-mt-sm" @click="goToQuestionnaireProfile(expectationsQuestionnaireId)">
+          Répondre au questionnaire de recueuil des attentes
+        </a>
+        <a class="clickable-name cursor-pointer q-mt-md" @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)">
+          Répondre au questionnaire de fin de formation
+        </a>
       </div>
     </div>
     <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
@@ -163,6 +167,7 @@ import {
   EDITION,
   EXPECTATIONS,
   PUBLISHED,
+  END_OF_COURSE,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -240,6 +245,7 @@ export default {
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
     const expectationsQuestionnaireId = ref();
+    const endOfCourseQuestionnaireId = ref();
 
     const course = computed(() => $store.state.course.course);
 
@@ -765,6 +771,7 @@ export default {
       const publishedQuestionnnaires = questionnaireList.filter(q => q.status === PUBLISHED);
 
       expectationsQuestionnaireId.value = publishedQuestionnnaires.find(q => q.type === EXPECTATIONS)._id;
+      endOfCourseQuestionnaireId.value = publishedQuestionnnaires.find(q => q.type === END_OF_COURSE)._id;
     };
 
     const goToQuestionnaireProfile = (questionnaireId) => {
@@ -826,6 +833,7 @@ export default {
       trainingContractTableLoading,
       trainingContracts,
       expectationsQuestionnaireId,
+      endOfCourseQuestionnaireId,
       // Computed
       course,
       v$,
@@ -888,4 +896,10 @@ export default {
   flex-direction: column
 .button-history
   align-self: flex-end
+
+.questionnaire-link
+  display: flex
+  flex-direction: column
+  align-items: left
+  justify-content: left
 </style>
