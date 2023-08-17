@@ -76,13 +76,31 @@
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
-      <div v-if="isVendorInterface" class="questionnaire-link">
-        <a class="clickable-name cursor-pointer q-mt-sm" @click="goToQuestionnaireProfile(expectationsQuestionnaireId)">
-          Répondre au questionnaire de recueuil des attentes
-        </a>
-        <a class="clickable-name cursor-pointer q-mt-md" @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)">
-          Répondre au questionnaire de fin de formation
-        </a>
+      <div v-if="isVendorInterface" class="questionnaire-link-container">
+        <q-card class="questionnaire-link" flat>
+          <text class="questionnaire-info">Répondre au questionnaire de recueil des attentes</text>
+          <div class="questionnaire-qrcode">
+            <img :src="expectationsQRCode" width="160"
+              alt="QR Code pour répondre au questionnaire de recueil des attentes"
+              title="QR Code pour répondre au questionnaire de recueil des attentes">
+          </div>
+          <a class="clickable-name cursor-pointer q-mt-md"
+            @click="goToQuestionnaireProfile(expectationsQuestionnaireId)">
+            Lien pour répondre au questionnaire de recueil des attentes
+          </a>
+        </q-card>
+        <q-card class="questionnaire-link" flat>
+          <text class="questionnaire-info">Répondre au questionnaire de fin de formation</text>
+          <div class="questionnaire-qrcode">
+            <img :src="endOfCourseQRCode" width="160"
+              alt="QR Code pour répondre au questionnaire de fin de formation"
+              title="QR Code pour répondre au questionnaire de fin de formation">
+          </div>
+          <a class="clickable-name cursor-pointer q-mt-md"
+            @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)">
+            Lien pour répondre au questionnaire de fin de formation
+          </a>
+        </q-card>
       </div>
     </div>
     <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
@@ -246,6 +264,8 @@ export default {
     const trainingContractTableLoading = ref(false);
     const expectationsQuestionnaireId = ref();
     const endOfCourseQuestionnaireId = ref();
+    const expectationsQRCode = ref();
+    const endOfCourseQRCode = ref();
 
     const course = computed(() => $store.state.course.course);
 
@@ -772,6 +792,14 @@ export default {
 
       expectationsQuestionnaireId.value = publishedQuestionnnaires.find(q => q.type === EXPECTATIONS)._id;
       endOfCourseQuestionnaireId.value = publishedQuestionnnaires.find(q => q.type === END_OF_COURSE)._id;
+
+      const expectationsCode = await Questionnaires
+        .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
+      expectationsQRCode.value = expectationsCode.data;
+
+      const endOfCourseCode = await Questionnaires
+        .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
+      endOfCourseQRCode.value = endOfCourseCode.data;
     };
 
     const goToQuestionnaireProfile = (questionnaireId) => {
@@ -834,6 +862,8 @@ export default {
       trainingContracts,
       expectationsQuestionnaireId,
       endOfCourseQuestionnaireId,
+      expectationsQRCode,
+      endOfCourseQRCode,
       // Computed
       course,
       v$,
@@ -897,9 +927,24 @@ export default {
 .button-history
   align-self: flex-end
 
+.questionnaire-link-container
+  padding: 24px 0 0 0
+  display: grid
+  grid-auto-flow: column
+  grid-gap: 24px
+
 .questionnaire-link
+  padding: 16px
   display: flex
   flex-direction: column
-  align-items: left
-  justify-content: left
+  align-items: center
+  justify-content: center
+.questionnaire-qrcode
+  padding: 16px 0 0 0px
+  display: flex
+  flex-direction: row
+
+.questionnaire-info
+  font-weight: bold
+  font-size: 14px
 </style>

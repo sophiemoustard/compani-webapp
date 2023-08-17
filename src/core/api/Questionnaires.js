@@ -28,4 +28,7 @@ export default {
     );
     return questionnaire.data.data.followUp;
   },
+  async getQRCode (id, params = null) {
+    return alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires/${id}/qrcode`, { params });
+  },
 };
