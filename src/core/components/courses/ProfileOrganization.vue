@@ -77,9 +77,9 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
       <div v-if="isVendorInterface" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell :img="expectationsQRCode" :type="EXPECTATIONS"
+        <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
           @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
-        <ni-questionnaire-qrcode-cell :img="expectationsQRCode" :type="END_OF_COURSE"
+        <ni-questionnaire-qrcode-cell v-if="endOfCourseQuestionnaireId" :img="endOfCourseQRCode" :type="END_OF_COURSE"
           @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)" />
       </div>
     </div>
@@ -246,8 +246,8 @@ export default {
     const trainingContractTableLoading = ref(false);
     const expectationsQuestionnaireId = ref();
     const endOfCourseQuestionnaireId = ref();
-    const expectationsQRCode = ref();
-    const endOfCourseQRCode = ref();
+    const expectationsQRCode = ref('');
+    const endOfCourseQRCode = ref('');
 
     const course = computed(() => $store.state.course.course);
 
@@ -772,16 +772,19 @@ export default {
       const questionnaireList = await Questionnaires.list();
       const publishedQuestionnnaires = questionnaireList.filter(q => q.status === PUBLISHED);
 
-      expectationsQuestionnaireId.value = publishedQuestionnnaires.find(q => q.type === EXPECTATIONS)._id;
-      endOfCourseQuestionnaireId.value = publishedQuestionnnaires.find(q => q.type === END_OF_COURSE)._id;
+      expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
+      if (expectationsQuestionnaireId.value) {
+        const expectationsCode = await Questionnaires
+          .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
+        expectationsQRCode.value = expectationsCode.data;
+      }
 
-      const expectationsCode = await Questionnaires
-        .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
-      expectationsQRCode.value = expectationsCode.data;
-
-      const endOfCourseCode = await Questionnaires
-        .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
-      endOfCourseQRCode.value = endOfCourseCode.data;
+      endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
+      if (endOfCourseQuestionnaireId.value) {
+        const endOfCourseCode = await Questionnaires
+          .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
+        endOfCourseQRCode.value = endOfCourseCode.data;
+      }
     };
 
     const goToQuestionnaireProfile = (questionnaireId) => {
@@ -796,8 +799,8 @@ export default {
 
     const created = async () => {
       const promises = [];
-      if (isVendorInterface) promises.push(refreshQuestionnaires()); // Repasser ici
-      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
+      if (isVendorInterface) promises.push(refreshQuestionnaires(), refreshSms(), refreshCompanyRepresentatives());
+      if (isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
       if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
 
       if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
