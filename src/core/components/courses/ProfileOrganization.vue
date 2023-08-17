@@ -77,30 +77,10 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
       <div v-if="isVendorInterface" class="questionnaire-link-container">
-        <q-card class="questionnaire-link" flat>
-          <text class="questionnaire-info">Répondre au questionnaire de recueil des attentes</text>
-          <div class="questionnaire-qrcode">
-            <img :src="expectationsQRCode" width="160"
-              alt="QR Code pour répondre au questionnaire de recueil des attentes"
-              title="QR Code pour répondre au questionnaire de recueil des attentes">
-          </div>
-          <a class="clickable-name cursor-pointer q-mt-md"
-            @click="goToQuestionnaireProfile(expectationsQuestionnaireId)">
-            Lien pour répondre au questionnaire de recueil des attentes
-          </a>
-        </q-card>
-        <q-card class="questionnaire-link" flat>
-          <text class="questionnaire-info">Répondre au questionnaire de fin de formation</text>
-          <div class="questionnaire-qrcode">
-            <img :src="endOfCourseQRCode" width="160"
-              alt="QR Code pour répondre au questionnaire de fin de formation"
-              title="QR Code pour répondre au questionnaire de fin de formation">
-          </div>
-          <a class="clickable-name cursor-pointer q-mt-md"
-            @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)">
-            Lien pour répondre au questionnaire de fin de formation
-          </a>
-        </q-card>
+        <ni-questionnaire-qrcode-cell :img="expectationsQRCode" :type="EXPECTATIONS"
+          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
+        <ni-questionnaire-qrcode-cell :img="expectationsQRCode" :type="END_OF_COURSE"
+          @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)" />
       </div>
     </div>
     <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
@@ -167,6 +147,7 @@ import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import BiColorButton from '@components/BiColorButton';
 import SecondaryButton from '@components/SecondaryButton';
+import QuestionnaireQRCodeCell from '@components/courses/QuestionnaireQRCodeCell';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -217,6 +198,7 @@ export default {
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
     'training-contract-container': TrainingContractContainer,
+    'ni-questionnaire-qrcode-cell': QuestionnaireQRCodeCell,
   },
   setup (props) {
     const { profileId } = toRefs(props);
@@ -864,6 +846,8 @@ export default {
       endOfCourseQuestionnaireId,
       expectationsQRCode,
       endOfCourseQRCode,
+      EXPECTATIONS,
+      END_OF_COURSE,
       // Computed
       course,
       v$,
@@ -926,25 +910,13 @@ export default {
   flex-direction: column
 .button-history
   align-self: flex-end
-
 .questionnaire-link-container
   padding: 24px 0 0 0
   display: grid
-  grid-auto-flow: column
+  grid-auto-flow: row
   grid-gap: 24px
-
-.questionnaire-link
-  padding: 16px
-  display: flex
-  flex-direction: column
-  align-items: center
-  justify-content: center
-.questionnaire-qrcode
-  padding: 16px 0 0 0px
-  display: flex
-  flex-direction: row
-
-.questionnaire-info
-  font-weight: bold
-  font-size: 14px
+  grid-template-rows: auto
+  @media screen and (min-width: 768px)
+    grid-auto-rows: 1fr
+    grid-template-columns: repeat(2, 1fr)
 </style>
