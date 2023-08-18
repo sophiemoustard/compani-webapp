@@ -776,14 +776,14 @@ export default {
       if (expectationsQuestionnaireId.value) {
         const expectationsCode = await Questionnaires
           .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
-        expectationsQRCode.value = expectationsCode.data;
+        expectationsQRCode.value = expectationsCode;
       }
 
       endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
       if (endOfCourseQuestionnaireId.value) {
         const endOfCourseCode = await Questionnaires
           .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
-        endOfCourseQRCode.value = endOfCourseCode.data;
+        endOfCourseQRCode.value = endOfCourseCode;
       }
     };
 
