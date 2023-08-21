@@ -1,5 +1,6 @@
+import axios from 'axios';
 import { alenviAxios } from '@api/ressources/alenviAxios';
-import { WEBAPP, OPERATIONS } from '@data/constants';
+import { WEBAPP, OPERATIONS, QUESTIONNAIRE } from '@data/constants';
 
 export default {
   async list (filterParams) {
@@ -86,5 +87,11 @@ export default {
       payload,
       { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
     );
+  },
+  async get (courseId) {
+    const params = { action: QUESTIONNAIRE };
+    const course = await axios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`, { params });
+
+    return course.data.data.course;
   },
 };
