@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-button class="on-left elm-width" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
-    <ni-button class="bg-primary btn" label="Valider" color="white" @click="submit" />
+    <ni-button class="bg-primary btn" label="Valider" color="white" :loading="loading" @click="submit" />
   </div>
 </template>
 
@@ -20,6 +20,7 @@ export default {
   props: {
     course: { type: Object, required: true },
     trainee: { type: Object, required: true },
+    loading: { type: Boolean, required: true },
   },
   emits: ['update-trainee', 'click', 'submit'],
   setup (props, { emit }) {
