@@ -17,7 +17,7 @@
 import { toRefs, computed } from 'vue';
 import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
-import { EXPECTATIONS } from '../../data/constants';
+import { EXPECTATIONS } from '@data/constants';
 
 export default {
   name: 'MetaInfos',
@@ -49,7 +49,6 @@ export default {
 
 <style lang="sass" scoped>
 .container
-  padding: 48px
   display: flex
   flex: 1
   flex-direction: column
