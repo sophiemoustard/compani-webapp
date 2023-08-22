@@ -69,7 +69,7 @@ export default {
   display: flex
   justify-content: center
   align-items: center
-  font-size: 24px
+  font-size: 20px
   font-weight: bold
   color: $copper-grey-700
 
