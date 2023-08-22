@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-button class="on-left elm-width" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
-    <ni-button class="bg-primary btn" label="Valider" color="white" />
+    <ni-button class="bg-primary btn" label="Valider" color="white" @click="submit" />
   </div>
 </template>
 
@@ -21,7 +21,7 @@ export default {
     course: { type: Object, required: true },
     trainee: { type: Object, required: true },
   },
-  emits: ['update-trainee', 'click'],
+  emits: ['update-trainee', 'click', 'submit'],
   setup (props, { emit }) {
     const { course } = toRefs(props);
     const traineesOptions = computed(() => (get(course.value, 'trainees')
@@ -30,11 +30,14 @@ export default {
 
     const updateCardIndex = type => emit('click', type);
 
+    const submit = () => emit('submit');
+
     return {
       // DATA
       DECREMENT,
       // Methods
       updateCardIndex,
+      submit,
       // Computed
       traineesOptions,
     };

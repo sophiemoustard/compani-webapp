@@ -6,7 +6,7 @@
       <start v-if="cardIndex === -1" :course="course" :trainee="tmpTrainee" @update-trainee="updateTrainee"
         @click="updateCardIndex" />
       <end v-if="cardIndex === questionnaire.cards.length" :course="course" :trainee="tmpTrainee"
-        @click="updateCardIndex" />
+        @click="updateCardIndex" @submit="createHistory" />
     </div>
   </div>
 </template>
@@ -21,7 +21,9 @@ import CompaniHeader from '@components/CompaniHeader';
 import MetaInfos from '@components/questionnaires/cards/MetaInfos';
 import Start from '@components/questionnaires/cards/Start';
 import End from '@components/questionnaires/cards/End';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { INCREMENT } from '@data/constants';
+import QuestionnaireHistories from '@api/QuestionnaireHistories';
 
 export default {
   name: 'Questionnaire',
@@ -65,6 +67,22 @@ export default {
 
     const updateCardIndex = async type => $store.dispatch('questionnaire/updateCardIndex', { type });
 
+    const createHistory = async () => {
+      try {
+        const payload = {
+          course: course.value._id,
+          questionnaire: questionnaire.value._id,
+          user: tmpTrainee.value._id,
+        };
+
+        await QuestionnaireHistories.create(payload);
+        NotifyPositive('Réponse enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'enregistrement des réponses au questionnaire.');
+      }
+    };
+
     return {
       // Data
       course,
@@ -76,6 +94,7 @@ export default {
       // Methods
       updateTrainee,
       updateCardIndex,
+      createHistory,
     };
   },
 };
