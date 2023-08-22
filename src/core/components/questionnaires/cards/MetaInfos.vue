@@ -52,24 +52,20 @@ export default {
   display: flex
   flex: 1
   flex-direction: column
+  padding: 0 0 16px 0
 .title
-  display: flex
-  justify-content: center
-  align-items: center
   font-size: 16px
+  text-align: center
   color: $copper-grey-700
 .items-container
   color: $copper-grey-600
   display: flex
   flex-direction: row
   justify-content: center
-
 .questionnaire-type
   padding: 16px 0px
-  display: flex
-  justify-content: center
-  align-items: center
-  font-size: 20px
+  text-align: center
+  font-size: 16px
   font-weight: bold
   color: $copper-grey-700
 

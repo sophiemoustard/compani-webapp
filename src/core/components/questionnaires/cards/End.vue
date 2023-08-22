@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <ni-button class="on-left elm-width" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
+    <ni-button class="back-btn" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
     <ni-button class="bg-primary btn" label="Valider" color="white" :loading="loading" @click="submit" />
   </div>
 </template>
@@ -52,12 +52,21 @@ export default {
   flex-direction: row
   align-items: center
 
-.elm-width
-  width: 10vw
-.btn
-  position: sticky
+.back-btn
+  width: 5vw
+  position: absolute
   top: 90vh
-  left: 10vw
-  width: 80vw
+  left: 25vw
+  @media screen and (max-width: $breakpoint-md)
+    left: 4vw
+
+.btn
+  position: absolute
+  top: 90vh
+  left: 30vw
+  width: 40vw
+  @media screen and (max-width: $breakpoint-md)
+    left: 15vw
+    width: 75vw
 
 </style>
