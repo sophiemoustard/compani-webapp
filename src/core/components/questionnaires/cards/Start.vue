@@ -46,8 +46,6 @@ export default {
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
 
-    const goToNextCard = type => emit('click', type);
-
     return {
       // Data
       INCREMENT,
