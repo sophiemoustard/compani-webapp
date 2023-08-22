@@ -68,10 +68,16 @@ export default {
   align-items: center
 
 .elm-width
-  width: 80vw
+  width: 40vw
+  @media screen and (max-width: $breakpoint-md)
+    left: 10vw
+    width: 80vw
 .btn
-  position: sticky
+  position: absolute
   top: 90vh
-  left: 10vw
-  width: 80vw
+  left: 30vw
+  width: 40vw
+  @media screen and (max-width: $breakpoint-md)
+    left: 10vw
+    width: 80vw
 </style>

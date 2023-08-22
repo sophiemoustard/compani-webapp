@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="justify-center client-background">
+    <div class="client-background">
       <meta-infos :course="course" :questionnaire="questionnaire" />
       <start v-if="cardIndex === -1" :course="course" :trainee="trainee" @update-trainee="updateTrainee"
         @click="updateCardIndex" />
@@ -114,9 +114,5 @@ export default {
   min-height: 90vh
   @media screen and (max-width: 768px)
     height: 85vh
-  display: flex
-  flex: 1
-  flex-direction: column
-  align-items: space-around
   padding: 48px
 </style>
