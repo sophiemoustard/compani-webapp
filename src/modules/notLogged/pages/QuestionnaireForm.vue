@@ -1,8 +1,9 @@
 <template>
   <div>
     <compani-header />
-    <div class="row justify-center client-background">
+    <div class="justify-center client-background">
       <meta-infos :course="course" :questionnaire="questionnaire" />
+      <start :course="course" :trainee="tmpTrainee" @update-trainee="updateTrainee" />
     </div>
   </div>
 </template>
@@ -10,10 +11,12 @@
 <script>
 import { useMeta } from 'quasar';
 import { toRefs, ref } from 'vue';
+import set from 'lodash/set';
 import Courses from '@api/Courses';
 import Questionnaires from '@api/Questionnaires';
 import CompaniHeader from '@components/CompaniHeader';
-import MetaInfos from '@components/questionnaires/MetaInfos';
+import MetaInfos from '@components/questionnaires/cards/MetaInfos';
+import Start from '@components/questionnaires/cards/Start';
 
 export default {
   name: 'QuestionnaireForm',
@@ -24,6 +27,7 @@ export default {
   components: {
     'compani-header': CompaniHeader,
     'meta-infos': MetaInfos,
+    start: Start,
   },
   setup (props) {
     const metaInfo = { title: 'Formulaire de réponse au questionnaire' };
@@ -32,6 +36,7 @@ export default {
     const { courseId, questionnaireId } = toRefs(props);
     const course = ref({});
     const questionnaire = ref({});
+    const tmpTrainee = ref({ _id: '' });
 
     const getCourse = async () => {
       const fetchedCourse = await Courses.get(courseId.value);
@@ -50,10 +55,15 @@ export default {
 
     created();
 
+    const updateTrainee = t => (set(tmpTrainee.value, '_id', t));
+
     return {
       // Data
       course,
       questionnaire,
+      tmpTrainee,
+      // Methods
+      updateTrainee,
     };
   },
 };
@@ -61,7 +71,12 @@ export default {
 
 <style lang="sass" scoped>
 .client-background
-  min-height: 100vh
+  min-height: 90vh
   @media screen and (max-width: 768px)
     height: 85vh
+  display: flex
+  flex: 1
+  flex-direction: column
+  align-items: space-around
+  padding: 48px
 </style>
