@@ -1,8 +1,7 @@
 <template>
-  <div class="container">
-    <ni-select caption="Qui êtes-vous ?" :model-value="trainee._id" :options="traineesOptions"
-      @update:model-value="update" required-field class="elm-width" />
-    <ni-button class="bg-primary elm-width" label="Suivant" color="white" @click="goToNextCard(INCREMENT)" />
+  <div class="btn">
+    <ni-button class="on-left" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
+    <ni-button class="bg-primary elm-width" label="Suivant" color="white" />
   </div>
 </template>
 
@@ -10,14 +9,12 @@
 import get from 'lodash/get';
 import { toRefs, computed } from 'vue';
 import { formatAndSortUserOptions } from '@helpers/utils';
-import Select from '@components/form/Select';
 import Button from '@components/Button';
-import { INCREMENT } from '@data/constants';
+import { DECREMENT } from '@data/constants';
 
 export default {
   name: 'Start',
   components: {
-    'ni-select': Select,
     'ni-button': Button,
   },
   props: {
@@ -31,16 +28,13 @@ export default {
       ? formatAndSortUserOptions(course.value.trainees, false)
       : []));
 
-    const update = event => emit('update-trainee', event);
-
-    const goToNextCard = type => emit('click', type);
+    const updateCardIndex = type => emit('click', type);
 
     return {
-      // Data
-      INCREMENT,
+      // DATA
+      DECREMENT,
       // Methods
-      update,
-      goToNextCard,
+      updateCardIndex,
       // Computed
       traineesOptions,
     };
