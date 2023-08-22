@@ -2,7 +2,7 @@
   <div class="container">
     <ni-select caption="Qui êtes-vous ?" :model-value="trainee._id" :options="traineesOptions"
       @update:model-value="update" required-field class="elm-width" />
-    <ni-button class="bg-primary elm-width" label="Suivant" color="white" @click="goToNextCard(INCREMENT)" />
+    <ni-button class="bg-primary btn" label="Suivant" color="white" @click="goToNextCard(INCREMENT)" />
   </div>
 </template>
 
@@ -54,10 +54,12 @@ export default {
   flex: 1
   flex-direction: column
   align-items: center
-  justify-content: space-between
 
 .elm-width
   width: 80vw
-  @media screen and (min-width: $breakpoint-sm-max)
-      width: 60vw
+.btn
+  position: sticky
+  top: 90vh
+  left: 10vw
+  width: 80vw
 </style>

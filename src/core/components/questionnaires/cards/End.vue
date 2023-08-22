@@ -1,7 +1,7 @@
 <template>
-  <div class="btn">
-    <ni-button class="on-left" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
-    <ni-button class="bg-primary elm-width" label="Suivant" color="white" />
+  <div class="container">
+    <ni-button class="on-left elm-width" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
+    <ni-button class="bg-primary btn" label="Valider" color="white" />
   </div>
 </template>
 
@@ -45,13 +45,15 @@ export default {
 <style lang="sass" scoped>
 .container
   display: flex
-  flex: 1
-  flex-direction: column
+  flex-direction: row
   align-items: center
-  justify-content: space-between
 
 .elm-width
+  width: 10vw
+.btn
+  position: sticky
+  top: 90vh
+  left: 10vw
   width: 80vw
-  @media screen and (min-width: $breakpoint-sm-max)
-      width: 60vw
+
 </style>
