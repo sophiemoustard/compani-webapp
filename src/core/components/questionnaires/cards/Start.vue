@@ -9,9 +9,12 @@
 <script>
 import get from 'lodash/get';
 import { toRefs, computed } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import { formatAndSortUserOptions } from '@helpers/utils';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
+import { NotifyWarning } from '@components/popup/notify';
 import { INCREMENT } from '@data/constants';
 
 export default {
@@ -26,14 +29,23 @@ export default {
   },
   emits: ['update-trainee', 'click'],
   setup (props, { emit }) {
-    const { course } = toRefs(props);
+    const { course, trainee } = toRefs(props);
+
+    const rules = computed(() => ({ trainee: { _id: { required } } }));
+    const v$ = useVuelidate(rules, { trainee });
+
     const traineesOptions = computed(() => (get(course.value, 'trainees')
       ? formatAndSortUserOptions(course.value.trainees, false)
       : []));
 
     const update = event => emit('update-trainee', event);
 
-    const goToNextCard = type => emit('click', type);
+    const goToNextCard = (type) => {
+      v$.value.trainee.$touch();
+      if (v$.value.trainee.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+      emit('click', type);
+    };
 
     return {
       // Data
