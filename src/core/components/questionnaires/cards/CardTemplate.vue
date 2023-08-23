@@ -1,5 +1,5 @@
 <template>
-  <div class="card-container" v-if="card.template === TRANSITION">
+  <div v-if="card.template === TRANSITION">
     <card-transition :title="card.title" @click="click" />
   </div>
 </template>
