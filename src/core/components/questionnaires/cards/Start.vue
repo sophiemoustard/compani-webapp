@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="card-container">
     <ni-select caption="Qui êtes-vous ?" :model-value="trainee._id" :options="traineesOptions"
       @update:model-value="update" required-field class="elm-width" />
     <ni-button class="bg-primary btn" label="Suivant" color="white" @click="goToNextCard(INCREMENT)" />
@@ -61,23 +61,4 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.container
-  display: flex
-  flex: 1
-  flex-direction: column
-  align-items: center
-
-.elm-width
-  width: 40vw
-  @media screen and (max-width: $breakpoint-md)
-    left: 10vw
-    width: 80vw
-.btn
-  position: absolute
-  top: 90vh
-  left: 30vw
-  width: 40vw
-  @media screen and (max-width: $breakpoint-md)
-    left: 10vw
-    width: 80vw
 </style>

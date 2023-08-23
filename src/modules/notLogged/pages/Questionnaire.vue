@@ -3,9 +3,9 @@
     <compani-header />
     <div class="client-background">
       <meta-infos :course="course" :questionnaire="questionnaire" />
-      <start v-if="cardIndex === -1" :course="course" :trainee="trainee" @update-trainee="updateTrainee"
+      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee"
         @click="updateCardIndex" />
-      <end v-if="cardIndex === questionnaire.cards.length" :course="course" :trainee="trainee"
+      <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee"
         :loading="btnLoading" @click="updateCardIndex" @submit="createHistory" />
     </div>
   </div>
@@ -43,6 +43,7 @@ export default {
     const questionnaire = ref({});
     const trainee = ref({ _id: '' });
     const btnLoading = ref(false);
+    const startCardIndex = ref(-1);
 
     const $store = useStore();
     const cardIndex = computed(() => $store.state.questionnaire.cardIndex);
@@ -87,6 +88,8 @@ export default {
       }
     };
 
+    const endCardIndex = computed(() => questionnaire.value.cards.length);
+
     return {
       // Data
       course,
@@ -94,6 +97,8 @@ export default {
       trainee,
       INCREMENT,
       btnLoading,
+      endCardIndex,
+      startCardIndex,
       // Computed
       cardIndex,
       // Methods
