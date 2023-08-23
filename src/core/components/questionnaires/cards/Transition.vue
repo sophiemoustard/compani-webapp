@@ -4,8 +4,7 @@
   </q-card>
   <div>
     <ni-button class="back-btn" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
-    <ni-button class="bg-primary btn" label="Suivant" color="white" :loading="loading"
-      @click="updateCardIndex(INCREMENT)" />
+    <ni-button class="bg-primary btn" label="Suivant" color="white" @click="updateCardIndex(INCREMENT)" />
   </div>
 </template>
 
