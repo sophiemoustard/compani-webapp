@@ -14,6 +14,7 @@
 <script>
 import { toRefs, ref, computed } from 'vue';
 import set from 'lodash/set';
+import get from 'lodash/get';
 import { useStore } from 'vuex';
 import Courses from '@api/Courses';
 import Questionnaires from '@api/Questionnaires';
@@ -82,13 +83,15 @@ export default {
         NotifyPositive('Réponse enregistrée.');
       } catch (e) {
         console.error(e);
+
+        if (e.response.status === 409) return NotifyNegative(e.response.data.message);
         NotifyNegative('Erreur lors de l\'enregistrement des réponses au questionnaire.');
       } finally {
         btnLoading.value = false;
       }
     };
 
-    const endCardIndex = computed(() => questionnaire.value.cards.length);
+    const endCardIndex = computed(() => (get(questionnaire.value, 'cards') ? questionnaire.value.cards.length : null));
 
     return {
       // Data
