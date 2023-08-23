@@ -58,4 +58,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.select
+  width: 100%
 </style>
