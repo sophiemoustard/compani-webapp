@@ -4,6 +4,9 @@
     <div class="questionnaire-container">
       <meta-infos :course="course" :questionnaire="questionnaire" />
       <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee" />
+      <div v-for="(card, index) of questionnaire.cards" :key="card._id">
+        <card-template class="card-container" v-if="cardIndex === index" :card="card" @click="updateCardIndex" />
+      </div>
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee"
         :loading="btnLoading" @submit="createHistory" />
     </div>
@@ -21,6 +24,7 @@ import CompaniHeader from '@components/CompaniHeader';
 import MetaInfos from '@components/questionnaires/cards/MetaInfos';
 import Start from '@components/questionnaires/cards/Start';
 import End from '@components/questionnaires/cards/End';
+import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { INCREMENT } from '@data/constants';
 import QuestionnaireHistories from '@api/QuestionnaireHistories';
@@ -36,6 +40,7 @@ export default {
     'meta-infos': MetaInfos,
     start: Start,
     end: End,
+    'card-template': CardTemplate,
   },
   setup (props) {
     const { courseId, questionnaireId } = toRefs(props);
