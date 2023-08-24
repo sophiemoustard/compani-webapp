@@ -1,30 +1,27 @@
 <template>
-  <q-card class="card" flat>
+  <q-card class="elm-width card" flat>
     <span class="title">{{ title }}</span>
   </q-card>
-  <div>
-    <ni-button class="back-btn" icon="arrow_back" color="primary" @click="updateCardIndex(DECREMENT)" />
-    <ni-button class="bg-primary btn" label="Suivant" color="white" @click="updateCardIndex(INCREMENT)" />
-  </div>
+  <ni-footer label="Suivant" @submit="updateCardIndex(INCREMENT)" />
 </template>
 
 <script>
 
 import { INCREMENT, DECREMENT } from '@data/constants';
-import Button from '@components/Button';
+import Footer from '@components/questionnaires/cards/Footer';
 
 export default {
   name: 'Transition',
   components: {
-    'ni-button': Button,
+    'ni-footer': Footer,
 
   },
-  emits: ['click'],
+  emits: ['submit'],
   props: {
     title: { type: String, required: true },
   },
   setup (_, { emit }) {
-    const updateCardIndex = type => emit('click', type);
+    const updateCardIndex = type => emit('submit', type);
 
     return {
       // Data
