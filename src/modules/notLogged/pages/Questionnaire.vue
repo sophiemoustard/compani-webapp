@@ -2,8 +2,10 @@
   <div>
     <compani-header />
     <div class="questionnaire-container">
-      <meta-infos :course="course" :questionnaire="questionnaire" />
-      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee" />
+      <meta-infos :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
+        :show-name="!isStartorEndCard" />
+        <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee"
+          @update-trainee="updateTrainee" />
       <div v-for="(card, index) of questionnaire.cards" :key="card._id">
         <card-template v-if="cardIndex === index" :card="card" @submit="updateCardIndex" />
       </div>
@@ -20,6 +22,7 @@ import get from 'lodash/get';
 import { useStore } from 'vuex';
 import Courses from '@api/Courses';
 import Questionnaires from '@api/Questionnaires';
+import QuestionnaireHistories from '@api/QuestionnaireHistories';
 import CompaniHeader from '@components/CompaniHeader';
 import MetaInfos from '@components/questionnaires/cards/MetaInfos';
 import Start from '@components/questionnaires/cards/Start';
@@ -27,7 +30,7 @@ import End from '@components/questionnaires/cards/End';
 import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { INCREMENT } from '@data/constants';
-import QuestionnaireHistories from '@api/QuestionnaireHistories';
+import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'Questionnaire',
@@ -95,6 +98,15 @@ export default {
 
     const endCardIndex = computed(() => (get(questionnaire.value, 'cards') ? questionnaire.value.cards.length : null));
 
+    const traineeName = computed(() => {
+      const trainees = get(course.value, 'trainees') || [];
+      const traineeIdentity = get(trainees.find(t => t._id === trainee.value._id), 'identity');
+
+      return formatIdentity(traineeIdentity, 'FL');
+    });
+
+    const isStartorEndCard = computed(() => cardIndex.value === -1 || cardIndex.value === endCardIndex.value);
+
     return {
       // Data
       course,
@@ -102,10 +114,12 @@ export default {
       trainee,
       INCREMENT,
       btnLoading,
-      endCardIndex,
       startCardIndex,
       // Computed
       cardIndex,
+      endCardIndex,
+      traineeName,
+      isStartorEndCard,
       // Methods
       updateTrainee,
       createHistory,
