@@ -23,6 +23,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Courses from '@api/Courses';
 import Questionnaires from '@api/Questionnaires';
+import QuestionnaireHistories from '@api/QuestionnaireHistories';
 import CompaniHeader from '@components/CompaniHeader';
 import MetaInfos from '@components/questionnaires/cards/MetaInfos';
 import Start from '@components/questionnaires/cards/Start';
@@ -30,7 +31,7 @@ import End from '@components/questionnaires/cards/End';
 import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { INCREMENT } from '@data/constants';
-import QuestionnaireHistories from '@api/QuestionnaireHistories';
+import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'QuestionnaireForm',
@@ -114,6 +115,15 @@ export default {
 
     created();
 
+    const traineeName = computed(() => {
+      const trainees = get(course.value, 'trainees') || [];
+      const traineeIdentity = get(trainees.find(t => t._id === trainee.value._id), 'identity');
+
+      return formatIdentity(traineeIdentity, 'FL');
+    });
+
+    const isStartorEndCard = computed(() => cardIndex.value === -1 || cardIndex.value === endCardIndex.value);
+
     return {
       // Data
       course,
@@ -121,10 +131,12 @@ export default {
       trainee,
       INCREMENT,
       btnLoading,
-      endCardIndex,
       startCardIndex,
       // Computed
       cardIndex,
+      endCardIndex,
+      traineeName,
+      isStartorEndCard,
       // Methods
       updateTrainee,
       createHistory,
