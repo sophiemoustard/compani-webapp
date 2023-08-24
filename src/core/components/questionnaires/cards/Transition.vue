@@ -1,8 +1,10 @@
 <template>
-  <q-card class="elm-width card" flat>
-    <span class="title">{{ title }}</span>
-  </q-card>
-  <ni-footer label="Suivant" @submit="updateCardIndex(INCREMENT)" />
+  <div class="card-container">
+    <q-card class="elm-width card" flat>
+      <span class="title">{{ title }}</span>
+    </q-card>
+    <ni-footer label="Suivant" @submit="updateCardIndex(INCREMENT)" />
+  </div>
 </template>
 
 <script>

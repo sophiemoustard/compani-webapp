@@ -6,7 +6,7 @@
       <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
         @update-trainee="updateTrainee" />
       <div v-for="(card, index) of questionnaire.cards" :key="card._id">
-        <card-template class="card-container" v-if="cardIndex === index" :card="card" @submit="updateCardIndex" />
+        <card-template v-if="cardIndex === index" :card="card" @submit="updateCardIndex" />
       </div>
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee" :loading="btnLoading"
         @submit="createHistory" />
