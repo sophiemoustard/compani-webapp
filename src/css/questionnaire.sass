@@ -31,12 +31,13 @@
 
 .card-container
   display: flex
-  flex: 1
   flex-direction: column
+  flex: 1
   align-items: center
   justify-content: space-between
-  padding-horizontal: 10%
-  width: 100vw
+  padding: 5% 10% 0% 10%
+  @media screen and (max-width: $breakpoint-md)
+    padding: 10% 10% 0% 10%
 
 .card
   padding: 16px 32px
