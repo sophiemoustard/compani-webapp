@@ -4,13 +4,11 @@
 
 <script>
 import { computed, toRefs, defineAsyncComponent } from 'vue';
-import { TRANSITION } from '@data/constants';
-import Transition from '@components/questionnaires/cards/Transition';
+import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA } from '@data/constants';
 
 export default {
   name: 'CardTemplate',
   components: {
-    'card-transition': Transition,
   },
   props: {
     card: { type: Object, required: true },
@@ -22,6 +20,8 @@ export default {
       switch (card.value.template) {
         case TRANSITION:
           return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/Transition'));
+        case TITLE_TEXT_MEDIA || TITLE_TEXT || TEXT_MEDIA:
+          return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/TitleTextMedia'));
         default:
           return null;
       }
