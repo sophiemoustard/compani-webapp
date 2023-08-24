@@ -1,8 +1,8 @@
 <template>
   <div class="card-container">
     <ni-select caption="Qui êtes-vous ?" :model-value="trainee._id" :options="traineesOptions"
-      @update:model-value="update" required-field class="elm-width" />
-    <ni-button class="bg-primary btn" label="Suivant" color="white" @click="goToNextCard(INCREMENT)" />
+      @update:model-value="updateTrainee" required-field class="elm-width" />
+    <ni-footer label="Suivant" @submit="updateCardIndex(INCREMENT)" :display-back="false" />
   </div>
 </template>
 
@@ -13,7 +13,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { formatAndSortUserOptions } from '@helpers/utils';
 import Select from '@components/form/Select';
-import Button from '@components/Button';
+import Footer from '@components/questionnaires/cards/Footer';
 import { NotifyWarning } from '@components/popup/notify';
 import { INCREMENT } from '@data/constants';
 
@@ -21,13 +21,13 @@ export default {
   name: 'Start',
   components: {
     'ni-select': Select,
-    'ni-button': Button,
+    'ni-footer': Footer,
   },
   props: {
     course: { type: Object, required: true },
     trainee: { type: Object, required: true },
   },
-  emits: ['update-trainee', 'click'],
+  emits: ['update-trainee', 'submit'],
   setup (props, { emit }) {
     const { course, trainee } = toRefs(props);
 
@@ -38,21 +38,21 @@ export default {
       ? formatAndSortUserOptions(course.value.trainees, false)
       : []));
 
-    const update = event => emit('update-trainee', event);
+    const updateTrainee = event => emit('update-trainee', event);
 
-    const goToNextCard = (type) => {
+    const updateCardIndex = (type) => {
       v$.value.trainee.$touch();
       if (v$.value.trainee.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-      emit('click', type);
+      emit('submit', type);
     };
 
     return {
       // Data
       INCREMENT,
       // Methods
-      update,
-      goToNextCard,
+      updateTrainee,
+      updateCardIndex,
       // Computed
       traineesOptions,
     };

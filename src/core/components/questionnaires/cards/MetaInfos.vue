@@ -50,11 +50,11 @@ export default {
 <style lang="sass" scoped>
 .container
   display: flex
-  flex: 1
   flex-direction: column
   padding: 0 0 16px 0
 .title
-  font-size: 16px
+  @media screen and (max-width: $breakpoint-md)
+    font-size: 12px
   text-align: center
   color: $copper-grey-700
 .items-container
@@ -62,11 +62,14 @@ export default {
   display: flex
   flex-direction: row
   justify-content: center
+  @media screen and (max-width: $breakpoint-md)
+    font-size: 14px
 .questionnaire-type
   padding: 16px 0px
   text-align: center
-  font-size: 16px
   font-weight: bold
   color: $copper-grey-700
+  @media screen and (max-width: $breakpoint-md)
+    font-size: 14px
 
 </style>

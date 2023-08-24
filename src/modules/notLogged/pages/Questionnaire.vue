@@ -1,12 +1,12 @@
 <template>
   <div>
     <compani-header />
-    <div class="client-background">
+    <div class="questionnaire-container">
       <meta-infos :course="course" :questionnaire="questionnaire" />
       <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee"
-        @click="updateCardIndex" />
+        @submit="updateCardIndex" />
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee"
-        :loading="btnLoading" @click="updateCardIndex" @submit="createHistory" />
+        :loading="btnLoading" @submit="createHistory" />
     </div>
   </div>
 </template>
@@ -114,7 +114,4 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.client-background
-  height: 100vh
-  padding: 48px
 </style>
