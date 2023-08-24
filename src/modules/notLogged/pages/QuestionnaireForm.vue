@@ -119,8 +119,6 @@ export default {
 
 <style lang="sass" scoped>
 .client-background
-  min-height: 90vh
-  @media screen and (max-width: 768px)
-    height: 85vh
+  height: 100vh
   padding: 48px
 </style>
