@@ -43,12 +43,14 @@ export default {
   display: flex
   flex-direction: column
   flex: 1
+  align-items: center
+  margin: 0 0 20px 0
 .title
   color: $copper-grey-700
   font-weight: bold
   text-align: center
 .img
-  width: 40vw
+  width: 30vw
   @media screen and (max-width: $breakpoint-md)
     width: 50vw
   height: auto
