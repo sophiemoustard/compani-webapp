@@ -2,13 +2,14 @@
   <div class="card-container">
     <ni-select caption="Qui êtes-vous ?" :model-value="trainee._id" :options="traineesOptions"
       @update:model-value="updateTrainee" required-field class="elm-width" />
-    <ni-footer label="Suivant" @submit="updateCardIndex(INCREMENT)" :display-back="false" />
+    <ni-footer label="Suivant" @submit="updateCardIndex" :display-back="false" />
   </div>
 </template>
 
 <script>
 import get from 'lodash/get';
 import { toRefs, computed } from 'vue';
+import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { formatAndSortUserOptions } from '@helpers/utils';
@@ -27,8 +28,9 @@ export default {
     course: { type: Object, required: true },
     trainee: { type: Object, required: true },
   },
-  emits: ['update-trainee', 'submit'],
+  emits: ['update-trainee'],
   setup (props, { emit }) {
+    const $store = useStore();
     const { course, trainee } = toRefs(props);
 
     const rules = computed(() => ({ trainee: { _id: { required } } }));
@@ -40,16 +42,14 @@ export default {
 
     const updateTrainee = event => emit('update-trainee', event);
 
-    const updateCardIndex = (type) => {
+    const updateCardIndex = () => {
       v$.value.trainee.$touch();
       if (v$.value.trainee.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-      emit('submit', type);
+      $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
 
     return {
-      // Data
-      INCREMENT,
       // Methods
       updateTrainee,
       updateCardIndex,

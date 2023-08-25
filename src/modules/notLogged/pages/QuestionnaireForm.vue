@@ -3,8 +3,7 @@
     <compani-header />
     <div class="questionnaire-container">
       <meta-infos :course="course" :questionnaire="questionnaire" />
-      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee"
-        @submit="updateCardIndex" />
+      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee" />
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee"
         :loading="btnLoading" @submit="createHistory" />
     </div>
@@ -72,8 +71,6 @@ export default {
 
     const updateTrainee = t => (set(trainee.value, '_id', t));
 
-    const updateCardIndex = async type => $store.dispatch('questionnaire/updateCardIndex', { type });
-
     const createHistory = async () => {
       try {
         btnLoading.value = true;
@@ -110,7 +107,6 @@ export default {
       cardIndex,
       // Methods
       updateTrainee,
-      updateCardIndex,
       createHistory,
     };
   },
