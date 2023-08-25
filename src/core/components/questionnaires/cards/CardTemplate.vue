@@ -6,7 +6,7 @@
       <card-title-text-media :card="card" />
   </div>
   <div v-if="card.template === OPEN_QUESTION">
-    <card-open-question @submit="submit" />
+    <card-open-question :card="card" @submit="submit" />
   </div>
 </template>
 

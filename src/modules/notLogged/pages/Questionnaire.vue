@@ -54,6 +54,7 @@ export default {
 
     const $store = useStore();
     const cardIndex = computed(() => $store.state.questionnaire.cardIndex);
+    const answerList = computed(() => $store.state.questionnaire.answerList);
 
     const getCourse = async () => {
       const fetchedCourse = await Courses.get(courseId.value);
@@ -81,6 +82,7 @@ export default {
           course: course.value._id,
           questionnaire: questionnaire.value._id,
           user: trainee.value._id,
+          questionnaireAnswersList: answerList.value,
         };
 
         await QuestionnaireHistories.create(payload);
