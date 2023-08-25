@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container elm-width">
     <span class="title">{{ programName }}</span>
     <div class="items-container">
       <q-item v-for="info in headerInfo" :key="info.icon">
@@ -80,4 +80,5 @@ export default {
   font-style: italic
   font-size: 12px
   color: $copper-grey-500
+  text-align: center
 </style>
