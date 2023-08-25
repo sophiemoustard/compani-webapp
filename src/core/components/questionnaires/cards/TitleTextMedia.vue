@@ -5,12 +5,12 @@
       <span class="q-mb-sm">{{ card.text }}</span>
       <img v-if="card.media" :src="card.media.link" class="img q-mb-sm">
     </div>
-    <ni-footer label="Suivant" @submit="updateCardIndex(INCREMENT)" />
+    <ni-footer label="Suivant" @submit="updateCardIndex" />
   </div>
 </template>
 
 <script>
-
+import { useStore } from 'vuex';
 import { INCREMENT } from '@data/constants';
 import Footer from '@components/questionnaires/cards/Footer';
 
@@ -20,16 +20,14 @@ export default {
     'ni-footer': Footer,
 
   },
-  emits: ['submit'],
   props: {
     card: { type: Object, required: true },
   },
-  setup (_, { emit }) {
-    const updateCardIndex = type => emit('submit', type);
+  setup () {
+    const $store = useStore();
+    const updateCardIndex = () => $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
 
     return {
-      // Data
-      INCREMENT,
       // Methods
       updateCardIndex,
     };
