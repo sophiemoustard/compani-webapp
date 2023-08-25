@@ -4,10 +4,9 @@
     <div class="questionnaire-container">
       <meta-infos :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
         :show-name="!isStartorEndCard" />
-        <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee"
-          @update-trainee="updateTrainee" />
+      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee" />
       <div v-for="(card, index) of questionnaire.cards" :key="card._id">
-        <card-template v-if="cardIndex === index" :card="card" @submit="updateCardIndex" />
+        <card-template v-if="cardIndex === index" :card="card" />
       </div>
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee"
         :loading="btnLoading" @submit="createHistory" />

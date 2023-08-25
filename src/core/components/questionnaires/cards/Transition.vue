@@ -3,13 +3,13 @@
     <q-card class="elm-width card" flat>
       <span class="title">{{ title }}</span>
     </q-card>
-    <ni-footer label="Suivant" @submit="updateCardIndex(INCREMENT)" />
+    <ni-footer label="Suivant" @submit="updateCardIndex" />
   </div>
 </template>
 
 <script>
-
-import { INCREMENT, DECREMENT } from '@data/constants';
+import { useStore } from 'vuex';
+import { INCREMENT } from '@data/constants';
 import Footer from '@components/questionnaires/cards/Footer';
 
 export default {
@@ -18,17 +18,14 @@ export default {
     'ni-footer': Footer,
 
   },
-  emits: ['submit'],
   props: {
     title: { type: String, required: true },
   },
-  setup (_, { emit }) {
-    const updateCardIndex = type => emit('submit', type);
+  setup () {
+    const $store = useStore();
+    const updateCardIndex = () => $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
 
     return {
-      // Data
-      INCREMENT,
-      DECREMENT,
       // Methods
       updateCardIndex,
     };
