@@ -1,8 +1,8 @@
 <template>
   <div class="card-container">
-    <ni-input class="elm-width" :model-value="answer" @update:model-value="setAnswer" :caption="card.question"
-      type="textarea" bg-color="white" dense placeholder="Veuillez cliquer ici pour répondre" :error="displayError"
-      error-message="Champ requis" :required-field="isRequired" />
+    <ni-input class="elm-width" bg-color="white" dense :caption="card.question" :model-value="answer"
+      @update:model-value="setAnswer" @blur="v$.answer.$touch" type="textarea" :error="v$.answer.$error"
+      error-message="Champ requis" placeholder="Veuillez cliquer ici pour répondre" :required-field="isRequired" />
     <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer(INCREMENT)" />
   </div>
 </template>
@@ -10,7 +10,10 @@
 <script>
 import get from 'lodash/get';
 import { toRefs, computed, ref } from 'vue';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import { INCREMENT } from '@data/constants';
+import { NotifyWarning } from '@components/popup/notify';
 import Footer from '@components/questionnaires/cards/Footer';
 import Input from '@components/form/Input';
 
@@ -31,12 +34,21 @@ export default {
     const setAnswer = (value) => { answer.value = value; };
 
     const updateQuestionnaireAnswer = (type) => {
-      emit('submit', { type, answers: [{ card: card.value._id, answerList: [answer.value] }] });
+      if (isRequired.value) {
+        v$.value.answer.$touch();
+        if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
+      }
+
+      emit(
+        'submit',
+        { type, ...(answer.value && { answers: [{ card: card.value._id, answerList: [answer.value] }] }) }
+      );
     };
 
     const isRequired = computed(() => get(card.value, 'isMandatory') || false);
 
-    const displayError = computed(() => isRequired.value === true && !answer.value);
+    const rules = computed(() => ({ answer: { required } }));
+    const v$ = useVuelidate(rules, { answer });
 
     return {
       // Data
@@ -44,7 +56,7 @@ export default {
       answer,
       // Computed
       isRequired,
-      displayError,
+      v$,
       // Methods
       updateQuestionnaireAnswer,
       setAnswer,
