@@ -6,7 +6,7 @@
       <card-title-text-media :card="card" />
   </div>
   <div v-if="card.template === OPEN_QUESTION">
-    <card-open-question :card="card" @submit="submit" />
+    <card-open-question :card="card" />
   </div>
 </template>
 
@@ -34,8 +34,6 @@ export default {
       TITLE_TEXT,
       TEXT_MEDIA,
       OPEN_QUESTION,
-      // Methods
-      submit,
     };
   },
 };
