@@ -14,7 +14,21 @@ export default {
       if (data.type === INCREMENT) state.cardIndex += 1;
       if (data.type === DECREMENT) state.cardIndex -= 1;
     },
-    SET_ANSWER_LIST: (state, data) => { state.answerList = [...state.answerList, ...data.answers]; },
+    SET_ANSWER_LIST: (state, data) => {
+      const allCardAnsweredIds = state.answerList.map(a => a.card);
+
+      for (const resp of data.answers) {
+        // Prevents duplication - if the user responds and then navigates between pages using the back button
+        // and edits his responses
+        if (allCardAnsweredIds.includes(resp.card)) {
+          const oldResponse = state.answerList.find(a => a.card === resp.card);
+          const oldResponseIndex = state.answerList.indexOf(oldResponse);
+          state.answerList[oldResponseIndex] = resp;
+        } else {
+          state.answerList.push(resp);
+        }
+      }
+    },
   },
   actions: {
     fetchQuestionnaire: async ({ commit }, params) => {

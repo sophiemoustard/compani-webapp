@@ -3,12 +3,13 @@
     <ni-input class="elm-width" bg-color="white" dense :caption="card.question" :model-value="answer"
       @update:model-value="setAnswer" @blur="v$.answer.$touch" type="textarea" :error="v$.answer.$error"
       error-message="Champ requis" placeholder="Veuillez cliquer ici pour répondre" :required-field="isRequired" />
-    <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer(INCREMENT)" />
+    <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
 </template>
 
 <script>
 import get from 'lodash/get';
+import { useStore } from 'vuex';
 import { toRefs, computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -23,26 +24,29 @@ export default {
     'ni-footer': Footer,
     'ni-input': Input,
   },
-  emits: ['submit'],
   props: {
     card: { type: Object, required: true },
   },
-  setup (props, { emit }) {
+  setup (props) {
     const { card } = toRefs(props);
     const answer = ref('');
+    const $store = useStore();
 
     const setAnswer = (value) => { answer.value = value; };
 
-    const updateQuestionnaireAnswer = (type) => {
+    const updateQuestionnaireAnswer = () => {
       if (isRequired.value) {
         v$.value.answer.$touch();
         if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
       }
 
-      emit(
-        'submit',
-        { type, ...(answer.value && { answers: [{ card: card.value._id, answerList: [answer.value] }] }) }
-      );
+      $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
+      if (answer.value) {
+        $store.dispatch(
+          'questionnaire/setAnswerList',
+          { answers: [{ card: card.value._id, answerList: [answer.value] }] }
+        );
+      }
     };
 
     const isRequired = computed(() => get(card.value, 'isMandatory') || false);
@@ -50,9 +54,17 @@ export default {
     const rules = computed(() => ({ answer: { required } }));
     const v$ = useVuelidate(rules, { answer });
 
+    const answerList = computed(() => $store.state.questionnaire.answerList);
+
+    const created = () => {
+      const initialAnswer = answerList.value.find(a => a.card === card.value._id);
+
+      setAnswer(get(initialAnswer, 'answerList[0]'));
+    };
+
+    created();
     return {
       // Data
-      INCREMENT,
       answer,
       // Computed
       isRequired,
