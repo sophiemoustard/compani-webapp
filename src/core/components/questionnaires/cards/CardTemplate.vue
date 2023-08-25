@@ -3,7 +3,7 @@
     <card-transition :title="card.title" />
   </div>
   <div v-if="[TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA].includes(card.template)">
-      <card-title-text-media :card="card" @submit="submit" />
+      <card-title-text-media :card="card" />
   </div>
 </template>
 
@@ -28,8 +28,6 @@ export default {
       TITLE_TEXT_MEDIA,
       TITLE_TEXT,
       TEXT_MEDIA,
-      // Methods
-      submit,
     };
   },
 };
