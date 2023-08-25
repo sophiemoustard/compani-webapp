@@ -1,6 +1,6 @@
 <template>
   <div v-if="card.template === TRANSITION">
-    <card-transition :title="card.title" @submit="submit" />
+    <card-transition :title="card.title" />
   </div>
 </template>
 
@@ -16,15 +16,10 @@ export default {
   props: {
     card: { type: Object, required: true },
   },
-  emits: ['submit'],
-  setup (_, { emit }) {
-    const submit = type => emit('submit', type);
-
+  setup () {
     return {
       // Data
       TRANSITION,
-      // Methods
-      submit,
     };
   },
 };
