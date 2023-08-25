@@ -47,8 +47,6 @@ export default {
     };
 
     return {
-      // Data
-      INCREMENT,
       // Methods
       updateTrainee,
       updateCardIndex,
