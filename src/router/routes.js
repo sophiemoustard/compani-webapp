@@ -21,9 +21,9 @@ const routes = [
     component: () => import('src/core/pages/404'),
   },
   {
-    path: '/ni/questionnaire/:questionnaireId',
-    name: 'ni questionnaire',
-    component: () => import('src/modules/notLogged/pages/Questionnaire'),
+    path: '/ni/questionnaires/:questionnaireId',
+    name: 'ni questionnaires',
+    component: () => import('src/modules/notLogged/pages/QuestionnaireForm'),
     props: route => ({ questionnaireId: route.params.questionnaireId, courseId: route.query.courseId }),
   },
 ];

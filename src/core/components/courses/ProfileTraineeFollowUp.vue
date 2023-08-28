@@ -236,7 +236,7 @@ export default {
 
     const goToQuestionnaireProfile = (questionnaireId) => {
       const questionnaire = $router.resolve({
-        name: 'ni questionnaire',
+        name: 'ni questionnaires',
         params: { questionnaireId },
         query: { courseId: profileId.value },
       });

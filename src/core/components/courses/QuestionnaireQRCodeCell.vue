@@ -4,7 +4,7 @@
     <div class="questionnaire-qrcode">
       <img :src="img" width="160" :alt="qrCodePlaceHolder">
     </div>
-    <a class="clickable-name cursor-pointer q-mt-md" @click="onClick">
+    <a class="clickable-name cursor-pointer text-link" @click="onClick">
       Lien pour répondre au questionnaire de {{ questionnaireTypeTitle }}
     </a>
   </q-card>
@@ -58,4 +58,8 @@ export default {
 .questionnaire-info
   font-weight: bold
   font-size: 14px
+
+.text-link
+  font-size: 14px
+  margin: 12px 0 0 0
 </style>
