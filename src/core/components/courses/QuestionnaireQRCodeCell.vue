@@ -1,5 +1,5 @@
 <template>
-  <q-card class="questionnaire-link" flat>
+  <q-card class="questionnaire-link">
     <text class="questionnaire-info">Répondre au questionnaire de {{ questionnaireTypeTitle }}</text>
     <div class="questionnaire-qrcode">
       <img :src="img" width="160" :alt="qrCodePlaceHolder">

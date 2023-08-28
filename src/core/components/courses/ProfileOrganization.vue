@@ -76,12 +76,6 @@
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
-      <div v-if="isVendorInterface" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
-          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
-        <ni-questionnaire-qrcode-cell v-if="endOfCourseQuestionnaireId" :img="endOfCourseQRCode" :type="END_OF_COURSE"
-          @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)" />
-      </div>
     </div>
     <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
       :training-contracts="trainingContracts" :training-contract-table-loading="trainingContractTableLoading"
@@ -129,7 +123,6 @@ import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
 import Courses from '@api/Courses';
-import Questionnaires from '@api/Questionnaires';
 import TrainingContracts from '@api/TrainingContracts';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
@@ -147,7 +140,6 @@ import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import BiColorButton from '@components/BiColorButton';
 import SecondaryButton from '@components/SecondaryButton';
-import QuestionnaireQRCodeCell from '@components/courses/QuestionnaireQRCodeCell';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -165,7 +157,6 @@ import {
   COURSE,
   EDITION,
   EXPECTATIONS,
-  PUBLISHED,
   END_OF_COURSE,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
@@ -198,7 +189,6 @@ export default {
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
     'training-contract-container': TrainingContractContainer,
-    'ni-questionnaire-qrcode-cell': QuestionnaireQRCodeCell,
   },
   setup (props) {
     const { profileId } = toRefs(props);
@@ -244,10 +234,6 @@ export default {
     const potentialTrainees = ref([]);
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
-    const expectationsQuestionnaireId = ref();
-    const endOfCourseQuestionnaireId = ref();
-    const expectationsQRCode = ref('');
-    const endOfCourseQRCode = ref('');
 
     const course = computed(() => $store.state.course.course);
 
@@ -768,43 +754,9 @@ export default {
 
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
 
-    const refreshQuestionnaires = async () => {
-      try {
-        const publishedQuestionnnaires = await Questionnaires.list({ status: PUBLISHED });
-
-        expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
-        if (expectationsQuestionnaireId.value) {
-          const expectationsCode = await Questionnaires
-            .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
-          expectationsQRCode.value = expectationsCode;
-        }
-
-        endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
-        if (endOfCourseQuestionnaireId.value) {
-          const endOfCourseCode = await Questionnaires
-            .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
-          endOfCourseQRCode.value = endOfCourseCode;
-        }
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
-      }
-    };
-
-    const goToQuestionnaireProfile = (questionnaireId) => {
-      const questionnaire = $router.resolve({
-        name: 'ni questionnaire',
-        params: { questionnaireId },
-        query: { courseId: profileId.value },
-      });
-
-      window.open(questionnaire.href, '_blank');
-    };
-
     const created = async () => {
       const promises = [];
-      if (isVendorInterface) promises.push(refreshQuestionnaires(), refreshSms(), refreshCompanyRepresentatives());
-      if (isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
+      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
       if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
 
       if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
@@ -849,10 +801,6 @@ export default {
       isIntraCourse,
       trainingContractTableLoading,
       trainingContracts,
-      expectationsQuestionnaireId,
-      endOfCourseQuestionnaireId,
-      expectationsQRCode,
-      endOfCourseQRCode,
       EXPECTATIONS,
       END_OF_COURSE,
       // Computed
@@ -905,7 +853,6 @@ export default {
       refreshTraineeTable,
       refreshTrainingContracts,
       goToContactProfile,
-      goToQuestionnaireProfile,
     };
   },
 };
@@ -917,13 +864,4 @@ export default {
   flex-direction: column
 .button-history
   align-self: flex-end
-.questionnaire-link-container
-  padding: 24px 0 0 0
-  display: grid
-  grid-auto-flow: row
-  grid-gap: 24px
-  grid-template-rows: auto
-  @media screen and (min-width: 768px)
-    grid-auto-rows: 1fr
-    grid-template-columns: repeat(2, 1fr)
 </style>
