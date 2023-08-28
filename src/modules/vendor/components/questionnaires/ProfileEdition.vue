@@ -19,7 +19,7 @@
       <card-edition :card-parent="questionnaire" @refresh="refreshCard" :disable-edition="isEditionLocked" />
     </div>
 
-    <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
+    <card-creation-modal v-model="cardCreationModal" @submit="createCard" is-questionnaire />
   </div>
 </template>
 

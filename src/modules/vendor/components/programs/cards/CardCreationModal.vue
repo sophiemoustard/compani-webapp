@@ -28,35 +28,37 @@
         </div>
       </div>
     </div>
-    <h6 class="text-weight-bold">Quiz</h6>
-    <div class="row q-mb-lg button-container">
-      <div v-for="template in quizTemplates" :key="template.value" @click="submit(template.value)"
-        class="card-button cursor-pointer">
-        <div class="text-weight-bold card-button-content">
-          <template v-if="template.value === FILL_THE_GAPS">
-            <div class="q-mb-sm">Texte à trou</div>
-            <div class="fill-the-gaps">Ceci est un ____</div>
-          </template>
-          <template v-else-if="template.value === SINGLE_CHOICE_QUESTION">
-            <div class="q-mb-sm">QCU</div>
-            <div class="choices-question">
-              <q-icon name="radio_button_unchecked" size="16px" />
-              <q-icon name="radio_button_checked" size="16px" />
-              <q-icon name="radio_button_unchecked" size="16px" />
-            </div>
-          </template>
-          <template v-else-if="template.value === MULTIPLE_CHOICE_QUESTION">
-            <div class="q-mb-sm">QCM</div>
-            <div class="choices-question">
-              <q-icon name="check_box_outline_blank" size="16px" />
-              <q-icon name="check_box" size="16px" />
-              <q-icon name="check_box" size="16px" />
-            </div>
-          </template>
-          <template v-else-if="template.value === ORDER_THE_SEQUENCE">
-            <div class="q-mb-sm order-the-sequence">Mettre dans l'ordre</div>
-            <q-icon name="fa fa-list-ol" size="20px" />
-          </template>
+    <div v-if="!isQuestionnaire">
+      <h6 class="text-weight-bold">Quiz</h6>
+      <div class="row q-mb-lg button-container">
+        <div v-for="template in quizTemplates" :key="template.value" @click="submit(template.value)"
+          class="card-button cursor-pointer">
+          <div class="text-weight-bold card-button-content">
+            <template v-if="template.value === FILL_THE_GAPS">
+              <div class="q-mb-sm">Texte à trou</div>
+              <div class="fill-the-gaps">Ceci est un ____</div>
+            </template>
+            <template v-else-if="template.value === SINGLE_CHOICE_QUESTION">
+              <div class="q-mb-sm">QCU</div>
+              <div class="choices-question">
+                <q-icon name="radio_button_unchecked" size="16px" />
+                <q-icon name="radio_button_checked" size="16px" />
+                <q-icon name="radio_button_unchecked" size="16px" />
+              </div>
+            </template>
+            <template v-else-if="template.value === MULTIPLE_CHOICE_QUESTION">
+              <div class="q-mb-sm">QCM</div>
+              <div class="choices-question">
+                <q-icon name="check_box_outline_blank" size="16px" />
+                <q-icon name="check_box" size="16px" />
+                <q-icon name="check_box" size="16px" />
+              </div>
+            </template>
+            <template v-else-if="template.value === ORDER_THE_SEQUENCE">
+              <div class="q-mb-sm order-the-sequence">Mettre dans l'ordre</div>
+              <q-icon name="fa fa-list-ol" size="20px" />
+            </template>
+          </div>
         </div>
       </div>
     </div>
@@ -101,6 +103,7 @@ export default {
   name: 'CardCreationModal',
   props: {
     modelValue: { type: Boolean, default: false },
+    isQuestionnaire: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
@@ -123,7 +126,9 @@ export default {
   },
   computed: {
     lessonTemplates () {
-      return CARD_TEMPLATES.filter(t => t.type === LESSON);
+      return CARD_TEMPLATES.filter(t => (this.isQuestionnaire
+        ? t.type === LESSON && t.value !== FLASHCARD
+        : t.type === LESSON));
     },
     quizTemplates () {
       return CARD_TEMPLATES.filter(t => t.type === QUIZ);
