@@ -15,7 +15,7 @@
       <attendance-table :course="course" />
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Réponses aux questionnaires</p>
+      <p class="text-weight-bold">Questionnaires</p>
       <div v-if="!isClientInterface" class="questionnaire-link-container">
         <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
           @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
@@ -321,7 +321,7 @@ export default {
     word-break: break-word
 
 .questionnaire-link-container
-  padding: 24px 0
+  margin-bottom: 24px
   display: grid
   grid-auto-flow: row
   grid-gap: 24px

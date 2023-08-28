@@ -156,8 +156,6 @@ import {
   HH_MM,
   COURSE,
   EDITION,
-  EXPECTATIONS,
-  END_OF_COURSE,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -801,8 +799,6 @@ export default {
       isIntraCourse,
       trainingContractTableLoading,
       trainingContracts,
-      EXPECTATIONS,
-      END_OF_COURSE,
       // Computed
       course,
       v$,

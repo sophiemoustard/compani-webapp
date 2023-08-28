@@ -8,10 +8,11 @@
 </template>
 
 <script>
+import { useMeta } from 'quasar';
 import CompaniHeader from '@components/CompaniHeader';
 
 export default {
-  name: 'Questionnaire',
+  name: 'QuestionnaireForm',
   props: {
     questionnaireId: { type: String, required: true },
     courseId: { type: String, required: true },
@@ -20,6 +21,9 @@ export default {
     'compani-header': CompaniHeader,
   },
   setup () {
+    const metaInfo = { title: 'Formulaire de réponse au questionnaire' };
+    useMeta(metaInfo);
+
     return {
     };
   },
