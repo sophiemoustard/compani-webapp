@@ -1,8 +1,8 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
-  async list () {
-    const questionnaires = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires`);
+  async list (params) {
+    const questionnaires = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires`, { params });
     return questionnaires.data.data.questionnaires;
   },
   async create (payload) {

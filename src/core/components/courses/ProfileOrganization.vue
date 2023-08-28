@@ -769,21 +769,25 @@ export default {
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
 
     const refreshQuestionnaires = async () => {
-      const questionnaireList = await Questionnaires.list();
-      const publishedQuestionnnaires = questionnaireList.filter(q => q.status === PUBLISHED);
+      try {
+        const publishedQuestionnnaires = await Questionnaires.list({ status: PUBLISHED });
 
-      expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
-      if (expectationsQuestionnaireId.value) {
-        const expectationsCode = await Questionnaires
-          .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
-        expectationsQRCode.value = expectationsCode;
-      }
+        expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
+        if (expectationsQuestionnaireId.value) {
+          const expectationsCode = await Questionnaires
+            .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
+          expectationsQRCode.value = expectationsCode;
+        }
 
-      endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
-      if (endOfCourseQuestionnaireId.value) {
-        const endOfCourseCode = await Questionnaires
-          .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
-        endOfCourseQRCode.value = endOfCourseCode;
+        endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
+        if (endOfCourseQuestionnaireId.value) {
+          const endOfCourseCode = await Questionnaires
+            .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
+          endOfCourseQRCode.value = endOfCourseCode;
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
       }
     };
 
