@@ -13,7 +13,6 @@
 <script>
 import { useMeta } from 'quasar';
 import { toRefs, ref, computed } from 'vue';
-import set from 'lodash/set';
 import get from 'lodash/get';
 import { useStore } from 'vuex';
 import Courses from '@api/Courses';
@@ -45,21 +44,34 @@ export default {
     const { courseId, questionnaireId } = toRefs(props);
     const course = ref({});
     const questionnaire = ref({});
-    const trainee = ref({ _id: '' });
+    const trainee = ref('');
     const btnLoading = ref(false);
     const startCardIndex = ref(-1);
+    const endCardIndex = ref(0);
 
     const $store = useStore();
     const cardIndex = computed(() => $store.state.questionnaire.cardIndex);
 
     const getCourse = async () => {
-      const fetchedCourse = await Courses.get(courseId.value);
-      course.value = fetchedCourse;
+      try {
+        const fetchedCourse = await Courses.getFromNotLogged(courseId.value);
+        course.value = fetchedCourse;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des informations de la formation.');
+      }
     };
 
     const getQuestionnaire = async () => {
-      const fetchedQuestionnaire = await Questionnaires.get(questionnaireId.value);
-      questionnaire.value = fetchedQuestionnaire;
+      try {
+        const fetchedQuestionnaire = await Questionnaires.getFromNotLogged(questionnaireId.value);
+        questionnaire.value = fetchedQuestionnaire;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des informations de la formation.');
+      } finally {
+        endCardIndex.value = get(questionnaire.value, 'cards').length;
+      }
     };
 
     const created = async () => {
@@ -69,7 +81,7 @@ export default {
 
     created();
 
-    const updateTrainee = t => (set(trainee.value, '_id', t));
+    const updateTrainee = t => (trainee.value = t);
 
     const createHistory = async () => {
       try {
@@ -77,7 +89,7 @@ export default {
         const payload = {
           course: course.value._id,
           questionnaire: questionnaire.value._id,
-          user: trainee.value._id,
+          user: trainee.value,
         };
 
         await QuestionnaireHistories.create(payload);
@@ -91,8 +103,6 @@ export default {
         btnLoading.value = false;
       }
     };
-
-    const endCardIndex = computed(() => (get(questionnaire.value, 'cards') ? questionnaire.value.cards.length : null));
 
     return {
       // Data

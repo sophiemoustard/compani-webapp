@@ -88,7 +88,7 @@ export default {
       { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
     );
   },
-  async get (courseId) {
+  async getFromNotLogged (courseId) {
     const params = { action: QUESTIONNAIRE };
     const course = await axios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`, { params });
 

@@ -10,7 +10,7 @@
 <script>
 import { useStore } from 'vuex';
 import Button from '@components/Button';
-import { DECREMENT, INCREMENT } from '@data/constants';
+import { DECREMENT } from '@data/constants';
 
 export default {
   name: 'FooterCard',
@@ -30,9 +30,6 @@ export default {
     const submit = () => emit('submit');
 
     return {
-      // DATA
-      DECREMENT,
-      INCREMENT,
       // Methods
       goBack,
       submit,

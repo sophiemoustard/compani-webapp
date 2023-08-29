@@ -4,7 +4,6 @@
 
 <script>
 import Footer from '@components/questionnaires/cards/Footer';
-import { DECREMENT } from '@data/constants';
 
 export default {
   name: 'Start',
@@ -19,8 +18,6 @@ export default {
     const submit = () => emit('submit');
 
     return {
-      // DATA
-      DECREMENT,
       // Methods
       submit,
     };

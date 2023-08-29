@@ -1,7 +1,8 @@
 <template>
   <div class="card-container">
-    <ni-select caption="Qui êtes-vous ?" :model-value="trainee._id" :options="traineesOptions"
-      @update:model-value="updateTrainee" required-field class="elm-width" />
+    <ni-select caption="Qui êtes-vous ?" :model-value="trainee" :options="traineesOptions"
+      @update:model-value="updateTrainee" required-field class="elm-width"
+      :error="v$.trainee.$error" @blur="v$.trainee.$touch" />
     <ni-footer label="Suivant" @submit="updateCardIndex" :display-back="false" />
   </div>
 </template>
@@ -26,14 +27,14 @@ export default {
   },
   props: {
     course: { type: Object, required: true },
-    trainee: { type: Object, required: true },
+    trainee: { type: String, required: true },
   },
   emits: ['update-trainee'],
   setup (props, { emit }) {
     const $store = useStore();
     const { course, trainee } = toRefs(props);
 
-    const rules = computed(() => ({ trainee: { _id: { required } } }));
+    const rules = computed(() => ({ trainee: { required } }));
     const v$ = useVuelidate(rules, { trainee });
 
     const traineesOptions = computed(() => (get(course.value, 'trainees')
@@ -55,6 +56,8 @@ export default {
       updateCardIndex,
       // Computed
       traineesOptions,
+      // Validations
+      v$,
     };
   },
 };
