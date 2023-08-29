@@ -1,12 +1,12 @@
 <template>
-    <ni-footer label="Valider" @submit="submit" :loading="loading" />
+  <ni-footer label="Valider" @submit="submit" :loading="loading" />
 </template>
 
 <script>
 import Footer from '@components/questionnaires/cards/Footer';
 
 export default {
-  name: 'Start',
+  name: 'End',
   components: {
     'ni-footer': Footer,
   },

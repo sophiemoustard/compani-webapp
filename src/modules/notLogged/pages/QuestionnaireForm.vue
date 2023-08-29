@@ -55,6 +55,9 @@ export default {
     const $store = useStore();
     const cardIndex = computed(() => $store.state.questionnaire.cardIndex);
 
+    const rules = computed(() => ({ trainee: { required } }));
+    const v$ = useVuelidate(rules, { trainee });
+
     const getCourse = async () => {
       try {
         const fetchedCourse = await Courses.getFromNotLogged(courseId.value);
@@ -78,9 +81,6 @@ export default {
     };
 
     const updateTrainee = (t) => { trainee.value = t; };
-
-    const rules = computed(() => ({ trainee: { required } }));
-    const v$ = useVuelidate(rules, { trainee });
 
     const createHistory = async () => {
       try {
