@@ -1,8 +1,7 @@
 <template>
   <div class="card-container">
-    <ni-select caption="Qui êtes-vous ?" :model-value="trainee" :options="traineesOptions"
-      @update:model-value="updateTrainee" required-field class="elm-width"
-      :error="v$.trainee.$error" @blur="v$.trainee.$touch" />
+    <ni-select caption="Qui êtes-vous ?" class="elm-width" :model-value="trainee" :options="traineesOptions"
+      :error="v$.trainee.$error" @blur="v$.trainee.$touch" @update:model-value="updateTrainee" required-field />
     <ni-footer label="Suivant" @submit="updateCardIndex" :display-back="false" />
   </div>
 </template>

@@ -25,7 +25,7 @@ export default {
   emits: ['submit'],
   setup (_, { emit }) {
     const $store = useStore();
-    const goBack = async type => $store.dispatch('questionnaire/updateCardIndex', { type: DECREMENT });
+    const goBack = () => $store.dispatch('questionnaire/updateCardIndex', { type: DECREMENT });
 
     const submit = () => emit('submit');
 

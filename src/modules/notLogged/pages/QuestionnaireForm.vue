@@ -4,8 +4,8 @@
     <div class="questionnaire-container">
       <meta-infos :course="course" :questionnaire="questionnaire" />
       <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee" />
-      <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee"
-        :loading="btnLoading" @submit="createHistory" />
+      <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee" :loading="btnLoading"
+        @submit="createHistory" />
     </div>
   </div>
 </template>
@@ -66,22 +66,15 @@ export default {
       try {
         const fetchedQuestionnaire = await Questionnaires.getFromNotLogged(questionnaireId.value);
         questionnaire.value = fetchedQuestionnaire;
+
+        endCardIndex.value = get(questionnaire.value, 'cards').length;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des informations de la formation.');
-      } finally {
-        endCardIndex.value = get(questionnaire.value, 'cards').length;
       }
     };
 
-    const created = async () => {
-      await getCourse();
-      await getQuestionnaire();
-    };
-
-    created();
-
-    const updateTrainee = t => (trainee.value = t);
+    const updateTrainee = (t) => { trainee.value = t; };
 
     const createHistory = async () => {
       try {
@@ -103,6 +96,12 @@ export default {
         btnLoading.value = false;
       }
     };
+
+    const created = async () => {
+      await Promise.all([getCourse(), getQuestionnaire()]);
+    };
+
+    created();
 
     return {
       // Data
