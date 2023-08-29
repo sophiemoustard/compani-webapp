@@ -1,7 +1,8 @@
 <template>
   <div class="card-container">
     <ni-select caption="Qui êtes-vous ?" class="elm-width" :model-value="trainee" :options="traineesOptions"
-      :error="v$.trainee.$error" @blur="v$.trainee.$touch" @update:model-value="updateTrainee" required-field />
+      :error="validations.trainee.$error" @blur="validations.trainee.$touch" @update:model-value="updateTrainee"
+      required-field />
     <ni-footer label="Suivant" @submit="updateCardIndex" :display-back="false" />
   </div>
 </template>
@@ -10,8 +11,6 @@
 import get from 'lodash/get';
 import { toRefs, computed } from 'vue';
 import { useStore } from 'vuex';
-import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
 import { formatAndSortUserOptions } from '@helpers/utils';
 import Select from '@components/form/Select';
 import Footer from '@components/questionnaires/cards/Footer';
@@ -27,14 +26,12 @@ export default {
   props: {
     course: { type: Object, required: true },
     trainee: { type: String, required: true },
+    validations: { type: Object, required: true },
   },
   emits: ['update-trainee'],
   setup (props, { emit }) {
     const $store = useStore();
-    const { course, trainee } = toRefs(props);
-
-    const rules = computed(() => ({ trainee: { required } }));
-    const v$ = useVuelidate(rules, { trainee });
+    const { course, validations } = toRefs(props);
 
     const traineesOptions = computed(() => (get(course.value, 'trainees')
       ? formatAndSortUserOptions(course.value.trainees, false)
@@ -43,8 +40,8 @@ export default {
     const updateTrainee = event => emit('update-trainee', event);
 
     const updateCardIndex = () => {
-      v$.value.trainee.$touch();
-      if (v$.value.trainee.$error) return NotifyWarning('Champ(s) invalide(s).');
+      validations.value.trainee.$touch();
+      if (validations.value.trainee.$error) return NotifyWarning('Champ(s) invalide(s).');
 
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
@@ -55,8 +52,6 @@ export default {
       updateCardIndex,
       // Computed
       traineesOptions,
-      // Validations
-      v$,
     };
   },
 };

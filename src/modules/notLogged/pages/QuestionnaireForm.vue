@@ -3,7 +3,8 @@
     <compani-header />
     <div class="questionnaire-container">
       <meta-infos :course="course" :questionnaire="questionnaire" />
-      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" @update-trainee="updateTrainee" />
+      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
+        @update-trainee="updateTrainee" />
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee" :loading="btnLoading"
         @submit="createHistory" />
     </div>
@@ -15,6 +16,8 @@ import { useMeta } from 'quasar';
 import { toRefs, ref, computed } from 'vue';
 import get from 'lodash/get';
 import { useStore } from 'vuex';
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 import Courses from '@api/Courses';
 import Questionnaires from '@api/Questionnaires';
 import CompaniHeader from '@components/CompaniHeader';
@@ -76,6 +79,9 @@ export default {
 
     const updateTrainee = (t) => { trainee.value = t; };
 
+    const rules = computed(() => ({ trainee: { required } }));
+    const v$ = useVuelidate(rules, { trainee });
+
     const createHistory = async () => {
       try {
         btnLoading.value = true;
@@ -117,6 +123,8 @@ export default {
       // Methods
       updateTrainee,
       createHistory,
+      // Validations
+      v$,
     };
   },
 };
