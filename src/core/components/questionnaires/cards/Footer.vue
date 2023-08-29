@@ -1,9 +1,7 @@
 <template>
   <div class="btn-container">
-    <ni-button v-if="displayBack" icon="arrow_back" class="btn-back" color="primary"
-      @click="goBack" />
-    <ni-button class="bg-primary btn" :label="label" color="white" :loading="loading"
-      @click="submit" />
+    <ni-button v-if="displayBack" icon="arrow_back" class="btn-back" color="primary" @click="goBack" />
+    <ni-button class="bg-primary btn" :label="label" color="white" :loading="loading" @click="submit" />
   </div>
 </template>
 
