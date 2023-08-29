@@ -14,9 +14,15 @@
       </div>
       <attendance-table :course="course" />
     </div>
-    <div v-if="areQuestionnaireAnswersVisible" class="q-mb-xl">
-      <p class="text-weight-bold">Réponses aux questionnaires</p>
-      <div class="questionnaires-container">
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Questionnaires</p>
+      <div v-if="!isClientInterface" class="questionnaire-link-container">
+        <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
+          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
+        <ni-questionnaire-qrcode-cell v-if="endOfCourseQuestionnaireId" :img="endOfCourseQRCode" :type="END_OF_COURSE"
+          @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)" />
+      </div>
+      <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
@@ -63,6 +69,7 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
+import Questionnaires from '@api/Questionnaires';
 import { NotifyNegative } from '@components/popup/notify';
 import AttendanceTable from '@components/table/AttendanceTable';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -70,7 +77,8 @@ import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
-import { E_LEARNING, SHORT_DURATION_H_MM, DD_MM_YYYY } from '@data/constants';
+import QuestionnaireQRCodeCell from '@components/courses/QuestionnaireQRCodeCell';
+import { E_LEARNING, SHORT_DURATION_H_MM, DD_MM_YYYY, END_OF_COURSE, EXPECTATIONS, PUBLISHED } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
@@ -89,6 +97,7 @@ export default {
     'questionnaire-answers-cell': QuestionnaireAnswersCell,
     'ni-bi-color-button': BiColorButton,
     'ni-banner': Banner,
+    'ni-questionnaire-qrcode-cell': QuestionnaireQRCodeCell,
   },
   props: {
     profileId: { type: String, required: true },
@@ -107,6 +116,10 @@ export default {
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+    const expectationsQuestionnaireId = ref();
+    const endOfCourseQuestionnaireId = ref();
+    const expectationsQRCode = ref('');
+    const endOfCourseQRCode = ref('');
 
     const course = computed(() => $store.state.course.course);
 
@@ -198,9 +211,42 @@ export default {
       }
     };
 
+    const refreshQuestionnaireLinks = async () => {
+      try {
+        const publishedQuestionnnaires = await Questionnaires.list({ status: PUBLISHED });
+
+        expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
+        if (expectationsQuestionnaireId.value) {
+          const expectationsCode = await Questionnaires
+            .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
+          expectationsQRCode.value = expectationsCode;
+        }
+
+        endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
+        if (endOfCourseQuestionnaireId.value) {
+          const endOfCourseCode = await Questionnaires
+            .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
+          endOfCourseQRCode.value = endOfCourseCode;
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
+      }
+    };
+
+    const goToQuestionnaireProfile = (questionnaireId) => {
+      const questionnaire = $router.resolve({
+        name: 'ni questionnaires',
+        params: { questionnaireId },
+        query: { courseId: profileId.value },
+      });
+
+      window.open(questionnaire.href, '_blank');
+    };
+
     const created = async () => {
       const promises = [getFollowUp(), getUnsubscribedAttendances()];
-      if (!isClientInterface) promises.push(refreshQuestionnaires());
+      if (!isClientInterface) promises.push(refreshQuestionnaires(), refreshQuestionnaireLinks());
 
       await Promise.all(promises);
     };
@@ -216,6 +262,13 @@ export default {
       isIntraOrVendor,
       learners,
       learnersLoading,
+      expectationsQuestionnaireId,
+      endOfCourseQuestionnaireId,
+      expectationsQRCode,
+      endOfCourseQRCode,
+      isClientInterface,
+      EXPECTATIONS,
+      END_OF_COURSE,
       // Computed
       course,
       areQuestionnaireAnswersVisible,
@@ -231,6 +284,7 @@ export default {
       goToQuestionnaireAnswers,
       downloadCompletionCertificates,
       downloadAttendanceSheet,
+      goToQuestionnaireProfile,
     };
   },
 };
@@ -265,4 +319,14 @@ export default {
     justify-content: flex-start
     margin-right: 2%
     word-break: break-word
+
+.questionnaire-link-container
+  margin-bottom: 24px
+  display: grid
+  grid-auto-flow: row
+  grid-gap: 24px
+  grid-template-rows: auto
+  @media screen and (min-width: 768px)
+    grid-auto-rows: 1fr
+    grid-template-columns: repeat(2, 1fr)
 </style>
