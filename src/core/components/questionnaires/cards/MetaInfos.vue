@@ -31,7 +31,7 @@ export default {
 
     const { headerInfo } = useCourses(course);
 
-    const programName = computed(() => composeCourseName(course.value));
+    const programName = computed(() => (course.value.subProgram ? composeCourseName(course.value) : ''));
 
     const questionnaireType = computed(() => (questionnaire.value.type === EXPECTATIONS
       ? 'recueil des attentes'

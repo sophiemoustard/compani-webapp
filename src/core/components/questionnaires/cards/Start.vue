@@ -33,7 +33,7 @@ export default {
     const $store = useStore();
     const { course, validations } = toRefs(props);
 
-    const traineesOptions = computed(() => (get(course.value, 'trainees')
+    const traineesOptions = computed(() => (get(course.value, 'trainees.length')
       ? formatAndSortUserOptions(course.value.trainees, false)
       : []));
 

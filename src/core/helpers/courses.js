@@ -1,4 +1,3 @@
-import get from 'lodash/get';
 import { E_LEARNING, ON_SITE, STEP_TYPES, INTRA, SHORT_DURATION_H_MM } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -9,9 +8,7 @@ export const happened = sameDaySlots => CompaniDate().isSameOrAfter(sameDaySlots
 export const composeCourseName = (course, attachCompany = false) => {
   const companyName = (attachCompany && course.type === INTRA) ? `${course.companies[0].name} - ` : '';
   const misc = course.misc ? ` - ${course.misc}` : '';
-  const programName = get(course, 'subProgram.program.name');
-
-  return companyName + programName + misc;
+  return companyName + course.subProgram.program.name + misc;
 };
 
 export const getStepTypeIcon = (type) => {
