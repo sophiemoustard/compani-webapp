@@ -118,7 +118,7 @@ export default {
 
     const traineeName = computed(() => {
       const trainees = get(course.value, 'trainees') || [];
-      const traineeIdentity = get(trainees.find(t => t._id === trainee.value._id), 'identity');
+      const traineeIdentity = get(trainees.find(t => t._id === trainee.value), 'identity');
 
       return formatIdentity(traineeIdentity, 'FL');
     });
