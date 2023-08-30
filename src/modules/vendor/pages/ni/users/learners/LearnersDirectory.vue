@@ -1,16 +1,17 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToLearnerProfile">
-      <template #body="{ col }">
-        <q-item v-if="col.name === 'name'">
-          <q-item-section avatar>
-            <img class="avatar" :src="getAvatar(col.value.picture)">
-          </q-item-section>
-          <q-item-section>{{ col.value.fullName }}</q-item-section>
-        </q-item>
-        <template v-else>{{ col.value }}</template>
+    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" v-model:pagination="pagination">
+      <template #body="{ col, props }">
+        <router-link :to="goToLearnerProfile(props.row.learner)" class="directory-text">
+          <q-item v-if="col.name === 'name'">
+            <q-item-section avatar>
+              <img class="avatar" :src="getAvatar(col.value.picture)">
+            </q-item-section>
+            <q-item-section>{{ col.value.fullName }}</q-item-section>
+          </q-item>
+          <q-item v-else class="row justify-center">{{ col.value }}</q-item>
+        </router-link>
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
@@ -98,8 +99,8 @@ export default {
     await Promise.all([this.refreshCompanies()]);
   },
   methods: {
-    goToLearnerProfile (row) {
-      this.$router.push({ name: 'ni users learners info', params: { learnerId: row.learner._id } });
+    goToLearnerProfile (learner) {
+      return learner._id ? { name: 'ni users learners info', params: { learnerId: learner._id } } : {};
     },
     async refreshCompanies () {
       try {
