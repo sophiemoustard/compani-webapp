@@ -123,7 +123,7 @@ export default {
       return formatIdentity(traineeIdentity, 'FL');
     });
 
-    const isStartorEndCard = computed(() => cardIndex.value === -1 || cardIndex.value === endCardIndex.value);
+    const isStartorEndCard = computed(() => [startCardIndex.value, endCardIndex.value].includes(cardIndex.value));
 
     return {
       // Data
