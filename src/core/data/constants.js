@@ -648,3 +648,7 @@ export const DIRECTORY = 'directory';
 // BUTTONS TYPES
 export const FLOATING = 'floating';
 export const MODAL = 'modal';
+
+// INCREMENTATION TYPE
+export const DECREMENT = 'decrement';
+export const INCREMENT = 'increment';

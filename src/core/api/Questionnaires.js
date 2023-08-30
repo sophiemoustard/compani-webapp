@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
@@ -10,6 +11,10 @@ export default {
   },
   async getById (id) {
     const questionnaire = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires/${id}`);
+    return questionnaire.data.data.questionnaire;
+  },
+  async getFromNotLogged (id) {
+    const questionnaire = await axios.get(`${process.env.API_HOSTNAME}/questionnaires/${id}`);
     return questionnaire.data.data.questionnaire;
   },
   async update (id, payload) {
