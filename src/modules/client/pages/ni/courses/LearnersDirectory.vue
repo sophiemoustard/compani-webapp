@@ -2,17 +2,17 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" v-model:pagination="pagination">
-      <template #body="{ col }">
-        <router-link :to="goToLearnerProfile(col.value)" class="directory-text">
+      <template #body="{ col, props }">
+        <router-link :to="goToLearnerProfile(props.row.learner)" class="directory-text">
           <q-item v-if="col.name === 'name'">
             <q-item-section avatar>
               <img class="avatar" :src="getAvatar(col.value.picture)">
             </q-item-section>
             <q-item-section>{{ col.value.fullName }}</q-item-section>
           </q-item>
-          <template v-else>{{ col.value }}</template>
-      </router-link>
-</template>
+          <q-item v-else class="row justify-center">{{ col.value }}</q-item>
+        </router-link>
+      </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="learnerCreationModal = true" :disable="tableLoading" />
@@ -99,8 +99,8 @@ export default {
   },
   mixins: [learnerDirectoryMixin, userMixin],
   methods: {
-    goToLearnerProfile (row) {
-      return row._id ? { name: 'ni courses learners info', params: { learnerId: row._id } } : {};
+    goToLearnerProfile (learner) {
+      return learner._id ? { name: 'ni courses learners info', params: { learnerId: learner._id } } : {};
     },
   },
 };
