@@ -21,6 +21,10 @@
               <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
           </template>
+          <template v-else-if="col.name === 'connectionInfos'">
+            <a v-if="col.value">{{ col.value }}</a>
+            <connected-dot v-else />
+          </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
@@ -49,6 +53,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { useLearnersEdition } from '@composables/learnersEdition';
+import ConnectedDot from './ConnectedDot';
 
 export default {
   name: 'TraineeTable',
@@ -63,6 +68,7 @@ export default {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
     'trainee-edition-modal': TraineeEditionModal,
+    'connected-dot': ConnectedDot,
   },
   emits: ['refresh'],
   setup (props, { emit }) {
@@ -99,6 +105,13 @@ export default {
         field: row => get(row, 'contact.phone') || '',
         format: formatPhone,
       },
+      {
+        name: 'connectionInfos',
+        label: 'Code de 1ère connexion à l\'app ',
+        field: row => get(row, 'loginCode'),
+        value: value => value,
+        align: 'center',
+      },
       { name: 'actions', label: '', align: 'right', field: '' },
     ]);
     const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
@@ -115,7 +128,7 @@ export default {
     const course = computed(() => $store.state.course.course);
 
     const traineeVisibleColumns = computed(() => {
-      const col = ['firstname', 'lastname', 'email', 'phone'];
+      const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos'];
 
       return canEdit.value ? [...col, 'actions'] : col;
     });
