@@ -66,10 +66,10 @@ export default {
         html: true,
         ok: 'Oui',
         cancel: 'Non',
-      }).onOk(this.archiveCourse)
+      }).onOk(this.archiveOrUnarchiveCourse)
         .onCancel(() => NotifyPositive(!this.course.archivedAt ? 'Archivage annulé.' : 'Désarchivage annulé.'));
     },
-    async archiveCourse () {
+    async archiveOrUnarchiveCourse () {
       try {
         const payload = !this.course.archivedAt ? { archivedAt: CompaniDate().toISO() } : { archivedAt: '' };
         await Courses.update(this.course._id, payload);
