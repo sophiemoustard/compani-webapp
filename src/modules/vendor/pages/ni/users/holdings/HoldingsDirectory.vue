@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire sociétés mères" search-placeholder="Rechercher une société mère"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredHoldings" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToHoldingProfile" />
+      :path="path" />
     <ni-primary-button icon="add" label="Ajouter une société mère" @click="holdingCreationModal = true"
       :disable="tableLoading" :mode="FLOATING" />
 
@@ -14,7 +14,6 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { useRouter } from 'vue-router';
 import escapeRegExp from 'lodash/escapeRegExp';
 import { computed, ref } from 'vue';
 import Holdings from '@api/Holdings';
@@ -40,8 +39,6 @@ export default {
     const metaInfo = { title: 'Répertoire sociétés mères' };
     useMeta(metaInfo);
 
-    const $router = useRouter();
-
     const holdings = ref([]);
     const tableLoading = ref(false);
     const columns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }];
@@ -50,6 +47,7 @@ export default {
     const holdingCreationModal = ref(false);
     const newHolding = ref({ name: '', address: '' });
     const modalLoading = ref(false);
+    const path = ref({ name: 'ni users holdings info', params: 'holdingId' });
 
     const filteredHoldings = computed(() => {
       const formattedString = escapeRegExp(removeDiacritics(searchStr.value));
@@ -108,10 +106,6 @@ export default {
       }
     };
 
-    const goToHoldingProfile = (row) => {
-      $router.push({ name: 'ni users holdings info', params: { holdingId: row._id } });
-    };
-
     const created = async () => {
       await refreshHoldings();
     };
@@ -127,6 +121,7 @@ export default {
       holdingCreationModal,
       modalLoading,
       newHolding,
+      path,
       FLOATING,
       // Computed
       filteredHoldings,
@@ -135,7 +130,6 @@ export default {
       updateSearch,
       resetCreationModal,
       createHolding,
-      goToHoldingProfile,
     };
   },
 

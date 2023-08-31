@@ -1,9 +1,9 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" v-model:pagination="pagination">
-      <template #body="{ col, props }">
-        <router-link :to="goToLearnerProfile(props.row.learner)" class="directory-text">
+    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
+      :path="path">
+      <template #body="{ col }">
           <q-item v-if="col.name === 'name'">
             <q-item-section avatar>
               <img class="avatar" :src="getAvatar(col.value.picture)">
@@ -11,7 +11,6 @@
             <q-item-section>{{ col.value.fullName }}</q-item-section>
           </q-item>
           <q-item v-else class="row justify-center">{{ col.value }}</q-item>
-        </router-link>
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
@@ -27,7 +26,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -51,7 +50,7 @@ export default {
     const company = computed(() => $store.getters['main/getCompany']);
     const companies = computed(() => [company.value._id]);
     const companyOptions = computed(() => [{ value: company.value._id, label: company.value.name }]);
-
+    const path = ref({ name: 'ni courses learners info', params: 'learnerId', field: 'learner' });
     const refresh = async () => getLearnerList(company.value._id);
 
     const {
@@ -84,6 +83,7 @@ export default {
       learnerCreationModalLoading,
       learnerCreationModal,
       disableUserInfoEdition,
+      path,
       // Computed
       filteredLearners,
       company,
@@ -98,10 +98,5 @@ export default {
     };
   },
   mixins: [learnerDirectoryMixin, userMixin],
-  methods: {
-    goToLearnerProfile (learner) {
-      return learner._id ? { name: 'ni courses learners info', params: { learnerId: learner._id } } : {};
-    },
-  },
 };
 </script>

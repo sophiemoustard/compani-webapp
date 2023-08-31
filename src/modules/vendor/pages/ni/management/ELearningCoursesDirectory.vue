@@ -3,7 +3,7 @@
     <ni-directory-header title="Formations eLearning" search-placeholder="Rechercher une formation"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToCourseProfile" />
+      :path="path" />
   </q-page>
 </template>
 
@@ -23,13 +23,13 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
+  data () {
+    return {
+      path: { name: 'ni management elearning courses info', params: 'courseId' },
+    };
+  },
   async created () {
     await this.refreshCourseList({ format: STRICTLY_E_LEARNING, action: OPERATIONS });
-  },
-  methods: {
-    goToCourseProfile (row) {
-      this.$router.push({ name: 'ni management elearning courses info', params: { courseId: row._id } });
-    },
   },
 };
 </script>

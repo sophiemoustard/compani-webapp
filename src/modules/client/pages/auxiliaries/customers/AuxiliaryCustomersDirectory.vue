@@ -2,7 +2,7 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Bénéficiaires" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" v-model:pagination="pagination" :loading="tableLoading"
-      @go-to="goToCustomerProfile" />
+      :path="path" />
   </q-page>
 </template>
 
@@ -41,6 +41,7 @@ export default {
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
         },
       ],
+      path: { name: 'auxiliaries customers info', params: 'customerId' },
     };
   },
   async created () {
@@ -66,7 +67,7 @@ export default {
           fullName: formattedName,
           noDiacriticsName: removeDiacritics(formattedName),
         },
-        customerId: customer._id,
+        _id: customer._id,
       };
     },
     async getCustomersList () {
@@ -79,9 +80,6 @@ export default {
         this.tableLoading = false;
         console.error(e);
       }
-    },
-    goToCustomerProfile (row) {
-      this.$router.push({ name: 'auxiliaries customers info', params: { customerId: row.customerId } });
     },
   },
 };

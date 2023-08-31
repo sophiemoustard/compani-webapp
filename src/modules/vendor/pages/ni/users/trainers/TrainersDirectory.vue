@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un profil"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToTrainerProfile" />
+      :path="path" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="trainerCreationModal = true" :disable="tableLoading" />
 
@@ -55,6 +55,7 @@ export default {
       newTrainer: { identity: { lastname: '', firstname: '' }, local: { email: '' } },
       modalLoading: false,
       firstStep: true,
+      path: { name: 'ni users trainers info', params: 'trainerId' },
     };
   },
   validations () {
@@ -107,9 +108,6 @@ export default {
     },
     updateSearch (value) {
       this.searchStr = value;
-    },
-    goToTrainerProfile (row) {
-      this.$router.push({ name: 'ni users trainers info', params: { trainerId: row._id } });
     },
     formatTrainer (trainer) {
       const formattedName = formatIdentity(trainer.identity, 'FL');
