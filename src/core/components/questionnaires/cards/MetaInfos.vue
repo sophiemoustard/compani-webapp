@@ -10,7 +10,7 @@
       </q-item>
     </div>
     <span class="questionnaire-type">Questionnaire de {{ questionnaireType }}</span>
-    <span v-if="showName" class="trainee-identity">
+    <span v-if="displayName" class="trainee-identity">
       Vous complétez ce questionnnaire en tant que: {{ traineeName }}
     </span>
   </div>
@@ -29,7 +29,7 @@ export default {
     course: { type: Object, required: true },
     questionnaire: { type: Object, required: true },
     traineeName: { type: String, required: true },
-    showName: { type: Boolean, default: true },
+    displayName: { type: Boolean, default: true },
   },
   setup (props) {
     const { course, questionnaire } = toRefs(props);

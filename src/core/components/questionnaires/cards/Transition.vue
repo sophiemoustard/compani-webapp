@@ -1,7 +1,7 @@
 <template>
   <div class="card-container">
     <q-card class="elm-width card" flat>
-      <span class="title">{{ title }}</span>
+      <span class="title">{{ card.title }}</span>
     </q-card>
     <ni-footer label="Suivant" @submit="updateCardIndex" />
   </div>
@@ -19,7 +19,7 @@ export default {
 
   },
   props: {
-    title: { type: String, required: true },
+    card: { type: Object, required: true },
   },
   setup () {
     const $store = useStore();

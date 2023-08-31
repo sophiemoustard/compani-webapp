@@ -3,12 +3,12 @@
     <compani-header />
     <div class="questionnaire-container">
       <meta-infos :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
-        :show-name="!isStartorEndCard" />
+        :display-name="!isStartorEndCard" />
       <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
         @update-trainee="updateTrainee" />
-      <div v-for="(card, index) of questionnaire.cards" :key="card._id">
+      <template v-for="(card, index) of questionnaire.cards" :key="card._id">
         <card-template v-if="cardIndex === index" :card="card" />
-      </div>
+      </template>
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee" :loading="btnLoading"
         @submit="createHistory" />
     </div>
@@ -110,12 +110,6 @@ export default {
       }
     };
 
-    const created = async () => {
-      await Promise.all([getCourse(), getQuestionnaire()]);
-    };
-
-    created();
-
     const traineeName = computed(() => {
       const trainees = get(course.value, 'trainees') || [];
       const traineeIdentity = get(trainees.find(t => t._id === trainee.value), 'identity');
@@ -124,6 +118,12 @@ export default {
     });
 
     const isStartorEndCard = computed(() => [startCardIndex.value, endCardIndex.value].includes(cardIndex.value));
+
+    const created = async () => {
+      await Promise.all([getCourse(), getQuestionnaire()]);
+    };
+
+    created();
 
     return {
       // Data

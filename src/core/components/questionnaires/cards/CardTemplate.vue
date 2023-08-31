@@ -1,10 +1,9 @@
 <template>
-  <div v-if="card.template === TRANSITION">
-    <card-transition :title="card.title" />
-  </div>
+  <component :is="templateInstance" :key="card._id" :card="card" />
 </template>
 
 <script>
+import { computed, toRefs, defineAsyncComponent } from 'vue';
 import { TRANSITION } from '@data/constants';
 import Transition from '@components/questionnaires/cards/Transition';
 
@@ -16,10 +15,21 @@ export default {
   props: {
     card: { type: Object, required: true },
   },
-  setup () {
+  setup (props) {
+    const { card } = toRefs(props);
+
+    const templateInstance = computed(() => {
+      switch (card.value.template) {
+        case TRANSITION:
+          return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/Transition'));
+        default:
+          return null;
+      }
+    });
+
     return {
-      // Data
-      TRANSITION,
+      // Computed
+      templateInstance,
     };
   },
 };
