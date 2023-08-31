@@ -2,9 +2,13 @@
   <div>
     <compani-header />
     <div class="questionnaire-container">
-      <meta-infos :course="course" :questionnaire="questionnaire" />
+      <meta-infos :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
+        :display-name="!isStartorEndCard" />
       <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
         @update-trainee="updateTrainee" />
+      <template v-for="(card, index) of questionnaire.cards" :key="card._id">
+        <card-template v-if="cardIndex === index" :card="card" />
+      </template>
       <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee" :loading="btnLoading"
         @submit="createHistory" />
     </div>
@@ -20,13 +24,15 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Courses from '@api/Courses';
 import Questionnaires from '@api/Questionnaires';
+import QuestionnaireHistories from '@api/QuestionnaireHistories';
 import CompaniHeader from '@components/CompaniHeader';
 import MetaInfos from '@components/questionnaires/cards/MetaInfos';
 import Start from '@components/questionnaires/cards/Start';
 import End from '@components/questionnaires/cards/End';
+import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { INCREMENT } from '@data/constants';
-import QuestionnaireHistories from '@api/QuestionnaireHistories';
+import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'QuestionnaireForm',
@@ -39,6 +45,7 @@ export default {
     'meta-infos': MetaInfos,
     start: Start,
     end: End,
+    'card-template': CardTemplate,
   },
   setup (props) {
     const metaInfo = { title: 'Formulaire de réponse au questionnaire' };
@@ -103,6 +110,15 @@ export default {
       }
     };
 
+    const traineeName = computed(() => {
+      const trainees = get(course.value, 'trainees') || [];
+      const traineeIdentity = get(trainees.find(t => t._id === trainee.value), 'identity');
+
+      return formatIdentity(traineeIdentity, 'FL');
+    });
+
+    const isStartorEndCard = computed(() => [startCardIndex.value, endCardIndex.value].includes(cardIndex.value));
+
     const created = async () => {
       await Promise.all([getCourse(), getQuestionnaire()]);
     };
@@ -116,10 +132,12 @@ export default {
       trainee,
       INCREMENT,
       btnLoading,
-      endCardIndex,
       startCardIndex,
       // Computed
       cardIndex,
+      endCardIndex,
+      traineeName,
+      isStartorEndCard,
       // Methods
       updateTrainee,
       createHistory,

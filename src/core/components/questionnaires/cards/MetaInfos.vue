@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container elm-width">
     <span class="title">{{ programName }}</span>
     <div class="items-container">
       <q-item v-for="info in headerInfo" :key="info.icon">
@@ -10,6 +10,9 @@
       </q-item>
     </div>
     <span class="questionnaire-type">Questionnaire de {{ questionnaireType }}</span>
+    <span v-if="displayName" class="trainee-identity">
+      Vous complétez ce questionnnaire en tant que: {{ traineeName }}
+    </span>
   </div>
 </template>
 
@@ -25,6 +28,8 @@ export default {
   props: {
     course: { type: Object, required: true },
     questionnaire: { type: Object, required: true },
+    traineeName: { type: String, required: true },
+    displayName: { type: Boolean, default: true },
   },
   setup (props) {
     const { course, questionnaire } = toRefs(props);
@@ -71,5 +76,9 @@ export default {
   color: $copper-grey-700
   @media screen and (max-width: $breakpoint-md)
     font-size: 14px
-
+.trainee-identity
+  font-style: italic
+  font-size: 12px
+  color: $copper-grey-500
+  text-align: center
 </style>
