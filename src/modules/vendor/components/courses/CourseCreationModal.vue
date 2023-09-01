@@ -77,11 +77,17 @@ export default {
   computed: {
     programOptions () {
       return this.programs
-        .map(p => ({
-          label: p.name,
-          value: p._id,
-          disable: !p.subPrograms.find(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED),
-        }))
+        .map((p) => {
+          const blendedPublishedSubPrograms = p.subPrograms
+            .filter(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED);
+
+          return {
+            label: p.name,
+            value: p._id,
+            disable: !blendedPublishedSubPrograms.length,
+            blendedPublishedSubPrograms,
+          };
+        })
         .sort((a, b) => a.label.localeCompare(b.label));
     },
     maxTraineesErrorMessage () {
@@ -99,21 +105,14 @@ export default {
   },
   watch: {
     'newCourse.program': function (value) {
-      const selectedProgram = this.programs.find(p => p._id === value);
-      const filteredSubPrograms = selectedProgram
-        ? selectedProgram.subPrograms
-          .filter(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED)
-        : [];
+      const selectedProgram = this.programOptions.find(p => p.value === value);
+      if (selectedProgram) {
+        const { blendedPublishedSubPrograms } = selectedProgram;
 
-      if (filteredSubPrograms.length) {
-        this.disableSubProgram = false;
-        this.subProgramOptions = formatAndSortOptions(filteredSubPrograms, 'name');
-
-        if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
-      } else {
-        this.subProgramOptions = [];
-        this.update('', 'subProgram');
-        this.disableSubProgram = true;
+        this.subProgramOptions = formatAndSortOptions(blendedPublishedSubPrograms, 'name');
+        this.disableSubProgram = !this.subProgramOptions.length;
+        if (this.disableSubProgram) this.update('', 'subProgram');
+        else if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
       }
     },
   },
