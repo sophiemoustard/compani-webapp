@@ -444,11 +444,11 @@ export default {
           companyRepresentativeOptions.value = [];
           return;
         }
-        const clientUsersFromCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompany })
+        const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompany, includesHoldingAdmins: true })
           : [];
 
-        companyRepresentativeOptions.value = Object.freeze(clientUsersFromCompany
+        companyRepresentativeOptions.value = Object.freeze(clientsUsersAllowedtoAccessCompany
           .map(user => formatInterlocutorOption(user)).sort((a, b) => a.label.localeCompare(b.label)));
       } catch (e) {
         console.error(e);
