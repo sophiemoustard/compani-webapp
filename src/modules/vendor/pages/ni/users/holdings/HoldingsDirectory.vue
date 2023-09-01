@@ -47,7 +47,7 @@ export default {
     const holdingCreationModal = ref(false);
     const newHolding = ref({ name: '', address: '' });
     const modalLoading = ref(false);
-    const path = ref({ name: 'ni users holdings info', params: 'holdingId' });
+    const path = { name: 'ni users holdings info', params: 'holdingId' };
 
     const filteredHoldings = computed(() => {
       const formattedString = escapeRegExp(removeDiacritics(searchStr.value));

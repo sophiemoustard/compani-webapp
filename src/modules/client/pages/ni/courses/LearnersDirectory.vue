@@ -26,7 +26,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -50,7 +50,7 @@ export default {
     const company = computed(() => $store.getters['main/getCompany']);
     const companies = computed(() => [company.value._id]);
     const companyOptions = computed(() => [{ value: company.value._id, label: company.value.name }]);
-    const path = ref({ name: 'ni courses learners info', params: 'learnerId' });
+    const path = { name: 'ni courses learners info', params: 'learnerId' };
     const refresh = async () => getLearnerList(company.value._id);
 
     const {

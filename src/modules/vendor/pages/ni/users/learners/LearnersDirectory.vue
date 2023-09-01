@@ -26,7 +26,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Companies from '@api/Companies';
@@ -47,7 +47,7 @@ export default {
     const metaInfo = { title: 'Répertoire apprenants' };
     useMeta(metaInfo);
 
-    const path = ref({ name: 'ni users learners info', params: 'learnerId' });
+    const path = { name: 'ni users learners info', params: 'learnerId' };
 
     const refresh = async () => getLearnerList();
 
