@@ -44,7 +44,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES, REQUIRED_LABEL, INTRA } from '@data/constants';
+import { COURSE_TYPES, REQUIRED_LABEL, INTRA, PUBLISHED } from '@data/constants';
 import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
@@ -77,7 +77,17 @@ export default {
   computed: {
     programOptions () {
       return this.programs
-        .map(p => ({ label: p.name, value: p._id, disable: !get(p, 'subPrograms.length') }))
+        .map((p) => {
+          const blendedPublishedSubPrograms = p.subPrograms
+            .filter(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED);
+
+          return {
+            label: p.name,
+            value: p._id,
+            disable: !blendedPublishedSubPrograms.length,
+            blendedPublishedSubPrograms,
+          };
+        })
         .sort((a, b) => a.label.localeCompare(b.label));
     },
     maxTraineesErrorMessage () {
@@ -95,17 +105,14 @@ export default {
   },
   watch: {
     'newCourse.program': function (value) {
-      const selectedProgram = this.programs.find(p => p._id === value);
+      const selectedProgram = this.programOptions.find(p => p.value === value);
+      if (selectedProgram) {
+        const { blendedPublishedSubPrograms } = selectedProgram;
 
-      if (get(selectedProgram, 'subPrograms.length')) {
-        this.disableSubProgram = false;
-        this.subProgramOptions = formatAndSortOptions(selectedProgram.subPrograms, 'name');
-
-        if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
-      } else {
-        this.subProgramOptions = [];
-        this.update('', 'subProgram');
-        this.disableSubProgram = true;
+        this.subProgramOptions = formatAndSortOptions(blendedPublishedSubPrograms, 'name');
+        this.disableSubProgram = !this.subProgramOptions.length;
+        if (this.disableSubProgram) this.update('', 'subProgram');
+        else if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
       }
     },
   },
