@@ -50,7 +50,7 @@ export default {
     const company = computed(() => $store.getters['main/getCompany']);
     const companies = computed(() => [company.value._id]);
     const companyOptions = computed(() => [{ value: company.value._id, label: company.value.name }]);
-    const path = ref({ name: 'ni courses learners info', params: 'learnerId', field: 'learner' });
+    const path = ref({ name: 'ni courses learners info', params: 'learnerId' });
     const refresh = async () => getLearnerList(company.value._id);
 
     const {

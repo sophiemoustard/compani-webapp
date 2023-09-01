@@ -12,7 +12,7 @@
           <q-item-section>{{ col.value.fullName }}</q-item-section>
         </q-item>
         <template v-else-if="col.name === 'profileErrors'">
-          <q-icon v-if="notifications.profiles[props.row.auxiliary._id] && props.row.isActive" name="error"
+          <q-icon v-if="notifications.profiles[props.row._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
         </template>
         <template v-else-if="col.name === 'active'">
@@ -153,7 +153,7 @@ export default {
           style: 'min-width: 30px; width: 4%',
         },
       ],
-      path: { name: 'ni auxiliaries info', params: 'auxiliaryId', field: 'auxiliary' },
+      path: { name: 'ni auxiliaries info', params: 'auxiliaryId' },
       REQUIRED_LABEL,
     };
   },
@@ -210,8 +210,8 @@ export default {
       const formattedName = formatIdentity(user.identity, 'FL');
 
       const formattedUser = {
+        _id: user._id,
         auxiliary: {
-          _id: user._id,
           fullName: formattedName,
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,

@@ -7,8 +7,7 @@
         <q-tr :no-hover="disabled" :props="props" @click="click(props.row)">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
             :class="col.name">
-            <router-link :class="{ 'no-event': !path, 'directory-text': true }"
-              :to="path ? goTo(path.field ? props.row[path.field] : props.row) : {}">
+            <router-link :class="{ 'no-event': !path, 'directory-text': true }" :to="goTo(props.row)">
               <slot name="body" :props="props" :col="col">
                 <template v-if="col.value">{{ col.value }}</template>
               </slot>
@@ -47,7 +46,7 @@ export default {
     rowKey: { type: String, default: 'name' },
     disabled: { type: Boolean, default: false },
     rowsPerPageOptions: { type: Array, default: () => [15, 50, 100, 200] },
-    path: { type: Object, default: () => {} },
+    path: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-pagination': Pagination,
@@ -70,6 +69,8 @@ export default {
       this.$emit('update:pagination', event);
     },
     goTo (row) {
+      if (!this.path) return {};
+
       return row._id ? { name: this.path.name, params: { [this.path.params]: row._id } } : {};
     },
   },

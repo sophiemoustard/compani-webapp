@@ -47,7 +47,7 @@ export default {
     const metaInfo = { title: 'Répertoire apprenants' };
     useMeta(metaInfo);
 
-    const path = ref({ name: 'ni users learners info', params: 'learnerId', field: 'learner' });
+    const path = ref({ name: 'ni users learners info', params: 'learnerId' });
 
     const refresh = async () => getLearnerList();
 
