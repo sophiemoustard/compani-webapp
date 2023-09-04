@@ -1,8 +1,8 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredCustomers" :columns="columns" v-model:pagination="pagination"
-      @go-to="goToCustomerProfile" :loading="tableLoading">
+    <ni-table-list :data="filteredCustomers" :columns="columns" v-model:pagination="pagination" :path="path"
+      :loading="tableLoading">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>
@@ -106,7 +106,7 @@ export default {
           field: 'stoppedAt',
           align: 'left',
           sortable: true,
-          format: value => formatDate(value) || '',
+          format: value => formatDate(value) || '\u00a0',
           sort: ascendingSort,
           style: 'width: 85px',
         },
@@ -116,7 +116,7 @@ export default {
           field: 'firstIntervention',
           align: 'left',
           sortable: false,
-          format: formatDate,
+          format: value => formatDate(value) || '\u00a0',
           style: 'width: 85px',
         },
         {
@@ -125,6 +125,7 @@ export default {
           field: 'missingInfo',
           align: 'left',
           sortable: true,
+          format: value => value || '\u00a0',
           sort: (a, b) => a - b,
           style: 'width: 30px',
         },
@@ -137,6 +138,7 @@ export default {
           style: 'width: 30px',
         },
       ],
+      path: { name: 'ni customers info', params: 'customerId' },
     };
   },
   validations () {
@@ -198,9 +200,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    goToCustomerProfile (customer) {
-      this.$router.push({ name: 'ni customers info', params: { customerId: customer._id } });
     },
     resetForm () {
       this.v$.newCustomer.$reset();

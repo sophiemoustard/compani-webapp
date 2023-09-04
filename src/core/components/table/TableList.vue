@@ -7,9 +7,11 @@
         <q-tr :no-hover="disabled" :props="props" @click="click(props.row)">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
             :class="col.name">
-            <slot name="body" :props="props" :col="col">
-              <template v-if="col.value">{{ col.value }}</template>
-            </slot>
+            <router-link :class="{ 'no-event': isEmpty(path), 'directory-text': true }" :to="goTo(props.row)">
+              <slot name="body" :props="props" :col="col">
+                <template v-if="col.value">{{ col.value }}</template>
+              </slot>
+            </router-link>
           </q-td>
         </q-tr>
       </template>
@@ -31,6 +33,7 @@
 </template>
 
 <script>
+import isEmpty from 'lodash/isEmpty';
 import Pagination from '@components/table/Pagination';
 
 export default {
@@ -44,6 +47,7 @@ export default {
     rowKey: { type: String, default: 'name' },
     disabled: { type: Boolean, default: false },
     rowsPerPageOptions: { type: Array, default: () => [15, 50, 100, 200] },
+    path: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-pagination': Pagination,
@@ -65,6 +69,17 @@ export default {
     update (event) {
       this.$emit('update:pagination', event);
     },
+    goTo (row) {
+      if (isEmpty(this.path) || !row._id) return {};
+
+      return { name: this.path.name, params: { [this.path.params]: row._id } };
+    },
+    isEmpty,
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.no-event
+  pointer-events: none
+</style>

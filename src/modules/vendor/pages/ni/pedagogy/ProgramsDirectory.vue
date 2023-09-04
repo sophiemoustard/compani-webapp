@@ -3,7 +3,7 @@
     <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme" @update-search="updateSearch"
       :search="searchStr" />
     <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToProgramProfile" />
+      :path="path" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un programme"
       @click="programCreationModal = true" :disable="tableLoading" />
 
@@ -46,7 +46,7 @@ export default {
           name: 'subPrograms',
           label: 'Sous-programmes',
           field: 'subPrograms',
-          format: value => value.length,
+          format: value => value.length || '0',
           sortable: true,
           sort: (a, b) => b.length - a.length,
           align: 'center',
@@ -58,6 +58,7 @@ export default {
       newProgram: { name: '', category: '' },
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
+      path: { name: 'ni pedagogy programs info', params: 'programId' },
     };
   },
   validations () {
@@ -80,9 +81,6 @@ export default {
   methods: {
     updateSearch (value) {
       this.searchStr = value;
-    },
-    goToProgramProfile (row) {
-      this.$router.push({ name: 'ni pedagogy programs info', params: { programId: row._id } });
     },
     async refreshProgram () {
       try {
