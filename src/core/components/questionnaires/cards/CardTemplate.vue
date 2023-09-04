@@ -20,7 +20,9 @@ export default {
       switch (card.value.template) {
         case TRANSITION:
           return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/Transition'));
-        case TITLE_TEXT_MEDIA || TITLE_TEXT || TEXT_MEDIA:
+        case TITLE_TEXT_MEDIA:
+        case TITLE_TEXT:
+        case TEXT_MEDIA:
           return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/TitleTextMedia'));
         default:
           return null;
