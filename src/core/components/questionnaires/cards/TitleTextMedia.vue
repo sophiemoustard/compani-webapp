@@ -18,7 +18,6 @@ export default {
   name: 'TitleTextMedia',
   components: {
     'ni-footer': Footer,
-
   },
   props: {
     card: { type: Object, required: true },
@@ -36,7 +35,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-
 .container
   display: flex
   flex-direction: column
