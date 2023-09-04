@@ -70,9 +70,9 @@ export default {
       this.$emit('update:pagination', event);
     },
     goTo (row) {
-      if (isEmpty(this.path)) return {};
+      if (isEmpty(this.path) || !row._id) return {};
 
-      return row._id ? { name: this.path.name, params: { [this.path.params]: row._id } } : {};
+      return { name: this.path.name, params: { [this.path.params]: row._id } };
     },
     isEmpty,
   },
