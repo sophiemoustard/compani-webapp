@@ -90,9 +90,8 @@ export default {
       },
       {
         name: 'connectionInfos',
-        label: 'Code de 1ère connexion à l\'app ',
-        field: row => get(row, 'loginCode'),
-        value: value => value,
+        label: 'Code de connexion à l\'app',
+        field: 'loginCode',
         align: 'center',
       },
       {
