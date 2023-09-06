@@ -260,7 +260,7 @@ export default {
 
     const v$ = useVuelidate(rules, { tmpInterlocutor, tmpContactId, tmpCourse, newSms });
 
-    const isTrainer = computed(() => vendorRole.value === TRAINER);
+    const loggedUserIsTrainer = computed(() => vendorRole.value === TRAINER);
 
     const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
@@ -440,12 +440,12 @@ export default {
         const loggedUserCompany = get(loggedUser.value, 'company._id');
         const courseCompany = course.value.type === INTRA ? course.value.companies[0]._id : '';
 
-        if (isTrainer.value && loggedUserCompany !== courseCompany) {
+        if (loggedUserIsTrainer.value && loggedUserCompany !== courseCompany) {
           companyRepresentativeOptions.value = [];
           return;
         }
         const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompany, includesHoldingAdmins: true })
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompany, includeHoldingAdmins: true })
           : [];
 
         companyRepresentativeOptions.value = Object.freeze(clientsUsersAllowedtoAccessCompany
