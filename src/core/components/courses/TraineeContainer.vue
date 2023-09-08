@@ -14,31 +14,6 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="displayCompanyNames" :data="course.companies"
-          :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
-          separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
-          <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props"
-              :class="[col.class, { 'company': props.rowIndex !== 0}]">
-              <template v-if="col.name === 'company'">
-                <div v-if="canEdit" @click="goToCompany(col.value)"> {{ col.value }}</div>
-                <div v-else>{{ col.value }}</div>
-              </template>
-              <template v-else-if="col.name === 'actions'">
-                <ni-button v-if="canEdit && !traineesGroupedByCompanies[props.row._id]"
-                  icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
-              </template>
-            </q-td>
-          </template>
-          <template #expanding-row="{ props }">
-            <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
-              :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
-              @refresh="refresh" hide-header />
-            <div class="text-center text-italic no-data" v-else>
-              Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
-            </div>
-          </template>
-        </ni-expanding-table>
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
           :loading="loading" table-class="q-pb-md" />
       </q-card>
@@ -71,9 +46,7 @@
 <script>
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
 import get from 'lodash/get';
-import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import { TRAINER } from '@data/constants';
 import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
@@ -83,7 +56,6 @@ import Input from '@components/form/Input';
 import UserAdditionModal from '@components/courses/UserAdditionModal';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeTable from '@components/courses/TraineeTable';
-import ExpandingTable from '@components/table/ExpandingTable';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useLearnersCreation } from '@composables/learnersCreation';
@@ -105,7 +77,6 @@ export default {
     'ni-trainee-table': TraineeTable,
     'user-addition-modal': UserAdditionModal,
     'learner-creation-modal': LearnerCreationModal,
-    'ni-expanding-table': ExpandingTable,
     'company-addition-modal': CompanyAdditionModal,
   },
   emits: ['refresh', 'update', 'update:maxTrainees'],
@@ -113,22 +84,8 @@ export default {
     const { canEdit, validations, potentialTrainees } = toRefs(props);
 
     const $store = useStore();
-    const $router = useRouter();
 
     const traineeModalLoading = ref(false);
-
-    const companyColumns = ref([
-      {
-        name: 'company',
-        label: 'Structure',
-        align: 'left',
-        class: canEdit.value ? 'clickable-name' : 'company-name',
-        field: row => get(row, 'name') || '',
-      },
-      { name: 'actions', label: '', align: 'right', field: '_id' },
-    ]);
-
-    const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
 
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
@@ -154,8 +111,6 @@ export default {
 
     const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
 
-    const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
-
     const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
 
     const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
@@ -172,11 +127,6 @@ export default {
       }
       return options;
     });
-
-    const loggedUser = computed(() => $store.state.main.loggedUser);
-
-    const displayCompanyNames =
-      computed(() => !isIntraCourse.value && (!isClientInterface || !!loggedUser.value.role.holding));
 
     const refresh = () => emit('refresh');
 
@@ -259,11 +209,6 @@ export default {
 
     const inputTmpMaxTrainees = event => emit('update:maxTrainees', event);
 
-    const goToCompany = async (companyName) => {
-      const companyId = course.value.companies.find(c => c.name === companyName)._id;
-      $router.push({ name: 'ni users companies info', params: { companyId }, query: { defaultTab: 'infos' } });
-    };
-
     const created = async () => { await getPotentialCompanies(); };
 
     created();
@@ -279,13 +224,11 @@ export default {
       newTraineeRegistration,
       traineeModalLoading,
       companyOptions,
-      companyColumns,
       companyVisibleColumns,
       companyAdditionModal,
       selectedCompany,
       selectCompanyOptions,
       companyModalLoading,
-      companyPagination,
       disableUserInfoEdition,
       // Validations
       learnerValidation,
@@ -301,11 +244,9 @@ export default {
       isArchived,
       isRofOrAdmin,
       maxTraineesErrorMessage,
-      traineesGroupedByCompanies,
       courseCompanyIds,
       hasLinkedCompanies,
       traineesCompanyOptions,
-      displayCompanyNames,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -317,7 +258,6 @@ export default {
       updateMaxTrainees,
       inputTmpMaxTrainees,
       refresh,
-      goToCompany,
       openCompanyAdditionModal,
       addCompany,
       resetCompanyAdditionModal,
@@ -330,10 +270,6 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
-.company-name
-  color: $primary
-  width: fit-content
-  cursor: default
 .company
   border-top: 1px solid $copper-grey-200
 .no-data
