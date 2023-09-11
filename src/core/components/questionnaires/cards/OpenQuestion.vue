@@ -57,9 +57,9 @@ export default {
     const answerList = computed(() => $store.state.questionnaire.answerList);
 
     const created = () => {
-      const initialAnswer = answerList.value.find(a => a.card === card.value._id);
+      const initialValue = answerList.value.find(a => a.card === card.value._id);
 
-      setAnswer(get(initialAnswer, 'answerList[0]'));
+      setAnswer(get(initialValue, 'answerList[0]'));
     };
 
     created();
