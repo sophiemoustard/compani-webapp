@@ -1,8 +1,7 @@
 <template>
   <div class="card-container">
-    <ni-input class="elm-width" bg-color="white" dense :caption="card.question" :model-value="answer"
-      @update:model-value="setAnswer" @blur="v$.answer.$touch" type="textarea" :error="v$.answer.$error"
-      error-message="Champ requis" placeholder="Veuillez cliquer ici pour répondre" :required-field="isRequired" />
+    <ni-input class="elm-width" :caption="card.question" v-model="answer" @blur="v$.answer.$touch" type="textarea"
+      :error="v$.answer.$error" :required-field="isRequired" placeholder="Veuillez cliquer ici pour répondre" />
     <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
 </template>
@@ -32,7 +31,7 @@ export default {
     const answer = ref('');
     const $store = useStore();
 
-    const setAnswer = (value) => { answer.value = value; };
+    const isRequired = computed(() => get(card.value, 'isMandatory') || false);
 
     const updateQuestionnaireAnswer = () => {
       if (isRequired.value) {
@@ -40,18 +39,16 @@ export default {
         if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
       }
 
-      $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
       if (answer.value) {
         $store.dispatch(
           'questionnaire/setAnswerList',
           { answers: [{ card: card.value._id, answerList: [answer.value] }] }
         );
       }
+      $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
 
-    const isRequired = computed(() => get(card.value, 'isMandatory') || false);
-
-    const rules = computed(() => ({ answer: { required } }));
+    const rules = computed(() => ({ answer: { ...(isRequired.value && { required }) } }));
     const v$ = useVuelidate(rules, { answer });
 
     const answerList = computed(() => $store.state.questionnaire.answerList);
@@ -59,7 +56,7 @@ export default {
     const created = () => {
       const initialValue = answerList.value.find(a => a.card === card.value._id);
 
-      setAnswer(get(initialValue, 'answerList[0]'));
+      answer.value = get(initialValue, 'answerList[0]');
     };
 
     created();
@@ -71,7 +68,6 @@ export default {
       v$,
       // Methods
       updateQuestionnaireAnswer,
-      setAnswer,
     };
   },
 };
