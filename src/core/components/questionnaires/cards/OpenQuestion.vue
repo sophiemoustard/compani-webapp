@@ -1,8 +1,8 @@
 <template>
   <div class="card-container">
-    <ni-input class="elm-width" :caption="card.question" v-model="answer" @blur="v$.answer.$touch" type="textarea"
-      :error="v$.answer.$error" :required-field="isRequired" placeholder="Veuillez cliquer ici pour répondre" />
-    <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
+    <ni-input class="elm-width" v-model="answer" :caption="card.question" :required-field="isRequired" type="textarea"
+      :error="v$.answer.$error" placeholder="Veuillez cliquer ici pour répondre" @blur="updateQuestionnaireAnswer" />
+    <ni-footer label="Suivant" @submit="updateCardIndex" />
   </div>
 </template>
 
@@ -34,10 +34,8 @@ export default {
     const isRequired = computed(() => get(card.value, 'isMandatory') || false);
 
     const updateQuestionnaireAnswer = () => {
-      if (isRequired.value) {
-        v$.value.answer.$touch();
-        if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
-      }
+      v$.value.answer.$touch();
+      if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
 
       if (answer.value) {
         $store.dispatch(
@@ -45,6 +43,12 @@ export default {
           { answers: [{ card: card.value._id, answerList: [answer.value] }] }
         );
       }
+    };
+
+    const updateCardIndex = () => {
+      v$.value.answer.$touch();
+      if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
+
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
 
@@ -67,6 +71,7 @@ export default {
       isRequired,
       v$,
       // Methods
+      updateCardIndex,
       updateQuestionnaireAnswer,
     };
   },
