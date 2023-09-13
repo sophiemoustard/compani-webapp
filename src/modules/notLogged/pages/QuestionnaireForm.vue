@@ -59,7 +59,6 @@ export default {
 
     const $store = useStore();
     const cardIndex = computed(() => $store.state.questionnaire.cardIndex);
-    const answerList = computed(() => $store.state.questionnaire.answerList);
 
     const rules = computed(() => ({ trainee: { required } }));
     const v$ = useVuelidate(rules, { trainee });
@@ -95,7 +94,7 @@ export default {
           course: course.value._id,
           questionnaire: questionnaire.value._id,
           user: trainee.value,
-          questionnaireAnswersList: answerList.value,
+          questionnaireAnswersList: $store.state.questionnaire.answerList,
         };
 
         await QuestionnaireHistories.create(payload);
