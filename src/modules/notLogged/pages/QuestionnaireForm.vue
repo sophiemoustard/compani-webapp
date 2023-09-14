@@ -94,6 +94,7 @@ export default {
           course: course.value._id,
           questionnaire: questionnaire.value._id,
           user: trainee.value,
+          questionnaireAnswersList: $store.state.questionnaire.answerList,
         };
 
         await QuestionnaireHistories.create(payload);
@@ -145,6 +146,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-</style>
