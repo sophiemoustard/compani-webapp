@@ -37,12 +37,10 @@ export default {
       v$.value.answer.$touch();
       if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-      if (answer.value) {
-        $store.dispatch(
-          'questionnaire/setAnswerList',
-          { answers: [{ card: card.value._id, answerList: [answer.value] }] }
-        );
-      }
+      $store.dispatch(
+        'questionnaire/setAnswerList',
+        { answers: [{ card: card.value._id, answerList: [answer.value] }] }
+      );
     };
 
     const updateCardIndex = () => {
@@ -77,6 +75,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-</style>

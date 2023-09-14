@@ -18,15 +18,15 @@ export default {
       const allCardAnsweredIds = state.answerList.map(a => a.card);
 
       for (const resp of data.answers) {
-        // Prevents duplication - if the user responds and then navigates between pages using the back button
-        // and edits his responses
+        // Prevents duplication: if the user answers and then navigates between pages using the "back"
+        // button and modifies his answers + unsaved answers if they are empty
         if (allCardAnsweredIds.includes(resp.card)) {
           const oldResponse = state.answerList.find(a => a.card === resp.card);
           const oldResponseIndex = state.answerList.indexOf(oldResponse);
-          state.answerList[oldResponseIndex] = resp;
-        } else {
-          state.answerList.push(resp);
-        }
+
+          if (resp.answerList[0]) state.answerList[oldResponseIndex] = resp;
+          else state.answerList.splice(oldResponseIndex, 1);
+        } else if (resp.answerList[0]) state.answerList.push(resp);
       }
     },
   },
