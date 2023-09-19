@@ -16,7 +16,7 @@ import { ref } from 'vue';
 import { useStore } from 'vuex';
 import Footer from '@components/questionnaires/cards/Footer';
 import SecondaryButton from '@components/SecondaryButton';
-import { GO_TO_CARD } from '../../../data/constants';
+import { GO_TO_CARD, START_CARD_INDEX } from '@data/constants';
 
 export default {
   name: 'End',
@@ -36,7 +36,7 @@ export default {
     const submit = () => emit('submit');
 
     const updateCardIndex = () => {
-      $store.dispatch('questionnaire/updateCardIndex', { type: GO_TO_CARD, index: -1 });
+      $store.dispatch('questionnaire/updateCardIndex', { type: GO_TO_CARD, index: START_CARD_INDEX });
     };
 
     return {

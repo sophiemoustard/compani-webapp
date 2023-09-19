@@ -1,6 +1,5 @@
 import Questionnaires from '@api/Questionnaires';
-import { DECREMENT, INCREMENT, GO_TO_CARD } from '@data/constants';
-import { START_CARD_INDEX } from '../../../core/data/constants';
+import { DECREMENT, INCREMENT, GO_TO_CARD, START_CARD_INDEX } from '@data/constants';
 
 export default {
   namespaced: true,
@@ -13,11 +12,19 @@ export default {
   mutations: {
     SET_QUESTIONNAIRE: (state, data) => { state.questionnaire = data ? ({ ...data }) : data; },
     SET_CARD_INDEX: (state, data) => {
-      if (data.type === INCREMENT) state.cardIndex += 1;
-      if (data.type === DECREMENT) state.cardIndex -= 1;
-      if (data.type === GO_TO_CARD) {
-        state.cardIndex = data.index;
-        if (data.index === START_CARD_INDEX) state.isFromEndCard = true;
+      switch (data.type) {
+        case INCREMENT:
+          state.cardIndex += 1;
+          if (state.isFromEndCard) state.isFromEndCard = false;
+          break;
+        case DECREMENT:
+          state.cardIndex -= 1;
+          if (state.isFromEndCard) state.isFromEndCard = false;
+          break;
+        case GO_TO_CARD:
+          state.cardIndex = data.index;
+          if (data.index === START_CARD_INDEX) state.isFromEndCard = true;
+          break;
       }
     },
     SET_ANSWER_LIST: (state, data) => {
