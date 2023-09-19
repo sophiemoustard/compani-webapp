@@ -4,7 +4,7 @@
     <meta-infos :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
       :display-name="!isStartorEndCard" />
     <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
-      @update-trainee="updateTrainee" />
+      :end-card-index="endCardIndex" @update-trainee="updateTrainee" />
     <template v-for="(card, index) of questionnaire.cards" :key="card._id">
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
@@ -29,7 +29,7 @@ import Start from '@components/questionnaires/cards/Start';
 import End from '@components/questionnaires/cards/End';
 import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { INCREMENT } from '@data/constants';
+import { INCREMENT, START_CARD_INDEX } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 
 export default {
@@ -54,7 +54,7 @@ export default {
     const questionnaire = ref({});
     const trainee = ref('');
     const btnLoading = ref(false);
-    const startCardIndex = ref(-1);
+    const startCardIndex = ref(START_CARD_INDEX);
     const endCardIndex = ref(0);
 
     const $store = useStore();

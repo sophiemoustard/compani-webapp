@@ -653,6 +653,7 @@ export const MODAL = 'modal';
 export const DECREMENT = 'decrement';
 export const INCREMENT = 'increment';
 export const GO_TO_CARD = 'go_to_card';
+export const START_CARD_INDEX = -1;
 
 // OPTION GROUP TYPE
 export const CHECKBOX = 'checkbox';
