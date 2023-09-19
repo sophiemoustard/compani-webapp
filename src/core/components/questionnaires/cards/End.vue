@@ -1,7 +1,12 @@
 <template>
   <div class="container elm-width">
-    <q-checkbox v-model="validateTrainee" :label="`Je certifie remplir le questionnaire en tant que ${traineeName}`" />
-    <ni-secondary-button label="Modifier le répondant" color="white" background="primary" @click="updateCardIndex" />
+    <q-checkbox v-model="validateTrainee">
+      <label>
+        Je certifie remplir le questionnaire en tant que <span class="text-weight-bold">{{ traineeName }}</span>
+      </label>
+    </q-checkbox>
+    <ni-secondary-button label="Modifier le répondant" color="white" background="primary" @click="updateCardIndex"
+      class="btn" />
     <ni-footer label="Valider" @submit="submit" :loading="loading" :disable="!validateTrainee" />
   </div>
 </template>
@@ -46,8 +51,12 @@ export default {
 </script>
 <style lang="sass" scoped>
 .container
-  display: flex
   flex-direction: column
-  justify-content: flex-start
-  align-items: flex-start
+  text-align: center
+  margin: 48px
+.btn
+  margin: 48px 0
+  width: 35vw
+  @media screen and (max-width: $breakpoint-md)
+    width: 65vw
 </style>
