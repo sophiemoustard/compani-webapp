@@ -1,97 +1,71 @@
 <template>
-  <div class="card elm-width">
-    <p :class="['title', { required: isRequired }]">
-      {{ card.question }}
-      <span v-if="card.isQuestionAnswerMultipleChoiced"> ( plusieurs réponses sont possibles ) </span>
-    </p>
-    <div v-for="(qcAnswer, index) of card.qcAnswers" :key="qcAnswer._id" class="answers">
-      <q-checkbox v-if="card.isQuestionAnswerMultipleChoiced" :model-value="multipleSelectionList[index]"
-        @update:model-value="updateSelectedAnswer(index)" :label="qcAnswer.text" />
-      <q-radio v-else v-model="singleSelection" :val="qcAnswer._id" :label="qcAnswer.text" />
-    </div>
+  <div class="card-container">
+    <ni-option-group :model-value="isMultipleChoiced ? multipleAnswer : singleAnswer"
+      :required-field="isRequired" :options="answerOptions" :type="optionType" :caption="cardTitle"
+      @update:model-value="updateAnswers" class="elm-width" />
+    <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
-  <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
 </template>
 
 <script>
 import { useStore } from 'vuex';
 import { ref, toRefs, computed } from 'vue';
 import get from 'lodash/get';
-import useVuelidate from '@vuelidate/core';
-import { minValue } from '@vuelidate/validators';
-import { NotifyWarning } from '@components/popup/notify';
-import { INCREMENT } from '../../../data/constants';
+import OptionGroup from '@components/form/OptionGroup';
+import { INCREMENT, REQUIRED_LABEL } from '@data/constants';
 import Footer from './Footer';
 
 export default {
   name: 'QuestionAnswer',
   components: {
     'ni-footer': Footer,
+    'ni-option-group': OptionGroup,
   },
   props: {
     card: { type: Object, required: true },
   },
   setup (props) {
     const { card } = toRefs(props);
-    const multipleSelectionList = ref(new Array(card.value.qcAnswers.length).fill(false));
-    const singleSelection = ref('');
-    const answer = ref([]);
+    const multipleAnswer = ref([]);
+    const singleAnswer = ref('');
     const $store = useStore();
 
-    const updateSelectedAnswer = (index) => {
-      multipleSelectionList.value[index] = !multipleSelectionList.value[index];
-    };
+    const isMultipleChoiced = computed(() => card.value.isQuestionAnswerMultipleChoiced);
+
+    const answerOptions = computed(() => card.value.qcAnswers.map(qc => ({ value: qc._id, label: qc.text })));
+
+    const optionType = computed(() => (card.value.isQuestionAnswerMultipleChoiced ? 'checkbox' : 'radio'));
+
+    const cardTitle = computed(() => card.value.question.concat(
+      (isMultipleChoiced.value ? ' (plusieurs réponses sont possibles)' : '')
+    ));
 
     const updateQuestionnaireAnswer = () => {
-      v$.value.selectedAnswerNumber.$touch();
-      if (v$.value.selectedAnswerNumber.$error) return NotifyWarning('Champ requis.');
-
-      if (card.value.isQuestionAnswerMultipleChoiced) {
-        const selectedAnswerIndexes = [...multipleSelectionList.value.keys()]
-          .filter(i => multipleSelectionList.value[i]);
-        selectedAnswerIndexes.forEach(idx => answer.value.push(card.value.qcAnswers[idx]._id));
-      } else {
-        answer.value.push(singleSelection.value);
-      }
+      const answers = isMultipleChoiced.value ? multipleAnswer.value : [singleAnswer.value];
 
       $store.dispatch(
         'questionnaire/setAnswerList',
-        { answers: [{ card: card.value._id, answerList: [...answer.value] }] }
+        { answers: [{ card: card.value._id, answerList: answers }] }
       );
 
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
 
-    const selectedAnswerNumber = computed(() => {
-      let answerListCard = [];
-      if (card.value.isQuestionAnswerMultipleChoiced) {
-        answerListCard = multipleSelectionList.value.filter(val => !!val);
-      }
-
-      if (singleSelection.value) answerListCard.push(singleSelection.value);
-
-      return answerListCard.length;
-    });
+    const updateAnswers = (value) => {
+      if (isMultipleChoiced.value) multipleAnswer.value = value;
+      else singleAnswer.value = value;
+    };
 
     const isRequired = computed(() => get(card.value, 'isMandatory') || false);
-
-    const rules = computed(() => ({ selectedAnswerNumber: { ...isRequired.value && { minValue: minValue(1) } } }));
-    const v$ = useVuelidate(rules, { selectedAnswerNumber });
 
     const answerList = computed(() => $store.state.questionnaire.answerList);
 
     const created = () => {
       const initialValue = answerList.value.find(a => a.card === card.value._id);
 
-      if (initialValue) {
-        if (card.value.isQuestionAnswerMultipleChoiced) {
-          for (const asw of initialValue.answerList) {
-            const index = card.value.qcAnswers.findIndex(a => a._id === asw);
-            multipleSelectionList.value[index] = true;
-          }
-        } else {
-          singleSelection.value = initialValue.answerList[0];
-        }
+      if (get(initialValue, 'answerList')) {
+        if (isMultipleChoiced.value) multipleAnswer.value = initialValue.answerList;
+        else singleAnswer.value = initialValue.answerList[0];
       }
     };
 
@@ -99,23 +73,19 @@ export default {
 
     return {
       // Data
-      multipleSelectionList,
-      singleSelection,
+      REQUIRED_LABEL,
+      multipleAnswer,
+      singleAnswer,
       // Methods
-      updateSelectedAnswer,
       updateQuestionnaireAnswer,
+      updateAnswers,
       // Computed
       isRequired,
+      isMultipleChoiced,
+      answerOptions,
+      optionType,
+      cardTitle,
     };
   },
 };
 </script>
-<style lang="sass" scoped>
-.title
-  color: $copper-grey-500
-  font-size: 14px
-.answers
-  display: flex
-  flex-direction: column
-  padding: 0 0 0 4px
-</style>
