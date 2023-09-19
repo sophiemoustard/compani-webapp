@@ -8,7 +8,7 @@
     <template v-for="(card, index) of questionnaire.cards" :key="card._id">
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
-    <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee" :loading="btnLoading"
+    <end v-if="cardIndex === endCardIndex" :trainee-name="traineeName" :loading="btnLoading"
       @submit="createHistory" />
   </div>
 </template>

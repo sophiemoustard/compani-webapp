@@ -1,24 +1,28 @@
 <template>
   <div class="btn-container elm-width">
     <ni-button v-if="displayBack" icon="arrow_back" class="btn-back" color="primary" @click="goBack" />
-    <ni-button class="bg-primary elm-width" :label="label" color="white" :loading="loading" @click="submit" />
+    <ni-primary-button class="bg-primary elm-width" :label="label" :loading="loading" :disable="disable"
+      @click="submit" />
   </div>
 </template>
 
 <script>
 import { useStore } from 'vuex';
 import Button from '@components/Button';
+import PrimaryButton from '@components/PrimaryButton';
 import { DECREMENT } from '@data/constants';
 
 export default {
   name: 'FooterCard',
   components: {
+    'ni-primary-button': PrimaryButton,
     'ni-button': Button,
   },
   props: {
     displayBack: { type: Boolean, default: true },
     label: { type: String, default: '' },
     loading: { type: Boolean, default: false },
+    disable: { type: Boolean, default: false },
   },
   emits: ['submit'],
   setup (_, { emit }) {
