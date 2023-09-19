@@ -1,5 +1,5 @@
 import Questionnaires from '@api/Questionnaires';
-import { DECREMENT, INCREMENT } from '@data/constants';
+import { DECREMENT, INCREMENT, GO_TO_CARD } from '@data/constants';
 
 export default {
   namespaced: true,
@@ -13,6 +13,7 @@ export default {
     SET_CARD_INDEX: (state, data) => {
       if (data.type === INCREMENT) state.cardIndex += 1;
       if (data.type === DECREMENT) state.cardIndex -= 1;
+      if (data.type === GO_TO_CARD) state.cardIndex = data.index;
     },
     SET_ANSWER_LIST: (state, data) => {
       const allCardAnsweredIds = state.answerList.map(a => a.card);

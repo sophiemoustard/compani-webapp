@@ -1,16 +1,23 @@
 <template>
-  <q-checkbox v-model="validateTrainee" :label="`Je certifie remplir le questionnaire en tant que ${traineeName}`" />
-  <ni-footer label="Valider" @submit="submit" :loading="loading" :disable="!validateTrainee" />
+  <div class="container elm-width">
+    <q-checkbox v-model="validateTrainee" :label="`Je certifie remplir le questionnaire en tant que ${traineeName}`" />
+    <ni-secondary-button label="Modifier le répondant" color="white" background="primary" @click="updateCardIndex" />
+    <ni-footer label="Valider" @submit="submit" :loading="loading" :disable="!validateTrainee" />
+  </div>
 </template>
 
 <script>
 import { ref } from 'vue';
+import { useStore } from 'vuex';
 import Footer from '@components/questionnaires/cards/Footer';
+import SecondaryButton from '@components/SecondaryButton';
+import { GO_TO_CARD } from '../../../data/constants';
 
 export default {
   name: 'End',
   components: {
     'ni-footer': Footer,
+    'ni-secondary-button': SecondaryButton,
   },
   props: {
     loading: { type: Boolean, required: true },
@@ -19,15 +26,28 @@ export default {
   emits: ['submit'],
   setup (_, { emit }) {
     const validateTrainee = ref(false);
+    const $store = useStore();
 
     const submit = () => emit('submit');
+
+    const updateCardIndex = () => {
+      $store.dispatch('questionnaire/updateCardIndex', { type: GO_TO_CARD, index: -1 });
+    };
 
     return {
       // Data
       validateTrainee,
       // Methods
       submit,
+      updateCardIndex,
     };
   },
 };
 </script>
+<style lang="sass" scoped>
+.container
+  display: flex
+  flex-direction: column
+  justify-content: flex-start
+  align-items: flex-start
+</style>
