@@ -4,9 +4,10 @@
       {{ card.question }}
       <span v-if="card.isQuestionAnswerMultipleChoiced"> ( plusieurs réponses sont attendues ) </span>
     </p>
-    <div v-for="(answer, index) of card.qcAnswers" :key="answer._id" class="answers">
-      <q-checkbox :model-value="isSelectedAnswerList[index]" @update:model-value="updateSelectedAnswer(index)"
-        :label="answer.text" />
+    <div v-for="(qcAnswer, index) of card.qcAnswers" :key="qcAnswer._id" class="answers">
+      <q-checkbox v-if="card.isQuestionAnswerMultipleChoiced" :model-value="multipleSelectionList[index]"
+        @update:model-value="updateSelectedAnswer(index)" :label="qcAnswer.text" />
+      <q-radio v-else v-model="singleSelection" :val="qcAnswer._id" :label="qcAnswer.text" />
     </div>
     <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
@@ -32,31 +33,43 @@ export default {
   },
   setup (props) {
     const { card } = toRefs(props);
+    const multipleSelectionList = ref(new Array(card.value.qcAnswers.length).fill(false));
+    const singleSelection = ref(false);
+    const answer = ref([]);
     const $store = useStore();
-    const isSelectedAnswerList = ref(new Array(card.value.qcAnswers.length).fill(false));
 
     const updateSelectedAnswer = (index) => {
-      isSelectedAnswerList.value[index] = !isSelectedAnswerList.value[index];
+      multipleSelectionList.value[index] = !multipleSelectionList.value[index];
     };
 
     const updateQuestionnaireAnswer = () => {
-      const answer = [];
-      const selectedAnswerIndexes = [...isSelectedAnswerList.value.keys()].filter(i => isSelectedAnswerList.value[i]);
-      selectedAnswerIndexes.forEach(idx => answer.push(card.value.qcAnswers[idx]._id));
+      if (card.value.isQuestionAnswerMultipleChoiced) {
+        const selectedAnswerIndexes = [...multipleSelectionList.value.keys()]
+          .filter(i => multipleSelectionList.value[i]);
+        selectedAnswerIndexes.forEach(idx => answer.value.push(card.value.qcAnswers[idx]._id));
+      } else {
+        answer.value.push(singleSelection.value);
+      }
 
       v$.value.selectedAnswerNumber.$touch();
       if (v$.value.selectedAnswerNumber.$error) return NotifyWarning('Champ requis.');
 
       $store.dispatch(
         'questionnaire/setAnswerList',
-        { answers: [{ card: card.value._id, answerList: [...answer] }] }
+        { answers: [{ card: card.value._id, answerList: answer.value }] }
       );
 
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
 
     const selectedAnswerNumber = computed(() => {
-      const answerListCard = isSelectedAnswerList.value.filter(val => !!val) || [];
+      let answerListCard = [];
+      if (card.value.isQuestionAnswerMultipleChoiced) {
+        answerListCard = multipleSelectionList.value.filter(val => !!val);
+      }
+
+      if (singleSelection.value) answerListCard.push(singleSelection.value);
+
       return answerListCard.length;
     });
 
@@ -66,21 +79,28 @@ export default {
     const v$ = useVuelidate(rules, { selectedAnswerNumber });
 
     const answerList = computed(() => $store.state.questionnaire.answerList);
+
     const created = () => {
       const initialValue = answerList.value.find(a => a.card === card.value._id);
 
       if (initialValue) {
-        for (const asw of initialValue.answerList) {
-          const index = card.value.qcAnswers.findIndex(a => a._id === asw);
-          isSelectedAnswerList.value[index] = true;
+        if (card.value.isQuestionAnswerMultipleChoiced) {
+          for (const asw of initialValue.answerList) {
+            const index = card.value.qcAnswers.findIndex(a => a._id === asw);
+            multipleSelectionList.value[index] = true;
+          }
+        } else {
+          singleSelection.value = initialValue.answerList[0];
         }
       }
     };
 
     created();
+
     return {
       // Data
-      isSelectedAnswerList,
+      multipleSelectionList,
+      singleSelection,
       // Methods
       updateSelectedAnswer,
       updateQuestionnaireAnswer,
@@ -91,7 +111,6 @@ export default {
 };
 </script>
 <style lang="sass" scoped>
-.container
 .title
   color: $copper-grey-500
   font-size: 14px
