@@ -2,15 +2,15 @@
   <div class="card elm-width">
     <p :class="['title', { required: isRequired }]">
       {{ card.question }}
-      <span v-if="card.isQuestionAnswerMultipleChoiced"> ( plusieurs réponses sont attendues ) </span>
+      <span v-if="card.isQuestionAnswerMultipleChoiced"> ( plusieurs réponses sont possibles ) </span>
     </p>
     <div v-for="(qcAnswer, index) of card.qcAnswers" :key="qcAnswer._id" class="answers">
       <q-checkbox v-if="card.isQuestionAnswerMultipleChoiced" :model-value="multipleSelectionList[index]"
         @update:model-value="updateSelectedAnswer(index)" :label="qcAnswer.text" />
       <q-radio v-else v-model="singleSelection" :val="qcAnswer._id" :label="qcAnswer.text" />
     </div>
-    <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
+  <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
 </template>
 
 <script>
@@ -34,7 +34,7 @@ export default {
   setup (props) {
     const { card } = toRefs(props);
     const multipleSelectionList = ref(new Array(card.value.qcAnswers.length).fill(false));
-    const singleSelection = ref(false);
+    const singleSelection = ref('');
     const answer = ref([]);
     const $store = useStore();
 
@@ -43,6 +43,9 @@ export default {
     };
 
     const updateQuestionnaireAnswer = () => {
+      v$.value.selectedAnswerNumber.$touch();
+      if (v$.value.selectedAnswerNumber.$error) return NotifyWarning('Champ requis.');
+
       if (card.value.isQuestionAnswerMultipleChoiced) {
         const selectedAnswerIndexes = [...multipleSelectionList.value.keys()]
           .filter(i => multipleSelectionList.value[i]);
@@ -51,12 +54,9 @@ export default {
         answer.value.push(singleSelection.value);
       }
 
-      v$.value.selectedAnswerNumber.$touch();
-      if (v$.value.selectedAnswerNumber.$error) return NotifyWarning('Champ requis.');
-
       $store.dispatch(
         'questionnaire/setAnswerList',
-        { answers: [{ card: card.value._id, answerList: answer.value }] }
+        { answers: [{ card: card.value._id, answerList: [...answer.value] }] }
       );
 
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
