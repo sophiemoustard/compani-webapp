@@ -1,15 +1,18 @@
 <template>
   <compani-header />
   <div class="questionnaire-container">
-    <meta-infos :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
+    <meta-infos v-if="!isAnswerRecorded" :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
       :display-name="!isStartorEndCard" />
     <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
       :end-card-index="endCardIndex" @update-trainee="updateTrainee" />
     <template v-for="(card, index) of questionnaire.cards" :key="card._id">
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
-    <end v-if="cardIndex === endCardIndex" :trainee-name="traineeName" :loading="btnLoading"
+    <end v-if="cardIndex === endCardIndex && !isAnswerRecorded" :trainee-name="traineeName" :loading="btnLoading"
       @submit="createHistory" />
+    <span v-if="cardIndex === endCardIndex && isAnswerRecorded" class="end-text">
+      Merci d'avoir répondu au questionnaire ! Vous pouvez à présent fermer la fenêtre.
+    </span>
   </div>
 </template>
 
@@ -56,6 +59,7 @@ export default {
     const btnLoading = ref(false);
     const startCardIndex = ref(START_CARD_INDEX);
     const endCardIndex = ref(0);
+    const isAnswerRecorded = ref(false);
 
     const $store = useStore();
     const cardIndex = computed(() => $store.state.questionnaire.cardIndex);
@@ -99,6 +103,7 @@ export default {
 
         await QuestionnaireHistories.create(payload);
         NotifyPositive('Réponse enregistrée.');
+        isAnswerRecorded.value = true;
       } catch (e) {
         console.error(e);
 
@@ -132,6 +137,7 @@ export default {
       INCREMENT,
       btnLoading,
       startCardIndex,
+      isAnswerRecorded,
       // Computed
       cardIndex,
       endCardIndex,
@@ -146,3 +152,8 @@ export default {
   },
 };
 </script>
+<style lang="sass" scoped>
+.end-text
+  text-align: center
+  color: $primary
+</style>
