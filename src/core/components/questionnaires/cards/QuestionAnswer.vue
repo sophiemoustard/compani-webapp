@@ -16,7 +16,7 @@ import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning } from '@components/popup/notify';
 import OptionGroup from '@components/form/OptionGroup';
 import Footer from '@components/questionnaires/cards/Footer';
-import { INCREMENT, REQUIRED_LABEL } from '@data/constants';
+import { INCREMENT, REQUIRED_LABEL, CHECKBOX, RADIO } from '@data/constants';
 
 export default {
   name: 'QuestionAnswer',
@@ -37,11 +37,10 @@ export default {
 
     const answerOptions = computed(() => card.value.qcAnswers.map(qc => ({ value: qc._id, label: qc.text })));
 
-    const optionType = computed(() => (card.value.isQuestionAnswerMultipleChoiced ? 'checkbox' : 'radio'));
+    const optionType = computed(() => (isMultipleChoiced.value ? CHECKBOX : RADIO));
 
-    const cardTitle = computed(() => card.value.question.concat(
-      (isMultipleChoiced.value ? ' (plusieurs réponses sont possibles)' : '')
-    ));
+    const cardTitle = computed(() => card.value.question
+      .concat((isMultipleChoiced.value ? ' (plusieurs réponses sont possibles)' : '')));
 
     const isRequired = computed(() => get(card.value, 'isMandatory') || false);
 

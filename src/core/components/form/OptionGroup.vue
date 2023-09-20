@@ -50,6 +50,10 @@ export default {
     padding: 10px 0 !important
     .q-radio__label
       font-size: 15px
+  .q-checkbox
+    padding: 10px 0 !important
+    .q-checkbox__label
+      font-size: 15px
 
 :deep(.q-field__control)
   min-height: 25px !important
