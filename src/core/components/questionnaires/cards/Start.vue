@@ -59,7 +59,6 @@ export default {
       updateCardIndex,
       // Computed
       traineesOptions,
-      isFromEndCard,
     };
   },
 };
