@@ -1,12 +1,20 @@
 <template>
   <div class="card-container">
-    <span>SONDAGE</span>
-    <ni-footer label="Suivant" @submit="updateCardIndex" />
+    <q-rating v-model="answer" icon="circle" max="5" color="primary" size="xl">
+      <template #tip-1>
+        <q-tooltip>{{ card.label.left }}</q-tooltip>
+      </template>
+      <template #tip-5>
+        <q-tooltip>{{ card.label.right }}</q-tooltip>
+      </template>
+    </q-rating>
+    <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
 </template>
 
 <script>
 import { useStore } from 'vuex';
+import { ref, toRefs } from 'vue';
 import { INCREMENT } from '@data/constants';
 import Footer from '@components/questionnaires/cards/Footer';
 
@@ -18,13 +26,25 @@ export default {
   props: {
     card: { type: Object, required: true },
   },
-  setup () {
+  setup (props) {
+    const { card } = toRefs(props);
     const $store = useStore();
-    const updateCardIndex = () => $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
+    const answer = ref(0);
+
+    const updateQuestionnaireAnswer = () => {
+      $store.dispatch(
+        'questionnaire/setAnswerList',
+        { answers: [{ card: card.value._id, answerList: [answer.value.toString()] }] }
+      );
+
+      $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
+    };
 
     return {
+      // Data
+      answer,
       // Methods
-      updateCardIndex,
+      updateQuestionnaireAnswer,
     };
   },
 };
