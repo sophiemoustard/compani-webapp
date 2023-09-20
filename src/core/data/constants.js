@@ -652,3 +652,7 @@ export const MODAL = 'modal';
 // INCREMENTATION TYPE
 export const DECREMENT = 'decrement';
 export const INCREMENT = 'increment';
+
+// OPTION GROUP TYPE
+export const CHECKBOX = 'checkbox';
+export const RADIO = 'radio';
