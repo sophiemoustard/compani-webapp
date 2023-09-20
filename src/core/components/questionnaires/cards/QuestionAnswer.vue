@@ -1,6 +1,6 @@
 <template>
   <div class="card-container">
-    <ni-option-group :model-value="isMultipleChoiced ? multipleAnswer : singleAnswer"
+    <ni-option-group :model-value="isMultipleChoiced ? multipleAnswer : singleAnswer" :error="v$.answers.$error"
       :required-field="isRequired" :options="answerOptions" :type="optionType" :caption="cardTitle"
       @update:model-value="updateAnswers" class="elm-width" />
     <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
@@ -11,9 +11,12 @@
 import { useStore } from 'vuex';
 import { ref, toRefs, computed } from 'vue';
 import get from 'lodash/get';
+import useVuelidate from '@vuelidate/core';
+import { minArrayLength } from '@helpers/vuelidateCustomVal';
+import { NotifyWarning } from '@components/popup/notify';
 import OptionGroup from '@components/form/OptionGroup';
+import Footer from '@components/questionnaires/cards/Footer';
 import { INCREMENT, REQUIRED_LABEL } from '@data/constants';
-import Footer from './Footer';
 
 export default {
   name: 'QuestionAnswer',
@@ -40,12 +43,20 @@ export default {
       (isMultipleChoiced.value ? ' (plusieurs réponses sont possibles)' : '')
     ));
 
+    const isRequired = computed(() => get(card.value, 'isMandatory') || false);
+
+    const answers = computed(() => (isMultipleChoiced.value ? multipleAnswer.value : [singleAnswer.value]));
+
+    const rules = computed(() => ({ answers: { ...(isRequired.value && { minArrayLength: minArrayLength(1) }) } }));
+    const v$ = useVuelidate(rules, { answers });
+
     const updateQuestionnaireAnswer = () => {
-      const answers = isMultipleChoiced.value ? multipleAnswer.value : [singleAnswer.value];
+      v$.value.answers.$touch();
+      if (v$.value.answers.$error) return NotifyWarning('Champ(s) invalide(s).');
 
       $store.dispatch(
         'questionnaire/setAnswerList',
-        { answers: [{ card: card.value._id, answerList: answers }] }
+        { answers: [{ card: card.value._id, answerList: answers.value }] }
       );
 
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
@@ -55,8 +66,6 @@ export default {
       if (isMultipleChoiced.value) multipleAnswer.value = value;
       else singleAnswer.value = value;
     };
-
-    const isRequired = computed(() => get(card.value, 'isMandatory') || false);
 
     const answerList = computed(() => $store.state.questionnaire.answerList);
 
@@ -85,6 +94,7 @@ export default {
       answerOptions,
       optionType,
       cardTitle,
+      v$,
     };
   },
 };
