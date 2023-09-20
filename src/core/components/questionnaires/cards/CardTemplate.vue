@@ -4,7 +4,15 @@
 
 <script>
 import { computed, toRefs, defineAsyncComponent } from 'vue';
-import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, OPEN_QUESTION, QUESTION_ANSWER } from '@data/constants';
+import {
+  TRANSITION,
+  TITLE_TEXT_MEDIA,
+  TITLE_TEXT,
+  TEXT_MEDIA,
+  OPEN_QUESTION,
+  QUESTION_ANSWER,
+  SURVEY,
+} from '@data/constants';
 
 export default {
   name: 'CardTemplate',
@@ -28,6 +36,8 @@ export default {
           return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/OpenQuestion'));
         case QUESTION_ANSWER:
           return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/QuestionAnswer'));
+        case SURVEY:
+          return defineAsyncComponent(() => import('src/core/components/questionnaires/cards/Survey'));
         default:
           return null;
       }
