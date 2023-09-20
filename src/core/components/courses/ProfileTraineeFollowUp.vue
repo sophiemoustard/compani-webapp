@@ -17,8 +17,8 @@
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
       <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode"
-          :type="EXPECTATIONS" @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
+        <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
+          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
         <ni-questionnaire-qrcode-cell v-if="endOfCourseQuestionnaireId" :img="endOfCourseQRCode" :type="END_OF_COURSE"
           @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)" />
       </div>
@@ -26,7 +26,7 @@
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
-      </div>
+    </div>
     <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="learnersLoading"
       class="q-mb-xl" is-blended />
     <div class="q-mb-sm">
