@@ -1,20 +1,9 @@
 <template>
   <div class="card-container">
-    <span>
-      {{ card.question }}
-      <span v-if="isRequired"> *</span>
-      <q-icon v-if="v$.answer.$error" class="q-mx-md" name="error_outline" color="secondary" />
-    </span>
-    <q-field borderless :error="v$.answer.$error" :error-message="REQUIRED_LABEL">
-      <q-rating v-model="answer" :icon="iconTab" max="5" color="primary" size="lg" class="q-mt-lg">
-        <template #tip-1>
-          <q-tooltip>{{ card.label.left }}</q-tooltip>
-        </template>
-        <template #tip-5>
-          <q-tooltip>{{ card.label.right }}</q-tooltip>
-        </template>
-      </q-rating>
-    </q-field>
+    <div class="elm-width items-center">
+      <ni-rating v-model="answer" :icon="iconTab" :caption="card.question" :error="v$.answer.$error"
+      :right-label="card.label.right" :left-label="card.label.left" :required-field="isRequired" />
+    </div>
     <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
 </template>
@@ -28,11 +17,13 @@ import { minValue } from '@vuelidate/validators';
 import { NotifyWarning } from '@components/popup/notify';
 import { INCREMENT, REQUIRED_LABEL } from '@data/constants';
 import Footer from '@components/questionnaires/cards/Footer';
+import Rating from '@components/Rating';
 
 export default {
   name: 'Survey',
   components: {
     'ni-footer': Footer,
+    'ni-rating': Rating,
   },
   props: {
     card: { type: Object, required: true },
