@@ -49,12 +49,10 @@ export default {
       v$.value.answer.$touch();
       if (v$.value.answer.$error) return NotifyWarning('Champ requis.');
 
-      if (answer.value) {
-        $store.dispatch(
-          'questionnaire/setAnswerList',
-          { answers: [{ card: card.value._id, answerList: [answer.value.toString()] }] }
-        );
-      }
+      $store.dispatch(
+        'questionnaire/setAnswerList',
+        { answers: [{ card: card.value._id, answerList: [answer.value ? answer.value.toString() : ''] }] }
+      );
 
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
