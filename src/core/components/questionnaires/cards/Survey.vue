@@ -63,6 +63,16 @@ export default {
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
 
+    const answerList = computed(() => $store.state.questionnaire.answerList);
+
+    const created = () => {
+      const initialValue = answerList.value.find(a => a.card === card.value._id);
+
+      answer.value = parseInt(get(initialValue, 'answerList[0]'), 10);
+    };
+
+    created();
+
     return {
       // Data
       answer,
