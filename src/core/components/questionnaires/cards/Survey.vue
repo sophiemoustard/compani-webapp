@@ -3,15 +3,18 @@
     <span>
       {{ card.question }}
       <span v-if="isRequired"> *</span>
+      <q-icon v-if="v$.answer.$error" class="q-mx-md" name="error_outline" color="secondary" />
     </span>
-    <q-rating v-model="answer" :icon="iconTab" max="5" color="primary" size="xl" class="q-my-lg">
-      <template #tip-1>
-        <q-tooltip>{{ card.label.left }}</q-tooltip>
-      </template>
-      <template #tip-5>
-        <q-tooltip>{{ card.label.right }}</q-tooltip>
-      </template>
-    </q-rating>
+    <q-field borderless :error="v$.answer.$error" :error-message="REQUIRED_LABEL">
+      <q-rating v-model="answer" :icon="iconTab" max="5" color="primary" size="lg" class="q-mt-lg">
+        <template #tip-1>
+          <q-tooltip>{{ card.label.left }}</q-tooltip>
+        </template>
+        <template #tip-5>
+          <q-tooltip>{{ card.label.right }}</q-tooltip>
+        </template>
+      </q-rating>
+    </q-field>
     <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
 </template>
@@ -23,7 +26,7 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { minValue } from '@vuelidate/validators';
 import { NotifyWarning } from '@components/popup/notify';
-import { INCREMENT } from '@data/constants';
+import { INCREMENT, REQUIRED_LABEL } from '@data/constants';
 import Footer from '@components/questionnaires/cards/Footer';
 
 export default {
@@ -53,12 +56,14 @@ export default {
 
     const updateQuestionnaireAnswer = () => {
       v$.value.answer.$touch();
-      if (v$.value.answer.$error) return NotifyWarning('Champ(s) invalide(s).');
+      if (v$.value.answer.$error) return NotifyWarning('Champ requis.');
 
-      $store.dispatch(
-        'questionnaire/setAnswerList',
-        { answers: [{ card: card.value._id, answerList: [answer.value.toString()] }] }
-      );
+      if (answer.value) {
+        $store.dispatch(
+          'questionnaire/setAnswerList',
+          { answers: [{ card: card.value._id, answerList: [answer.value.toString()] }] }
+        );
+      }
 
       $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
     };
@@ -77,8 +82,10 @@ export default {
       // Data
       answer,
       iconTab,
+      REQUIRED_LABEL,
       // Computed
       isRequired,
+      v$,
       // Methods
       updateQuestionnaireAnswer,
     };
