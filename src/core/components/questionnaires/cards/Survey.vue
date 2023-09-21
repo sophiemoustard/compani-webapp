@@ -1,6 +1,7 @@
 <template>
   <div class="card-container">
-    <q-rating v-model="answer" icon="circle" max="5" color="primary" size="xl">
+    {{ card.question }}
+    <q-rating v-model="answer" :icon="iconTab" max="5" color="primary" size="xl" class="q-my-lg">
       <template #tip-1>
         <q-tooltip>{{ card.label.left }}</q-tooltip>
       </template>
@@ -30,6 +31,13 @@ export default {
     const { card } = toRefs(props);
     const $store = useStore();
     const answer = ref(0);
+    const iconTab = ref([
+      'mdi-numeric-1-box',
+      'mdi-numeric-2-box',
+      'mdi-numeric-3-box',
+      'mdi-numeric-4-box',
+      'mdi-numeric-5-box',
+    ]);
 
     const updateQuestionnaireAnswer = () => {
       $store.dispatch(
@@ -43,6 +51,7 @@ export default {
     return {
       // Data
       answer,
+      iconTab,
       // Methods
       updateQuestionnaireAnswer,
     };
