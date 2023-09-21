@@ -1,15 +1,18 @@
 <template>
   <compani-header />
   <div class="questionnaire-container">
-    <meta-infos :course="course" :questionnaire="questionnaire" :trainee-name="traineeName"
-      :display-name="!isStartorEndCard" />
+    <meta-infos v-if="!isQuestionnaireAnswered" :course="course" :questionnaire="questionnaire"
+      :trainee-name="traineeName" :display-name="!isStartorEndCard" />
     <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
-      @update-trainee="updateTrainee" />
+      :end-card-index="endCardIndex" @update-trainee="updateTrainee" />
     <template v-for="(card, index) of questionnaire.cards" :key="card._id">
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
-    <end v-if="cardIndex === endCardIndex" :course="course" :trainee="trainee" :loading="btnLoading"
+    <end v-if="cardIndex === endCardIndex && !isQuestionnaireAnswered" :trainee-name="traineeName" :loading="btnLoading"
       @submit="createHistory" />
+    <span v-if="cardIndex === endCardIndex && isQuestionnaireAnswered" class="end-text">
+      Merci d'avoir répondu au questionnaire ! Vous pouvez à présent fermer la fenêtre.
+    </span>
   </div>
 </template>
 
@@ -29,7 +32,7 @@ import Start from '@components/questionnaires/cards/Start';
 import End from '@components/questionnaires/cards/End';
 import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { INCREMENT } from '@data/constants';
+import { INCREMENT, START_CARD_INDEX } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 
 export default {
@@ -54,8 +57,9 @@ export default {
     const questionnaire = ref({});
     const trainee = ref('');
     const btnLoading = ref(false);
-    const startCardIndex = ref(-1);
+    const startCardIndex = ref(START_CARD_INDEX);
     const endCardIndex = ref(0);
+    const isQuestionnaireAnswered = ref(false);
 
     const $store = useStore();
     const cardIndex = computed(() => $store.state.questionnaire.cardIndex);
@@ -99,6 +103,7 @@ export default {
 
         await QuestionnaireHistories.create(payload);
         NotifyPositive('Réponse enregistrée.');
+        isQuestionnaireAnswered.value = true;
       } catch (e) {
         console.error(e);
 
@@ -132,6 +137,7 @@ export default {
       INCREMENT,
       btnLoading,
       startCardIndex,
+      isQuestionnaireAnswered,
       // Computed
       cardIndex,
       endCardIndex,
@@ -146,3 +152,8 @@ export default {
   },
 };
 </script>
+<style lang="sass" scoped>
+.end-text
+  text-align: center
+  color: $primary
+</style>

@@ -15,7 +15,7 @@ import { formatAndSortUserOptions } from '@helpers/utils';
 import Select from '@components/form/Select';
 import Footer from '@components/questionnaires/cards/Footer';
 import { NotifyWarning } from '@components/popup/notify';
-import { INCREMENT } from '@data/constants';
+import { INCREMENT, GO_TO_CARD } from '@data/constants';
 
 export default {
   name: 'Start',
@@ -27,11 +27,12 @@ export default {
     course: { type: Object, required: true },
     trainee: { type: String, required: true },
     validations: { type: Object, required: true },
+    endCardIndex: { type: Number, required: true },
   },
   emits: ['update-trainee'],
   setup (props, { emit }) {
     const $store = useStore();
-    const { course, validations } = toRefs(props);
+    const { course, validations, endCardIndex } = toRefs(props);
 
     const traineesOptions = computed(() => (get(course.value, 'trainees.length')
       ? formatAndSortUserOptions(course.value.trainees, false)
@@ -39,11 +40,17 @@ export default {
 
     const updateTrainee = event => emit('update-trainee', event);
 
+    const isFromEndCard = computed(() => $store.state.questionnaire.isFromEndCard);
+
     const updateCardIndex = () => {
       validations.value.trainee.$touch();
       if (validations.value.trainee.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-      $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
+      if (isFromEndCard.value) {
+        $store.dispatch('questionnaire/updateCardIndex', { type: GO_TO_CARD, index: endCardIndex.value });
+      } else {
+        $store.dispatch('questionnaire/updateCardIndex', { type: INCREMENT });
+      }
     };
 
     return {

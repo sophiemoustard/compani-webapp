@@ -14,9 +14,9 @@
       </div>
       <attendance-table :course="course" />
     </div>
-    <div class="q-mb-xl">
+    <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
-      <div v-if="!isClientInterface" class="questionnaire-link-container">
+      <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
         <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
           @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
         <ni-questionnaire-qrcode-cell v-if="endOfCourseQuestionnaireId" :img="endOfCourseQRCode" :type="END_OF_COURSE"
@@ -137,7 +137,13 @@ export default {
     } = useCourses(course);
     const { learners, getFollowUp, learnersLoading } = useTraineeFollowUp(profileId);
 
-    const areQuestionnaireAnswersVisible = computed(() => !isClientInterface && questionnaires.value.length);
+    const areQuestionnaireAnswersVisible = computed(() => questionnaires.value.length);
+
+    const areQuestionnaireQRCodeVisible = computed(() => expectationsQuestionnaireId.value ||
+      endOfCourseQuestionnaireId.value);
+
+    const areQuestionnaireVisible = computed(() => (!isClientInterface &&
+      (areQuestionnaireAnswersVisible.value || areQuestionnaireQRCodeVisible.value)));
 
     const courseHasElearningStep = computed(() => course.value.subProgram.steps.some(step => step.type === E_LEARNING));
 
@@ -271,13 +277,15 @@ export default {
       END_OF_COURSE,
       // Computed
       course,
-      areQuestionnaireAnswersVisible,
       courseHasElearningStep,
       disableDownloadCompletionCertificates,
       followUpDisabled,
       followUpMissingInfo,
       disableDocDownload,
       isArchived,
+      areQuestionnaireAnswersVisible,
+      areQuestionnaireVisible,
+      areQuestionnaireQRCodeVisible,
       // Methods
       get,
       formatQuantity,
