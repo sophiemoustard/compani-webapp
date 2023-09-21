@@ -21,8 +21,6 @@ import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'Rating',
-  components: {
-  },
   props: {
     modelValue: { type: Number, default: 0 },
     leftLabel: { type: String, required: true },
@@ -46,7 +44,3 @@ export default {
   },
 };
 </script>
-<style lang="sass" scoped>
-.required::after
-  content: ' *'
-</style>
