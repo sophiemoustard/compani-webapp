@@ -20,7 +20,7 @@ describe('customers agenda tests', () => {
   });
 
   it('should go through agenda and display events', () => {
-    cy.get('#q-app').click(500, 500);
+    cy.get('#q-app').click(500, 500, { force: true });
     cy.get('.event-intervention').should('have.length', 1);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'Auxiliary O.');
 
