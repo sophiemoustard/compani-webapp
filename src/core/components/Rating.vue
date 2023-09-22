@@ -1,11 +1,14 @@
 <template>
-  <div class="row">
-    <p :class="[{ required: requiredField }, 'col-11', 'input-caption']">{{ caption }}</p>
+  <div class="row items-start">
+    <div class="caption input-caption">
+      <p :class="[{ required: requiredField }]">{{ caption }}</p>
+      <span class="q-mx-sm">(1 : {{ leftLabel }} - 5 : {{ rightLabel }})</span>
+    </div>
     <q-icon v-if="error" name="error_outline" color="secondary" class="col-1" />
   </div>
   <q-field borderless :error="error" :error-message="errorMessage">
     <q-rating :model-value="modelValue" @update:model-value="update" :icon="icon" max="5" color="primary"
-      size="lg">
+      size="lg" class="q-mx-sm">
       <template #tip-1>
         <q-tooltip>{{ leftLabel }}</q-tooltip>
       </template>
@@ -44,3 +47,7 @@ export default {
   },
 };
 </script>
+<style lang="sass" scoped>
+.caption
+  flex: 1
+</style>
