@@ -349,6 +349,7 @@ export const COURSE_SMS = 'Formation';
 // COURSE
 export const INTRA = 'intra';
 export const INTER_B2B = 'inter_b2b';
+export const INTRA_HOLDING = 'intra_holding';
 export const COURSE_TYPES = [
   { label: 'Intra', value: INTRA },
   { label: 'Inter B2B', value: INTER_B2B },

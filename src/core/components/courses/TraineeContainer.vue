@@ -4,7 +4,7 @@
       <div class="row">
         <p class="text-weight-bold table-title">{{ tableTitle }}</p>
       </div>
-      <div class="row" v-if="isIntraCourse">
+      <div class="row" v-if="isIntraCourse || isIntraHoldingCourse">
         <ni-input v-if="isRofOrAdmin && !isClientInterface" caption="Nombre max de stagiaires" :disable="isArchived"
           :model-value="maxTrainees" @update:model-value="inputTmpMaxTrainees($event)"
           :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" @blur="updateMaxTrainees" />
@@ -180,7 +180,7 @@ export default {
 
     const refresh = () => emit('refresh');
 
-    const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
+    const { isIntraCourse, isClientInterface, isArchived, isIntraHoldingCourse } = useCourses(course);
 
     const {
       newLearner,
@@ -297,6 +297,7 @@ export default {
       traineesOptions,
       course,
       isIntraCourse,
+      isIntraHoldingCourse,
       isClientInterface,
       isArchived,
       isRofOrAdmin,
