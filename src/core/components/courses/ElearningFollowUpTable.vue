@@ -11,8 +11,9 @@
           <template v-else-if="col.name === 'expand'">
             <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
           </template>
-          <template v-else-if="col.name === 'isConnected'">
-            <connected-dot v-if="col.value" />
+          <template v-else-if="col.name === 'connectionInfos'">
+            <a v-if="col.value">{{ col.value }}</a>
+            <connected-dot v-else />
           </template>
           <template v-else>
             <div :class="['name', canAccessTrainee(props.row) && 'clickable-name']"
@@ -88,10 +89,9 @@ export default {
         style: isBlended.value ? 'width: 40%' : 'width: 70%',
       },
       {
-        name: 'isConnected',
-        label: 'Connexion à l\'app ?',
-        field: 'firstMobileConnection',
-        format: value => !!value,
+        name: 'connectionInfos',
+        label: 'Code de connexion à l\'app',
+        field: 'loginCode',
         align: 'center',
       },
       {
@@ -115,7 +115,7 @@ export default {
     });
 
     const visibleColumns = computed(() => (isBlended.value
-      ? ['name', 'isConnected', 'progress', 'expand']
+      ? ['name', 'connectionInfos', 'progress', 'expand']
       : ['name', 'progress', 'expand']));
 
     const goToLearnerProfile = (row, $event) => {

@@ -96,8 +96,8 @@ export const useLearnersCreation = (
     const formattedName = formatIdentity(user.identity, 'FL');
 
     return {
+      _id: user._id,
       learner: {
-        _id: user._id,
         fullName: formattedName,
         lastname: user.identity.lastname,
         picture: user.picture ? user.picture.link : null,

@@ -1,4 +1,3 @@
-
 import { Ability, AbilityBuilder } from '@casl/ability';
 import get from 'lodash/get';
 import { roleBasedAccessControl } from '@helpers/rbac';

@@ -1,8 +1,9 @@
+import axios from 'axios';
 import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
-  async list () {
-    const questionnaires = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires`);
+  async list (params) {
+    const questionnaires = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires`, { params });
     return questionnaires.data.data.questionnaires;
   },
   async create (payload) {
@@ -10,6 +11,10 @@ export default {
   },
   async getById (id) {
     const questionnaire = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires/${id}`);
+    return questionnaire.data.data.questionnaire;
+  },
+  async getFromNotLogged (id) {
+    const questionnaire = await axios.get(`${process.env.API_HOSTNAME}/questionnaires/${id}`);
     return questionnaire.data.data.questionnaire;
   },
   async update (id, payload) {
@@ -27,5 +32,10 @@ export default {
       { params }
     );
     return questionnaire.data.data.followUp;
+  },
+  async getQRCode (id, params = null) {
+    const qrCode = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires/${id}/qrcode`, { params });
+
+    return qrCode.data.data.qrCode;
   },
 };

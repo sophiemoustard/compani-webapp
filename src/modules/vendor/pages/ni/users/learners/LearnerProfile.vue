@@ -24,7 +24,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -60,10 +60,11 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche apprenant' };
     useMeta(metaInfo);
+    const { defaultTab, learnerId } = toRefs(props);
 
     const tabsContent = [
-      { label: 'Infos personnelles', name: 'info', default: props.defaultTab === 'info', component: ProfileInfo },
-      { label: 'Formations', name: 'courses', default: props.defaultTab === 'courses', component: ProfileCourses },
+      { label: 'Infos personnelles', name: 'info', default: defaultTab.value === 'info', component: ProfileInfo },
+      { label: 'Formations', name: 'courses', default: defaultTab.value === 'courses', component: ProfileCourses },
     ];
     const companyOptions = ref([]);
     const companyLinkModal = ref(false);
@@ -78,7 +79,7 @@ export default {
 
     const refreshUserProfile = async () => {
       try {
-        await $store.dispatch('userProfile/fetchUserProfile', { userId: props.learnerId });
+        await $store.dispatch('userProfile/fetchUserProfile', { userId: learnerId.value });
       } catch (e) {
         console.error(e);
       }

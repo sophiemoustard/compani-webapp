@@ -7,7 +7,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { computed, onBeforeUnmount } from 'vue';
+import { computed, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
@@ -32,21 +32,22 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche formation' };
     useMeta(metaInfo);
+    const { defaultTab, courseId } = toRefs(props);
 
     const tabsContent = [
       {
         label: 'Suivi',
         name: 'followUp',
-        default: props.defaultTab === 'followUp',
+        default: defaultTab.value === 'followUp',
         component: ProfileFollowUp,
       },
       {
         label: 'Questionnaires',
         name: 'questionnaires',
-        default: props.defaultTab === 'questionnaires',
+        default: defaultTab.value === 'questionnaires',
         component: ProfileQuestionnaires,
       },
-      { label: 'Accès', name: 'access', default: props.defaultTab === 'access', component: ProfileAccess },
+      { label: 'Accès', name: 'access', default: defaultTab.value === 'access', component: ProfileAccess },
     ];
 
     const $store = useStore();
@@ -59,7 +60,7 @@ export default {
 
     const refreshCourse = async () => {
       try {
-        await $store.dispatch('course/fetchCourse', { courseId: props.courseId });
+        await $store.dispatch('course/fetchCourse', { courseId: courseId.value });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération de la formation.');

@@ -167,6 +167,10 @@ export default {
     border-radius: 3px
     height: 38px
     margin: 0
+    > div:nth-child(1)
+      height: 100%
+      margin-top: 0
+      margin-left: 0
     .q-btn__content
       color: $copper-grey-400
   .q-btn

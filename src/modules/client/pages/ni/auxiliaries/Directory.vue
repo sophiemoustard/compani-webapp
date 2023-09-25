@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" v-model:pagination="pagination"
-      @go-to="goToUserProfile">
+      :path="path">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
@@ -12,7 +12,7 @@
           <q-item-section>{{ col.value.fullName }}</q-item-section>
         </q-item>
         <template v-else-if="col.name === 'profileErrors'">
-          <q-icon v-if="notifications.profiles[props.row.auxiliary._id] && props.row.isActive" name="error"
+          <q-icon v-if="notifications.profiles[props.row._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
         </template>
         <template v-else-if="col.name === 'active'">
@@ -113,6 +113,7 @@ export default {
           label: 'Infos',
           align: 'left',
           sortable: true,
+          format: value => value || '\u00a0',
           style: 'min-width: 75px; width: 8%',
         },
         {
@@ -131,7 +132,7 @@ export default {
           field: 'hiringDate',
           align: 'left',
           sortable: true,
-          format: formatDate,
+          format: value => formatDate(value) || '\u00a0',
           sort: ascendingSort,
           style: 'min-width: 110px; width: 15%',
         },
@@ -152,6 +153,7 @@ export default {
           style: 'min-width: 30px; width: 4%',
         },
       ],
+      path: { name: 'ni auxiliaries info', params: 'auxiliaryId' },
       REQUIRED_LABEL,
     };
   },
@@ -208,8 +210,8 @@ export default {
       const formattedName = formatIdentity(user.identity, 'FL');
 
       const formattedUser = {
+        _id: user._id,
         auxiliary: {
-          _id: user._id,
           fullName: formattedName,
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
@@ -241,9 +243,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    goToUserProfile (row) {
-      this.$router.push({ name: 'ni auxiliaries info', params: { auxiliaryId: row.auxiliary._id } });
     },
     resetForm () {
       this.v$.newUser.$reset();

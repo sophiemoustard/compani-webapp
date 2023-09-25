@@ -9,7 +9,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
@@ -32,17 +32,18 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche auxiliaire' };
     useMeta(metaInfo);
+    const { defaultTab, auxiliaryId } = toRefs(props);
 
     const tabsContent = [
       {
         label: 'Infos personnelles',
         name: 'info',
-        default: props.defaultTab === 'info',
+        default: defaultTab.value === 'info',
         component: ProfileInfo,
         notification: 'profiles',
       },
-      { label: 'Contrats', name: 'contracts', default: props.defaultTab === 'contracts', component: ProfileContracts },
-      { label: 'Paie', name: 'pays', default: props.defaultTab === 'pays', component: ProfilePay },
+      { label: 'Contrats', name: 'contracts', default: defaultTab.value === 'contracts', component: ProfileContracts },
+      { label: 'Paie', name: 'pays', default: defaultTab.value === 'pays', component: ProfilePay },
     ];
     const auxiliaryName = ref('');
 
@@ -58,7 +59,7 @@ export default {
     };
 
     const created = async () => {
-      await $store.dispatch('userProfile/fetchUserProfile', { userId: props.auxiliaryId });
+      await $store.dispatch('userProfile/fetchUserProfile', { userId: auxiliaryId.value });
       refreshAuxiliaryName();
     };
 

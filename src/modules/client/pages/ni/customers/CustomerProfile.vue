@@ -9,7 +9,7 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileTabs from '@components/ProfileTabs';
@@ -31,25 +31,26 @@ export default {
   setup (props) {
     const metaInfo = { title: 'Fiche bénéficiaire' };
     useMeta(metaInfo);
+    const { defaultTab, customerId } = toRefs(props);
 
     const tabsContent = [
       {
         label: 'Accompagnement',
         name: 'followUp',
-        default: props.defaultTab === 'followUp',
+        default: defaultTab.value === 'followUp',
         component: ProfileFollowUp,
       },
       {
         label: 'Infos',
         name: 'info',
-        default: props.defaultTab === 'info',
+        default: defaultTab.value === 'info',
         component: ProfileInfo,
         notification: 'profiles',
       },
       {
         label: 'Facturation',
         name: 'billing',
-        default: props.defaultTab === 'billing',
+        default: defaultTab.value === 'billing',
         component: ProfileBilling,
       },
     ];
@@ -67,7 +68,7 @@ export default {
     };
 
     const created = async () => {
-      await $store.dispatch('customer/fetchCustomer', { customerId: props.customerId });
+      await $store.dispatch('customer/fetchCustomer', { customerId: customerId.value });
       refreshCustomerName();
     };
 

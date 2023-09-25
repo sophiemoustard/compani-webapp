@@ -32,9 +32,9 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.18.0
+          node-version: 18.17.0
 
-      - run: cd api && npm ci
+      - run: cd api && yarn install
         env:
           DETACHMENT_ALLOWED_COMPANY_IDS : ${{ secrets.DETACHMENT_ALLOWED_COMPANY_IDS }}
       - uses: actions/checkout@v3

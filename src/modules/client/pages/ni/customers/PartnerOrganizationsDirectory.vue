@@ -3,7 +3,7 @@
     <ni-directory-header title="Structures partenaires" search-placeholder="Rechercher une structure"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredPartnerOrganizations" :columns="columns" :visible-columns="visibleColumns"
-      v-model:pagination="pagination" :loading="tableLoading" @go-to="goToPartnerOrganizationProfile" />
+      v-model:pagination="pagination" :loading="tableLoading" :path="path" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="partnerOrganizationCreationModal = true" />
 
@@ -66,6 +66,7 @@ export default {
       ],
       visibleColumns: ['name', 'prescriptions'],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
+      path: { name: 'ni customers partner organizations info', params: 'partnerOrganizationId' },
     };
   },
   validations () {
@@ -95,12 +96,6 @@ export default {
   methods: {
     updateSearch (value) {
       this.searchStr = value;
-    },
-    goToPartnerOrganizationProfile (partnerOrganization) {
-      this.$router.push({
-        name: 'ni customers partner organizations info',
-        params: { partnerOrganizationId: partnerOrganization._id },
-      });
     },
     async refreshPartnerOrganizations () {
       try {
