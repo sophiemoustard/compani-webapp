@@ -1,4 +1,4 @@
-import { Ability, AbilityBuilder } from '@casl/ability';
+import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 import get from 'lodash/get';
 import { roleBasedAccessControl } from '@helpers/rbac';
 import {
@@ -10,6 +10,9 @@ import {
   PLANNING_REFERENT,
   ERP,
   TRAINER,
+  INTRA,
+  INTRA_HOLDING,
+  HOLDING_ADMIN,
 } from '@data/constants';
 import router from 'src/router/index';
 
@@ -24,7 +27,7 @@ export const defineAbilitiesFor = (user) => {
   const { role, company, _id, sector } = user;
   const clientRole = get(role, 'client.name');
   const vendorRole = get(role, 'vendor.name');
-  const { can, rules } = new AbilityBuilder();
+  const { can, rules } = new AbilityBuilder(createMongoAbility);
 
   const companySubscriptions = company
     ? Object.keys(company.subscriptions).filter(key => company.subscriptions[key])
@@ -35,7 +38,6 @@ export const defineAbilitiesFor = (user) => {
   if (isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
     can('set', 'user_company');
     can('update', 'coursebilling');
-    can('update', 'interlocutor');
   }
   if (isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER].includes(vendorRole)) {
     can('update', 'course_trainee_follow_up');
@@ -53,5 +55,27 @@ export const defineAbilitiesFor = (user) => {
       can('update', 'Events', { sectorId: { $eq: sector } });
     }
   }
-  return new Ability(rules);
+  return createMongoAbility(rules);
+};
+
+export const defineAbilitiesForCourse = (user) => {
+  const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
+  const { role } = user;
+  const vendorRole = get(role, 'vendor.name');
+  const holdingRole = get(role, 'holding.name');
+
+  const { can, rules } = new AbilityBuilder(createMongoAbility);
+
+  if (isVendorInterface) {
+    if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
+      can('update', 'Course', 'company_representative', { type: { $in: [INTRA, INTRA_HOLDING] } });
+      can('update', 'interlocutor');
+    }
+  } else {
+    can('update', 'Course', 'company_representative', { type: { $in: [INTRA] } });
+    if ([HOLDING_ADMIN].includes(holdingRole)) {
+      can('update', 'Course', 'company_representative', { type: { $in: [INTRA_HOLDING] } });
+    }
+  }
+  return createMongoAbility(rules);
 };

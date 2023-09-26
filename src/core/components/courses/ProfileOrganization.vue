@@ -19,9 +19,9 @@
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant" :contact="course.contact"
           :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
           @open-modal="openTrainerModal" />
-        <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Référent structure"
-          :contact="course.contact" :can-update="(canUpdateInterlocutor || isClientInterface) && course.type === INTRA"
-          label="Ajouter un référent structure" :disable="isArchived" @open-modal="openCompanyRepresentativeModal" />
+        <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Chargé de formation structure"
+          :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
+          label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
@@ -109,6 +109,7 @@
 </template>
 
 <script>
+import { subject } from '@casl/ability';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { computed, ref, toRefs, watch } from 'vue';
@@ -156,8 +157,9 @@ import {
   HH_MM,
   COURSE,
   EDITION,
+  HOLDING_ADMIN,
 } from '@data/constants';
-import { defineAbilitiesFor } from '@helpers/ability';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
 import { formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
@@ -238,6 +240,7 @@ export default {
     const {
       vendorRole,
       isIntraCourse,
+      isIntraHoldingCourse,
       disableDocDownload,
       pdfLoading,
       isClientInterface,
@@ -315,8 +318,14 @@ export default {
       return !!smsMissingInfo.value.length || noPhoneNumber;
     });
 
+    const canUpdateCompanyRepresentative = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Course', course.value), 'company_representative');
+    });
+
     const canUpdateInterlocutor = computed(() => {
-      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role']));
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       return ability.can('update', 'interlocutor');
     });
@@ -332,7 +341,7 @@ export default {
         { interlocutor: course.value.salesRepresentative, role: 'Référent(e) Compani' },
         ...(course.value.trainer._id ? [{ interlocutor: course.value.trainer, role: 'Intervenant(e)' }] : []),
         ...(course.value.companyRepresentative._id
-          ? [{ interlocutor: course.value.companyRepresentative, role: 'Référent(e) structure' }]
+          ? [{ interlocutor: course.value.companyRepresentative, role: 'Chargé(e) de formation structure' }]
           : []),
       ];
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
@@ -438,16 +447,20 @@ export default {
 
     const refreshCompanyRepresentatives = async () => {
       try {
+        if (course.value.type === INTER_B2B) {
+          companyRepresentativeOptions.value = [];
+          return;
+        }
         const loggedUserCompany = get(loggedUser.value, 'company._id');
-        const courseCompany = course.value.type === INTRA ? course.value.companies[0]._id : '';
+        const courseCompanies = course.value.companies.map(c => c._id);
 
-        if (loggedUserIsTrainer.value && loggedUserCompany !== courseCompany) {
+        if (loggedUserIsTrainer.value && !courseCompanies.includes(loggedUserCompany)) {
           companyRepresentativeOptions.value = [];
           return;
         }
         const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompany, includeHoldingAdmins: true })
-          : [];
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompanies[0], includeHoldingAdmins: true })
+          : await Users.list({ role: [HOLDING_ADMIN], holding: course.value.holding });
 
         companyRepresentativeOptions.value = Object.freeze(clientsUsersAllowedtoAccessCompany
           .map(user => formatInterlocutorOption(user)).sort((a, b) => a.label.localeCompare(b.label)));
@@ -686,7 +699,7 @@ export default {
         isContact: !!course.value.companyRepresentative._id &&
         course.value.companyRepresentative._id === course.value.contact._id,
       };
-      interlocutorLabel.value = { action, interlocutor: 'référent structure' };
+      interlocutorLabel.value = { action, interlocutor: 'chargé de formation structure' };
       companyRepresentativeModal.value = true;
     };
 
@@ -755,7 +768,10 @@ export default {
 
     const created = async () => {
       const promises = [];
-      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
+      if (isIntraCourse.value || (isIntraHoldingCourse.value && (isVendorInterface || hasHoldingRole.value))) {
+        promises.push(refreshCompanyRepresentatives());
+      }
+      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms());
       if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
 
       if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
@@ -812,6 +828,7 @@ export default {
       smsMissingInfo,
       disableSms,
       canUpdateInterlocutor,
+      canUpdateCompanyRepresentative,
       traineesEmails,
       contactOptions,
       isIntraOrVendor,

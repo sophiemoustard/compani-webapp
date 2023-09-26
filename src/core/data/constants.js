@@ -213,6 +213,9 @@ export const VENDOR_ADMIN = 'vendor_admin';
 export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
 export const TRAINER = 'trainer';
 
+// ROLES HOLDING
+export const HOLDING_ADMIN = 'holding_admin';
+
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 export const ROLE_TRANSLATION = {
