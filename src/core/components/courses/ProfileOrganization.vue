@@ -3,7 +3,7 @@
     <div class="profile-container q-mb-xl">
       <ni-bi-color-button v-if="isIntraOrVendor" class="button-history" icon="history" label="Historique"
         @click="toggleHistory" />
-      <div v-if="isIntraOrVendor" class="row gutter-profile">
+      <div v-if="isIntraOrIntraHoldingOrVendor" class="row gutter-profile">
         <ni-input caption="Informations complémentaires" v-model.trim="tmpCourse.misc"
           @blur="updateCourse('misc')" :disable="isArchived" />
       </div>
@@ -243,6 +243,7 @@ export default {
       isClientInterface,
       isVendorInterface,
       isIntraOrVendor,
+      isIntraOrIntraHoldingOrVendor,
       followUpDisabled,
       isArchived,
       followUpMissingInfo,
@@ -814,6 +815,7 @@ export default {
       traineesEmails,
       contactOptions,
       isIntraOrVendor,
+      isIntraOrIntraHoldingOrVendor,
       disableDocDownload,
       followUpDisabled,
       isArchived,

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES } from '@data/constants';
+import { INTRA, COURSE_TYPES, INTRA_HOLDING } from '@data/constants';
 import {
   formatIdentity,
   formatDownloadName,
@@ -20,6 +20,8 @@ export const useCourses = (course) => {
   const pdfLoading = ref(false);
 
   const isIntraCourse = computed(() => (get(course.value, 'type') === INTRA));
+
+  const isIntraHoldingCourse = computed(() => (get(course.value, 'type') === INTRA_HOLDING));
 
   const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
 
@@ -43,6 +45,9 @@ export const useCourses = (course) => {
   const isArchived = computed(() => !!course.value.archivedAt);
 
   const isIntraOrVendor = computed(() => isIntraCourse.value || isVendorInterface);
+
+  const isIntraOrIntraHoldingOrVendor =
+    computed(() => isIntraCourse.value || isIntraHoldingCourse.value || isVendorInterface);
 
   const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
@@ -81,12 +86,14 @@ export const useCourses = (course) => {
   return {
     // Computed
     isIntraCourse,
+    isIntraHoldingCourse,
     headerInfo,
     vendorRole,
     disableDocDownload,
     isVendorInterface,
     isClientInterface,
     isIntraOrVendor,
+    isIntraOrIntraHoldingOrVendor,
     followUpDisabled,
     isArchived,
     pdfLoading,
