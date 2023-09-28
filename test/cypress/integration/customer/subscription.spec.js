@@ -8,7 +8,7 @@ describe('customers subscription tests', () => {
   });
 
   it('should display correctly the subscriptions part of the page', () => {
-    cy.get('#q-app').click(500, 500);
+    cy.get('[data-cy="q-app"]').click();
 
     cy.dataCy('hourly-price').should('contain', 'Prix horaire (TTC) : 27,00\u00A0€ / heure');
     cy.dataCy('week-infos').should(
@@ -23,7 +23,7 @@ describe('customers subscription tests', () => {
   });
 
   it('should interact correctly with the subscriptions part of the page', () => {
-    cy.get('#q-app').click(500, 500);
+    cy.get('[data-cy="q-app"]').click();
     cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
     cy.get('.q-checkbox').click();
     cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
@@ -85,7 +85,7 @@ describe('customers subscription tests', () => {
   });
 
   it('should display correctly the payment part and open the modal for the mandate', () => {
-    cy.get('#q-app').click(500, 500);
+    cy.get('[data-cy="q-app"]').click();
 
     cy.dataCy('bank-account-owner').should('have.value', 'David gaudu');
     cy.dataCy('iban').should('have.value', 'FR3617569000306699167186M11');
