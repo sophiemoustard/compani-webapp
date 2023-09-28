@@ -240,7 +240,6 @@ export default {
     const {
       vendorRole,
       isIntraCourse,
-      isIntraHoldingCourse,
       disableDocDownload,
       pdfLoading,
       isClientInterface,
@@ -458,6 +457,7 @@ export default {
           companyRepresentativeOptions.value = [];
           return;
         }
+
         const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
           ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompanies[0], includeHoldingAdmins: true })
           : await Users.list({ role: [HOLDING_ADMIN], holding: course.value.holding });
@@ -768,9 +768,7 @@ export default {
 
     const created = async () => {
       const promises = [];
-      if (isIntraCourse.value || (isIntraHoldingCourse.value && (isVendorInterface || hasHoldingRole.value))) {
-        promises.push(refreshCompanyRepresentatives());
-      }
+      if (canUpdateCompanyRepresentative.value) promises.push(refreshCompanyRepresentatives());
       if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms());
       if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
 

@@ -61,17 +61,19 @@ export const defineAbilitiesFor = (user) => {
 export const defineAbilitiesForCourse = (user) => {
   const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
   const { role } = user;
-  const vendorRole = get(role, 'vendor.name');
-  const holdingRole = get(role, 'holding.name');
 
   const { can, rules } = new AbilityBuilder(createMongoAbility);
 
   if (isVendorInterface) {
+    const vendorRole = get(role, 'vendor.name');
+
     if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
       can('update', 'Course', 'company_representative', { type: { $in: [INTRA, INTRA_HOLDING] } });
       can('update', 'interlocutor');
     }
   } else {
+    const holdingRole = get(role, 'holding.name');
+
     can('update', 'Course', 'company_representative', { type: { $in: [INTRA] } });
     if ([HOLDING_ADMIN].includes(holdingRole)) {
       can('update', 'Course', 'company_representative', { type: { $in: [INTRA_HOLDING] } });
