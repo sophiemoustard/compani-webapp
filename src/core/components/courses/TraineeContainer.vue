@@ -21,7 +21,7 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
               <template v-if="col.name === 'company'">
-                <div v-if="canEdit" @click="goToCompany(col.value)"> {{ col.value }}</div>
+                <div v-if="canAccessCompany" @click="goToCompany(col.value)"> {{ col.value }}</div>
                 <div v-else>{{ col.value }}</div>
               </template>
               <template v-else-if="col.name === 'actions'">
@@ -42,8 +42,8 @@
         <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
           :loading="loading" table-class="q-pb-md" />
       </q-card>
-      <div align="right" v-if="canEdit" class="q-pa-sm">
-        <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
+      <div align="right" v-if="canUpdateCompany" class="q-pa-sm">
+        <ni-button v-if="canUpdateCompany" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
           @click="openCompanyAdditionModal" />
         <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
           @click="openTraineeCreationModal" />
@@ -69,13 +69,16 @@
 </template>
 
 <script>
+import { subject } from '@casl/ability';
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
-import { TRAINER } from '@data/constants';
+import { TRAINER, INTRA } from '@data/constants';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
@@ -115,6 +118,20 @@ export default {
     const $store = useStore();
     const $router = useRouter();
 
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const canUpdateCompany = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Course', course.value), 'companies');
+    });
+
+    const canAccessCompany = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('read', 'companies');
+    });
+
     const traineeModalLoading = ref(false);
 
     const companyColumns = ref([
@@ -122,7 +139,7 @@ export default {
         name: 'company',
         label: 'Structure',
         align: 'left',
-        class: canEdit.value ? 'clickable-name' : 'company-name',
+        class: canAccessCompany.value ? 'clickable-name' : 'company-name',
         field: row => get(row, 'name') || '',
       },
       { name: 'actions', label: '', align: 'right', field: '_id' },
@@ -156,7 +173,7 @@ export default {
 
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
-    const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
+    const companyVisibleColumns = computed(() => (canUpdateCompany.value ? ['company', 'actions'] : ['company']));
 
     const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
 
@@ -172,8 +189,6 @@ export default {
       }
       return options;
     });
-
-    const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const displayCompanyNames =
       computed(() => !isIntraCourse.value && (!isClientInterface || !!loggedUser.value.role.holding));
@@ -264,7 +279,7 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId }, query: { defaultTab: 'infos' } });
     };
 
-    const created = async () => { await getPotentialCompanies(); };
+    const created = async () => { if (course.value.type !== INTRA) await getPotentialCompanies(); };
 
     created();
 
@@ -307,6 +322,8 @@ export default {
       hasLinkedCompanies,
       traineesCompanyOptions,
       displayCompanyNames,
+      canUpdateCompany,
+      canAccessCompany,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
