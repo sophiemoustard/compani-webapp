@@ -74,10 +74,11 @@ export const defineAbilitiesForCourse = (user) => {
   } else {
     const holdingRole = get(role, 'holding.name');
 
-    can('update', 'Course', 'company_representative', { type: { $in: [INTRA] } });
+    can('update', 'Course', 'company_representative', { type: INTRA });
     if ([HOLDING_ADMIN].includes(holdingRole)) {
-      can('update', 'Course', 'company_representative', { type: { $in: [INTRA_HOLDING] } });
+      can('update', 'Course', 'company_representative', { type: INTRA_HOLDING });
     }
   }
+
   return createMongoAbility(rules);
 };
