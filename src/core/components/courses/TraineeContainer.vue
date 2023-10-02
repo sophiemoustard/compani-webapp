@@ -279,7 +279,9 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId }, query: { defaultTab: 'infos' } });
     };
 
-    const created = async () => { if (course.value.type !== INTRA) await getPotentialCompanies(); };
+    const created = async () => {
+      if (course.value.type !== INTRA && canUpdateCompany.value) await getPotentialCompanies();
+    };
 
     created();
 
