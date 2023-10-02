@@ -120,6 +120,8 @@ export default {
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
+    const course = computed(() => $store.state.course.course);
+
     const canUpdateCompany = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
@@ -129,7 +131,7 @@ export default {
     const canAccessCompany = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
-      return ability.can('read', 'companies');
+      return ability.can('read', subject('Course', course.value), 'companies');
     });
 
     const traineeModalLoading = ref(false);
@@ -150,8 +152,6 @@ export default {
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
     const isTrainer = ref(vendorRole.value === TRAINER);
-
-    const course = computed(() => $store.state.course.course);
 
     const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
 

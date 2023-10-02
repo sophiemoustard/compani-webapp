@@ -70,8 +70,8 @@ export const defineAbilitiesForCourse = (user) => {
 
     if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
       can('update', 'Course', 'company_representative', { type: { $in: [INTRA, INTRA_HOLDING] } });
-      can('update', 'interlocutor');
-      can('read', 'companies');
+      can('update', 'Course', 'interlocutor');
+      can('read', 'Course', 'companies');
       can('update', 'Course', 'companies', { type: { $in: [INTER_B2B, INTRA_HOLDING] } });
     }
   } else {
