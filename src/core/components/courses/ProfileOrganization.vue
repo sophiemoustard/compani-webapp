@@ -29,9 +29,9 @@
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
-    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshTraineeTable"
-      @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
-      v-model:max-trainees="tmpCourse.maxTrainees" />
+    <ni-trainee-container :can-update-trainees="canUpdateTrainees" :loading="courseLoading"
+      @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse"
+      :potential-trainees="potentialTrainees" v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
@@ -273,8 +273,6 @@ export default {
 
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
-    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isRofOrVendorAdmin.value));
-
     const isFinished = computed(() => {
       const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
       return !slotsToCome.length && !course.value.slotsToPlan.length;
@@ -327,6 +325,12 @@ export default {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       return ability.can('update', subject('Course', course.value), 'interlocutor');
+    });
+
+    const canUpdateTrainees = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Course', course.value), 'trainees');
     });
 
     const traineesEmails = computed(() => {
@@ -770,7 +774,7 @@ export default {
       const promises = [];
       if (canUpdateCompanyRepresentative.value) promises.push(refreshCompanyRepresentatives());
       if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms());
-      if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
+      if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
 
       if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
       else {
@@ -820,13 +824,13 @@ export default {
       isRofOrVendorAdmin,
       hasHoldingRole,
       canEditSlots,
-      canEditTrainees,
       filteredMessageTypeOptions,
       missingTraineesPhone,
       smsMissingInfo,
       disableSms,
       canUpdateInterlocutor,
       canUpdateCompanyRepresentative,
+      canUpdateTrainees,
       traineesEmails,
       contactOptions,
       isIntraOrVendor,

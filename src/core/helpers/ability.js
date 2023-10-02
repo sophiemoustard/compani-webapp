@@ -68,20 +68,25 @@ export const defineAbilitiesForCourse = (user) => {
   if (isVendorInterface) {
     const vendorRole = get(role, 'vendor.name');
 
+    can('read', 'Course', 'trainees');
     if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
       can('update', 'Course', 'company_representative', { type: { $in: [INTRA, INTRA_HOLDING] } });
       can('update', 'Course', 'interlocutor');
       can('read', 'Course', 'companies');
       can('update', 'Course', 'companies', { type: { $in: [INTER_B2B, INTRA_HOLDING] } });
-    }
+      can('update', 'Course', 'trainees');
+    } else if (vendorRole === TRAINER) can('update', 'Course', 'trainees', { type: INTRA });
   } else {
     const holdingRole = get(role, 'holding.name');
+    const clientRole = get(role, 'client.name');
 
     can('update', 'Course', 'company_representative', { type: INTRA });
+    can('update', 'Course', 'trainees', { type: { $in: [INTRA_HOLDING, INTRA] } });
     if ([HOLDING_ADMIN].includes(holdingRole)) {
       can('update', 'Course', 'company_representative', { type: INTRA_HOLDING });
       can('update', 'Course', 'companies', { type: INTRA_HOLDING });
-    }
+      can('read', 'Course', 'trainees');
+    } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) can('read', 'Course', 'trainees', { type: INTRA });
   }
 
   return createMongoAbility(rules);

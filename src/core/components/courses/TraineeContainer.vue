@@ -32,21 +32,21 @@
           </template>
           <template #expanding-row="{ props }">
             <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
-              :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
+              :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canUpdateTrainees"
               @refresh="refresh" hide-header />
             <div class="text-center text-italic no-data" v-else>
               Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
             </div>
           </template>
         </ni-expanding-table>
-        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
+        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canUpdateTrainees" @refresh="refresh"
           :loading="loading" table-class="q-pb-md" />
       </q-card>
-      <div align="right" v-if="canUpdateCompany" class="q-pa-sm">
+      <div align="right" v-if="canUpdateTrainees" class="q-pa-sm">
         <ni-button v-if="canUpdateCompany" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
           @click="openCompanyAdditionModal" />
-        <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
-          @click="openTraineeCreationModal" />
+        <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
+          :disable="loading" @click="openTraineeCreationModal" />
       </div>
     </div>
 
@@ -96,7 +96,7 @@ import { useCompaniesCoursesLink } from '@composables/companiesCoursesLink';
 export default {
   name: 'TraineeContainer',
   props: {
-    canEdit: { type: Boolean, default: false },
+    canUpdateTrainees: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     maxTrainees: { type: [Number, String], default: '' },
@@ -113,7 +113,7 @@ export default {
   },
   emits: ['refresh', 'update', 'update:maxTrainees'],
   setup (props, { emit }) {
-    const { canEdit, validations, potentialTrainees } = toRefs(props);
+    const { validations, potentialTrainees } = toRefs(props);
 
     const $store = useStore();
     const $router = useRouter();
@@ -132,6 +132,12 @@ export default {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       return ability.can('read', subject('Course', course.value), 'companies');
+    });
+
+    const canAccessEveryTrainee = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('read', subject('Course', course.value), 'trainees');
     });
 
     const traineeModalLoading = ref(false);
@@ -155,7 +161,7 @@ export default {
 
     const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
 
-    const tableTitle = computed(() => (canEdit.value || isTrainer.value
+    const tableTitle = computed(() => (canAccessEveryTrainee.value || isTrainer.value
       ? `Stagiaires (${traineesNumber.value})`
       : `Stagiaires de votre structure (${traineesNumber.value})`));
 
