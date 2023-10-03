@@ -72,7 +72,7 @@
         </ni-banner>
         <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       </div>
-      <div v-if="isIntraOrVendor">
+      <div v-if="isIntraOrIntraHoldingOrVendor">
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
