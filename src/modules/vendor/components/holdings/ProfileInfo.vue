@@ -125,7 +125,7 @@ export default {
 
     const openCompanyLinkModal = async () => {
       try {
-        const companies = await Companies.list({ noHolding: true });
+        const companies = await Companies.list({ withoutHoldingCompanies: true });
 
         companyOptions.value = formatAndSortOptions(companies, 'name');
         companyLinkModal.value = true;

@@ -326,7 +326,7 @@ export default {
     const canUpdateInterlocutor = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
-      return ability.can('update', 'interlocutor');
+      return ability.can('update', subject('Course', course.value), 'interlocutor');
     });
 
     const traineesEmails = computed(() => {
