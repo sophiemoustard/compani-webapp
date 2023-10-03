@@ -451,9 +451,10 @@ export default {
           return;
         }
         const loggedUserCompany = get(loggedUser.value, 'company._id');
+        const loggedUserHoldingRole = get(loggedUser.value, 'role.holding.name');
         const courseCompanies = course.value.companies.map(c => c._id);
 
-        if (loggedUserIsTrainer.value && !courseCompanies.includes(loggedUserCompany)) {
+        if (loggedUserIsTrainer.value && !loggedUserHoldingRole && !courseCompanies.includes(loggedUserCompany)) {
           companyRepresentativeOptions.value = [];
           return;
         }
