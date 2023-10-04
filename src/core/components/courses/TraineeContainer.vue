@@ -25,7 +25,7 @@
                 <div v-else>{{ col.value }}</div>
               </template>
               <template v-else-if="col.name === 'actions'">
-                <ni-button v-if="canUpdateCompany && !traineesGroupedByCompanies[props.row._id]"
+                <ni-button v-if="canUpdateCompanies && !traineesGroupedByCompanies[props.row._id]"
                   icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
               </template>
             </q-td>
@@ -43,8 +43,8 @@
           :loading="loading" table-class="q-pb-md" />
       </q-card>
       <div align="right" v-if="canUpdateTrainees" class="q-pa-sm">
-        <ni-button v-if="canUpdateCompany" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
-          @click="openCompanyAdditionModal" />
+        <ni-button v-if="canUpdateCompanies" color="primary" icon="add" label="Rattacher une structure"
+          :disable="loading" @click="openCompanyAdditionModal" />
         <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
           :disable="loading" @click="openTraineeCreationModal" />
       </div>
@@ -122,7 +122,7 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
-    const canUpdateCompany = computed(() => {
+    const canUpdateCompanies = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       return ability.can('update', subject('Course', course.value), 'companies');
@@ -179,7 +179,7 @@ export default {
 
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
-    const companyVisibleColumns = computed(() => (canUpdateCompany.value ? ['company', 'actions'] : ['company']));
+    const companyVisibleColumns = computed(() => (canUpdateCompanies.value ? ['company', 'actions'] : ['company']));
 
     const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
 
@@ -286,7 +286,7 @@ export default {
     };
 
     const created = async () => {
-      if (course.value.type !== INTRA && canUpdateCompany.value) await getPotentialCompanies();
+      if (course.value.type !== INTRA && canUpdateCompanies.value) await getPotentialCompanies();
     };
 
     created();
@@ -330,7 +330,7 @@ export default {
       hasLinkedCompanies,
       traineesCompanyOptions,
       displayCompanyNames,
-      canUpdateCompany,
+      canUpdateCompanies,
       canAccessCompany,
       // Methods
       nextStepLearnerCreationModal,
