@@ -68,7 +68,7 @@ export const defineAbilitiesForCourse = (user) => {
   if (isVendorInterface) {
     const vendorRole = get(role, 'vendor.name');
 
-    can('read', 'Course', 'trainees');
+    can('read', 'Course', 'all_trainees');
     if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
       can('update', 'Course', 'company_representative', { type: { $in: [INTRA, INTRA_HOLDING] } });
       can('update', 'Course', 'interlocutor');
@@ -85,7 +85,7 @@ export const defineAbilitiesForCourse = (user) => {
     if ([HOLDING_ADMIN].includes(holdingRole)) {
       can('update', 'Course', 'company_representative', { type: INTRA_HOLDING });
       can('update', 'Course', 'companies', { type: INTRA_HOLDING });
-      can('read', 'Course', 'trainees');
+      can('read', 'Course', 'all_trainees');
     } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) can('read', 'Course', 'trainees', { type: INTRA });
   }
 

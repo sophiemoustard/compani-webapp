@@ -137,7 +137,7 @@ export default {
     const canAccessEveryTrainee = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
-      return ability.can('read', subject('Course', course.value), 'trainees');
+      return ability.can('read', subject('Course', course.value), 'all_trainees');
     });
 
     const traineeModalLoading = ref(false);
