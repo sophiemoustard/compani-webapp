@@ -25,7 +25,7 @@
                 <div v-else>{{ col.value }}</div>
               </template>
               <template v-else-if="col.name === 'actions'">
-                <ni-button v-if="canEdit && !traineesGroupedByCompanies[props.row._id]"
+                <ni-button v-if="canUpdateCompany && !traineesGroupedByCompanies[props.row._id]"
                   icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
               </template>
             </q-td>
