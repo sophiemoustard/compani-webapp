@@ -8,8 +8,8 @@
       :placeholder="placeholder" :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage"
       @blur="blur" ref="dateInput" @focus="focus">
       <template #append>
-        <q-icon name="event" class="cursor-pointer" @click="focus" color="copper-grey-500">
-          <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
+        <q-icon name="event" class="cursor-pointer" @click="openDateMenu" color="copper-grey-500">
+          <q-menu ref="qDateMenu" anchor="bottom right" self="top right" @hide="closeDateMenu">
             <q-date minimal :model-value="date" @update:model-value="select" :options="dateOptions"
               :disable="disable" />
           </q-menu>
@@ -40,8 +40,11 @@ export default {
   },
   emits: ['blur', 'focus', 'update:model-value'],
   data () {
+    const isDateMenuOpened = false;
+
     return {
       quasarDateFormat: 'yyyy/LL/dd',
+      isDateMenuOpened,
     };
   },
   computed: {
@@ -72,6 +75,8 @@ export default {
         this.$refs.dateInput.blur();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.isDateMenuOpened = false;
       }
     },
     input (value) {
@@ -90,10 +95,19 @@ export default {
       this.$emit('update:model-value', value);
     },
     blur () {
+      if (this.isDateMenuOpened) return;
+
       this.$emit('blur');
     },
     focus () {
       this.$emit('focus');
+    },
+    openDateMenu () {
+      this.focus();
+      this.isDateMenuOpened = true;
+    },
+    closeDateMenu () {
+      this.isDateMenuOpened = false;
     },
   },
 };
