@@ -7,10 +7,11 @@
             <div class="col-xs-12 col-sm-4">
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
-            <div class="col-xs-12 col-sm-8">
-              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" borderless class="q-ma-sm"
-                v-model:error="billingDatesHasError" />
-            </div>
+            <q-field borderless class="col-xs-6 col-sm-8" :error="v$.tempDates.$error"
+              :error-message="dateRangeErrorMessage">
+              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" borderless
+                class="q-ma-sm" />
+            </q-field>
           </div>
         </div>
       </template>
@@ -78,8 +79,9 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { MONTH } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
+import { isBefore } from '@helpers/date';
 import { formatPrice, formatIdentity, formatAndSortOptions, toEuros, toCents } from '@helpers/utils';
-import { minArrayLength } from '@helpers/vuelidateCustomVal';
+import { minArrayLength, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -107,6 +109,10 @@ export default {
       tableLoading: false,
       pagination: { rowsPerPage: 0 },
       billingDates: {
+        startDate: null,
+        endDate: null,
+      },
+      tempDates: {
         startDate: null,
         endDate: null,
       },
@@ -154,6 +160,10 @@ export default {
   validations () {
     return {
       deliveryFile: { thirdPartyPayers: { minArrayLength: minArrayLength(1) }, month: { required } },
+      tempDates: {
+        startDate: { required, maxDate: maxDate(this.tempDates.endDate) },
+        endDate: { required, minDate: minDate(this.tempDates.startDate) },
+      },
     };
   },
   computed: {
@@ -192,6 +202,12 @@ export default {
       }
       return orderedByCustomerDraftBills;
     },
+    dateRangeErrorMessage () {
+      if (isBefore(this.tempDates.endDate, this.tempDates.startDate)) {
+        return 'La date de fin doit être postérieure à la date de début';
+      }
+      return '';
+    },
   },
   watch: {
     filteredAndOrderedDraftBills () {
@@ -201,6 +217,7 @@ export default {
   async created () {
     this.setBillingDates();
     await Promise.all([this.getDraftBills(), this.getThirdPartyPayers()]);
+    this.tempDates = this.billingDates;
   },
   methods: {
     formatPrice,
@@ -371,11 +388,17 @@ export default {
     tableRowKey (row) {
       return row.customer._id;
     },
-    async updateDates (date) {
+    async updateDates (dates) {
       try {
-        if (this.billingDatesHasError) return;
-        this.billingDates = date;
+        this.tempDates = dates;
+        this.v$.tempDates.$touch();
 
+        if (this.v$.tempDates.$error) {
+          console.log("on passe dans l'erreur");
+          return NotifyWarning('Date(s) invalide(s)');
+        }
+
+        this.billingDates = dates;
         await this.getDraftBills();
       } catch (e) {
         console.error(e);
@@ -392,4 +415,6 @@ export default {
     padding-right: 10px
   @media screen and (max-width: $breakpoint-sm-max)
     margin: 0px !important
+.q-field
+  padding-bottom: 0px
 </style>
