@@ -14,7 +14,7 @@
       <q-tr :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
           :style="col.style" :class="[col.classes, { 'border': props.rowIndex === 0 && !hideHeader}]">
-          <template v-if="col.name === 'actions' && canEdit">
+          <template v-if="col.name === 'actions' && canUpdateTrainees">
             <div>
               <ni-button icon="edit" @click="openTraineeEditionModal(props.row)"
                 :disable="!canEditTrainee(props.row) || !!course.archivedAt" />
@@ -36,7 +36,8 @@
 </template>
 
 <script>
-import { computed, ref, toRefs } from 'vue';
+import { subject } from '@casl/ability';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import useVuelidate from '@vuelidate/core';
@@ -44,6 +45,7 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import { formatPhone, formatPhoneForPayload } from '@helpers/utils';
 import Courses from '@api/Courses';
 import Users from '@api/Users';
@@ -59,7 +61,6 @@ export default {
   name: 'TraineeTable',
   props: {
     trainees: { type: Array, default: () => [] },
-    canEdit: { type: Boolean, default: false },
     hideHeader: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     tableClass: { type: String, default: () => '' },
@@ -72,8 +73,6 @@ export default {
   },
   emits: ['refresh'],
   setup (props, { emit }) {
-    const { canEdit } = toRefs(props);
-
     const $q = useQuasar();
     const $store = useStore();
 
@@ -124,12 +123,20 @@ export default {
 
     const traineeValidation = useVuelidate(traineeRules, { editedTrainee });
 
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const canUpdateTrainees = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Course', course.value), 'trainees');
+    });
+
     const course = computed(() => $store.state.course.course);
 
     const traineeVisibleColumns = computed(() => {
       const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos'];
 
-      return canEdit.value ? [...col, 'actions'] : col;
+      return canUpdateTrainees.value ? [...col, 'actions'] : col;
     });
 
     const openTraineeEditionModal = async (trainee) => {
@@ -200,6 +207,7 @@ export default {
       // Computed
       course,
       traineeVisibleColumns,
+      canUpdateTrainees,
       // Methods
       openTraineeEditionModal,
       resetTraineeEditionForm,
