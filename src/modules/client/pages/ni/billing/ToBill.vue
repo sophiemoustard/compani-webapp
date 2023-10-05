@@ -8,8 +8,8 @@
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
             <div class="col-xs-12 col-sm-8">
-              <ni-date-range v-model="billingDates" @blur="getDraftBills" v-model:error="billingDatesHasError"
-                borderless class="q-ma-sm" />
+              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" borderless class="q-ma-sm"
+                v-model:error="billingDatesHasError" />
             </div>
           </div>
         </div>
@@ -271,8 +271,6 @@ export default {
       }
     },
     async getDraftBills () {
-      if (this.billingDatesHasError) return;
-
       try {
         this.tableLoading = true;
         const params = {
@@ -372,6 +370,16 @@ export default {
     },
     tableRowKey (row) {
       return row.customer._id;
+    },
+    async updateDates (date) {
+      try {
+        if (this.billingDatesHasError) return;
+        this.billingDates = date;
+
+        await this.getDraftBills();
+      } catch (e) {
+        console.error(e);
+      }
     },
   },
 };
