@@ -29,9 +29,9 @@
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
-    <ni-trainee-container :can-update-trainees="canUpdateTrainees" :loading="courseLoading"
-      @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse"
-      :potential-trainees="potentialTrainees" v-model:max-trainees="tmpCourse.maxTrainees" />
+    <ni-trainee-container :loading="courseLoading" @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')"
+      :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
+      v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
@@ -830,7 +830,6 @@ export default {
       disableSms,
       canUpdateInterlocutor,
       canUpdateCompanyRepresentative,
-      canUpdateTrainees,
       traineesEmails,
       contactOptions,
       isIntraOrVendor,

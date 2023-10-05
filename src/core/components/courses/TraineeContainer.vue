@@ -32,15 +32,14 @@
           </template>
           <template #expanding-row="{ props }">
             <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
-              :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canUpdateTrainees"
-              @refresh="refresh" hide-header />
+              :trainees="traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header />
             <div class="text-center text-italic no-data" v-else>
               Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
             </div>
           </template>
         </ni-expanding-table>
-        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canUpdateTrainees" @refresh="refresh"
-          :loading="loading" table-class="q-pb-md" />
+        <ni-trainee-table v-else :trainees="course.trainees" @refresh="refresh" :loading="loading"
+          table-class="q-pb-md" />
       </q-card>
       <div align="right" v-if="canUpdateTrainees" class="q-pa-sm">
         <ni-button v-if="canUpdateCompanies" color="primary" icon="add" label="Rattacher une structure"
@@ -96,7 +95,6 @@ import { useCompaniesCoursesLink } from '@composables/companiesCoursesLink';
 export default {
   name: 'TraineeContainer',
   props: {
-    canUpdateTrainees: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     maxTrainees: { type: [Number, String], default: '' },
@@ -121,6 +119,12 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const course = computed(() => $store.state.course.course);
+
+    const canUpdateTrainees = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Course', course.value), 'trainees');
+    });
 
     const canUpdateCompanies = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
@@ -332,6 +336,7 @@ export default {
       displayCompanyNames,
       canUpdateCompanies,
       canAccessCompany,
+      canUpdateTrainees,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
