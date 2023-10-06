@@ -7,11 +7,10 @@
             <div class="col-xs-12 col-sm-4">
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
-            <q-field borderless class="col-xs-6 col-sm-8" :error="v$.tempDates.$error"
-              :error-message="dateRangeErrorMessage">
-              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" borderless
-                class="q-ma-sm" />
-            </q-field>
+            <div class="col-xs-12 col-sm-8">
+              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" class="q-ma-sm"
+                borderless />
+            </div>
           </div>
         </div>
       </template>
@@ -108,14 +107,7 @@ export default {
     return {
       tableLoading: false,
       pagination: { rowsPerPage: 0 },
-      billingDates: {
-        startDate: null,
-        endDate: null,
-      },
-      tempDates: {
-        startDate: null,
-        endDate: null,
-      },
+      billingDates: { startDate: null, endDate: null },
       billingDatesHasError: false,
       draftBills: [],
       selected: [],
@@ -160,9 +152,9 @@ export default {
   validations () {
     return {
       deliveryFile: { thirdPartyPayers: { minArrayLength: minArrayLength(1) }, month: { required } },
-      tempDates: {
-        startDate: { required, maxDate: maxDate(this.tempDates.endDate) },
-        endDate: { required, minDate: minDate(this.tempDates.startDate) },
+      billingDates: {
+        startDate: { required, maxDate: maxDate(this.billingDates.endDate) },
+        endDate: { required, minDate: minDate(this.billingDates.startDate) },
       },
     };
   },
@@ -203,7 +195,7 @@ export default {
       return orderedByCustomerDraftBills;
     },
     dateRangeErrorMessage () {
-      if (isBefore(this.tempDates.endDate, this.tempDates.startDate)) {
+      if (isBefore(this.billingDates.endDate, this.billingDates.startDate)) {
         return 'La date de fin doit être postérieure à la date de début';
       }
       return '';
@@ -217,7 +209,6 @@ export default {
   async created () {
     this.setBillingDates();
     await Promise.all([this.getDraftBills(), this.getThirdPartyPayers()]);
-    this.tempDates = this.billingDates;
   },
   methods: {
     formatPrice,
@@ -305,7 +296,7 @@ export default {
           },
           ...(!!draft.thirdPartyPayerBills && {
             thirdPartyPayerBills:
-                draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) })),
+              draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) })),
           }),
         }));
       } catch (e) {
@@ -388,17 +379,12 @@ export default {
     tableRowKey (row) {
       return row.customer._id;
     },
-    async updateDates (dates) {
+    async updateDates ({ startDate, endDate }) {
       try {
-        this.tempDates = dates;
-        this.v$.tempDates.$touch();
-
-        if (this.v$.tempDates.$error) {
-          console.log("on passe dans l'erreur");
-          return NotifyWarning('Date(s) invalide(s)');
-        }
-
-        this.billingDates = dates;
+        this.billingDates = { startDate, endDate };
+        await this.$nextTick();
+        this.v$.billingDates.$touch();
+        if (this.v$.billingDates.$error) return NotifyWarning('Date(s) invalide(s)');
         await this.getDraftBills();
       } catch (e) {
         console.error(e);

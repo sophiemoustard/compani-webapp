@@ -35,10 +35,7 @@ export default {
     modelValue: {
       type: Object,
       default () {
-        return {
-          startDate: CompaniDate().startOf('day').toISO(),
-          endDate: CompaniDate().endOf('day').toISO(),
-        };
+        return { startDate: CompaniDate().startOf('day').toISO(), endDate: CompaniDate().endOf('day').toISO() };
       },
     },
     requiredField: { type: Boolean, default: false },
@@ -75,7 +72,7 @@ export default {
     },
   },
   watch: {
-    value () {
+    modelValue () {
       this.$emit('update:error', this.v$.modelValue.$error);
     },
   },
