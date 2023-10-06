@@ -8,8 +8,7 @@
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
             <div class="col-xs-12 col-sm-8">
-              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" class="q-ma-sm"
-                borderless />
+              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" class="q-ma-sm" borderless />
             </div>
           </div>
         </div>
@@ -78,7 +77,6 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { MONTH } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
-import { isBefore } from '@helpers/date';
 import { formatPrice, formatIdentity, formatAndSortOptions, toEuros, toCents } from '@helpers/utils';
 import { minArrayLength, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
@@ -193,12 +191,6 @@ export default {
         );
       }
       return orderedByCustomerDraftBills;
-    },
-    dateRangeErrorMessage () {
-      if (isBefore(this.billingDates.endDate, this.billingDates.startDate)) {
-        return 'La date de fin doit être postérieure à la date de début';
-      }
-      return '';
     },
   },
   watch: {
@@ -383,8 +375,10 @@ export default {
       try {
         this.billingDates = { startDate, endDate };
         await this.$nextTick();
+
         this.v$.billingDates.$touch();
         if (this.v$.billingDates.$error) return NotifyWarning('Date(s) invalide(s)');
+
         await this.getDraftBills();
       } catch (e) {
         console.error(e);
