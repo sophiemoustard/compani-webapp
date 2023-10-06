@@ -8,7 +8,8 @@
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
             <div class="col-xs-12 col-sm-8">
-              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" class="q-ma-sm" borderless />
+              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" class="q-ma-sm" borderless
+                :disable="tableLoading" />
             </div>
           </div>
         </div>
