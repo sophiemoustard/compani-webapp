@@ -53,12 +53,10 @@ describe('ToBill', () => {
     cy.dataCy('select-tpp').eq(0).type('{backspace}Sans{downarrow}{enter}');
     cy.dataCy('bill-row').should('have.length', 2);
 
-    cy.get('[data-cy=date-input]  input').eq(0).clear().type('01/01/2019');
-    cy.get('[data-cy=date-input]  input')
-      .eq(1)
-      .clear()
-      .type('17/01/2019')
-      .blur();
+    cy.get('[data-cy=date-input]  input').eq(0).clear();
+    cy.get('[data-cy=date-input]  input').eq(0).type('01/01/2019');
+    cy.get('[data-cy=date-input]  input').eq(1).clear();
+    cy.get('[data-cy=date-input]  input').eq(1).type('17/01/2019');
     cy.dataCy('bill-row').should('have.length', 1);
     cy.dataCy('col-customer').should('contain', 'AUFRAY H.');
     cy.dataCy('col-endDate').should('contain', '17/01/2019');
@@ -77,11 +75,8 @@ describe('ToBill', () => {
 
     cy.dataCy('select-tpp').eq(0).click();
     cy.dataCy('select-tpp').eq(0).type('{backspace}Tous{downarrow}{enter}');
-    cy.get('[data-cy=date-input]  input')
-      .eq(1)
-      .clear()
-      .type('01/01/2021')
-      .blur();
+    cy.get('[data-cy=date-input]  input').eq(1).clear();
+    cy.get('[data-cy=date-input]  input').eq(1).type('01/01/2021');
     cy.dataCy('bill-row').should('have.length', 3);
 
     // should bill correctly

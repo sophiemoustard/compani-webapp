@@ -7,10 +7,10 @@
     <q-field dense borderless :error="hasError" :error-message="innerErrorMessage">
       <div :class="['date-container', 'justify-center', 'items-center', 'row', borders && 'date-container-borders']">
         <ni-date-input data-cy="date-input" :model-value="modelValue.startDate" class="date-item" @blur="blur"
-          @update:model-value="update($event, 'startDate')" />
+          @update:model-value="update($event, 'startDate')" :disable="disable" />
         <p class="delimiter">-</p>
         <ni-date-input data-cy="date-input" :model-value="modelValue.endDate" :min="modelValue.startDate" @blur="blur"
-          @update:model-value="update($event, 'endDate')" class="date-item" />
+          @update:model-value="update($event, 'endDate')" class="date-item" :disable="disable" />
       </div>
     </q-field>
   </div>
@@ -35,10 +35,7 @@ export default {
     modelValue: {
       type: Object,
       default () {
-        return {
-          startDate: CompaniDate().startOf('day').toISO(),
-          endDate: CompaniDate().endOf('day').toISO(),
-        };
+        return { startDate: CompaniDate().startOf('day').toISO(), endDate: CompaniDate().endOf('day').toISO() };
       },
     },
     requiredField: { type: Boolean, default: false },
@@ -46,6 +43,7 @@ export default {
     errorMessage: { type: String, default: REQUIRED_LABEL },
     borders: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
+    disable: { type: Boolean, default: false },
   },
   emits: ['update:model-value', 'blur', 'update:error'],
   setup () {
@@ -75,7 +73,7 @@ export default {
     },
   },
   watch: {
-    value () {
+    modelValue () {
       this.$emit('update:error', this.v$.modelValue.$error);
     },
   },
