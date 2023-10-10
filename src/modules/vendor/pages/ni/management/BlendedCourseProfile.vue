@@ -20,7 +20,7 @@ import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileBilling from '@components/courses/ProfileBilling';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, INTRA_HOLDING } from '@data/constants';
 import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
 
@@ -46,6 +46,9 @@ export default {
     const $q = useQuasar();
 
     const courseName = ref('');
+
+    const course = computed(() => $store.state.course.course);
+
     const tabsContent = computed(() => {
       const organizationTab = {
         label: 'Organisation',
@@ -69,10 +72,10 @@ export default {
       const vendorRole = $store.getters['main/getVendorRole'];
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
 
+      if (course.value.type === INTRA_HOLDING) return [organizationTab];
+
       return isAdmin ? [organizationTab, followUpTab, billingTab] : [organizationTab, followUpTab];
     });
-
-    const course = computed(() => $store.state.course.course);
 
     const { headerInfo } = useCourses(course);
 

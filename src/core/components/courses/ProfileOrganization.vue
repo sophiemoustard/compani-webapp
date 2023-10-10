@@ -77,9 +77,9 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
-      :training-contracts="trainingContracts" :training-contract-table-loading="trainingContractTableLoading"
-      @refresh="refreshTrainingContracts" :has-holding-role="hasHoldingRole" />
+    <training-contract-container v-if="!isIntraHoldingCourse" :course="course" :has-holding-role="hasHoldingRole"
+      :is-rof-or-vendor-admin="isRofOrVendorAdmin" :training-contracts="trainingContracts"
+      :training-contract-table-loading="trainingContractTableLoading" @refresh="refreshTrainingContracts" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -158,6 +158,7 @@ import {
   COURSE,
   EDITION,
   HOLDING_ADMIN,
+  INTRA_HOLDING,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -270,6 +271,8 @@ export default {
     const hasHoldingRole = computed(() => !!get(loggedUser.value, 'role.holding'));
 
     const isCourseInter = computed(() => course.value.type === INTER_B2B);
+
+    const isIntraHoldingCourse = computed(() => course.value.type === INTRA_HOLDING);
 
     const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
@@ -748,7 +751,7 @@ export default {
 
     const refreshTrainingContracts = async () => {
       try {
-        if (!isRofOrVendorAdmin.value && isVendorInterface) return;
+        if ((!isRofOrVendorAdmin.value && isVendorInterface) || isIntraHoldingCourse.value) return;
 
         trainingContractTableLoading.value = true;
         const loggedUserHolding = get(loggedUser.value, 'holding._id');
@@ -842,6 +845,7 @@ export default {
       isClientInterface,
       isCourseInter,
       isVendorInterface,
+      isIntraHoldingCourse,
       // Methods
       get,
       formatQuantity,
