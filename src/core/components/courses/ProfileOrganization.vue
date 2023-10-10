@@ -36,7 +36,7 @@
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
-    <div v-if="isIntraOrVendor">
+    <div v-if="canUpdateSMS">
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contacter les stagiaires</p>
         <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
@@ -331,6 +331,12 @@ export default {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       return ability.can('update', subject('Course', course.value), 'trainees');
+    });
+
+    const canUpdateSMS = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Course', course.value), 'sms');
     });
 
     const traineesEmails = computed(() => {
@@ -774,7 +780,7 @@ export default {
     const created = async () => {
       const promises = [];
       if (canUpdateCompanyRepresentative.value) promises.push(refreshCompanyRepresentatives());
-      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms());
+      if (canUpdateSMS.value) promises.push(refreshSms());
       if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
 
       if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
@@ -831,6 +837,7 @@ export default {
       disableSms,
       canUpdateInterlocutor,
       canUpdateCompanyRepresentative,
+      canUpdateSMS,
       traineesEmails,
       contactOptions,
       isIntraOrVendor,
