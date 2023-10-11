@@ -237,7 +237,7 @@ export default {
       : 'activité eLearning réalisée'));
 
     const goToCourseProfile = (props) => {
-      if (props.row.type === INTRA_HOLDING) return {};
+      if (props.row.type === INTRA_HOLDING) return;
       if (!isVendorInterface && props.row.subProgram.isStrictlyELearning) {
         return $router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
       }

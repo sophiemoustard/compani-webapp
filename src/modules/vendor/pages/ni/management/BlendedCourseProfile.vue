@@ -50,31 +50,35 @@ export default {
     const course = computed(() => $store.state.course.course);
 
     const tabsContent = computed(() => {
-      const organizationTab = {
-        label: 'Organisation',
-        name: 'organization',
-        default: defaultTab.value === 'organization',
-        component: ProfileOrganization,
-      };
-      const followUpTab = {
-        label: 'Suivi des stagiaires',
-        name: 'traineeFollowUp',
-        default: defaultTab.value === 'traineeFollowUp',
-        component: ProfileTraineeFollowUp,
-      };
-      const billingTab = {
-        label: 'Facturation',
-        name: 'billing',
-        default: defaultTab.value === 'billing',
-        component: ProfileBilling,
-      };
-
       const vendorRole = $store.getters['main/getVendorRole'];
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
 
-      if (course.value.type === INTRA_HOLDING) return [organizationTab];
-
-      return isAdmin ? [organizationTab, followUpTab, billingTab] : [organizationTab, followUpTab];
+      return [
+        {
+          label: 'Organisation',
+          name: 'organization',
+          default: defaultTab.value === 'organization',
+          component: ProfileOrganization,
+        },
+        ...(course.value.type !== INTRA_HOLDING
+          ? [{
+            label: 'Suivi des stagiaires',
+            name: 'traineeFollowUp',
+            default: defaultTab.value === 'traineeFollowUp',
+            component: ProfileTraineeFollowUp,
+          }]
+          : []
+        ),
+        ...(course.value.type !== INTRA_HOLDING && isAdmin
+          ? [{
+            label: 'Facturation',
+            name: 'billing',
+            default: defaultTab.value === 'billing',
+            component: ProfileBilling,
+          }]
+          : []
+        ),
+      ];
     });
 
     const { headerInfo } = useCourses(course);
