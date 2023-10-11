@@ -146,17 +146,20 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
+import uniq from 'lodash/uniq';
 import pickBy from 'lodash/pickBy';
-import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatPrice, formatDownloadName, formatQuantity } from '@helpers/utils';
-import { downloadFile } from '@helpers/file';
-import CompaniDate from '@helpers/dates/companiDates';
-import { descendingSortBy } from '@helpers/dates/utils';
 import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY } from '@data/constants';
+import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING } from '@data/constants';
+import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
+import { formatPrice, formatDownloadName, formatQuantity, formatIdentity } from '@helpers/utils';
+import { downloadFile } from '@helpers/file';
+import { computeDuration } from '@helpers/courses';
+import CompaniDate from '@helpers/dates/companiDates';
+import CompaniDuration from '@helpers/dates/companiDurations';
+import { ascendingSortBy, descendingSortBy } from '@helpers/dates/utils';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import PayerEditionModal from 'src/modules/vendor/components/billing/PayerEditionModal';
 import CourseFeeEditionModal from 'src/modules/vendor/components/billing/CourseFeeEditionModal';
@@ -265,6 +268,29 @@ export default {
 
     const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
+    const defaultDescription = computed(() => {
+      const slots = ([...get(course.value, 'slots')] || []).sort(ascendingSortBy('startDate'));
+      const hasSlotsToPlan = (get(course.value, 'slotsToPlan') || []).length;
+
+      const liveSteps = (get(course.value, 'subProgram.steps') || []).filter(s => s.type !== E_LEARNING);
+      const liveDuration = CompaniDuration(computeDuration(liveSteps)).format(LONG_DURATION_H_MM);
+      const eLearningSteps = (get(course.value, 'subProgram.steps') || []).filter(s => s.type === E_LEARNING);
+      const eLEarngingDuration = CompaniDuration(computeDuration(eLearningSteps)).format(LONG_DURATION_H_MM);
+      const startDate = slots.length ? CompaniDate(slots[0].startDate).format(DD_MM_YYYY) : '(date à planifier)';
+      const endDate = hasSlotsToPlan
+        ? '(date à planifier)'
+        : CompaniDate(slots[slots.length - 1].startDate).format(DD_MM_YYYY);
+      const location = uniq(slots.map(s => get(s, 'address.city'))).join(', ');
+      const trainer = formatIdentity(get(course.value, 'trainer.identity'), 'FL');
+
+      return 'Actions pour le développement des compétences \r\n'
+        + `Formation pour ${traineesLength.value} salarié-es\r\n`
+        + `Durée : ${liveDuration} présentiel${eLearningSteps.length ? `, ${eLEarngingDuration} eLearning` : ''}\r\n`
+        + `Dates : du ${startDate} au ${endDate} \r\n`
+        + `Lieu : ${location} \r\n`
+        + `Nom du formateur : ${trainer}`;
+    });
+
     const validatedCourseBillsCount = computed(() => courseBills.value
       .filter(cb => cb.billedAt && !cb.courseCreditNote)
       .length);
@@ -315,7 +341,11 @@ export default {
       editedBill.value = {
         _id: bill._id,
         payer,
-        mainFee: { price: bill.mainFee.price, count: bill.mainFee.count, description: bill.mainFee.description },
+        mainFee: {
+          price: bill.mainFee.price,
+          count: bill.mainFee.count,
+          description: bill.mainFee.description || defaultDescription.value,
+        },
       };
     };
 
