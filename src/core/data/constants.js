@@ -356,6 +356,7 @@ export const INTRA_HOLDING = 'intra_holding';
 export const COURSE_TYPES = [
   { label: 'Intra', value: INTRA },
   { label: 'Inter B2B', value: INTER_B2B },
+  { label: 'Intra société mère', value: INTRA_HOLDING },
 ];
 export const BLENDED = 'blended';
 export const STRICTLY_E_LEARNING = 'strictly_e_learning';

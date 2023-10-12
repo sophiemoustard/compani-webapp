@@ -4,8 +4,15 @@ import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { WITHOUT_TRAINER, WITHOUT_SALES_REPRESENTATIVE, INTRA, INTER_B2B } from '@data/constants';
-import { ARCHIVED_COURSES, UNARCHIVED_COURSES } from '../data/constants';
+import {
+  WITHOUT_TRAINER,
+  WITHOUT_SALES_REPRESENTATIVE,
+  INTRA,
+  INTER_B2B,
+  ARCHIVED_COURSES,
+  INTRA_HOLDING,
+  UNARCHIVED_COURSES,
+} from '@data/constants';
 
 export const useCourseFilters = (activeCourses, archivedCourses) => {
   const $store = useStore();
@@ -105,6 +112,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     { label: 'Tous les types', value: '' },
     { label: 'Intra', value: INTRA },
     { label: 'Inter B2B', value: INTER_B2B },
+    { label: 'Intra société mère', value: INTRA_HOLDING },
   ]);
 
   const updateSelectedType = type => $store.dispatch('course/setSelectedType', { type });

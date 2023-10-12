@@ -17,10 +17,13 @@
       <ni-select v-if="isIntraCourse" in-modal :model-value="newCourse.company"
         @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions"
         :error="validations.company.$error" @update:model-value="update($event, 'company')" />
+      <ni-select v-if="isIntraHoldingCourse" in-modal :model-value="newCourse.holding"
+        @blur="validations.holding.$touch" required-field caption="Société mère" :options="holdingOptions"
+        :error="validations.holding.$error" @update:model-value="update($event, 'holding')" />
       <ni-date-input caption="Date de démarrage souhaitée" :model-value="newCourse.estimatedStartDate" in-modal
         @update:model-value="update($event, 'estimatedStartDate')" />
-      <ni-input v-if="isIntraCourse" in-modal required-field type="number" caption="Nombre d'inscrits max"
-        :model-value="newCourse.maxTrainees" @blur="validations.maxTrainees.$touch"
+      <ni-input v-if="isIntraCourse || isIntraHoldingCourse" in-modal required-field type="number"
+        caption="Nombre d'inscrits max" :model-value="newCourse.maxTrainees" @blur="validations.maxTrainees.$touch"
         :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage"
         @update:model-value="update($event, 'maxTrainees')" />
       <ni-input v-if="isIntraCourse" :model-value="newCourse.expectedBillsCount" in-modal required-field type="number"
@@ -44,17 +47,17 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES, REQUIRED_LABEL, INTRA, PUBLISHED } from '@data/constants';
+import { COURSE_TYPES, REQUIRED_LABEL, INTRA, INTRA_HOLDING, PUBLISHED } from '@data/constants';
 import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
   name: 'CourseCreationModal',
   props: {
     modelValue: { type: Boolean, default: false },
-    isIntraCourse: { type: Boolean, default: false },
     newCourse: { type: Object, default: () => ({}) },
     programs: { type: Array, default: () => [] },
     companyOptions: { type: Array, default: () => [] },
+    holdingOptions: { type: Array, default: () => [] },
     salesRepresentativeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
@@ -102,6 +105,8 @@ export default {
       if (this.validations.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
       return 'Nombre non valide';
     },
+    isIntraCourse () { return this.newCourse.type === INTRA; },
+    isIntraHoldingCourse () { return this.newCourse.type === INTRA_HOLDING; },
   },
   watch: {
     'newCourse.program': function (value) {
@@ -130,8 +135,9 @@ export default {
       this.$emit(
         'update:new-course',
         {
-          ...omit(this.newCourse, ['company', 'maxTrainees', 'expectedBillsCount']),
+          ...omit(this.newCourse, ['company', 'holding', 'maxTrainees', 'expectedBillsCount']),
           ...(event === INTRA && { maxTrainees: '8', expectedBillsCount: '0' }),
+          ...(event === INTRA_HOLDING && { maxTrainees: '8' }),
           type: event,
         }
       );
