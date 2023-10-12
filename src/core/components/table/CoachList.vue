@@ -33,7 +33,8 @@
     <coach-creation-modal v-model="coachCreationModal" v-model:new-coach="newCoach" :validations="v$.newCoach"
       :first-step="firstStep" :loading="loading" :phone-nbr-error="phoneNbrError(v$.newCoach)"
       :role-options="roleOptions" @hide="resetCoachCreationForm" @show="openCoachCreationModal" @submit="createCoach"
-      @go-to-next-step="nextStep" :email-error="emailError(v$.newCoach)" />
+      @go-to-next-step="nextStep" :email-error="emailError(v$.newCoach)"
+      :can-send-email="!get(company, 'subscriptions.erp')" />
 
     <coach-edition-modal v-model="coachEditionModal" :phone-nbr-error="phoneNbrError(v$.selectedCoach)"
       :validations="v$.selectedCoach" :email-error="emailError(v$.selectedCoach)" v-model:selected-coach="selectedCoach"
@@ -48,6 +49,7 @@ import { required, email } from '@vuelidate/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 import cloneDeep from 'lodash/cloneDeep';
 import Roles from '@api/Roles';
 import Email from '@api/Email';
@@ -111,6 +113,7 @@ export default {
         role: '',
         local: { email: '' },
         company: '',
+        sendEmail: true,
       },
       userValidations: {
         identity: { lastname: { required } },
@@ -125,6 +128,7 @@ export default {
       },
       roles: [],
       users: [],
+      get,
     };
   },
   validations () {
@@ -153,7 +157,7 @@ export default {
       if (this.canSetUserCompany) userPayload.company = this.company._id;
       if (get(user, 'contact.phone')) userPayload.contact.phone = formatPhoneForPayload(user.contact.phone);
 
-      return userPayload;
+      return omit(userPayload, 'sendEmail');
     },
     async nextStep () {
       try {
@@ -216,14 +220,14 @@ export default {
         this.loading = false;
       }
 
-      if (!get(this.company, 'subscriptions.erp')) await this.sendEmail();
+      if (!get(this.company, 'subscriptions.erp') && this.newCoach.sendEmail) await this.sendEmail();
 
       await this.getUsers();
       this.coachCreationModal = false;
     },
     resetCoachCreationForm () {
       this.firstStep = true;
-      this.newCoach = { ...clear(this.newCoach) };
+      this.newCoach = { ...clear(this.newCoach), sendEmail: true };
       this.v$.newCoach.$reset();
     },
     async getRoles () {
