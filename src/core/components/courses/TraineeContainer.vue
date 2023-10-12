@@ -219,7 +219,7 @@ export default {
       getPotentialCompanies,
     } = useCompaniesCoursesLink(course, emit);
 
-    const defineCourseAbility = () => {
+    const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       canUpdateTrainees.value = ability.can('update', subject('Course', course.value), 'trainees');
@@ -280,7 +280,7 @@ export default {
     };
 
     const created = async () => {
-      defineCourseAbility();
+      defineCourseAbilities();
       if (course.value.type !== INTRA && canUpdateCompanies.value) await getPotentialCompanies();
     };
 
@@ -305,6 +305,9 @@ export default {
       companyModalLoading,
       companyPagination,
       disableUserInfoEdition,
+      canUpdateCompanies,
+      canAccessCompany,
+      canUpdateTrainees,
       // Validations
       learnerValidation,
       traineeRegistrationValidation,
@@ -325,9 +328,6 @@ export default {
       hasLinkedCompanies,
       traineesCompanyOptions,
       displayCompanyNames,
-      canUpdateCompanies,
-      canAccessCompany,
-      canUpdateTrainees,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,

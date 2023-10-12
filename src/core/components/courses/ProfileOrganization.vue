@@ -349,7 +349,7 @@ export default {
       }
     }, { immediate: true });
 
-    const defineCourseAbility = () => {
+    const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       canUpdateCompanyRepresentative.value = ability
@@ -771,7 +771,7 @@ export default {
 
     const created = async () => {
       const promises = [];
-      defineCourseAbility();
+      defineCourseAbilities();
       if (canUpdateCompanyRepresentative.value) promises.push(refreshCompanyRepresentatives());
       if (canUpdateSMS.value) promises.push(refreshSms());
       if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
