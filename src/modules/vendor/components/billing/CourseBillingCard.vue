@@ -269,15 +269,14 @@ export default {
     const editedBillingPurchaseErrorMessages = computed(() => getBillErrorMessages('editedBillingPurchase'));
 
     const defaultDescription = computed(() => {
-      const slots = ([...get(course.value, 'slots')] || []).sort(ascendingSortBy('startDate'));
-      const hasSlotsToPlan = (get(course.value, 'slotsToPlan') || []).length;
+      const slots = [...course.value.slots].sort(ascendingSortBy('startDate'));
 
-      const liveSteps = (get(course.value, 'subProgram.steps') || []).filter(s => s.type !== E_LEARNING);
+      const liveSteps = course.value.subProgram.steps.filter(s => s.type !== E_LEARNING);
       const liveDuration = CompaniDuration(computeDuration(liveSteps)).format(LONG_DURATION_H_MM);
-      const eLearningSteps = (get(course.value, 'subProgram.steps') || []).filter(s => s.type === E_LEARNING);
-      const eLEarngingDuration = CompaniDuration(computeDuration(eLearningSteps)).format(LONG_DURATION_H_MM);
+      const eLearningSteps = course.value.subProgram.steps.filter(s => s.type === E_LEARNING);
+      const eLearningDuration = CompaniDuration(computeDuration(eLearningSteps)).format(LONG_DURATION_H_MM);
       const startDate = slots.length ? CompaniDate(slots[0].startDate).format(DD_MM_YYYY) : '(date à planifier)';
-      const endDate = hasSlotsToPlan
+      const endDate = course.value.slotsToPlan.length
         ? '(date à planifier)'
         : CompaniDate(slots[slots.length - 1].startDate).format(DD_MM_YYYY);
       const location = uniq(slots.map(s => get(s, 'address.city'))).join(', ');
@@ -285,7 +284,7 @@ export default {
 
       return 'Actions pour le développement des compétences \r\n'
         + `Formation pour ${traineesLength.value} salarié-es\r\n`
-        + `Durée : ${liveDuration} présentiel${eLearningSteps.length ? `, ${eLEarngingDuration} eLearning` : ''}\r\n`
+        + `Durée : ${liveDuration} présentiel${eLearningSteps.length ? `, ${eLearningDuration} eLearning` : ''}\r\n`
         + `Dates : du ${startDate} au ${endDate} \r\n`
         + `Lieu : ${location} \r\n`
         + `Nom du formateur : ${trainer}`;
