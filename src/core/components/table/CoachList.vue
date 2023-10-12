@@ -128,7 +128,6 @@ export default {
       },
       roles: [],
       users: [],
-      get,
     };
   },
   validations () {
@@ -293,6 +292,7 @@ export default {
         this.usersLoading = false;
       }
     },
+    get,
   },
 };
 </script>
