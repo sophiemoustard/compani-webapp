@@ -1,4 +1,4 @@
-import { E_LEARNING, ON_SITE, STEP_TYPES, INTRA, SHORT_DURATION_H_MM } from '@data/constants';
+import { E_LEARNING, ON_SITE, STEP_TYPES, INTRA, SHORT_DURATION_H_MM, PT0S } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { formatIntervalHourly, getISODuration } from './dates/utils';
@@ -24,3 +24,8 @@ export const getStepTypeLabel = (value) => {
 
 export const formatSlotSchedule = slot => `${formatIntervalHourly(slot)} `
   + `(${CompaniDuration(getISODuration(slot)).format(SHORT_DURATION_H_MM)})`;
+
+export const computeDuration = steps => (steps.length
+  ? steps.reduce((acc, s) => (s.theoreticalDuration ? acc.add(s.theoreticalDuration) : acc), CompaniDuration()).toISO()
+  : PT0S
+);
