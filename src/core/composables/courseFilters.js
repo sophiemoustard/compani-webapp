@@ -7,10 +7,8 @@ import { formatAndSortIdentityOptions } from '@helpers/utils';
 import {
   WITHOUT_TRAINER,
   WITHOUT_SALES_REPRESENTATIVE,
-  INTRA,
-  INTER_B2B,
   ARCHIVED_COURSES,
-  INTRA_HOLDING,
+  COURSE_TYPES,
   UNARCHIVED_COURSES,
 } from '@data/constants';
 
@@ -108,12 +106,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
   /* TYPE */
   const selectedType = computed(() => $store.state.course.selectedType);
 
-  const typeFilterOptions = ref([
-    { label: 'Tous les types', value: '' },
-    { label: 'Intra', value: INTRA },
-    { label: 'Inter B2B', value: INTER_B2B },
-    { label: 'Intra société mère', value: INTRA_HOLDING },
-  ]);
+  const typeFilterOptions = ref([{ label: 'Tous les types', value: '' }, ...COURSE_TYPES]);
 
   const updateSelectedType = type => $store.dispatch('course/setSelectedType', { type });
 

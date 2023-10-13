@@ -259,10 +259,7 @@ export default {
             expectedBillsCount: { required, positiveNumber, integerNumber },
           }),
         company: { required: requiredIf(isIntraCourse.value) },
-        ...(isIntraHoldingCourse.value &&
-          {
-            maxTrainees: { required, strictPositiveNumber, integerNumber },
-          }),
+        ...(isIntraHoldingCourse.value && { maxTrainees: { required, strictPositiveNumber, integerNumber } }),
         holding: { required: requiredIf(isIntraHoldingCourse.value) },
       },
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
