@@ -70,6 +70,7 @@ export const defineAbilitiesForCourse = (user) => {
 
     can('read', 'Course', 'all_trainees');
     can('update', 'Course', 'sms');
+    can('read', 'Course', 'history');
     if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
       can('update', 'Course', 'company_representative', { type: { $in: [INTRA, INTRA_HOLDING] } });
       can('update', 'Course', 'interlocutor');
@@ -84,11 +85,13 @@ export const defineAbilitiesForCourse = (user) => {
     can('update', 'Course', 'company_representative', { type: INTRA });
     can('update', 'Course', 'trainees', { type: { $in: [INTRA_HOLDING, INTRA] } });
     can('update', 'Course', 'sms', { type: INTRA });
+    can('read', 'Course', 'history', { type: INTRA });
     if ([HOLDING_ADMIN].includes(holdingRole)) {
       can('update', 'Course', 'company_representative', { type: INTRA_HOLDING });
       can('update', 'Course', 'companies', { type: INTRA_HOLDING });
       can('read', 'Course', 'all_trainees');
       can('update', 'Course', 'sms', { type: INTRA_HOLDING });
+      can('read', 'Course', 'history', { type: INTRA_HOLDING });
     } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) can('read', 'Course', 'all_trainees', { type: INTRA });
   }
 

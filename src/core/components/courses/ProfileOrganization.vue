@@ -1,7 +1,7 @@
 <template>
   <div v-if="course">
     <div class="profile-container q-mb-xl">
-      <ni-bi-color-button v-if="isIntraOrVendor" class="button-history" icon="history" label="Historique"
+      <ni-bi-color-button v-if="canReadHistory" class="button-history" icon="history" label="Historique"
         @click="toggleHistory" />
       <div v-if="isIntraOrIntraHoldingOrVendor" class="row gutter-profile">
         <ni-input caption="Informations complémentaires" v-model.trim="tmpCourse.misc"
@@ -235,6 +235,11 @@ export default {
     const potentialTrainees = ref([]);
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
+    const canUpdateCompanyRepresentative = ref(false);
+    const canUpdateInterlocutor = ref(false);
+    const canUpdateTrainees = ref(false);
+    const canUpdateSMS = ref(false);
+    const canReadHistory = ref(false);
 
     const course = computed(() => $store.state.course.course);
 
@@ -318,30 +323,6 @@ export default {
       return !!smsMissingInfo.value.length || noPhoneNumber;
     });
 
-    const canUpdateCompanyRepresentative = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', subject('Course', course.value), 'company_representative');
-    });
-
-    const canUpdateInterlocutor = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', subject('Course', course.value), 'interlocutor');
-    });
-
-    const canUpdateTrainees = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', subject('Course', course.value), 'trainees');
-    });
-
-    const canUpdateSMS = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', subject('Course', course.value), 'sms');
-    });
-
     const traineesEmails = computed(() => {
       if (!course.value.trainees) return '';
 
@@ -370,6 +351,17 @@ export default {
         if (!newValue.companies.every(c => oldValueCompaniesIds.includes(c._id))) await refreshTrainingContracts();
       }
     }, { immediate: true });
+
+    const defineCourseAbilities = () => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      canUpdateCompanyRepresentative.value = ability
+        .can('update', subject('Course', course.value), 'company_representative');
+      canUpdateInterlocutor.value = ability.can('update', subject('Course', course.value), 'interlocutor');
+      canUpdateTrainees.value = ability.can('update', subject('Course', course.value), 'trainees');
+      canUpdateSMS.value = ability.can('update', subject('Course', course.value), 'sms');
+      canReadHistory.value = ability.can('read', subject('Course', course.value), 'history');
+    };
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
@@ -782,6 +774,7 @@ export default {
 
     const created = async () => {
       const promises = [];
+      defineCourseAbilities();
       if (canUpdateCompanyRepresentative.value) promises.push(refreshCompanyRepresentatives());
       if (canUpdateSMS.value) promises.push(refreshSms());
       if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
@@ -828,6 +821,10 @@ export default {
       isIntraCourse,
       trainingContractTableLoading,
       trainingContracts,
+      canUpdateInterlocutor,
+      canUpdateCompanyRepresentative,
+      canUpdateSMS,
+      canReadHistory,
       // Computed
       course,
       v$,
@@ -838,9 +835,6 @@ export default {
       missingTraineesPhone,
       smsMissingInfo,
       disableSms,
-      canUpdateInterlocutor,
-      canUpdateCompanyRepresentative,
-      canUpdateSMS,
       traineesEmails,
       contactOptions,
       isIntraOrVendor,

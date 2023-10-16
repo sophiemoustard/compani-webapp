@@ -116,33 +116,14 @@ export default {
     const $store = useStore();
     const $router = useRouter();
 
+    const canUpdateTrainees = ref(false);
+    const canUpdateCompanies = ref(false);
+    const canAccessCompany = ref(false);
+    const canAccessEveryTrainee = ref(false);
+
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const course = computed(() => $store.state.course.course);
-
-    const canUpdateTrainees = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', subject('Course', course.value), 'trainees');
-    });
-
-    const canUpdateCompanies = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', subject('Course', course.value), 'companies');
-    });
-
-    const canAccessCompany = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('read', subject('Course', course.value), 'companies');
-    });
-
-    const canAccessEveryTrainee = computed(() => {
-      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
-
-      return ability.can('read', subject('Course', course.value), 'all_trainees');
-    });
 
     const traineeModalLoading = ref(false);
 
@@ -238,6 +219,15 @@ export default {
       getPotentialCompanies,
     } = useCompaniesCoursesLink(course, emit);
 
+    const defineCourseAbilities = () => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      canUpdateTrainees.value = ability.can('update', subject('Course', course.value), 'trainees');
+      canUpdateCompanies.value = ability.can('update', subject('Course', course.value), 'companies');
+      canAccessCompany.value = ability.can('read', subject('Course', course.value), 'companies');
+      canAccessEveryTrainee.value = ability.can('read', subject('Course', course.value), 'all_trainees');
+    };
+
     const resetTraineeAdditionForm = () => {
       newTraineeRegistration.value = {};
       traineeRegistrationValidation.value.newTraineeRegistration.$reset();
@@ -290,6 +280,7 @@ export default {
     };
 
     const created = async () => {
+      defineCourseAbilities();
       if (course.value.type !== INTRA && canUpdateCompanies.value) await getPotentialCompanies();
     };
 
@@ -314,6 +305,9 @@ export default {
       companyModalLoading,
       companyPagination,
       disableUserInfoEdition,
+      canUpdateCompanies,
+      canAccessCompany,
+      canUpdateTrainees,
       // Validations
       learnerValidation,
       traineeRegistrationValidation,
@@ -334,9 +328,6 @@ export default {
       hasLinkedCompanies,
       traineesCompanyOptions,
       displayCompanyNames,
-      canUpdateCompanies,
-      canAccessCompany,
-      canUpdateTrainees,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
