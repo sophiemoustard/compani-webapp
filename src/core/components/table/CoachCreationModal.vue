@@ -19,8 +19,8 @@
         :last="!canSendEmail" caption="Téléphone" @blur="validations.contact.phone.$touch"
         :error-message="phoneNbrError" @update:model-value="update($event.trim(), 'contact.phone')" />
     </template>
-    <q-checkbox v-if="canSendEmail" label="Envoyer un email à la création du compte"
-      :model-value="newCoach.sendEmail" @update:model-value="update($event, 'sendEmail')" class="q-pb-md" />
+    <q-checkbox v-if="canSendEmail" dense label="Envoyer un email à la création du compte"
+      :model-value="newCoach.sendEmail" @update:model-value="update($event, 'sendEmail')" class="margin-input last" />
     <template #footer>
       <ni-button v-if="firstStep" class="bg-primary full-width modal-btn" label="Suivant" icon-right="add" color="white"
         :loading="loading" @click="goToNextStep" />
