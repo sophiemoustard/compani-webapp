@@ -19,6 +19,7 @@ import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfile
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { useCourses } from '@composables/courses';
 import { composeCourseName } from '@helpers/courses';
+import { INTRA_HOLDING } from '@data/constants';
 
 export default {
   name: 'BlendedCourseProfile',
@@ -40,24 +41,27 @@ export default {
     const $route = useRoute();
 
     const courseName = ref('');
-    const tabsContent = [
+
+    const course = computed(() => $store.state.course.course);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const tabsContent = computed(() => [
       {
         label: 'Organisation',
         name: 'organization',
         default: defaultTab.value === 'organization',
         component: ProfileOrganization,
       },
-      {
-        label: 'Suivi des stagiaires',
-        name: 'traineeFollowUp',
-        default: defaultTab.value === 'traineeFollowUp',
-        component: ProfileTraineeFollowUp,
-      },
-    ];
-
-    const course = computed(() => $store.state.course.course);
-
-    const loggedUser = computed(() => $store.state.main.loggedUser);
+      ...(course.value.type !== INTRA_HOLDING
+        ? [{
+          label: 'Suivi des stagiaires',
+          name: 'traineeFollowUp',
+          default: defaultTab.value === 'traineeFollowUp',
+          component: ProfileTraineeFollowUp,
+        }]
+        : []),
+    ]);
 
     const { headerInfo } = useCourses(course);
 
@@ -88,10 +92,10 @@ export default {
     return {
       // Data
       courseName,
-      tabsContent,
       // Computed
       course,
       headerInfo,
+      tabsContent,
     };
   },
 };

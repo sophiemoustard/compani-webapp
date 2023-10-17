@@ -4,7 +4,7 @@
       <div class="row">
         <p class="text-weight-bold table-title">{{ tableTitle }}</p>
       </div>
-      <div class="row" v-if="isIntraCourse">
+      <div class="row" v-if="isIntraCourse || isIntraHoldingCourse">
         <ni-input v-if="isRofOrAdmin && !isClientInterface" caption="Nombre max de stagiaires" :disable="isArchived"
           :model-value="maxTrainees" @update:model-value="inputTmpMaxTrainees($event)"
           :error="validations.maxTrainees.$error" :error-message="maxTraineesErrorMessage" @blur="updateMaxTrainees" />
@@ -21,32 +21,31 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props"
               :class="[col.class, { 'company': props.rowIndex !== 0}]">
               <template v-if="col.name === 'company'">
-                <div v-if="canEdit" @click="goToCompany(col.value)"> {{ col.value }}</div>
+                <div v-if="canAccessCompany" @click="goToCompany(col.value)"> {{ col.value }}</div>
                 <div v-else>{{ col.value }}</div>
               </template>
               <template v-else-if="col.name === 'actions'">
-                <ni-button v-if="canEdit && !traineesGroupedByCompanies[props.row._id]"
+                <ni-button v-if="canUpdateCompanies && !traineesGroupedByCompanies[props.row._id]"
                   icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
               </template>
             </q-td>
           </template>
           <template #expanding-row="{ props }">
             <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
-              :trainees="traineesGroupedByCompanies[props.row._id]" :can-edit="canEdit"
-              @refresh="refresh" hide-header />
+              :trainees="traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header />
             <div class="text-center text-italic no-data" v-else>
               Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
             </div>
           </template>
         </ni-expanding-table>
-        <ni-trainee-table v-else :trainees="course.trainees" :can-edit="canEdit" @refresh="refresh"
-          :loading="loading" table-class="q-pb-md" />
+        <ni-trainee-table v-else :trainees="course.trainees" @refresh="refresh" :loading="loading"
+          table-class="q-pb-md" />
       </q-card>
-      <div align="right" v-if="canEdit" class="q-pa-sm">
-        <ni-button v-if="!isIntraCourse" color="primary" icon="add" label="Rattacher une structure" :disable="loading"
-          @click="openCompanyAdditionModal" />
-        <ni-button color="primary" icon="add" label="Ajouter une personne" :disable="loading"
-          @click="openTraineeCreationModal" />
+      <div align="right" v-if="canUpdateTrainees" class="q-pa-sm">
+        <ni-button v-if="canUpdateCompanies" color="primary" icon="add" label="Rattacher une structure"
+          :disable="loading" @click="openCompanyAdditionModal" />
+        <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
+          :disable="loading" @click="openTraineeCreationModal" />
       </div>
     </div>
 
@@ -69,13 +68,16 @@
 </template>
 
 <script>
+import { subject } from '@casl/ability';
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
-import { TRAINER } from '@data/constants';
+import { TRAINER, INTRA } from '@data/constants';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
@@ -93,7 +95,6 @@ import { useCompaniesCoursesLink } from '@composables/companiesCoursesLink';
 export default {
   name: 'TraineeContainer',
   props: {
-    canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     maxTrainees: { type: [Number, String], default: '' },
@@ -110,10 +111,19 @@ export default {
   },
   emits: ['refresh', 'update', 'update:maxTrainees'],
   setup (props, { emit }) {
-    const { canEdit, validations, potentialTrainees } = toRefs(props);
+    const { validations, potentialTrainees } = toRefs(props);
 
     const $store = useStore();
     const $router = useRouter();
+
+    const canUpdateTrainees = ref(false);
+    const canUpdateCompanies = ref(false);
+    const canAccessCompany = ref(false);
+    const canAccessEveryTrainee = ref(false);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const course = computed(() => $store.state.course.course);
 
     const traineeModalLoading = ref(false);
 
@@ -122,7 +132,7 @@ export default {
         name: 'company',
         label: 'Structure',
         align: 'left',
-        class: canEdit.value ? 'clickable-name' : 'company-name',
+        class: canAccessCompany.value ? 'clickable-name' : 'company-name',
         field: row => get(row, 'name') || '',
       },
       { name: 'actions', label: '', align: 'right', field: '_id' },
@@ -134,11 +144,9 @@ export default {
 
     const isTrainer = ref(vendorRole.value === TRAINER);
 
-    const course = computed(() => $store.state.course.course);
-
     const traineesNumber = computed(() => (course.value.trainees ? course.value.trainees.length : 0));
 
-    const tableTitle = computed(() => (canEdit.value || isTrainer.value
+    const tableTitle = computed(() => (canAccessEveryTrainee.value || isTrainer.value
       ? `Stagiaires (${traineesNumber.value})`
       : `Stagiaires de votre structure (${traineesNumber.value})`));
 
@@ -156,7 +164,7 @@ export default {
 
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
-    const companyVisibleColumns = computed(() => (canEdit.value ? ['company', 'actions'] : ['company']));
+    const companyVisibleColumns = computed(() => (canUpdateCompanies.value ? ['company', 'actions'] : ['company']));
 
     const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
 
@@ -173,14 +181,12 @@ export default {
       return options;
     });
 
-    const loggedUser = computed(() => $store.state.main.loggedUser);
-
     const displayCompanyNames =
       computed(() => !isIntraCourse.value && (!isClientInterface || !!loggedUser.value.role.holding));
 
     const refresh = () => emit('refresh');
 
-    const { isIntraCourse, isClientInterface, isArchived } = useCourses(course);
+    const { isIntraCourse, isClientInterface, isArchived, isIntraHoldingCourse } = useCourses(course);
 
     const {
       newLearner,
@@ -212,6 +218,15 @@ export default {
       validateCompanyDeletion,
       getPotentialCompanies,
     } = useCompaniesCoursesLink(course, emit);
+
+    const defineCourseAbilities = () => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      canUpdateTrainees.value = ability.can('update', subject('Course', course.value), 'trainees');
+      canUpdateCompanies.value = ability.can('update', subject('Course', course.value), 'companies');
+      canAccessCompany.value = ability.can('read', subject('Course', course.value), 'companies');
+      canAccessEveryTrainee.value = ability.can('read', subject('Course', course.value), 'all_trainees');
+    };
 
     const resetTraineeAdditionForm = () => {
       newTraineeRegistration.value = {};
@@ -264,7 +279,10 @@ export default {
       $router.push({ name: 'ni users companies info', params: { companyId }, query: { defaultTab: 'infos' } });
     };
 
-    const created = async () => { await getPotentialCompanies(); };
+    const created = async () => {
+      defineCourseAbilities();
+      if (course.value.type !== INTRA && canUpdateCompanies.value) await getPotentialCompanies();
+    };
 
     created();
 
@@ -287,6 +305,9 @@ export default {
       companyModalLoading,
       companyPagination,
       disableUserInfoEdition,
+      canUpdateCompanies,
+      canAccessCompany,
+      canUpdateTrainees,
       // Validations
       learnerValidation,
       traineeRegistrationValidation,
@@ -297,6 +318,7 @@ export default {
       traineesOptions,
       course,
       isIntraCourse,
+      isIntraHoldingCourse,
       isClientInterface,
       isArchived,
       isRofOrAdmin,

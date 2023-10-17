@@ -213,6 +213,9 @@ export const VENDOR_ADMIN = 'vendor_admin';
 export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
 export const TRAINER = 'trainer';
 
+// ROLES HOLDING
+export const HOLDING_ADMIN = 'holding_admin';
+
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 export const ROLE_TRANSLATION = {
@@ -349,9 +352,11 @@ export const COURSE_SMS = 'Formation';
 // COURSE
 export const INTRA = 'intra';
 export const INTER_B2B = 'inter_b2b';
+export const INTRA_HOLDING = 'intra_holding';
 export const COURSE_TYPES = [
   { label: 'Intra', value: INTRA },
   { label: 'Inter B2B', value: INTER_B2B },
+  { label: 'Intra société mère', value: INTRA_HOLDING },
 ];
 export const BLENDED = 'blended';
 export const STRICTLY_E_LEARNING = 'strictly_e_learning';

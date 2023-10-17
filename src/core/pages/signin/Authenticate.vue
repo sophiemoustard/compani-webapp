@@ -66,8 +66,7 @@ export default {
       title: 'Connexion',
       meta: [{
         name: 'description',
-        content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées '
-          + 'par Compani.',
+        content: 'Outil collaboratif pour transformer le secteur du prendre soin.',
       }],
     };
     useMeta(metaInfo);

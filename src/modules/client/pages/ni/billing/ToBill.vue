@@ -8,8 +8,8 @@
               <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" data-cy="select-tpp" />
             </div>
             <div class="col-xs-12 col-sm-8">
-              <ni-date-range v-model="billingDates" @blur="getDraftBills" v-model:error="billingDatesHasError"
-                borderless class="q-ma-sm" />
+              <ni-date-range :model-value="billingDates" @update:model-value="updateDates" class="q-ma-sm" borderless
+                :disable="tableLoading" />
             </div>
           </div>
         </div>
@@ -79,7 +79,7 @@ import { MONTH } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 import { formatPrice, formatIdentity, formatAndSortOptions, toEuros, toCents } from '@helpers/utils';
-import { minArrayLength } from '@helpers/vuelidateCustomVal';
+import { minArrayLength, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import DeliveryDownloadModal from 'src/modules/client/components/customers/billing/DeliveryDownloadModal';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -106,10 +106,7 @@ export default {
     return {
       tableLoading: false,
       pagination: { rowsPerPage: 0 },
-      billingDates: {
-        startDate: null,
-        endDate: null,
-      },
+      billingDates: { startDate: null, endDate: null },
       billingDatesHasError: false,
       draftBills: [],
       selected: [],
@@ -154,6 +151,10 @@ export default {
   validations () {
     return {
       deliveryFile: { thirdPartyPayers: { minArrayLength: minArrayLength(1) }, month: { required } },
+      billingDates: {
+        startDate: { required, maxDate: maxDate(this.billingDates.endDate) },
+        endDate: { required, minDate: minDate(this.billingDates.startDate) },
+      },
     };
   },
   computed: {
@@ -271,8 +272,6 @@ export default {
       }
     },
     async getDraftBills () {
-      if (this.billingDatesHasError) return;
-
       try {
         this.tableLoading = true;
         const params = {
@@ -290,7 +289,7 @@ export default {
           },
           ...(!!draft.thirdPartyPayerBills && {
             thirdPartyPayerBills:
-                draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) })),
+              draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) })),
           }),
         }));
       } catch (e) {
@@ -373,6 +372,19 @@ export default {
     tableRowKey (row) {
       return row.customer._id;
     },
+    async updateDates ({ startDate, endDate }) {
+      try {
+        this.billingDates = { startDate, endDate };
+        await this.$nextTick();
+
+        this.v$.billingDates.$touch();
+        if (this.v$.billingDates.$error) return NotifyWarning('Date(s) invalide(s)');
+
+        await this.getDraftBills();
+      } catch (e) {
+        console.error(e);
+      }
+    },
   },
 };
 </script>
@@ -384,4 +396,6 @@ export default {
     padding-right: 10px
   @media screen and (max-width: $breakpoint-sm-max)
     margin: 0px !important
+.q-field
+  padding-bottom: 0px
 </style>

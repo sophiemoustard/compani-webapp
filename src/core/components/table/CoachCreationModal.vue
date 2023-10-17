@@ -8,17 +8,19 @@
       @update:model-value="update($event.trim(), 'local.email')" />
     <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" :model-value="newCoach.role"
       :error="validations.role.$error" @blur="validations.role.$touch" @update:model-value="update($event, 'role')"
-      :last="firstStep" required-field />
+      :last="firstStep && !canSendEmail" required-field />
     <template v-if="!firstStep">
       <ni-input :model-value="newCoach.identity.firstname" @update:model-value="update($event, 'identity.firstname')"
         in-modal caption="Prénom" />
       <ni-input in-modal :model-value="newCoach.identity.lastname" :error="validations.identity.lastname.$error"
         @blur="validations.identity.lastname.$touch" @update:model-value="update($event, 'identity.lastname')"
         required-field caption="Nom" />
-      <ni-input in-modal :model-value="newCoach.contact.phone" :error="validations.contact.phone.$error" last
-        caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
-        @update:model-value="update($event.trim(), 'contact.phone')" />
+      <ni-input in-modal :model-value="newCoach.contact.phone" :error="validations.contact.phone.$error"
+        :last="!canSendEmail" caption="Téléphone" @blur="validations.contact.phone.$touch"
+        :error-message="phoneNbrError" @update:model-value="update($event.trim(), 'contact.phone')" />
     </template>
+    <q-checkbox v-if="canSendEmail" dense label="Envoyer un email à la création du compte"
+      :model-value="newCoach.sendEmail" @update:model-value="update($event, 'sendEmail')" class="margin-input last" />
     <template #footer>
       <ni-button v-if="firstStep" class="bg-primary full-width modal-btn" label="Suivant" icon-right="add" color="white"
         :loading="loading" @click="goToNextStep" />
@@ -46,6 +48,7 @@ export default {
     firstStep: { type: Boolean, default: false },
     emailError: { type: String, default: '' },
     phoneNbrError: { type: String, default: '' },
+    canSendEmail: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,

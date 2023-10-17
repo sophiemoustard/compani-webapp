@@ -13,7 +13,7 @@
       <div v-if="!course.slots.length && isVendorInterface && isRofOrVendorAdmin" class="row gutter-profile">
         <ni-date-input class="col-xs-12 col-md-6" caption="Date de démarrage souhaitée"
           :model-value="estimatedStartDate" @update:model-value="inputTmpEstimatedStartDate($event)"
-          @blur="updateEstimatedStartDate" />
+          @blur="updateEstimatedStartDate" :disabled="course.archivedAt" />
       </div>
       <q-card class="q-pa-md">
         <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">

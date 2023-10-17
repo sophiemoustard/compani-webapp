@@ -32,9 +32,10 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="openCourseCreationModal" />
 
-    <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :is-intra-course="isIntraCourse"
-      :programs="programs" :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading"
-      @hide="resetCreationModal" @submit="createCourse" :sales-representative-options="salesRepresentativeOptions" />
+    <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :programs="programs"
+      :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading" @hide="resetCreationModal"
+      @submit="createCourse" :sales-representative-options="salesRepresentativeOptions"
+      :holding-options="holdingOptions" />
   </q-page>
 </template>
 
@@ -49,6 +50,7 @@ import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
+import Holdings from '@api/Holdings';
 import Programs from '@api/Programs';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -58,7 +60,14 @@ import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCre
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { useCourseFilters } from '@composables/courseFilters';
-import { INTRA, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, OPERATIONS } from '@data/constants';
+import {
+  INTRA,
+  INTRA_HOLDING,
+  BLENDED,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
+  OPERATIONS,
+} from '@data/constants';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
 
@@ -83,6 +92,7 @@ export default {
       program: '',
       subProgram: '',
       company: '',
+      holding: '',
       misc: '',
       type: INTRA,
       salesRepresentative: '',
@@ -91,10 +101,12 @@ export default {
       expectedBillsCount: '0',
     });
     const companyOptions = ref([]);
+    const holdingOptions = ref([]);
     const programs = ref([]);
     const salesRepresentativeOptions = ref([]);
 
     const isIntraCourse = computed(() => newCourse.value.type === INTRA);
+    const isIntraHoldingCourse = computed(() => newCourse.value.type === INTRA_HOLDING);
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const refreshPrograms = async () => {
@@ -113,6 +125,16 @@ export default {
       } catch (e) {
         console.error(e);
         companyOptions.value = [];
+      }
+    };
+
+    const refreshHoldings = async () => {
+      try {
+        const holdings = await Holdings.list();
+        holdingOptions.value = formatAndSortOptions(holdings, 'name');
+      } catch (e) {
+        console.error(e);
+        holdingOptions.value = [];
       }
     };
 
@@ -136,6 +158,7 @@ export default {
       newCourse.value = {
         program: '',
         company: '',
+        holding: '',
         misc: '',
         type: INTRA,
         salesRepresentative: '',
@@ -236,6 +259,8 @@ export default {
             expectedBillsCount: { required, positiveNumber, integerNumber },
           }),
         company: { required: requiredIf(isIntraCourse.value) },
+        ...(isIntraHoldingCourse.value && { maxTrainees: { required, strictPositiveNumber, integerNumber } }),
+        holding: { required: requiredIf(isIntraHoldingCourse.value) },
       },
       selectedStartDate: { maxDate: selectedEndDate.value ? maxDate(selectedEndDate.value) : '' },
       selectedEndDate: { minDate: selectedStartDate.value ? minDate(selectedStartDate.value) : '' },
@@ -248,6 +273,7 @@ export default {
         refreshArchivedCourses(),
         refreshPrograms(),
         refreshCompanies(),
+        refreshHoldings(),
         refreshSalesRepresentatives(),
       ]);
     };
@@ -262,6 +288,7 @@ export default {
       modalLoading,
       newCourse,
       companyOptions,
+      holdingOptions,
       programs,
       salesRepresentativeOptions,
       activeCourses,
@@ -269,7 +296,6 @@ export default {
       archiveStatusOptions,
       typeFilterOptions,
       // Computed
-      isIntraCourse,
       selectedCompany,
       companyFilterOptions,
       selectedTrainer,

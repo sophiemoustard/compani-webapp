@@ -20,7 +20,7 @@ import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileBilling from '@components/courses/ProfileBilling';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, INTRA_HOLDING } from '@data/constants';
 import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
 
@@ -46,33 +46,40 @@ export default {
     const $q = useQuasar();
 
     const courseName = ref('');
-    const tabsContent = computed(() => {
-      const organizationTab = {
-        label: 'Organisation',
-        name: 'organization',
-        default: defaultTab.value === 'organization',
-        component: ProfileOrganization,
-      };
-      const followUpTab = {
-        label: 'Suivi des stagiaires',
-        name: 'traineeFollowUp',
-        default: defaultTab.value === 'traineeFollowUp',
-        component: ProfileTraineeFollowUp,
-      };
-      const billingTab = {
-        label: 'Facturation',
-        name: 'billing',
-        default: defaultTab.value === 'billing',
-        component: ProfileBilling,
-      };
 
+    const course = computed(() => $store.state.course.course);
+
+    const tabsContent = computed(() => {
       const vendorRole = $store.getters['main/getVendorRole'];
       const isAdmin = [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole);
 
-      return isAdmin ? [organizationTab, followUpTab, billingTab] : [organizationTab, followUpTab];
+      return [
+        {
+          label: 'Organisation',
+          name: 'organization',
+          default: defaultTab.value === 'organization',
+          component: ProfileOrganization,
+        },
+        ...(course.value.type !== INTRA_HOLDING
+          ? [{
+            label: 'Suivi des stagiaires',
+            name: 'traineeFollowUp',
+            default: defaultTab.value === 'traineeFollowUp',
+            component: ProfileTraineeFollowUp,
+          }]
+          : []
+        ),
+        ...(course.value.type !== INTRA_HOLDING && isAdmin
+          ? [{
+            label: 'Facturation',
+            name: 'billing',
+            default: defaultTab.value === 'billing',
+            component: ProfileBilling,
+          }]
+          : []
+        ),
+      ];
     });
-
-    const course = computed(() => $store.state.course.course);
 
     const { headerInfo } = useCourses(course);
 

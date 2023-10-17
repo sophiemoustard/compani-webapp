@@ -1,9 +1,9 @@
 <template>
   <div v-if="course">
     <div class="profile-container q-mb-xl">
-      <ni-bi-color-button v-if="isIntraOrVendor" class="button-history" icon="history" label="Historique"
+      <ni-bi-color-button v-if="canReadHistory" class="button-history" icon="history" label="Historique"
         @click="toggleHistory" />
-      <div v-if="isIntraOrVendor" class="row gutter-profile">
+      <div v-if="isIntraOrIntraHoldingOrVendor" class="row gutter-profile">
         <ni-input caption="Informations complémentaires" v-model.trim="tmpCourse.misc"
           @blur="updateCourse('misc')" :disable="isArchived" />
       </div>
@@ -19,9 +19,9 @@
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant" :contact="course.contact"
           :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
           @open-modal="openTrainerModal" />
-        <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Référent structure"
-          :contact="course.contact" :can-update="(canUpdateInterlocutor || isClientInterface) && course.type === INTRA"
-          label="Ajouter un référent structure" :disable="isArchived" @open-modal="openCompanyRepresentativeModal" />
+        <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Chargé de formation structure"
+          :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
+          label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
@@ -29,14 +29,14 @@
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
-    <ni-trainee-container :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshTraineeTable"
-      @update="updateCourse('maxTrainees')" :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
+    <ni-trainee-container :loading="courseLoading" @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')"
+      :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
-    <div v-if="isIntraOrVendor">
+    <div v-if="canUpdateSMS">
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contacter les stagiaires</p>
         <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
@@ -72,14 +72,14 @@
         </ni-banner>
         <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       </div>
-      <div v-if="isIntraOrVendor">
+      <div v-if="isIntraOrIntraHoldingOrVendor">
         <ni-bi-color-button icon="file_download" label="Feuilles d'émargement vierges"
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container :course="course" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
-      :training-contracts="trainingContracts" :training-contract-table-loading="trainingContractTableLoading"
-      @refresh="refreshTrainingContracts" :has-holding-role="hasHoldingRole" />
+    <training-contract-container v-if="!isIntraHoldingCourse" :course="course" :has-holding-role="hasHoldingRole"
+      :is-rof-or-vendor-admin="isRofOrVendorAdmin" :training-contracts="trainingContracts"
+      :training-contract-table-loading="trainingContractTableLoading" @refresh="refreshTrainingContracts" />
 
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
       v-model:new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :error="v$.newSms"
@@ -109,6 +109,7 @@
 </template>
 
 <script>
+import { subject } from '@casl/ability';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { computed, ref, toRefs, watch } from 'vue';
@@ -156,8 +157,10 @@ import {
   HH_MM,
   COURSE,
   EDITION,
+  HOLDING_ADMIN,
+  INTRA_HOLDING,
 } from '@data/constants';
-import { defineAbilitiesFor } from '@helpers/ability';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
 import { formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
@@ -232,6 +235,11 @@ export default {
     const potentialTrainees = ref([]);
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
+    const canUpdateCompanyRepresentative = ref(false);
+    const canUpdateInterlocutor = ref(false);
+    const canUpdateTrainees = ref(false);
+    const canUpdateSMS = ref(false);
+    const canReadHistory = ref(false);
 
     const course = computed(() => $store.state.course.course);
 
@@ -243,6 +251,7 @@ export default {
       isClientInterface,
       isVendorInterface,
       isIntraOrVendor,
+      isIntraOrIntraHoldingOrVendor,
       followUpDisabled,
       isArchived,
       followUpMissingInfo,
@@ -268,9 +277,9 @@ export default {
 
     const isCourseInter = computed(() => course.value.type === INTER_B2B);
 
-    const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
+    const isIntraHoldingCourse = computed(() => course.value.type === INTRA_HOLDING);
 
-    const canEditTrainees = computed(() => isIntraCourse.value || (isVendorInterface && isRofOrVendorAdmin.value));
+    const canEditSlots = computed(() => !(isClientInterface && isCourseInter.value));
 
     const isFinished = computed(() => {
       const slotsToCome = course.value.slots.filter(slot => CompaniDate().isBefore(slot.endDate));
@@ -314,12 +323,6 @@ export default {
       return !!smsMissingInfo.value.length || noPhoneNumber;
     });
 
-    const canUpdateInterlocutor = computed(() => {
-      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role']));
-
-      return ability.can('update', 'interlocutor');
-    });
-
     const traineesEmails = computed(() => {
       if (!course.value.trainees) return '';
 
@@ -331,7 +334,7 @@ export default {
         { interlocutor: course.value.salesRepresentative, role: 'Référent(e) Compani' },
         ...(course.value.trainer._id ? [{ interlocutor: course.value.trainer, role: 'Intervenant(e)' }] : []),
         ...(course.value.companyRepresentative._id
-          ? [{ interlocutor: course.value.companyRepresentative, role: 'Référent(e) structure' }]
+          ? [{ interlocutor: course.value.companyRepresentative, role: 'Chargé(e) de formation structure' }]
           : []),
       ];
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
@@ -348,6 +351,17 @@ export default {
         if (!newValue.companies.every(c => oldValueCompaniesIds.includes(c._id))) await refreshTrainingContracts();
       }
     }, { immediate: true });
+
+    const defineCourseAbilities = () => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      canUpdateCompanyRepresentative.value = ability
+        .can('update', subject('Course', course.value), 'company_representative');
+      canUpdateInterlocutor.value = ability.can('update', subject('Course', course.value), 'interlocutor');
+      canUpdateTrainees.value = ability.can('update', subject('Course', course.value), 'trainees');
+      canUpdateSMS.value = ability.can('update', subject('Course', course.value), 'sms');
+      canReadHistory.value = ability.can('read', subject('Course', course.value), 'history');
+    };
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
@@ -437,16 +451,22 @@ export default {
 
     const refreshCompanyRepresentatives = async () => {
       try {
-        const loggedUserCompany = get(loggedUser.value, 'company._id');
-        const courseCompany = course.value.type === INTRA ? course.value.companies[0]._id : '';
-
-        if (loggedUserIsTrainer.value && loggedUserCompany !== courseCompany) {
+        if (course.value.type === INTER_B2B) {
           companyRepresentativeOptions.value = [];
           return;
         }
+        const loggedUserCompany = get(loggedUser.value, 'company._id');
+        const loggedUserHoldingRole = get(loggedUser.value, 'role.holding.name');
+        const courseCompanies = course.value.companies.map(c => c._id);
+
+        if (loggedUserIsTrainer.value && !loggedUserHoldingRole && !courseCompanies.includes(loggedUserCompany)) {
+          companyRepresentativeOptions.value = [];
+          return;
+        }
+
         const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompany, includeHoldingAdmins: true })
-          : [];
+          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompanies[0], includeHoldingAdmins: true })
+          : await Users.list({ role: [HOLDING_ADMIN], holding: course.value.holding });
 
         companyRepresentativeOptions.value = Object.freeze(clientsUsersAllowedtoAccessCompany
           .map(user => formatInterlocutorOption(user)).sort((a, b) => a.label.localeCompare(b.label)));
@@ -685,7 +705,7 @@ export default {
         isContact: !!course.value.companyRepresentative._id &&
         course.value.companyRepresentative._id === course.value.contact._id,
       };
-      interlocutorLabel.value = { action, interlocutor: 'référent structure' };
+      interlocutorLabel.value = { action, interlocutor: 'chargé de formation structure' };
       companyRepresentativeModal.value = true;
     };
 
@@ -729,7 +749,7 @@ export default {
 
     const refreshTrainingContracts = async () => {
       try {
-        if (!isRofOrVendorAdmin.value && isVendorInterface) return;
+        if ((!isRofOrVendorAdmin.value && isVendorInterface) || isIntraHoldingCourse.value) return;
 
         trainingContractTableLoading.value = true;
         const loggedUserHolding = get(loggedUser.value, 'holding._id');
@@ -754,8 +774,10 @@ export default {
 
     const created = async () => {
       const promises = [];
-      if (isVendorInterface || isIntraCourse.value) promises.push(refreshSms(), refreshCompanyRepresentatives());
-      if (isRofOrVendorAdmin.value || isIntraCourse.value) promises.push(refreshPotentialTrainees());
+      defineCourseAbilities();
+      if (canUpdateCompanyRepresentative.value) promises.push(refreshCompanyRepresentatives());
+      if (canUpdateSMS.value) promises.push(refreshSms());
+      if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
 
       if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
       else {
@@ -799,21 +821,24 @@ export default {
       isIntraCourse,
       trainingContractTableLoading,
       trainingContracts,
+      canUpdateInterlocutor,
+      canUpdateCompanyRepresentative,
+      canUpdateSMS,
+      canReadHistory,
       // Computed
       course,
       v$,
       isRofOrVendorAdmin,
       hasHoldingRole,
       canEditSlots,
-      canEditTrainees,
       filteredMessageTypeOptions,
       missingTraineesPhone,
       smsMissingInfo,
       disableSms,
-      canUpdateInterlocutor,
       traineesEmails,
       contactOptions,
       isIntraOrVendor,
+      isIntraOrIntraHoldingOrVendor,
       disableDocDownload,
       followUpDisabled,
       isArchived,
@@ -821,6 +846,7 @@ export default {
       isClientInterface,
       isCourseInter,
       isVendorInterface,
+      isIntraHoldingCourse,
       // Methods
       get,
       formatQuantity,
