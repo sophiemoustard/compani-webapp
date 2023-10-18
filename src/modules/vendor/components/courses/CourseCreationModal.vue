@@ -116,8 +116,8 @@ export default {
 
         this.subProgramOptions = formatAndSortOptions(blendedPublishedSubPrograms, 'name');
         this.disableSubProgram = !this.subProgramOptions.length;
-        if (this.disableSubProgram) this.update('', 'subProgram');
-        else if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
+        if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
+        else this.update('', 'subProgram');
       }
     },
   },
