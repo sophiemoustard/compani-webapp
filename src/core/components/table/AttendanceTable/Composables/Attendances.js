@@ -224,7 +224,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
   const goToLearnerProfile = (row) => {
     const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
 
-    return { name, params: { learnerId: row._id } };
+    return { name, params: { learnerId: row._id }, query: { defaultTab: 'courses' } };
   };
 
   return {

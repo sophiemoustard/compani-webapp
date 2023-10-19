@@ -45,7 +45,9 @@
                 <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
               </template>
               <template v-else-if="col.name === 'name'">
-                <div @click.stop="goToCourseProfile(props)" class="clickable-name">{{ col.value }}</div>
+                <div @click="$event.stopPropagation()">
+                  <router-link :to="goToCourseProfile(props)" class="clickable-name">{{ col.value }}</router-link>
+                </div>
               </template>
               <template v-else>{{ col.value }}</template>
             </q-td>
@@ -112,7 +114,6 @@
 <script>
 import { useStore } from 'vuex';
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
@@ -153,7 +154,6 @@ export default {
   },
   setup () {
     const $store = useStore();
-    const $router = useRouter();
 
     const { isVendorInterface, isClientInterface } = useCourses();
     const { getCountsByMonth, monthAxisLabels } = useCharts();
@@ -234,22 +234,26 @@ export default {
 
     const goToCourseProfile = (props) => {
       if (!isVendorInterface && props.row.subProgram.isStrictlyELearning) {
-        return $router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
+        return { name: 'ni elearning courses info', params: { courseId: props.row._id } };
       }
 
       if (!isVendorInterface) {
-        return $router.push({ name: 'ni courses info', params: { courseId: props.row._id } });
+        return {
+          name: 'ni courses info',
+          params: { courseId: props.row._id },
+          query: { defaultTab: 'traineeFollowUp' },
+        };
       }
 
       if (props.row.subProgram.isStrictlyELearning) {
-        return $router.push({ name: 'ni management elearning courses info', params: { courseId: props.row._id } });
+        return { name: 'ni management elearning courses info', params: { courseId: props.row._id } };
       }
 
-      $router.push({
+      return {
         name: 'ni management blended courses info',
         params: { courseId: props.row._id },
         query: { defaultTab: 'traineeFollowUp' },
-      });
+      };
     };
 
     const getUserCourses = async () => {

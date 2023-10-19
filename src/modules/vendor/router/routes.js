@@ -178,8 +178,6 @@ const routes = [
               to.query.defaultTab = 'traineeFollowUp';
             } else if (from.name === 'ni users companies info' && from.query.defaultTab === 'bills') {
               to.query.defaultTab = 'billing';
-            } else {
-              to.query.defaultTab = 'organization';
             }
 
             return next();

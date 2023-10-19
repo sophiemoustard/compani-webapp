@@ -44,9 +44,6 @@ export const defineAbilitiesFor = (user) => {
     can('update', 'course_trainee_follow_up');
   }
 
-  if ((isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) ||
-      [CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('read', 'learner_info');
-
   if (companySubscriptions.includes(ERP)) {
     if (clientRole === CLIENT_ADMIN) can('update', 'erp_config');
 

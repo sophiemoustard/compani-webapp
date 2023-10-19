@@ -16,7 +16,7 @@
             <connected-dot v-else />
           </template>
           <template v-else>
-            <div v-if="canAccessTrainee" :class="['name', 'clickable-name']" @click="$event.stopPropagation()">
+            <div v-if="canAccessTrainee" class="name clickable-name" @click="$event.stopPropagation()">
               <router-link :to="goToLearnerProfile(props.row)">{{ col.value }}</router-link>
             </div>
             <div v-else>{{ col.value }}</div>
@@ -50,7 +50,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 import { getStepTypeIcon } from '@helpers/courses';
 import { sortStrings } from '@helpers/utils';
-import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
 import ConnectedDot from './ConnectedDot';
 
@@ -104,12 +104,6 @@ export default {
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
-    const canReadLearnerInfo = computed(() => {
-      const ability = defineAbilitiesFor(pick(loggedUser.value, ['role', 'company', '_id', 'sector']));
-
-      return ability.can('read', 'learner_info');
-    });
-
     const canAccessTrainee = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
@@ -130,7 +124,6 @@ export default {
       columns,
       pagination,
       // Computed
-      canReadLearnerInfo,
       visibleColumns,
       canAccessTrainee,
       // Methods
