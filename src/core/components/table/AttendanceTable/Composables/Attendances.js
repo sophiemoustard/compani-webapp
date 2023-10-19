@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
-import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import useVuelidate from '@vuelidate/core';
@@ -15,7 +14,6 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 
 export const useAttendances = (course, isClientInterface, canUpdate, loggedUser, modalLoading) => {
   const $q = useQuasar();
-  const $router = useRouter();
 
   const attendances = ref([]);
   const traineeAdditionModal = ref(false);
@@ -225,7 +223,8 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const goToLearnerProfile = (row) => {
     const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
-    $router.push({ name, params: { learnerId: row._id } });
+
+    return { name, params: { learnerId: row._id } };
   };
 
   return {

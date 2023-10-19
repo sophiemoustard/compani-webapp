@@ -16,10 +16,10 @@
             <connected-dot v-else />
           </template>
           <template v-else>
-            <div :class="['name', canAccessTrainee(props.row) && 'clickable-name']"
-              @click="goToLearnerProfile(props.row, $event)">
-              {{ col.value }}
+            <div v-if="canAccessTrainee" :class="['name', 'clickable-name']" @click="$event.stopPropagation()">
+              <router-link :to="goToLearnerProfile(props.row)">{{ col.value }}</router-link>
             </div>
+            <div v-else>{{ col.value }}</div>
           </template>
         </q-td>
       </template>
@@ -44,16 +44,14 @@
 <script>
 import get from 'lodash/get';
 import { computed, ref, toRefs } from 'vue';
-import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import pick from 'lodash/pick';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 import { getStepTypeIcon } from '@helpers/courses';
 import { sortStrings } from '@helpers/utils';
-import { defineAbilitiesFor } from '@helpers/ability';
+import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
-import { useLearnersEdition } from '@composables/learnersEdition';
 import ConnectedDot from './ConnectedDot';
 
 export default {
@@ -69,13 +67,11 @@ export default {
     isBlended: { type: Boolean, default: false },
   },
   setup (props) {
-    const $router = useRouter();
     const $store = useStore();
 
     const { isBlended } = toRefs(props);
 
     const { isClientInterface } = useCourses();
-    const { canAccessTrainee } = useLearnersEdition();
 
     const columns = ref([
       {
@@ -114,16 +110,19 @@ export default {
       return ability.can('read', 'learner_info');
     });
 
+    const canAccessTrainee = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('access', 'trainee');
+    });
+
     const visibleColumns = computed(() => (isBlended.value
       ? ['name', 'connectionInfos', 'progress', 'expand']
       : ['name', 'progress', 'expand']));
 
-    const goToLearnerProfile = (row, $event) => {
-      if (!canAccessTrainee(row)) return;
-
-      $event.stopPropagation();
+    const goToLearnerProfile = (row) => {
       const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
-      $router.push({ name, params: { learnerId: row._id }, query: { defaultTab: 'courses' } });
+      return { name, params: { learnerId: row._id }, query: { defaultTab: 'courses' } };
     };
 
     return {
@@ -133,10 +132,10 @@ export default {
       // Computed
       canReadLearnerInfo,
       visibleColumns,
+      canAccessTrainee,
       // Methods
       goToLearnerProfile,
       getStepTypeIcon,
-      canAccessTrainee,
     };
   },
 };

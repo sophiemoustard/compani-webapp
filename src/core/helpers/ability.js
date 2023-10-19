@@ -77,6 +77,7 @@ export const defineAbilitiesForCourse = (user) => {
       can('read', 'Course', 'companies');
       can('update', 'Course', 'companies', { type: { $in: [INTER_B2B, INTRA_HOLDING] } });
       can('update', 'Course', 'trainees');
+      can('access', 'trainee');
     } else if (vendorRole === TRAINER) can('update', 'Course', 'trainees', { type: INTRA });
   } else {
     const holdingRole = get(role, 'holding.name');
@@ -86,6 +87,7 @@ export const defineAbilitiesForCourse = (user) => {
     can('update', 'Course', 'trainees', { type: { $in: [INTRA_HOLDING, INTRA] } });
     can('update', 'Course', 'sms', { type: INTRA });
     can('read', 'Course', 'history', { type: INTRA });
+    can('access', 'trainee');
     if ([HOLDING_ADMIN].includes(holdingRole)) {
       can('update', 'Course', 'company_representative', { type: INTRA_HOLDING });
       can('update', 'Course', 'companies', { type: INTRA_HOLDING });

@@ -2,7 +2,7 @@
   <div>
     <div class="q-mt-lg q-mb-xl">
       <p class="text-weight-bold">Émargements</p>
-      <div v-if="isIntraOrVendor" class="q-mb-md">
+      <div v-if="isIntraOrIntraHoldingOrVendor" class="q-mb-md">
         <ni-banner v-if="followUpDisabled">
           <template #message>
             Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
@@ -128,7 +128,7 @@ export default {
     const {
       isClientInterface,
       pdfLoading,
-      isIntraOrVendor,
+      isIntraOrIntraHoldingOrVendor,
       isArchived,
       disableDocDownload,
       followUpDisabled,
@@ -265,7 +265,7 @@ export default {
       unsubscribedAttendances,
       columns,
       pagination,
-      isIntraOrVendor,
+      isIntraOrIntraHoldingOrVendor,
       learners,
       learnersLoading,
       expectationsQuestionnaireId,
