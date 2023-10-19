@@ -5,8 +5,9 @@ import isEmpty from 'lodash/isEmpty';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Attendances from '@api/Attendances';
+import Holdings from '@api/Holdings';
 import Users from '@api/Users';
-import { HH_MM, DAY_OF_WEEK_SHORT, DAY_OF_MONTH, MONTH_SHORT, COURSE, INTRA } from '@data/constants';
+import { HH_MM, DAY_OF_WEEK_SHORT, DAY_OF_MONTH, MONTH_SHORT, COURSE, INTRA, INTRA_HOLDING } from '@data/constants';
 import { upperCaseFirstLetter, formatIdentity, sortStrings, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -94,16 +95,19 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
       if (isClientInterface) {
         if (course.value.type === INTRA) companies.push(course.value.companies[0]._id);
         else if (get(loggedUser.value, 'role.holding')) {
-          companies.push(
-            ...course.value.companies
-              .filter(c => get(loggedUser.value, 'holding.companies').includes(c._id))
-              .map(c => c._id)
-          );
+          if (course.value.type === INTRA_HOLDING) companies.push(...get(loggedUser.value, 'holding.companies'));
+          else {
+            companies.push(
+              ...course.value.companies
+                .filter(c => get(loggedUser.value, 'holding.companies').includes(c._id))
+                .map(c => c._id)
+            );
+          }
         } else companies.push(get(loggedUser.value, 'company._id'));
-      } else {
-        companies.push(...course.value.companies.map(c => c._id));
-      }
-
+      } else if (course.value.type === INTRA_HOLDING) {
+        const holding = await Holdings.getById(course.value.holding);
+        companies.push(...holding.companies.map(c => c._id));
+      } else companies.push(...course.value.companies.map(c => c._id));
       potentialTrainees.value = !isEmpty(companies)
         ? Object.freeze(await Users.learnerList({ companies, action: COURSE }))
         : [];
