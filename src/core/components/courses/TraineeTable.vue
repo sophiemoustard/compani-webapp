@@ -16,8 +16,7 @@
           :style="col.style" :class="[col.classes, { 'border': props.rowIndex === 0 && !hideHeader}]">
           <template v-if="col.name === 'actions' && canUpdateTrainees">
             <div>
-              <ni-button icon="edit" @click="openTraineeEditionModal(props.row)"
-                :disable="!canEditTrainee(props.row) || !!course.archivedAt" />
+              <ni-button icon="edit" @click="openTraineeEditionModal(props.row)" :disable="!!course.archivedAt" />
               <ni-button icon="close" @click="validateTraineeDeletion(props.row._id)" :disable="!!course.archivedAt" />
             </div>
           </template>
@@ -54,7 +53,6 @@ import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { useLearnersEdition } from '@composables/learnersEdition';
 import ConnectedDot from './ConnectedDot';
 
 export default {
@@ -75,8 +73,6 @@ export default {
   setup (props, { emit }) {
     const $q = useQuasar();
     const $store = useStore();
-
-    const { canEditTrainee } = useLearnersEdition();
 
     const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
@@ -213,7 +209,6 @@ export default {
       resetTraineeEditionForm,
       updateTrainee,
       validateTraineeDeletion,
-      canEditTrainee,
     };
   },
 };
