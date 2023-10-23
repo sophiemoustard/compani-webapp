@@ -162,7 +162,8 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
       return true;
     } catch (e) {
       console.error(e);
-      NotifyNegative('Erreur lors de la modification de l\'émargement.');
+      if (e.status === 403 && e.data.message) NotifyNegative(e.data.message);
+      else NotifyNegative('Erreur lors de la modification de l\'émargement.');
       return false;
     } finally {
       loading.value = false;
