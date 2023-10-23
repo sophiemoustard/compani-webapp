@@ -23,7 +23,17 @@
 import { computed, toRefs } from 'vue';
 import get from 'lodash/get';
 import { useStore } from 'vuex';
-import { FORTHCOMING, COMPLETED, IN_PROGRESS, TRAINER, ON_SITE, INTRA } from '@data/constants';
+import {
+  FORTHCOMING,
+  COMPLETED,
+  IN_PROGRESS,
+  TRAINER,
+  ON_SITE,
+  INTRA,
+  ARCHIVED_COURSES,
+  UNARCHIVED_COURSES,
+  WITHOUT_TRAINER,
+} from '@data/constants';
 import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -31,7 +41,6 @@ import CompaniDuration from '@helpers/dates/companiDurations';
 import { useCourses } from '@composables/courses';
 import ForthcomingSection from './ForthcomingSection';
 import InProgressSection from './InProgressSection';
-import { ARCHIVED_COURSES, UNARCHIVED_COURSES } from '../../../data/constants';
 
 export default {
   name: 'CourseDetail',
@@ -106,7 +115,11 @@ export default {
     const isDisplayed = computed(() => {
       if (selectedProgram.value && course.value.subProgram.program._id !== selectedProgram.value) return false;
 
-      if (selectedTrainer.value && get(course.value, 'trainer._id') !== selectedTrainer.value) return false;
+      if (selectedTrainer.value) {
+        if (selectedTrainer.value !== WITHOUT_TRAINER) {
+          if (get(course.value, 'trainer._id') !== selectedTrainer.value) return false;
+        } else if (get(course.value, 'trainer._id')) return false;
+      }
 
       const companiesIds = course.value.companies.map(company => company._id);
       if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
