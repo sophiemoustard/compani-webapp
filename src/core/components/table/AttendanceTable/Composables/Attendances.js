@@ -91,23 +91,25 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const getPotentialTrainees = async () => {
     try {
-      const companies = [];
+      let companies = [];
+      const courseCompanyIds = course.value.companies.map(c => c._id);
       if (isClientInterface) {
-        if (course.value.type === INTRA) companies.push(course.value.companies[0]._id);
+        if (course.value.type === INTRA) companies = courseCompanyIds;
         else if (get(loggedUser.value, 'role.holding')) {
-          if (course.value.type === INTRA_HOLDING) companies.push(...get(loggedUser.value, 'holding.companies'));
+          if (course.value.type === INTRA_HOLDING) companies = get(loggedUser.value, 'holding.companies');
           else {
-            companies.push(
-              ...course.value.companies
-                .filter(c => get(loggedUser.value, 'holding.companies').includes(c._id))
-                .map(c => c._id)
-            );
+            companies = courseCompanyIds.filter(c => get(loggedUser.value, 'holding.companies').includes(c));
           }
-        } else companies.push(get(loggedUser.value, 'company._id'));
+        } else {
+          companies = [get(loggedUser.value, 'company._id')];
+        }
       } else if (course.value.type === INTRA_HOLDING) {
         const holding = await Holdings.getById(course.value.holding);
-        companies.push(...holding.companies.map(c => c._id));
-      } else companies.push(...course.value.companies.map(c => c._id));
+        companies = holding.companies.map(c => c._id);
+      } else {
+        companies = courseCompanyIds;
+      }
+
       potentialTrainees.value = !isEmpty(companies)
         ? Object.freeze(await Users.learnerList({ companies, action: COURSE }))
         : [];
