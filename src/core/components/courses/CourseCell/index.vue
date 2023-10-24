@@ -116,9 +116,9 @@ export default {
       if (selectedProgram.value && course.value.subProgram.program._id !== selectedProgram.value) return false;
 
       if (selectedTrainer.value) {
-        if (selectedTrainer.value !== WITHOUT_TRAINER) {
-          if (get(course.value, 'trainer._id') !== selectedTrainer.value) return false;
-        } else if (get(course.value, 'trainer._id')) return false;
+        const courseTrainer = get(course.value, 'trainer._id');
+        if (selectedTrainer.value === WITHOUT_TRAINER && courseTrainer) return false;
+        if (selectedTrainer.value !== WITHOUT_TRAINER && courseTrainer !== selectedTrainer.value) return false;
       }
 
       const companiesIds = course.value.companies.map(company => company._id);
