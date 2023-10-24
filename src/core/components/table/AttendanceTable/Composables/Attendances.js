@@ -96,10 +96,9 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
       if (isClientInterface) {
         if (course.value.type === INTRA) companies = courseCompanyIds;
         else if (get(loggedUser.value, 'role.holding')) {
-          if (course.value.type === INTRA_HOLDING) companies = get(loggedUser.value, 'holding.companies');
-          else {
-            companies = courseCompanyIds.filter(c => get(loggedUser.value, 'holding.companies').includes(c));
-          }
+          const holdingCompanies = get(loggedUser.value, 'holding.companies');
+          if (course.value.type === INTRA_HOLDING) companies = holdingCompanies;
+          else companies = courseCompanyIds.filter(c => holdingCompanies.includes(c));
         } else {
           companies = [get(loggedUser.value, 'company._id')];
         }
