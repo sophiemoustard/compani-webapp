@@ -4,13 +4,7 @@ import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import {
-  WITHOUT_TRAINER,
-  WITHOUT_SALES_REPRESENTATIVE,
-  ARCHIVED_COURSES,
-  COURSE_TYPES,
-  UNARCHIVED_COURSES,
-} from '@data/constants';
+import { WITHOUT_TRAINER, ARCHIVED_COURSES, COURSE_TYPES, UNARCHIVED_COURSES } from '@data/constants';
 
 export const useCourseFilters = (activeCourses, archivedCourses) => {
   const $store = useStore();
@@ -80,11 +74,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     const filteredCourses = courses.value.filter(course => !!course.salesRepresentative);
     const salesRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'salesRepresentative');
 
-    return [
-      { label: 'Tous les référents Compani', value: '' },
-      { label: 'Sans référent(e) Compani', value: WITHOUT_SALES_REPRESENTATIVE },
-      ...sortedUniqBy(salesRepresentatives, 'value'),
-    ];
+    return [{ label: 'Tous les référents Compani', value: '' }, ...sortedUniqBy(salesRepresentatives, 'value')];
   });
 
   const updateSelectedSalesRepresentative = (salesRepresentativeId) => {
