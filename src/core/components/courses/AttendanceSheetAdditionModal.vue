@@ -3,12 +3,12 @@
     <template #title>
       Ajouter une nouvelle <span class="text-weight-bold">feuille d'émargement</span>
     </template>
-    <ni-select v-if="course.type === INTRA" :model-value="newAttendanceSheet.date" @blur="validations.date.$touch"
+    <ni-select v-if="course.type === INTER_B2B" :model-value="newAttendanceSheet.trainee"
+      :error="validations.trainee.$error" @update:model-value="update($event, 'trainee')" in-modal required-field
+      caption="Participant(e)" :options="traineeOptions" @blur="validations.trainee.$touch" />
+    <ni-select v-else :model-value="newAttendanceSheet.date" @blur="validations.date.$touch"
       :error="validations.date.$error" @update:model-value="update($event, 'date')" :options="dateOptions"
       required-field in-modal caption="Date" />
-    <ni-select v-else :model-value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
-      :error="validations.trainee.$error" @update:model-value="update($event, 'trainee')" in-modal required-field
-      caption="Participant(e)" :options="traineeOptions" />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
       :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
@@ -24,7 +24,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import { INTRA, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY } from '@data/constants';
+import { INTER_B2B, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -46,7 +46,7 @@ export default {
   emits: ['hide', 'update:model-value', 'update:new-attendance-sheet', 'submit'],
   data () {
     return {
-      INTRA,
+      INTER_B2B,
       DOC_EXTENSIONS,
       IMAGE_EXTENSIONS,
     };
