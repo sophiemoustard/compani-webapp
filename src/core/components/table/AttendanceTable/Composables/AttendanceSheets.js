@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
-import { INTRA, INTER_B2B, DD_MM_YYYY } from '@data/constants';
+import { INTER_B2B, DD_MM_YYYY } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -41,16 +41,16 @@ export const useAttendanceSheets = (
   const attendanceSheetRules = computed(() => ({
     newAttendanceSheet: {
       file: { required },
-      trainee: { required: requiredIf(course.value.type !== INTRA) },
-      date: { required: requiredIf(course.value.type === INTRA) },
+      trainee: { required: requiredIf(course.value.type === INTER_B2B) },
+      date: { required: requiredIf(course.value.type !== INTER_B2B) },
     },
   }));
 
   const v$ = useVuelidate(attendanceSheetRules, { newAttendanceSheet });
 
-  const attendanceSheetVisibleColumns = computed(() => (course.value.type === INTRA
-    ? ['date', 'actions']
-    : ['trainee', 'actions']));
+  const attendanceSheetVisibleColumns = computed(() => (course.value.type === INTER_B2B
+    ? ['trainee', 'actions']
+    : ['date', 'actions']));
 
   const unsubscribedTrainees = computed(() => {
     const traineesId = course.value.trainees.map(trainee => trainee._id);
@@ -117,7 +117,7 @@ export const useAttendanceSheets = (
   const formatPayload = () => {
     const { course: newAttendanceSheetCourse, file, trainee, date } = newAttendanceSheet.value;
     const form = new FormData();
-    course.value.type === INTRA ? form.append('date', date) : form.append('trainee', trainee);
+    course.value.type === INTER_B2B ? form.append('trainee', trainee) : form.append('date', date);
     form.append('course', newAttendanceSheetCourse);
     form.append('file', file);
 
