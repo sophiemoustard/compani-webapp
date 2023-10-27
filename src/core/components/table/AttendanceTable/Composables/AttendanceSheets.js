@@ -139,7 +139,8 @@ export const useAttendanceSheets = (
       await refreshAttendanceSheets();
     } catch (e) {
       console.error(e);
-      NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
+      if (e.status === 403 && e.data.message) NotifyNegative(e.data.message);
+      else NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
     } finally {
       modalLoading.value = false;
     }
