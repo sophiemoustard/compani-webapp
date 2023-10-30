@@ -105,6 +105,9 @@ export const useAttendanceSheets = (
     if (course.value.archivedAt) {
       return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
     }
+    if (!course.value.companies.length) {
+      return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
+    }
 
     attendanceSheetAdditionModal.value = true;
   };
