@@ -105,6 +105,9 @@ export const useAttendanceSheets = (
     if (course.value.archivedAt) {
       return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
     }
+    if (!course.value.companies.length) {
+      return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
+    }
 
     attendanceSheetAdditionModal.value = true;
   };
@@ -139,8 +142,7 @@ export const useAttendanceSheets = (
       await refreshAttendanceSheets();
     } catch (e) {
       console.error(e);
-      if (e.status === 403 && e.data.message) NotifyNegative(e.data.message);
-      else NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
+      NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
     } finally {
       modalLoading.value = false;
     }
