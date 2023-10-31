@@ -60,15 +60,12 @@ export default {
           default: defaultTab.value === 'organization',
           component: ProfileOrganization,
         },
-        ...(course.value.type !== INTRA_HOLDING
-          ? [{
-            label: 'Suivi des stagiaires',
-            name: 'traineeFollowUp',
-            default: defaultTab.value === 'traineeFollowUp',
-            component: ProfileTraineeFollowUp,
-          }]
-          : []
-        ),
+        {
+          label: 'Suivi des stagiaires',
+          name: 'traineeFollowUp',
+          default: defaultTab.value === 'traineeFollowUp',
+          component: ProfileTraineeFollowUp,
+        },
         ...(course.value.type !== INTRA_HOLDING && isAdmin
           ? [{
             label: 'Facturation',

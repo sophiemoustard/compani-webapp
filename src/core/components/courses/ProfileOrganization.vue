@@ -245,12 +245,10 @@ export default {
 
     const {
       vendorRole,
-      isIntraCourse,
       disableDocDownload,
       pdfLoading,
       isClientInterface,
       isVendorInterface,
-      isIntraOrVendor,
       isIntraOrIntraHoldingOrVendor,
       followUpDisabled,
       isArchived,
@@ -818,7 +816,6 @@ export default {
       tmpContactId,
       courseHistoryFeed,
       tmpCourse,
-      isIntraCourse,
       trainingContractTableLoading,
       trainingContracts,
       canUpdateInterlocutor,
@@ -837,7 +834,6 @@ export default {
       disableSms,
       traineesEmails,
       contactOptions,
-      isIntraOrVendor,
       isIntraOrIntraHoldingOrVendor,
       disableDocDownload,
       followUpDisabled,

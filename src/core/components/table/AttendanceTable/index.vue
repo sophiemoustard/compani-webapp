@@ -32,10 +32,10 @@
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label @click="canAccessTrainee(props.row) && goToLearnerProfile(props.row)"
-                    :class="['ellipsis', canAccessTrainee(props.row) && 'clickable-name cursor-pointer']">
-                    {{ col.value }}
+                  <q-item-label v-if="canAccessTrainee" class="ellipsis clickable-name cursor-pointer">
+                    <router-link :to="goToLearnerProfile(props.row)">{{ col.value }}</router-link>
                   </q-item-label>
+                  <q-item-label v-else class="ellipsis">{{ col.value }}</q-item-label>
                   <q-item-label v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-label>
                 </q-item-section>
               </q-item>
@@ -101,11 +101,10 @@ import { useRouter } from 'vue-router';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { defineAbilitiesFor } from '@helpers/ability';
+import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
-import { useLearnersEdition } from '@composables/learnersEdition';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
@@ -139,7 +138,11 @@ export default {
       return ability.can('update', 'course_trainee_follow_up');
     });
 
-    const { canAccessTrainee } = useLearnersEdition();
+    const canAccessTrainee = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('access', 'trainee');
+    });
 
     const {
       // Data
@@ -228,6 +231,7 @@ export default {
       formattedAttendanceSheets,
       traineeFilterOptions,
       canUpdate,
+      canAccessTrainee,
       disableCheckbox,
       // Methods
       get,
@@ -246,7 +250,6 @@ export default {
       updateSlotCheckbox,
       getDelimiterClass,
       goToLearnerProfile,
-      canAccessTrainee,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,

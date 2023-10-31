@@ -44,8 +44,6 @@ export const useCourses = (course) => {
 
   const isArchived = computed(() => !!course.value.archivedAt);
 
-  const isIntraOrVendor = computed(() => isIntraCourse.value || isVendorInterface);
-
   const isIntraOrIntraHoldingOrVendor =
     computed(() => isIntraCourse.value || isIntraHoldingCourse.value || isVendorInterface);
 
@@ -92,7 +90,6 @@ export const useCourses = (course) => {
     disableDocDownload,
     isVendorInterface,
     isClientInterface,
-    isIntraOrVendor,
     isIntraOrIntraHoldingOrVendor,
     followUpDisabled,
     isArchived,

@@ -45,9 +45,8 @@
                 <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
               </template>
               <template v-else-if="col.name === 'name'">
-                <div @click.stop="goToCourseProfile(props)"
-                  :class="props.row.type !== INTRA_HOLDING && 'clickable-name'">
-                    {{ col.value }}
+                <div @click="$event.stopPropagation()">
+                  <router-link :to="goToCourseProfile(props)" class="clickable-name">{{ col.value }}</router-link>
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -115,7 +114,6 @@
 <script>
 import { useStore } from 'vuex';
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import has from 'lodash/has';
 import uniqBy from 'lodash/uniqBy';
@@ -132,7 +130,6 @@ import {
   DD_MM_YYYY,
   MONTH,
   DAY,
-  INTRA_HOLDING,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -157,7 +154,6 @@ export default {
   },
   setup () {
     const $store = useStore();
-    const $router = useRouter();
 
     const { isVendorInterface, isClientInterface } = useCourses();
     const { getCountsByMonth, monthAxisLabels } = useCharts();
@@ -237,24 +233,27 @@ export default {
       : 'activité eLearning réalisée'));
 
     const goToCourseProfile = (props) => {
-      if (props.row.type === INTRA_HOLDING) return;
       if (!isVendorInterface && props.row.subProgram.isStrictlyELearning) {
-        return $router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
+        return { name: 'ni elearning courses info', params: { courseId: props.row._id } };
       }
 
       if (!isVendorInterface) {
-        return $router.push({ name: 'ni courses info', params: { courseId: props.row._id } });
+        return {
+          name: 'ni courses info',
+          params: { courseId: props.row._id },
+          query: { defaultTab: 'traineeFollowUp' },
+        };
       }
 
       if (props.row.subProgram.isStrictlyELearning) {
-        return $router.push({ name: 'ni management elearning courses info', params: { courseId: props.row._id } });
+        return { name: 'ni management elearning courses info', params: { courseId: props.row._id } };
       }
 
-      $router.push({
+      return {
         name: 'ni management blended courses info',
         params: { courseId: props.row._id },
         query: { defaultTab: 'traineeFollowUp' },
-      });
+      };
     };
 
     const getUserCourses = async () => {
@@ -356,7 +355,6 @@ export default {
       monthAxisLabels,
       DD_MM_YYYY,
       SHORT_DURATION_H_MM,
-      INTRA_HOLDING,
       // Computed
       userProfile,
       eLearningCoursesOnGoing,

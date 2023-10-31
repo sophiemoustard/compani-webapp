@@ -1,13 +1,13 @@
 import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
-import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Attendances from '@api/Attendances';
+import Holdings from '@api/Holdings';
 import Users from '@api/Users';
-import { HH_MM, DAY_OF_WEEK_SHORT, DAY_OF_MONTH, MONTH_SHORT, COURSE, INTRA } from '@data/constants';
+import { HH_MM, DAY_OF_WEEK_SHORT, DAY_OF_MONTH, MONTH_SHORT, COURSE, INTRA, INTRA_HOLDING } from '@data/constants';
 import { upperCaseFirstLetter, formatIdentity, sortStrings, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -15,7 +15,6 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 
 export const useAttendances = (course, isClientInterface, canUpdate, loggedUser, modalLoading) => {
   const $q = useQuasar();
-  const $router = useRouter();
 
   const attendances = ref([]);
   const traineeAdditionModal = ref(false);
@@ -76,7 +75,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const traineesWithAttendance = computed(() => ([...course.value.trainees, ...unsubscribedTrainees.value]));
 
-  const noTrainees = computed(() => !course.value.trainees.length);
+  const noTrainees = computed(() => !traineesWithAttendance.value.length);
 
   const courseHasSlot = computed(() => course.value.slots.length);
 
@@ -92,18 +91,22 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const getPotentialTrainees = async () => {
     try {
-      const companies = [];
+      let companies = [];
+      const courseCompanyIds = course.value.companies.map(c => c._id);
       if (isClientInterface) {
-        if (course.value.type === INTRA) companies.push(course.value.companies[0]._id);
+        if (course.value.type === INTRA) companies = courseCompanyIds;
         else if (get(loggedUser.value, 'role.holding')) {
-          companies.push(
-            ...course.value.companies
-              .filter(c => get(loggedUser.value, 'holding.companies').includes(c._id))
-              .map(c => c._id)
-          );
-        } else companies.push(get(loggedUser.value, 'company._id'));
+          const holdingCompanies = get(loggedUser.value, 'holding.companies');
+          if (course.value.type === INTRA_HOLDING) companies = holdingCompanies;
+          else companies = courseCompanyIds.filter(c => holdingCompanies.includes(c));
+        } else {
+          companies = [get(loggedUser.value, 'company._id')];
+        }
+      } else if (course.value.type === INTRA_HOLDING) {
+        const holding = await Holdings.getById(course.value.holding);
+        companies = holding.companies.map(c => c._id);
       } else {
-        companies.push(...course.value.companies.map(c => c._id));
+        companies = courseCompanyIds;
       }
 
       potentialTrainees.value = !isEmpty(companies)
@@ -160,7 +163,8 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
       return true;
     } catch (e) {
       console.error(e);
-      NotifyNegative('Erreur lors de la modification de l\'émargement.');
+      if (e.status === 403 && e.data.message) NotifyNegative(e.data.message);
+      else NotifyNegative('Erreur lors de la modification de l\'émargement.');
       return false;
     } finally {
       loading.value = false;
@@ -225,7 +229,8 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const goToLearnerProfile = (row) => {
     const name = isClientInterface ? 'ni courses learners info' : 'ni users learners info';
-    $router.push({ name, params: { learnerId: row._id } });
+
+    return { name, params: { learnerId: row._id }, query: { defaultTab: 'courses' } };
   };
 
   return {
