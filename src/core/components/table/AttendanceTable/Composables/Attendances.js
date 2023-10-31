@@ -75,7 +75,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const traineesWithAttendance = computed(() => ([...course.value.trainees, ...unsubscribedTrainees.value]));
 
-  const noTrainees = computed(() => !course.value.trainees.length);
+  const noTrainees = computed(() => !traineesWithAttendance.value.length);
 
   const courseHasSlot = computed(() => course.value.slots.length);
 
