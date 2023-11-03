@@ -87,6 +87,7 @@ import { composeCourseName, formatSlotSchedule } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
 import { useCourses } from '@composables/courses';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
+import { ALL_PDF, ALL_WORD, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '../../data/constants';
 
 export default {
   name: 'ProfileTraineeFollowUp',
@@ -134,8 +135,11 @@ export default {
       followUpDisabled,
       followUpMissingInfo,
       downloadAttendanceSheet,
+      vendorRole,
     } = useCourses(course);
     const { learners, getFollowUp, learnersLoading } = useTraineeFollowUp(profileId);
+
+    const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole.value));
 
     const areQuestionnaireAnswersVisible = computed(() => questionnaires.value.length);
 
@@ -207,8 +211,10 @@ export default {
         pdfLoading.value = true;
         const formattedName = formatDownloadName(`attestations ${composeCourseName(course.value, true)}`);
         const zipName = `${formattedName}.zip`;
-        const pdf = await Courses.downloadCompletionCertificates(course.value._id);
-        downloadZip(pdf, zipName);
+
+        const format = (isClientInterface || !isRofOrVendorAdmin.value) ? ALL_PDF : ALL_WORD;
+        const zip = await Courses.downloadCompletionCertificates(course.value._id, { format });
+        downloadZip(zip, zipName);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');
