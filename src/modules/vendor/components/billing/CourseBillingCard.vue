@@ -216,8 +216,8 @@ export default {
     const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
-    const newCreditNote = ref({ courseBill: '', misc: '', date: '', company: '' });
-    const creditNoteMetaInfo = ref({ number: '', netInclTaxes: '', courseName: '' });
+    const newCreditNote = ref({ courseBill: '', misc: '', date: '', companies: [] });
+    const creditNoteMetaInfo = ref({ number: '', netInclTaxes: '', courseName: '', companiesName: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
@@ -251,7 +251,7 @@ export default {
       newCreditNote: {
         courseBill: { required },
         date: { required, minDate: minDate(minCourseCreditNoteDate.value) },
-        company: { required },
+        companies: { required },
       },
     }));
     const validations = useVuelidate(rules, {
@@ -559,15 +559,16 @@ export default {
         courseBill: billId,
         date: '',
         misc: '',
-        company: companies.value[0]._id,
+        companies: companies.value.map(c => c._id),
       };
       creditNoteCreationModal.value = true;
       minCourseCreditNoteDate.value = bill.billedAt;
       creditNoteMetaInfo.value = {
         number,
         netInclTaxes,
-        courseName: `${get(companies, 'value[0].name')} - ${get(course, 'value.subProgram.program.name')}
+        courseName: `${get(course, 'value.subProgram.program.name')}
           ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`,
+        companiesName,
       };
     };
 
@@ -592,9 +593,9 @@ export default {
     };
 
     const resetCreditNoteCreationModal = () => {
-      newCreditNote.value = { courseBill: '', date: '', misc: '', company: '' };
+      newCreditNote.value = { courseBill: '', date: '', misc: '', companies: [] };
       minCourseCreditNoteDate.value = '';
-      creditNoteMetaInfo.value = { number: '', netInclTaxes: '', courseName: '' };
+      creditNoteMetaInfo.value = { number: '', netInclTaxes: '', courseName: '', companiesName: '' };
       validations.value.newCreditNote.$reset();
     };
 
