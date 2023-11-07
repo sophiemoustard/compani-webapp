@@ -119,10 +119,11 @@ export const upperCaseFirstLetter = str => str.charAt(0).toUpperCase() + str.sli
 
 export const truncate = (string, limit = 30) => (string.length > limit ? `${string.slice(0, limit)}...` : string);
 
-export const formatQuantity = (itemLabel, quantity, pluralMark = 's') => {
-  if (quantity > 1) itemLabel = itemLabel.split(' ').map(word => `${word}${pluralMark}`).join(' ');
+export const formatQuantity = (itemLabel, quantity, pluralMark = 's', displayQuantity = true) => {
+  let label = itemLabel;
+  if (quantity > 1) label = itemLabel.split(' ').map(word => `${word}${pluralMark}`).join(' ');
 
-  return `${quantity} ${itemLabel}`;
+  return displayQuantity ? `${quantity} ${label}` : label;
 };
 
 export const sortStrings = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase());

@@ -3,9 +3,9 @@
     <div class="q-mt-lg q-mb-xl">
       <p v-if="course.type === INTER_B2B" class="text-weight-bold">
         <span v-for="company of companies" :key="company._id" class="text-weight-regular text-copper-500">
-            <router-link class="redirection cursor-pointer" :to="goToCompany(company._id)">
-              {{ company.name }}
-            </router-link>
+          <router-link class="redirection cursor-pointer" :to="goToCompany(company._id)">
+            {{ company.name }}
+          </router-link>
         </span>
       </p>
       <div v-if="courseBills.length">
@@ -308,7 +308,7 @@ export default {
 
     const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)}
       ${companies.value.length > 1 ? 'des structures sélectionnées' : 'de la structure'}
-      ${traineesLength.value > 1 ? 'inscrits' : 'inscrit'} à cette formation`);
+      ${formatQuantity('inscrit', traineesLength.value, 's', false)} à cette formation`);
 
     const getBillErrorMessages = (parent) => {
       let price = '';
