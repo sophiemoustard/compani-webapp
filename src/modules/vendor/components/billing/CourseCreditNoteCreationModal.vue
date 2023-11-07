@@ -9,7 +9,7 @@
           {{ creditNoteMetaInfo.number }} - {{ formatPrice(creditNoteMetaInfo.netInclTaxes) }}
       </span>
     </div>
-    <div class="course-name">{{ creditNoteMetaInfo.courseName }}</div>
+    <div class="course-bill-infos">{{ creditNoteMetaInfo.courseName }}</div>
     <ni-banner v-if="displayValidatedCourseBillsCount" icon="info_outline" icon-color="copper-grey-700"
       class="bg-copper-grey-200 text-copper-grey-700">
       <template #message>

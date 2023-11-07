@@ -3,7 +3,10 @@
     <template #title>
       Éditer le <span class="text-weight-bold">payeur</span>
     </template>
-    <div class="course-name">{{ courseName }} </div>
+    <div class="course-bill-infos">
+      <div>{{ courseName }} </div>
+      <div>Facture pour le compte de {{ companiesName }}</div>
+    </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="editedPayer" required-field
       @update:model-value="update" />
     <template #footer>
@@ -26,6 +29,7 @@ export default {
     payerOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
     courseName: { type: String, default: '' },
+    companiesName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,

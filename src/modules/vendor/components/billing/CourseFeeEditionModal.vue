@@ -3,7 +3,10 @@
     <template #title>
       <span class="text-weight-bold">{{ title }}</span>
     </template>
-    <div class="course-name">{{ courseName }} </div>
+    <div class="course-bill-infos">
+      <div>{{ courseName }} </div>
+      <div>Facture pour le compte de {{ companiesName }}</div>
+    </div>
     <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number" :disable="isBilled"
       :model-value="courseFee.price" @blur="validations.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'price')" />
@@ -36,6 +39,7 @@ export default {
     title: { type: String, default: '' },
     isBilled: { type: Boolean, default: false },
     courseName: { type: String, default: '' },
+    companiesName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,

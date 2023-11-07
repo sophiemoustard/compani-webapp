@@ -5,13 +5,13 @@
         @blur="updateCourse('expectedBillsCount')" caption="Nombre de factures"
         :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
     </div>
-    <div v-for="company of companies" :key="company._id">
-      <ni-course-billing-card :company="company" :course="course" :payer-list="payerList" :loading="billsLoading"
-      :billing-item-list="billingItemList" :course-bills="courseBills.filter(bill => bill.company._id === company._id)"
-      @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll"
-      :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
+    <div v-for="(companies, index) of companiesList" :key="index">
+      <ni-course-billing-card :companies="companies" :course="course" :payer-list="payerList" :loading="billsLoading"
+        :billing-item-list="billingItemList" :course-bills="billsGroupedByCompanies[companies.map(c => c._id)]"
+        @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll"
+        :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
     </div>
-    <div v-if="!companies.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
+    <div v-if="!companiesList.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
   </div>
 </template>
 
@@ -22,6 +22,7 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import uniqBy from 'lodash/uniqBy';
 import pickBy from 'lodash/pickBy';
+import groupBy from 'lodash/groupBy';
 import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import { formatAndSortOptions, formatPrice } from '@helpers/utils';
@@ -68,12 +69,14 @@ export default {
 
     const { isIntraCourse } = useCourses(course);
 
-    const companies = computed(() => {
-      const billsCompanies = courseBills.value.map(bill => bill.company);
+    const companiesList = computed(() => {
+      const billsCompanies = courseBills.value.map(bill => bill.companies);
 
-      return uniqBy([...course.value.companies, ...billsCompanies], '_id')
-        .sort((a, b) => a.name.localeCompare(b.name));
+      return uniqBy([...[...course.value.companies.map(c => [c])], ...[...billsCompanies]], '[0]._id')
+        .sort((a, b) => a[0].name.localeCompare(b[0].name));
     });
+
+    const billsGroupedByCompanies = computed(() => groupBy(courseBills.value, c => c.companies.map(cp => cp._id)));
 
     const expectedBillsCountErrorMessage = computed(() => {
       if (v$.value.course.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
@@ -186,16 +189,17 @@ export default {
       billsLoading,
       // Computed
       course,
-      companies,
+      companiesList,
       isIntraCourse,
-      updateCourse,
       expectedBillsCountErrorMessage,
+      billsGroupedByCompanies,
       // Methods
       saveTmp,
       refreshCourseBills,
       refreshAndUnroll,
       refreshPayers,
       refreshBillingItems,
+      updateCourse,
       get,
       omit,
       pickBy,

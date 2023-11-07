@@ -4,7 +4,10 @@
       Nouvelle <span class="text-weight-bold">facture</span>
     </template>
     <div>{{ courseName }} </div>
-    <div class="trainees">{{ traineesQuantity }} </div>
+    <div class="course-bill-infos">
+      <div>Facture pour le compte de {{ companiesName }}</div>
+      <div>{{ traineesQuantity }} </div>
+    </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
       @update:model-value="update($event, 'payer')" />
     <ni-input in-modal :caption="courseType === INTRA ? 'Prix du programme' : 'Prix par stagiaire'"
@@ -41,6 +44,7 @@ export default {
     courseName: { type: String, default: '' },
     courseType: { type: String, default: '' },
     traineesQuantity: { type: String, default: '' },
+    companiesName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
@@ -69,10 +73,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.trainees
-  color: $copper-grey-500
-  font-size: 14px
-  margin-bottom: 16px
-</style>
