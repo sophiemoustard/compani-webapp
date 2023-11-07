@@ -3,7 +3,10 @@
     <template #title>
       Confirmation
     </template>
-    <div class="course-name">{{ courseName }} </div>
+    <div class="course-bill-infos">
+      <div>{{ courseName }} </div>
+      <div>Facture pour le compte de {{ companiesName }}</div>
+    </div>
     <ni-banner v-if="!traineesLength && courseType === INTER_B2B" icon="info_outline" icon-color="orange-700"
       class="bg-orange-50 text-orange-900">
       <template #message>Aucun stagiaire de la structure n'est inscrit à la formation</template>
@@ -38,6 +41,7 @@ export default {
     traineesLength: { type: Number, default: 0 },
     courseName: { type: String, default: '' },
     courseType: { type: String, default: '' },
+    companiesName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
