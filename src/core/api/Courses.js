@@ -54,10 +54,10 @@ export default {
       { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
     );
   },
-  downloadCompletionCertificates (courseId) {
+  downloadCompletionCertificates (courseId, params) {
     return alenviAxios.get(
       `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates`,
-      { responseType: 'arraybuffer', headers: { Accept: 'application/zip' } }
+      { params, responseType: 'arraybuffer', headers: { Accept: 'application/zip' } }
     );
   },
   async addAccessRule (courseId, payload) {

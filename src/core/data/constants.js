@@ -481,6 +481,11 @@ export const ACCESS_OPTIONS = [
 // ORIGIN
 export const WEBAPP = 'webapp';
 
+// FORMAT
+export const PDF = 'pdf';
+export const ALL_PDF = 'all_pdf';
+export const ALL_WORD = 'all_word';
+
 // Email
 export const TRAINEE = 'trainee';
 
