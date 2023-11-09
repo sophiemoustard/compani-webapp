@@ -72,7 +72,7 @@ export default {
     const companiesList = computed(() => {
       const billsCompanies = courseBills.value.map(bill => bill.companies);
 
-      return uniqBy([...[...course.value.companies.map(c => [c])], ...[...billsCompanies]], '[0]._id')
+      return uniqBy([...course.value.companies.map(c => [c]), ...billsCompanies], '[0]._id')
         .sort((a, b) => a[0].name.localeCompare(b[0].name));
     });
 
