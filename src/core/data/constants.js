@@ -486,6 +486,10 @@ export const PDF = 'pdf';
 export const ALL_PDF = 'all_pdf';
 export const ALL_WORD = 'all_word';
 
+// TYPE
+export const CUSTOM = 'custom';
+export const OFFICIAL = 'official';
+
 // Email
 export const TRAINEE = 'trainee';
 

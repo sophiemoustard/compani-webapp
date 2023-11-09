@@ -38,7 +38,9 @@
         </template>
       </ni-banner>
       <ni-bi-color-button icon="file_download" label="Attestations"
-        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates" size="16px" />
+        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates(CUSTOM)" size="16px" />
+      <ni-bi-color-button icon="file_download" label="Certificat de réalisation" size="16px"
+        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates(OFFICIAL)" />
     </div>
     <div v-if="unsubscribedAttendances.length">
       <div class="text-italic q-ma-xs">
@@ -78,7 +80,16 @@ import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCe
 import BiColorButton from '@components/BiColorButton';
 import Banner from '@components/Banner';
 import QuestionnaireQRCodeCell from '@components/courses/QuestionnaireQRCodeCell';
-import { E_LEARNING, SHORT_DURATION_H_MM, DD_MM_YYYY, END_OF_COURSE, EXPECTATIONS, PUBLISHED } from '@data/constants';
+import {
+  E_LEARNING,
+  SHORT_DURATION_H_MM,
+  DD_MM_YYYY,
+  END_OF_COURSE,
+  EXPECTATIONS,
+  PUBLISHED,
+  OFFICIAL,
+  CUSTOM,
+} from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
@@ -204,7 +215,7 @@ export default {
       }
     };
 
-    const downloadCompletionCertificates = async () => {
+    const downloadCompletionCertificates = async (type) => {
       if (disableDownloadCompletionCertificates.value) return;
 
       try {
@@ -213,7 +224,7 @@ export default {
         const zipName = `${formattedName}.zip`;
 
         const format = (isClientInterface || !isRofOrVendorAdmin.value) ? ALL_PDF : ALL_WORD;
-        const zip = await Courses.downloadCompletionCertificates(course.value._id, { format });
+        const zip = await Courses.downloadCompletionCertificates(course.value._id, { format, type });
         downloadZip(zip, zipName);
       } catch (e) {
         console.error(e);
@@ -281,6 +292,8 @@ export default {
       isClientInterface,
       EXPECTATIONS,
       END_OF_COURSE,
+      OFFICIAL,
+      CUSTOM,
       // Computed
       course,
       courseHasElearningStep,
