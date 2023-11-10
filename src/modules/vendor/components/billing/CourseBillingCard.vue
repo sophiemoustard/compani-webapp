@@ -553,19 +553,10 @@ export default {
     const openCreditNoteCreationModal = (bill) => {
       if (expectedBillsCountInvalid.value) return NotifyWarning('Champ(s) invalide(s).');
       const { _id: billId, number, netInclTaxes } = bill;
-      newCreditNote.value = {
-        courseBill: billId,
-        date: '',
-        misc: '',
-      };
+      newCreditNote.value = { courseBill: billId, date: '', misc: '' };
       creditNoteCreationModal.value = true;
       minCourseCreditNoteDate.value = bill.billedAt;
-      creditNoteMetaInfo.value = {
-        number,
-        netInclTaxes,
-        courseName: composeCourseName(course.value),
-        companiesName,
-      };
+      creditNoteMetaInfo.value = { number, netInclTaxes, courseName: composeCourseName(course.value), companiesName };
     };
 
     const addCreditNote = async () => {
