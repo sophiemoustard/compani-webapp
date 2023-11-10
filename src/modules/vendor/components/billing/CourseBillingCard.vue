@@ -216,7 +216,7 @@ export default {
     const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
-    const newCreditNote = ref({ courseBill: '', misc: '', date: '', companies: [] });
+    const newCreditNote = ref({ courseBill: '', misc: '', date: '' });
     const creditNoteMetaInfo = ref({ number: '', netInclTaxes: '', courseName: '', companiesName: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
@@ -251,7 +251,6 @@ export default {
       newCreditNote: {
         courseBill: { required },
         date: { required, minDate: minDate(minCourseCreditNoteDate.value) },
-        companies: { required },
       },
     }));
     const validations = useVuelidate(rules, {
@@ -558,7 +557,6 @@ export default {
         courseBill: billId,
         date: '',
         misc: '',
-        companies: companies.value.map(c => c._id),
       };
       creditNoteCreationModal.value = true;
       minCourseCreditNoteDate.value = bill.billedAt;
@@ -591,7 +589,7 @@ export default {
     };
 
     const resetCreditNoteCreationModal = () => {
-      newCreditNote.value = { courseBill: '', date: '', misc: '', companies: [] };
+      newCreditNote.value = { courseBill: '', date: '', misc: '' };
       minCourseCreditNoteDate.value = '';
       creditNoteMetaInfo.value = { number: '', netInclTaxes: '', courseName: '', companiesName: '' };
       validations.value.newCreditNote.$reset();
