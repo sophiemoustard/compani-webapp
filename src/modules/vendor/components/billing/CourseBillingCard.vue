@@ -160,7 +160,7 @@ import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY, LONG_DURATION_H_
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatPrice, formatDownloadName, formatQuantity, formatIdentity } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
-import { computeDuration } from '@helpers/courses';
+import { computeDuration, composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { ascendingSortBy, descendingSortBy } from '@helpers/dates/utils';
@@ -301,8 +301,7 @@ export default {
       .filter(trainee => companies.value.map(c => c._id).includes(trainee.registrationCompany))
       .length);
 
-    const courseName = computed(() => `${get(course, 'value.subProgram.program.name')}
-      ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
+    const courseName = computed(() => composeCourseName(course.value));
 
     const companiesName = computed(() => companies.value.map(c => c.name).join(', '));
 
@@ -566,8 +565,7 @@ export default {
       creditNoteMetaInfo.value = {
         number,
         netInclTaxes,
-        courseName: `${get(course, 'value.subProgram.program.name')}
-          ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`,
+        courseName: composeCourseName(course.value),
         companiesName,
       };
     };
