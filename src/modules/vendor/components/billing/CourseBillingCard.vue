@@ -156,10 +156,10 @@ import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
+import { useCourseBills } from '@composables/courseBills';
 import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING } from '@data/constants';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatPrice, formatDownloadName, formatQuantity, formatIdentity } from '@helpers/utils';
-import { downloadFile } from '@helpers/file';
+import { formatPrice, formatQuantity, formatIdentity } from '@helpers/utils';
 import { computeDuration, composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -204,7 +204,6 @@ export default {
     const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
     const creditNoteCreationLoading = ref(false);
-    const pdfLoading = ref(false);
     const billCreationModal = ref(false);
     const payerEditionModal = ref(false);
     const mainFeeEditionModal = ref(false);
@@ -222,6 +221,12 @@ export default {
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
     const minCourseCreditNoteDate = ref('');
+
+    const {
+      pdfLoading,
+      downloadBill,
+      downloadCreditNote,
+    } = useCourseBills(courseBills);
 
     const rules = computed(() => ({
       newBill: {
@@ -627,35 +632,6 @@ export default {
     const isDateVisible = bill => isPayerVisible(bill) && bill.billedAt;
 
     const getBillingItemName = billingItem => billingItemList.value.find(item => item.value === billingItem).label;
-
-    const downloadBill = async (bill) => {
-      try {
-        pdfLoading.value = true;
-        const pdf = await CourseBills.getPdf(bill._id);
-        const pdfName = `${formatDownloadName(`${bill.payer.name} ${bill.number}`)}.pdf`;
-        downloadFile(pdf, pdfName, 'application/octet-stream');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la facture.');
-      } finally {
-        pdfLoading.value = false;
-      }
-    };
-
-    const downloadCreditNote = async (creditNote) => {
-      try {
-        pdfLoading.value = true;
-        const pdf = await CourseCreditNotes.getPdf(creditNote._id);
-        const { payer } = courseBills.value.find(bill => bill._id === creditNote.courseBill);
-        const pdfName = `${formatDownloadName(`${payer.name} ${creditNote.number}`)}.pdf`;
-        downloadFile(pdf, pdfName, 'application/octet-stream');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de l\'avoir.');
-      } finally {
-        pdfLoading.value = false;
-      }
-    };
 
     const goToCompany = companyId => ({
       name: 'ni users companies info',
