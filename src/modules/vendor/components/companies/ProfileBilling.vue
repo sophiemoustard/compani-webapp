@@ -8,10 +8,10 @@
           @open-modal="openBillingRepresentativeModal" />
       </div>
     </div>
-    <template v-if="Object.keys(courseBills).length">
-      <div v-for="payer of Object.keys(courseBills)" :key="payer" class="q-mb-xl">
-        <p class="text-weight-bold">{{ getTableName( courseBills[payer][0].payer) }}</p>
-        <ni-expanding-table :data="courseBills[payer]" :columns="columns" v-model:pagination="pagination"
+    <template v-if="Object.keys(groupedCourseBills).length">
+      <div v-for="payer of Object.keys(groupedCourseBills)" :key="payer" class="q-mb-xl">
+        <p class="text-weight-bold">{{ getTableName( groupedCourseBills[payer][0].payer) }}</p>
+        <ni-expanding-table :data="groupedCourseBills[payer]" :columns="columns" v-model:pagination="pagination"
           :hide-bottom="false" :loading="loading">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -26,7 +26,12 @@
                 </div>
                 <div class="row items-center" v-if="props.row.courseCreditNote">
                   <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
-                  <div class="q-ml-xs text-orange-500">Annulée par avoir - {{ props.row.courseCreditNote.number }}</div>
+                  <div class="q-ml-xs text-orange-500">
+                    Annulée par avoir -
+                    <span class="download-credit-note" @click.stop="downloadCreditNote(props.row.courseCreditNote)">
+                      {{ props.row.courseCreditNote.number }}
+                    </span>
+                  </div>
                 </div>
               </template>
               <template v-else-if="col.name === 'progress' && col.value >= 0">
@@ -75,7 +80,7 @@
               <q-td />
               <q-td />
               <q-td><div class="flex justify-end items-center">Total</div></q-td>
-              <q-td><div class="flex justify-end items-center">{{ getTotal(courseBills[payer]) }}</div></q-td>
+              <q-td><div class="flex justify-end items-center">{{ getTotal(groupedCourseBills[payer]) }}</div></q-td>
               <q-td />
               <q-td />
             </q-tr>
@@ -132,17 +137,16 @@ import {
 } from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
 import { ascendingSortBy, ascendingSort } from '@helpers/dates/utils';
-import { downloadFile } from '@helpers/file';
 import {
   formatPrice,
   formatPriceWithSign,
-  formatDownloadName,
   formatAndSortUserOptions,
   truncate,
 } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
+import { useCourseBills } from '@composables/courseBills';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
 
@@ -160,9 +164,9 @@ export default {
   setup () {
     const $store = useStore();
     const $router = useRouter();
-    const courseBills = ref([]);
+    const groupedCourseBills = ref([]);
+    const courseBillList = ref([]);
     const loading = ref(false);
-    const pdfLoading = ref(false);
     const paymentCreationLoading = ref(false);
     const paymentEditionLoading = ref(false);
     const coursePaymentMetaInfo = ref({ number: '', courseName: '', netInclTaxes: '' });
@@ -244,6 +248,12 @@ export default {
 
     const company = computed(() => (canUpdateBilling.value ? $store.state.company.company : loggedUser.value.company));
 
+    const {
+      pdfLoading,
+      downloadBill,
+      downloadCreditNote,
+    } = useCourseBills(courseBillList);
+
     const sortCourseBills = (a, b) => {
       const payerCompare = a.payer.name.localeCompare(b.payer.name);
 
@@ -259,41 +269,28 @@ export default {
     const refreshCourseBills = async () => {
       try {
         loading.value = true;
-        const courseBillList = await CourseBills
+        const courseBills = await CourseBills
           .list({ company: company.value._id, action: BALANCE })
           .then(data => data.sort(sortCourseBills));
 
-        if (courseBillList.length) {
-          const billsGroupedByPayer = groupBy(courseBillList, 'payer._id');
-          courseBills.value = {
+        if (courseBills.length) {
+          courseBillList.value = courseBills;
+          const billsGroupedByPayer = groupBy(courseBills, 'payer._id');
+          groupedCourseBills.value = {
             ...(!!billsGroupedByPayer[company.value._id] &&
             { [company.value._id]: billsGroupedByPayer[company.value._id] }
             ),
             ...omit(billsGroupedByPayer, [company.value._id]),
           };
         } else {
-          courseBills.value = {};
+          groupedCourseBills.value = {};
         }
       } catch (e) {
         console.error(e);
-        courseBills.value = [];
+        groupedCourseBills.value = [];
         NotifyNegative('Erreur lors de la récupération des factures.');
       } finally {
         loading.value = false;
-      }
-    };
-
-    const downloadBill = async (bill) => {
-      try {
-        pdfLoading.value = true;
-        const pdf = await CourseBills.getPdf(bill._id);
-        const pdfName = `${formatDownloadName(`${bill.payer.name} ${bill.number}`)}.pdf`;
-        downloadFile(pdf, pdfName, 'application/octet-stream');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la facture.');
-      } finally {
-        pdfLoading.value = false;
       }
     };
 
@@ -478,7 +475,7 @@ export default {
     };
 
     watch(company, async () => {
-      if (!courseBills.value.length && company.value) {
+      if (!groupedCourseBills.value.length && company.value) {
         await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
       }
     });
@@ -491,7 +488,7 @@ export default {
 
     return {
       // Data
-      courseBills,
+      groupedCourseBills,
       columns,
       pagination,
       loading,
@@ -519,6 +516,7 @@ export default {
       refreshCourseBills,
       formatPrice,
       downloadBill,
+      downloadCreditNote,
       openCoursePaymentCreationModal,
       openCoursePaymentEditionModal,
       createPayment,
@@ -590,4 +588,8 @@ export default {
 .expand
   width: 5%
   padding: 4px
+.download-credit-note
+  &:hover
+    text-decoration: underline
+    text-decoration-color: $orange-500
 </style>
