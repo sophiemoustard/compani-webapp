@@ -39,8 +39,9 @@
       </ni-banner>
       <ni-bi-color-button icon="file_download" label="Attestations"
         :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates(CUSTOM)" size="16px" />
-      <ni-bi-color-button icon="file_download" label="Certificat de réalisation" size="16px"
-        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates(OFFICIAL)" />
+      <ni-bi-color-button v-if="isRofOrVendorAdmin && !isClientInterface" icon="file_download"
+        label="Certificats de réalisation" size="16px" :disable="disableDownloadCompletionCertificates"
+        @click="downloadCompletionCertificates(OFFICIAL)" />
     </div>
     <div v-if="unsubscribedAttendances.length">
       <div class="text-italic q-ma-xs">
@@ -220,7 +221,8 @@ export default {
 
       try {
         pdfLoading.value = true;
-        const formattedName = formatDownloadName(`attestations ${composeCourseName(course.value, true)}`);
+        const docType = type === OFFICIAL ? 'certificats' : 'attestations';
+        const formattedName = formatDownloadName(`${docType} ${composeCourseName(course.value, true)}`);
         const zipName = `${formattedName}.zip`;
 
         const format = (isClientInterface || !isRofOrVendorAdmin.value) ? ALL_PDF : ALL_WORD;
@@ -305,6 +307,7 @@ export default {
       areQuestionnaireAnswersVisible,
       areQuestionnaireVisible,
       areQuestionnaireQRCodeVisible,
+      isRofOrVendorAdmin,
       // Methods
       get,
       formatQuantity,
