@@ -146,7 +146,7 @@ import {
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
-import { useCourseBills } from '@composables/courseBills';
+import { useCourseBilling } from '@composables/courseBills';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from '../billing/CoursePaymentEditionModal';
 
@@ -252,7 +252,7 @@ export default {
       pdfLoading,
       downloadBill,
       downloadCreditNote,
-    } = useCourseBills(courseBillList);
+    } = useCourseBilling(courseBillList);
 
     const sortCourseBills = (a, b) => {
       const payerCompare = a.payer.name.localeCompare(b.payer.name);

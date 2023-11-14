@@ -5,7 +5,7 @@ import { NotifyNegative } from '@components/popup/notify';
 import { formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 
-export const useCourseBills = (courseBills) => {
+export const useCourseBilling = (courseBills) => {
   const pdfLoading = ref(false);
 
   const downloadBill = async (bill) => {

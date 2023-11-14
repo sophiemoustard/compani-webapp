@@ -156,7 +156,7 @@ import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
-import { useCourseBills } from '@composables/courseBills';
+import { useCourseBilling } from '@composables/courseBills';
 import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING } from '@data/constants';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatPrice, formatQuantity, formatIdentity } from '@helpers/utils';
@@ -222,11 +222,7 @@ export default {
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
     const minCourseCreditNoteDate = ref('');
 
-    const {
-      pdfLoading,
-      downloadBill,
-      downloadCreditNote,
-    } = useCourseBills(courseBills);
+    const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBills);
 
     const rules = computed(() => ({
       newBill: {
