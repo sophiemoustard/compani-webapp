@@ -248,11 +248,7 @@ export default {
 
     const company = computed(() => (canUpdateBilling.value ? $store.state.company.company : loggedUser.value.company));
 
-    const {
-      pdfLoading,
-      downloadBill,
-      downloadCreditNote,
-    } = useCourseBilling(courseBillList);
+    const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBillList);
 
     const sortCourseBills = (a, b) => {
       const payerCompare = a.payer.name.localeCompare(b.payer.name);
@@ -269,13 +265,12 @@ export default {
     const refreshCourseBills = async () => {
       try {
         loading.value = true;
-        const courseBills = await CourseBills
+        courseBillList.value = await CourseBills
           .list({ company: company.value._id, action: BALANCE })
           .then(data => data.sort(sortCourseBills));
 
-        if (courseBills.length) {
-          courseBillList.value = courseBills;
-          const billsGroupedByPayer = groupBy(courseBills, 'payer._id');
+        if (courseBillList.value.length) {
+          const billsGroupedByPayer = groupBy(courseBillList.value, 'payer._id');
           groupedCourseBills.value = {
             ...(!!billsGroupedByPayer[company.value._id] &&
             { [company.value._id]: billsGroupedByPayer[company.value._id] }
@@ -287,6 +282,7 @@ export default {
         }
       } catch (e) {
         console.error(e);
+        courseBillList.value = [];
         groupedCourseBills.value = [];
         NotifyNegative('Erreur lors de la récupération des factures.');
       } finally {
