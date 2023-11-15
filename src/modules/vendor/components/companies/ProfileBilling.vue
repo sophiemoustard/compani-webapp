@@ -585,7 +585,5 @@ export default {
   width: 5%
   padding: 4px
 .download-credit-note
-  &:hover
-    text-decoration: underline
-    text-decoration-color: $orange-500
+  text-decoration: underline
 </style>
