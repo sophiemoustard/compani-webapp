@@ -39,7 +39,7 @@
       </ni-banner>
       <ni-bi-color-button icon="file_download" label="Attestations"
         :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates(CUSTOM)" size="16px" />
-      <ni-bi-color-button v-if="canReadCompletionCertificate" icon="file_download"
+      <ni-bi-color-button v-if="canReadCompletionCertificate" icon="file_download" class="q-my-md"
         label="Certificats de réalisation" size="16px" :disable="disableDownloadCompletionCertificates"
         @click="downloadCompletionCertificates(OFFICIAL)" />
     </div>
