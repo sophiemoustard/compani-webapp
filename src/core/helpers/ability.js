@@ -75,6 +75,7 @@ export const defineAbilitiesForCourse = (user) => {
       can('update', 'Course', 'companies', { type: { $in: [INTER_B2B, INTRA_HOLDING] } });
       can('update', 'Course', 'trainees');
       can('access', 'trainee');
+      can('read', 'Course', 'certificates');
     } else if (vendorRole === TRAINER) can('update', 'Course', 'trainees', { type: INTRA });
   } else {
     const holdingRole = get(role, 'holding.name');
