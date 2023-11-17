@@ -168,6 +168,7 @@ export default {
 
     const canReadCompletionCertificate = computed(() => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
       return ability.can('read', subject('Course', course.value), 'certificates');
     });
 
