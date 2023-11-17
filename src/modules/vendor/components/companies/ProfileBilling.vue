@@ -145,6 +145,7 @@ import {
 } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
+import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
 import { useCourseBilling } from '@composables/courseBills';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
@@ -294,7 +295,7 @@ export default {
       coursePaymentMetaInfo.value = {
         number: courseBill.number,
         netInclTaxes: courseBill.netInclTaxes,
-        courseName: `${courseBill.course.subProgram.program.name} - ${courseBill.course.misc}`,
+        courseName: composeCourseName(courseBill.course),
         companiesName: courseBill.companies.map(c => c.name).join(', '),
       };
       newCoursePayment.value.courseBill = courseBill._id;
@@ -318,7 +319,7 @@ export default {
           if (validations.value.newCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           paymentCreationLoading.value = true;
-          await CoursePayments.create({ ...newCoursePayment.value });
+          await CoursePayments.create(newCoursePayment.value);
           NotifyPositive('Règlement créé.');
 
           coursePaymentCreationModal.value = false;
