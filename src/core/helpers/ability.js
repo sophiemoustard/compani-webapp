@@ -75,6 +75,7 @@ export const defineAbilitiesForCourse = (user) => {
       can('update', 'Course', 'companies', { type: { $in: [INTER_B2B, INTRA_HOLDING] } });
       can('update', 'Course', 'trainees');
       can('access', 'trainee');
+      can('read', 'Course', 'certificates');
     } else if (vendorRole === TRAINER) can('update', 'Course', 'trainees', { type: INTRA });
   } else {
     const holdingRole = get(role, 'holding.name');
@@ -91,7 +92,10 @@ export const defineAbilitiesForCourse = (user) => {
       can('read', 'Course', 'all_trainees');
       can('update', 'Course', 'sms', { type: INTRA_HOLDING });
       can('read', 'Course', 'history', { type: INTRA_HOLDING });
-    } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) can('read', 'Course', 'all_trainees', { type: INTRA });
+    } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) {
+      can('read', 'Course', 'all_trainees', { type: INTRA });
+      can('read', 'Course', 'certificates');
+    }
   }
 
   return createMongoAbility(rules);

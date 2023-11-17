@@ -39,8 +39,9 @@
       </ni-banner>
       <ni-bi-color-button icon="file_download" label="Attestations"
         :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates(CUSTOM)" size="16px" />
-      <ni-bi-color-button icon="file_download" class="q-my-md" label="Certificats de réalisation" size="16px"
-        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates(OFFICIAL)" />
+      <ni-bi-color-button v-if="canReadCompletionCertificate" icon="file_download" class="q-my-md"
+        label="Certificats de réalisation" size="16px" :disable="disableDownloadCompletionCertificates"
+        @click="downloadCompletionCertificates(OFFICIAL)" />
     </div>
     <div v-if="unsubscribedAttendances.length">
       <div class="text-italic q-ma-xs">
@@ -65,7 +66,9 @@
 </template>
 
 <script>
+import { subject } from '@casl/ability';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -96,6 +99,7 @@ import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
 import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
 import { composeCourseName, formatSlotSchedule } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
 import { ALL_PDF, ALL_WORD, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '../../data/constants';
@@ -161,6 +165,11 @@ export default {
       (areQuestionnaireAnswersVisible.value || areQuestionnaireQRCodeVisible.value)));
 
     const courseHasElearningStep = computed(() => course.value.subProgram.steps.some(step => step.type === E_LEARNING));
+
+    const canReadCompletionCertificate = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+      return ability.can('read', subject('Course', course.value), 'certificates');
+    });
 
     const disableDownloadCompletionCertificates =
       computed(() => disableDocDownload.value || !get(course.value, 'subProgram.program.learningGoals'));
@@ -307,6 +316,7 @@ export default {
       areQuestionnaireVisible,
       areQuestionnaireQRCodeVisible,
       isRofOrVendorAdmin,
+      canReadCompletionCertificate,
       // Methods
       get,
       formatQuantity,
