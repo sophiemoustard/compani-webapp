@@ -145,6 +145,7 @@ import {
 } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
+import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
 import { useCourseBilling } from '@composables/courseBills';
 import CoursePaymentCreationModal from '../billing/CoursePaymentCreationModal';
@@ -169,7 +170,7 @@ export default {
     const loading = ref(false);
     const paymentCreationLoading = ref(false);
     const paymentEditionLoading = ref(false);
-    const coursePaymentMetaInfo = ref({ number: '', courseName: '', netInclTaxes: '' });
+    const coursePaymentMetaInfo = ref({ number: '', courseName: '', netInclTaxes: '', companiesName: '' });
     const coursePaymentCreationModal = ref(false);
     const coursePaymentEditionModal = ref(false);
     const newCoursePayment = ref({ nature: PAYMENT, type: '', netInclTaxes: '', date: '', courseBill: '' });
@@ -294,7 +295,8 @@ export default {
       coursePaymentMetaInfo.value = {
         number: courseBill.number,
         netInclTaxes: courseBill.netInclTaxes,
-        courseName: `${company.value.name} - ${courseBill.course.subProgram.program.name} - ${courseBill.course.misc}`,
+        courseName: composeCourseName(courseBill.course),
+        companiesName: courseBill.companies.map(c => c.name).join(', '),
       };
       newCoursePayment.value.courseBill = courseBill._id;
       coursePaymentCreationModal.value = true;
@@ -317,7 +319,7 @@ export default {
           if (validations.value.newCoursePayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           paymentCreationLoading.value = true;
-          await CoursePayments.create({ ...newCoursePayment.value, company: company.value._id });
+          await CoursePayments.create(newCoursePayment.value);
           NotifyPositive('Règlement créé.');
 
           coursePaymentCreationModal.value = false;
