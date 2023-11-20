@@ -2,16 +2,19 @@
   <div>
     <div class="q-mt-lg q-mb-xl">
       <p v-if="course.type === INTER_B2B" class="text-weight-bold">
-        {{ company.name }}
-        <span class="text-weight-regular text-copper-500">
-           ( <a class="redirection cursor-pointer" @click="goToCompany">voir la fiche structure</a> )
+        <span v-for="company of companies" :key="company._id" class="text-weight-regular text-copper-500">
+          <router-link class="redirection cursor-pointer" :to="goToCompany(company._id)">
+            {{ company.name }}
+          </router-link>
         </span>
       </p>
       <div v-if="courseBills.length">
         <p v-if="course.type === INTRA" class="text-weight-bold">
-          Infos de facturation - {{ company.name }}
+          Infos de facturation -
           <span class="text-weight-regular text-copper-500">
-            ( <a class="redirection cursor-pointer" @click="goToCompany">voir la fiche structure</a> )
+            <router-link class="redirection cursor-pointer" :to="goToCompany(companies[0]._id)">
+              {{ companies[0].name }}
+            </router-link>
           </span>
         </p>
         <q-card v-for="bill of courseBills" :key="bill._id" flat class="q-mb-md">
@@ -101,34 +104,36 @@
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
       @submit="addBill" :validations="validations.newBill" @hide="resetBillCreationModal" :loading="billCreationLoading"
       :payer-options="payerList" :error-messages="newBillErrorMessages" :trainees-quantity="traineesQuantity"
-      :course-type="course.type" />
+      :course-type="course.type" :companies-name="companiesName" />
 
     <ni-payer-edition-modal v-model="payerEditionModal" v-model:edited-payer="editedBill.payer" @submit="editBill"
-       @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" :course-name="courseName" />
+       @hide="resetEditedBill" :loading="billEditionLoading" :payer-options="payerList" :course-name="courseName"
+       :companies-name="companiesName" />
 
     <!-- main fee edition modal -->
     <ni-course-fee-edition-modal v-model="mainFeeEditionModal" v-model:course-fee="editedBill.mainFee"
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
       :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :course-name="courseName"
-      :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled" />
+      :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
+      :companies-name="companiesName" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal" :course-name="courseName"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
       :validations="validations.newBillingPurchase" @hide="resetBillingPurchaseAdditionModal"
       :loading="billingPurchaseCreationLoading" :billing-item-options="billingItemList"
-      :error-messages="newBillingPurchaseErrorMessages" />
+      :error-messages="newBillingPurchaseErrorMessages" :companies-name="companiesName" />
 
     <!-- billing purchase edition modal -->
     <ni-course-fee-edition-modal v-model="billingPurchaseEditionModal" :validations="validations.editedBillingPurchase"
       v-model:course-fee="editedBillingPurchase" :title="courseFeeEditionModalMetaInfo.title"
       @submit="editBillingPurchase" :loading="billingPurchaseEditionLoading" @hide="resetBillingPurchaseEditionModal"
       :error-messages="editedBillingPurchaseErrorMessages" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
-      :course-name="courseName" />
+      :course-name="courseName" :companies-name="companiesName" />
 
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
       :validations="validations.billToValidate" @cancel="cancelBillValidation" :trainees-length="traineesLength"
-      :course-name="courseName" :course-type="course.type" />
+      :course-name="courseName" :course-type="course.type" :companies-name="companiesName" />
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
       @submit="addCreditNote" @hide="resetCreditNoteCreationModal" :loading="creditNoteCreationLoading"
@@ -141,7 +146,6 @@
 <script>
 import { useMeta, useQuasar } from 'quasar';
 import { computed, ref, toRefs } from 'vue';
-import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -152,11 +156,11 @@ import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
+import { useCourseBilling } from '@composables/courseBills';
 import { REQUIRED_LABEL, COMPANY, INTRA, INTER_B2B, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING } from '@data/constants';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatPrice, formatDownloadName, formatQuantity, formatIdentity } from '@helpers/utils';
-import { downloadFile } from '@helpers/file';
-import { computeDuration } from '@helpers/courses';
+import { formatPrice, formatQuantity, formatIdentity } from '@helpers/utils';
+import { computeDuration, composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { ascendingSortBy, descendingSortBy } from '@helpers/dates/utils';
@@ -170,7 +174,7 @@ import CourseCreditNoteCreationModal from 'src/modules/vendor/components/billing
 export default {
   name: 'CourseBillingCard',
   props: {
-    company: { type: Object, default: () => ({}) },
+    companies: { type: Array, default: () => ([]) },
     course: { type: Object, default: () => ({}) },
     payerList: { type: Array, default: () => ([]) },
     billingItemList: { type: Array, default: () => ([]) },
@@ -192,16 +196,14 @@ export default {
     const metaInfo = { title: 'Configuration facturation' };
     useMeta(metaInfo);
     const $q = useQuasar();
-    const $router = useRouter();
 
-    const { company, course, payerList, billingItemList, courseBills, expectedBillsCountInvalid } = toRefs(props);
+    const { companies, course, payerList, billingItemList, courseBills, expectedBillsCountInvalid } = toRefs(props);
     const billCreationLoading = ref(false);
     const billEditionLoading = ref(false);
     const billingPurchaseCreationLoading = ref(false);
     const billingPurchaseEditionLoading = ref(false);
     const billValidationLoading = ref(false);
     const creditNoteCreationLoading = ref(false);
-    const pdfLoading = ref(false);
     const billCreationModal = ref(false);
     const payerEditionModal = ref(false);
     const mainFeeEditionModal = ref(false);
@@ -213,12 +215,14 @@ export default {
     const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
-    const newCreditNote = ref({ courseBill: '', misc: '', date: '', company: '' });
-    const creditNoteMetaInfo = ref({ number: '', netInclTaxes: '', courseName: '' });
+    const newCreditNote = ref({ courseBill: '', misc: '', date: '' });
+    const creditNoteMetaInfo = ref({ number: '', netInclTaxes: '', courseName: '', companiesName: '' });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const billToValidate = ref({ _id: '', billedAt: '' });
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
     const minCourseCreditNoteDate = ref('');
+
+    const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBills);
 
     const rules = computed(() => ({
       newBill: {
@@ -248,7 +252,6 @@ export default {
       newCreditNote: {
         courseBill: { required },
         date: { required, minDate: minDate(minCourseCreditNoteDate.value) },
-        company: { required },
       },
     }));
     const validations = useVuelidate(rules, {
@@ -295,14 +298,16 @@ export default {
       .length);
 
     const traineesLength = computed(() => course.value.trainees
-      .filter(trainee => trainee.registrationCompany === company.value._id)
+      .filter(trainee => companies.value.map(c => c._id).includes(trainee.registrationCompany))
       .length);
 
-    const courseName = computed(() => `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
-      ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`);
+    const courseName = computed(() => composeCourseName(course.value));
 
-    const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)} de
-      ${get(company, 'value.name')} ${traineesLength.value > 1 ? 'inscrits' : 'inscrit'} à cette formation`);
+    const companiesName = computed(() => companies.value.map(c => c.name).join(', '));
+
+    const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)}
+      ${companies.value.length > 1 ? 'des structures sélectionnées' : 'de la structure'}
+      ${formatQuantity('inscrit', traineesLength.value, 's', false)} à cette formation`);
 
     const getBillErrorMessages = (parent) => {
       let price = '';
@@ -429,7 +434,7 @@ export default {
     const formatCreationPayload = () => ({
       course: course.value._id,
       mainFee: newBill.value.mainFee,
-      company: company.value._id,
+      companies: companies.value.map(c => c._id),
       payer: formatPayerForPayload(newBill.value.payer),
     });
 
@@ -549,20 +554,10 @@ export default {
     const openCreditNoteCreationModal = (bill) => {
       if (expectedBillsCountInvalid.value) return NotifyWarning('Champ(s) invalide(s).');
       const { _id: billId, number, netInclTaxes } = bill;
-      newCreditNote.value = {
-        courseBill: billId,
-        date: '',
-        misc: '',
-        company: company.value._id,
-      };
+      newCreditNote.value = { courseBill: billId, date: '', misc: '' };
       creditNoteCreationModal.value = true;
       minCourseCreditNoteDate.value = bill.billedAt;
-      creditNoteMetaInfo.value = {
-        number,
-        netInclTaxes,
-        courseName: `${get(company, 'value.name')} - ${get(course, 'value.subProgram.program.name')}
-          ${get(course, 'value.misc') ? ` - ${get(course, 'value.misc')}` : ''}`,
-      };
+      creditNoteMetaInfo.value = { number, netInclTaxes, courseName: composeCourseName(course.value), companiesName };
     };
 
     const addCreditNote = async () => {
@@ -586,9 +581,9 @@ export default {
     };
 
     const resetCreditNoteCreationModal = () => {
-      newCreditNote.value = { courseBill: '', date: '', misc: '', company: '' };
+      newCreditNote.value = { courseBill: '', date: '', misc: '' };
       minCourseCreditNoteDate.value = '';
-      creditNoteMetaInfo.value = { number: '', netInclTaxes: '', courseName: '' };
+      creditNoteMetaInfo.value = { number: '', netInclTaxes: '', courseName: '', companiesName: '' };
       validations.value.newCreditNote.$reset();
     };
 
@@ -634,42 +629,11 @@ export default {
 
     const getBillingItemName = billingItem => billingItemList.value.find(item => item.value === billingItem).label;
 
-    const downloadBill = async (bill) => {
-      try {
-        pdfLoading.value = true;
-        const pdf = await CourseBills.getPdf(bill._id);
-        const pdfName = `${formatDownloadName(`${bill.payer.name} ${bill.number}`)}.pdf`;
-        downloadFile(pdf, pdfName, 'application/octet-stream');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la facture.');
-      } finally {
-        pdfLoading.value = false;
-      }
-    };
-
-    const downloadCreditNote = async (creditNote) => {
-      try {
-        pdfLoading.value = true;
-        const pdf = await CourseCreditNotes.getPdf(creditNote._id);
-        const { payer } = courseBills.value.find(bill => bill._id === creditNote.courseBill);
-        const pdfName = `${formatDownloadName(`${payer.name} ${creditNote.number}`)}.pdf`;
-        downloadFile(pdf, pdfName, 'application/octet-stream');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de l\'avoir.');
-      } finally {
-        pdfLoading.value = false;
-      }
-    };
-
-    const goToCompany = () => {
-      $router.push({
-        name: 'ni users companies info',
-        params: { companyId: company.value._id },
-        query: { defaultTab: 'bills' },
-      });
-    };
+    const goToCompany = companyId => ({
+      name: 'ni users companies info',
+      params: { companyId },
+      query: { defaultTab: 'bills' },
+    });
 
     return {
       // Data
@@ -709,6 +673,7 @@ export default {
       canAddBill,
       traineesLength,
       courseName,
+      companiesName,
       traineesQuantity,
       validatedCourseBillsCount,
       displayValidatedCourseBillsCount,

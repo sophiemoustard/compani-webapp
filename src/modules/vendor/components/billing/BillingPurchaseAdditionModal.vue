@@ -3,7 +3,10 @@
     <template #title>
       Ajouter un article <span class="text-weight-bold">à facturer</span>
     </template>
-    <div class="course-name">{{ courseName }} </div>
+    <div class="course-bill-infos">
+      <div>{{ courseName }} </div>
+      <div>Facture pour le compte de {{ companiesName }}</div>
+    </div>
     <ni-select in-modal caption="Article" :options="billingItemOptions" :model-value="newBillingPurchase.billingItem"
       required-field @blur="validations.billingItem.$touch" :error="validations.billingItem.$error"
       @update:model-value="update($event, 'billingItem')" />
@@ -39,6 +42,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     courseName: { type: String, default: '' },
+    companiesName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
