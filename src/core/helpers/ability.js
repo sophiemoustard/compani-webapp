@@ -92,7 +92,10 @@ export const defineAbilitiesForCourse = (user) => {
       can('read', 'Course', 'all_trainees');
       can('update', 'Course', 'sms', { type: INTRA_HOLDING });
       can('read', 'Course', 'history', { type: INTRA_HOLDING });
-    } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) can('read', 'Course', 'all_trainees', { type: INTRA });
+    } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) {
+      can('read', 'Course', 'all_trainees', { type: INTRA });
+      can('read', 'Course', 'certificates');
+    }
   }
 
   return createMongoAbility(rules);
