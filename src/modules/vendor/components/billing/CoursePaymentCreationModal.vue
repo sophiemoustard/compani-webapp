@@ -13,7 +13,7 @@
     </div>
     <div class="course-bill-infos">
       <div>{{ coursePaymentMetaInfo.courseName }}</div>
-      <div>Paiement pour le compte de {{ coursePaymentMetaInfo.companiesName }}</div>
+      <div>{{ paymentNature }} pour le compte de {{ coursePaymentMetaInfo.companiesName }}</div>
     </div>
     <ni-input in-modal caption="Montant" suffix="€" type="number" required-field :error-message="netInclTaxesError"
       :model-value="newCoursePayment.netInclTaxes" @update:model-value="update($event, 'netInclTaxes')"
