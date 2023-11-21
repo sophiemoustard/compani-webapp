@@ -20,7 +20,7 @@ import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileBilling from '@components/courses/ProfileBilling';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, INTRA_HOLDING } from '@data/constants';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
 
@@ -66,7 +66,7 @@ export default {
           default: defaultTab.value === 'traineeFollowUp',
           component: ProfileTraineeFollowUp,
         },
-        ...(course.value.type !== INTRA_HOLDING && isAdmin
+        ...(isAdmin
           ? [{
             label: 'Facturation',
             name: 'billing',

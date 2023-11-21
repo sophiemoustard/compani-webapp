@@ -9,7 +9,7 @@
       <div>{{ traineesQuantity }} </div>
     </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
-      @update:model-value="update($event, 'payer')" />
+      @update:model-value="update($event, 'payer')" :error="validations.payer.$error" />
     <ni-input in-modal :caption="courseType === INTRA ? 'Prix du programme' : 'Prix par stagiaire'"
       :error="validations.mainFee.price.$error" type="number" :model-value="newBill.mainFee.price"
       @blur="validations.mainFee.price.$touch" suffix="€" required-field :error-message="errorMessages.price"
