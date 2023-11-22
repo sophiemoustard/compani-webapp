@@ -17,18 +17,19 @@
     @click="openBillCreationModal" :disable="billCreationLoading" :loading="billsLoading" />
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
-    @submit="addBill" :validations="v$.newBill" @hide="resetBillCreationModal" :loading="billCreationLoading"
-    :payer-options="payerList" :error-messages="newBillErrorMessages" :trainees-quantity="traineesQuantity"
-    :course-type="course.type" :companies-name="companiesName" />
+    @submit="validateBillCreation" :validations="v$.newBill" @hide="resetBillCreationModal"
+    :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages"
+    :trainees-quantity="traineesQuantity" :course-type="course.type" :companies-name="companiesName" />
 
     <ni-companies-selection-modal v-model="companiesSelectionModal" v-model:companies-to-bill="companiesToBill"
       :course-companies="course.companies" @submit="openNextModal" :validations="v$.companiesToBill"
-      @hide="resetCompaniesSelectionModal" />
+      @hide="resetCompaniesSelectionModal" :course-name="courseName" />
   </div>
 </template>
 
 <script>
 import { useStore } from 'vuex';
+import { useQuasar } from 'quasar';
 import { computed, ref } from 'vue';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
@@ -64,6 +65,8 @@ export default {
   },
   setup () {
     const $store = useStore();
+    const $q = useQuasar();
+
     const courseBills = ref([]);
     const billsLoading = ref(false);
     const payerList = ref([]);
@@ -75,7 +78,7 @@ export default {
     const billCreationLoading = ref(false);
     const newBill = ref({ payer: '', mainFee: { price: 0, count: 1 } });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
-
+    const removeNewBillDatas = ref(true);
     const course = computed(() => $store.state.course.course);
 
     const companiesToBill = ref(course.value.type === INTRA ? [course.value.companies[0]._id] : []);
@@ -238,6 +241,34 @@ export default {
       areDetailsVisible.value[bill] = !areDetailsVisible.value[bill];
     };
 
+    const validateBillCreation = async () => {
+      v$.value.newBill.$touch();
+      if (v$.value.newBill.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      const areCompaniesAlreadyBilled = Object.keys(billsGroupedByCompanies.value)
+        .some(companies => companiesToBill.value.some(c => companies.includes(c)));
+      if (areCompaniesAlreadyBilled && course.value.type !== INTRA) {
+        const message = companiesToBill.value.length > 1
+          ? 'Au moins une des structures sélectionée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?'
+          : 'La structure sélectionnée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?';
+        $q.dialog({
+          title: 'Confirmation',
+          message,
+          html: true,
+          ok: true,
+          cancel: 'Annuler',
+          persistent: true,
+        }).onOk(() => addBill())
+          .onCancel(() => {
+            removeNewBillDatas.value = false;
+            billCreationModal.value = false;
+            companiesSelectionModal.value = true;
+          });
+      } else {
+        await addBill();
+      }
+    };
+
     const addBill = async () => {
       try {
         v$.value.newBill.$touch();
@@ -260,9 +291,11 @@ export default {
     };
 
     const resetBillCreationModal = () => {
-      newBill.value = { payer: '', mainFee: { price: 0, count: 1 } };
-      v$.value.newBill.$reset();
-      resetCompaniesSelectionModal();
+      if (removeNewBillDatas.value) {
+        newBill.value = { payer: '', mainFee: { price: 0, count: 1 } };
+        v$.value.newBill.$reset();
+        resetCompaniesSelectionModal();
+      }
     };
 
     const openBillCreationModal = () => {
@@ -284,6 +317,7 @@ export default {
       if (v$.value.companiesToBill.$error) return NotifyWarning('Champ(s) invalide(s).');
       companiesSelectionModal.value = false;
       billCreationModal.value = true;
+      removeNewBillDatas.value = true;
     };
 
     const resetCompaniesSelectionModal = () => {
@@ -330,7 +364,7 @@ export default {
       refreshPayers,
       refreshBillingItems,
       updateCourse,
-      addBill,
+      validateBillCreation,
       resetBillCreationModal,
       openBillCreationModal,
       resetCompaniesSelectionModal,

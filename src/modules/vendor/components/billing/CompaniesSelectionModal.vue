@@ -3,8 +3,9 @@
     <template #title>
       Ajouter des <span class="text-weight-bold">structures</span>
     </template>
+    <div class="q-mb-md">{{ courseName }} </div>
     <ni-option-group :model-value="companiesToBill" :error-message="REQUIRED_LABEL" required-field
-        :options="companiesOptions" :error="validations.$error" type="checkbox" inline
+        :options="companiesOptions" :error="validations.$error" type="checkbox"
         caption="Sélectionner les structures à facturer" @update:model-value="update($event)" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter les structures" icon-right="add" color="white"
@@ -27,6 +28,7 @@ export default {
     companiesToBill: { type: Array, default: () => [] },
     courseCompanies: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
+    courseName: { type: String, default: '' },
   },
   components: {
     'ni-modal': Modal,
