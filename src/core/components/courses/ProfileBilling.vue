@@ -18,13 +18,13 @@
     </div>
     <div v-if="!course.companies.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
 
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer une facture"
-    @click="openBillCreationModal" :disable="billCreationLoading" :loading="billsLoading" />
+    <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer une facture" @click="openBillCreationModal"
+      color="primary" :disable="billCreationLoading || !course.companies.length" :loading="billsLoading" />
 
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
-    @submit="validateBillCreation" :validations="v$.newBill" @hide="resetBillCreationModal"
-    :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages"
-    :trainees-quantity="traineesQuantity" :course-type="course.type" :companies-name="companiesName" />
+      @submit="validateBillCreation" :validations="v$.newBill" @hide="resetBillCreationModal"
+      :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages"
+      :trainees-quantity="traineesQuantity" :course-type="course.type" :companies-name="companiesName" />
 
     <ni-companies-selection-modal v-model="companiesSelectionModal" v-model:companies-to-bill="companiesToBill"
       :course-companies="course.companies" @submit="openNextModal" :validations="v$.companiesToBill"
@@ -114,9 +114,8 @@ export default {
 
     const { getBillErrorMessages } = useCourseBilling(courseBills, v$);
 
-    const companiesList = computed(() => (
-      Array.from(new Set(courseBills.value.map(bill => bill.companies).map(JSON.stringify)), JSON.parse)
-    ));
+    const companiesList = computed(() => (Array
+      .from(new Set(courseBills.value.map(bill => bill.companies).map(JSON.stringify)), JSON.parse)));
 
     const billsGroupedByCompanies = computed(() => groupBy(courseBills.value, c => c.companies.map(cp => cp._id)));
 
@@ -258,6 +257,7 @@ export default {
         const message = companiesToBill.value.length > 1
           ? 'Au moins une des structures sélectionée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?'
           : 'La structure sélectionnée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?';
+
         $q.dialog({
           title: 'Confirmation',
           message,

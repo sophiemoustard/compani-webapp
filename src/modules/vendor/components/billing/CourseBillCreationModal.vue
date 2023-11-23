@@ -5,7 +5,7 @@
     </template>
     <div>{{ courseName }} </div>
     <div class="course-bill-infos">
-      <ni-banner class="bg-copper-grey-100" icon="info_outline">
+      <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
         <template #message>Facture pour le compte de {{ companiesName }}</template>
       </ni-banner>
       <div>{{ traineesQuantity }} </div>
