@@ -3,7 +3,6 @@ import get from 'lodash/get';
 import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative } from '@components/popup/notify';
-import { REQUIRED_LABEL } from '@data/constants';
 import { formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 
@@ -42,12 +41,10 @@ export const useCourseBilling = (courseBills, validations) => {
   const getBillErrorMessages = (parent) => {
     let price = '';
     let count = '';
-    if (get(validations, `value.${parent}.price.required.$response`) === false) price = REQUIRED_LABEL;
     if (get(validations, `value.${parent}.price.strictPositiveNumber.$response`) === false) {
       price = 'Prix non valide';
     }
 
-    if (get(validations, `value.${parent}.count.required.$response`) === false) count = REQUIRED_LABEL;
     if (get(validations, `value.${parent}.count.strictPositiveNumber.$response`) === false ||
       get(validations, `value.${parent}.count.integerNumber.$response`) === false) {
       count = 'Nombre non valide';

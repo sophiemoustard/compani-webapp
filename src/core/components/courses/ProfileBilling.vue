@@ -5,13 +5,18 @@
         @blur="updateCourse('expectedBillsCount')" caption="Nombre de factures"
         :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
     </div>
+    <ni-banner v-else-if="missingBillsCompanies.length" icon="info_outline">
+      <template #message>
+        Les structures suivantes n'ont pas été facturées : {{ formatName(missingBillsCompanies) }}.
+      </template>
+    </ni-banner>
     <div v-for="(companies, index) of companiesList" :key="index">
       <ni-course-billing-card :companies="companies" :course="course" :payer-list="payerList" :loading="billsLoading"
         :billing-item-list="billingItemList" :course-bills="billsGroupedByCompanies[companies.map(c => c._id)]"
         @refresh-course-bills="refreshCourseBills" @unroll="unrollBill" :are-details-visible="areDetailsVisible"
         :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
     </div>
-    <div v-if="!companiesList.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
+    <div v-if="!course.companies.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer une facture"
     @click="openBillCreationModal" :disable="billCreationLoading" :loading="billsLoading" />
@@ -39,7 +44,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import { minArrayLength, integerNumber, positiveNumber, strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { composeCourseName } from '@helpers/courses';
-import { formatAndSortOptions, formatPrice, formatQuantity } from '@helpers/utils';
+import { formatAndSortOptions, formatPrice, formatQuantity, formatName } from '@helpers/utils';
 import { descendingSortBy } from '@helpers/dates/utils';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -48,11 +53,12 @@ import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { useCourseBilling } from '@composables/courseBills';
-import { LIST, COMPANY, REQUIRED_LABEL, INTRA } from '@data/constants';
+import { LIST, COMPANY, REQUIRED_LABEL, INTRA, FUNDING_ORGANISATION } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import CompaniesSelectionModal from 'src/modules/vendor/components/billing/CompaniesSelectionModal';
 import Input from '@components/form/Input';
+import Banner from '@components/Banner';
 import { useCourses } from '@composables/courses';
 
 export default {
@@ -62,6 +68,7 @@ export default {
     'ni-bill-creation-modal': BillCreationModal,
     'ni-companies-selection-modal': CompaniesSelectionModal,
     'ni-input': Input,
+    'ni-banner': Banner,
   },
   setup () {
     const $store = useStore();
@@ -72,7 +79,6 @@ export default {
     const payerList = ref([]);
     const billingItemList = ref([]);
     const tmpInput = ref('');
-    const FUNDING_ORGANISATION = 'funding_organisation';
     const billCreationModal = ref(false);
     const companiesSelectionModal = ref(false);
     const billCreationLoading = ref(false);
@@ -109,12 +115,13 @@ export default {
     const { getBillErrorMessages } = useCourseBilling(courseBills, v$);
 
     const companiesList = computed(() => (
-      course.value.type === INTRA
-        ? [course.value.companies]
-        : Array.from(new Set(courseBills.value.map(bill => bill.companies).map(JSON.stringify)), JSON.parse)
+      Array.from(new Set(courseBills.value.map(bill => bill.companies).map(JSON.stringify)), JSON.parse)
     ));
 
     const billsGroupedByCompanies = computed(() => groupBy(courseBills.value, c => c.companies.map(cp => cp._id)));
+
+    const missingBillsCompanies = computed(() => course.value.companies
+      .filter(c => !Object.keys(billsGroupedByCompanies.value).some(companiesIds => companiesIds.includes(c._id))));
 
     const expectedBillsCountErrorMessage = computed(() => {
       if (v$.value.course.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
@@ -139,10 +146,10 @@ export default {
 
     const courseName = computed(() => composeCourseName(course.value));
 
-    const companiesName = computed(() => course.value.companies
-      .filter(c => companiesToBill.value.includes(c._id))
-      .map(c => c.name)
-      .join(', '));
+    const companiesName = computed(() => {
+      const companies = course.value.companies.filter(c => companiesToBill.value.includes(c._id));
+      return formatName(companies);
+    });
 
     const saveTmp = path => (tmpInput.value = course.value[path]);
 
@@ -271,9 +278,6 @@ export default {
 
     const addBill = async () => {
       try {
-        v$.value.newBill.$touch();
-        if (v$.value.newBill.$error) return NotifyWarning('Champ(s) invalide(s)');
-
         billCreationLoading.value = true;
         await CourseBills.create(formatCreationPayload());
         NotifyPositive('Facture créée.');
@@ -357,6 +361,7 @@ export default {
       traineesQuantity,
       courseName,
       companiesName,
+      missingBillsCompanies,
       // Methods
       saveTmp,
       refreshCourseBills,
@@ -368,11 +373,12 @@ export default {
       resetBillCreationModal,
       openBillCreationModal,
       resetCompaniesSelectionModal,
+      openNextModal,
       get,
       omit,
       pickBy,
       formatPrice,
-      openNextModal,
+      formatName,
     };
   },
 };

@@ -5,7 +5,9 @@
     </template>
     <div>{{ courseName }} </div>
     <div class="course-bill-infos">
-      <div>Facture pour le compte de {{ companiesName }}</div>
+      <ni-banner class="bg-copper-grey-100" icon="info_outline">
+        <template #message>Facture pour le compte de {{ companiesName }}</template>
+      </ni-banner>
       <div>{{ traineesQuantity }} </div>
     </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
@@ -30,6 +32,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
+import Banner from '@components/Banner';
 import { INTRA } from '@data/constants';
 
 export default {
@@ -51,6 +54,7 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
     'ni-select': Select,
+    'ni-banner': Banner,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-bill'],
   setup (props, { emit }) {

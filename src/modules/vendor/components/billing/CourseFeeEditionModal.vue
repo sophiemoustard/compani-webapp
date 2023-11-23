@@ -5,7 +5,9 @@
     </template>
     <div class="course-bill-infos">
       <div>{{ courseName }} </div>
-      <div>Facture pour le compte de {{ companiesName }}</div>
+      <ni-banner class="bg-copper-grey-100" icon="info_outline">
+        <template #message>Facture pour le compte de {{ companiesName }}</template>
+      </ni-banner>
     </div>
     <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number" :disable="isBilled"
       :model-value="courseFee.price" @blur="validations.price.$touch" suffix="€" required-field
@@ -26,6 +28,7 @@
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
+import Banner from '@components/Banner';
 import Input from '@components/form/Input';
 
 export default {
@@ -45,6 +48,7 @@ export default {
     'ni-modal': Modal,
     'ni-button': Button,
     'ni-input': Input,
+    'ni-banner': Banner,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:course-fee'],
   setup (props, { emit }) {

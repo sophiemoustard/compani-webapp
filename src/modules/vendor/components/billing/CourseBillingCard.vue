@@ -217,13 +217,6 @@ export default {
     const courseFeeEditionModalMetaInfo = ref({ title: '', isBilled: false });
     const minCourseCreditNoteDate = ref('');
 
-    const {
-      pdfLoading,
-      downloadBill,
-      downloadCreditNote,
-      getBillErrorMessages,
-    } = useCourseBilling(courseBills);
-
     const rules = computed(() => ({
       editedBill: {
         mainFee: {
@@ -255,6 +248,13 @@ export default {
       billToValidate,
       newCreditNote,
     });
+
+    const {
+      pdfLoading,
+      downloadBill,
+      downloadCreditNote,
+      getBillErrorMessages,
+    } = useCourseBilling(courseBills, validations);
 
     const mainFeeErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
 
