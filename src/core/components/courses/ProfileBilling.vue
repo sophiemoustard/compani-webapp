@@ -11,8 +11,8 @@
       </template>
     </ni-banner>
     <div v-for="(companies, index) of companiesList" :key="index">
-      <ni-course-billing-card :companies="companies" :course="course" :payer-list="payerList" :loading="billsLoading"
-        :billing-item-list="billingItemList" :course-bills="billsGroupedByCompanies[companies.map(c => c._id)]"
+      <ni-course-billing-card :course="course" :payer-list="payerList" :loading="billsLoading"
+        :billing-item-list="billingItemList" :course-bills="billsGroupedByCompanies[companies]"
         @refresh-course-bills="refreshCourseBills" @unroll="unrollBill" :are-details-visible="areDetailsVisible"
         :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
     </div>
@@ -114,15 +114,15 @@ export default {
 
     const { getBillErrorMessages } = useCourseBilling(courseBills, v$);
 
-    const companiesList = computed(() => (Array
-      .from(new Set(courseBills.value.map(bill => bill.companies).map(JSON.stringify)), JSON.parse)));
-
     const billsGroupedByCompanies = computed(() => {
       const sortedBills = courseBills.value
-        .map(bill => ({ ...bill, companies: bill.companies.sort((a, b) => sortStrings(a._id, b._id)) }));
+        .map(bill => ({ ...bill, companies: bill.companies.sort((a, b) => sortStrings(a.name, b.name)) }))
+        .sort((a, b) => sortStrings(formatName(a.companies), formatName(b.companies)));
 
       return groupBy(sortedBills, bill => bill.companies.map(cp => cp._id));
     });
+
+    const companiesList = computed(() => Object.keys(billsGroupedByCompanies.value));
 
     const missingBillsCompanies = computed(() => course.value.companies
       .filter(c => !Object.keys(billsGroupedByCompanies.value).some(companiesIds => companiesIds.includes(c._id))));
@@ -260,7 +260,7 @@ export default {
         .some(companies => companiesToBill.value.some(c => companies.includes(c)));
       if (areCompaniesAlreadyBilled && course.value.type !== INTRA) {
         const message = companiesToBill.value.length > 1
-          ? 'Au moins une des structures sélectionée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?'
+          ? 'Au moins une des structures sélectionnée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?'
           : 'La structure sélectionnée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?';
 
         $q.dialog({

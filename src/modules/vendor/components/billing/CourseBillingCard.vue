@@ -165,7 +165,6 @@ import CourseCreditNoteCreationModal from 'src/modules/vendor/components/billing
 export default {
   name: 'CourseBillingCard',
   props: {
-    companies: { type: Array, default: () => ([]) },
     course: { type: Object, default: () => ({}) },
     payerList: { type: Array, default: () => ([]) },
     billingItemList: { type: Array, default: () => ([]) },
@@ -189,7 +188,6 @@ export default {
     const $q = useQuasar();
 
     const {
-      companies,
       course,
       payerList,
       billingItemList,
@@ -255,6 +253,8 @@ export default {
       downloadCreditNote,
       getBillErrorMessages,
     } = useCourseBilling(courseBills, validations);
+
+    const companies = computed(() => courseBills.value[0].companies);
 
     const mainFeeErrorMessages = computed(() => getBillErrorMessages('editedBill.mainFee'));
 
@@ -579,6 +579,7 @@ export default {
       DD_MM_YYYY,
       // Computed
       validations,
+      companies,
       mainFeeErrorMessages,
       newBillingPurchaseErrorMessages,
       editedBillingPurchaseErrorMessages,
