@@ -44,7 +44,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import { minArrayLength, integerNumber, positiveNumber, strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { composeCourseName } from '@helpers/courses';
-import { formatAndSortOptions, formatPrice, formatQuantity, formatName } from '@helpers/utils';
+import { formatAndSortOptions, formatPrice, formatQuantity, formatName, sortStrings } from '@helpers/utils';
 import { descendingSortBy } from '@helpers/dates/utils';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -117,7 +117,12 @@ export default {
     const companiesList = computed(() => (Array
       .from(new Set(courseBills.value.map(bill => bill.companies).map(JSON.stringify)), JSON.parse)));
 
-    const billsGroupedByCompanies = computed(() => groupBy(courseBills.value, c => c.companies.map(cp => cp._id)));
+    const billsGroupedByCompanies = computed(() => {
+      const sortedBills = courseBills.value
+        .map(bill => ({ ...bill, companies: bill.companies.sort((a, b) => sortStrings(a._id, b._id)) }));
+
+      return groupBy(sortedBills, bill => bill.companies.map(cp => cp._id));
+    });
 
     const missingBillsCompanies = computed(() => course.value.companies
       .filter(c => !Object.keys(billsGroupedByCompanies.value).some(companiesIds => companiesIds.includes(c._id))));
