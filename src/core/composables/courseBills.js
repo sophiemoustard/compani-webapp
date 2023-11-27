@@ -5,6 +5,7 @@ import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative } from '@components/popup/notify';
 import { formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
+import { REQUIRED_LABEL } from '../data/constants';
 
 export const useCourseBilling = (courseBills, validations) => {
   const pdfLoading = ref(false);
@@ -41,6 +42,7 @@ export const useCourseBilling = (courseBills, validations) => {
   const getBillErrorMessages = (parent) => {
     let price = '';
     let count = '';
+    let countUnit = '';
     if (get(validations, `value.${parent}.price.strictPositiveNumber.$response`) === false) {
       price = 'Prix non valide';
     }
@@ -50,7 +52,9 @@ export const useCourseBilling = (courseBills, validations) => {
       count = 'Nombre non valide';
     }
 
-    return { price, count };
+    if (get(validations, `value.${parent}.countUnit.required.$response`) === false) countUnit = REQUIRED_LABEL;
+
+    return { price, count, countUnit };
   };
 
   return {

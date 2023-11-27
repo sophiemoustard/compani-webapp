@@ -82,7 +82,7 @@ export default {
     const billCreationModal = ref(false);
     const companiesSelectionModal = ref(false);
     const billCreationLoading = ref(false);
-    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1 } });
+    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1, countUnit: '' } });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const removeNewBillDatas = ref(true);
     const course = computed(() => $store.state.course.course);
@@ -103,6 +103,7 @@ export default {
         mainFee: {
           price: { required, strictPositiveNumber },
           count: { required, strictPositiveNumber, integerNumber },
+          countUnit: { required },
         },
       },
       companiesToBill: { minArrayLength: minArrayLength(1) },
@@ -301,7 +302,7 @@ export default {
 
     const resetBillCreationModal = () => {
       if (removeNewBillDatas.value) {
-        newBill.value = { payer: '', mainFee: { price: 0, count: 1 } };
+        newBill.value = { payer: '', mainFee: { price: 0, count: 1, countUnit: '' } };
         v$.value.newBill.$reset();
         resetCompaniesSelectionModal();
       }

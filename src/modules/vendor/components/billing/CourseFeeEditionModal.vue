@@ -9,6 +9,9 @@
         <template #message>Facture pour le compte de {{ companiesName }}</template>
       </ni-banner>
     </div>
+    <ni-option-group v-if="showCountUnit" in-modal :model-value="courseFee.countUnit" :options="countUnitOptions"
+      type="radio" @update:model-value="update($event, 'countUnit')" :error="validations.countUnit.$error"
+      caption="Unité" inline required-field />
     <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number" :disable="isBilled"
       :model-value="courseFee.price" @blur="validations.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'price')" />
@@ -25,11 +28,15 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import Banner from '@components/Banner';
 import Input from '@components/form/Input';
+import OptionGroup from '@components/form/OptionGroup';
+import { formatQuantity } from '@helpers/utils';
+import { TRAINEE, GROUP } from '@data/constants';
 
 export default {
   name: 'CourseFeeEditionModal',
@@ -43,15 +50,21 @@ export default {
     isBilled: { type: Boolean, default: false },
     courseName: { type: String, default: '' },
     companiesName: { type: String, default: '' },
+    showCountUnit: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
     'ni-button': Button,
     'ni-input': Input,
     'ni-banner': Banner,
+    'ni-option-group': OptionGroup,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:course-fee'],
   setup (props, { emit }) {
+    const countUnitOptions = computed(() => [
+      { label: 'Groupe', value: GROUP },
+      { label: `Stagiaire (${formatQuantity('stagiaire sélectionné', props.courseFee.count)})`, value: TRAINEE },
+    ]);
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
@@ -60,6 +73,8 @@ export default {
     };
 
     return {
+      // Computed
+      countUnitOptions,
       // Methods
       hide,
       input,

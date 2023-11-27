@@ -12,6 +12,9 @@
     </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
       @update:model-value="update($event, 'payer')" :error="validations.payer.$error" />
+    <ni-option-group in-modal :model-value="newBill.mainFee.countUnit" :options="countUnitOptions" type="radio"
+      @update:model-value="update($event, 'mainFee.countUnit')" :error="validations.mainFee.countUnit.$error"
+      caption="Unité" inline required-field />
     <ni-input in-modal :caption="courseType === INTRA ? 'Prix du programme' : 'Prix par stagiaire'"
       :error="validations.mainFee.price.$error" type="number" :model-value="newBill.mainFee.price"
       @blur="validations.mainFee.price.$touch" suffix="€" required-field :error-message="errorMessages.price"
@@ -27,13 +30,16 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import OptionGroup from '@components/form/OptionGroup';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import Banner from '@components/Banner';
-import { INTRA } from '@data/constants';
+import { INTRA, TRAINEE, GROUP } from '@data/constants';
+import { formatQuantity } from '@helpers/utils';
 
 export default {
   name: 'CourseBillCreationModal',
@@ -55,9 +61,14 @@ export default {
     'ni-button': Button,
     'ni-select': Select,
     'ni-banner': Banner,
+    'ni-option-group': OptionGroup,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-bill'],
   setup (props, { emit }) {
+    const countUnitOptions = computed(() => [
+      { label: 'Groupe', value: GROUP },
+      { label: `Stagiaire (${formatQuantity('stagiaire sélectionné', props.newBill.mainFee.count)})`, value: TRAINEE },
+    ]);
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
@@ -68,6 +79,8 @@ export default {
     return {
       // Data
       INTRA,
+      // Computed
+      countUnitOptions,
       // Methods
       hide,
       input,

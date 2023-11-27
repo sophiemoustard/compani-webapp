@@ -107,7 +107,7 @@
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
       :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :course-name="courseName"
       :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
-      :companies-name="companiesName" />
+      :companies-name="companiesName" :show-count-unit="course.type !== INTRA" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal" :course-name="courseName"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -206,7 +206,7 @@ export default {
     const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const creditNoteCreationModal = ref(false);
-    const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '' } });
+    const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '', countUnit: '' } });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const newCreditNote = ref({ courseBill: '', misc: '', date: '' });
@@ -220,6 +220,7 @@ export default {
         mainFee: {
           price: { required, strictPositiveNumber },
           count: { required, strictPositiveNumber, integerNumber },
+          countUnit: { required },
         },
       },
       newBillingPurchase: {
@@ -307,6 +308,7 @@ export default {
         mainFee: {
           price: bill.mainFee.price,
           count: bill.mainFee.count,
+          countUnit: bill.mainFee.countUnit,
           description: bill.mainFee.description || defaultDescription.value,
         },
       };
@@ -354,7 +356,7 @@ export default {
     };
 
     const resetEditedBill = () => {
-      editedBill.value = { _id: '', payer: '', mainFee: { price: '', description: '', count: '' } };
+      editedBill.value = { _id: '', payer: '', mainFee: { price: '', description: '', count: '', countUnit: '' } };
       validations.value.editedBill.$reset();
     };
 
