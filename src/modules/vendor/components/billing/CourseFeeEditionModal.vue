@@ -12,7 +12,7 @@
     <ni-option-group v-if="showCountUnit" in-modal :model-value="courseFee.countUnit" :options="countUnitOptions"
       type="radio" @update:model-value="update($event, 'countUnit')" :error="validations.countUnit.$error"
       caption="Unité" inline required-field />
-    <ni-input in-modal caption="Prix unitaire" :error="validations.price.$error" type="number" :disable="isBilled"
+    <ni-input in-modal :caption="priceCaption" :error="validations.price.$error" type="number" :disable="isBilled"
       :model-value="courseFee.price" @blur="validations.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'price')" />
     <ni-input in-modal caption="Quantité" :error="validations.count.$error" type="number" :disable="isBilled"
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, toRefs } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
@@ -51,6 +51,8 @@ export default {
     courseName: { type: String, default: '' },
     companiesName: { type: String, default: '' },
     showCountUnit: { type: Boolean, default: false },
+    traineesLength: { type: Number, default: 1 },
+    companiesLength: { type: Number, default: 1 },
   },
   components: {
     'ni-modal': Modal,
@@ -61,20 +63,32 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:course-fee'],
   setup (props, { emit }) {
+    const { courseFee, traineesLength, companiesLength, showCountUnit } = toRefs(props);
+
+    const priceCaption = computed(() => {
+      if (!showCountUnit.value || courseFee.value.countUnit === GROUP) return 'Prix du groupe';
+      return 'Prix par stagiaire';
+    });
+
+    const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)}
+      ${companiesLength.value > 1 ? 'des structures sélectionnées' : 'de la structure'}
+      ${formatQuantity('inscrit', traineesLength.value, 's', false)} à cette formation`);
+
     const countUnitOptions = computed(() => [
       { label: 'Groupe', value: GROUP },
-      { label: `Stagiaire (${formatQuantity('stagiaire sélectionné', props.courseFee.count)})`, value: TRAINEE },
+      { label: `Stagiaire (${traineesQuantity.value})`, value: TRAINEE },
     ]);
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
     const update = (event, path) => {
-      emit('update:course-fee', set({ ...props.courseFee }, path, event));
+      emit('update:course-fee', set({ ...courseFee.value }, path, event));
     };
 
     return {
       // Computed
       countUnitOptions,
+      priceCaption,
       // Methods
       hide,
       input,

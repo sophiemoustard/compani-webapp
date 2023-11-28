@@ -107,7 +107,8 @@
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
       :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :course-name="courseName"
       :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
-      :companies-name="companiesName" :show-count-unit="course.type !== INTRA" />
+      :companies-name="companiesName" :show-count-unit="course.type !== INTRA" :companies-length="companies.length"
+      :trainees-length="traineesLength" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal" :course-name="courseName"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -149,7 +150,7 @@ import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import { useCourseBilling } from '@composables/courseBills';
-import { COMPANY, INTRA, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING } from '@data/constants';
+import { COMPANY, INTRA, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING, GROUP } from '@data/constants';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
 import { formatPrice, formatIdentity } from '@helpers/utils';
 import { computeDuration, composeCourseName } from '@helpers/courses';
@@ -206,7 +207,11 @@ export default {
     const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const creditNoteCreationModal = ref(false);
-    const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '', countUnit: '' } });
+    const editedBill = ref({
+      _id: '',
+      payer: '',
+      mainFee: { price: '', description: '', count: '', countUnit: GROUP },
+    });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const newCreditNote = ref({ courseBill: '', misc: '', date: '' });
@@ -356,7 +361,7 @@ export default {
     };
 
     const resetEditedBill = () => {
-      editedBill.value = { _id: '', payer: '', mainFee: { price: '', description: '', count: '', countUnit: '' } };
+      editedBill.value = { _id: '', payer: '', mainFee: { price: '', description: '', count: '', countUnit: GROUP } };
       validations.value.editedBill.$reset();
     };
 

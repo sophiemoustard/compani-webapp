@@ -24,7 +24,7 @@
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
       @submit="validateBillCreation" :validations="v$.newBill" @hide="resetBillCreationModal"
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages"
-      :trainees-quantity="traineesQuantity" :course-type="course.type" :companies-name="companiesName" />
+      :trainees-length="traineesLength" :course="course" :companies-to-bill="companiesToBill" />
 
     <ni-companies-selection-modal v-model="companiesSelectionModal" v-model:companies-to-bill="companiesToBill"
       :course-companies="course.companies" @submit="openNextModal" :validations="v$.companiesToBill"
@@ -44,7 +44,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import { minArrayLength, integerNumber, positiveNumber, strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { composeCourseName } from '@helpers/courses';
-import { formatAndSortOptions, formatPrice, formatQuantity, formatName, sortStrings } from '@helpers/utils';
+import { formatAndSortOptions, formatPrice, formatName, sortStrings } from '@helpers/utils';
 import { descendingSortBy } from '@helpers/dates/utils';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -53,7 +53,7 @@ import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { useCourseBilling } from '@composables/courseBills';
-import { LIST, COMPANY, REQUIRED_LABEL, INTRA, FUNDING_ORGANISATION } from '@data/constants';
+import { LIST, COMPANY, REQUIRED_LABEL, INTRA, FUNDING_ORGANISATION, GROUP } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import CompaniesSelectionModal from 'src/modules/vendor/components/billing/CompaniesSelectionModal';
@@ -82,7 +82,7 @@ export default {
     const billCreationModal = ref(false);
     const companiesSelectionModal = ref(false);
     const billCreationLoading = ref(false);
-    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1, countUnit: '' } });
+    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP } });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const removeNewBillDatas = ref(true);
     const course = computed(() => $store.state.course.course);
@@ -145,16 +145,7 @@ export default {
       .filter(trainee => companiesToBill.value.includes(trainee.registrationCompany))
       .length);
 
-    const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)}
-      ${companiesToBill.value.length > 1 ? 'des structures sélectionnées' : 'de la structure'}
-      ${formatQuantity('inscrit', traineesLength.value, 's', false)} à cette formation`);
-
     const courseName = computed(() => composeCourseName(course.value));
-
-    const companiesName = computed(() => {
-      const companies = course.value.companies.filter(c => companiesToBill.value.includes(c._id));
-      return formatName(companies);
-    });
 
     const saveTmp = path => (tmpInput.value = course.value[path]);
 
@@ -302,7 +293,7 @@ export default {
 
     const resetBillCreationModal = () => {
       if (removeNewBillDatas.value) {
-        newBill.value = { payer: '', mainFee: { price: 0, count: 1, countUnit: '' } };
+        newBill.value = { payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP } };
         v$.value.newBill.$reset();
         resetCompaniesSelectionModal();
       }
@@ -364,9 +355,8 @@ export default {
       expectedBillsCountErrorMessage,
       billsGroupedByCompanies,
       newBillErrorMessages,
-      traineesQuantity,
+      traineesLength,
       courseName,
-      companiesName,
       missingBillsCompanies,
       // Methods
       saveTmp,
