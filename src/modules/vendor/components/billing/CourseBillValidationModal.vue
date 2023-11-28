@@ -5,11 +5,13 @@
     </template>
     <div class="course-bill-infos">
       <div>{{ courseName }} </div>
-      <div>Facture pour le compte de {{ companiesName }}</div>
+      <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
+        <template #message>Facture pour le compte de {{ companiesName }}</template>
+      </ni-banner>
     </div>
-    <ni-banner v-if="!traineesLength && courseType === INTER_B2B" icon="info_outline" icon-color="orange-700"
+    <ni-banner v-if="!traineesLength && courseType !== INTRA" icon="info_outline" icon-color="orange-700"
       class="bg-orange-50 text-orange-900">
-      <template #message>Aucun stagiaire de la structure n'est inscrit à la formation</template>
+      <template #message>Aucun stagiaire des structures sélectionnées n'est inscrit à la formation</template>
     </ni-banner>
    <ni-date-input caption="Date de facture" :model-value="billToValidate.billedAt" :error="validations.billedAt.$error"
       @blur="validations.billedAt.$touch" in-modal required-field @update:model-value="update($event, 'billedAt')" />
@@ -29,7 +31,7 @@ import Modal from '@components/modal/Modal';
 import Banner from '@components/Banner';
 import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
-import { INTER_B2B } from '@data/constants';
+import { INTRA } from '@data/constants';
 
 export default {
   name: 'CourseBillValidationModal',
@@ -61,7 +63,7 @@ export default {
 
     return {
       // Data
-      INTER_B2B,
+      INTRA,
       // Methods
       hide,
       input,
