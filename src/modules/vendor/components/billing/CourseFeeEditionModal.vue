@@ -51,8 +51,7 @@ export default {
     courseName: { type: String, default: '' },
     companiesName: { type: String, default: '' },
     showCountUnit: { type: Boolean, default: false },
-    traineesLength: { type: Number, default: 1 },
-    companiesLength: { type: Number, default: 1 },
+    traineesQuantity: { type: Number, default: 1 },
   },
   components: {
     'ni-modal': Modal,
@@ -63,20 +62,16 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:course-fee'],
   setup (props, { emit }) {
-    const { courseFee, traineesLength, companiesLength, showCountUnit } = toRefs(props);
+    const { courseFee, traineesQuantity, showCountUnit } = toRefs(props);
 
     const priceCaption = computed(() => {
       if (!showCountUnit.value || courseFee.value.countUnit === GROUP) return 'Prix du groupe';
       return 'Prix par stagiaire';
     });
 
-    const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)}
-      ${companiesLength.value > 1 ? 'des structures sélectionnées' : 'de la structure'}
-      ${formatQuantity('inscrit', traineesLength.value, 's', false)} à cette formation`);
-
     const countUnitOptions = computed(() => [
       { label: 'Groupe', value: GROUP },
-      { label: `Stagiaire (${traineesQuantity.value})`, value: TRAINEE },
+      { label: `Stagiaire (${formatQuantity('inscrit', traineesQuantity.value)} à cette formation)`, value: TRAINEE },
     ]);
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);

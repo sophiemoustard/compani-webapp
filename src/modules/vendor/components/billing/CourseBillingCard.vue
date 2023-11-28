@@ -54,7 +54,7 @@
                 <div class="fee-info">
                   <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                   <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
-                  <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
+                  <div>Quantité {{ getCountUnitLabel(bill) }} : {{ get(bill, 'mainFee.count') }}</div>
                   <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
                     Description : {{ bill.mainFee.description }}
                   </div>
@@ -107,8 +107,7 @@
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
       :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :course-name="courseName"
       :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
-      :companies-name="companiesName" :show-count-unit="course.type !== INTRA" :companies-length="companies.length"
-      :trainees-length="traineesLength" />
+      :companies-name="companiesName" :show-count-unit="course.type !== INTRA" :trainees-quantity="traineesLength" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal" :course-name="courseName"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -152,7 +151,7 @@ import Button from '@components/Button';
 import { useCourseBilling } from '@composables/courseBills';
 import { COMPANY, INTRA, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING, GROUP } from '@data/constants';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatPrice, formatIdentity } from '@helpers/utils';
+import { formatPrice, formatIdentity, formatName } from '@helpers/utils';
 import { computeDuration, composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -300,7 +299,9 @@ export default {
 
     const courseName = computed(() => composeCourseName(course.value));
 
-    const companiesName = computed(() => companies.value.map(c => c.name).join(', '));
+    const getCountUnitLabel = bill => (get(bill, 'mainFee.countUnit') === GROUP ? '(groupe)' : '(stagiaire)');
+
+    const companiesName = computed(() => formatName(companies.value));
 
     const displayValidatedCourseBillsCount = computed(() => course.value.type === INTRA &&
       course.value.expectedBillsCount > 1);
@@ -624,6 +625,7 @@ export default {
       downloadBill,
       downloadCreditNote,
       goToCompany,
+      getCountUnitLabel,
       get,
       omit,
       pickBy,

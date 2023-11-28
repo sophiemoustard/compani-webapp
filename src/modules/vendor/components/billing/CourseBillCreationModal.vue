@@ -8,7 +8,7 @@
       <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
         <template #message>Facture pour le compte de {{ companiesName }}</template>
       </ni-banner>
-      <div v-if="course.type === INTRA">{{ traineesQuantity }} </div>
+      <div v-if="course.type === INTRA">{{ traineesQuantityInfos }} </div>
     </div>
     <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
       @update:model-value="update($event, 'payer')" :error="validations.payer.$error" />
@@ -51,7 +51,7 @@ export default {
     loading: { type: Boolean, default: false },
     courseName: { type: String, default: '' },
     course: { type: Object, default: () => ({}) },
-    traineesLength: { type: Number, default: 1 },
+    traineesQuantity: { type: Number, default: 1 },
     companiesToBill: { type: Array, default: () => [] },
   },
   components: {
@@ -64,25 +64,26 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-bill'],
   setup (props, { emit }) {
-    const { newBill, traineesLength, course, companiesToBill } = toRefs(props);
+    const { newBill, traineesQuantity, course, companiesToBill } = toRefs(props);
 
-    const priceCaption = computed(() => {
-      if (course.value.type === INTRA || newBill.value.mainFee.countUnit === GROUP) return 'Prix du groupe';
-      return 'Prix par stagiaire';
-    });
+    const priceCaption = computed(() => (
+      newBill.value.mainFee.countUnit === GROUP
+        ? 'Prix du groupe'
+        : 'Prix par stagiaire'
+    ));
 
     const companiesName = computed(() => {
       const companies = course.value.companies.filter(c => companiesToBill.value.includes(c._id));
       return formatName(companies);
     });
 
-    const traineesQuantity = computed(() => `${formatQuantity('stagiaire', traineesLength.value)}
+    const traineesQuantityInfos = computed(() => `${formatQuantity('stagiaire', traineesQuantity.value)}
       ${companiesToBill.value.length > 1 ? 'des structures sélectionnées' : 'de la structure'}
-      ${formatQuantity('inscrit', traineesLength.value, 's', false)} à cette formation`);
+      ${formatQuantity('inscrit', traineesQuantity.value, 's', false)} à cette formation`);
 
     const countUnitOptions = computed(() => [
       { label: 'Groupe', value: GROUP },
-      { label: `Stagiaire (${traineesQuantity.value})`, value: TRAINEE },
+      { label: `Stagiaire (${formatQuantity('inscrit', traineesQuantity.value)} à cette formation)`, value: TRAINEE },
     ]);
 
     const hide = () => emit('hide');
@@ -90,8 +91,9 @@ export default {
     const submit = () => emit('submit');
     const update = (event, path) => {
       emit('update:new-bill', set({ ...newBill.value }, path, event));
-      if (event === TRAINEE) emit('update:new-bill', set({ ...newBill.value }, 'mainFee.count', traineesLength.value));
-      if (event === GROUP) emit('update:new-bill', set({ ...newBill.value }, 'mainFee.count', 1));
+      if (event === TRAINEE) {
+        emit('update:new-bill', set({ ...newBill.value }, 'mainFee.count', traineesQuantity.value));
+      } else if (event === GROUP) emit('update:new-bill', set({ ...newBill.value }, 'mainFee.count', 1));
     };
 
     return {
@@ -100,7 +102,7 @@ export default {
       // Computed
       countUnitOptions,
       priceCaption,
-      traineesQuantity,
+      traineesQuantityInfos,
       companiesName,
       // Methods
       hide,
