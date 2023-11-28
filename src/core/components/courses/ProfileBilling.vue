@@ -24,7 +24,7 @@
     <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
       @submit="validateBillCreation" :validations="v$.newBill" @hide="resetBillCreationModal"
       :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages"
-      :trainees-quantity="traineesLength" :course="course" :companies-to-bill="companiesToBill" />
+      :trainees-quantity="traineesQuantity" :course="course" :companies-to-bill="companiesToBill" />
 
     <ni-companies-selection-modal v-model="companiesSelectionModal" v-model:companies-to-bill="companiesToBill"
       :course-companies="course.companies" @submit="openNextModal" :validations="v$.companiesToBill"
@@ -141,7 +141,7 @@ export default {
 
     const newBillErrorMessages = computed(() => getBillErrorMessages('newBill.mainFee'));
 
-    const traineesLength = computed(() => course.value.trainees
+    const traineesQuantity = computed(() => course.value.trainees
       .filter(trainee => companiesToBill.value.includes(trainee.registrationCompany))
       .length);
 
@@ -355,7 +355,7 @@ export default {
       expectedBillsCountErrorMessage,
       billsGroupedByCompanies,
       newBillErrorMessages,
-      traineesLength,
+      traineesQuantity,
       courseName,
       missingBillsCompanies,
       // Methods

@@ -9,7 +9,7 @@
         <template #message>Facture pour le compte de {{ companiesName }}</template>
       </ni-banner>
     </div>
-    <ni-banner v-if="!traineesLength && courseType !== INTRA" icon="info_outline" icon-color="orange-700"
+    <ni-banner v-if="!traineesQuantity && courseType !== INTRA" icon="info_outline" icon-color="orange-700"
       class="bg-orange-50 text-orange-900">
       <template #message>Aucun stagiaire des structures sélectionnées n'est inscrit à la formation</template>
     </ni-banner>
@@ -40,7 +40,7 @@ export default {
     billToValidate: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    traineesLength: { type: Number, default: 0 },
+    traineesQuantity: { type: Number, default: 0 },
     courseName: { type: String, default: '' },
     courseType: { type: String, default: '' },
     companiesName: { type: String, default: '' },

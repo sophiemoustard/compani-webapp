@@ -67,9 +67,7 @@ export default {
     const { newBill, traineesQuantity, course, companiesToBill } = toRefs(props);
 
     const priceCaption = computed(() => (
-      newBill.value.mainFee.countUnit === GROUP
-        ? 'Prix du groupe'
-        : 'Prix par stagiaire'
+      newBill.value.mainFee.countUnit === GROUP ? 'Prix du groupe' : 'Prix par stagiaire'
     ));
 
     const companiesName = computed(() => {
