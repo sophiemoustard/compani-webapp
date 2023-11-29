@@ -54,7 +54,9 @@
                 <div class="fee-info">
                   <div class="text-copper-500">{{ get(course, 'subProgram.program.name') }}</div>
                   <div>Prix unitaire : {{ formatPrice(get(bill, 'mainFee.price')) }}</div>
-                  <div>Quantité : {{ get(bill, 'mainFee.count') }}</div>
+                  <div>
+                    Quantité ({{ COUNT_UNIT[get(bill, 'mainFee.countUnit')] }}) : {{ get(bill, 'mainFee.count') }}
+                  </div>
                   <div v-if="get(bill, 'mainFee.description')" class="ellipsis">
                     Description : {{ bill.mainFee.description }}
                   </div>
@@ -107,7 +109,7 @@
       @submit="editBill" :validations="validations.editedBill.mainFee" @hide="resetMainFeeEditionModal"
       :loading="billEditionLoading" :error-messages="mainFeeErrorMessages" :course-name="courseName"
       :title="courseFeeEditionModalMetaInfo.title" :is-billed="courseFeeEditionModalMetaInfo.isBilled"
-      :companies-name="companiesName" />
+      :companies-name="companiesName" :show-count-unit="course.type !== INTRA" :trainees-quantity="traineesQuantity" />
 
     <ni-billing-purchase-addition-modal v-model="billingPurchaseAdditionModal" :course-name="courseName"
       v-model:new-billing-purchase="newBillingPurchase" @submit="addBillingPurchase"
@@ -124,7 +126,7 @@
 
     <ni-course-bill-validation-modal v-model="courseBillValidationModal" v-model:bill-to-validate="billToValidate"
       @submit="validateBill" @hide="resetCourseBillValidationModal" :loading="billValidationLoading"
-      :validations="validations.billToValidate" @cancel="cancelBillValidation" :trainees-length="traineesLength"
+      :validations="validations.billToValidate" @cancel="cancelBillValidation" :trainees-quantity="traineesQuantity"
       :course-name="courseName" :course-type="course.type" :companies-name="companiesName" />
 
     <ni-course-credit-note-creation-modal v-model="creditNoteCreationModal" v-model:new-credit-note="newCreditNote"
@@ -149,9 +151,9 @@ import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import { useCourseBilling } from '@composables/courseBills';
-import { COMPANY, INTRA, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING } from '@data/constants';
+import { COMPANY, INTRA, DD_MM_YYYY, LONG_DURATION_H_MM, E_LEARNING, GROUP, COUNT_UNIT } from '@data/constants';
 import { strictPositiveNumber, integerNumber, minDate } from '@helpers/vuelidateCustomVal';
-import { formatPrice, formatIdentity } from '@helpers/utils';
+import { formatPrice, formatIdentity, formatName } from '@helpers/utils';
 import { computeDuration, composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -206,7 +208,11 @@ export default {
     const billingPurchaseEditionModal = ref(false);
     const courseBillValidationModal = ref(false);
     const creditNoteCreationModal = ref(false);
-    const editedBill = ref({ _id: '', payer: '', mainFee: { price: '', description: '', count: '' } });
+    const editedBill = ref({
+      _id: '',
+      payer: '',
+      mainFee: { price: '', description: '', count: '', countUnit: GROUP },
+    });
     const newBillingPurchase = ref({ billId: '', billingItem: '', price: 0, count: 1, description: '' });
     const editedBillingPurchase = ref({ _id: '', billId: '', price: 0, count: 1, description: '' });
     const newCreditNote = ref({ courseBill: '', misc: '', date: '' });
@@ -220,6 +226,7 @@ export default {
         mainFee: {
           price: { required, strictPositiveNumber },
           count: { required, strictPositiveNumber, integerNumber },
+          countUnit: { required },
         },
       },
       newBillingPurchase: {
@@ -277,7 +284,7 @@ export default {
       const trainer = formatIdentity(get(course.value, 'trainer.identity'), 'FL');
 
       return 'Actions pour le développement des compétences \r\n'
-        + `Formation pour ${traineesLength.value} salarié-es\r\n`
+        + `Formation pour ${traineesQuantity.value} salarié-es\r\n`
         + `Durée : ${liveDuration} présentiel${eLearningSteps.length ? `, ${eLearningDuration} eLearning` : ''}\r\n`
         + `Dates : du ${startDate} au ${endDate} \r\n`
         + `Lieu : ${location} \r\n`
@@ -288,13 +295,13 @@ export default {
       .filter(cb => cb.billedAt && !cb.courseCreditNote)
       .length);
 
-    const traineesLength = computed(() => course.value.trainees
+    const traineesQuantity = computed(() => course.value.trainees
       .filter(trainee => companies.value.map(c => c._id).includes(trainee.registrationCompany))
       .length);
 
     const courseName = computed(() => composeCourseName(course.value));
 
-    const companiesName = computed(() => companies.value.map(c => c.name).join(', '));
+    const companiesName = computed(() => formatName(companies.value));
 
     const displayValidatedCourseBillsCount = computed(() => course.value.type === INTRA &&
       course.value.expectedBillsCount > 1);
@@ -307,6 +314,7 @@ export default {
         mainFee: {
           price: bill.mainFee.price,
           count: bill.mainFee.count,
+          countUnit: bill.mainFee.countUnit,
           description: bill.mainFee.description || defaultDescription.value,
         },
       };
@@ -354,7 +362,7 @@ export default {
     };
 
     const resetEditedBill = () => {
-      editedBill.value = { _id: '', payer: '', mainFee: { price: '', description: '', count: '' } };
+      editedBill.value = { _id: '', payer: '', mainFee: { price: '', description: '', count: '', countUnit: GROUP } };
       validations.value.editedBill.$reset();
     };
 
@@ -577,13 +585,14 @@ export default {
       creditNoteMetaInfo,
       INTRA,
       DD_MM_YYYY,
+      COUNT_UNIT,
       // Computed
       validations,
       companies,
       mainFeeErrorMessages,
       newBillingPurchaseErrorMessages,
       editedBillingPurchaseErrorMessages,
-      traineesLength,
+      traineesQuantity,
       courseName,
       companiesName,
       validatedCourseBillsCount,
