@@ -8,8 +8,8 @@
           @open-modal="openBillingRepresentativeModal" />
       </div>
     </div>
-    <template v-if="groupedCourseBill.flat().length">
-      <div v-for="(billList, index) of groupedCourseBill" :key="index" class="q-mb-xl">
+    <template v-if="groupedCourseBills.flat().length">
+      <div v-for="(billList, index) of groupedCourseBills" :key="index" class="q-mb-xl">
         <p v-if="billList.length" class="text-weight-bold">{{ getTableName(index) }}</p>
         <ni-expanding-table v-if="billList.length" :data="billList" :columns="columns" v-model:pagination="pagination"
           :hide-bottom="false" :loading="loading">
@@ -37,7 +37,8 @@
                   Payeur : {{ props.row.payer.name }}
                 </div>
                 <div v-if="!props.row.companies.map(c => c._id).includes(company._id)" class="program text-weight-bold">
-                  Structures : {{ formatName(props.row.companies) }}
+                  {{ formatQuantity('Structure', props.row.companies.length, 's', false) }} :
+                  {{ formatName(props.row.companies) }}
                 </div>
               </template>
               <template v-else-if="col.name === 'progress' && col.value >= 0">
@@ -148,6 +149,7 @@ import {
   formatAndSortUserOptions,
   truncate,
   formatName,
+  formatQuantity,
 } from '@helpers/utils';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
@@ -254,7 +256,7 @@ export default {
 
     const company = computed(() => (canUpdateBilling.value ? $store.state.company.company : loggedUser.value.company));
 
-    const groupedCourseBill = computed(() => {
+    const groupedCourseBills = computed(() => {
       const companyBillsPayedByCompany = courseBillList.value
         .filter(bill => bill.payer._id === company.value._id &&
           bill.companies.map(c => c._id).includes(company.value._id));
@@ -411,18 +413,20 @@ export default {
     );
 
     const getTableName = (index) => {
-      if (index === 0) {
-        return isVendorInterface
-          ? `Formation de ${company.value.name} facturées à ${company.value.name}`
-          : 'Mes formations facturées à ma structure';
-      } if (index === 1) {
-        return isVendorInterface
-          ? `Formations de ${company.value.name} facturées à un tiers`
-          : 'Mes formations facturées à un tiers';
+      switch (index) {
+        case 0:
+          return isVendorInterface
+            ? `Formation de ${company.value.name} facturées à ${company.value.name}`
+            : 'Mes formations facturées à ma structure';
+        case 1:
+          return isVendorInterface
+            ? `Formations de ${company.value.name} facturées à un tiers`
+            : 'Mes formations facturées à un tiers';
+        case 2:
+          return isVendorInterface
+            ? `Autres formations facturées à ${company.value.name}`
+            : 'Autres formations facturées à ma structure';
       }
-      return isVendorInterface
-        ? `Autres formations facturées à ${company.value.name}`
-        : 'Autres formations facturées à ma structure';
     };
 
     const getProgramName = (course) => {
@@ -528,11 +532,12 @@ export default {
       company,
       validations,
       canUpdateBilling,
-      groupedCourseBill,
+      groupedCourseBills,
       // Methods
       refreshCourseBills,
       formatPrice,
       formatName,
+      formatQuantity,
       downloadBill,
       downloadCreditNote,
       openCoursePaymentCreationModal,
