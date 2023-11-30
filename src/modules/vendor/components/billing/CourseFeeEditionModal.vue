@@ -11,7 +11,7 @@
     </div>
     <ni-option-group v-if="showCountUnit" in-modal :model-value="courseFee.countUnit" :options="countUnitOptions"
       type="radio" @update:model-value="update($event, 'countUnit')" :error="validations.countUnit.$error"
-      caption="Unité" inline required-field />
+      caption="Unité" inline required-field :disable="isBilled" />
     <ni-input in-modal :caption="priceCaption" :error="validations.price.$error" type="number" :disable="isBilled"
       :model-value="courseFee.price" @blur="validations.price.$touch" suffix="€" required-field
       :error-message="errorMessages.price" @update:model-value="update($event, 'price')" />
