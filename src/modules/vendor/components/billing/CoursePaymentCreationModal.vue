@@ -13,7 +13,9 @@
     </div>
     <div class="course-bill-infos">
       <div>{{ coursePaymentMetaInfo.courseName }}</div>
-      <div>{{ paymentNature }} pour le compte de {{ coursePaymentMetaInfo.companiesName }}</div>
+      <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
+        <template #message>{{ paymentNature }} pour le compte de {{ coursePaymentMetaInfo.companiesName }}</template>
+      </ni-banner>
     </div>
     <ni-input in-modal caption="Montant" suffix="€" type="number" required-field :error-message="netInclTaxesError"
       :model-value="newCoursePayment.netInclTaxes" @update:model-value="update($event, 'netInclTaxes')"
@@ -35,6 +37,7 @@ import { computed } from 'vue';
 import set from 'lodash/set';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Banner from '@components/Banner';
 import Button from '@components/Button';
 import DateInput from '@components/form/DateInput';
 import Modal from '@components/modal/Modal';
@@ -51,6 +54,7 @@ export default {
     'ni-modal': Modal,
     'ni-btn-toggle': ButtonToggle,
     'ni-button': Button,
+    'ni-banner': Banner,
   },
   props: {
     newCoursePayment: { type: Object, default: () => ({}) },

@@ -11,7 +11,9 @@
     </div>
     <div class="course-bill-infos">
       <div>{{ creditNoteMetaInfo.courseName }}</div>
-      <div>Avoir pour le compte de {{ creditNoteMetaInfo.companiesName }}</div>
+      <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
+        <template #message>Avoir pour le compte de {{ creditNoteMetaInfo.companiesName }}</template>
+      </ni-banner>
     </div>
     <ni-banner v-if="displayValidatedCourseBillsCount" icon="info_outline" icon-color="copper-grey-700"
       class="bg-copper-grey-200 text-copper-grey-700">
