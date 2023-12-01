@@ -33,10 +33,11 @@
                     </span>
                   </div>
                 </div>
-                <div v-if="props.row.payer._id !== company._id" class="program text-weight-bold">
+                <div v-if="props.row.payer._id !== company._id" class="text-copper-grey-600 text-weight-bold">
                   Payeur : {{ props.row.payer.name }}
                 </div>
-                <div v-if="!props.row.companies.map(c => c._id).includes(company._id)" class="program text-weight-bold">
+                <div v-if="!props.row.companies.map(c => c._id).includes(company._id)"
+                  class="text-copper-grey-600 text-weight-bold">
                   {{ formatQuantity('Structure', props.row.companies.length, 's', false) }} :
                   {{ formatName(props.row.companies) }}
                 </div>
