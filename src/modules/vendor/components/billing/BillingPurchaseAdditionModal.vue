@@ -5,7 +5,9 @@
     </template>
     <div class="course-bill-infos">
       <div>{{ courseName }} </div>
-      <div>Facture pour le compte de {{ companiesName }}</div>
+      <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
+        <template #message>Facture pour le compte de {{ companiesName }}</template>
+      </ni-banner>
     </div>
     <ni-select in-modal caption="Article" :options="billingItemOptions" :model-value="newBillingPurchase.billingItem"
       required-field @blur="validations.billingItem.$touch" :error="validations.billingItem.$error"
@@ -31,6 +33,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
+import Banner from '@components/Banner';
 
 export default {
   name: 'BillingPurchaseAdditionModal',
@@ -49,6 +52,7 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
     'ni-select': Select,
+    'ni-banner': Banner,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-billing-purchase'],
   setup (props, { emit }) {

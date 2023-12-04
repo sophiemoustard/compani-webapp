@@ -606,6 +606,9 @@ export const CREDIT_NOTE_TYPE_OPTIONS = [
 // COURSE_BILLS
 export const LIST = 'list';
 export const BALANCE = 'balance';
+export const FUNDING_ORGANISATION = 'funding_organisation';
+export const GROUP = 'group';
+export const COUNT_UNIT = { [GROUP]: 'groupe', [TRAINEE]: 'stagiaire' };
 
 // KANBAN COURSE FILTERS
 export const WITHOUT_TRAINER = 'without_trainer';

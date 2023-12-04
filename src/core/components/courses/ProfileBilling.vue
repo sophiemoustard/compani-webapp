@@ -5,55 +5,90 @@
         @blur="updateCourse('expectedBillsCount')" caption="Nombre de factures"
         :error="v$.course.expectedBillsCount.$error" :error-message="expectedBillsCountErrorMessage" />
     </div>
+    <ni-banner v-else-if="missingBillsCompanies.length" icon="info_outline">
+      <template #message>
+        Les structures suivantes n'ont pas été facturées : {{ formatName(missingBillsCompanies) }}.
+      </template>
+    </ni-banner>
     <div v-for="(companies, index) of companiesList" :key="index">
-      <ni-course-billing-card :companies="companies" :course="course" :payer-list="payerList" :loading="billsLoading"
-        :billing-item-list="billingItemList" :course-bills="billsGroupedByCompanies[companies.map(c => c._id)]"
-        @refresh-course-bills="refreshCourseBills" @refresh-and-unroll="refreshAndUnroll"
+      <ni-course-billing-card :course="course" :payer-list="payerList" :loading="billsLoading"
+        :billing-item-list="billingItemList" :course-bills="billsGroupedByCompanies[companies]"
+        @refresh-course-bills="refreshCourseBills" @unroll="unrollBill" :are-details-visible="areDetailsVisible"
         :expected-bills-count-invalid="v$.course.expectedBillsCount.$error" />
     </div>
-    <div v-if="!companiesList.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
+    <div v-if="!course.companies.length" class="text-italic">Aucune structure n'est rattachée à la formation</div>
+
+    <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer une facture" @click="openBillCreationModal"
+      color="primary" :disable="billCreationLoading || !course.companies.length" :loading="billsLoading" />
+
+    <ni-bill-creation-modal v-model="billCreationModal" v-model:new-bill="newBill" :course-name="courseName"
+      @submit="validateBillCreation" :validations="v$.newBill" @hide="resetBillCreationModal"
+      :loading="billCreationLoading" :payer-options="payerList" :error-messages="newBillErrorMessages"
+      :trainees-quantity="traineesQuantity" :course="course" :companies-to-bill="companiesToBill" />
+
+    <ni-companies-selection-modal v-model="companiesSelectionModal" v-model:companies-to-bill="companiesToBill"
+      :course-companies="course.companies" @submit="openNextModal" :validations="v$.companiesToBill"
+      @hide="resetCompaniesSelectionModal" :course-name="courseName" />
   </div>
 </template>
 
 <script>
 import { useStore } from 'vuex';
+import { useQuasar } from 'quasar';
 import { computed, ref } from 'vue';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import uniqBy from 'lodash/uniqBy';
 import pickBy from 'lodash/pickBy';
 import groupBy from 'lodash/groupBy';
 import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
-import { formatAndSortOptions, formatPrice } from '@helpers/utils';
+import { minArrayLength, integerNumber, positiveNumber, strictPositiveNumber } from '@helpers/vuelidateCustomVal';
+import { composeCourseName } from '@helpers/courses';
+import { formatAndSortOptions, formatPrice, formatName, sortStrings } from '@helpers/utils';
+import { descendingSortBy } from '@helpers/dates/utils';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { LIST, COMPANY, REQUIRED_LABEL } from '@data/constants';
+import { useCourseBilling } from '@composables/courseBills';
+import { LIST, COMPANY, REQUIRED_LABEL, INTRA, FUNDING_ORGANISATION, GROUP } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
+import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
+import CompaniesSelectionModal from 'src/modules/vendor/components/billing/CompaniesSelectionModal';
 import Input from '@components/form/Input';
+import Banner from '@components/Banner';
 import { useCourses } from '@composables/courses';
-import { integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'ProfileBilling',
   components: {
     'ni-course-billing-card': CourseBillingCard,
+    'ni-bill-creation-modal': BillCreationModal,
+    'ni-companies-selection-modal': CompaniesSelectionModal,
     'ni-input': Input,
+    'ni-banner': Banner,
   },
   setup () {
     const $store = useStore();
+    const $q = useQuasar();
+
     const courseBills = ref([]);
     const billsLoading = ref(false);
     const payerList = ref([]);
     const billingItemList = ref([]);
     const tmpInput = ref('');
-    const FUNDING_ORGANISATION = 'funding_organisation';
-
+    const billCreationModal = ref(false);
+    const companiesSelectionModal = ref(false);
+    const billCreationLoading = ref(false);
+    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP } });
+    const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
+    const removeNewBillDatas = ref(true);
     const course = computed(() => $store.state.course.course);
+
+    const companiesToBill = ref(course.value.type === INTRA ? [course.value.companies[0]._id] : []);
+
     const rules = computed(() => ({
       course: {
         expectedBillsCount: {
@@ -63,20 +98,35 @@ export default {
           minValue: minValue(courseBills.value.filter(cb => !cb.courseCreditNote).length),
         },
       },
+      newBill: {
+        payer: { required },
+        mainFee: {
+          price: { required, strictPositiveNumber },
+          count: { required, strictPositiveNumber, integerNumber },
+          countUnit: { required },
+        },
+      },
+      companiesToBill: { minArrayLength: minArrayLength(1) },
     }));
 
-    const v$ = useVuelidate(rules, { course });
+    const v$ = useVuelidate(rules, { course, newBill, companiesToBill });
 
     const { isIntraCourse } = useCourses(course);
 
-    const companiesList = computed(() => {
-      const billsCompanies = courseBills.value.map(bill => bill.companies);
+    const { getBillErrorMessages } = useCourseBilling(courseBills, v$);
 
-      return uniqBy([...course.value.companies.map(c => [c]), ...billsCompanies], '[0]._id')
-        .sort((a, b) => a[0].name.localeCompare(b[0].name));
+    const billsGroupedByCompanies = computed(() => {
+      const sortedBills = courseBills.value
+        .map(bill => ({ ...bill, companies: bill.companies.sort((a, b) => sortStrings(a.name, b.name)) }))
+        .sort((a, b) => sortStrings(formatName(a.companies), formatName(b.companies)));
+
+      return groupBy(sortedBills, bill => bill.companies.map(cp => cp._id));
     });
 
-    const billsGroupedByCompanies = computed(() => groupBy(courseBills.value, c => c.companies.map(cp => cp._id)));
+    const companiesList = computed(() => Object.keys(billsGroupedByCompanies.value));
+
+    const missingBillsCompanies = computed(() => course.value.companies
+      .filter(c => !Object.keys(billsGroupedByCompanies.value).some(companiesIds => companiesIds.includes(c._id))));
 
     const expectedBillsCountErrorMessage = computed(() => {
       if (v$.value.course.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
@@ -88,6 +138,14 @@ export default {
       }
       return 'Nombre non valide';
     });
+
+    const newBillErrorMessages = computed(() => getBillErrorMessages('newBill.mainFee'));
+
+    const traineesQuantity = computed(() => course.value.trainees
+      .filter(trainee => companiesToBill.value.includes(trainee.registrationCompany))
+      .length);
+
+    const courseName = computed(() => composeCourseName(course.value));
 
     const saveTmp = path => (tmpInput.value = course.value[path]);
 
@@ -104,9 +162,10 @@ export default {
       }
     };
 
-    const refreshAndUnroll = async (unrollBill) => {
-      await refreshCourseBills();
-      unrollBill();
+    const formatPayerForPayload = (payloadPayer) => {
+      const payerType = payerList.value.find(payer => payer.value === payloadPayer).type;
+
+      return payerType === COMPANY ? { company: payloadPayer } : { fundingOrganisation: payloadPayer };
     };
 
     const refreshPayers = async () => {
@@ -173,6 +232,102 @@ export default {
       }
     };
 
+    const formatCreationPayload = () => ({
+      course: course.value._id,
+      mainFee: newBill.value.mainFee,
+      companies: companiesToBill.value,
+      payer: formatPayerForPayload(newBill.value.payer),
+    });
+
+    const unrollBill = (billId) => {
+      const bill = billId || [...courseBills.value].sort(descendingSortBy('createdAt'))[0]._id;
+      areDetailsVisible.value[bill] = !areDetailsVisible.value[bill];
+    };
+
+    const validateBillCreation = async () => {
+      v$.value.newBill.$touch();
+      if (v$.value.newBill.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      const areCompaniesAlreadyBilled = Object.keys(billsGroupedByCompanies.value)
+        .some(companies => companiesToBill.value.some(c => companies.includes(c)));
+      if (areCompaniesAlreadyBilled && course.value.type !== INTRA) {
+        const message = companiesToBill.value.length > 1
+          ? 'Au moins une des structures sélectionnée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?'
+          : 'La structure sélectionnée a déjà été facturée, souhaitez-vous la refacturer&nbsp;?';
+
+        $q.dialog({
+          title: 'Confirmation',
+          message,
+          html: true,
+          ok: true,
+          cancel: 'Annuler',
+          persistent: true,
+        }).onOk(() => addBill())
+          .onCancel(() => {
+            removeNewBillDatas.value = false;
+            billCreationModal.value = false;
+            companiesSelectionModal.value = true;
+          });
+      } else {
+        await addBill();
+      }
+    };
+
+    const addBill = async () => {
+      try {
+        billCreationLoading.value = true;
+        await CourseBills.create(formatCreationPayload());
+        NotifyPositive('Facture créée.');
+
+        billCreationModal.value = false;
+        resetCompaniesSelectionModal();
+        await refreshCourseBills();
+        unrollBill();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la facture.');
+      } finally {
+        billCreationLoading.value = false;
+      }
+    };
+
+    const resetBillCreationModal = () => {
+      if (removeNewBillDatas.value) {
+        newBill.value = { payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP } };
+        v$.value.newBill.$reset();
+        resetCompaniesSelectionModal();
+      }
+    };
+
+    const openBillCreationModal = () => {
+      if (course.value.type === INTRA) {
+        if (v$.value.course.expectedBillsCount.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        const courseBillsWithoutCreditNote = courseBills.value.filter(cb => !cb.courseCreditNote);
+        if (courseBillsWithoutCreditNote.length === course.value.expectedBillsCount) {
+          return NotifyWarning('Impossible de créer une facture, nombre de factures maximum atteint.');
+        }
+        billCreationModal.value = true;
+      } else {
+        companiesSelectionModal.value = true;
+      }
+    };
+
+    const openNextModal = () => {
+      v$.value.companiesToBill.$touch();
+      if (v$.value.companiesToBill.$error) return NotifyWarning('Champ(s) invalide(s).');
+      companiesSelectionModal.value = false;
+      billCreationModal.value = true;
+      removeNewBillDatas.value = true;
+    };
+
+    const resetCompaniesSelectionModal = () => {
+      if (!billCreationModal.value) {
+        companiesToBill.value = course.value.type === INTRA ? [course.value.companies[0]._id] : [];
+        v$.value.companiesToBill.$reset();
+      }
+    };
+
     const created = async () => {
       await Promise.all([refreshCourseBills(), refreshPayers(), refreshBillingItems()]);
     };
@@ -187,23 +342,39 @@ export default {
       billingItemList,
       courseBills,
       billsLoading,
+      billCreationLoading,
+      billCreationModal,
+      newBill,
+      companiesSelectionModal,
+      companiesToBill,
+      areDetailsVisible,
       // Computed
       course,
       companiesList,
       isIntraCourse,
       expectedBillsCountErrorMessage,
       billsGroupedByCompanies,
+      newBillErrorMessages,
+      traineesQuantity,
+      courseName,
+      missingBillsCompanies,
       // Methods
       saveTmp,
       refreshCourseBills,
-      refreshAndUnroll,
+      unrollBill,
       refreshPayers,
       refreshBillingItems,
       updateCourse,
+      validateBillCreation,
+      resetBillCreationModal,
+      openBillCreationModal,
+      resetCompaniesSelectionModal,
+      openNextModal,
       get,
       omit,
       pickBy,
       formatPrice,
+      formatName,
     };
   },
 };

@@ -1,11 +1,13 @@
 import { ref } from 'vue';
+import get from 'lodash/get';
 import CourseBills from '@api/CourseBills';
 import CourseCreditNotes from '@api/CourseCreditNotes';
 import { NotifyNegative } from '@components/popup/notify';
 import { formatDownloadName } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
+import { REQUIRED_LABEL } from '../data/constants';
 
-export const useCourseBilling = (courseBills) => {
+export const useCourseBilling = (courseBills, validations) => {
   const pdfLoading = ref(false);
 
   const downloadBill = async (bill) => {
@@ -37,11 +39,30 @@ export const useCourseBilling = (courseBills) => {
     }
   };
 
+  const getBillErrorMessages = (parent) => {
+    let price = '';
+    let count = '';
+    let countUnit = '';
+    if (get(validations, `value.${parent}.price.strictPositiveNumber.$response`) === false) {
+      price = 'Prix non valide';
+    }
+
+    if (get(validations, `value.${parent}.count.strictPositiveNumber.$response`) === false ||
+      get(validations, `value.${parent}.count.integerNumber.$response`) === false) {
+      count = 'Nombre non valide';
+    }
+
+    if (get(validations, `value.${parent}.countUnit.required.$response`) === false) countUnit = REQUIRED_LABEL;
+
+    return { price, count, countUnit };
+  };
+
   return {
     // Data
     pdfLoading,
     // Methods
     downloadBill,
     downloadCreditNote,
+    getBillErrorMessages,
   };
 };
