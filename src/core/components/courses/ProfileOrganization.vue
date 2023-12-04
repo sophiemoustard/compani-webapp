@@ -77,7 +77,7 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container v-if="!isIntraHoldingCourse" :course="course" :has-holding-role="hasHoldingRole"
+    <training-contract-container :course="course" :has-holding-role="hasHoldingRole"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" :training-contracts="trainingContracts"
       :training-contract-table-loading="trainingContractTableLoading" @refresh="refreshTrainingContracts" />
 
@@ -236,6 +236,8 @@ export default {
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
     const canUpdateCompanyRepresentative = ref(false);
+    const canGetTrainingContracts = ref(false);
+    const canGetTrainersAndSalesRepresentatives = ref(false);
     const canUpdateInterlocutor = ref(false);
     const canUpdateTrainees = ref(false);
     const canUpdateSMS = ref(false);
@@ -359,6 +361,9 @@ export default {
       canUpdateTrainees.value = ability.can('update', subject('Course', course.value), 'trainees');
       canUpdateSMS.value = ability.can('update', subject('Course', course.value), 'sms');
       canReadHistory.value = ability.can('read', subject('Course', course.value), 'history');
+      canGetTrainingContracts.value = ability.can('read', subject('Course', course.value), 'training_contracts');
+      canGetTrainersAndSalesRepresentatives.value = ability
+        .can('read', subject('Course', course.value), 'interlocutor');
     };
 
     const toggleHistory = async () => {
@@ -747,7 +752,7 @@ export default {
 
     const refreshTrainingContracts = async () => {
       try {
-        if ((!isRofOrVendorAdmin.value && isVendorInterface) || isIntraHoldingCourse.value) return;
+        if (!isRofOrVendorAdmin.value && isVendorInterface) return;
 
         trainingContractTableLoading.value = true;
         const loggedUserHolding = get(loggedUser.value, 'holding._id');
@@ -776,8 +781,8 @@ export default {
       if (canUpdateCompanyRepresentative.value) promises.push(refreshCompanyRepresentatives());
       if (canUpdateSMS.value) promises.push(refreshSms());
       if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
-
-      if (isRofOrVendorAdmin.value) promises.push(refreshTrainersAndSalesRepresentatives(), refreshTrainingContracts());
+      if (canGetTrainingContracts.value) promises.push(refreshTrainingContracts());
+      if (canGetTrainersAndSalesRepresentatives.value) promises.push(refreshTrainersAndSalesRepresentatives());
       else {
         salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
       }

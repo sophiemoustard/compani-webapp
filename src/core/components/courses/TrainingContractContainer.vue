@@ -280,10 +280,6 @@ export default {
       }
     };
 
-    const created = async () => emit('refresh');
-
-    created();
-
     return {
       // Data
       newGeneratedTrainingContractInfos,
