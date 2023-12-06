@@ -77,7 +77,7 @@
           :disable="disableDocDownload || isArchived" @click="downloadAttendanceSheet" size="16px" />
       </div>
     </div>
-    <training-contract-container :course="course" :has-holding-role="hasHoldingRole"
+    <training-contract-container v-if="canGetTrainingContracts" :course="course" :has-holding-role="hasHoldingRole"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" :training-contracts="trainingContracts"
       :training-contract-table-loading="trainingContractTableLoading" @refresh="refreshTrainingContracts" />
 
@@ -827,6 +827,7 @@ export default {
       canUpdateCompanyRepresentative,
       canUpdateSMS,
       canReadHistory,
+      canGetTrainingContracts,
       // Computed
       course,
       v$,

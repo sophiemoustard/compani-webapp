@@ -1,5 +1,5 @@
 <template>
-  <div v-if="(isVendorInterface && isRofOrVendorAdmin) || (!isVendorInterface && !!trainingContracts.length)"
+  <div v-if="isVendorInterface || !!trainingContracts.length"
     class="q-mb-xl">
     <p class="text-weight-bold">Convention de formation</p>
     <div class="q-mb-sm">
