@@ -88,7 +88,7 @@ export const defineAbilitiesForCourse = (user) => {
     can('update', 'Course', 'sms', { type: INTRA });
     can('read', 'Course', 'history', { type: INTRA });
     can('access', 'trainee');
-    can('read', 'Course', 'training_contracts', { type: { $in: [INTRA_HOLDING, INTRA] } });
+    can('read', 'Course', 'training_contracts');
     if ([HOLDING_ADMIN].includes(holdingRole)) {
       can('update', 'Course', 'company_representative', { type: INTRA_HOLDING });
       can('update', 'Course', 'companies', { type: INTRA_HOLDING });
