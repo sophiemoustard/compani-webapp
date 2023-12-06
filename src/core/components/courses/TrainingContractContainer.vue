@@ -42,11 +42,11 @@
   <training-contract-generation-modal v-model="trainingContractGenerationModal" :company-options="companyOptions"
     v-model:new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse"
     @submit="openTrainingContractInfosModal" @hide="resetGeneratedTrainingContractInfos" :error-message="errorMessage"
-    :validations="validations.newGeneratedTrainingContractInfos" />
+    :validations="validations.newGeneratedTrainingContractInfos" :is-inter-course="isInterCourse" />
 
   <training-contract-infos-modal v-model="trainingContractInfosModal" :course="course"
     @submit="generateTrainingContract" :loading="pdfLoading" @hide="resetGeneratedTrainingContractInfos"
-    :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse" />
+    :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-inter-course="isInterCourse" />
 
   <training-contract-creation-modal v-model="trainingContractCreationModal" :company-options="companyOptions"
     v-model:new-training-contract="newTrainingContract" @submit="createTrainingContract" :loading="pdfLoading"
@@ -101,7 +101,7 @@ export default {
     const { course, trainingContracts } = toRefs(props);
     const $q = useQuasar();
 
-    const { pdfLoading, isIntraCourse, isVendorInterface } = useCourses(course);
+    const { pdfLoading, isIntraCourse, isInterCourse, isVendorInterface } = useCourses(course);
 
     const newGeneratedTrainingContractInfos = ref({
       price: 0,
@@ -296,6 +296,7 @@ export default {
       customFields,
       companyOptions,
       isIntraCourse,
+      isInterCourse,
       isVendorInterface,
       areAllTrainingContractsUploaded,
       disableGenerationButton,

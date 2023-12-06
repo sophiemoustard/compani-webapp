@@ -16,7 +16,7 @@
     <div><span class="text-weight-bold">Durée :</span> {{ totalDuration }}</div>
     <div>
       <span class="text-weight-bold">Effectif :</span>
-      {{ course.misc ? `${course.misc}, ` : '' }}{{ isIntraCourse ? 'jusqu\'à ' : '' }}
+      {{ course.misc ? `${course.misc}, ` : '' }}{{ !isInterCourse ? 'jusqu\'à ' : '' }}
       {{ formatQuantity('stagiaire', learnersCount) }}
     </div>
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
@@ -25,7 +25,7 @@
       <span class="text-weight-bold">Intervenant(e) :</span>
       {{ formatIdentity(course.trainer.identity, 'FL') }}
     </div>
-    <div v-if="isIntraCourse" class="q-mb-md">
+    <div v-if="!isInterCourse" class="q-mb-md">
       <span class="text-weight-bold">Prix du programme :</span>
       {{ Number(newGeneratedTrainingContractInfos.price) }} €
     </div>
@@ -65,7 +65,7 @@ export default {
     course: { type: Object, default: () => ({}) },
     newGeneratedTrainingContractInfos: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    isIntraCourse: { type: Boolean, default: true },
+    isInterCourse: { type: Boolean, default: true },
   },
   components: {
     'ni-modal': Modal,
@@ -73,7 +73,7 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit'],
   setup (props, { emit }) {
-    const { course, newGeneratedTrainingContractInfos, isIntraCourse } = toRefs(props);
+    const { course, newGeneratedTrainingContractInfos, isInterCourse } = toRefs(props);
 
     // make sure code is similar to back part in TrainingContracts helper
     const liveDuration = computed(() => {
@@ -127,7 +127,7 @@ export default {
     });
 
     const learnersCount = computed(() => {
-      if (isIntraCourse.value) return course.value.maxTrainees;
+      if (!isInterCourse.value) return course.value.maxTrainees;
 
       return course.value.trainees
         .filter(t => t.registrationCompany === newGeneratedTrainingContractInfos.value.company).length;

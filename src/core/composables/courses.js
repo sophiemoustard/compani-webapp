@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, INTRA_HOLDING } from '@data/constants';
+import { INTRA, COURSE_TYPES, INTRA_HOLDING, INTER_B2B } from '@data/constants';
 import {
   formatIdentity,
   formatDownloadName,
@@ -20,6 +20,8 @@ export const useCourses = (course) => {
   const pdfLoading = ref(false);
 
   const isIntraCourse = computed(() => (get(course.value, 'type') === INTRA));
+
+  const isInterCourse = computed(() => (get(course.value, 'type') === INTER_B2B));
 
   const isIntraHoldingCourse = computed(() => (get(course.value, 'type') === INTRA_HOLDING));
 
@@ -84,6 +86,7 @@ export const useCourses = (course) => {
   return {
     // Computed
     isIntraCourse,
+    isInterCourse,
     isIntraHoldingCourse,
     headerInfo,
     vendorRole,
