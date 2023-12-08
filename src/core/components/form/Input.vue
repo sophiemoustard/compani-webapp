@@ -128,6 +128,7 @@ export default {
 <style lang="sass" scoped>
 .input-file-container
   padding: 6px 10px
+  overflow-wrap: break-word
   .input-file-empty
     font-size: 12px
   .input-file
