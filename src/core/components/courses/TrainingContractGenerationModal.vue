@@ -3,7 +3,7 @@
     <template #title>
       Ajouter <span class="text-weight-bold">le prix de la formation</span>
     </template>
-    <ni-input in-modal :caption="isIntraCourse ? 'Prix du programme' : 'Prix par stagiaire'" suffix="€" required-field
+    <ni-input in-modal :caption="isInterCourse ? 'Prix par stagiaire' : 'Prix du programme'" suffix="€" required-field
       :error="validations.price.$error" type="number" :model-value="newGeneratedTrainingContractInfos.price"
       @blur="validations.price.$touch" :error-message="errorMessage" @update:model-value="update($event, 'price')" />
     <ni-select v-if="!isIntraCourse" in-modal :model-value="newGeneratedTrainingContractInfos.company"
@@ -32,6 +32,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     companyOptions: { type: Array, default: () => [] },
     isIntraCourse: { type: Boolean, default: true },
+    isInterCourse: { type: Boolean, default: true },
     newGeneratedTrainingContractInfos: { type: Object, default: () => ({}) },
   },
   components: {
