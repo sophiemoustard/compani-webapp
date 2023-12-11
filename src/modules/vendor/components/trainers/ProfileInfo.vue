@@ -6,6 +6,8 @@
         @focus="saveTmp('identity.firstname')" @blur="updateUser('identity.firstname')" />
       <ni-input v-model.trim="userProfile.identity.lastname" caption="Nom" @focus="saveTmp('identity.lastname')"
         @blur="updateUser('identity.lastname')" :error="v$.userProfile.identity.lastname.$error" />
+      <ni-select caption="Civilité" :error="v$.userProfile.identity.title.$error" v-model="userProfile.identity.title"
+        :options="civilityOptions" @focus="saveTmp('identity.title')" @blur="updateUser('identity.title')" />
       <div class="col-12 col-md-6 row items-center">
         <div class="col-xs-11">
           <ni-input ref="userEmail" name="emailInput" caption="Adresse email" type="email" lower-case
@@ -36,8 +38,9 @@ import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
+import Select from '@components/form/Select';
 import { userMixin } from '@mixins/userMixin';
-import { TRAINER } from '@data/constants';
+import { TRAINER, CIVILITY_OPTIONS } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import useVuelidate from '@vuelidate/core';
 
@@ -48,17 +51,19 @@ export default {
   components: {
     'ni-input': Input,
     'ni-button': Button,
+    'ni-select': Select,
   },
   data () {
     return {
       tmpInput: '',
       emailLock: true,
+      civilityOptions: CIVILITY_OPTIONS.filter(opt => ['Monsieur', 'Madame'].includes(opt.label)),
     };
   },
   validations () {
     return {
       userProfile: {
-        identity: { lastname: { required } },
+        identity: { lastname: { required }, title: { required } },
         local: { email: { required, email } },
         contact: { phone: { required, frPhoneNumber } },
       },
