@@ -40,7 +40,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import { userMixin } from '@mixins/userMixin';
-import { TRAINER, CIVILITY_OPTIONS } from '@data/constants';
+import { TRAINER, CIVILITY_OPTIONS, MR, MRS } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import useVuelidate from '@vuelidate/core';
 
@@ -57,7 +57,7 @@ export default {
     return {
       tmpInput: '',
       emailLock: true,
-      civilityOptions: CIVILITY_OPTIONS.filter(opt => ['Monsieur', 'Madame'].includes(opt.label)),
+      civilityOptions: CIVILITY_OPTIONS.filter(opt => [MR, MRS].includes(opt.value)),
     };
   },
   validations () {

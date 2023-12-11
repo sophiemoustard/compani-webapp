@@ -29,7 +29,7 @@ import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import { CIVILITY_OPTIONS } from '@data/constants';
+import { CIVILITY_OPTIONS, MR, MRS } from '@data/constants';
 
 export default {
   name: 'TrainerCreationModal',
@@ -49,7 +49,7 @@ export default {
   emits: ['update:model-value', 'hide', 'submit', 'go-to-next-step', 'update:new-trainer'],
   data () {
     return {
-      civilityOptions: CIVILITY_OPTIONS.filter(opt => ['Monsieur', 'Madame'].includes(opt.label)),
+      civilityOptions: CIVILITY_OPTIONS.filter(opt => [MR, MRS].includes(opt.value)),
     };
   },
   methods: {
