@@ -65,7 +65,7 @@ export default {
     const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
     const selectedProgram = computed(() => $store.state.course.selectedProgram);
     const selectedCompany = computed(() => $store.state.course.selectedCompany);
-    const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
+    const selectedOperationsRepresentative = computed(() => $store.state.course.selectedOperationsRepresentative);
     const selectedStartDate = computed(() => $store.state.course.selectedStartDate);
     const selectedEndDate = computed(() => $store.state.course.selectedEndDate);
     const selectedType = computed(() => $store.state.course.selectedType);
@@ -124,8 +124,8 @@ export default {
       const companiesIds = course.value.companies.map(company => company._id);
       if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
 
-      if (selectedSalesRepresentative.value &&
-        course.value.salesRepresentative._id !== selectedSalesRepresentative.value) {
+      if (selectedOperationsRepresentative.value &&
+        course.value.operationsRepresentative._id !== selectedOperationsRepresentative.value) {
         return false;
       }
 
