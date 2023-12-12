@@ -74,7 +74,10 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     const filteredCourses = courses.value.filter(course => !!course.operationsRepresentative);
     const operationsRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'operationsRepresentative');
 
-    return [{ label: 'Tous les référents Compani', value: '' }, ...sortedUniqBy(operationsRepresentatives, 'value')];
+    return [
+      { label: 'Tous les chargés des opérations', value: '' },
+      ...sortedUniqBy(operationsRepresentatives, 'value'),
+    ];
   });
 
   const updateSelectedOperationsRepresentative = (operationsRepresentativeId) => {

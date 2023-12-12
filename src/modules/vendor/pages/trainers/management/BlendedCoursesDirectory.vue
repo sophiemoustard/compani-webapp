@@ -7,8 +7,8 @@
         @update:model-value="updateSelectedCompany" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativeFilterOptions" clearable
-        :model-value="selectedSalesRepresentative" @update:model-value="updateSelectedSalesRepresentative" />
+      <ni-select :options="operationsRepresentativeFilterOptions" clearable
+        :model-value="selectedOperationsRepresentative" @update:model-value="updateSelectedOperationsRepresentative" />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
         error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
@@ -69,8 +69,8 @@ export default {
       companyFilterOptions,
       selectedProgram,
       programFilterOptions,
-      selectedSalesRepresentative,
-      salesRepresentativeFilterOptions,
+      selectedOperationsRepresentative,
+      operationsRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedType,
@@ -80,7 +80,7 @@ export default {
       selectedArchiveStatus,
       updateSelectedCompany,
       updateSelectedProgram,
-      updateSelectedSalesRepresentative,
+      updateSelectedOperationsRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
       updateSelectedType,
@@ -143,8 +143,8 @@ export default {
       companyFilterOptions,
       selectedProgram,
       programFilterOptions,
-      selectedSalesRepresentative,
-      salesRepresentativeFilterOptions,
+      selectedOperationsRepresentative,
+      operationsRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedType,
@@ -154,7 +154,7 @@ export default {
       // Methods
       updateSelectedCompany,
       updateSelectedProgram,
-      updateSelectedSalesRepresentative,
+      updateSelectedOperationsRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
       updateSelectedType,
