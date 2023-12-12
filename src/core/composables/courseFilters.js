@@ -67,18 +67,18 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
 
   const updateSelectedCompany = companyId => $store.dispatch('course/setSelectedCompany', { companyId });
 
-  /* SALES REPRESENTATIVE */
-  const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
+  /* OPERATIONS REPRESENTATIVE */
+  const selectedOperationsRepresentative = computed(() => $store.state.course.selectedOperationsRepresentative);
 
-  const salesRepresentativeFilterOptions = computed(() => {
-    const filteredCourses = courses.value.filter(course => !!course.salesRepresentative);
-    const salesRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'salesRepresentative');
+  const operationsRepresentativeFilterOptions = computed(() => {
+    const filteredCourses = courses.value.filter(course => !!course.operationsRepresentative);
+    const operationsRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'operationsRepresentative');
 
-    return [{ label: 'Tous les référents Compani', value: '' }, ...sortedUniqBy(salesRepresentatives, 'value')];
+    return [{ label: 'Tous les référents Compani', value: '' }, ...sortedUniqBy(operationsRepresentatives, 'value')];
   });
 
-  const updateSelectedSalesRepresentative = (salesRepresentativeId) => {
-    $store.dispatch('course/setSelectedSalesRepresentative', { salesRepresentativeId });
+  const updateSelectedOperationsRepresentative = (operationsRepresentativeId) => {
+    $store.dispatch('course/setSelectedOperationsRepresentative', { operationsRepresentativeId });
   };
 
   /* DATES */
@@ -139,8 +139,8 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     programFilterOptions,
     selectedCompany,
     companyFilterOptions,
-    selectedSalesRepresentative,
-    salesRepresentativeFilterOptions,
+    selectedOperationsRepresentative,
+    operationsRepresentativeFilterOptions,
     selectedStartDate,
     selectedEndDate,
     selectedType,
@@ -152,7 +152,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     updateSelectedTrainer,
     updateSelectedProgram,
     updateSelectedCompany,
-    updateSelectedSalesRepresentative,
+    updateSelectedOperationsRepresentative,
     updateSelectedStartDate,
     updateSelectedEndDate,
     updateSelectedType,
