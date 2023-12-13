@@ -26,7 +26,7 @@ import Select from '@components/form/Select';
 import { DOC_EXTENSIONS, IMAGE_EXTENSIONS } from '@data/constants';
 
 export default {
-  name: 'TrainingContractGenerationModal',
+  name: 'TrainingContractCreationModal',
   props: {
     modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },

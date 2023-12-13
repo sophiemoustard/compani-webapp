@@ -1,5 +1,5 @@
 <template>
-  <div v-if="(isVendorInterface && isRofOrVendorAdmin) || (!isVendorInterface && !!trainingContracts.length)"
+  <div v-if="isVendorInterface || !!trainingContracts.length"
     class="q-mb-xl">
     <p class="text-weight-bold">Convention de formation</p>
     <div class="q-mb-sm">
@@ -29,8 +29,7 @@
             icon="add" :disable="disableUploadButton" />
         </div>
       </template>
-      <div v-if="isIntraCourse || (!isVendorInterface && !!trainingContracts.length && !hasHoldingRole)"
-        class="q-mt-md row">
+      <div v-else class="q-mt-md row">
         <ni-file-uploader caption="Convention de formation signée" :extensions="extensions" :url="url"
           :custom-fields="customFields" :entity="trainingContracts[0]" path="file" :disable="!!course.archivedAt"
           @uploaded="uploaded" hide-image :can-delete="isVendorInterface"
@@ -43,11 +42,11 @@
   <training-contract-generation-modal v-model="trainingContractGenerationModal" :company-options="companyOptions"
     v-model:new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse"
     @submit="openTrainingContractInfosModal" @hide="resetGeneratedTrainingContractInfos" :error-message="errorMessage"
-    :validations="validations.newGeneratedTrainingContractInfos" />
+    :validations="validations.newGeneratedTrainingContractInfos" :is-inter-course="isInterCourse" />
 
   <training-contract-infos-modal v-model="trainingContractInfosModal" :course="course"
     @submit="generateTrainingContract" :loading="pdfLoading" @hide="resetGeneratedTrainingContractInfos"
-    :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-intra-course="isIntraCourse" />
+    :new-generated-training-contract-infos="newGeneratedTrainingContractInfos" :is-inter-course="isInterCourse" />
 
   <training-contract-creation-modal v-model="trainingContractCreationModal" :company-options="companyOptions"
     v-model:new-training-contract="newTrainingContract" @submit="createTrainingContract" :loading="pdfLoading"
@@ -102,7 +101,7 @@ export default {
     const { course, trainingContracts } = toRefs(props);
     const $q = useQuasar();
 
-    const { pdfLoading, isIntraCourse, isVendorInterface } = useCourses(course);
+    const { pdfLoading, isIntraCourse, isInterCourse, isVendorInterface } = useCourses(course);
 
     const newGeneratedTrainingContractInfos = ref({
       price: 0,
@@ -280,10 +279,6 @@ export default {
       }
     };
 
-    const created = async () => emit('refresh');
-
-    created();
-
     return {
       // Data
       newGeneratedTrainingContractInfos,
@@ -301,6 +296,7 @@ export default {
       customFields,
       companyOptions,
       isIntraCourse,
+      isInterCourse,
       isVendorInterface,
       areAllTrainingContractsUploaded,
       disableGenerationButton,
