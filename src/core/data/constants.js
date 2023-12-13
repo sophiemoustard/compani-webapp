@@ -12,9 +12,11 @@ export const AUDIO_EXTENSIONS = 'audio/*';
 export const HTML_EXTENSIONS = '.html';
 
 // CUSTOMER
+export const MR = 'mr';
+export const MRS = 'mrs';
 export const CIVILITY_OPTIONS = [
-  { label: 'Monsieur', value: 'mr' },
-  { label: 'Madame', value: 'mrs' },
+  { label: 'Monsieur', value: MR },
+  { label: 'Madame', value: MRS },
   { label: 'Monsieur / Madame', value: 'couple' },
 ];
 

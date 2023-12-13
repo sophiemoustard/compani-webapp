@@ -52,7 +52,7 @@ export default {
       pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
       searchStr: '',
       trainerCreationModal: false,
-      newTrainer: { identity: { lastname: '', firstname: '' }, local: { email: '' } },
+      newTrainer: { identity: { lastname: '', firstname: '', title: '' }, local: { email: '' } },
       modalLoading: false,
       firstStep: true,
       path: { name: 'ni users trainers info', params: 'trainerId' },
@@ -60,7 +60,7 @@ export default {
   },
   validations () {
     return {
-      newTrainer: { identity: { lastname: { required } }, local: { email: { required, email } } },
+      newTrainer: { identity: { lastname: { required }, title: { required } }, local: { email: { required, email } } },
     };
   },
   computed: {
@@ -103,7 +103,7 @@ export default {
     },
     resetCreationModal () {
       this.firstStep = true;
-      this.newTrainer = { identity: { lastname: '', firstname: '' }, local: { email: '' } };
+      this.newTrainer = { identity: { lastname: '', firstname: '', title: '' }, local: { email: '' } };
       this.v$.newTrainer.$reset();
     },
     updateSearch (value) {
