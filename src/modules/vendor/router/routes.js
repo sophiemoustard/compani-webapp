@@ -86,7 +86,18 @@ const routes = [
         path: 'ni/users/trainers/:trainerId',
         name: 'ni users trainers info',
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
-        props: true,
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (['ni management blended courses', 'ni management blended courses info'].includes(from.name)) {
+              to.query.defaultTab = 'contracts';
+            }
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        props: route => ({ ...route.query, ...route.params }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'users',
