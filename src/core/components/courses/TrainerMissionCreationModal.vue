@@ -65,8 +65,11 @@ export default {
       .map(c => ({ value: c._id, label: composeCourseName(c, false) })));
 
     const hide = () => emit('hide');
+
     const input = event => emit('update:model-value', event);
+
     const submit = () => emit('submit');
+
     const update = async (event, path) => {
       if (path === 'program') await hide();
       emit('update:trainer-mission', set({ ...trainerMission.value }, path, event));

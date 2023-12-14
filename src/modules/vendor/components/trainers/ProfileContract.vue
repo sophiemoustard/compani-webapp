@@ -1,7 +1,7 @@
 <template>
   <div>
-    <ni-button class="bg-primary" color="white" icon="add" label="Créer un ordre de mission"
-      @click="missionCreationModal = true" :disable="missionCreationLoading || !courseList.length" />
+    <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un ordre de mission" color="primary"
+      @click="missionCreationModal = true" :loading="missionCreationLoading" :disable="!courseList.length" />
 
     <ni-trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
       @submit="createTrainerMission" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
@@ -13,14 +13,11 @@
 import { useStore } from 'vuex';
 import { computed, ref } from 'vue';
 import get from 'lodash/get';
-import omit from 'lodash/omit';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
-import CompaniDate from '@helpers/dates/companiDates';
 import Courses from '@api/Courses';
 import TrainerMissions from '@api/TrainerMissions';
-import Button from '@components/Button';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { TRAINER, BLENDED, OPERATIONS } from '@data/constants';
 import TrainerMissionCreationModal from '../../../../core/components/courses/TrainerMissionCreationModal';
@@ -29,7 +26,6 @@ export default {
   name: 'ProfileContract',
   components: {
     'ni-trainer-mission-creation-modal': TrainerMissionCreationModal,
-    'ni-button': Button,
   },
   setup () {
     const $store = useStore();
@@ -77,7 +73,6 @@ export default {
       form.append('file', file);
       form.append('trainer', trainer.value._id);
       form.append('fee', fee);
-      form.append('date', CompaniDate().toISO());
 
       return form;
     };
@@ -91,17 +86,16 @@ export default {
         await TrainerMissions.create(formatPayload());
 
         missionCreationModal.value = false;
-        NotifyPositive('Ordre de mission ajoutée.');
+        NotifyPositive('Ordre de mission ajouté.');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) {
-          return NotifyNegative('Il existe déjà un ordre de mission pour une des formations.');
-        }
+        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de l\'ordre de mission.');
       } finally {
         missionCreationLoading.value = false;
       }
     };
+
     const resetMissionCreationModal = () => {
       newTrainerMission.value = { program: '', courses: [], fee: 0, file: '' };
       v$.value.newTrainerMission.$reset();
@@ -125,8 +119,6 @@ export default {
       // Methods
       createTrainerMission,
       resetMissionCreationModal,
-      get,
-      omit,
     };
   },
 };
