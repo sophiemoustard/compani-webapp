@@ -25,7 +25,7 @@ export default {
     SET_SELECTED_TRAINER: (state, data) => { state.selectedTrainer = data; },
     SET_SELECTED_PROGRAM: (state, data) => { state.selectedProgram = data; },
     SET_SELECTED_COMPANY: (state, data) => { state.selectedCompany = data; },
-    SET_SELECTED_SALES_REPRESENTATIVE: (state, data) => { state.selectedOperationsRepresentative = data; },
+    SET_SELECTED_OPERATIONS_REPRESENTATIVE: (state, data) => { state.selectedOperationsRepresentative = data; },
     SET_SELECTED_START_DATE: (state, data) => { state.selectedStartDate = data; },
     SET_SELECTED_END_DATE: (state, data) => { state.selectedEndDate = data; },
     SET_SELECTED_TYPE: (state, data) => { state.selectedType = data; },
@@ -62,7 +62,7 @@ export default {
     setSelectedProgram: ({ commit }, params) => { commit('SET_SELECTED_PROGRAM', params.programId); },
     setSelectedCompany: ({ commit }, params) => { commit('SET_SELECTED_COMPANY', params.companyId); },
     setSelectedOperationsRepresentative: ({ commit }, params) => {
-      commit('SET_SELECTED_SALES_REPRESENTATIVE', params.operationsRepresentativeId);
+      commit('SET_SELECTED_OPERATIONS_REPRESENTATIVE', params.operationsRepresentativeId);
     },
     setSelectedStartDate: ({ commit }, params) => { commit('SET_SELECTED_START_DATE', params.startDate); },
     setSelectedEndDate: ({ commit }, params) => { commit('SET_SELECTED_END_DATE', params.endDate); },
@@ -74,7 +74,7 @@ export default {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
       commit('SET_SELECTED_COMPANY', '');
-      commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
+      commit('SET_SELECTED_OPERATIONS_REPRESENTATIVE', '');
       commit('SET_SELECTED_START_DATE', '');
       commit('SET_SELECTED_END_DATE', '');
       commit('SET_SELECTED_TYPE', '');

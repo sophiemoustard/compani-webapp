@@ -13,7 +13,7 @@
         <a class="clickable-name cursor-pointer" @click="goToContactProfile">la page dédiée</a> .
       </div>
       <div class="interlocutor-container">
-        <interlocutor-cell :interlocutor="course.operationsRepresentative" caption="Chargé(e) des opérations"
+        <interlocutor-cell :interlocutor="course.operationsRepresentative" caption="Chargé des opérations"
           :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
           @open-modal="openOperationsRepresentativeModal" />
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant" :contact="course.contact"
@@ -220,7 +220,7 @@ export default {
     const urlIos = ref('https://apple.co/33kKzcU');
     const tmpInterlocutor = ref({ _id: '', isContact: false });
     const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0 });
-    const operationsRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'chargé(e) des opérations' });
+    const operationsRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'chargé des opérations' });
     const operationsRepresentativeEditionModal = ref(false);
     const interlocutorModalLoading = ref(false);
     const interlocutorLabel = ref({ action: '', interlocutor: '' });
@@ -230,7 +230,7 @@ export default {
     const contactModalLoading = ref(false);
     const contactAdditionModal = ref(false);
     const tmpContactId = ref('');
-    const SALES_REPRESENTATIVE = ref('operationsRepresentative');
+    const OPERATIONS_REPRESENTATIVE = ref('operationsRepresentative');
     const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
@@ -631,7 +631,7 @@ export default {
         await Courses.update(profileId.value, payload);
 
         switch (role) {
-          case SALES_REPRESENTATIVE.value: operationsRepresentativeEditionModal.value = false;
+          case OPERATIONS_REPRESENTATIVE.value: operationsRepresentativeEditionModal.value = false;
             break;
           case TRAINER: trainerModal.value = false;
             break;
