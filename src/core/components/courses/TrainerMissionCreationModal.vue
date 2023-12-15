@@ -6,12 +6,9 @@
     <ni-select in-modal :model-value="trainerMission.program" caption="Programme" :options="programOptions"
       required-field @update:model-value="update($event, 'program')" />
     <div v-if="trainerMission.program">
-      <div v-for="(companies, index) of companiesList" :key="index">
-        <div class="text-copper-500">{{ companiesName[companies] }}</div>
-        <ni-option-group in-modal :model-value="trainerMission.courses" :options="coursesOptions[companies]"
-          type="checkbox" @update:model-value="update($event, 'courses')" :error="validations.courses.$error"
-          caption="Formations" required-field />
-      </div>
+      <ni-multiple-option-group in-modal :model-value="trainerMission.courses" :options-groups="coursesOptions"
+        type="checkbox" @update:model-value="update($event, 'courses')" :error="validations.courses.$error"
+         :group-titles="companiesName" caption="Formations" required-field />
       <ni-input in-modal caption="Frais de formateur" :error="validations.fee.$error" type="number" suffix="€"
         :model-value="trainerMission.fee" @blur="validations.fee.$touch" required-field
         @update:model-value="update($event, 'fee')" error-message="Valeur non valide" />
@@ -33,7 +30,7 @@ import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
-import OptionGroup from '@components/form/OptionGroup';
+import MultipleOptionGroup from '@components/form/MultipleOptionGroup';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import { composeCourseName } from '@helpers/courses';
@@ -41,7 +38,7 @@ import { formatName, sortStrings } from '@helpers/utils';
 import { DOC_EXTENSIONS, IMAGE_EXTENSIONS } from '@data/constants';
 
 export default {
-  name: 'TrainierMissionCreationModal',
+  name: 'TrainerMissionCreationModal',
   props: {
     modelValue: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -54,7 +51,7 @@ export default {
     'ni-button': Button,
     'ni-input': Input,
     'ni-select': Select,
-    'ni-option-group': OptionGroup,
+    'ni-multiple-option-group': MultipleOptionGroup,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:trainer-mission'],
   setup (props, { emit }) {
@@ -75,24 +72,12 @@ export default {
 
     const companiesList = computed(() => Object.keys(coursesGroupedByCompany.value));
 
-    const companiesName = computed(() => {
-      const names = {};
-      for (const companies of Object.keys(coursesGroupedByCompany.value)) {
-        names[companies] = formatName(coursesGroupedByCompany.value[companies][0].companies);
-      }
+    const companiesName = computed(() => Object.keys(coursesGroupedByCompany.value)
+      .map(companies => ({ label: formatName(coursesGroupedByCompany.value[companies][0].companies) })));
 
-      return names;
-    });
-
-    const coursesOptions = computed(() => {
-      const options = {};
-      for (const companies of Object.keys(coursesGroupedByCompany.value)) {
-        options[companies] = coursesGroupedByCompany.value[companies]
-          .map(c => ({ value: c._id, label: composeCourseName(c, false) }));
-      }
-
-      return options;
-    });
+    const coursesOptions = computed(() => Object.keys(coursesGroupedByCompany.value)
+      .map(companies => coursesGroupedByCompany.value[companies]
+        .map(c => ({ value: c._id, label: composeCourseName(c, false) }))));
 
     const hide = () => emit('hide');
 
