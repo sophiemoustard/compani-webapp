@@ -89,17 +89,17 @@
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor('operationsRepresentative')" :validations="v$.tmpInterlocutor"
+      @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetOperationsRepresentativeEdition"
       :interlocutors-options="operationsRepresentativeOptions" :show-contact="canUpdateInterlocutor"
       :label="operationsRepresentativeLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
-      @submit="updateInterlocutor('trainer')" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
+      @submit="updateInterlocutor(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor('companyRepresentative')" :validations="v$.tmpInterlocutor"
+      @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
@@ -216,8 +216,6 @@ export default {
     const smsHistoryList = ref([]);
     const smsLoading = ref(false);
     const smsHistoriesModal = ref(false);
-    const urlAndroid = ref('https://bit.ly/3en5OkF');
-    const urlIos = ref('https://apple.co/33kKzcU');
     const tmpInterlocutor = ref({ _id: '', isContact: false });
     const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0 });
     const operationsRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'chargé des opérations' });
@@ -230,8 +228,6 @@ export default {
     const contactModalLoading = ref(false);
     const contactAdditionModal = ref(false);
     const tmpContactId = ref('');
-    const OPERATIONS_REPRESENTATIVE = ref('operationsRepresentative');
-    const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
     const trainingContracts = ref([]);
@@ -243,6 +239,10 @@ export default {
     const canUpdateTrainees = ref(false);
     const canUpdateSMS = ref(false);
     const canReadHistory = ref(false);
+    const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
+    const COMPANY_REPRESENTATIVE = 'companyRepresentative';
+    const urlAndroid = 'https://bit.ly/3en5OkF';
+    const urlIos = 'https://apple.co/33kKzcU';
 
     const course = computed(() => $store.state.course.course);
 
@@ -546,7 +546,7 @@ export default {
       newSms.value.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `La première session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
       + 'de cette formation, veuillez télécharger notre application Compani :\n'
-      + `Pour android : ${urlAndroid.value} \nPour iPhone : ${urlIos.value}\n`
+      + `Pour android : ${urlAndroid} \nPour iPhone : ${urlIos}\n`
       + 'Bonne formation,\nCompani';
     };
 
@@ -561,7 +561,7 @@ export default {
       newSms.value.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `Votre prochaine session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
       + 'de cette formation, veuillez télécharger notre application Compani :\n'
-      + `Pour android : ${urlAndroid.value} \nPour iPhone : ${urlIos.value} `
+      + `Pour android : ${urlAndroid} \nPour iPhone : ${urlIos} `
       + '\nBonne formation,\nCompani';
     };
 
@@ -631,11 +631,14 @@ export default {
         await Courses.update(profileId.value, payload);
 
         switch (role) {
-          case OPERATIONS_REPRESENTATIVE.value: operationsRepresentativeEditionModal.value = false;
+          case OPERATIONS_REPRESENTATIVE:
+            operationsRepresentativeEditionModal.value = false;
             break;
-          case TRAINER: trainerModal.value = false;
+          case TRAINER:
+            trainerModal.value = false;
             break;
-          case COMPANY_REPRESENTATIVE.value: companyRepresentativeModal.value = false;
+          case COMPANY_REPRESENTATIVE:
+            companyRepresentativeModal.value = false;
             break;
         }
         await refreshCourse();
@@ -830,6 +833,9 @@ export default {
       canUpdateSMS,
       canReadHistory,
       canGetTrainingContracts,
+      COMPANY_REPRESENTATIVE,
+      OPERATIONS_REPRESENTATIVE,
+      TRAINER,
       // Computed
       course,
       v$,
