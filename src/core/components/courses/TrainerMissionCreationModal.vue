@@ -6,9 +6,9 @@
     <ni-select in-modal :model-value="trainerMission.program" caption="Programme" :options="programOptions"
       required-field @update:model-value="update($event, 'program')" />
     <div v-if="trainerMission.program">
-      <ni-multiple-option-group in-modal :model-value="trainerMission.courses" :options-groups="coursesOptions"
+      <ni-option-group in-modal :model-value="trainerMission.courses" :options="coursesOptions"
         type="checkbox" @update:model-value="update($event, 'courses')" :error="validations.courses.$error"
-         :group-titles="companiesName" caption="Formations" required-field />
+        caption="Formations" required-field />
       <ni-input in-modal caption="Frais de formateur" :error="validations.fee.$error" type="number" suffix="€"
         :model-value="trainerMission.fee" @blur="validations.fee.$touch" required-field
         @update:model-value="update($event, 'fee')" error-message="Valeur non valide" />
@@ -30,12 +30,10 @@ import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
-import MultipleOptionGroup from '@components/form/MultipleOptionGroup';
+import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import { composeCourseName } from '@helpers/courses';
-import { formatName, sortStrings } from '@helpers/utils';
-import { DOC_EXTENSIONS, IMAGE_EXTENSIONS } from '@data/constants';
+import { DOC_EXTENSIONS, IMAGE_EXTENSIONS, INTER_B2B, INTRA } from '@data/constants';
 
 export default {
   name: 'TrainerMissionCreationModal',
@@ -51,7 +49,7 @@ export default {
     'ni-button': Button,
     'ni-input': Input,
     'ni-select': Select,
-    'ni-multiple-option-group': MultipleOptionGroup,
+    'ni-option-group': OptionGroup,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:trainer-mission'],
   setup (props, { emit }) {
@@ -62,22 +60,15 @@ export default {
     const programOptions = computed(() => uniqBy(courses.value.map(c => c.subProgram.program), '_id')
       .map(p => ({ label: p.name, value: p._id })));
 
-    const coursesGroupedByCompany = computed(() => {
-      const sortedCourses = coursesGroupedByProgram.value[trainerMission.value.program]
-        .map(course => ({ ...course, companies: course.companies.sort((a, b) => sortStrings(a.name, b.name)) }))
-        .sort((a, b) => sortStrings(formatName(a.companies), formatName(b.companies)));
+    const coursesOptions = computed(() => coursesGroupedByProgram.value[trainerMission.value.program]
+      .map((c) => {
+        let label = '';
+        if (c.type === INTRA)label = `${c.companies[0].name}${c.misc ? ` - ${c.misc}` : ''}`;
+        else if (c.type === INTER_B2B) label = `INTER${c.misc ? ` - ${c.misc}` : ''} `;
+        else label = `${c.holding.name}${c.misc ? ` - ${c.misc}` : ''}`;
 
-      return groupBy(sortedCourses, course => course.companies.map(c => c._id));
-    });
-
-    const companiesList = computed(() => Object.keys(coursesGroupedByCompany.value));
-
-    const companiesName = computed(() => Object.keys(coursesGroupedByCompany.value)
-      .map(companies => ({ label: formatName(coursesGroupedByCompany.value[companies][0].companies) })));
-
-    const coursesOptions = computed(() => Object.keys(coursesGroupedByCompany.value)
-      .map(companies => coursesGroupedByCompany.value[companies]
-        .map(c => ({ value: c._id, label: composeCourseName(c, false) }))));
+        return { value: c._id, label };
+      }));
 
     const hide = () => emit('hide');
 
@@ -97,8 +88,6 @@ export default {
       // Computed
       programOptions,
       coursesGroupedByProgram,
-      companiesList,
-      companiesName,
       coursesOptions,
       // Methods
       hide,
