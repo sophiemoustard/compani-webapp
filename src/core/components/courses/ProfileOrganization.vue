@@ -13,9 +13,9 @@
         <a class="clickable-name cursor-pointer" @click="goToContactProfile">la page dédiée</a> .
       </div>
       <div class="interlocutor-container">
-        <interlocutor-cell :interlocutor="course.salesRepresentative" caption="Référent Compani"
+        <interlocutor-cell :interlocutor="course.operationsRepresentative" caption="Chargé des opérations"
           :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
-          @open-modal="openSalesRepresentativeModal" />
+          @open-modal="openOperationsRepresentativeModal" />
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant" :contact="course.contact"
           :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
           @open-modal="openTrainerModal" />
@@ -88,17 +88,18 @@
     <sms-history-modal v-model="smsHistoriesModal" :sms-history-list="smsHistoryList" :send-sms="sendSms"
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
-    <interlocutor-modal v-model="salesRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor('salesRepresentative')" :validations="v$.tmpInterlocutor"
-      :loading="interlocutorModalLoading" @hide="resetSalesRepresentativeEdition" :label="salesRepresentativeLabel"
-      :interlocutors-options="salesRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
+    <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
+      @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetOperationsRepresentativeEdition"
+      :interlocutors-options="operationsRepresentativeOptions" :show-contact="canUpdateInterlocutor"
+      :label="operationsRepresentativeLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
-      @submit="updateInterlocutor('trainer')" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
+      @submit="updateInterlocutor(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor('companyRepresentative')" :validations="v$.tmpInterlocutor"
+      @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
@@ -198,7 +199,7 @@ export default {
     const $router = useRouter();
 
     const trainerOptions = ref([]);
-    const salesRepresentativeOptions = ref([]);
+    const operationsRepresentativeOptions = ref([]);
     const companyRepresentativeOptions = ref([]);
     const courseLoading = ref(false);
     const tmpInput = ref('');
@@ -215,12 +216,10 @@ export default {
     const smsHistoryList = ref([]);
     const smsLoading = ref(false);
     const smsHistoriesModal = ref(false);
-    const urlAndroid = ref('https://bit.ly/3en5OkF');
-    const urlIos = ref('https://apple.co/33kKzcU');
     const tmpInterlocutor = ref({ _id: '', isContact: false });
     const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0 });
-    const salesRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'référent Compani' });
-    const salesRepresentativeEditionModal = ref(false);
+    const operationsRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'chargé des opérations' });
+    const operationsRepresentativeEditionModal = ref(false);
     const interlocutorModalLoading = ref(false);
     const interlocutorLabel = ref({ action: '', interlocutor: '' });
     const trainerModal = ref(false);
@@ -229,19 +228,21 @@ export default {
     const contactModalLoading = ref(false);
     const contactAdditionModal = ref(false);
     const tmpContactId = ref('');
-    const SALES_REPRESENTATIVE = ref('salesRepresentative');
-    const COMPANY_REPRESENTATIVE = ref('companyRepresentative');
     const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
     const canUpdateCompanyRepresentative = ref(false);
     const canGetTrainingContracts = ref(false);
-    const canGetTrainersAndSalesRepresentatives = ref(false);
+    const canGetTrainersAndOperationsRepresentatives = ref(false);
     const canUpdateInterlocutor = ref(false);
     const canUpdateTrainees = ref(false);
     const canUpdateSMS = ref(false);
     const canReadHistory = ref(false);
+    const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
+    const COMPANY_REPRESENTATIVE = 'companyRepresentative';
+    const urlAndroid = 'https://bit.ly/3en5OkF';
+    const urlIos = 'https://apple.co/33kKzcU';
 
     const course = computed(() => $store.state.course.course);
 
@@ -331,7 +332,7 @@ export default {
 
     const contactOptions = computed(() => {
       const interlocutors = [
-        { interlocutor: course.value.salesRepresentative, role: 'Référent(e) Compani' },
+        { interlocutor: course.value.operationsRepresentative, role: 'Chargé(e) des opérations' },
         ...(course.value.trainer._id ? [{ interlocutor: course.value.trainer, role: 'Intervenant(e)' }] : []),
         ...(course.value.companyRepresentative._id
           ? [{ interlocutor: course.value.companyRepresentative, role: 'Chargé(e) de formation structure' }]
@@ -362,7 +363,7 @@ export default {
       canUpdateSMS.value = ability.can('update', subject('Course', course.value), 'sms');
       canReadHistory.value = ability.can('read', subject('Course', course.value), 'history');
       canGetTrainingContracts.value = ability.can('read', subject('Course', course.value), 'training_contracts');
-      canGetTrainersAndSalesRepresentatives.value = ability
+      canGetTrainersAndOperationsRepresentatives.value = ability
         .can('read', subject('Course', course.value), 'interlocutor');
     };
 
@@ -478,21 +479,21 @@ export default {
       }
     };
 
-    const refreshTrainersAndSalesRepresentatives = async () => {
+    const refreshTrainersAndOperationsRepresentatives = async () => {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         trainerOptions.value = Object.freeze(
           vendorUsers.map(vu => formatInterlocutorOption(vu)).sort((a, b) => a.label.localeCompare(b.label))
         );
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
-        const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-        salesRepresentativeOptions.value = salesRepresentatives
+        const operationsRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
+        operationsRepresentativeOptions.value = operationsRepresentatives
           .map(sr => formatInterlocutorOption(sr))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         trainerOptions.value = [];
-        salesRepresentativeOptions.value = [];
+        operationsRepresentativeOptions.value = [];
       }
     };
 
@@ -545,7 +546,7 @@ export default {
       newSms.value.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `La première session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
       + 'de cette formation, veuillez télécharger notre application Compani :\n'
-      + `Pour android : ${urlAndroid.value} \nPour iPhone : ${urlIos.value}\n`
+      + `Pour android : ${urlAndroid} \nPour iPhone : ${urlIos}\n`
       + 'Bonne formation,\nCompani';
     };
 
@@ -560,7 +561,7 @@ export default {
       newSms.value.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${courseName.value}.\n`
       + `Votre prochaine session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
       + 'de cette formation, veuillez télécharger notre application Compani :\n'
-      + `Pour android : ${urlAndroid.value} \nPour iPhone : ${urlIos.value} `
+      + `Pour android : ${urlAndroid} \nPour iPhone : ${urlIos} `
       + '\nBonne formation,\nCompani';
     };
 
@@ -630,11 +631,14 @@ export default {
         await Courses.update(profileId.value, payload);
 
         switch (role) {
-          case SALES_REPRESENTATIVE.value: salesRepresentativeEditionModal.value = false;
+          case OPERATIONS_REPRESENTATIVE:
+            operationsRepresentativeEditionModal.value = false;
             break;
-          case TRAINER: trainerModal.value = false;
+          case TRAINER:
+            trainerModal.value = false;
             break;
-          case COMPANY_REPRESENTATIVE.value: companyRepresentativeModal.value = false;
+          case COMPANY_REPRESENTATIVE:
+            companyRepresentativeModal.value = false;
             break;
         }
         await refreshCourse();
@@ -670,17 +674,17 @@ export default {
       v$.value.tmpContactId.$reset();
     };
 
-    const resetSalesRepresentativeEdition = () => {
+    const resetOperationsRepresentativeEdition = () => {
       tmpInterlocutor.value = { _id: '', isContact: false };
       v$.value.tmpInterlocutor.$reset();
     };
 
-    const openSalesRepresentativeModal = () => {
+    const openOperationsRepresentativeModal = () => {
       tmpInterlocutor.value = {
-        _id: course.value.salesRepresentative._id,
-        isContact: course.value.salesRepresentative._id === course.value.contact._id,
+        _id: course.value.operationsRepresentative._id,
+        isContact: course.value.operationsRepresentative._id === course.value.contact._id,
       };
-      salesRepresentativeEditionModal.value = true;
+      operationsRepresentativeEditionModal.value = true;
     };
 
     const resetInterlocutor = () => {
@@ -782,9 +786,10 @@ export default {
       if (canUpdateSMS.value) promises.push(refreshSms());
       if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
       if (canGetTrainingContracts.value) promises.push(refreshTrainingContracts());
-      if (canGetTrainersAndSalesRepresentatives.value) promises.push(refreshTrainersAndSalesRepresentatives());
-      else {
-        salesRepresentativeOptions.value = [formatInterlocutorOption(course.value.salesRepresentative)];
+      if (canGetTrainersAndOperationsRepresentatives.value) {
+        promises.push(refreshTrainersAndOperationsRepresentatives());
+      } else {
+        operationsRepresentativeOptions.value = [formatInterlocutorOption(course.value.operationsRepresentative)];
       }
 
       await Promise.all(promises);
@@ -797,7 +802,7 @@ export default {
       INTRA,
       trainerOptions,
       potentialTrainees,
-      salesRepresentativeOptions,
+      operationsRepresentativeOptions,
       companyRepresentativeOptions,
       courseLoading,
       displayHistory,
@@ -809,8 +814,8 @@ export default {
       smsHistoryList,
       smsHistoriesModal,
       tmpInterlocutor,
-      salesRepresentativeLabel,
-      salesRepresentativeEditionModal,
+      operationsRepresentativeLabel,
+      operationsRepresentativeEditionModal,
       interlocutorModalLoading,
       interlocutorLabel,
       trainerModal,
@@ -828,6 +833,9 @@ export default {
       canUpdateSMS,
       canReadHistory,
       canGetTrainingContracts,
+      COMPANY_REPRESENTATIVE,
+      OPERATIONS_REPRESENTATIVE,
+      TRAINER,
       // Computed
       course,
       v$,
@@ -865,8 +873,8 @@ export default {
       updateInterlocutor,
       updateContact,
       resetContactAddition,
-      resetSalesRepresentativeEdition,
-      openSalesRepresentativeModal,
+      resetOperationsRepresentativeEdition,
+      openOperationsRepresentativeModal,
       resetInterlocutor,
       openTrainerModal,
       openCompanyRepresentativeModal,

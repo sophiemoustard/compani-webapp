@@ -9,8 +9,8 @@
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
         @update:model-value="updateSelectedProgram" />
-      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative" clearable
-        @update:model-value="updateSelectedSalesRepresentative" />
+      <ni-select :options="operationsRepresentativeFilterOptions" :model-value="selectedOperationsRepresentative"
+        @update:model-value="updateSelectedOperationsRepresentative" clearable />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
         error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
@@ -34,7 +34,7 @@
 
     <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :programs="programs"
       :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading" @hide="resetCreationModal"
-      @submit="createCourse" :sales-representative-options="salesRepresentativeOptions"
+      @submit="createCourse" :operations-representative-options="operationsRepresentativeOptions"
       :holding-options="holdingOptions" />
   </q-page>
 </template>
@@ -95,7 +95,7 @@ export default {
       holding: '',
       misc: '',
       type: INTRA,
-      salesRepresentative: '',
+      operationsRepresentative: '',
       estimatedStartDate: '',
       maxTrainees: '8',
       expectedBillsCount: '0',
@@ -103,7 +103,7 @@ export default {
     const companyOptions = ref([]);
     const holdingOptions = ref([]);
     const programs = ref([]);
-    const salesRepresentativeOptions = ref([]);
+    const operationsRepresentativeOptions = ref([]);
 
     const isIntraCourse = computed(() => newCourse.value.type === INTRA);
     const isIntraHoldingCourse = computed(() => newCourse.value.type === INTRA_HOLDING);
@@ -138,18 +138,18 @@ export default {
       }
     };
 
-    const refreshSalesRepresentatives = async () => {
+    const refreshOperationsRepresentatives = async () => {
       try {
-        const salesRepresentatives = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        salesRepresentativeOptions.value = formatAndSortIdentityOptions(salesRepresentatives);
+        const operationsRepresentatives = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        operationsRepresentativeOptions.value = formatAndSortIdentityOptions(operationsRepresentatives);
       } catch (e) {
         console.error(e);
-        salesRepresentativeOptions.value = [];
+        operationsRepresentativeOptions.value = [];
       }
     };
 
     const openCourseCreationModal = () => {
-      newCourse.value = { ...newCourse.value, salesRepresentative: loggedUser.value._id };
+      newCourse.value = { ...newCourse.value, operationsRepresentative: loggedUser.value._id };
       courseCreationModal.value = true;
     };
 
@@ -161,7 +161,7 @@ export default {
         holding: '',
         misc: '',
         type: INTRA,
-        salesRepresentative: '',
+        operationsRepresentative: '',
         estimatedStartDate: '',
         maxTrainees: '8',
         expectedBillsCount: '0',
@@ -200,8 +200,8 @@ export default {
       trainerFilterOptions,
       selectedProgram,
       programFilterOptions,
-      selectedSalesRepresentative,
-      salesRepresentativeFilterOptions,
+      selectedOperationsRepresentative,
+      operationsRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedType,
@@ -212,7 +212,7 @@ export default {
       updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,
-      updateSelectedSalesRepresentative,
+      updateSelectedOperationsRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
       updateSelectedType,
@@ -252,7 +252,7 @@ export default {
         program: { required },
         subProgram: { required },
         type: { required },
-        salesRepresentative: { required },
+        operationsRepresentative: { required },
         ...(isIntraCourse.value &&
           {
             maxTrainees: { required, strictPositiveNumber, integerNumber },
@@ -274,7 +274,7 @@ export default {
         refreshPrograms(),
         refreshCompanies(),
         refreshHoldings(),
-        refreshSalesRepresentatives(),
+        refreshOperationsRepresentatives(),
       ]);
     };
 
@@ -290,7 +290,7 @@ export default {
       companyOptions,
       holdingOptions,
       programs,
-      salesRepresentativeOptions,
+      operationsRepresentativeOptions,
       activeCourses,
       archivedCourses,
       archiveStatusOptions,
@@ -302,8 +302,8 @@ export default {
       trainerFilterOptions,
       selectedProgram,
       programFilterOptions,
-      selectedSalesRepresentative,
-      salesRepresentativeFilterOptions,
+      selectedOperationsRepresentative,
+      operationsRepresentativeFilterOptions,
       selectedStartDate,
       selectedEndDate,
       selectedType,
@@ -317,7 +317,7 @@ export default {
       updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,
-      updateSelectedSalesRepresentative,
+      updateSelectedOperationsRepresentative,
       updateSelectedStartDate,
       updateSelectedEndDate,
       updateSelectedType,

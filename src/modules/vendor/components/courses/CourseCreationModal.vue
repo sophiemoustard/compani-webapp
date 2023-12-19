@@ -5,9 +5,10 @@
       </template>
       <ni-option-group :model-value="newCourse.type" @update:model-value="updateType($event)" type="radio"
         caption="Type" required-field inline :error="validations.type.$error" :options="courseTypes" />
-      <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Référent Compani" required-field
-        @update:model-value="update($event, 'salesRepresentative')" :options="salesRepresentativeOptions"
-        @blur="validations.salesRepresentative.$touch" :error="validations.salesRepresentative.$error" />
+      <ni-select in-modal :model-value="newCourse.operationsRepresentative" caption="Chargé(e) des opérations"
+        @update:model-value="update($event, 'operationsRepresentative')" :options="operationsRepresentativeOptions"
+        @blur="validations.operationsRepresentative.$touch" :error="validations.operationsRepresentative.$error"
+        required-field />
       <ni-select in-modal :model-value="newCourse.program" @update:model-value="update($event, 'program')"
         @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error"
         :options="programOptions" />
@@ -58,7 +59,7 @@ export default {
     programs: { type: Array, default: () => [] },
     companyOptions: { type: Array, default: () => [] },
     holdingOptions: { type: Array, default: () => [] },
-    salesRepresentativeOptions: { type: Array, default: () => [] },
+    operationsRepresentativeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
