@@ -15,6 +15,7 @@ import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
+import ProfileContract from 'src/modules/vendor/components/trainers/ProfileContract';
 import { formatIdentity } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
 
@@ -41,6 +42,12 @@ export default {
         default: defaultTab.value === 'info',
         component: ProfileInfo,
         notification: 'profiles',
+      },
+      {
+        label: 'Contrats',
+        name: 'contracts',
+        default: defaultTab.value === 'contract',
+        component: ProfileContract,
       },
     ];
 
