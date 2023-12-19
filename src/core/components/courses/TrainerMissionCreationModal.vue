@@ -11,7 +11,7 @@
         caption="Formations" required-field />
       <ni-input in-modal caption="Frais de formateur" :error="validations.fee.$error" type="number" suffix="€"
         :model-value="trainerMission.fee" @blur="validations.fee.$touch" required-field
-        @update:model-value="update($event, 'fee')" error-message="Valeur non valide" />
+        @update:model-value="update($event, 'fee')" error-message="La valeur doit être supérieure à 0" />
       <ni-input in-modal caption="Ordre de mission" type="file" @blur="validations.file.$touch" last required-field
         :model-value="trainerMission.file" @update:model-value="update($event, 'file')"
         :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
@@ -60,15 +60,24 @@ export default {
     const programOptions = computed(() => uniqBy(courses.value.map(c => c.subProgram.program), '_id')
       .map(p => ({ label: p.name, value: p._id })));
 
-    const coursesOptions = computed(() => coursesGroupedByProgram.value[trainerMission.value.program]
-      .map((c) => {
-        let label = '';
-        if (c.type === INTRA)label = `${c.companies[0].name}${c.misc ? ` - ${c.misc}` : ''}`;
-        else if (c.type === INTER_B2B) label = `INTER${c.misc ? ` - ${c.misc}` : ''} `;
-        else label = `${c.holding.name}${c.misc ? ` - ${c.misc}` : ''}`;
+    const formatCourseLabel = (course) => {
+      let info = '';
+      switch (course.type) {
+        case INTRA:
+          info = course.companies[0].name;
+          break;
+        case INTER_B2B:
+          info = 'INTER';
+          break;
+        default:
+          info = course.holding.name;
+          break;
+      }
+      return `${info}${course.misc ? ` - ${course.misc}` : ''}`;
+    };
 
-        return { value: c._id, label };
-      }));
+    const coursesOptions = computed(() => coursesGroupedByProgram.value[trainerMission.value.program]
+      .map(c => ({ value: c._id, label: formatCourseLabel(c) })));
 
     const hide = () => emit('hide');
 
