@@ -5,7 +5,7 @@
     <div class="q-mb-sm">
       <q-card>
         <ni-responsive-table :data="trainerMissions" :columns="columns" v-model:pagination="pagination"
-          :loading="loading">
+          :loading="loading" :rows-per-page-options="[5, 10, 15, 20]" :hide-bottom="false">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
@@ -15,7 +15,7 @@
                     :disable="!props.row.file.link" />
                 </template>
                 <template v-if="col.name === 'courses'">
-                  <div v-for="course of props.row.courses" :key="course._id" class="q-mb-xs">
+                  <div v-for="course of props.row.courses" :key="course._id" class="q-mb-xs course">
                     <router-link class="clickable-name" :to="gotToCourse(course._id)">
                       {{ composeCourseName(course, true) }}
                     </router-link>
@@ -50,11 +50,10 @@ export default {
   components: {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
-
   },
   emits: ['refresh'],
   setup () {
-    const pagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
+    const pagination = ref({ rowsPerPage: 5, sortBy: 'date', descending: true });
     const columns = ref([
       {
         name: 'date',
@@ -98,3 +97,14 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.course
+  @media screen and (max-width: 767px)
+    text-align: left
+  @media screen and (max-width: 840px)
+    margin-left: 4px
+.course:first-child
+  @media screen and (max-width: 767px)
+    margin-top: 24px
+</style>

@@ -9,7 +9,7 @@
 
     <ni-trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
       @submit="createTrainerMission" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
-      :loading="missionCreationLoading" :courses="coursesWithoutMission" />
+      :loading="missionCreationLoading" :courses="coursesWithoutTrainerMission" />
   </div>
 </template>
 
@@ -57,7 +57,7 @@ export default {
       ? $store.state.main.loggedUser
       : $store.state.userProfile.userProfile));
 
-    const coursesWithoutMission = computed(() => {
+    const coursesWithoutTrainerMission = computed(() => {
       const trainerMissionsCourses = trainerMissions.value.map(tm => tm.courses.map(c => c._id)).flat();
 
       return courseList.value.filter(c => !trainerMissionsCourses.includes(c._id));
@@ -81,7 +81,7 @@ export default {
 
     const refreshTrainerMissions = async () => {
       try {
-        const missions = await await TrainerMissions.list({ trainer: trainer.value._id });
+        const missions = await TrainerMissions.list({ trainer: trainer.value._id });
         trainerMissions.value = missions;
       } catch (e) {
         console.error(e);
@@ -122,7 +122,7 @@ export default {
     };
 
     const openTrainerMissionCreationModal = () => {
-      if (!coursesWithoutMission.value.length) {
+      if (!coursesWithoutTrainerMission.value.length) {
         return NotifyWarning('Toutes les formations sont rattachées à un ordre de mission.');
       }
 
@@ -156,7 +156,7 @@ export default {
       trainerMissions,
       courseList,
       // Computed
-      coursesWithoutMission,
+      coursesWithoutTrainerMission,
       // Methods
       openTrainerMissionCreationModal,
       createTrainerMission,
