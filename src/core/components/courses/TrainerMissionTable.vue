@@ -14,12 +14,15 @@
                   <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
                     :disable="!props.row.file.link" />
                 </template>
-                <template v-if="col.name === 'courses'">
+                <template v-else-if="col.name === 'courses'">
                   <div v-for="course of props.row.courses" :key="course._id" class="q-mb-xs course">
                     <router-link class="clickable-name" :to="gotToCourse(course._id)">
                       {{ composeCourseName(course, true) }}
                     </router-link>
                   </div>
+                </template>
+                <template v-else-if="col.name === 'fee'">
+                  <div class="text-weight-bold">{{ col.value }}</div>
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -53,6 +56,7 @@ export default {
   },
   emits: ['refresh'],
   setup () {
+    const screenWidth = ref(window.innerWidth);
     const pagination = ref({ rowsPerPage: 5, sortBy: 'date', descending: true });
     const columns = ref([
       {
@@ -67,7 +71,7 @@ export default {
         label: 'Formation',
         align: 'left',
         field: 'courses',
-        style: 'width: 70%',
+        style: screenWidth.value > 767 && 'width: 70%',
       },
       {
         name: 'fee',
@@ -75,7 +79,6 @@ export default {
         align: 'center',
         field: 'fee',
         format: formatPrice,
-        classes: 'text-weight-bold',
       },
       { name: 'actions', label: '', align: 'right', field: '' },
     ]);
