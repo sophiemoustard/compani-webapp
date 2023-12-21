@@ -46,7 +46,7 @@ export default {
       {
         label: 'Contrats',
         name: 'contracts',
-        default: defaultTab.value === 'contract',
+        default: defaultTab.value === 'contracts',
         component: ProfileContract,
       },
     ];

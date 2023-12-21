@@ -1,11 +1,15 @@
 <template>
   <div>
+    <div class="clickable-name text-italic q-mb-md">
+      <router-link :to="gotToCourseDirectory()">Voir les formations du formateur</router-link>
+    </div>
+    <ni-trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading" />
     <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un ordre de mission" color="primary"
-      @click="missionCreationModal = true" :loading="missionCreationLoading" :disable="!courseList.length" />
+      @click="openTrainerMissionCreationModal" :loading="missionCreationLoading" :disable="!courseList.length" />
 
     <ni-trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
       @submit="createTrainerMission" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
-      :loading="missionCreationLoading" :courses="courseList" />
+      :loading="missionCreationLoading" :courses="coursesWithoutTrainerMission" />
   </div>
 </template>
 
@@ -20,12 +24,14 @@ import Courses from '@api/Courses';
 import TrainerMissions from '@api/TrainerMissions';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { TRAINER, BLENDED, OPERATIONS } from '@data/constants';
-import TrainerMissionCreationModal from '../../../../core/components/courses/TrainerMissionCreationModal';
+import TrainerMissionCreationModal from '@components/courses/TrainerMissionCreationModal';
+import TrainerMissionTable from '@components/courses/TrainerMissionTable';
 
 export default {
   name: 'ProfileContract',
   components: {
     'ni-trainer-mission-creation-modal': TrainerMissionCreationModal,
+    'ni-trainer-mission-table': TrainerMissionTable,
   },
   setup () {
     const $store = useStore();
@@ -34,6 +40,7 @@ export default {
     const missionCreationLoading = ref(false);
     const newTrainerMission = ref({ courses: [], fee: 0, program: '', file: '' });
     const courseList = ref([]);
+    const trainerMissions = ref([]);
 
     const rules = computed(() => ({
       newTrainerMission: {
@@ -50,6 +57,12 @@ export default {
       ? $store.state.main.loggedUser
       : $store.state.userProfile.userProfile));
 
+    const coursesWithoutTrainerMission = computed(() => {
+      const trainerMissionsCourses = trainerMissions.value.map(tm => tm.courses.map(c => c._id)).flat();
+
+      return courseList.value.filter(c => !trainerMissionsCourses.includes(c._id));
+    });
+
     const refreshCourses = async () => {
       try {
         const courses = await await Courses.list({
@@ -63,6 +76,17 @@ export default {
         console.error(e);
         courseList.value = [];
         NotifyNegative('Erreur lors de la récupération des formations.');
+      }
+    };
+
+    const refreshTrainerMissions = async () => {
+      try {
+        const missions = await TrainerMissions.list({ trainer: trainer.value._id });
+        trainerMissions.value = missions;
+      } catch (e) {
+        console.error(e);
+        trainerMissions.value = [];
+        NotifyNegative('Erreur lors de la récupération des ordres de mission.');
       }
     };
 
@@ -87,6 +111,7 @@ export default {
 
         missionCreationModal.value = false;
         NotifyPositive('Ordre de mission ajouté.');
+        await refreshTrainerMissions();
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
@@ -96,13 +121,27 @@ export default {
       }
     };
 
+    const openTrainerMissionCreationModal = () => {
+      if (!coursesWithoutTrainerMission.value.length) {
+        return NotifyWarning('Toutes les formations sont rattachées à un ordre de mission.');
+      }
+
+      missionCreationModal.value = true;
+    };
+
     const resetMissionCreationModal = () => {
       newTrainerMission.value = { program: '', courses: [], fee: 0, file: '' };
       v$.value.newTrainerMission.$reset();
     };
 
+    const gotToCourseDirectory = () => {
+      $store.dispatch('course/setSelectedTrainer', { trainerId: trainer.value._id });
+
+      return { name: 'ni management blended courses' };
+    };
+
     const created = async () => {
-      await Promise.all([refreshCourses()]);
+      await Promise.all([refreshCourses(), refreshTrainerMissions()]);
     };
 
     created();
@@ -114,11 +153,15 @@ export default {
       missionCreationModal,
       missionCreationLoading,
       newTrainerMission,
-      // Computed
+      trainerMissions,
       courseList,
+      // Computed
+      coursesWithoutTrainerMission,
       // Methods
+      openTrainerMissionCreationModal,
       createTrainerMission,
       resetMissionCreationModal,
+      gotToCourseDirectory,
     };
   },
 };
