@@ -33,6 +33,8 @@
         @blur="validations.expectedBillsCount.$touch" />
       <ni-input in-modal :model-value="newCourse.misc" @update:model-value="update($event.trim(), 'misc')"
         caption="Informations Complémentaires" />
+      <q-checkbox in-modal :model-value="newCourse.hasCertifyingTest" label="La formation est certifiante" dense
+        @update:model-value="update($event, 'hasCertifyingTest')" class="q-mb-lg" />
       <template #footer>
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="loading"
           icon-right="add" @click="submit" />

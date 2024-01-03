@@ -7,6 +7,10 @@
         <ni-input caption="Informations complémentaires" v-model.trim="tmpCourse.misc"
           @blur="updateCourse('misc')" :disable="isArchived" />
       </div>
+      <div v-if="canUpdateCertifyingTest">
+        <q-checkbox v-model="tmpCourse.hasCertifyingTest" label="La formation est certifiante"
+          @update:model-value="updateCourse('hasCertifyingTest')" class="q-mb-md" />
+      </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">
         Des questions sur votre parcours de formation ou sur la facturation ? Retrouvez vos contacts Compani sur
@@ -217,7 +221,7 @@ export default {
     const smsLoading = ref(false);
     const smsHistoriesModal = ref(false);
     const tmpInterlocutor = ref({ _id: '', isContact: false });
-    const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0 });
+    const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0, hasCertifyingTest: false });
     const operationsRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'chargé des opérations' });
     const operationsRepresentativeEditionModal = ref(false);
     const interlocutorModalLoading = ref(false);
@@ -239,6 +243,7 @@ export default {
     const canUpdateTrainees = ref(false);
     const canUpdateSMS = ref(false);
     const canReadHistory = ref(false);
+    const canUpdateCertifyingTest = ref(false);
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
     const urlAndroid = 'https://bit.ly/3en5OkF';
@@ -342,7 +347,7 @@ export default {
     });
 
     watch(course, async (newValue, oldValue) => {
-      tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees']);
+      tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees', 'hasCertifyingTest']);
 
       if (!oldValue) return;
 
@@ -365,6 +370,7 @@ export default {
       canGetTrainingContracts.value = ability.can('read', subject('Course', course.value), 'training_contracts');
       canGetTrainersAndOperationsRepresentatives.value = ability
         .can('read', subject('Course', course.value), 'interlocutor');
+      canUpdateCertifyingTest.value = ability.can('update', subject('Course', course.value), 'certifying_test');
     };
 
     const toggleHistory = async () => {
@@ -833,6 +839,7 @@ export default {
       canUpdateSMS,
       canReadHistory,
       canGetTrainingContracts,
+      canUpdateCertifyingTest,
       COMPANY_REPRESENTATIVE,
       OPERATIONS_REPRESENTATIVE,
       TRAINER,
