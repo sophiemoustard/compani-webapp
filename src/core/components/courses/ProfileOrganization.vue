@@ -6,10 +6,8 @@
       <div v-if="isIntraOrIntraHoldingOrVendor" class="row gutter-profile">
         <ni-input caption="Informations complémentaires" v-model.trim="tmpCourse.misc"
           @blur="updateCourse('misc')" :disable="isArchived" />
-      </div>
-      <div v-if="canUpdateCertifyingTest">
-        <q-checkbox v-model="tmpCourse.hasCertifyingTest" label="La formation est certifiante"
-          @update:model-value="updateCourse('hasCertifyingTest')" class="q-mb-md" />
+        <q-checkbox v-if="canUpdateCertifyingTest" v-model="tmpCourse.hasCertifyingTest" class="certifying-checkbox"
+          label="La formation est certifiante" @update:model-value="updateCourse('hasCertifyingTest')" />
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">
@@ -903,4 +901,7 @@ export default {
   flex-direction: column
 .button-history
   align-self: flex-end
+.certifying-checkbox
+  @media screen and (max-width: 767px)
+    padding: 0px 0px 16px 16px
 </style>
