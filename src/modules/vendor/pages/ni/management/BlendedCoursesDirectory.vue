@@ -99,6 +99,7 @@ export default {
       estimatedStartDate: '',
       maxTrainees: '8',
       expectedBillsCount: '0',
+      hasCertifyingTest: false,
     });
     const companyOptions = ref([]);
     const holdingOptions = ref([]);
@@ -165,6 +166,7 @@ export default {
         estimatedStartDate: '',
         maxTrainees: '8',
         expectedBillsCount: '0',
+        hasCertifyingTest: false,
       };
     };
 
