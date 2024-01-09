@@ -46,6 +46,8 @@
           :disable="loading" @click="openCompanyAdditionModal" />
         <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
           :disable="loading" @click="openTraineeCreationModal" />
+        <ni-button v-if="course.hasCertifyingTest && canUpdateCertifyingTest" color="primary" icon="edit"
+          label="Modifier les certifications" :disable="loading" @click="openCertificationsUpdateModal" />
       </div>
     </div>
 
@@ -65,6 +67,10 @@
     <company-addition-modal v-model="companyAdditionModal" v-model:selected-company="selectedCompany"
       @submit="addCompany" :validations="companyValidation.selectedCompany" :loading="companyModalLoading"
       @hide="resetCompanyAdditionModal" :company-options="selectCompanyOptions" />
+
+    <certifications-update-modal v-model="certificationsUpdateModal" @hide="resetCertificationUpdateModal"
+      v-model:certified-trainees="editedCertifications" :trainee-options="traineeOptions"
+      :loading="certificationUpdateLoading" @submit="updateCertifications" />
   </div>
 </template>
 
@@ -79,7 +85,7 @@ import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import { TRAINER, INTRA } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
-import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortUserOptions, formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -88,6 +94,7 @@ import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeTable from '@components/courses/TraineeTable';
 import ExpandingTable from '@components/table/ExpandingTable';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
+import CertificationsUpdateModal from '@components/courses/CertificationsUpdateModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useLearnersCreation } from '@composables/learnersCreation';
 import { useCourses } from '@composables/courses';
@@ -109,6 +116,7 @@ export default {
     'learner-creation-modal': LearnerCreationModal,
     'ni-expanding-table': ExpandingTable,
     'company-addition-modal': CompanyAdditionModal,
+    'certifications-update-modal': CertificationsUpdateModal,
   },
   emits: ['refresh', 'update', 'update:maxTrainees'],
   setup (props, { emit }) {
@@ -122,6 +130,12 @@ export default {
     const canAccessCompany = ref(false);
     const canAccessEveryTrainee = ref(false);
     const canUpdateCertifyingTest = ref(false);
+
+    const editedCertifications = ref([]);
+    const certificationsUpdateModal = ref(false);
+    const certificationUpdateLoading = ref(false);
+
+    const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -239,6 +253,7 @@ export default {
       };
       traineeRegistrationValidation.value.newTraineeRegistration.$reset();
     };
+
     const addTrainee = async () => {
       try {
         traineeModalLoading.value = true;
@@ -276,6 +291,32 @@ export default {
     const openLearnerCreationModal = async () => {
       traineeAdditionModal.value = false;
       learnerCreationModal.value = true;
+    };
+
+    const openCertificationsUpdateModal = () => {
+      editedCertifications.value = course.value.certifiedTrainees;
+      certificationsUpdateModal.value = true;
+    };
+
+    const resetCertificationUpdateModal = () => {
+      editedCertifications.value = [];
+    };
+
+    const updateCertifications = async () => {
+      try {
+        certificationUpdateLoading.value = true;
+
+        await Courses.update(course.value._id, { certifiedTrainees: editedCertifications.value });
+
+        certificationsUpdateModal.value = false;
+        refresh();
+        NotifyPositive('Certifications modifiées.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des certifications.');
+      } finally {
+        certificationUpdateLoading.value = false;
+      }
     };
 
     const updateMaxTrainees = () => emit('update');
@@ -317,6 +358,9 @@ export default {
       canAccessCompany,
       canUpdateTrainees,
       canUpdateCertifyingTest,
+      editedCertifications,
+      certificationsUpdateModal,
+      certificationUpdateLoading,
       // Validations
       learnerValidation,
       traineeRegistrationValidation,
@@ -337,6 +381,7 @@ export default {
       hasLinkedCompanies,
       traineesCompanyOptions,
       displayCompanyNames,
+      traineeOptions,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -353,6 +398,9 @@ export default {
       addCompany,
       resetCompanyAdditionModal,
       validateCompanyDeletion,
+      openCertificationsUpdateModal,
+      resetCertificationUpdateModal,
+      updateCertifications,
     };
   },
 };
