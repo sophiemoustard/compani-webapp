@@ -77,7 +77,11 @@ export default {
     const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
-    const traineeColumns = ref([
+    const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
+
+    const course = computed(() => $store.state.course.course);
+
+    const traineeColumns = computed(() => [
       {
         name: 'firstname',
         label: 'Prénom',
@@ -106,9 +110,17 @@ export default {
         field: 'loginCode',
         align: 'center',
       },
+      ...course.value.hasCertifyingTest
+        ? [{
+          name: 'certification',
+          label: 'Certification',
+          field: row => get(course.value, 'certifiedTrainees', []).includes(row._id),
+          format: value => (value ? 'Oui' : 'Non'),
+          align: 'center',
+        }]
+        : [],
       { name: 'actions', label: '', align: 'right', field: '' },
     ]);
-    const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
 
     const traineeRules = {
       editedTrainee: {
@@ -127,10 +139,8 @@ export default {
       return ability.can('update', subject('Course', course.value), 'trainees');
     });
 
-    const course = computed(() => $store.state.course.course);
-
     const traineeVisibleColumns = computed(() => {
-      const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos'];
+      const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos', 'certification'];
 
       return canUpdateTrainees.value ? [...col, 'actions'] : col;
     });
