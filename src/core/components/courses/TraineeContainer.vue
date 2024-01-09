@@ -53,7 +53,8 @@
       @submit="addTrainee" :validations="traineeRegistrationValidation.newTraineeRegistration"
       :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :users-options="traineesOptions"
       @open-user-creation-modal="openLearnerCreationModal" :users-company-options="traineesCompanyOptions"
-      :display-company-select="!isIntraCourse" display-no-options-slot label="Stagiaire" />
+      :display-company-select="!isIntraCourse" display-no-options-slot label="Stagiaire"
+      :display-is-certified="course.hasCertifyingTest && canUpdateCertifyingTest" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -120,6 +121,7 @@ export default {
     const canUpdateCompanies = ref(false);
     const canAccessCompany = ref(false);
     const canAccessEveryTrainee = ref(false);
+    const canUpdateCertifyingTest = ref(false);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -226,10 +228,15 @@ export default {
       canUpdateCompanies.value = ability.can('update', subject('Course', course.value), 'companies');
       canAccessCompany.value = ability.can('read', subject('Course', course.value), 'companies');
       canAccessEveryTrainee.value = ability.can('read', subject('Course', course.value), 'all_trainees');
+      canUpdateCertifyingTest.value = ability.can('update', subject('Course', course.value), 'certifying_test');
     };
 
     const resetTraineeAdditionForm = () => {
-      newTraineeRegistration.value = {};
+      newTraineeRegistration.value = {
+        user: '',
+        ...(!isIntraCourse.value && { company: '' }),
+        isCertified: false,
+      };
       traineeRegistrationValidation.value.newTraineeRegistration.$reset();
     };
     const addTrainee = async () => {
@@ -243,6 +250,7 @@ export default {
         const payload = {
           trainee: newTraineeRegistration.value.user,
           ...(!isIntraCourse.value && { company: newTraineeRegistration.value.company }),
+          ...(newTraineeRegistration.value.isCertified && { isCertified: true }),
         };
         await Courses.addTrainee(course.value._id, payload);
 
@@ -308,6 +316,7 @@ export default {
       canUpdateCompanies,
       canAccessCompany,
       canUpdateTrainees,
+      canUpdateCertifyingTest,
       // Validations
       learnerValidation,
       traineeRegistrationValidation,

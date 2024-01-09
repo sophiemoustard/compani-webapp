@@ -176,7 +176,10 @@ export default {
         if (v$.value.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         modalLoading.value = true;
-        await Courses.create(pickBy(omit(newCourse.value, 'program')));
+        await Courses.create({
+          ...pickBy(omit(newCourse.value, 'program')),
+          hasCertifyingTest: newCourse.value.hasCertifyingTest,
+        });
 
         courseCreationModal.value = false;
         NotifyPositive('Formation créée.');

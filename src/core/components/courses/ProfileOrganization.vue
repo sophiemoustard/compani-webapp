@@ -7,7 +7,8 @@
         <ni-input caption="Informations complémentaires" v-model.trim="tmpCourse.misc"
           @blur="updateCourse('misc')" :disable="isArchived" />
         <q-checkbox v-if="canUpdateCertifyingTest" v-model="tmpCourse.hasCertifyingTest" class="certifying-checkbox"
-          label="La formation est certifiante" @update:model-value="updateCourse('hasCertifyingTest')" />
+          label="La formation est certifiante" @update:model-value="updateCourse('hasCertifyingTest')"
+          :disable="!!get(course, 'certifiedTrainees.length')" />
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">

@@ -51,7 +51,7 @@ export const useLearnersCreation = (
   const tableLoading = ref(false);
   const learnerAlreadyExists = ref(false);
   const traineeAdditionModal = ref(false);
-  const newTraineeRegistration = ref({ user: '', ...(isInterCourse && { company: '' }) });
+  const newTraineeRegistration = ref({ user: '', ...(isInterCourse && { company: '' }), isCertified: false });
   const disableUserInfoEdition = ref(false);
 
   const $store = useStore();
@@ -260,7 +260,7 @@ export const useLearnersCreation = (
     try {
       learnerCreationModalLoading.value = true;
       if (learnerAlreadyExists.value) newTraineeRegistration.value = { user: await updateLearner() };
-      else newTraineeRegistration.value = { user: await createLearner() };
+      else newTraineeRegistration.value = { user: await createLearner(), isCertified: false };
 
       if (isInterCourse) newTraineeRegistration.value.company = newLearner.value.company;
 
