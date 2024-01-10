@@ -14,32 +14,48 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="displayCompanyNames" :data="course.companies"
+        <div v-else-if="displayCompanyNames">
+          <q-table :columns="traineeColumns" hide-bottom :visible-columns="traineeVisibleColumns" flat
+            class="table-responsive q-pa-sm">
+            <template #header="props">
+              <slot name="header" :props="props">
+                <q-tr :props="props">
+                  <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
+                    :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
+                    {{ col.label }}
+                  </q-th>
+                </q-tr>
+              </slot>
+            </template>
+          </q-table>
+          <ni-expanding-table :data="course.companies"
           :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
           separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
-          <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props"
-              :class="[col.class, { 'company': props.rowIndex !== 0}]">
-              <template v-if="col.name === 'company'">
-                <div v-if="canAccessCompany" @click="goToCompany(col.value)"> {{ col.value }}</div>
-                <div v-else>{{ col.value }}</div>
-              </template>
-              <template v-else-if="col.name === 'actions'">
-                <ni-button v-if="canUpdateCompanies && !traineesGroupedByCompanies[props.row._id]"
-                  icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
-              </template>
-            </q-td>
-          </template>
-          <template #expanding-row="{ props }">
-            <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
-              :trainees="traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header />
-            <div class="text-center text-italic no-data" v-else>
-              Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
-            </div>
-          </template>
-        </ni-expanding-table>
+            <template #row="{ props }">
+              <q-td v-for="col in props.cols" :key="col.name" :props="props"
+                :class="[col.class, { 'company': props.rowIndex !== 0}]">
+                <template v-if="col.name === 'company'">
+                  <div v-if="canAccessCompany" @click="goToCompany(col.value)"> {{ col.value }}</div>
+                  <div v-else>{{ col.value }}</div>
+                </template>
+                <template v-else-if="col.name === 'actions'">
+                  <ni-button v-if="canUpdateCompanies && !traineesGroupedByCompanies[props.row._id]"
+                    icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
+                </template>
+              </q-td>
+            </template>
+            <template #expanding-row="{ props }">
+              <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header
+                :columns="traineeColumns" :visible-columns="traineeVisibleColumns"
+                :trainees="traineesGroupedByCompanies[props.row._id]" />
+              <div class="text-center text-italic no-data" v-else>
+                Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
+              </div>
+            </template>
+          </ni-expanding-table>
+        </div>
         <ni-trainee-table v-else :trainees="course.trainees" @refresh="refresh" :loading="loading"
-          table-class="q-pb-md" />
+          table-class="q-pb-md" :columns="traineeColumns" :visible-columns="traineeVisibleColumns" />
       </q-card>
       <div align="right" v-if="canUpdateTrainees" class="q-pa-sm">
         <ni-button v-if="canUpdateCompanies" color="primary" icon="add" label="Rattacher une structure"
@@ -85,7 +101,12 @@ import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import { TRAINER, INTRA } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
-import { formatAndSortUserOptions, formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
+import {
+  formatAndSortUserOptions,
+  formatAndSortOptions,
+  formatAndSortIdentityOptions,
+  formatPhone,
+} from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -155,6 +176,53 @@ export default {
     ]);
 
     const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
+
+    const traineeColumns = computed(() => [
+      {
+        name: 'firstname',
+        label: 'Prénom',
+        align: 'left',
+        field: row => get(row, 'identity.firstname') || '',
+        classes: 'text-capitalize',
+      },
+      {
+        name: 'lastname',
+        label: 'Nom',
+        align: 'left',
+        field: row => get(row, 'identity.lastname') || '',
+        classes: 'text-capitalize',
+      },
+      { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '', classes: 'email' },
+      {
+        name: 'phone',
+        label: 'Téléphone',
+        align: 'left',
+        field: row => get(row, 'contact.phone') || '',
+        format: formatPhone,
+      },
+      {
+        name: 'connectionInfos',
+        label: 'Code de connexion à l\'app',
+        field: 'loginCode',
+        align: 'center',
+      },
+      ...course.value.hasCertifyingTest
+        ? [{
+          name: 'certification',
+          label: 'Certification',
+          field: row => get(course.value, 'certifiedTrainees', []).includes(row._id),
+          format: value => (value ? 'Oui' : 'Non'),
+          align: 'center',
+        }]
+        : [],
+      { name: 'actions', label: '', align: 'right', field: '' },
+    ]);
+
+    const traineeVisibleColumns = computed(() => {
+      const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos', 'certification'];
+
+      return canUpdateTrainees.value ? [...col, 'actions'] : col;
+    });
 
     const vendorRole = computed(() => $store.getters['main/getVendorRole']);
 
@@ -382,6 +450,8 @@ export default {
       traineesCompanyOptions,
       displayCompanyNames,
       traineeOptions,
+      traineeColumns,
+      traineeVisibleColumns,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -423,4 +493,6 @@ export default {
     & td
       height: 25px
       padding: 12px 0px 0px 4px
+.table-actions-responsive
+  width: 15%
 </style>
