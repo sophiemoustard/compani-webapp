@@ -1,24 +1,23 @@
 <template>
   <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
-    <template #title>
-       Modifier <span class="text-weight-bold">les certifications</span>
+    <template #title>Modifier <span class="text-weight-bold">les certifications</span></template>
+    <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
+      <template #message>Les apprenants sélectionnés passeront la certification</template>
+    </ni-banner>
+    <ni-option-group in-modal :model-value="certifiedTrainees" @update:model-value="update" type="checkbox"
+      :options="traineeOptions" />
+    <template #footer>
+      <ni-button class="bg-primary full-width modal-btn" label="Modifier les certifications" icon-right="edit"
+        color="white" :loading="loading" @click="submit" />
     </template>
-    <div class="text-copper-grey-600">
-      Les apprenants sélectionnés passeront la certification
-    </div>
-      <ni-option-group in-modal :model-value="certifiedTrainees" @update:model-value="update" type="checkbox"
-        :options="traineeOptions" />
-      <template #footer>
-        <ni-button class="bg-primary full-width modal-btn" label="Modifier les certifications" icon-right="edit"
-          color="white" :loading="loading" @click="submit" />
-      </template>
-    </ni-modal>
+  </ni-modal>
 </template>
 
 <script>
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
 import Button from '@components/Button';
+import Banner from '@components/Banner';
 
 export default {
   name: 'CertificationsUpdateModal',
@@ -32,6 +31,7 @@ export default {
     'ni-modal': Modal,
     'ni-button': Button,
     'ni-option-group': OptionGroup,
+    'ni-banner': Banner,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:certified-trainees'],
   setup (_, { emit }) {

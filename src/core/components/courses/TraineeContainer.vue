@@ -16,7 +16,7 @@
         </div>
         <div v-else-if="displayCompanyNames">
           <q-table :columns="traineeColumns" hide-bottom :visible-columns="traineeVisibleColumns" flat
-            class="table-responsive q-pa-sm">
+            class="table-responsive q-pa-md">
             <template #header="props">
               <slot name="header" :props="props">
                 <q-tr :props="props">
@@ -29,13 +29,13 @@
             </template>
           </q-table>
           <ni-expanding-table :data="course.companies"
-          :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
-          separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
+            :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
+            separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
             <template #row="{ props }">
               <q-td v-for="col in props.cols" :key="col.name" :props="props"
                 :class="[col.class, { 'company': props.rowIndex !== 0}]">
                 <template v-if="col.name === 'company'">
-                  <div v-if="canAccessCompany" @click="goToCompany(col.value)"> {{ col.value }}</div>
+                  <div v-if="canAccessCompany" @click="goToCompany(col.value)">{{ col.value }}</div>
                   <div v-else>{{ col.value }}</div>
                 </template>
                 <template v-else-if="col.name === 'actions'">
@@ -146,15 +146,15 @@ export default {
     const $store = useStore();
     const $router = useRouter();
 
+    const editedCertifications = ref([]);
+    const certificationsUpdateModal = ref(false);
+    const certificationUpdateLoading = ref(false);
+
     const canUpdateTrainees = ref(false);
     const canUpdateCompanies = ref(false);
     const canAccessCompany = ref(false);
     const canAccessEveryTrainee = ref(false);
     const canUpdateCertifyingTest = ref(false);
-
-    const editedCertifications = ref([]);
-    const certificationsUpdateModal = ref(false);
-    const certificationUpdateLoading = ref(false);
 
     const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
 
@@ -164,15 +164,14 @@ export default {
 
     const traineeModalLoading = ref(false);
 
-    const companyColumns = ref([
+    const companyColumns = computed(() => [
       {
         name: 'company',
         label: 'Structure',
         align: 'left',
-        class: canAccessCompany.value ? 'clickable-name' : 'company-name',
+        classes: canAccessCompany.value ? 'clickable-name cursor-pointer' : 'company-name',
         field: row => get(row, 'name') || '',
       },
-      { name: 'actions', label: '', align: 'right', field: '_id' },
     ]);
 
     const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
