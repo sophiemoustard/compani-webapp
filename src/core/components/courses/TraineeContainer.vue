@@ -16,7 +16,7 @@
         </div>
         <div v-else-if="displayCompanyNames">
           <q-table :columns="traineeColumns" hide-bottom :visible-columns="traineeVisibleColumns" flat
-            class="table-responsive q-pa-md">
+            class="table-responsive q-px-md q-mt-md">
             <template #header="props">
               <slot name="header" :props="props">
                 <q-tr :props="props">
@@ -28,12 +28,12 @@
               </slot>
             </template>
           </q-table>
-          <ni-expanding-table :data="course.companies"
+          <ni-expanding-table :data="course.companies" custom-class="q-px-lg q-pb-md"
             :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
             separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
             <template #row="{ props }">
               <q-td v-for="col in props.cols" :key="col.name" :props="props"
-                :class="[col.class, { 'company': props.rowIndex !== 0}]">
+                :class="[col.class, 'bg-copper-grey-50', { 'company': props.rowIndex !== 0}]">
                 <template v-if="col.name === 'company'">
                   <div v-if="canAccessCompany" @click="goToCompany(col.value)">{{ col.value }}</div>
                   <div v-else>{{ col.value }}</div>

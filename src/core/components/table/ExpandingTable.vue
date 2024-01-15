@@ -1,8 +1,8 @@
 <template>
   <q-card class="relative-position table-spinner-container" flat>
-    <q-table v-if="!loading" :rows="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
+    <q-table v-if="!loading" :columns="columns" :class="customClass" :pagination="pagination" :row-key="rowKey"
       :hide-bottom="hideBottom" :visible-columns="formattedVisibleColumns" binary-state-sort :hide-header="hideHeader"
-      :expanded="expanded" @update:pagination="$emit('update:pagination', $event)" :separator="separator">
+      :expanded="expanded" @update:pagination="$emit('update:pagination', $event)" :separator="separator" :rows="data">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props"> {{ col.label }} </q-th>
@@ -59,6 +59,7 @@ export default {
     hideHeader: { type: Boolean, default: false },
     expanded: { type: Array, default: undefined },
     separator: { type: String, default: 'horizontal' },
+    customClass: { type: String, default: 'q-pa-md' },
   },
   computed: {
     formattedVisibleColumns () {
