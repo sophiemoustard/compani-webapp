@@ -28,14 +28,16 @@
               </slot>
             </template>
           </q-table>
-          <ni-expanding-table :data="course.companies" custom-class="q-px-lg q-pb-md"
+          <ni-expanding-table :data="course.companies" custom-class="q-pb-md q-px-md"
             :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
             separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
             <template #row="{ props }">
               <q-td v-for="col in props.cols" :key="col.name" :props="props"
-                :class="[col.class, 'bg-copper-grey-50', { 'company': props.rowIndex !== 0}]">
+                :class="[col.class, { 'company': props.rowIndex !== 0}]">
                 <template v-if="col.name === 'company'">
-                  <div v-if="canAccessCompany" @click="goToCompany(col.value)">{{ col.value }}</div>
+                  <div v-if="canAccessCompany" class="company-name-container" @click="goToCompany(col.value)">
+                    {{ col.value }}
+                  </div>
                   <div v-else>{{ col.value }}</div>
                 </template>
                 <template v-else-if="col.name === 'actions'">
@@ -45,11 +47,13 @@
               </q-td>
             </template>
             <template #expanding-row="{ props }">
-              <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header
-                :columns="traineeColumns" :visible-columns="traineeVisibleColumns"
-                :trainees="traineesGroupedByCompanies[props.row._id]" />
-              <div class="text-center text-italic no-data" v-else>
-                Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
+              <div class="table-content">
+                <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header
+                  :columns="traineeColumns" :visible-columns="traineeVisibleColumns"
+                  :trainees="traineesGroupedByCompanies[props.row._id]" table-class="trainee-table" />
+                <div class="text-center text-italic no-data" v-else>
+                  Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
+                </div>
               </div>
             </template>
           </ni-expanding-table>
@@ -172,6 +176,7 @@ export default {
         classes: canAccessCompany.value ? 'clickable-name cursor-pointer' : 'company-name',
         field: row => get(row, 'name') || '',
       },
+      { name: 'actions', label: '', align: 'right', field: '_id', classes: 'company-action-container' },
     ]);
 
     const companyPagination = ref({ rowsPerPage: 0, sortBy: 'company' });
@@ -478,20 +483,25 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
+.company-name-container
+  padding: 8px 24px
 .company-name
   color: $primary
   width: fit-content
   cursor: default
 .company
   border-top: 1px solid $copper-grey-200
+.company-action-container
+  width: 20%
 .no-data
   font-size: 13px
-  padding: 12px 0px 12px 0px
+  padding: 12px 12px
 .q-table
   & tbody
     & td
       height: 25px
-      padding: 12px 0px 0px 4px
 .table-actions-responsive
   width: 15%
+.table-content
+  width: 125% !important
 </style>
