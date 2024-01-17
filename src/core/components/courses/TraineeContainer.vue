@@ -28,7 +28,7 @@
               </slot>
             </template>
           </q-table>
-          <ni-expanding-table :data="course.companies" custom-class="q-pb-md q-px-md"
+          <ni-expanding-table :data="course.companies" table-class="q-pb-md q-px-md"
             :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
             separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
             <template #row="{ props }">
@@ -47,7 +47,7 @@
               </q-td>
             </template>
             <template #expanding-row="{ props }">
-              <div class="table-content">
+              <div :class="[{'table-content': canUpdateCompanies}]">
                 <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header
                   :columns="traineeColumns" :visible-columns="traineeVisibleColumns"
                   :trainees="traineesGroupedByCompanies[props.row._id]" table-class="trainee-table" />
@@ -484,7 +484,7 @@ export default {
 .table-title
   flex: 1
 .company-name-container
-  padding: 8px 24px
+  padding: 8px 24px 0
 .company-name
   color: $primary
   width: fit-content
@@ -504,4 +504,6 @@ export default {
   width: 15%
 .table-content
   width: 125% !important
+:deep(.q-table__middle)
+    margin: 0
 </style>

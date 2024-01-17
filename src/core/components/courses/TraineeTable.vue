@@ -189,4 +189,6 @@ export default {
 .hide-header
   height: 0px
   display: block
+  th
+    padding: 0
 </style>

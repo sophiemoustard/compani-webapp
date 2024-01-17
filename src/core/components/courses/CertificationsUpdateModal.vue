@@ -2,7 +2,7 @@
   <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>Modifier <span class="text-weight-bold">les certifications</span></template>
     <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="info_outline">
-      <template #message>Les apprenants sélectionnés passeront la certification</template>
+      <template #message>Les personnes sélectionnées passeront la certification</template>
     </ni-banner>
     <ni-option-group in-modal :model-value="certifiedTrainees" @update:model-value="update" type="checkbox"
       :options="traineeOptions" />
