@@ -1,11 +1,12 @@
 <template>
-  <ni-responsive-table :data="trainees" :columns="columns" v-model:pagination="traineePagination" separator="none"
-    :loading="loading" :class="tableClass" :visible-columns="visibleColumns">
+  <ni-responsive-table :data="trainees" :columns="traineeColumns" v-model:pagination="traineePagination"
+    :hide-header="hideHeader" separator="none" :loading="loading" :class="tableClass"
+    :visible-columns="traineeVisibleColumns">
     <template #header="{ props }">
-      <q-tr :props="props" :class="[{ 'hide-header': hideHeader }]">
+      <q-tr :props="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-          :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
-          {{ hideHeader ? '' : col.label }}
+          :class="[{ 'table-actions-responsive': col.name === 'actions', 'email': col.name === 'email' }]">
+          {{ col.label }}
         </q-th>
       </q-tr>
     </template>
@@ -44,7 +45,7 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 import { defineAbilitiesForCourse } from '@helpers/ability';
-import { formatPhoneForPayload } from '@helpers/utils';
+import { formatPhone, formatPhoneForPayload } from '@helpers/utils';
 import Courses from '@api/Courses';
 import Users from '@api/Users';
 import Button from '@components/Button';
@@ -61,8 +62,6 @@ export default {
     hideHeader: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     tableClass: { type: String, default: () => '' },
-    columns: { type: Array, default: () => [] },
-    visibleColumns: { type: Array, default: () => [] },
   },
   components: {
     'ni-button': Button,
@@ -82,12 +81,59 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
+    const traineeColumns = computed(() => [
+      {
+        name: 'firstname',
+        label: 'Prénom',
+        align: 'left',
+        field: row => get(row, 'identity.firstname') || '',
+        classes: 'text-capitalize',
+      },
+      {
+        name: 'lastname',
+        label: 'Nom',
+        align: 'left',
+        field: row => get(row, 'identity.lastname') || '',
+        classes: 'text-capitalize',
+      },
+      { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '', classes: 'email' },
+      {
+        name: 'phone',
+        label: 'Téléphone',
+        align: 'left',
+        field: row => get(row, 'contact.phone') || '',
+        format: formatPhone,
+      },
+      {
+        name: 'connectionInfos',
+        label: 'Code de connexion à l\'app',
+        field: 'loginCode',
+        align: 'center',
+      },
+      ...course.value.hasCertifyingTest
+        ? [{
+          name: 'certification',
+          label: 'Certification',
+          field: row => get(course.value, 'certifiedTrainees', []).includes(row._id),
+          format: value => (value ? 'Oui' : 'Non'),
+          align: 'center',
+        }]
+        : [],
+      { name: 'actions', label: '', align: 'right', field: '', classes: 'table-actions-responsive' },
+    ]);
+
     const traineeRules = {
       editedTrainee: {
         identity: { lastname: { required } },
         contact: { phone: { required, frPhoneNumber } },
       },
     };
+
+    const traineeVisibleColumns = computed(() => {
+      const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos', 'certification'];
+
+      return canUpdateTrainees.value ? [...col, 'actions'] : col;
+    });
 
     const traineeValidation = useVuelidate(traineeRules, { editedTrainee });
 
@@ -157,6 +203,7 @@ export default {
 
     return {
       // Data
+      traineeColumns,
       traineePagination,
       traineeEditionModal,
       traineeModalLoading,
@@ -165,6 +212,7 @@ export default {
       traineeValidation,
       // Computed
       course,
+      traineeVisibleColumns,
       canUpdateTrainees,
       // Methods
       openTraineeEditionModal,
@@ -178,7 +226,7 @@ export default {
 <style lang="sass" scoped>
 .email
   @media screen and (min-width: 767px)
-    width: 30%
+    width: 20%
 .table-actions-responsive
   width: 15%
 .q-table tbody td
@@ -186,9 +234,4 @@ export default {
 .border
   @media screen and (min-width: 767px)
     border-top: 1px solid $copper-grey-200
-.hide-header
-  height: 0px
-  display: block
-  th
-    padding: 0
 </style>
