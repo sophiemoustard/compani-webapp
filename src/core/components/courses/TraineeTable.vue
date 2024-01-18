@@ -5,7 +5,7 @@
     <template #header="{ props }">
       <q-tr :props="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-          :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
+          :class="[{ 'table-actions-responsive': col.name === 'actions', 'email': col.name === 'email' }]">
           {{ col.label }}
         </q-th>
       </q-tr>
@@ -77,7 +77,11 @@ export default {
     const traineePagination = ref({ rowsPerPage: 0, sortBy: 'lastname' });
     const traineeEditionModal = ref(false);
     const traineeModalLoading = ref(false);
-    const traineeColumns = ref([
+    const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
+
+    const course = computed(() => $store.state.course.course);
+
+    const traineeColumns = computed(() => [
       {
         name: 'firstname',
         label: 'Prénom',
@@ -106,9 +110,17 @@ export default {
         field: 'loginCode',
         align: 'center',
       },
-      { name: 'actions', label: '', align: 'right', field: '' },
+      ...course.value.hasCertifyingTest
+        ? [{
+          name: 'certification',
+          label: 'Certification',
+          field: row => get(course.value, 'certifiedTrainees', []).includes(row._id),
+          format: value => (value ? 'Oui' : 'Non'),
+          align: 'center',
+        }]
+        : [],
+      { name: 'actions', label: '', align: 'right', field: '', classes: 'table-actions-responsive' },
     ]);
-    const editedTrainee = ref({ identity: {}, contact: {}, local: {} });
 
     const traineeRules = {
       editedTrainee: {
@@ -116,6 +128,12 @@ export default {
         contact: { phone: { required, frPhoneNumber } },
       },
     };
+
+    const traineeVisibleColumns = computed(() => {
+      const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos', 'certification'];
+
+      return canUpdateTrainees.value ? [...col, 'actions'] : col;
+    });
 
     const traineeValidation = useVuelidate(traineeRules, { editedTrainee });
 
@@ -125,14 +143,6 @@ export default {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
       return ability.can('update', subject('Course', course.value), 'trainees');
-    });
-
-    const course = computed(() => $store.state.course.course);
-
-    const traineeVisibleColumns = computed(() => {
-      const col = ['firstname', 'lastname', 'email', 'phone', 'connectionInfos'];
-
-      return canUpdateTrainees.value ? [...col, 'actions'] : col;
     });
 
     const openTraineeEditionModal = async (trainee) => {
@@ -216,7 +226,7 @@ export default {
 <style lang="sass" scoped>
 .email
   @media screen and (min-width: 767px)
-    width: 30%
+    width: 20%
 .table-actions-responsive
   width: 15%
 .q-table tbody td

@@ -14,30 +14,34 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <ni-expanding-table v-else-if="displayCompanyNames" :data="course.companies"
-          :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
-          separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
-          <template #row="{ props }">
-            <q-td v-for="col in props.cols" :key="col.name" :props="props"
-              :class="[col.class, { 'company': props.rowIndex !== 0}]">
-              <template v-if="col.name === 'company'">
-                <div v-if="canAccessCompany" @click="goToCompany(col.value)"> {{ col.value }}</div>
-                <div v-else>{{ col.value }}</div>
-              </template>
-              <template v-else-if="col.name === 'actions'">
-                <ni-button v-if="canUpdateCompanies && !traineesGroupedByCompanies[props.row._id]"
-                  icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
-              </template>
-            </q-td>
-          </template>
-          <template #expanding-row="{ props }">
-            <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
-              :trainees="traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header />
-            <div class="text-center text-italic no-data" v-else>
-              Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
+        <template v-else-if="displayCompanyNames">
+          <ni-trainee-table />
+          <ni-expanding-table :data="course.companies" table-class="q-pb-md"
+            :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
+            separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
+            <template #row="{ props }">
+              <div class="company-name-container">
+                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="[col.class, 'company']">
+                  <template v-if="col.name === 'company'">
+                    <div v-if="canAccessCompany" @click="goToCompany(col.value)">{{ col.value }}</div>
+                    <div v-else>{{ col.value }}</div>
+                  </template>
+                  <template v-else-if="col.name === 'actions'">
+                    <ni-button v-if="canUpdateCompanies && !traineesGroupedByCompanies[props.row._id]"
+                      icon="close" @click="validateCompanyDeletion(col.value)" :disable="!!course.archivedAt" />
+                  </template>
+                </q-td>
             </div>
-          </template>
-        </ni-expanding-table>
+            </template>
+            <template #expanding-row="{ props }">
+              <ni-trainee-table v-if="!!traineesGroupedByCompanies[props.row._id]"
+                :trainees="traineesGroupedByCompanies[props.row._id]" @refresh="refresh" hide-header />
+              <div class="text-center text-italic no-data" v-else>
+                Aucun(e) apprenant(e) de cette structure n'a été ajouté(e)
+              </div>
+            </template>
+          </ni-expanding-table>
+        </template>
         <ni-trainee-table v-else :trainees="course.trainees" @refresh="refresh" :loading="loading"
           table-class="q-pb-md" />
       </q-card>
@@ -46,6 +50,8 @@
           :disable="loading" @click="openCompanyAdditionModal" />
         <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
           :disable="loading" @click="openTraineeCreationModal" />
+        <ni-button v-if="course.hasCertifyingTest && canUpdateCertifyingTest" color="primary" icon="edit"
+          label="Modifier les certifications" :disable="loading" @click="openCertificationsUpdateModal" />
       </div>
     </div>
 
@@ -53,7 +59,8 @@
       @submit="addTrainee" :validations="traineeRegistrationValidation.newTraineeRegistration"
       :loading="traineeModalLoading" @hide="resetTraineeAdditionForm" :users-options="traineesOptions"
       @open-user-creation-modal="openLearnerCreationModal" :users-company-options="traineesCompanyOptions"
-      :display-company-select="!isIntraCourse" display-no-options-slot label="Stagiaire" />
+      :display-company-select="!isIntraCourse" display-no-options-slot label="Stagiaire"
+      :display-is-certified="course.hasCertifyingTest && canUpdateCertifyingTest" />
 
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner"
       @hide="resetLearnerCreationModal" :first-step="firstStep" @next-step="nextStepLearnerCreationModal"
@@ -64,6 +71,10 @@
     <company-addition-modal v-model="companyAdditionModal" v-model:selected-company="selectedCompany"
       @submit="addCompany" :validations="companyValidation.selectedCompany" :loading="companyModalLoading"
       @hide="resetCompanyAdditionModal" :company-options="selectCompanyOptions" />
+
+    <certifications-update-modal v-model="certificationsUpdateModal" @hide="resetCertificationUpdateModal"
+      v-model:certified-trainees="editedCertifications" :trainee-options="traineeOptions"
+      :loading="certificationUpdateLoading" @submit="updateCertifications" />
   </div>
 </template>
 
@@ -78,7 +89,7 @@ import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import { TRAINER, INTRA } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
-import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortUserOptions, formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -87,6 +98,7 @@ import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeTable from '@components/courses/TraineeTable';
 import ExpandingTable from '@components/table/ExpandingTable';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
+import CertificationsUpdateModal from '@components/courses/CertificationsUpdateModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useLearnersCreation } from '@composables/learnersCreation';
 import { useCourses } from '@composables/courses';
@@ -108,6 +120,7 @@ export default {
     'learner-creation-modal': LearnerCreationModal,
     'ni-expanding-table': ExpandingTable,
     'company-addition-modal': CompanyAdditionModal,
+    'certifications-update-modal': CertificationsUpdateModal,
   },
   emits: ['refresh', 'update', 'update:maxTrainees'],
   setup (props, { emit }) {
@@ -116,10 +129,17 @@ export default {
     const $store = useStore();
     const $router = useRouter();
 
+    const editedCertifications = ref([]);
+    const certificationsUpdateModal = ref(false);
+    const certificationUpdateLoading = ref(false);
+
     const canUpdateTrainees = ref(false);
     const canUpdateCompanies = ref(false);
     const canAccessCompany = ref(false);
     const canAccessEveryTrainee = ref(false);
+    const canUpdateCertifyingTest = ref(false);
+
+    const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -127,12 +147,12 @@ export default {
 
     const traineeModalLoading = ref(false);
 
-    const companyColumns = ref([
+    const companyColumns = computed(() => [
       {
         name: 'company',
         label: 'Structure',
         align: 'left',
-        class: canAccessCompany.value ? 'clickable-name' : 'company-name',
+        classes: canAccessCompany.value ? 'clickable-name cursor-pointer' : 'company-name',
         field: row => get(row, 'name') || '',
       },
       { name: 'actions', label: '', align: 'right', field: '_id' },
@@ -226,12 +246,18 @@ export default {
       canUpdateCompanies.value = ability.can('update', subject('Course', course.value), 'companies');
       canAccessCompany.value = ability.can('read', subject('Course', course.value), 'companies');
       canAccessEveryTrainee.value = ability.can('read', subject('Course', course.value), 'all_trainees');
+      canUpdateCertifyingTest.value = ability.can('update', subject('Course', course.value), 'certifying_test');
     };
 
     const resetTraineeAdditionForm = () => {
-      newTraineeRegistration.value = {};
+      newTraineeRegistration.value = {
+        user: '',
+        ...(!isIntraCourse.value && { company: '' }),
+        isCertified: false,
+      };
       traineeRegistrationValidation.value.newTraineeRegistration.$reset();
     };
+
     const addTrainee = async () => {
       try {
         traineeModalLoading.value = true;
@@ -243,6 +269,7 @@ export default {
         const payload = {
           trainee: newTraineeRegistration.value.user,
           ...(!isIntraCourse.value && { company: newTraineeRegistration.value.company }),
+          ...(newTraineeRegistration.value.isCertified && { isCertified: true }),
         };
         await Courses.addTrainee(course.value._id, payload);
 
@@ -268,6 +295,32 @@ export default {
     const openLearnerCreationModal = async () => {
       traineeAdditionModal.value = false;
       learnerCreationModal.value = true;
+    };
+
+    const openCertificationsUpdateModal = () => {
+      editedCertifications.value = course.value.certifiedTrainees;
+      certificationsUpdateModal.value = true;
+    };
+
+    const resetCertificationUpdateModal = () => {
+      editedCertifications.value = [];
+    };
+
+    const updateCertifications = async () => {
+      try {
+        certificationUpdateLoading.value = true;
+
+        await Courses.update(course.value._id, { certifiedTrainees: editedCertifications.value });
+
+        certificationsUpdateModal.value = false;
+        refresh();
+        NotifyPositive('Certifications modifiées.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des certifications.');
+      } finally {
+        certificationUpdateLoading.value = false;
+      }
     };
 
     const updateMaxTrainees = () => emit('update');
@@ -308,6 +361,10 @@ export default {
       canUpdateCompanies,
       canAccessCompany,
       canUpdateTrainees,
+      canUpdateCertifyingTest,
+      editedCertifications,
+      certificationsUpdateModal,
+      certificationUpdateLoading,
       // Validations
       learnerValidation,
       traineeRegistrationValidation,
@@ -328,6 +385,7 @@ export default {
       hasLinkedCompanies,
       traineesCompanyOptions,
       displayCompanyNames,
+      traineeOptions,
       // Methods
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
@@ -344,6 +402,9 @@ export default {
       addCompany,
       resetCompanyAdditionModal,
       validateCompanyDeletion,
+      openCertificationsUpdateModal,
+      resetCertificationUpdateModal,
+      updateCertifications,
     };
   },
 };
@@ -352,18 +413,21 @@ export default {
 <style lang="sass" scoped>
 .table-title
   flex: 1
+.company-name-container
+  padding: 0px 24px
 .company-name
   color: $primary
   width: fit-content
   cursor: default
 .company
   border-top: 1px solid $copper-grey-200
+  width: 100vw
+  padding-top: 8px
 .no-data
   font-size: 13px
-  padding: 12px 0px 12px 0px
+  padding: 12px
 .q-table
   & tbody
     & td
       height: 25px
-      padding: 12px 0px 0px 4px
 </style>
