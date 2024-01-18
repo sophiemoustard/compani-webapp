@@ -14,8 +14,8 @@
         <div v-if="!hasLinkedCompanies" class="text-center text-italic no-data">
           Aucune structure n'est rattachée à cette formation
         </div>
-        <div v-else-if="displayCompanyNames">
-          <ni-trainee-table :trainees="[]" @refresh="refresh" />
+        <template v-else-if="displayCompanyNames">
+          <ni-trainee-table />
           <ni-expanding-table :data="course.companies" table-class="q-pb-md"
             :columns="companyColumns" :visible-columns="companyVisibleColumns" hide-header :expanded="courseCompanyIds"
             separator="none" hide-bottom :loading="loading" v-model:pagination="companyPagination">
@@ -41,7 +41,7 @@
               </div>
             </template>
           </ni-expanding-table>
-        </div>
+        </template>
         <ni-trainee-table v-else :trainees="course.trainees" @refresh="refresh" :loading="loading"
           table-class="q-pb-md" />
       </q-card>
@@ -414,17 +414,18 @@ export default {
 .table-title
   flex: 1
 .company-name-container
-  padding: 8px 24px 0
+  padding: 0px 24px
 .company-name
   color: $primary
   width: fit-content
   cursor: default
 .company
   border-top: 1px solid $copper-grey-200
-  width: 100%
+  width: 100vw
+  padding-top: 8px
 .no-data
   font-size: 13px
-  padding: 12px 12px
+  padding: 12px
 .q-table
   & tbody
     & td

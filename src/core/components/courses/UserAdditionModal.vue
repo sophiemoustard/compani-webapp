@@ -38,7 +38,6 @@
 
 <script>
 
-import isNull from 'lodash/isNull';
 import set from 'lodash/set';
 import { computed, toRefs } from 'vue';
 import Modal from '@components/modal/Modal';
@@ -88,7 +87,7 @@ export default {
       if (Object.keys(usersCompanyOptions.value).length && usersCompanyOptions.value[event].length === 1) {
         const company = usersCompanyOptions.value[event][0].value;
         const isCertified = displayIsCertified.value ? newUserRegistration.value.isCertified : null;
-        emit('update:new-user-registration', { company, user: event, ...(!isNull(isCertified) && { isCertified }) });
+        emit('update:new-user-registration', { company, user: event, ...(isCertified !== null && { isCertified }) });
       } else {
         emit('update:new-user-registration', set({ ...newUserRegistration.value }, 'user', event));
       }
