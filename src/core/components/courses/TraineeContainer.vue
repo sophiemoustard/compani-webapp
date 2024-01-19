@@ -50,8 +50,8 @@
           :disable="loading" @click="openCompanyAdditionModal" />
         <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
           :disable="loading" @click="openTraineeCreationModal" />
-        <ni-button v-if="course.hasCertifyingTest && canUpdateCertifyingTest" color="primary" icon="edit"
-          label="Modifier les certifications" :disable="loading" @click="openCertificationsUpdateModal" />
+        <ni-button v-if="course.hasCertifyingTest && canUpdateCertifyingTest && course.trainees.length" color="primary"
+          icon="edit" label="Modifier les certifications" :disable="loading" @click="openCertificationsUpdateModal" />
       </div>
     </div>
 
