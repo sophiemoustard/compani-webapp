@@ -50,8 +50,8 @@
           :disable="loading" @click="openCompanyAdditionModal" />
         <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
           :disable="loading" @click="openTraineeCreationModal" />
-        <ni-button v-if="course.hasCertifyingTest && canUpdateCertifyingTest" color="primary" icon="edit"
-          label="Modifier les certifications" :disable="loading" @click="openCertificationsUpdateModal" />
+        <ni-button v-if="displayCertificationEdition" color="primary" icon="edit" label="Modifier les certifications"
+          :disable="loading" @click="openCertificationsUpdateModal" />
       </div>
     </div>
 
@@ -203,6 +203,9 @@ export default {
 
     const displayCompanyNames =
       computed(() => !isIntraCourse.value && (!isClientInterface || !!loggedUser.value.role.holding));
+
+    const displayCertificationEdition =
+      computed(() => course.value.hasCertifyingTest && canUpdateCertifyingTest.value && course.value.trainees.length);
 
     const refresh = () => emit('refresh');
 
@@ -385,6 +388,7 @@ export default {
       hasLinkedCompanies,
       traineesCompanyOptions,
       displayCompanyNames,
+      displayCertificationEdition,
       traineeOptions,
       // Methods
       nextStepLearnerCreationModal,
