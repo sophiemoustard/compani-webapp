@@ -25,8 +25,10 @@
         </template>
       </ni-select>
       <ni-select v-if="displayCompanySelect" in-modal :model-value="newUserRegistration.company"
-        @update:model-value="updateCompany" caption="Structure" :options="companyOptionsForUser" required-field
-        :error="validations.company.$error" :disable="companyOptionsForUser.length < 2" />
+        @update:model-value="update($event, 'company')" caption="Structure" :options="companyOptionsForUser"
+        required-field :error="validations.company.$error" :disable="companyOptionsForUser.length < 2" />
+      <q-checkbox v-if="displayIsCertified" in-modal :model-value="newUserRegistration.isCertified" class="q-mb-lg"
+        label="Le stagiaire passe la certification" @update:model-value="update($event, 'isCertified')" dense />
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" label="Ajouter la personne" icon-right="add" color="white"
           :loading="loading" @click="submit" />
@@ -54,6 +56,7 @@ export default {
     displayCompanySelect: { type: Boolean, default: false },
     label: { type: String, default: '' },
     displayNoOptionsSlot: { type: Boolean, default: false },
+    displayIsCertified: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
@@ -62,7 +65,7 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-user-registration', 'open-user-creation-modal'],
   setup (props, { emit }) {
-    const { newUserRegistration, usersCompanyOptions } = toRefs(props);
+    const { newUserRegistration, usersCompanyOptions, displayIsCertified } = toRefs(props);
 
     const companyOptionsForUser = computed(() => {
       if (!newUserRegistration.value.user) return [];
@@ -74,19 +77,20 @@ export default {
 
     const input = event => emit('update:model-value', event);
 
+    const update = (event, path) => {
+      emit('update:new-user-registration', set({ ...newUserRegistration.value }, path, event));
+    };
+
     const submit = () => emit('submit');
 
     const updateUser = (event) => {
       if (Object.keys(usersCompanyOptions.value).length && usersCompanyOptions.value[event].length === 1) {
         const company = usersCompanyOptions.value[event][0].value;
-        emit('update:new-user-registration', { company, user: event });
+        const isCertified = displayIsCertified.value ? newUserRegistration.value.isCertified : null;
+        emit('update:new-user-registration', { company, user: event, ...(isCertified !== null && { isCertified }) });
       } else {
         emit('update:new-user-registration', set({ ...newUserRegistration.value }, 'user', event));
       }
-    };
-
-    const updateCompany = (event) => {
-      emit('update:new-user-registration', set({ ...newUserRegistration.value }, 'company', event));
     };
 
     const openUserCreationModal = () => emit('open-user-creation-modal');
@@ -97,9 +101,9 @@ export default {
       // Methods
       hide,
       input,
+      update,
       submit,
       updateUser,
-      updateCompany,
       openUserCreationModal,
     };
   },
