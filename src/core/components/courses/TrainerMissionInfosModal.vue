@@ -3,21 +3,21 @@
     <template #title>
       <span class="text-weight-bold">Informations de l'ordre de mission</span>
     </template>
-      <div>
-        <span class="text-weight-bold">NOM et Prénom :</span> {{ formatIdentity(course.trainer.identity, 'FL') }}
-      </div>
-      <div>
-        <span class="text-weight-bold">Fonction : </span>
-          <span v-if="course.trainer.identity.title">{{ trainerGender }}</span>
-          <span v-else class="text-orange-700">Civilité manquante</span>
-      </div>
-     <div><span class="text-weight-bold">Nom du programme :</span> {{ courses[0].subProgram.program.name }}</div>
-     <div>
+    <div>
+      <span class="text-weight-bold">Prénom et NOM :</span> {{ formatIdentity(course.trainer.identity, 'FL') }}
+    </div>
+    <div>
+      <span class="text-weight-bold">Fonction : </span>
+      <span v-if="course.trainer.identity.title">{{ trainerGender }}</span>
+      <span v-else class="text-orange-700">Civilité manquante</span>
+    </div>
+    <div><span class="text-weight-bold">Nom du programme :</span> {{ courses[0].subProgram.program.name }}</div>
+    <div>
       <span class="text-weight-bold">Durée :</span> {{ formatQuantity('session', slotsCount) }} - {{ liveDuration }}
     </div>
-     <div><span class="text-weight-bold">Nombre de groupes :</span> {{ courses.length }}</div>
-     <div><span class="text-weight-bold">Structure(s) :</span> {{ companies }}</div>
-     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
+    <div><span class="text-weight-bold">Nombre de groupes :</span> {{ courses.length }}</div>
+    <div><span class="text-weight-bold">Structure(s) :</span> {{ companies }}</div>
+    <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Formation certifiante :</span> {{ formattedCertifications }}</div>
     <div class="q-mb-md"><span class="text-weight-bold">Frais de formateur :</span> {{ fee }} €</div>

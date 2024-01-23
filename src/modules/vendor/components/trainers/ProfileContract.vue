@@ -116,6 +116,8 @@ export default {
     };
 
     const nextStep = async () => {
+      v$.value.newTrainerMission.$touch();
+      if (v$.value.newTrainerMission.$error) return NotifyWarning('Champ(s) invalide(s)');
       if (creationMethod.value === UPLOAD) await createTrainerMission();
       else {
         trainerMissionInfosModal.value = true;
@@ -125,8 +127,6 @@ export default {
 
     const createTrainerMission = async () => {
       try {
-        v$.value.newTrainerMission.$touch();
-        if (v$.value.newTrainerMission.$error) return NotifyWarning('Champ(s) invalide(s)');
         missionCreationLoading.value = true;
 
         await TrainerMissions.create(formatPayload());
