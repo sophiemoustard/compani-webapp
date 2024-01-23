@@ -84,13 +84,12 @@ export default {
     const submit = () => emit('submit');
 
     const updateUser = (event) => {
+      const isCertified = displayIsCertified.value ? newUserRegistration.value.isCertified : null;
+      let user = { user: event, ...(isCertified !== null && { isCertified }) };
       if (Object.keys(usersCompanyOptions.value).length && usersCompanyOptions.value[event].length === 1) {
-        const company = usersCompanyOptions.value[event][0].value;
-        const isCertified = displayIsCertified.value ? newUserRegistration.value.isCertified : null;
-        emit('update:new-user-registration', { company, user: event, ...(isCertified !== null && { isCertified }) });
-      } else {
-        emit('update:new-user-registration', set({ ...newUserRegistration.value }, 'user', event));
+        user = { ...user, company: usersCompanyOptions.value[event][0].value };
       }
+      emit('update:new-user-registration', set(user));
     };
 
     const openUserCreationModal = () => emit('open-user-creation-modal');
