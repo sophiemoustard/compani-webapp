@@ -5,7 +5,8 @@
         Voir les formations du formateur
       </router-link>
     </div>
-    <trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading" />
+    <trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading"
+      @refresh="refreshTrainerMissions" />
     <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un ordre de mission" color="primary"
       @click="openTrainerMissionCreationModal" :loading="missionCreationLoading" :disable="!courseList.length" />
 
@@ -69,9 +70,14 @@ export default {
       : $store.state.userProfile.userProfile));
 
     const coursesWithoutTrainerMission = computed(() => {
-      const trainerMissionsCourses = trainerMissions.value.map(tm => tm.courses.map(c => c._id)).flat();
+      const formattedTrainerMissions = trainerMissions.value
+        .map(tm => ({ courses: tm.courses.map(c => c._id), cancelledAt: tm.cancelledAt }));
 
-      return courseList.value.filter(c => !trainerMissionsCourses.includes(c._id));
+      return courseList.value.filter((c) => {
+        const trainerMissionsWithCourse = formattedTrainerMissions.filter(tm => tm.courses.includes(c._id));
+
+        return !trainerMissionsWithCourse.length || trainerMissionsWithCourse.every(tm => tm.cancelledAt);
+      });
     });
 
     const selectedCourses = computed(() => courseList.value
@@ -191,6 +197,7 @@ export default {
       gotToCourseDirectory,
       setSelectedTrainer,
       nextStep,
+      refreshTrainerMissions,
     };
   },
 };

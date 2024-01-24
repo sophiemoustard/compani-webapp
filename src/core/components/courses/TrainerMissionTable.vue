@@ -11,8 +11,12 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
                 :style="col.style" :class="[{ 'border': props.rowIndex === 0 }]">
                 <template v-if="col.name === 'actions'">
-                  <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
-                    :disable="!props.row.file.link" />
+                  <div v-if="props.row.cancelledAt" class="text-orange-700 q-mr-md">annulé</div>
+                  <div v-else>
+                    <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
+                      :disable="!props.row.file.link" />
+                    <ni-button icon="close" color="primary" @click="validateMissionCancellation(props.row._id)" />
+                  </div>
                 </template>
                 <template v-else-if="col.name === 'courses'">
                   <div v-for="course of props.row.courses" :key="course._id" class="q-mb-xs course">
@@ -37,12 +41,15 @@
 
 <script>
 import { ref } from 'vue';
+import { useQuasar } from 'quasar';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import CompaniDate from '@helpers/dates/companiDates';
-import { DD_MM_YYYY } from '@data/constants';
+import { DD_MM_YYYY, DAY } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
+import TrainerMissions from '@api/TrainerMissions';
 
 export default {
   name: 'TrainerMissionTable',
@@ -55,7 +62,9 @@ export default {
     'ni-responsive-table': ResponsiveTable,
   },
   emits: ['refresh'],
-  setup () {
+  setup (_, { emit }) {
+    const $q = useQuasar();
+
     const screenWidth = ref(window.innerWidth);
     const pagination = ref({ rowsPerPage: 5, sortBy: 'date', descending: true });
     const columns = ref([
@@ -89,6 +98,29 @@ export default {
       query: { defaultTab: 'organization' },
     });
 
+    const validateMissionCancellation = (trainerMissionId) => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir annuler cet ordre de mission&nbsp;?',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => cancelTrainerMission(trainerMissionId))
+        .onCancel(() => NotifyPositive('Annulation de l\'ordre de mission annulée.'));
+    };
+
+    const cancelTrainerMission = async (trainerMissionId) => {
+      try {
+        await TrainerMissions.update(trainerMissionId, { cancelledAt: CompaniDate().startOf(DAY).toISO() });
+
+        emit('refresh');
+        NotifyPositive('Ordre de mission annulé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'annulation de l\'ordre de mission.');
+      }
+    };
+
     return {
       // Data
       columns,
@@ -96,6 +128,7 @@ export default {
       // Methods
       composeCourseName,
       gotToCourse,
+      validateMissionCancellation,
     };
   },
 };
