@@ -5,16 +5,16 @@
         Voir les formations du formateur
       </router-link>
     </div>
-    <ni-trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading" />
+    <trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading" />
     <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un ordre de mission" color="primary"
       @click="openTrainerMissionCreationModal" :loading="missionCreationLoading" :disable="!courseList.length" />
 
-    <ni-trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
+    <trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
       @submit="nextStep" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
       :loading="missionCreationLoading" :courses="coursesWithoutTrainerMission"
       v-model:creation-method="creationMethod" />
 
-    <ni-trainer-mission-infos-modal v-model="trainerMissionInfosModal" :courses="selectedCourses"
+    <trainer-mission-infos-modal v-model="trainerMissionInfosModal" :courses="selectedCourses"
       :fee="Number(newTrainerMission.fee)" :loading="missionCreationLoading" @submit="createTrainerMission"
       @hide="resetMissionCreationModal" />
   </div>
@@ -38,9 +38,9 @@ import TrainerMissionInfosModal from '@components/courses/TrainerMissionInfosMod
 export default {
   name: 'ProfileContract',
   components: {
-    'ni-trainer-mission-creation-modal': TrainerMissionCreationModal,
-    'ni-trainer-mission-table': TrainerMissionTable,
-    'ni-trainer-mission-infos-modal': TrainerMissionInfosModal,
+    'trainer-mission-creation-modal': TrainerMissionCreationModal,
+    'trainer-mission-table': TrainerMissionTable,
+    'trainer-mission-infos-modal': TrainerMissionInfosModal,
   },
   setup () {
     const $store = useStore();

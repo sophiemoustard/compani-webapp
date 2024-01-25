@@ -48,15 +48,12 @@
 
 <script>
 import { computed, toRefs } from 'vue';
-import get from 'lodash/get';
-import compact from 'lodash/compact';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import { formatIdentity, formatQuantity } from '@helpers/utils';
 import CompaniDuration from '@helpers/dates/companiDurations';
-import CompaniDate from '@helpers/dates/companiDates';
-import { getISOTotalDuration, ascendingSortBy } from '@helpers/dates/utils';
-import { SHORT_DURATION_H_MM, E_LEARNING, DD_MM_YYYY, REMOTE } from '@data/constants';
+import { SHORT_DURATION_H_MM, E_LEARNING } from '@data/constants';
+import { useInfosModal } from '@composables/infosModal';
 
 export default {
   name: 'TrainingContractInfosModal',
@@ -75,22 +72,8 @@ export default {
   setup (props, { emit }) {
     const { course, newGeneratedTrainingContractInfos, isInterCourse } = toRefs(props);
 
-    // make sure code is similar to back part in TrainingContracts helper
-    const liveDuration = computed(() => {
-      if (course.value.slotsToPlan.length) {
-        const theoreticalDurationList = course.value.subProgram.steps
-          .filter(step => step.type !== E_LEARNING)
-          .map(step => step.theoreticalDuration);
-
-        if (theoreticalDurationList.some(duration => !duration)) return '';
-
-        return theoreticalDurationList
-          .reduce((acc, duration) => acc.add(duration), CompaniDuration())
-          .format(SHORT_DURATION_H_MM);
-      }
-
-      return CompaniDuration(getISOTotalDuration(course.value.slots)).format(SHORT_DURATION_H_MM);
-    });
+    const slots = computed(() => course.value.slots);
+    const { liveDuration, dates, addressList } = useInfosModal(course, slots);
 
     const elearnigDuration = computed(() => {
       if (!course.value.subProgram.steps.some(step => step.type === E_LEARNING)) return '';
@@ -106,24 +89,6 @@ export default {
         ? ` (+ ${elearnigDuration.value} de e-learning)`
         : '';
       return liveDuration.value + elearningDuration;
-    });
-
-    const dates = computed(() => {
-      const slotDatesWithDuplicate = [...course.value.slots]
-        .sort(ascendingSortBy('startDate'))
-        .map(slot => CompaniDate(slot.startDate).format(DD_MM_YYYY));
-      const uniqDates = [...new Set(slotDatesWithDuplicate)];
-
-      return uniqDates.join(' - ');
-    });
-
-    const addressList = computed(() => {
-      if (course.value.subProgram.steps.every(step => step.type === REMOTE)) return 'en distanciel';
-      const fullAddressList = compact(course.value.slots.map(slot => get(slot, 'address.fullAddress')));
-      if ([...new Set(fullAddressList)].length <= 2) return [...new Set(fullAddressList)].join(', ');
-
-      const cityList = compact(course.value.slots.map(slot => get(slot, 'address.city')));
-      return [...new Set(cityList)].join(', ');
     });
 
     const learnersCount = computed(() => {

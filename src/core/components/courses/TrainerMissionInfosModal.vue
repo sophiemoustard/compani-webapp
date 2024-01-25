@@ -18,7 +18,7 @@
     <div><span class="text-weight-bold">Nombre de groupes :</span> {{ courses.length }}</div>
     <div><span class="text-weight-bold">Structure(s) :</span> {{ companies }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
-    <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
+    <div><span class="text-weight-bold">Dates :</span> {{ formattedDates }}</div>
     <div><span class="text-weight-bold">Formation certifiante :</span> {{ formattedCertifications }}</div>
     <div class="q-mb-md"><span class="text-weight-bold">Frais de formateur :</span> {{ fee }} €</div>
     <template #footer>
@@ -31,17 +31,13 @@
 <script>
 import { computed, toRefs } from 'vue';
 import get from 'lodash/get';
-import compact from 'lodash/compact';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
 import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, formatQuantity, formatName } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
-import CompaniDuration from '@helpers/dates/companiDurations';
-import CompaniDate from '@helpers/dates/companiDates';
-import { getISOTotalDuration, ascendingSortBy } from '@helpers/dates/utils';
-import { SHORT_DURATION_H_MM, E_LEARNING, DD_MM_YYYY, REMOTE, CIVILITY_OPTIONS } from '@data/constants';
-import { MR } from '../../data/constants';
+import { CIVILITY_OPTIONS, MR } from '@data/constants';
+import { useInfosModal } from '@composables/infosModal';
 
 export default {
   name: 'TrainerMissionInfosModal',
@@ -66,46 +62,23 @@ export default {
       return civility === MR ? 'Formateur' : 'Formatrice';
     });
 
-    const liveDuration = computed(() => {
-      if (course.value.slotsToPlan.length) {
-        const theoreticalDurationList = course.value.subProgram.steps
-          .filter(step => step.type !== E_LEARNING)
-          .map(step => step.theoreticalDuration);
-
-        if (theoreticalDurationList.some(duration => !duration)) return '';
-
-        return theoreticalDurationList
-          .reduce((acc, duration) => acc.add(duration), CompaniDuration())
-          .format(SHORT_DURATION_H_MM);
-      }
-
-      return CompaniDuration(getISOTotalDuration(course.value.slots)).format(SHORT_DURATION_H_MM);
-    });
-
     const slotsCount = computed(() => course.value.slots.length + course.value.slotsToPlan.length);
 
     const companies = computed(() => [...new Set(courses.value.map(c => formatName(c.companies)))].join(', '));
 
     const slots = computed(() => courses.value.map(c => c.slots).flat());
+    const slotsToPlan = computed(() => courses.value.map(c => c.slotsToPlan).flat());
 
-    const dates = computed(() => {
-      const slotDatesWithDuplicate = [...slots.value]
-        .sort(ascendingSortBy('startDate'))
-        .map(slot => CompaniDate(slot.startDate).format(DD_MM_YYYY));
-      const uniqDates = [...new Set(slotDatesWithDuplicate)];
+    const { liveDuration, dates, addressList } = useInfosModal(course, slots);
 
-      return uniqDates.join(' - ');
-    });
-
-    const addressList = computed(() => {
-      const { steps } = course.value.subProgram;
-
-      if (steps.every(step => step.type === REMOTE)) return 'en distanciel';
-      const fullAddressList = compact(slots.value.map(slot => get(slot, 'address.fullAddress')));
-      if ([...new Set(fullAddressList)].length <= 2) return [...new Set(fullAddressList)].join(', ');
-
-      const cityList = compact(slots.value.map(slot => get(slot, 'address.city')));
-      return [...new Set(cityList)].join(', ');
+    const formattedDates = computed(() => {
+      if (dates.value.length) {
+        if (slotsToPlan.value) {
+          return `${dates.value}, ${formatQuantity('créneau', slotsToPlan.value.length, 'x')} encore à définir`;
+        }
+        return dates.value;
+      }
+      return `${formatQuantity('créneau', slotsToPlan.value.length, 'x')} encore à définir`;
     });
 
     const formattedCertifications = computed(() => {
@@ -130,7 +103,7 @@ export default {
       slotsCount,
       liveDuration,
       companies,
-      dates,
+      formattedDates,
       addressList,
       formattedCertifications,
       course,
