@@ -70,14 +70,12 @@ export default {
       : $store.state.userProfile.userProfile));
 
     const coursesWithoutTrainerMission = computed(() => {
-      const formattedTrainerMissions = trainerMissions.value
-        .map(tm => ({ courses: tm.courses.map(c => c._id), cancelledAt: tm.cancelledAt }));
+      const coursesWithActiveTrainerMissions = trainerMissions.value
+        .filter(tm => !tm.cancelledAt)
+        .map(tm => tm.courses.map(c => c._id))
+        .flat();
 
-      return courseList.value.filter((c) => {
-        const trainerMissionsWithCourse = formattedTrainerMissions.filter(tm => tm.courses.includes(c._id));
-
-        return !trainerMissionsWithCourse.length || trainerMissionsWithCourse.every(tm => tm.cancelledAt);
-      });
+      return courseList.value.filter(c => !coursesWithActiveTrainerMissions.includes(c._id));
     });
 
     const selectedCourses = computed(() => courseList.value
