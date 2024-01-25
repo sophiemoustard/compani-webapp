@@ -84,11 +84,14 @@ export default {
     const submit = () => emit('submit');
 
     const updateUser = (event) => {
+      const userHasOneCompany = Object.keys(usersCompanyOptions.value).length &&
+        usersCompanyOptions.value[event].length === 1;
       const isCertified = displayIsCertified.value ? newUserRegistration.value.isCertified : null;
-      let user = { user: event, ...(isCertified !== null && { isCertified }) };
-      if (Object.keys(usersCompanyOptions.value).length && usersCompanyOptions.value[event].length === 1) {
-        user = { ...user, company: usersCompanyOptions.value[event][0].value };
-      }
+      const user = {
+        user: event,
+        ...(isCertified !== null && { isCertified }),
+        ...(userHasOneCompany && { company: usersCompanyOptions.value[event][0].value }),
+      };
       emit('update:new-user-registration', set(user));
     };
 
