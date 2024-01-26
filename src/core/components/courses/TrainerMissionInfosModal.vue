@@ -37,7 +37,7 @@ import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, formatQuantity, formatName } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 import { CIVILITY_OPTIONS, MR } from '@data/constants';
-import { useInfosModal } from '@composables/infosModal';
+import { useCourseDocumentInfosModal } from '@composables/courseDocumentInfosModal';
 
 export default {
   name: 'TrainerMissionInfosModal',
@@ -69,11 +69,11 @@ export default {
     const slots = computed(() => courses.value.map(c => c.slots).flat());
     const slotsToPlan = computed(() => courses.value.map(c => c.slotsToPlan).flat());
 
-    const { liveDuration, dates, addressList } = useInfosModal(course, slots);
+    const { liveDuration, dates, addressList } = useCourseDocumentInfosModal(course, slots);
 
     const formattedDates = computed(() => {
       if (dates.value.length) {
-        if (slotsToPlan.value) {
+        if (slotsToPlan.value.length) {
           return `${dates.value}, ${formatQuantity('créneau', slotsToPlan.value.length, 'x')} encore à définir`;
         }
         return dates.value;

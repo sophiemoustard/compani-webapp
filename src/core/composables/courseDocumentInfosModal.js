@@ -6,8 +6,8 @@ import { getISOTotalDuration, ascendingSortBy } from '@helpers/dates/utils';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 
-export const useInfosModal = (course, slots) => {
-  // make sure code is similar to back part in TrainingContracts helper
+export const useCourseDocumentInfosModal = (course, slots) => {
+  // make sure code is similar to API part
   const liveDuration = computed(() => {
     if (course.value.slotsToPlan.length) {
       const theoreticalDurationList = course.value.subProgram.steps

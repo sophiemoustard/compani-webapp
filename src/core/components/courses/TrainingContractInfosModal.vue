@@ -53,7 +53,7 @@ import Button from '@components/Button';
 import { formatIdentity, formatQuantity } from '@helpers/utils';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { SHORT_DURATION_H_MM, E_LEARNING } from '@data/constants';
-import { useInfosModal } from '@composables/infosModal';
+import { useCourseDocumentInfosModal } from '@composables/courseDocumentInfosModal';
 
 export default {
   name: 'TrainingContractInfosModal',
@@ -73,7 +73,7 @@ export default {
     const { course, newGeneratedTrainingContractInfos, isInterCourse } = toRefs(props);
 
     const slots = computed(() => course.value.slots);
-    const { liveDuration, dates, addressList } = useInfosModal(course, slots);
+    const { liveDuration, dates, addressList } = useCourseDocumentInfosModal(course, slots);
 
     const elearnigDuration = computed(() => {
       if (!course.value.subProgram.steps.some(step => step.type === E_LEARNING)) return '';
