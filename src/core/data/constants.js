@@ -676,3 +676,11 @@ export const START_CARD_INDEX = -1;
 // OPTION GROUP TYPE
 export const CHECKBOX = 'checkbox';
 export const RADIO = 'radio';
+
+// TRAINER MISSION CREATION METHOD TYPES
+export const UPLOAD = 'upload';
+export const GENERATION = 'generation';
+export const CREATION_METHOD_OPTIONS = [
+  { label: 'Téléverser', value: UPLOAD },
+  { label: 'Générer', value: GENERATION },
+];
