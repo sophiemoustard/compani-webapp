@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :model-value="modelValue" @reset="reset" @update:model-value="input" container-class="modal-container-md">
+  <ni-modal :model-value="modelValue" @hide="hide" @update:model-value="input" container-class="modal-container-md">
     <template #title>
       {{ titleLabel }} <span class="text-weight-bold">un ordre de mission</span>
     </template>
@@ -65,7 +65,7 @@ export default {
     'ni-option-group': OptionGroup,
     'ni-btn-toggle': ButtonToggle,
   },
-  emits: ['reset', 'update:model-value', 'submit', 'update:trainer-mission', 'update:creation-method'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:trainer-mission', 'update:creation-method'],
   setup (props, { emit }) {
     const { trainerMission, courses, creationMethod } = toRefs(props);
 
@@ -97,7 +97,7 @@ export default {
     const coursesOptions = computed(() => coursesGroupedByProgram.value[trainerMission.value.program]
       .map(c => ({ value: c._id, label: formatCourseLabel(c) })));
 
-    const reset = () => emit('reset');
+    const hide = () => emit('hide');
 
     const input = event => emit('update:model-value', event);
 
@@ -106,7 +106,7 @@ export default {
     const update = async (event, path) => {
       if (path === 'program') {
         const tempCreationMethod = creationMethod.value;
-        reset();
+        hide();
         await nextTick();
         updateMethod(tempCreationMethod);
       }
@@ -131,7 +131,7 @@ export default {
       titleLabel,
       submitLabel,
       // Methods
-      reset,
+      hide,
       input,
       submit,
       update,

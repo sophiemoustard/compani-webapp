@@ -11,7 +11,7 @@
       @click="openTrainerMissionCreationModal" :loading="missionCreationLoading" :disable="!courseList.length" />
 
     <trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
-      @submit="nextStep" :validations="v$.newTrainerMission" @reset="resetMissionCreationModal"
+      @submit="nextStep" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
       :loading="missionCreationLoading" :courses="coursesWithoutTrainerMission"
       v-model:creation-method="creationMethod" />
 
