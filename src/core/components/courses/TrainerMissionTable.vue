@@ -80,7 +80,7 @@ export default {
         label: 'Formation',
         align: 'left',
         field: 'courses',
-        style: screenWidth.value > 767 && 'width: 70%',
+        style: screenWidth.value > 767 && 'width: 65%',
       },
       {
         name: 'fee',
@@ -89,7 +89,7 @@ export default {
         field: 'fee',
         format: formatPrice,
       },
-      { name: 'actions', label: '', align: 'right', field: '' },
+      { name: 'actions', label: '', align: 'right', field: '', style: screenWidth.value > 767 && 'width: 15%' },
     ]);
 
     const gotToCourse = courseId => ({
