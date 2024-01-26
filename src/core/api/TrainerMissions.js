@@ -8,4 +8,7 @@ export default {
     const trainerMissions = await alenviAxios.get(`${process.env.API_HOSTNAME}/trainermissions`, { params });
     return trainerMissions.data.data.trainerMissions;
   },
+  async update (trainerMissionId, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/trainermissions/${trainerMissionId}`, payload);
+  },
 };

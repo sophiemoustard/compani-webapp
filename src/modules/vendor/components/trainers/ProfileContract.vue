@@ -5,12 +5,13 @@
         Voir les formations du formateur
       </router-link>
     </div>
-    <trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading" />
+    <trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading"
+      @refresh="refreshTrainerMissions" />
     <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un ordre de mission" color="primary"
       @click="openTrainerMissionCreationModal" :loading="missionCreationLoading" :disable="!courseList.length" />
 
     <trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
-      @submit="nextStep" :validations="v$.newTrainerMission" @reset="resetMissionCreationModal"
+      @submit="nextStep" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
       :loading="missionCreationLoading" :courses="coursesWithoutTrainerMission"
       v-model:creation-method="creationMethod" />
 
@@ -69,9 +70,12 @@ export default {
       : $store.state.userProfile.userProfile));
 
     const coursesWithoutTrainerMission = computed(() => {
-      const trainerMissionsCourses = trainerMissions.value.map(tm => tm.courses.map(c => c._id)).flat();
+      const coursesWithActiveTrainerMissions = trainerMissions.value
+        .filter(tm => !tm.cancelledAt)
+        .map(tm => tm.courses.map(c => c._id))
+        .flat();
 
-      return courseList.value.filter(c => !trainerMissionsCourses.includes(c._id));
+      return courseList.value.filter(c => !coursesWithActiveTrainerMissions.includes(c._id));
     });
 
     const selectedCourses = computed(() => courseList.value
@@ -191,6 +195,7 @@ export default {
       gotToCourseDirectory,
       setSelectedTrainer,
       nextStep,
+      refreshTrainerMissions,
     };
   },
 };
