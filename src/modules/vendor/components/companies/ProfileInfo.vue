@@ -23,8 +23,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
+import { computed, ref, toRefs } from 'vue';
+import { useStore } from 'vuex';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -35,20 +36,14 @@ import Select from '@components/form/Select';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { validTradeName, frAddress } from '@helpers/vuelidateCustomVal';
-import { companyMixin } from '@mixins/companyMixin';
-import { validationMixin } from '@mixins/validationMixin';
 import { COMPANY_TYPES } from '@data/constants';
+import { useValidations } from '@composables/validations';
+import { useCompanies } from '@composables/companies';
 
 export default {
   name: 'ProfileInfo',
   props: {
     profileId: { type: String, required: true },
-  },
-  setup () {
-    const tmpInput = '';
-    const companyTypeOptions = COMPANY_TYPES;
-
-    return { tmpInput, companyTypeOptions, v$: useVuelidate() };
   },
   components: {
     'ni-input': Input,
@@ -56,70 +51,98 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-select': Select,
   },
-  mixins: [companyMixin, validationMixin],
-  validations () {
-    return { company: {
-      name: { required },
-      type: { required },
-      tradeName: { validTradeName },
-      address: {
-        zipCode: { required },
-        street: { required },
-        city: { required },
-        fullAddress: { required, frAddress },
-        location: { required },
+  setup (props) {
+    const { profileId } = toRefs(props);
+    const tmpInput = ref('');
+    const companyTypeOptions = COMPANY_TYPES;
+
+    const $store = useStore();
+    const company = computed(() => $store.state.company.company);
+
+    const companyRules = computed(() => ({
+      company: {
+        name: { required },
+        type: { required },
+        tradeName: { validTradeName },
+        address: {
+          zipCode: { required },
+          street: { required },
+          city: { required },
+          fullAddress: { required, frAddress },
+          location: { required },
+        },
       },
-    } };
-  },
-  computed: {
-    ...mapState('company', ['company']),
-  },
-  async created () {
-    if (!this.company) await this.refreshCompany();
-  },
-  methods: {
-    saveTmp (path) {
-      this.tmpInput = get(this.company, path);
-    },
-    async refreshCompany () {
+    }));
+
+    const v$ = useVuelidate(companyRules, { company });
+    const { waitForValidation } = useValidations();
+    const { tradeNameError, addressError } = useCompanies(v$.value);
+
+    const saveTmp = (path) => { tmpInput.value = get(company.value, path); };
+
+    const refreshCompany = async () => {
       try {
-        await this.$store.dispatch('company/fetchCompany', { companyId: this.profileId });
+        await $store.dispatch('company/fetchCompany', { companyId: profileId.value });
       } catch (e) {
         console.error(e);
       }
-    },
-    async trimAndUpdateCompany (path) {
-      const value = get(this.company, path);
-      set(this.company, path, value ? value.trim() : '');
+    };
 
-      this.updateCompany(path);
-    },
-    async updateCompany (path) {
+    const trimAndUpdateCompany = async (path) => {
+      const value = get(company.value, path);
+      set(company.value, path, value ? value.trim() : '');
+
+      await updateCompany(path);
+    };
+
+    const updateCompany = async (path) => {
       try {
-        const value = get(this.company, path);
-        if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
-        if (this.tmpInput === value) return;
-        this.v$.company.$touch();
+        const value = get(company.value, path);
+        if (path === 'address' && tmpInput.value === get(company.value, 'address.fullAddress')) return;
+        if (tmpInput.value === value) return;
+        v$.value.company.$touch();
 
-        if (get(this.v$.company, path)) {
-          const isValid = await this.waitForValidation(this.v$.company, path);
+        if (get(v$.value.company, path)) {
+          const isValid = await waitForValidation(v$.value.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
         const payload = set({}, path, value);
-        await Companies.updateById(this.company._id, payload);
+        await Companies.updateById(company.value._id, payload);
         NotifyPositive('Modification enregistrée.');
 
-        await this.refreshCompany();
+        await refreshCompany();
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        this.tmpInput = '';
+        tmpInput.value = '';
       }
-    },
+    };
+
+    const created = async () => {
+      if (!company.value) await refreshCompany();
+    };
+
+    created();
+
+    return {
+      // Data
+      tmpInput,
+      companyTypeOptions,
+      // Validations
+      v$,
+      // Methods
+      saveTmp,
+      trimAndUpdateCompany,
+      updateCompany,
+      tradeNameError,
+      // Computed
+      company,
+      addressError,
+    };
   },
 };
 </script>
