@@ -275,6 +275,7 @@ const routes = [
         path: 'trainers/info',
         name: 'trainers info',
         component: () => import('src/modules/vendor/pages/trainers/administrative/Info'),
+        props: route => ({ ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'administrative',

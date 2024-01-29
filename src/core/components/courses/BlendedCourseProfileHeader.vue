@@ -1,8 +1,8 @@
 <template>
   <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
-    <template #title v-if="!isClientInterface">
+    <template #title v-if="!isClientInterface && isAdmin">
       <ni-button icon="delete" @click="deleteCourse" />
-      <ni-button :flat="false" v-if="isAdmin" class="q-ml-sm" :label="archiveLabel" @click="validateCourseArchive" />
+      <ni-button :flat="false" class="q-ml-sm" :label="archiveLabel" @click="validateCourseArchive" />
     </template>
   </ni-profile-header>
 </template>

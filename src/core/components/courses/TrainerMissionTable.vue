@@ -15,7 +15,8 @@
                   <div v-else>
                     <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
                       :disable="!props.row.file.link" />
-                    <ni-button icon="close" color="primary" @click="validateMissionCancellation(props.row._id)" />
+                    <ni-button v-if="canUpdate" icon="close" color="primary"
+                      @click="validateMissionCancellation(props.row._id)" />
                   </div>
                 </template>
                 <template v-else-if="col.name === 'courses'">
@@ -40,7 +41,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, toRefs } from 'vue';
 import { useQuasar } from 'quasar';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -56,14 +57,16 @@ export default {
   props: {
     loading: { type: Boolean, default: false },
     trainerMissions: { type: Array, default: () => [] },
+    canUpdate: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
   },
   emits: ['refresh'],
-  setup (_, { emit }) {
+  setup (props, { emit }) {
     const $q = useQuasar();
+    const { canUpdate } = toRefs(props);
 
     const screenWidth = ref(window.innerWidth);
     const pagination = ref({ rowsPerPage: 5, sortBy: 'date', descending: true });
@@ -93,7 +96,7 @@ export default {
     ]);
 
     const gotToCourse = courseId => ({
-      name: 'ni management blended courses info',
+      name: canUpdate.value ? 'ni management blended courses info' : 'trainers courses info',
       params: { courseId },
       query: { defaultTab: 'organization' },
     });
