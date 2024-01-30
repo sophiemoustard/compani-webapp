@@ -97,7 +97,7 @@ export default {
 
         const payload = this.newCompany.salesRepresentative
           ? this.newCompany
-          : omit(this.newCompany, 'salesRepresentative')
+          : omit(this.newCompany, 'salesRepresentative');
         await Companies.create({ ...payload });
 
         this.companyCreationModal = false;

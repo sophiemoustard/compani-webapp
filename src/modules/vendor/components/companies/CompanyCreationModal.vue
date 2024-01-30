@@ -5,8 +5,8 @@
     </template>
     <ni-input in-modal :model-value="newCompany.name" @update:model-value="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Raison sociale" :error="validations.name.$error" />
-    <ni-select in-modal caption="Chargé(e) d'accompagnement" v-model="newCompany.salesRepresentative"
-      :options="salesRepresentativeOptions" clearable />
+    <ni-select in-modal caption="Chargé(e) d'accompagnement" :model-value="newCompany.salesRepresentative"
+      @update:model-value="update($event, 'salesRepresentative')" :options="salesRepresentativeOptions" clearable />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -38,21 +38,21 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-company'],
   setup (props, { emit }) {
-    const { newCompany, validations } = toRefs(props);
+    const { newCompany } = toRefs(props);
     const salesRepresentativeOptions = ref([]);
 
     const hide = () => emit('hide');
 
-    const input = (event) => emit('update:model-value', event);
+    const input = event => emit('update:model-value', event);
 
     const submit = () => emit('submit');
 
     const update = (event, prop) => {
       if (prop === 'salesRepresentative' && !event) return;
-      emit('update:new-company', { ...newCompany.value, [prop]: event })
-      };
+      emit('update:new-company', { ...newCompany.value, [prop]: event });
+    };
 
-    const refreshSalesRepresentativeOptions = async() => {
+    const refreshSalesRepresentativeOptions = async () => {
       const rofAndAdminUsers = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
 
       salesRepresentativeOptions.value = formatAndSortUserOptions(rofAndAdminUsers, false);
@@ -65,16 +65,14 @@ export default {
     created();
 
     return {
-      // Data 
-      newCompany,
-      validations,
+      // Data
       salesRepresentativeOptions,
       // Methods
       hide,
       input,
       submit,
       update,
-    }
-  }
+    };
+  },
 };
 </script>
