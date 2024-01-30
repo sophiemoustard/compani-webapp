@@ -98,7 +98,7 @@
       :label="operationsRepresentativeLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
-      @submit="updateTrainerAndMissions(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
+      @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
@@ -659,10 +659,17 @@ export default {
       }
     };
 
-    const updateTrainerAndMissions = async () => {
+    const updateMissionAndTrainer = async () => {
+      await TrainerMissions
+        .update(course.value.trainerMission._id, { cancelledAt: CompaniDate().startOf(DAY).toISO() });
+      await updateInterlocutor(TRAINER);
+    };
+
+    const validateTrainerUpdate = async () => {
       if (course.value.trainerMission && tmpInterlocutor.value._id !== course.value.trainer._id) {
         v$.value.tmpInterlocutor.$touch();
         if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         const message = 'Un ordre de mission est associé au formateur actuel et sera annulé.'
           + ' Êtes-vous sûr(e) de vouloir continuer&nbsp;?';
         $q.dialog({
@@ -671,11 +678,8 @@ export default {
           html: true,
           ok: true,
           cancel: 'Annuler',
-        }).onOk(async () => {
-          await TrainerMissions
-            .update(course.value.trainerMission._id, { cancelledAt: CompaniDate().startOf(DAY).toISO() });
-          await updateInterlocutor(TRAINER);
-        }).onCancel(() => NotifyPositive('Mise à jour annulée.'));
+        }).onOk(() => updateMissionAndTrainer())
+          .onCancel(() => NotifyPositive('Mise à jour annulée.'));
       } else {
         await updateInterlocutor(TRAINER);
       }
@@ -902,7 +906,7 @@ export default {
       sendMessage,
       downloadConvocation,
       updateInterlocutor,
-      updateTrainerAndMissions,
+      validateTrainerUpdate,
       updateContact,
       resetContactAddition,
       resetOperationsRepresentativeEdition,
