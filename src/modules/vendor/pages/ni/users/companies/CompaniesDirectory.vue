@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import omit from 'lodash/omit';
 import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -49,7 +50,7 @@ export default {
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
       companyCreationModal: false,
-      newCompany: { name: '' },
+      newCompany: { name: '', salesRepresentative: '' },
       modalLoading: false,
       path: { name: 'ni users companies info', params: 'companyId' },
     };
@@ -93,7 +94,11 @@ export default {
         this.v$.newCompany.$touch();
         if (this.v$.newCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
-        await Companies.create({ ...this.newCompany });
+
+        const payload = this.newCompany.salesRepresentative
+          ? this.newCompany
+          : omit(this.newCompany, 'salesRepresentative')
+        await Companies.create({ ...payload });
 
         this.companyCreationModal = false;
         NotifyPositive('Structure créée.');

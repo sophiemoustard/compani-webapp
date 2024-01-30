@@ -5,6 +5,8 @@
     </template>
     <ni-input in-modal :model-value="newCompany.name" @update:model-value="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Raison sociale" :error="validations.name.$error" />
+    <ni-select in-modal caption="Chargé(e) d'accompagnement" v-model="newCompany.salesRepresentative"
+      :options="salesRepresentativeOptions" clearable />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -13,8 +15,13 @@
 </template>
 
 <script>
+import { toRefs, ref } from 'vue';
+import Users from '@api/Users';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import Select from '@components/form/Select';
+import { formatAndSortUserOptions } from '@helpers/utils';
+import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 
 export default {
   name: 'CompanyCreationModal',
@@ -27,21 +34,47 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'ni-select': Select,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-company'],
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, prop) {
-      this.$emit('update:new-company', { ...this.newCompany, [prop]: event });
-    },
-  },
+  setup (props, { emit }) {
+    const { newCompany, validations } = toRefs(props);
+    const salesRepresentativeOptions = ref([]);
+
+    const hide = () => emit('hide');
+
+    const input = (event) => emit('update:model-value', event);
+
+    const submit = () => emit('submit');
+
+    const update = (event, prop) => {
+      if (prop === 'salesRepresentative' && !event) return;
+      emit('update:new-company', { ...newCompany.value, [prop]: event })
+      };
+
+    const refreshSalesRepresentativeOptions = async() => {
+      const rofAndAdminUsers = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+
+      salesRepresentativeOptions.value = formatAndSortUserOptions(rofAndAdminUsers, false);
+    };
+
+    const created = async () => {
+      await refreshSalesRepresentativeOptions();
+    };
+
+    created();
+
+    return {
+      // Data 
+      newCompany,
+      validations,
+      salesRepresentativeOptions,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    }
+  }
 };
 </script>

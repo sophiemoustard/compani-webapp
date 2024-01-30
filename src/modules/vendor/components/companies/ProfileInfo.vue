@@ -187,6 +187,9 @@ export default {
       tmpSalesRepresentative,
       // Validations
       v$,
+      // Computed
+      company,
+      addressError,
       // Methods
       saveTmp,
       trimAndUpdateCompany,
@@ -195,9 +198,6 @@ export default {
       refreshSalesRepresentativeOptions,
       openSalesRepresentativeModal,
       resetSalesRepresentative,
-      // Computed
-      company,
-      addressError,
     };
   },
 };
