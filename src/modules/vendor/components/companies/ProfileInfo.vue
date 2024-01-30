@@ -30,7 +30,7 @@
   <ni-interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpSalesRepresentative"
     @submit="updateCompany('salesRepresentative')" :label="salesRepresentativeModalLabel"
     :interlocutors-options="salesRepresentativeOptions" :loading="salesRepresentativeModalLoading"
-    @hide="resetSalesRepresentative" />
+    @hide="resetSalesRepresentative" :validations="v$.tmpSalesRepresentative" />
 </template>
 
 <script>
@@ -76,7 +76,7 @@ export default {
     const tmpSalesRepresentative = ref({});
     const salesRepresentativeModal = ref(false);
     const salesRepresentativeModalLoading = ref(false);
-    const salesRepresentativeModalLabel = ref({ action: '', interlocutor: 'chargé(e) d\'accompagnement' });
+    const salesRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
 
     const $store = useStore();
     const company = computed(() => $store.state.company.company);
@@ -94,8 +94,9 @@ export default {
           location: { required },
         },
       },
+      tmpSalesRepresentative: { _id: { required } },
     }));
-    const v$ = useVuelidate(companyRules, { company });
+    const v$ = useVuelidate(companyRules, { company, tmpSalesRepresentative });
 
     const { waitForValidation } = useValidations();
 
@@ -123,16 +124,21 @@ export default {
         const value = get(company.value, path);
         if (path === 'address' && tmpInput.value === get(company.value, 'address.fullAddress')) return;
         if (tmpInput.value === value) return;
-        v$.value.company.$touch();
 
-        if (get(v$.value.company, path)) {
+        let payload;
+        if (path === 'salesRepresentative') {
+          v$.value.tmpSalesRepresentative.$touch();
+          if (v$.value.tmpSalesRepresentative.$error) return NotifyWarning('Champ invalide');
+
+          payload = { salesRepresentative: tmpSalesRepresentative.value._id };
+        } else {
+          v$.value.company.$touch();
           const isValid = await waitForValidation(v$.value.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+
+          payload = set({}, path, value);
         }
 
-        const payload = path === 'salesRepresentative'
-          ? { salesRepresentative: tmpSalesRepresentative.value._id }
-          : set({}, path, value);
         await Companies.updateById(company.value._id, payload);
 
         NotifyPositive('Modification enregistrée.');
@@ -167,6 +173,7 @@ export default {
       tmpSalesRepresentative.value = {};
       salesRepresentativeModalLabel.value = { action: '', interlocutor: '' };
       salesRepresentativeModalLoading.value = false;
+      v$.value.tmpSalesRepresentative.$reset();
     };
 
     const created = async () => {
