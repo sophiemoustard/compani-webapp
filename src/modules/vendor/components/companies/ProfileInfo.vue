@@ -1,6 +1,12 @@
 <template>
   <div v-if="company">
+    <p class="text-weight-bold">Accompagnement</p>
+    <div class="interlocutor-container q-mb-xl">
+      <ni-interlocutor-cell :interlocutor="company.salesRepresentative" caption="Chargé d'accompagnement"
+        :can-update="true" label="Ajouter un chargé d'accompagnement" @open-modal="openSalesRepresentativeModal" />
+    </div>
     <div class="q-mb-xl">
+      <p class="text-weight-bold">Informations générales</p>
       <div class="row gutter-profile">
         <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
           @blur="trimAndUpdateCompany('name')" :error="v$.company.name.$error" />
@@ -20,6 +26,11 @@
     </div>
     <ni-coach-list :company="company" />
   </div>
+
+  <ni-interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpSalesRepresentative"
+    @submit="updateCompany('salesRepresentative')" :label="salesRepresentativeModalLabel"
+    :interlocutors-options="salesRepresentativeOptions" :loading="salesRepresentativeModalLoading"
+    @hide="resetSalesRepresentative" />
 </template>
 
 <script>
@@ -30,15 +41,19 @@ import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Companies from '@api/Companies';
+import Users from '@api/Users';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import InterlocutorCell from '@components/courses/InterlocutorCell';
+import InterlocutorModal from '@components/courses/InterlocutorModal';
 import { validTradeName, frAddress } from '@helpers/vuelidateCustomVal';
-import { COMPANY_TYPES } from '@data/constants';
+import { formatAndSortUserOptions } from '@helpers/utils';
 import { useValidations } from '@composables/validations';
 import { useCompanies } from '@composables/companies';
+import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, EDITION, COMPANY_TYPES } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -50,11 +65,18 @@ export default {
     'ni-coach-list': CoachList,
     'ni-search-address': SearchAddress,
     'ni-select': Select,
+    'ni-interlocutor-cell': InterlocutorCell,
+    'ni-interlocutor-modal': InterlocutorModal,
   },
   setup (props) {
     const { profileId } = toRefs(props);
     const tmpInput = ref('');
-    const companyTypeOptions = COMPANY_TYPES;
+    const companyTypeOptions = ref(COMPANY_TYPES);
+    const salesRepresentativeOptions = ref([]);
+    const tmpSalesRepresentative = ref({});
+    const salesRepresentativeModal = ref(false);
+    const salesRepresentativeModalLoading = ref(false);
+    const salesRepresentativeModalLabel = ref({ action: '', interlocutor: 'chargé(e) d\'accompagnement' });
 
     const $store = useStore();
     const company = computed(() => $store.state.company.company);
@@ -73,9 +95,10 @@ export default {
         },
       },
     }));
-
     const v$ = useVuelidate(companyRules, { company });
+
     const { waitForValidation } = useValidations();
+
     const { tradeNameError, addressError } = useCompanies(v$.value);
 
     const saveTmp = (path) => { tmpInput.value = get(company.value, path); };
@@ -107,9 +130,13 @@ export default {
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const payload = set({}, path, value);
+        const payload = path === 'salesRepresentative'
+          ? { salesRepresentative: tmpSalesRepresentative.value._id }
+          : set({}, path, value);
         await Companies.updateById(company.value._id, payload);
+
         NotifyPositive('Modification enregistrée.');
+        salesRepresentativeModal.value = false;
 
         await refreshCompany();
       } catch (e) {
@@ -122,8 +149,29 @@ export default {
       }
     };
 
+    const refreshSalesRepresentativeOptions = async () => {
+      const rofAndAdminUsers = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+
+      salesRepresentativeOptions.value = formatAndSortUserOptions(rofAndAdminUsers, false);
+    };
+
+    const openSalesRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+      tmpSalesRepresentative.value = get(company.value, 'salesRepresentative');
+      salesRepresentativeModalLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
+      salesRepresentativeModal.value = true;
+    };
+
+    const resetSalesRepresentative = () => {
+      tmpSalesRepresentative.value = {};
+      salesRepresentativeModalLabel.value = { action: '', interlocutor: '' };
+      salesRepresentativeModalLoading.value = false;
+    };
+
     const created = async () => {
       if (!company.value) await refreshCompany();
+      await refreshSalesRepresentativeOptions();
     };
 
     created();
@@ -132,6 +180,11 @@ export default {
       // Data
       tmpInput,
       companyTypeOptions,
+      salesRepresentativeOptions,
+      salesRepresentativeModal,
+      salesRepresentativeModalLabel,
+      salesRepresentativeModalLoading,
+      tmpSalesRepresentative,
       // Validations
       v$,
       // Methods
@@ -139,6 +192,9 @@ export default {
       trimAndUpdateCompany,
       updateCompany,
       tradeNameError,
+      refreshSalesRepresentativeOptions,
+      openSalesRepresentativeModal,
+      resetSalesRepresentative,
       // Computed
       company,
       addressError,
