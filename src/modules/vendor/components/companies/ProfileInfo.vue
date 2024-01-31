@@ -3,7 +3,7 @@
     <p class="text-weight-bold">Accompagnement</p>
     <div class="interlocutor-container q-mb-xl">
       <ni-interlocutor-cell :interlocutor="company.salesRepresentative" caption="Chargé d'accompagnement"
-        :can-update="true" label="Ajouter un chargé d'accompagnement" @open-modal="openSalesRepresentativeModal" />
+        can-update label="Ajouter un chargé d'accompagnement" @open-modal="openSalesRepresentativeModal" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Informations générales</p>
@@ -70,8 +70,8 @@ export default {
   },
   setup (props) {
     const { profileId } = toRefs(props);
+    const companyTypeOptions = COMPANY_TYPES;
     const tmpInput = ref('');
-    const companyTypeOptions = ref(COMPANY_TYPES);
     const salesRepresentativeOptions = ref([]);
     const tmpSalesRepresentative = ref({});
     const salesRepresentativeModal = ref(false);

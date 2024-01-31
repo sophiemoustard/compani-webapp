@@ -48,7 +48,6 @@ export default {
     const submit = () => emit('submit');
 
     const update = (event, prop) => {
-      if (prop === 'salesRepresentative' && !event) return;
       emit('update:new-company', { ...newCompany.value, [prop]: event });
     };
 
