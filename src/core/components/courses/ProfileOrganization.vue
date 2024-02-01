@@ -98,7 +98,7 @@
       :label="operationsRepresentativeLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
-      @submit="updateInterlocutor(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
+      @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
@@ -117,7 +117,7 @@ import { subject } from '@casl/ability';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { computed, ref, toRefs, watch } from 'vue';
-import { copyToClipboard } from 'quasar';
+import { useQuasar, copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
@@ -128,6 +128,7 @@ import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
 import Courses from '@api/Courses';
+import TrainerMissions from '@api/TrainerMissions';
 import TrainingContracts from '@api/TrainingContracts';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
@@ -163,6 +164,7 @@ import {
   EDITION,
   HOLDING_ADMIN,
   INTRA_HOLDING,
+  DAY,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -200,6 +202,7 @@ export default {
 
     const $store = useStore();
     const $router = useRouter();
+    const $q = useQuasar();
 
     const trainerOptions = ref([]);
     const operationsRepresentativeOptions = ref([]);
@@ -656,6 +659,32 @@ export default {
       }
     };
 
+    const updateMissionAndTrainer = async () => {
+      await TrainerMissions
+        .update(course.value.trainerMission._id, { cancelledAt: CompaniDate().startOf(DAY).toISO() });
+      await updateInterlocutor(TRAINER);
+    };
+
+    const validateTrainerUpdate = async () => {
+      if (course.value.trainerMission && tmpInterlocutor.value._id !== course.value.trainer._id) {
+        v$.value.tmpInterlocutor.$touch();
+        if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const message = 'Un ordre de mission est associé au formateur actuel et sera annulé.'
+          + ' Êtes-vous sûr(e) de vouloir continuer&nbsp;?';
+        $q.dialog({
+          title: 'Confirmation',
+          message,
+          html: true,
+          ok: true,
+          cancel: 'Annuler',
+        }).onOk(() => updateMissionAndTrainer())
+          .onCancel(() => NotifyPositive('Mise à jour annulée.'));
+      } else {
+        await updateInterlocutor(TRAINER);
+      }
+    };
+
     const updateContact = async () => {
       try {
         contactModalLoading.value = true;
@@ -877,6 +906,7 @@ export default {
       sendMessage,
       downloadConvocation,
       updateInterlocutor,
+      validateTrainerUpdate,
       updateContact,
       resetContactAddition,
       resetOperationsRepresentativeEdition,
