@@ -8,12 +8,14 @@
     <div class="interlocutor-container q-mt-lg">
       <ni-interlocutor-cell :interlocutor="billingRepresentative" caption="Chargé de facturation Compani"
         :can-update="false" />
+      <ni-interlocutor-cell :interlocutor="salesRepresentative" caption="Chargé d'accompagnement" :can-update="false" />
     </div>
   </q-page>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import VendorCompanies from '@api/VendorCompanies';
 import TitleHeader from '@components/TitleHeader';
@@ -27,6 +29,9 @@ export default {
   },
   setup () {
     const billingRepresentative = ref({});
+
+    const $store = useStore();
+    const salesRepresentative = computed(() => get($store.getters['main/getCompany'], 'salesRepresentative'));
 
     const getBillingRepresentative = async () => {
       const vendorCompany = await VendorCompanies.get();
@@ -43,6 +48,8 @@ export default {
     return {
       // Data
       billingRepresentative,
+      // Computed
+      salesRepresentative,
     };
   },
 };
