@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import omit from 'lodash/omit';
+import pickBy from 'lodash/pickBy';
 import { useMeta } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -95,10 +95,7 @@ export default {
         if (this.v$.newCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
 
-        const payload = this.newCompany.salesRepresentative
-          ? this.newCompany
-          : omit(this.newCompany, 'salesRepresentative');
-        await Companies.create({ ...payload });
+        await Companies.create(pickBy(this.newCompany));
 
         this.companyCreationModal = false;
         NotifyPositive('Structure créée.');
