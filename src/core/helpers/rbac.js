@@ -116,6 +116,7 @@ const trainerRoutes = [
   { name: 'trainers courses' },
   { name: 'trainers courses info' },
   { name: 'trainers info' },
+  { name: 'trainers contracts' },
   { name: 'account vendor' },
   { name: 'ni management questionnaire answers' },
 ];

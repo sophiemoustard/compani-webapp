@@ -2,13 +2,14 @@
   <div>
     <div class="clickable-name text-italic q-mb-md">
       <router-link :to="gotToCourseDirectory()" @click="setSelectedTrainer">
-        Voir les formations du formateur
+        {{ canUpdateTrainerMissions ? 'Voir les formations du formateur' : 'Voir mes formations' }}
       </router-link>
     </div>
     <trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading"
-      @refresh="refreshTrainerMissions" />
-    <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un ordre de mission" color="primary"
-      @click="openTrainerMissionCreationModal" :loading="missionCreationLoading" :disable="!courseList.length" />
+      @refresh="refreshTrainerMissions" :can-update="canUpdateTrainerMissions" />
+    <q-btn v-if="canUpdateTrainerMissions" class="fixed fab-custom" no-caps rounded icon="add"
+      label="Créer un ordre de mission" color="primary" @click="openTrainerMissionCreationModal"
+      :loading="missionCreationLoading" :disable="!courseList.length" />
 
     <trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
       @submit="nextStep" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
@@ -22,12 +23,15 @@
 </template>
 
 <script>
+import { subject } from '@casl/ability';
 import { useStore } from 'vuex';
 import { computed, ref } from 'vue';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import Courses from '@api/Courses';
 import TrainerMissions from '@api/TrainerMissions';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -54,6 +58,14 @@ export default {
     const creationMethod = ref(UPLOAD);
     const trainerMissionInfosModal = ref(false);
 
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const canUpdateTrainerMissions = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Courses', courseList.value), 'trainer_missions');
+    });
+
     const rules = computed(() => ({
       newTrainerMission: {
         program: { required },
@@ -65,8 +77,8 @@ export default {
 
     const v$ = useVuelidate(rules, { newTrainerMission });
 
-    const trainer = computed(() => (TRAINER === get($store.state.main.loggedUser, 'role.vendor.name')
-      ? $store.state.main.loggedUser
+    const trainer = computed(() => (TRAINER === get(loggedUser.value, 'role.vendor.name')
+      ? loggedUser.value
       : $store.state.userProfile.userProfile));
 
     const coursesWithoutTrainerMission = computed(() => {
@@ -166,7 +178,9 @@ export default {
     };
     const setSelectedTrainer = () => $store.dispatch('course/setSelectedTrainer', { trainerId: trainer.value._id });
 
-    const gotToCourseDirectory = () => ({ name: 'ni management blended courses' });
+    const gotToCourseDirectory = () => (
+      canUpdateTrainerMissions.value ? { name: 'ni management blended courses' } : { name: 'trainers courses' }
+    );
 
     const created = async () => {
       await Promise.all([refreshCourses(), refreshTrainerMissions()]);
@@ -188,6 +202,7 @@ export default {
       // Computed
       coursesWithoutTrainerMission,
       selectedCourses,
+      canUpdateTrainerMissions,
       // Methods
       openTrainerMissionCreationModal,
       createTrainerMission,
