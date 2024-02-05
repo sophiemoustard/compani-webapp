@@ -79,16 +79,8 @@ export const menuItemsMixin = {
           ref: 'administrative',
           label: 'Administration',
           children: [
-            {
-              name: 'trainers info',
-              icon: 'person',
-              label: 'Infos personnelles',
-            },
-            {
-              name: 'trainers contracts',
-              icon: 'description',
-              label: 'Ordres de mission',
-            },
+            { name: 'trainers info', icon: 'person', label: 'Infos personnelles' },
+            { name: 'trainers contracts', icon: 'description', label: 'Ordres de mission' },
           ],
         },
       ];

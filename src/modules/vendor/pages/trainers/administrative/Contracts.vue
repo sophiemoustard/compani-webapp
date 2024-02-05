@@ -1,9 +1,7 @@
 <template>
-  <q-page padding class="vendor-background">
-    <div v-if="loggedUser">
-      <ni-title-header title="Ordres de mission" class="q-mb-xl" />
-      <profile-contract />
-    </div>
+  <q-page v-if="loggedUser" padding class="vendor-background">
+    <ni-title-header title="Ordres de mission" class="q-mb-xl" />
+    <profile-contract />
   </q-page>
 </template>
 
