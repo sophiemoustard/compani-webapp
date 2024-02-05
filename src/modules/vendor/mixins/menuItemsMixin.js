@@ -84,6 +84,11 @@ export const menuItemsMixin = {
               icon: 'person',
               label: 'Infos personnelles',
             },
+            {
+              name: 'trainers contracts',
+              icon: 'description',
+              label: 'Ordres de mission',
+            },
           ],
         },
       ];

@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="vendor-background">
     <div v-if="loggedUser">
-      <ni-title-header title="Informations personnelles" class="q-mb-xl" />
-      <profile-info />
+      <ni-title-header title="Ordres de mission" class="q-mb-xl" />
+      <profile-contract />
     </div>
   </q-page>
 </template>
@@ -12,16 +12,16 @@ import { useMeta } from 'quasar';
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import TitleHeader from '@components/TitleHeader';
-import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
+import ProfileContract from 'src/modules/vendor/components/trainers/ProfileContract';
 
 export default {
-  name: 'Infos',
+  name: 'Contracts',
   components: {
     'ni-title-header': TitleHeader,
-    'profile-info': ProfileInfo,
+    'profile-contract': ProfileContract,
   },
   setup () {
-    const metaInfo = { title: 'Fiche formateur' };
+    const metaInfo = { title: 'Ordres de mission' };
     useMeta(metaInfo);
 
     const $store = useStore();
