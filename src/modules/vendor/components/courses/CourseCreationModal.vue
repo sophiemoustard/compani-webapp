@@ -10,8 +10,7 @@
         @blur="validations.operationsRepresentative.$touch" :error="validations.operationsRepresentative.$error"
         required-field />
       <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Chargé(e) d'accompagnement"
-        @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable
-        required-field />
+        @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable />
       <ni-select in-modal :model-value="newCourse.program" @update:model-value="update($event, 'program')"
         @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error"
         :options="programOptions" />
@@ -84,20 +83,19 @@ export default {
     const subProgramOptions = ref([]);
     const disableSubProgram = ref(false);
 
-    const programOptions = computed(() => {
-      return programs.value.map((p) => {
-          const blendedPublishedSubPrograms = p.subPrograms
-            .filter(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED);
+    const programOptions = computed(() => programs.value
+      .map((p) => {
+        const blendedPublishedSubPrograms = p.subPrograms
+          .filter(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED);
 
-          return {
-            label: p.name,
-            value: p._id,
-            disable: !blendedPublishedSubPrograms.length,
-            blendedPublishedSubPrograms,
-          };
-        })
-        .sort((a, b) => a.label.localeCompare(b.label));
-    });
+        return {
+          label: p.name,
+          value: p._id,
+          disable: !blendedPublishedSubPrograms.length,
+          blendedPublishedSubPrograms,
+        };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label)));
 
     const maxTraineesErrorMessage = computed(() => {
       if (get(validations.value, 'maxTrainees.required.$response') === false) return REQUIRED_LABEL;
@@ -121,7 +119,7 @@ export default {
 
     const hide = () => emit('hide');
 
-    const input = (event) => emit('update:model-value', event);
+    const input = event => emit('update:model-value', event);
 
     const submit = () => emit('submit');
 
