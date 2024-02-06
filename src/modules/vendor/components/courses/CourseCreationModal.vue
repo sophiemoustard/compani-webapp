@@ -43,6 +43,7 @@
 </template>
 
 <script>
+import { ref, computed, toRefs, watch } from 'vue';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import Modal from '@components/modal/Modal';
@@ -73,17 +74,15 @@ export default {
     'ni-date-input': DateInput,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-course'],
-  data () {
-    return {
-      courseTypes: COURSE_TYPES,
-      subProgramOptions: [],
-      disableSubProgram: false,
-    };
-  },
-  computed: {
-    programOptions () {
-      return this.programs
-        .map((p) => {
+  setup (props, { emit }) {
+    const { programs, validations, newCourse } = toRefs(props);
+
+    const courseTypes = COURSE_TYPES;
+    const subProgramOptions = ref([]);
+    const disableSubProgram = ref(false);
+
+    const programOptions = computed(() => {
+      return programs.value.map((p) => {
           const blendedPublishedSubPrograms = p.subPrograms
             .filter(sp => !sp.isStrictlyELearning && sp.status === PUBLISHED);
 
@@ -95,59 +94,80 @@ export default {
           };
         })
         .sort((a, b) => a.label.localeCompare(b.label));
-    },
-    maxTraineesErrorMessage () {
-      if (get(this.validations, 'maxTrainees.required.$response') === false) return REQUIRED_LABEL;
-      if (get(this.validations, 'maxTrainees.strictPositiveNumber.$response') === false ||
-        get(this.validations, 'maxTrainees.integerNumber.$response') === false) {
+    });
+
+    const maxTraineesErrorMessage = computed(() => {
+      if (get(validations.value, 'maxTrainees.required.$response') === false) return REQUIRED_LABEL;
+      if (get(validations.value, 'maxTrainees.strictPositiveNumber.$response') === false ||
+        get(validations.value, 'maxTrainees.integerNumber.$response') === false) {
         return 'Nombre non valide';
       }
       return '';
-    },
-    expectedBillsCountErrorMessage () {
-      if (this.validations.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
-      return 'Nombre non valide';
-    },
-    isIntraCourse () { return this.newCourse.type === INTRA; },
-    isIntraHoldingCourse () { return this.newCourse.type === INTRA_HOLDING; },
-  },
-  watch: {
-    'newCourse.program': function (value) {
-      const selectedProgram = this.programOptions.find(p => p.value === value);
-      if (selectedProgram) {
-        const { blendedPublishedSubPrograms } = selectedProgram;
+    });
 
-        this.subProgramOptions = formatAndSortOptions(blendedPublishedSubPrograms, 'name');
-        this.disableSubProgram = !this.subProgramOptions.length;
-        if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
-        else this.update('', 'subProgram');
-      }
-    },
-  },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    updateType (event) {
-      this.$emit(
+    const expectedBillsCountErrorMessage = computed(() => {
+      if (validations.value.expectedBillsCount.required.$response === false) return REQUIRED_LABEL;
+      return 'Nombre non valide';
+    });
+
+    const isIntraCourse = computed(() => newCourse.value.type === INTRA);
+
+    const isIntraHoldingCourse = computed(() => newCourse.value.type === INTRA_HOLDING);
+
+    const hide = () => emit('hide');
+
+    const input = (event) => emit('update:model-value', event);
+
+    const submit = () => emit('submit');
+
+    const updateType = (event) => {
+      emit(
         'update:new-course',
         {
-          ...omit(this.newCourse, ['company', 'holding', 'maxTrainees', 'expectedBillsCount']),
+          ...omit(newCourse.value, ['company', 'holding', 'maxTrainees', 'expectedBillsCount']),
           ...(event === INTRA && { maxTrainees: '8', expectedBillsCount: '0' }),
           ...(event === INTRA_HOLDING && { maxTrainees: '8' }),
           type: event,
         }
       );
-    },
-    update (event, prop) {
-      this.$emit('update:new-course', { ...this.newCourse, [prop]: event });
-    },
+    };
+
+    const update = (event, prop) => emit('update:new-course', { ...newCourse.value, [prop]: event });
+
+    watch(
+      () => newCourse.value.program,
+      (value) => {
+        const selectedProgram = programOptions.value.find(p => p.value === value);
+        if (selectedProgram) {
+          const { blendedPublishedSubPrograms } = selectedProgram;
+
+          subProgramOptions.value = formatAndSortOptions(blendedPublishedSubPrograms, 'name');
+          disableSubProgram.value = !subProgramOptions.value.length;
+          console.log('----test', subProgramOptions.value[0]);
+          if (subProgramOptions.value.length === 1) update(subProgramOptions.value[0].value, 'subProgram');
+          else update('', 'subProgram');
+        }
+      }
+    );
+
+    return {
+      // Data
+      courseTypes,
+      subProgramOptions,
+      disableSubProgram,
+      // Computed
+      programOptions,
+      maxTraineesErrorMessage,
+      expectedBillsCountErrorMessage,
+      isIntraCourse,
+      isIntraHoldingCourse,
+      // Methods
+      hide,
+      input,
+      submit,
+      updateType,
+      update,
+    };
   },
 };
 </script>
