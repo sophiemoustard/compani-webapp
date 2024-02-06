@@ -60,7 +60,7 @@ export default {
     modelValue: { type: Boolean, default: false },
     newCourse: { type: Object, default: () => ({}) },
     programs: { type: Array, default: () => [] },
-    companyOptions: { type: Array, default: () => [] },
+    companies: { type: Array, default: () => [] },
     holdingOptions: { type: Array, default: () => [] },
     adminUserOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
@@ -75,7 +75,7 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-course'],
   setup (props, { emit }) {
-    const { programs, validations, newCourse } = toRefs(props);
+    const { programs, validations, newCourse, companies } = toRefs(props);
 
     const courseTypes = COURSE_TYPES;
     const subProgramOptions = ref([]);
@@ -114,6 +114,8 @@ export default {
 
     const isIntraHoldingCourse = computed(() => newCourse.value.type === INTRA_HOLDING);
 
+    const companyOptions = computed(() => formatAndSortOptions(companies.value, 'name'));
+
     const hide = () => emit('hide');
 
     const input = (event) => emit('update:model-value', event);
@@ -143,7 +145,7 @@ export default {
 
           subProgramOptions.value = formatAndSortOptions(blendedPublishedSubPrograms, 'name');
           disableSubProgram.value = !subProgramOptions.value.length;
-          console.log('----test', subProgramOptions.value[0]);
+
           if (subProgramOptions.value.length === 1) update(subProgramOptions.value[0].value, 'subProgram');
           else update('', 'subProgram');
         }
@@ -161,6 +163,7 @@ export default {
       expectedBillsCountErrorMessage,
       isIntraCourse,
       isIntraHoldingCourse,
+      companyOptions,
       // Methods
       hide,
       input,

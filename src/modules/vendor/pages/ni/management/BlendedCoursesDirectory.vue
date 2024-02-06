@@ -33,7 +33,7 @@
       @click="openCourseCreationModal" />
 
     <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :programs="programs"
-      :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading" @hide="resetCreationModal"
+      :companies="companies" :validations="v$.newCourse" :loading="modalLoading" @hide="resetCreationModal"
       @submit="createCourse" :admin-user-options="adminUserOptions" :holding-options="holdingOptions" />
   </q-page>
 </template>
@@ -100,7 +100,7 @@ export default {
       expectedBillsCount: '0',
       hasCertifyingTest: false,
     });
-    const companyOptions = ref([]);
+    const companies = ref([]);
     const holdingOptions = ref([]);
     const programs = ref([]);
     const adminUserOptions = ref([]);
@@ -120,11 +120,10 @@ export default {
 
     const refreshCompanies = async () => {
       try {
-        const companies = await Companies.list();
-        companyOptions.value = formatAndSortOptions(companies, 'name');
+        companies.value = await Companies.list();
       } catch (e) {
         console.error(e);
-        companyOptions.value = [];
+        companies.value = [];
       }
     };
 
@@ -291,7 +290,7 @@ export default {
       courseCreationModal,
       modalLoading,
       newCourse,
-      companyOptions,
+      companies,
       holdingOptions,
       programs,
       adminUserOptions,
