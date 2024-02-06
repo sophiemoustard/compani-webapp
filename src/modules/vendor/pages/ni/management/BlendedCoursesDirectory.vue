@@ -99,6 +99,7 @@ export default {
       maxTrainees: '8',
       expectedBillsCount: '0',
       hasCertifyingTest: false,
+      salesRepresentative: '',
     });
     const companies = ref([]);
     const holdingOptions = ref([]);
@@ -165,6 +166,7 @@ export default {
         maxTrainees: '8',
         expectedBillsCount: '0',
         hasCertifyingTest: false,
+        salesRepresentative: '',
       };
     };
 

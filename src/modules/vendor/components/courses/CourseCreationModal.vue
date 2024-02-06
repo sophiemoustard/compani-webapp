@@ -9,6 +9,9 @@
         @update:model-value="update($event, 'operationsRepresentative')" :options="adminUserOptions"
         @blur="validations.operationsRepresentative.$touch" :error="validations.operationsRepresentative.$error"
         required-field />
+      <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Chargé(e) d'accompagnement"
+        @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable
+        required-field />
       <ni-select in-modal :model-value="newCourse.program" @update:model-value="update($event, 'program')"
         @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error"
         :options="programOptions" />
