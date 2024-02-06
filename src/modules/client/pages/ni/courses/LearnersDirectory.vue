@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { useMeta } from 'quasar';
 import { computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
@@ -47,11 +48,16 @@ export default {
     useMeta(metaInfo);
 
     const $store = useStore();
-    const company = computed(() => $store.getters['main/getCompany']);
-    const companies = computed(() => [company.value._id]);
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+    const company = computed(() => get(loggedUser.value, 'company'));
+    const companies = computed(() => (
+      get(loggedUser.value, 'role.holding')
+        ? loggedUser.value.holding.companies
+        : [company.value._id]
+    ));
     const companyOptions = computed(() => [{ value: company.value._id, label: company.value.name }]);
     const path = { name: 'ni courses learners info', params: 'learnerId' };
-    const refresh = async () => getLearnerList(company.value._id);
+    const refresh = async () => getLearnerList();
 
     const {
       searchStr,
