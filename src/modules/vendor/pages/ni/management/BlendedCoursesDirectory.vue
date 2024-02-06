@@ -34,8 +34,7 @@
 
     <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :programs="programs"
       :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading" @hide="resetCreationModal"
-      @submit="createCourse" :operations-representative-options="operationsRepresentativeOptions"
-      :holding-options="holdingOptions" />
+      @submit="createCourse" :admin-user-options="adminUserOptions" :holding-options="holdingOptions" />
   </q-page>
 </template>
 
@@ -104,7 +103,7 @@ export default {
     const companyOptions = ref([]);
     const holdingOptions = ref([]);
     const programs = ref([]);
-    const operationsRepresentativeOptions = ref([]);
+    const adminUserOptions = ref([]);
 
     const isIntraCourse = computed(() => newCourse.value.type === INTRA);
     const isIntraHoldingCourse = computed(() => newCourse.value.type === INTRA_HOLDING);
@@ -139,13 +138,13 @@ export default {
       }
     };
 
-    const refreshOperationsRepresentatives = async () => {
+    const refreshAdminUsers = async () => {
       try {
-        const operationsRepresentatives = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        operationsRepresentativeOptions.value = formatAndSortIdentityOptions(operationsRepresentatives);
+        const adminUsers = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        adminUserOptions.value = formatAndSortIdentityOptions(adminUsers);
       } catch (e) {
         console.error(e);
-        operationsRepresentativeOptions.value = [];
+        adminUserOptions.value = [];
       }
     };
 
@@ -279,7 +278,7 @@ export default {
         refreshPrograms(),
         refreshCompanies(),
         refreshHoldings(),
-        refreshOperationsRepresentatives(),
+        refreshAdminUsers(),
       ]);
     };
 
@@ -295,7 +294,7 @@ export default {
       companyOptions,
       holdingOptions,
       programs,
-      operationsRepresentativeOptions,
+      adminUserOptions,
       activeCourses,
       archivedCourses,
       archiveStatusOptions,
