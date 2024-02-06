@@ -30,7 +30,7 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
-import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
+import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import Courses from '@api/Courses';
 import TrainerMissions from '@api/TrainerMissions';
@@ -70,7 +70,7 @@ export default {
       newTrainerMission: {
         program: { required },
         file: { required: requiredIf(creationMethod.value === UPLOAD) },
-        fee: { required, strictPositiveNumber },
+        fee: { required, positiveNumber },
         courses: { required },
       },
     }));

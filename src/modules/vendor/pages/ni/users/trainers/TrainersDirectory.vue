@@ -26,7 +26,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, removeDiacritics } from '@helpers/utils';
-import { TRAINER } from '@data/constants';
+import { TRAINER, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 import TrainerCreationModal from 'src/modules/vendor/components/trainers/TrainerCreationModal';
 
@@ -117,9 +117,9 @@ export default {
     async refreshTrainers () {
       try {
         this.tableLoading = true;
-        const trainers = await Users.list({ role: [TRAINER] });
+        const trainersAndROFs = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER] });
 
-        this.trainers = trainers.map(trainer => this.formatTrainer(trainer));
+        this.trainers = trainersAndROFs.map(trainer => this.formatTrainer(trainer));
       } catch (e) {
         console.error(e);
         this.trainers = [];

@@ -13,7 +13,7 @@
         caption="Formations" required-field />
       <ni-input in-modal caption="Frais de formateur" :error="validations.fee.$error" type="number" suffix="€"
         :model-value="trainerMission.fee" @blur="validations.fee.$touch" required-field
-        @update:model-value="update($event, 'fee')" error-message="La valeur doit être supérieure à 0" />
+        @update:model-value="update($event, 'fee')" error-message="La valeur doit être supérieure ou égale à 0" />
       <ni-input v-if="creationMethod === UPLOAD" in-modal caption="Ordre de mission" type="file"
         @blur="validations.file.$touch" last required-field :model-value="trainerMission.file"
         @update:model-value="update($event, 'file')" :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]"
