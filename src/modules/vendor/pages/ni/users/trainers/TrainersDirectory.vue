@@ -117,9 +117,9 @@ export default {
     async refreshTrainers () {
       try {
         this.tableLoading = true;
-        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER] });
+        const trainersAndROFs = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER] });
 
-        this.trainers = trainers.map(trainer => this.formatTrainer(trainer));
+        this.trainers = trainersAndROFs.map(trainer => this.formatTrainer(trainer));
       } catch (e) {
         console.error(e);
         this.trainers = [];
