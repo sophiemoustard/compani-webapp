@@ -1,6 +1,12 @@
 <template>
   <div v-if="company">
+    <p class="text-weight-bold">Accompagnement</p>
+    <div class="interlocutor-container q-mb-xl">
+      <ni-interlocutor-cell :interlocutor="company.salesRepresentative" caption="Chargé d'accompagnement"
+        can-update label="Ajouter un chargé d'accompagnement" @open-modal="openSalesRepresentativeModal" />
+    </div>
     <div class="q-mb-xl">
+      <p class="text-weight-bold">Informations générales</p>
       <div class="row gutter-profile">
         <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
           @blur="trimAndUpdateCompany('name')" :error="v$.company.name.$error" />
@@ -20,106 +26,186 @@
     </div>
     <ni-coach-list :company="company" />
   </div>
+
+  <ni-interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpSalesRepresentative"
+    @submit="updateCompany('salesRepresentative')" :label="salesRepresentativeModalLabel"
+    :interlocutors-options="salesRepresentativeOptions" :loading="salesRepresentativeModalLoading"
+    @hide="resetSalesRepresentative" :validations="v$.tmpSalesRepresentative" />
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import useVuelidate from '@vuelidate/core';
+import { computed, ref, toRefs } from 'vue';
+import { useStore } from 'vuex';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Companies from '@api/Companies';
+import Users from '@api/Users';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import InterlocutorCell from '@components/courses/InterlocutorCell';
+import InterlocutorModal from '@components/courses/InterlocutorModal';
 import { validTradeName, frAddress } from '@helpers/vuelidateCustomVal';
-import { companyMixin } from '@mixins/companyMixin';
-import { validationMixin } from '@mixins/validationMixin';
-import { COMPANY_TYPES } from '@data/constants';
+import { formatAndSortUserOptions } from '@helpers/utils';
+import { useValidations } from '@composables/validations';
+import { useCompanies } from '@composables/companies';
+import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, EDITION, COMPANY_TYPES } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
   props: {
     profileId: { type: String, required: true },
   },
-  setup () {
-    const tmpInput = '';
-    const companyTypeOptions = COMPANY_TYPES;
-
-    return { tmpInput, companyTypeOptions, v$: useVuelidate() };
-  },
   components: {
     'ni-input': Input,
     'ni-coach-list': CoachList,
     'ni-search-address': SearchAddress,
     'ni-select': Select,
+    'ni-interlocutor-cell': InterlocutorCell,
+    'ni-interlocutor-modal': InterlocutorModal,
   },
-  mixins: [companyMixin, validationMixin],
-  validations () {
-    return { company: {
-      name: { required },
-      type: { required },
-      tradeName: { validTradeName },
-      address: {
-        zipCode: { required },
-        street: { required },
-        city: { required },
-        fullAddress: { required, frAddress },
-        location: { required },
+  setup (props) {
+    const { profileId } = toRefs(props);
+    const companyTypeOptions = COMPANY_TYPES;
+    const tmpInput = ref('');
+    const salesRepresentativeOptions = ref([]);
+    const tmpSalesRepresentative = ref({});
+    const salesRepresentativeModal = ref(false);
+    const salesRepresentativeModalLoading = ref(false);
+    const salesRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
+
+    const $store = useStore();
+    const company = computed(() => $store.state.company.company);
+
+    const companyRules = computed(() => ({
+      company: {
+        name: { required },
+        type: { required },
+        tradeName: { validTradeName },
+        address: {
+          zipCode: { required },
+          street: { required },
+          city: { required },
+          fullAddress: { required, frAddress },
+          location: { required },
+        },
       },
-    } };
-  },
-  computed: {
-    ...mapState('company', ['company']),
-  },
-  async created () {
-    if (!this.company) await this.refreshCompany();
-  },
-  methods: {
-    saveTmp (path) {
-      this.tmpInput = get(this.company, path);
-    },
-    async refreshCompany () {
+      tmpSalesRepresentative: { _id: { required } },
+    }));
+    const v$ = useVuelidate(companyRules, { company, tmpSalesRepresentative });
+
+    const { waitForValidation } = useValidations();
+
+    const { tradeNameError, addressError } = useCompanies(v$.value);
+
+    const saveTmp = (path) => { tmpInput.value = get(company.value, path); };
+
+    const refreshCompany = async () => {
       try {
-        await this.$store.dispatch('company/fetchCompany', { companyId: this.profileId });
+        await $store.dispatch('company/fetchCompany', { companyId: profileId.value });
       } catch (e) {
         console.error(e);
       }
-    },
-    async trimAndUpdateCompany (path) {
-      const value = get(this.company, path);
-      set(this.company, path, value ? value.trim() : '');
+    };
 
-      this.updateCompany(path);
-    },
-    async updateCompany (path) {
+    const trimAndUpdateCompany = async (path) => {
+      const value = get(company.value, path);
+      set(company.value, path, value ? value.trim() : '');
+
+      await updateCompany(path);
+    };
+
+    const updateCompany = async (path) => {
       try {
-        const value = get(this.company, path);
-        if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
-        if (this.tmpInput === value) return;
-        this.v$.company.$touch();
+        const value = get(company.value, path);
+        if (path === 'address' && tmpInput.value === get(company.value, 'address.fullAddress')) return;
+        if (tmpInput.value === value) return;
 
-        if (get(this.v$.company, path)) {
-          const isValid = await this.waitForValidation(this.v$.company, path);
+        let payload;
+        if (path === 'salesRepresentative') {
+          v$.value.tmpSalesRepresentative.$touch();
+          if (v$.value.tmpSalesRepresentative.$error) return NotifyWarning('Champ invalide');
+
+          payload = { salesRepresentative: tmpSalesRepresentative.value._id };
+        } else {
+          v$.value.company.$touch();
+          const isValid = await waitForValidation(v$.value.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+
+          payload = set({}, path, value);
         }
 
-        const payload = set({}, path, value);
-        await Companies.updateById(this.company._id, payload);
-        NotifyPositive('Modification enregistrée.');
+        await Companies.updateById(company.value._id, payload);
 
-        await this.refreshCompany();
+        NotifyPositive('Modification enregistrée.');
+        salesRepresentativeModal.value = false;
+
+        await refreshCompany();
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        this.tmpInput = '';
+        tmpInput.value = '';
       }
-    },
+    };
+
+    const refreshSalesRepresentativeOptions = async () => {
+      const rofAndAdminUsers = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+
+      salesRepresentativeOptions.value = formatAndSortUserOptions(rofAndAdminUsers, false);
+    };
+
+    const openSalesRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+      tmpSalesRepresentative.value = get(company.value, 'salesRepresentative');
+      salesRepresentativeModalLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
+      salesRepresentativeModal.value = true;
+    };
+
+    const resetSalesRepresentative = () => {
+      tmpSalesRepresentative.value = {};
+      salesRepresentativeModalLabel.value = { action: '', interlocutor: '' };
+      salesRepresentativeModalLoading.value = false;
+      v$.value.tmpSalesRepresentative.$reset();
+    };
+
+    const created = async () => {
+      if (!company.value) await refreshCompany();
+      await refreshSalesRepresentativeOptions();
+    };
+
+    created();
+
+    return {
+      // Data
+      tmpInput,
+      companyTypeOptions,
+      salesRepresentativeOptions,
+      salesRepresentativeModal,
+      salesRepresentativeModalLabel,
+      salesRepresentativeModalLoading,
+      tmpSalesRepresentative,
+      // Validations
+      v$,
+      // Computed
+      company,
+      addressError,
+      // Methods
+      saveTmp,
+      trimAndUpdateCompany,
+      updateCompany,
+      tradeNameError,
+      refreshSalesRepresentativeOptions,
+      openSalesRepresentativeModal,
+      resetSalesRepresentative,
+    };
   },
 };
 </script>

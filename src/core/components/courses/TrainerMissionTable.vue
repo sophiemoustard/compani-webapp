@@ -11,8 +11,13 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props"
                 :style="col.style" :class="[{ 'border': props.rowIndex === 0 }]">
                 <template v-if="col.name === 'actions'">
-                  <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
-                    :disable="!props.row.file.link" />
+                  <div v-if="props.row.cancelledAt" class="text-orange-700 q-mr-md">Annulé</div>
+                  <div v-else>
+                    <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
+                      :disable="!props.row.file.link" />
+                    <ni-button v-if="canUpdate" icon="close" color="primary"
+                      @click="validateMissionCancellation(props.row._id)" />
+                  </div>
                 </template>
                 <template v-else-if="col.name === 'courses'">
                   <div v-for="course of props.row.courses" :key="course._id" class="q-mb-xs course">
@@ -36,26 +41,33 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, toRefs } from 'vue';
+import { useQuasar } from 'quasar';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import CompaniDate from '@helpers/dates/companiDates';
-import { DD_MM_YYYY } from '@data/constants';
+import { DD_MM_YYYY, DAY } from '@data/constants';
 import { formatPrice } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
+import TrainerMissions from '@api/TrainerMissions';
 
 export default {
   name: 'TrainerMissionTable',
   props: {
     loading: { type: Boolean, default: false },
     trainerMissions: { type: Array, default: () => [] },
+    canUpdate: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
   },
   emits: ['refresh'],
-  setup () {
+  setup (props, { emit }) {
+    const $q = useQuasar();
+    const { canUpdate } = toRefs(props);
+
     const screenWidth = ref(window.innerWidth);
     const pagination = ref({ rowsPerPage: 5, sortBy: 'date', descending: true });
     const columns = ref([
@@ -71,7 +83,7 @@ export default {
         label: 'Formation',
         align: 'left',
         field: 'courses',
-        style: screenWidth.value > 767 && 'width: 70%',
+        style: screenWidth.value > 767 && 'width: 65%',
       },
       {
         name: 'fee',
@@ -80,14 +92,37 @@ export default {
         field: 'fee',
         format: formatPrice,
       },
-      { name: 'actions', label: '', align: 'right', field: '' },
+      { name: 'actions', label: '', align: 'right', field: '', style: screenWidth.value > 767 && 'width: 15%' },
     ]);
 
     const gotToCourse = courseId => ({
-      name: 'ni management blended courses info',
+      name: canUpdate.value ? 'ni management blended courses info' : 'trainers courses info',
       params: { courseId },
       query: { defaultTab: 'organization' },
     });
+
+    const validateMissionCancellation = (trainerMissionId) => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir annuler cet ordre de mission&nbsp;?',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => cancelTrainerMission(trainerMissionId))
+        .onCancel(() => NotifyPositive('Annulation de l\'ordre de mission annulée.'));
+    };
+
+    const cancelTrainerMission = async (trainerMissionId) => {
+      try {
+        await TrainerMissions.update(trainerMissionId, { cancelledAt: CompaniDate().startOf(DAY).toISO() });
+
+        emit('refresh');
+        NotifyPositive('Ordre de mission annulé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'annulation de l\'ordre de mission.');
+      }
+    };
 
     return {
       // Data
@@ -96,6 +131,7 @@ export default {
       // Methods
       composeCourseName,
       gotToCourse,
+      validateMissionCancellation,
     };
   },
 };

@@ -281,6 +281,15 @@ const routes = [
         },
       },
       {
+        path: 'trainers/contracts',
+        name: 'trainers contracts',
+        component: () => import('src/modules/vendor/pages/trainers/administrative/Contracts'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'administrative',
+        },
+      },
+      {
         path: 'account',
         name: 'account vendor',
         component: () => import('src/core/pages/AccountInfo'),

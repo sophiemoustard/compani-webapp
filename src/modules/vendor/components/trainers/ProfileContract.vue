@@ -1,37 +1,51 @@
 <template>
   <div>
     <div class="clickable-name text-italic q-mb-md">
-      <router-link :to="gotToCourseDirectory()">Voir les formations du formateur</router-link>
+      <router-link :to="gotToCourseDirectory()" @click="setSelectedTrainer">
+        {{ canUpdateTrainerMissions ? 'Voir les formations du formateur' : 'Voir mes formations' }}
+      </router-link>
     </div>
-    <ni-trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading" />
-    <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un ordre de mission" color="primary"
-      @click="openTrainerMissionCreationModal" :loading="missionCreationLoading" :disable="!courseList.length" />
+    <trainer-mission-table :trainer-missions="trainerMissions" :loading="missionCreationLoading"
+      @refresh="refreshTrainerMissions" :can-update="canUpdateTrainerMissions" />
+    <q-btn v-if="canUpdateTrainerMissions" class="fixed fab-custom" no-caps rounded icon="add"
+      label="Créer un ordre de mission" color="primary" @click="openTrainerMissionCreationModal"
+      :loading="missionCreationLoading" :disable="!courseList.length" />
 
-    <ni-trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
-      @submit="createTrainerMission" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
-      :loading="missionCreationLoading" :courses="coursesWithoutTrainerMission" />
+    <trainer-mission-creation-modal v-model="missionCreationModal" v-model:trainer-mission="newTrainerMission"
+      @submit="nextStep" :validations="v$.newTrainerMission" @hide="resetMissionCreationModal"
+      :loading="missionCreationLoading" :courses="coursesWithoutTrainerMission"
+      v-model:creation-method="creationMethod" />
+
+    <trainer-mission-infos-modal v-model="trainerMissionInfosModal" :courses="selectedCourses"
+      :fee="Number(newTrainerMission.fee)" :loading="missionCreationLoading" @submit="createTrainerMission"
+      @hide="resetMissionCreationModal" />
   </div>
 </template>
 
 <script>
+import { subject } from '@casl/ability';
 import { useStore } from 'vuex';
 import { computed, ref } from 'vue';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
-import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
+import { required, requiredIf } from '@vuelidate/validators';
+import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 import Courses from '@api/Courses';
 import TrainerMissions from '@api/TrainerMissions';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { TRAINER, BLENDED, OPERATIONS } from '@data/constants';
+import { TRAINER, BLENDED, OPERATIONS, UPLOAD } from '@data/constants';
 import TrainerMissionCreationModal from '@components/courses/TrainerMissionCreationModal';
 import TrainerMissionTable from '@components/courses/TrainerMissionTable';
+import TrainerMissionInfosModal from '@components/courses/TrainerMissionInfosModal';
 
 export default {
   name: 'ProfileContract',
   components: {
-    'ni-trainer-mission-creation-modal': TrainerMissionCreationModal,
-    'ni-trainer-mission-table': TrainerMissionTable,
+    'trainer-mission-creation-modal': TrainerMissionCreationModal,
+    'trainer-mission-table': TrainerMissionTable,
+    'trainer-mission-infos-modal': TrainerMissionInfosModal,
   },
   setup () {
     const $store = useStore();
@@ -41,27 +55,43 @@ export default {
     const newTrainerMission = ref({ courses: [], fee: 0, program: '', file: '' });
     const courseList = ref([]);
     const trainerMissions = ref([]);
+    const creationMethod = ref(UPLOAD);
+    const trainerMissionInfosModal = ref(false);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const canUpdateTrainerMissions = computed(() => {
+      const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+      return ability.can('update', subject('Courses', courseList.value), 'trainer_missions');
+    });
 
     const rules = computed(() => ({
       newTrainerMission: {
         program: { required },
-        file: { required },
-        fee: { required, strictPositiveNumber },
+        file: { required: requiredIf(creationMethod.value === UPLOAD) },
+        fee: { required, positiveNumber },
         courses: { required },
       },
     }));
 
     const v$ = useVuelidate(rules, { newTrainerMission });
 
-    const trainer = computed(() => (TRAINER === get($store.state.main.loggedUser, 'role.vendor.name')
-      ? $store.state.main.loggedUser
+    const trainer = computed(() => (TRAINER === get(loggedUser.value, 'role.vendor.name')
+      ? loggedUser.value
       : $store.state.userProfile.userProfile));
 
     const coursesWithoutTrainerMission = computed(() => {
-      const trainerMissionsCourses = trainerMissions.value.map(tm => tm.courses.map(c => c._id)).flat();
+      const coursesWithActiveTrainerMissions = trainerMissions.value
+        .filter(tm => !tm.cancelledAt)
+        .map(tm => tm.courses.map(c => c._id))
+        .flat();
 
-      return courseList.value.filter(c => !trainerMissionsCourses.includes(c._id));
+      return courseList.value.filter(c => !coursesWithActiveTrainerMissions.includes(c._id));
     });
+
+    const selectedCourses = computed(() => courseList.value
+      .filter(c => newTrainerMission.value.courses.includes(c._id)));
 
     const refreshCourses = async () => {
       try {
@@ -94,22 +124,32 @@ export default {
       const { courses, file, fee } = newTrainerMission.value;
       const form = new FormData();
       courses.forEach(course => form.append('courses', course));
-      form.append('file', file);
+      if (file) form.append('file', file);
       form.append('trainer', trainer.value._id);
       form.append('fee', fee);
 
       return form;
     };
 
+    const nextStep = async () => {
+      v$.value.newTrainerMission.$touch();
+      if (v$.value.newTrainerMission.$error) return NotifyWarning('Champ(s) invalide(s)');
+      if (creationMethod.value === UPLOAD) await createTrainerMission();
+      else {
+        trainerMissionInfosModal.value = true;
+        missionCreationModal.value = false;
+      }
+    };
+
     const createTrainerMission = async () => {
       try {
-        v$.value.newTrainerMission.$touch();
-        if (v$.value.newTrainerMission.$error) return NotifyWarning('Champ(s) invalide(s)');
         missionCreationLoading.value = true;
 
         await TrainerMissions.create(formatPayload());
 
         missionCreationModal.value = false;
+        trainerMissionInfosModal.value = false;
+        resetMissionCreationModal();
         NotifyPositive('Ordre de mission ajouté.');
         await refreshTrainerMissions();
       } catch (e) {
@@ -130,15 +170,17 @@ export default {
     };
 
     const resetMissionCreationModal = () => {
-      newTrainerMission.value = { program: '', courses: [], fee: 0, file: '' };
-      v$.value.newTrainerMission.$reset();
+      if (!trainerMissionInfosModal.value) {
+        newTrainerMission.value = { program: '', courses: [], fee: 0, file: '' };
+        creationMethod.value = UPLOAD;
+        v$.value.newTrainerMission.$reset();
+      }
     };
+    const setSelectedTrainer = () => $store.dispatch('course/setSelectedTrainer', { trainerId: trainer.value._id });
 
-    const gotToCourseDirectory = () => {
-      $store.dispatch('course/setSelectedTrainer', { trainerId: trainer.value._id });
-
-      return { name: 'ni management blended courses' };
-    };
+    const gotToCourseDirectory = () => (
+      canUpdateTrainerMissions.value ? { name: 'ni management blended courses' } : { name: 'trainers courses' }
+    );
 
     const created = async () => {
       await Promise.all([refreshCourses(), refreshTrainerMissions()]);
@@ -155,13 +197,20 @@ export default {
       newTrainerMission,
       trainerMissions,
       courseList,
+      creationMethod,
+      trainerMissionInfosModal,
       // Computed
       coursesWithoutTrainerMission,
+      selectedCourses,
+      canUpdateTrainerMissions,
       // Methods
       openTrainerMissionCreationModal,
       createTrainerMission,
       resetMissionCreationModal,
       gotToCourseDirectory,
+      setSelectedTrainer,
+      nextStep,
+      refreshTrainerMissions,
     };
   },
 };
