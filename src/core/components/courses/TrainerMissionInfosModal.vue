@@ -58,7 +58,7 @@ export default {
     const course = computed(() => courses.value[0]);
 
     const trainerGender = computed(() => {
-      const civility = get(CIVILITY_OPTIONS.find(opt => course.value.trainer.identity.title === opt.value), 'label');
+      const civility = get(CIVILITY_OPTIONS.find(opt => course.value.trainer.identity.title === opt.value), 'value');
       return civility === MR ? 'Formateur' : 'Formatrice';
     });
 
