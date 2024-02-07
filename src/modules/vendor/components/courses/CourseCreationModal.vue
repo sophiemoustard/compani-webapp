@@ -156,7 +156,7 @@ export default {
     watch(
       () => newCourse.value.company,
       (companyId) => {
-        const selectedCompany = companies.value.find(p => p._id === companyId);
+        const selectedCompany = companies.value.find(c => c._id === companyId);
 
         const value = get(selectedCompany, 'salesRepresentative') || '';
         update(value, 'salesRepresentative');
