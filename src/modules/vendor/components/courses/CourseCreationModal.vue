@@ -9,8 +9,6 @@
         @update:model-value="update($event, 'operationsRepresentative')" :options="adminUserOptions"
         @blur="validations.operationsRepresentative.$touch" :error="validations.operationsRepresentative.$error"
         required-field />
-      <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Chargé(e) d'accompagnement"
-        @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable />
       <ni-select in-modal :model-value="newCourse.program" @update:model-value="update($event, 'program')"
         @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error"
         :options="programOptions" />
@@ -20,6 +18,8 @@
       <ni-select v-if="isIntraCourse" in-modal :model-value="newCourse.company"
         @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions"
         :error="validations.company.$error" @update:model-value="update($event, 'company')" />
+      <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Chargé(e) d'accompagnement"
+        @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable />
       <ni-select v-if="isIntraHoldingCourse" in-modal :model-value="newCourse.holding"
         @blur="validations.holding.$touch" required-field caption="Société mère" :options="holdingOptions"
         :error="validations.holding.$error" @update:model-value="update($event, 'holding')" />
@@ -150,6 +150,16 @@ export default {
           if (subProgramOptions.value.length === 1) update(subProgramOptions.value[0].value, 'subProgram');
           else update('', 'subProgram');
         }
+      }
+    );
+
+    watch(
+      () => newCourse.value.company,
+      (companyId) => {
+        const selectedCompany = companies.value.find(p => p._id === companyId);
+
+        const value = get(selectedCompany, 'salesRepresentative') || '';
+        update(value, 'salesRepresentative');
       }
     );
 
