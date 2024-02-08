@@ -384,7 +384,8 @@ export default {
       canGetTrainersAndAdminUsers.value = ability
         .can('read', subject('Course', course.value), 'interlocutor');
       canUpdateCertifyingTest.value = ability.can('update', subject('Course', course.value), 'certifying_test');
-      canReadAndUpdateSalesRepresentative.value = ability.can('read', subject('Course', course.value), 'sales_representative');
+      canReadAndUpdateSalesRepresentative.value = ability
+        .can('read', subject('Course', course.value), 'sales_representative');
     };
 
     const toggleHistory = async () => {
@@ -727,7 +728,7 @@ export default {
       v$.value.tmpContactId.$reset();
     };
 
-    const resetOperationsOrSalesRepresentativeModal= () => {
+    const resetOperationsOrSalesRepresentativeModal = () => {
       tmpInterlocutor.value = { _id: '', isContact: false };
       v$.value.tmpInterlocutor.$reset();
     };
