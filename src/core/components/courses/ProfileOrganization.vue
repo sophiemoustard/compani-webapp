@@ -25,6 +25,8 @@
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Chargé de formation structure"
           :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
+        <interlocutor-cell v-if="canReadAndUpdateSalesRepresentative" :interlocutor="course.salesRepresentative"
+          caption="Chargé d'accompagnement" :can-update="true" label="Ajouter un chargé d'accompagnement" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
@@ -246,6 +248,7 @@ export default {
     const canUpdateSMS = ref(false);
     const canReadHistory = ref(false);
     const canUpdateCertifyingTest = ref(false);
+    const canReadAndUpdateSalesRepresentative = ref(false);
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
     const urlAndroid = 'https://bit.ly/3en5OkF';
@@ -373,6 +376,7 @@ export default {
       canGetTrainersAndAdminUsers.value = ability
         .can('read', subject('Course', course.value), 'interlocutor');
       canUpdateCertifyingTest.value = ability.can('update', subject('Course', course.value), 'certifying_test');
+      canReadAndUpdateSalesRepresentative.value = ability.can('read', subject('Course', course.value), 'sales_representative');
     };
 
     const toggleHistory = async () => {
@@ -868,6 +872,7 @@ export default {
       canReadHistory,
       canGetTrainingContracts,
       canUpdateCertifyingTest,
+      canReadAndUpdateSalesRepresentative,
       COMPANY_REPRESENTATIVE,
       OPERATIONS_REPRESENTATIVE,
       TRAINER,
