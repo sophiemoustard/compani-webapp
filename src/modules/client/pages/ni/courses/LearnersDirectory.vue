@@ -18,23 +18,26 @@
 
       <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
-      :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" @hide="resetLearnerCreationModal"
-      @next-step="nextStepLearnerCreationModal" :validations="learnerValidation.newLearner" disable-company
-      :company-options="companyOptions" :disable-user-info="disableUserInfoEdition" />
+      :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" :disable-company="!isHoldingAdmin"
+      @next-step="nextStepLearnerCreationModal" :validations="learnerValidation.newLearner"
+      :company-options="companyOptions" :disable-user-info="disableUserInfoEdition" @hide="resetLearnerCreationModal" />
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
 import { useMeta } from 'quasar';
-import { computed, onMounted } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
+import Companies from '@api/Companies';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
+import { NotifyNegative } from '@components/popup/notify';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
 import { useLearnersCreation } from '@composables/learnersCreation';
+import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
   name: 'LearnersDirectory',
@@ -48,14 +51,16 @@ export default {
     useMeta(metaInfo);
 
     const $store = useStore();
+    const holdingCompanies = ref([]);
     const loggedUser = computed(() => $store.state.main.loggedUser);
     const company = computed(() => get(loggedUser.value, 'company'));
-    const companies = computed(() => (
-      get(loggedUser.value, 'role.holding')
-        ? loggedUser.value.holding.companies
-        : [company.value._id]
+    const isHoldingAdmin = computed(() => get(loggedUser.value, 'role.holding'));
+    const companies = computed(() => (isHoldingAdmin.value ? loggedUser.value.holding.companies : [company.value._id]));
+    const companyOptions = computed(() => (
+      isHoldingAdmin.value
+        ? holdingCompanies.value
+        : [{ value: company.value._id, label: company.value.name }]
     ));
-    const companyOptions = computed(() => [{ value: company.value._id, label: company.value.name }]);
     const path = { name: 'ni courses learners info', params: 'learnerId' };
     const refresh = async () => getLearnerList();
 
@@ -77,7 +82,22 @@ export default {
       resetLearnerCreationModal,
     } = useLearnersCreation(refresh, true, true, companies);
 
-    onMounted(async () => { await refresh(); });
+    const getHoldingCompanies = async () => {
+      try {
+        const companyList = await Companies.list({ holding: loggedUser.value.holding._id });
+        holdingCompanies.value = formatAndSortOptions(companyList, 'name');
+      } catch (error) {
+        holdingCompanies.value = [];
+        NotifyNegative('Erreur lors de la récupération des structures.');
+      }
+    };
+
+    const created = async () => {
+      await refresh();
+      if (isHoldingAdmin.value) await getHoldingCompanies();
+    };
+
+    created();
 
     return {
       // Data
@@ -94,6 +114,7 @@ export default {
       filteredLearners,
       company,
       companyOptions,
+      isHoldingAdmin,
       // Validations
       learnerValidation,
       // Methods
