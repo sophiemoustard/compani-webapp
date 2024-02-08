@@ -26,7 +26,8 @@
           :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
         <interlocutor-cell v-if="canReadAndUpdateSalesRepresentative" :interlocutor="course.salesRepresentative"
-          caption="Chargé d'accompagnement" :can-update="true" label="Ajouter un chargé d'accompagnement" />
+          caption="Chargé d'accompagnement" :can-update="true" label="Ajouter un chargé d'accompagnement"
+          @open-modal="openSalesRepresentativeModal" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
@@ -107,6 +108,11 @@
       @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
+
+    <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
+      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
+      :loading="interlocutorModalLoading" @hide="resetOperationsRepresentativeEdition"
+      :interlocutors-options="adminUserOptions" :show-contact="false" :label="interlocutorLabel" />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
@@ -235,6 +241,7 @@ export default {
     const companyRepresentativeModal = ref(false);
     const contactModalLoading = ref(false);
     const contactAdditionModal = ref(false);
+    const salesRepresentativeModal = ref(false);
     const tmpContactId = ref('');
     const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
@@ -251,6 +258,7 @@ export default {
     const canReadAndUpdateSalesRepresentative = ref(false);
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
+    const SALES_REPRESENTATIVE = 'salesRepresentative';
     const urlAndroid = 'https://bit.ly/3en5OkF';
     const urlIos = 'https://apple.co/33kKzcU';
 
@@ -653,6 +661,9 @@ export default {
           case COMPANY_REPRESENTATIVE:
             companyRepresentativeModal.value = false;
             break;
+          case SALES_REPRESENTATIVE:
+            salesRepresentativeModal.value = false;
+            break;
         }
         await refreshCourse();
         NotifyPositive('Interlocuteur mis à jour.');
@@ -760,6 +771,14 @@ export default {
       contactAdditionModal.value = true;
     };
 
+    const openSalesRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+      tmpInterlocutor.value = { _id: course.value.salesRepresentative._id };
+      interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
+      salesRepresentativeModal.value = true;
+    };
+
     const copy = () => {
       copyToClipboard(traineesEmails.value)
         .then(() => NotifyPositive('Adresses mail copiées !'))
@@ -861,6 +880,7 @@ export default {
       companyRepresentativeModal,
       contactModalLoading,
       contactAdditionModal,
+      salesRepresentativeModal,
       tmpContactId,
       courseHistoryFeed,
       tmpCourse,
@@ -876,6 +896,7 @@ export default {
       COMPANY_REPRESENTATIVE,
       OPERATIONS_REPRESENTATIVE,
       TRAINER,
+      SALES_REPRESENTATIVE,
       // Computed
       course,
       v$,
@@ -920,6 +941,7 @@ export default {
       openTrainerModal,
       openCompanyRepresentativeModal,
       openContactAdditionModal,
+      openSalesRepresentativeModal,
       copy,
       updateCourse,
       downloadAttendanceSheet,
