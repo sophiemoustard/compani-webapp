@@ -96,7 +96,7 @@
 
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
-      :loading="interlocutorModalLoading" @hide="resetOperationsRepresentativeEdition"
+      :loading="interlocutorModalLoading" @hide="resetOperationsOrSalesRepresentativeModal"
       :interlocutors-options="adminUserOptions" :show-contact="canUpdateInterlocutor"
       :label="operationsRepresentativeLabel" />
 
@@ -110,9 +110,9 @@
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
-      :loading="interlocutorModalLoading" @hide="resetOperationsRepresentativeEdition"
-      :interlocutors-options="adminUserOptions" :show-contact="false" :label="interlocutorLabel" />
+      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading"
+      @hide="resetOperationsOrSalesRepresentativeModal" :interlocutors-options="adminUserOptions"
+      :show-contact="false" :label="interlocutorLabel" clearable-interlocutor />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
@@ -635,8 +635,11 @@ export default {
     const updateInterlocutor = async (role) => {
       try {
         interlocutorModalLoading.value = true;
-        v$.value.tmpInterlocutor.$touch();
-        if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        if (role !== SALES_REPRESENTATIVE) {
+          v$.value.tmpInterlocutor.$touch();
+          if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         const payload = {
           [role]: tmpInterlocutor.value._id,
@@ -724,7 +727,7 @@ export default {
       v$.value.tmpContactId.$reset();
     };
 
-    const resetOperationsRepresentativeEdition = () => {
+    const resetOperationsOrSalesRepresentativeModal= () => {
       tmpInterlocutor.value = { _id: '', isContact: false };
       v$.value.tmpInterlocutor.$reset();
     };
@@ -774,7 +777,7 @@ export default {
     const openSalesRepresentativeModal = (value) => {
       const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
-      tmpInterlocutor.value = { _id: course.value.salesRepresentative._id };
+      tmpInterlocutor.value = { _id: get(course.value, 'salesRepresentative._id') || '' };
       interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
       salesRepresentativeModal.value = true;
     };
@@ -935,7 +938,7 @@ export default {
       validateTrainerUpdate,
       updateContact,
       resetContactAddition,
-      resetOperationsRepresentativeEdition,
+      resetOperationsOrSalesRepresentativeModal,
       openOperationsRepresentativeModal,
       resetInterlocutor,
       openTrainerModal,
