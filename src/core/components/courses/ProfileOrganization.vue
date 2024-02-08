@@ -94,7 +94,7 @@
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetOperationsRepresentativeEdition"
-      :interlocutors-options="operationsRepresentativeOptions" :show-contact="canUpdateInterlocutor"
+      :interlocutors-options="adminUserOptions" :show-contact="canUpdateInterlocutor"
       :label="operationsRepresentativeLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
@@ -205,7 +205,7 @@ export default {
     const $q = useQuasar();
 
     const trainerOptions = ref([]);
-    const operationsRepresentativeOptions = ref([]);
+    const adminUserOptions = ref([]);
     const companyRepresentativeOptions = ref([]);
     const courseLoading = ref(false);
     const tmpInput = ref('');
@@ -240,7 +240,7 @@ export default {
     const trainingContractTableLoading = ref(false);
     const canUpdateCompanyRepresentative = ref(false);
     const canGetTrainingContracts = ref(false);
-    const canGetTrainersAndOperationsRepresentatives = ref(false);
+    const canGetTrainersAndAdminUsers = ref(false);
     const canUpdateInterlocutor = ref(false);
     const canUpdateTrainees = ref(false);
     const canUpdateSMS = ref(false);
@@ -370,7 +370,7 @@ export default {
       canUpdateSMS.value = ability.can('update', subject('Course', course.value), 'sms');
       canReadHistory.value = ability.can('read', subject('Course', course.value), 'history');
       canGetTrainingContracts.value = ability.can('read', subject('Course', course.value), 'training_contracts');
-      canGetTrainersAndOperationsRepresentatives.value = ability
+      canGetTrainersAndAdminUsers.value = ability
         .can('read', subject('Course', course.value), 'interlocutor');
       canUpdateCertifyingTest.value = ability.can('update', subject('Course', course.value), 'certifying_test');
     };
@@ -487,21 +487,22 @@ export default {
       }
     };
 
-    const refreshTrainersAndOperationsRepresentatives = async () => {
+    const refreshTrainersAndAdminUsers = async () => {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         trainerOptions.value = Object.freeze(
           vendorUsers.map(vu => formatInterlocutorOption(vu)).sort((a, b) => a.label.localeCompare(b.label))
         );
+
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
-        const operationsRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-        operationsRepresentativeOptions.value = operationsRepresentatives
+        const adminUsers = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
+        adminUserOptions.value = adminUsers
           .map(sr => formatInterlocutorOption(sr))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         trainerOptions.value = [];
-        operationsRepresentativeOptions.value = [];
+        adminUserOptions.value = [];
       }
     };
 
@@ -820,10 +821,9 @@ export default {
       if (canUpdateSMS.value) promises.push(refreshSms());
       if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
       if (canGetTrainingContracts.value) promises.push(refreshTrainingContracts());
-      if (canGetTrainersAndOperationsRepresentatives.value) {
-        promises.push(refreshTrainersAndOperationsRepresentatives());
-      } else {
-        operationsRepresentativeOptions.value = [formatInterlocutorOption(course.value.operationsRepresentative)];
+      if (canGetTrainersAndAdminUsers.value) promises.push(refreshTrainersAndAdminUsers());
+      else {
+        adminUserOptions.value = [formatInterlocutorOption(course.value.operationsRepresentative)];
       }
 
       await Promise.all(promises);
@@ -836,7 +836,7 @@ export default {
       INTRA,
       trainerOptions,
       potentialTrainees,
-      operationsRepresentativeOptions,
+      adminUserOptions,
       companyRepresentativeOptions,
       courseLoading,
       displayHistory,
