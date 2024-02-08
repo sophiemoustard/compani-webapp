@@ -18,9 +18,9 @@
 
       <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
-      :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" @hide="resetLearnerCreationModal"
+      :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" :disable-company="!isHoldingAdmin"
       @next-step="nextStepLearnerCreationModal" :validations="learnerValidation.newLearner"
-      :company-options="companyOptions" :disable-user-info="disableUserInfoEdition" :disable-company="disableCompany" />
+      :company-options="companyOptions" :disable-user-info="disableUserInfoEdition" @hide="resetLearnerCreationModal" />
   </q-page>
 </template>
 
@@ -54,14 +54,10 @@ export default {
     const holdingCompanies = ref([]);
     const loggedUser = computed(() => $store.state.main.loggedUser);
     const company = computed(() => get(loggedUser.value, 'company'));
-    const companies = computed(() => (
-      get(loggedUser.value, 'role.holding')
-        ? loggedUser.value.holding.companies
-        : [company.value._id]
-    ));
-    const disableCompany = computed(() => !get(loggedUser.value, 'role.holding'));
+    const isHoldingAdmin = computed(() => get(loggedUser.value, 'role.holding'));
+    const companies = computed(() => (isHoldingAdmin.value ? loggedUser.value.holding.companies : [company.value._id]));
     const companyOptions = computed(() => (
-      get(loggedUser.value, 'role.holding')
+      isHoldingAdmin.value
         ? holdingCompanies.value
         : [{ value: company.value._id, label: company.value.name }]
     ));
@@ -98,7 +94,7 @@ export default {
 
     const created = async () => {
       await refresh();
-      if (get(loggedUser.value, 'role.holding')) await getHoldingCompanies();
+      if (isHoldingAdmin.value) await getHoldingCompanies();
     };
 
     created();
@@ -118,7 +114,7 @@ export default {
       filteredLearners,
       company,
       companyOptions,
-      disableCompany,
+      isHoldingAdmin,
       // Validations
       learnerValidation,
       // Methods
