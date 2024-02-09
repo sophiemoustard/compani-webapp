@@ -25,6 +25,9 @@
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Chargé de formation structure"
           :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
+        <interlocutor-cell v-if="canReadAndUpdateSalesRepresentative" :interlocutor="course.salesRepresentative"
+          caption="Chargé d'accompagnement" can-update label="Ajouter un chargé d'accompagnement"
+          @open-modal="openSalesRepresentativeModal" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
@@ -93,9 +96,8 @@
 
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
-      :loading="interlocutorModalLoading" @hide="resetOperationsRepresentativeEdition"
-      :interlocutors-options="operationsRepresentativeOptions" :show-contact="canUpdateInterlocutor"
-      :label="operationsRepresentativeLabel" />
+      :loading="interlocutorModalLoading" @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
+      :show-contact="canUpdateInterlocutor" :label="interlocutorLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
       @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
@@ -105,6 +107,11 @@
       @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
+
+    <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
+      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading"
+      @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
+      :show-contact="false" :label="interlocutorLabel" clearable-interlocutor />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
@@ -205,7 +212,7 @@ export default {
     const $q = useQuasar();
 
     const trainerOptions = ref([]);
-    const operationsRepresentativeOptions = ref([]);
+    const adminUserOptions = ref([]);
     const companyRepresentativeOptions = ref([]);
     const courseLoading = ref(false);
     const tmpInput = ref('');
@@ -224,7 +231,6 @@ export default {
     const smsHistoriesModal = ref(false);
     const tmpInterlocutor = ref({ _id: '', isContact: false });
     const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0, hasCertifyingTest: false });
-    const operationsRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'chargé des opérations' });
     const operationsRepresentativeEditionModal = ref(false);
     const interlocutorModalLoading = ref(false);
     const interlocutorLabel = ref({ action: '', interlocutor: '' });
@@ -233,6 +239,7 @@ export default {
     const companyRepresentativeModal = ref(false);
     const contactModalLoading = ref(false);
     const contactAdditionModal = ref(false);
+    const salesRepresentativeModal = ref(false);
     const tmpContactId = ref('');
     const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
@@ -240,14 +247,16 @@ export default {
     const trainingContractTableLoading = ref(false);
     const canUpdateCompanyRepresentative = ref(false);
     const canGetTrainingContracts = ref(false);
-    const canGetTrainersAndOperationsRepresentatives = ref(false);
+    const canGetTrainersAndAdminUsers = ref(false);
     const canUpdateInterlocutor = ref(false);
     const canUpdateTrainees = ref(false);
     const canUpdateSMS = ref(false);
     const canReadHistory = ref(false);
     const canUpdateCertifyingTest = ref(false);
+    const canReadAndUpdateSalesRepresentative = ref(false);
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
+    const SALES_REPRESENTATIVE = 'salesRepresentative';
     const urlAndroid = 'https://bit.ly/3en5OkF';
     const urlIos = 'https://apple.co/33kKzcU';
 
@@ -370,9 +379,11 @@ export default {
       canUpdateSMS.value = ability.can('update', subject('Course', course.value), 'sms');
       canReadHistory.value = ability.can('read', subject('Course', course.value), 'history');
       canGetTrainingContracts.value = ability.can('read', subject('Course', course.value), 'training_contracts');
-      canGetTrainersAndOperationsRepresentatives.value = ability
+      canGetTrainersAndAdminUsers.value = ability
         .can('read', subject('Course', course.value), 'interlocutor');
       canUpdateCertifyingTest.value = ability.can('update', subject('Course', course.value), 'certifying_test');
+      canReadAndUpdateSalesRepresentative.value = ability
+        .can('read', subject('Course', course.value), 'sales_representative');
     };
 
     const toggleHistory = async () => {
@@ -487,21 +498,22 @@ export default {
       }
     };
 
-    const refreshTrainersAndOperationsRepresentatives = async () => {
+    const refreshTrainersAndAdminUsers = async () => {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         trainerOptions.value = Object.freeze(
           vendorUsers.map(vu => formatInterlocutorOption(vu)).sort((a, b) => a.label.localeCompare(b.label))
         );
+
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
-        const operationsRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-        operationsRepresentativeOptions.value = operationsRepresentatives
+        const adminUsers = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
+        adminUserOptions.value = adminUsers
           .map(sr => formatInterlocutorOption(sr))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         trainerOptions.value = [];
-        operationsRepresentativeOptions.value = [];
+        adminUserOptions.value = [];
       }
     };
 
@@ -622,8 +634,11 @@ export default {
     const updateInterlocutor = async (role) => {
       try {
         interlocutorModalLoading.value = true;
-        v$.value.tmpInterlocutor.$touch();
-        if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        if (role !== SALES_REPRESENTATIVE) {
+          v$.value.tmpInterlocutor.$touch();
+          if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         const payload = {
           [role]: tmpInterlocutor.value._id,
@@ -647,6 +662,9 @@ export default {
             break;
           case COMPANY_REPRESENTATIVE:
             companyRepresentativeModal.value = false;
+            break;
+          case SALES_REPRESENTATIVE:
+            salesRepresentativeModal.value = false;
             break;
         }
         await refreshCourse();
@@ -708,8 +726,9 @@ export default {
       v$.value.tmpContactId.$reset();
     };
 
-    const resetOperationsRepresentativeEdition = () => {
+    const resetInterlocutor = () => {
       tmpInterlocutor.value = { _id: '', isContact: false };
+      interlocutorLabel.value = { action: '', interlocutor: '' };
       v$.value.tmpInterlocutor.$reset();
     };
 
@@ -718,13 +737,9 @@ export default {
         _id: course.value.operationsRepresentative._id,
         isContact: course.value.operationsRepresentative._id === course.value.contact._id,
       };
-      operationsRepresentativeEditionModal.value = true;
-    };
 
-    const resetInterlocutor = () => {
-      tmpInterlocutor.value = { _id: '', isContact: false };
-      interlocutorLabel.value = { action: '', interlocutor: '' };
-      v$.value.tmpInterlocutor.$reset();
+      interlocutorLabel.value = { action: 'Modifier le', interlocutor: 'chargé d\'accompagnement' };
+      operationsRepresentativeEditionModal.value = true;
     };
 
     const openTrainerModal = (value) => {
@@ -753,6 +768,14 @@ export default {
     const openContactAdditionModal = () => {
       tmpContactId.value = course.value.contact._id;
       contactAdditionModal.value = true;
+    };
+
+    const openSalesRepresentativeModal = (value) => {
+      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+      tmpInterlocutor.value = { _id: get(course.value, 'salesRepresentative._id') || '' };
+      interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
+      salesRepresentativeModal.value = true;
     };
 
     const copy = () => {
@@ -820,10 +843,9 @@ export default {
       if (canUpdateSMS.value) promises.push(refreshSms());
       if (canUpdateTrainees.value) promises.push(refreshPotentialTrainees());
       if (canGetTrainingContracts.value) promises.push(refreshTrainingContracts());
-      if (canGetTrainersAndOperationsRepresentatives.value) {
-        promises.push(refreshTrainersAndOperationsRepresentatives());
-      } else {
-        operationsRepresentativeOptions.value = [formatInterlocutorOption(course.value.operationsRepresentative)];
+      if (canGetTrainersAndAdminUsers.value) promises.push(refreshTrainersAndAdminUsers());
+      else {
+        adminUserOptions.value = [formatInterlocutorOption(course.value.operationsRepresentative)];
       }
 
       await Promise.all(promises);
@@ -836,7 +858,7 @@ export default {
       INTRA,
       trainerOptions,
       potentialTrainees,
-      operationsRepresentativeOptions,
+      adminUserOptions,
       companyRepresentativeOptions,
       courseLoading,
       displayHistory,
@@ -848,7 +870,6 @@ export default {
       smsHistoryList,
       smsHistoriesModal,
       tmpInterlocutor,
-      operationsRepresentativeLabel,
       operationsRepresentativeEditionModal,
       interlocutorModalLoading,
       interlocutorLabel,
@@ -857,6 +878,7 @@ export default {
       companyRepresentativeModal,
       contactModalLoading,
       contactAdditionModal,
+      salesRepresentativeModal,
       tmpContactId,
       courseHistoryFeed,
       tmpCourse,
@@ -868,9 +890,11 @@ export default {
       canReadHistory,
       canGetTrainingContracts,
       canUpdateCertifyingTest,
+      canReadAndUpdateSalesRepresentative,
       COMPANY_REPRESENTATIVE,
       OPERATIONS_REPRESENTATIVE,
       TRAINER,
+      SALES_REPRESENTATIVE,
       // Computed
       course,
       v$,
@@ -909,12 +933,12 @@ export default {
       validateTrainerUpdate,
       updateContact,
       resetContactAddition,
-      resetOperationsRepresentativeEdition,
       openOperationsRepresentativeModal,
       resetInterlocutor,
       openTrainerModal,
       openCompanyRepresentativeModal,
       openContactAdditionModal,
+      openSalesRepresentativeModal,
       copy,
       updateCourse,
       downloadAttendanceSheet,

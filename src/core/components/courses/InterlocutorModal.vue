@@ -3,9 +3,9 @@
     <template #title>
         {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor }}</span>
     </template>
-      <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')" required-field
+      <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')"
         :caption="upperCaseFirstLetter(label.interlocutor)" :options="interlocutorsOptions" option-slot
-        :error="validations.$error">
+        :error="validations.$error" :clearable="clearableInterlocutor" :required-field="!clearableInterlocutor">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
             <q-item-section avatar>
@@ -51,6 +51,7 @@ export default {
     loading: { type: Boolean, default: false },
     label: { type: Object, default: () => ({}) },
     showContact: { type: Boolean, default: false },
+    clearableInterlocutor: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
