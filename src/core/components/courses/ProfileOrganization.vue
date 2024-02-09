@@ -26,7 +26,7 @@
           :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
         <interlocutor-cell v-if="canReadAndUpdateSalesRepresentative" :interlocutor="course.salesRepresentative"
-          caption="Chargé d'accompagnement" :can-update="true" label="Ajouter un chargé d'accompagnement"
+          caption="Chargé d'accompagnement" can-update label="Ajouter un chargé d'accompagnement"
           @open-modal="openSalesRepresentativeModal" />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
@@ -96,9 +96,8 @@
 
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
-      :loading="interlocutorModalLoading" @hide="resetOperationsOrSalesRepresentativeModal"
-      :interlocutors-options="adminUserOptions" :show-contact="canUpdateInterlocutor"
-      :label="operationsRepresentativeLabel" />
+      :loading="interlocutorModalLoading" @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
+      :show-contact="canUpdateInterlocutor" :label="interlocutorLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
       @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
@@ -111,7 +110,7 @@
 
     <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading"
-      @hide="resetOperationsOrSalesRepresentativeModal" :interlocutors-options="adminUserOptions"
+      @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
       :show-contact="false" :label="interlocutorLabel" clearable-interlocutor />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
@@ -232,7 +231,6 @@ export default {
     const smsHistoriesModal = ref(false);
     const tmpInterlocutor = ref({ _id: '', isContact: false });
     const tmpCourse = ref({ misc: '', estimateStartDate: '', maxTrainees: 0, hasCertifyingTest: false });
-    const operationsRepresentativeLabel = ref({ action: 'Modifier le ', interlocutor: 'chargé des opérations' });
     const operationsRepresentativeEditionModal = ref(false);
     const interlocutorModalLoading = ref(false);
     const interlocutorLabel = ref({ action: '', interlocutor: '' });
@@ -728,8 +726,9 @@ export default {
       v$.value.tmpContactId.$reset();
     };
 
-    const resetOperationsOrSalesRepresentativeModal = () => {
+    const resetInterlocutor = () => {
       tmpInterlocutor.value = { _id: '', isContact: false };
+      interlocutorLabel.value = { action: '', interlocutor: '' };
       v$.value.tmpInterlocutor.$reset();
     };
 
@@ -738,13 +737,9 @@ export default {
         _id: course.value.operationsRepresentative._id,
         isContact: course.value.operationsRepresentative._id === course.value.contact._id,
       };
-      operationsRepresentativeEditionModal.value = true;
-    };
 
-    const resetInterlocutor = () => {
-      tmpInterlocutor.value = { _id: '', isContact: false };
-      interlocutorLabel.value = { action: '', interlocutor: '' };
-      v$.value.tmpInterlocutor.$reset();
+      interlocutorLabel.value = { action: 'Modifier le', interlocutor: 'chargé d\'accompagnement' };
+      operationsRepresentativeEditionModal.value = true;
     };
 
     const openTrainerModal = (value) => {
@@ -875,7 +870,6 @@ export default {
       smsHistoryList,
       smsHistoriesModal,
       tmpInterlocutor,
-      operationsRepresentativeLabel,
       operationsRepresentativeEditionModal,
       interlocutorModalLoading,
       interlocutorLabel,
@@ -939,7 +933,6 @@ export default {
       validateTrainerUpdate,
       updateContact,
       resetContactAddition,
-      resetOperationsOrSalesRepresentativeModal,
       openOperationsRepresentativeModal,
       resetInterlocutor,
       openTrainerModal,
