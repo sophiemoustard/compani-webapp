@@ -6,7 +6,7 @@
       <slot name="title" />
     </div>
     <div v-if="formattedHeaderInfo" class="row profile-info">
-      <q-item v-for="info of formattedHeaderInfo" class="col-md-6 col-xs-12 q-pa-xs" :key="info.icon">
+      <q-item v-for="info of formattedHeaderInfo" class="col-md-3 q-pa-xs" :key="info.icon">
         <q-item-section side>
           <q-icon size="xs" :name="info.icon" :class="info.iconClass" />
         </q-item-section>
