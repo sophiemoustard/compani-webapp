@@ -19,6 +19,7 @@ export default {
     selectedNoAddressInSlots: false,
     selectedMissingTrainees: false,
     selectedArchiveStatus: UNARCHIVED_COURSES,
+    selectedSalesRepresentative: '',
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = data ? ({ ...data }) : data; },
@@ -32,6 +33,7 @@ export default {
     SET_SELECTED_NO_ADDRESS_IN_SLOTS: (state, data) => { state.selectedNoAddressInSlots = data; },
     SET_SELECTED_MISSING_TRAINEES: (state, data) => { state.selectedMissingTrainees = data; },
     SET_SELECTED_ARCHIVE_STATUS: (state, data) => { state.selectedArchiveStatus = data; },
+    SET_SELECTED_SALES_REPRESENTATIVE: (state, data) => { state.selectedSalesRepresentative = data; },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {
@@ -41,6 +43,7 @@ export default {
         if (!get(course, 'operationsRepresentative._id')) course.operationsRepresentative = { _id: '' };
         if (!get(course, 'contact._id')) course.contact = { _id: '' };
         if (!get(course, 'companyRepresentative._id')) course.companyRepresentative = { _id: '' };
+        if (!get(course, 'salesRepresentative._id')) course.salesRepresentative = { _id: '' };
 
         // Coachs and client admins with vendor role only see trainees from their companies on client interface
         const userClientRole = store.getters['main/getClientRole'];
@@ -81,6 +84,10 @@ export default {
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
       commit('SET_SELECTED_MISSING_TRAINEES', false);
       commit('SET_SELECTED_ARCHIVE_STATUS', UNARCHIVED_COURSES);
+      commit('SET_SELECTED_OPERATIONS_REPRESENTATIVE', '');
+    },
+    setSelectedSalesRepresentative: ({ commit }, params) => {
+      commit('SET_SELECTED_SALES_REPRESENTATIVE', params.salesRepresentativeId);
     },
   },
   getters: {},

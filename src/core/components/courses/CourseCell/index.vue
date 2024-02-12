@@ -33,6 +33,7 @@ import {
   ARCHIVED_COURSES,
   UNARCHIVED_COURSES,
   WITHOUT_TRAINER,
+  WITHOUT_SALES_REPRESENTATIVE,
 } from '@data/constants';
 import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
@@ -72,6 +73,7 @@ export default {
     const selectedNoAddressInSlots = computed(() => $store.state.course.selectedNoAddressInSlots);
     const selectedMissingTrainees = computed(() => $store.state.course.selectedMissingTrainees);
     const selectedArchiveStatus = computed(() => $store.state.course.selectedArchiveStatus);
+    const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
 
     const isCourseAfterStartDate = computed(() => {
       const estimatedDateIsAfter = !course.value.slots.length && course.value.estimatedStartDate &&
@@ -144,6 +146,15 @@ export default {
       if (selectedNoAddressInSlots.value && !hasCourseNoAddressInOnSiteSlots.value) return false;
 
       if (selectedMissingTrainees.value && !doesCourseMissTrainees.value) return false;
+
+      if (selectedSalesRepresentative.value) {
+        const courseSalesRepresentative = get(course.value, 'salesRepresentative._id');
+        const selectWithoutSalesRepresentative = selectedSalesRepresentative.value === WITHOUT_SALES_REPRESENTATIVE;
+        if (selectWithoutSalesRepresentative && courseSalesRepresentative) return false;
+        if (!selectWithoutSalesRepresentative && courseSalesRepresentative !== selectedSalesRepresentative.value) {
+          return false;
+        }
+      }
 
       return true;
     });

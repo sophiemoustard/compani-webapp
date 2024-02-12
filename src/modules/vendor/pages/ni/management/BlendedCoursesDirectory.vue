@@ -21,6 +21,8 @@
         @update:model-value="updateSelectedType" />
       <ni-select :options="archiveStatusOptions" :model-value="selectedArchiveStatus"
         @update:model-value="updateSelectedArchiveStatus" />
+      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
+        @update:model-value="updateSelectedSalesRepresentative" clearable />
     </div>
     <div class="q-mb-lg filters-container checkboxes">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"
@@ -225,6 +227,9 @@ export default {
       updateSelectedMissingTrainees,
       updateSelectedArchiveStatus,
       resetFilters,
+      selectedSalesRepresentative,
+      updateSelectedSalesRepresentative,
+      salesRepresentativeFilterOptions,
     } = useCourseFilters(activeCourses, archivedCourses);
 
     const refreshActiveCourses = async () => {
@@ -315,6 +320,8 @@ export default {
       selectedNoAddressInSlots,
       selectedMissingTrainees,
       selectedArchiveStatus,
+      selectedSalesRepresentative,
+      salesRepresentativeFilterOptions,
       // Methods
       openCourseCreationModal,
       resetCreationModal,
@@ -330,6 +337,7 @@ export default {
       updateSelectedMissingTrainees,
       updateSelectedArchiveStatus,
       resetFilters,
+      updateSelectedSalesRepresentative,
     };
   },
 };
