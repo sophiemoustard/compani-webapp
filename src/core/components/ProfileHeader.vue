@@ -5,8 +5,8 @@
       <span class="ellipsis page-title flex-1">{{ title }}</span>
       <slot name="title" />
     </div>
-    <div v-if="formattedHeaderInfo" class="row profile-info">
-      <q-item v-for="info of formattedHeaderInfo" class="col-md-3 q-pa-xs" :key="info.icon">
+    <div v-if="formattedHeaderInfo" class="row profile-info header-info">
+      <q-item v-for="info of formattedHeaderInfo" :key="info.icon">
         <q-item-section side>
           <q-icon size="xs" :name="info.icon" :class="info.iconClass" />
         </q-item-section>
@@ -39,4 +39,8 @@ export default {
 <style lang="sass" scoped>
 .q-item
   min-height: 0
+.header-info
+  display: flex
+  flex: 1
+  justify-content: start
 </style>

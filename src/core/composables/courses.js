@@ -71,7 +71,7 @@ export const useCourses = (course) => {
     const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
     const canReadSalesRepresenttive = ability.can('read', subject('Course', course.value), 'sales_representative');
-    return canReadSalesRepresenttive && get(course.value, 'salesRepresentative');
+    return canReadSalesRepresenttive && get(course.value, 'salesRepresentative._id');
   });
 
   const headerInfo = computed(() => [

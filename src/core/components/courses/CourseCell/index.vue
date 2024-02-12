@@ -9,7 +9,7 @@
             <q-item-section side>
               <q-icon size="12px" :name="info.icon" :class="info.iconClass" />
             </q-item-section>
-            <q-item-section>{{ info.label }}</q-item-section>
+            <q-item-section class="label">{{ info.label }}</q-item-section>
           </q-item>
         </div>
         <forthcoming-section v-if="course.status === FORTHCOMING" :course="course" />
@@ -249,4 +249,10 @@ export default {
 .infos-course-nearest-date
   color: $copper-grey-900 !important
   font-size: 14px
+.label
+  display: inline
+  max-width: 12em
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
 </style>
