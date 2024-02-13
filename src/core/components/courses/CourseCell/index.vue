@@ -149,9 +149,9 @@ export default {
 
       if (selectedSalesRepresentative.value) {
         const courseSalesRepresentative = get(course.value, 'salesRepresentative._id');
-        const selectWithoutSalesRepresentative = selectedSalesRepresentative.value === WITHOUT_SALES_REPRESENTATIVE;
-        if (selectWithoutSalesRepresentative && courseSalesRepresentative) return false;
-        if (!selectWithoutSalesRepresentative && courseSalesRepresentative !== selectedSalesRepresentative.value) {
+        const withoutSalesRepresentativeSelected = selectedSalesRepresentative.value === WITHOUT_SALES_REPRESENTATIVE;
+        if (withoutSalesRepresentativeSelected && courseSalesRepresentative) return false;
+        if (!withoutSalesRepresentativeSelected && courseSalesRepresentative !== selectedSalesRepresentative.value) {
           return false;
         }
       }

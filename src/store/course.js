@@ -73,6 +73,9 @@ export default {
     setSelectedNoAddressInSlots: ({ commit }, params) => commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', params.isSelected),
     setSelectedMissingTrainees: ({ commit }, params) => commit('SET_SELECTED_MISSING_TRAINEES', params.isSelected),
     setSelectedArchiveStatus: ({ commit }, params) => commit('SET_SELECTED_ARCHIVE_STATUS', params.status),
+    setSelectedSalesRepresentative: ({ commit }, params) => {
+      commit('SET_SELECTED_SALES_REPRESENTATIVE', params.salesRepresentativeId);
+    },
     resetFilters: ({ commit }) => {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
@@ -84,10 +87,7 @@ export default {
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
       commit('SET_SELECTED_MISSING_TRAINEES', false);
       commit('SET_SELECTED_ARCHIVE_STATUS', UNARCHIVED_COURSES);
-      commit('SET_SELECTED_OPERATIONS_REPRESENTATIVE', '');
-    },
-    setSelectedSalesRepresentative: ({ commit }, params) => {
-      commit('SET_SELECTED_SALES_REPRESENTATIVE', params.salesRepresentativeId);
+      commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
     },
   },
   getters: {},

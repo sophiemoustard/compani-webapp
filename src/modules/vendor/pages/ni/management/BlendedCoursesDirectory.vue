@@ -11,6 +11,8 @@
         @update:model-value="updateSelectedProgram" />
       <ni-select :options="operationsRepresentativeFilterOptions" :model-value="selectedOperationsRepresentative"
         @update:model-value="updateSelectedOperationsRepresentative" clearable />
+      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
+        @update:model-value="updateSelectedSalesRepresentative" clearable />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
         error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
@@ -21,8 +23,6 @@
         @update:model-value="updateSelectedType" />
       <ni-select :options="archiveStatusOptions" :model-value="selectedArchiveStatus"
         @update:model-value="updateSelectedArchiveStatus" />
-      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
-        @update:model-value="updateSelectedSalesRepresentative" clearable />
     </div>
     <div class="q-mb-lg filters-container checkboxes">
       <q-checkbox dense :model-value="selectedNoAddressInSlots" color="primary" label="Aucune adresse"

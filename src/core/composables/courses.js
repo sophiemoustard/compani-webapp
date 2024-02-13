@@ -67,20 +67,18 @@ export const useCourses = (course) => {
 
   const loggedUser = computed(() => $store.state.main.loggedUser);
 
-  const displaySalesRepresentativeInfo = computed(() => {
+  const displaySalesRepresentative = computed(() => {
     const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
-    const canReadSalesRepresenttive = ability.can('read', subject('Course', course.value), 'sales_representative');
-    return canReadSalesRepresenttive && get(course.value, 'salesRepresentative._id');
+    const canReadSalesRepresentative = ability.can('read', subject('Course', course.value), 'sales_representative');
+    return canReadSalesRepresentative && get(course.value, 'salesRepresentative._id');
   });
 
   const headerInfo = computed(() => [
     { icon: 'bookmark_border', label: courseType.value },
     ...(trainerName.value ? [{ icon: 'emoji_people', label: trainerName.value }] : []),
     ...(course.value.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
-    ...(displaySalesRepresentativeInfo.value
-      ? [{ icon: 'fa fa-handshake', label: `${salesRepresentativeName.value}` }]
-      : []),
+    ...(displaySalesRepresentative.value ? [{ icon: 'fa fa-handshake', label: salesRepresentativeName.value }] : []),
   ]);
 
   const downloadAttendanceSheet = async () => {
@@ -117,7 +115,6 @@ export const useCourses = (course) => {
     isArchived,
     pdfLoading,
     followUpMissingInfo,
-    salesRepresentativeName,
     // Methods
     downloadAttendanceSheet,
   };

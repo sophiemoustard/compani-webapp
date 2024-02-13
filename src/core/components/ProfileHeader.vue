@@ -42,5 +42,5 @@ export default {
 .header-info
   display: flex
   flex: 1
-  justify-content: start
+  justify-content: flex-start
 </style>
