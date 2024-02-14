@@ -1,7 +1,9 @@
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { subject } from '@casl/ability';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTRA_HOLDING, INTER_B2B } from '@data/constants';
@@ -12,6 +14,7 @@ import {
 } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 import { downloadFile } from '@helpers/file';
+import { defineAbilitiesForCourse } from '@helpers/ability';
 
 export const useCourses = (course) => {
   const $store = useStore();
@@ -58,10 +61,24 @@ export const useCourses = (course) => {
 
   const trainerName = computed(() => formatIdentity(get(course.value, 'trainer.identity'), 'FL'));
 
+  const salesRepresentativeName = computed(
+    () => formatIdentity(get(course.value, 'salesRepresentative.identity'), 'FL')
+  );
+
+  const loggedUser = computed(() => $store.state.main.loggedUser);
+
+  const displaySalesRepresentative = computed(() => {
+    const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
+
+    const canReadSalesRepresentative = ability.can('read', subject('Course', course.value), 'sales_representative');
+    return canReadSalesRepresentative && get(course.value, 'salesRepresentative._id');
+  });
+
   const headerInfo = computed(() => [
     { icon: 'bookmark_border', label: courseType.value },
-    { icon: 'emoji_people', label: trainerName.value },
+    ...(trainerName.value ? [{ icon: 'emoji_people', label: trainerName.value }] : []),
     ...(course.value.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
+    ...(displaySalesRepresentative.value ? [{ icon: 'fa fa-handshake', label: salesRepresentativeName.value }] : []),
   ]);
 
   const downloadAttendanceSheet = async () => {
