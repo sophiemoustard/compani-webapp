@@ -35,7 +35,7 @@
 
 <script>
 import useVuelidate from '@vuelidate/core';
-import { computed, ref, toRefs, onBeforeUnmount } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
