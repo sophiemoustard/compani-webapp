@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <ni-profile-header :title="companyName" :header-info="headerInfo" />
-    <profile-tabs :profile-id="companyId" :tabs-content="tabsContent" />
+    <profile-tabs :profile-id="companyId" :tabs-content="tabsContent" @refresh="refreshCompany" />
   </q-page>
 </template>
 
@@ -72,6 +72,8 @@ export default {
       companyName,
       // Computed
       headerInfo,
+      // Methods
+      refreshCompany,
     };
   },
 };

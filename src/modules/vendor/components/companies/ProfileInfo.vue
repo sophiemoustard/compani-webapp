@@ -183,10 +183,6 @@ export default {
 
     created();
 
-    onBeforeUnmount(() => {
-      if (v$.value.company.$error) refreshCompany();
-    });
-
     return {
       // Data
       tmpInput,
