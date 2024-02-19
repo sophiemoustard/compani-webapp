@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background">
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity" />
-      <profile-tabs :profile-id="trainerId" :tabs-content="tabsContent" />
+      <profile-tabs :profile-id="trainerId" :tabs-content="tabsContent" @refresh="refreshUserProfile" />
     </div>
   </q-page>
 </template>
@@ -67,10 +67,17 @@ export default {
 
     onBeforeUnmount(() => { $store.dispatch('userProfile/resetUserProfile'); });
 
-    const created = async () => {
-      if (vendorRole.value !== TRAINER) {
+    const refreshUserProfile = async () => {
+      try {
         await $store.dispatch('userProfile/fetchUserProfile', { userId: trainerId.value });
+      } catch (e) {
+        console.error(e);
       }
+    };
+
+    const created = async () => {
+      if (vendorRole.value !== TRAINER) await refreshUserProfile();
+
       userIdentity.value = formatIdentity(get(userProfile.value, 'identity'), 'FL');
     };
 
@@ -83,6 +90,8 @@ export default {
       // Computed
       userProfile,
       vendorRole,
+      // Methods
+      refreshUserProfile,
     };
   },
 };
