@@ -44,15 +44,15 @@
         </template>
         <ni-trainee-table v-else :trainees="course.trainees" @refresh="refresh" :loading="loading"
           table-class="q-pb-md" />
+        <q-card-actions v-if="canUpdateTrainees" align="right" class="q-pa-sm">
+          <ni-button v-if="canUpdateCompanies" color="primary" icon="add" label="Rattacher une structure"
+            :disable="loading" @click="openCompanyAdditionModal" />
+          <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
+            :disable="loading" @click="openTraineeCreationModal" />
+          <ni-button v-if="displayCertificationEdition" color="primary" icon="edit" label="Modifier les certifications"
+            :disable="loading" @click="openCertificationsUpdateModal" />
+        </q-card-actions>
       </q-card>
-      <div align="right" v-if="canUpdateTrainees" class="q-pa-sm">
-        <ni-button v-if="canUpdateCompanies" color="primary" icon="add" label="Rattacher une structure"
-          :disable="loading" @click="openCompanyAdditionModal" />
-        <ni-button v-if="course.companies.length" color="primary" icon="add" label="Ajouter une personne"
-          :disable="loading" @click="openTraineeCreationModal" />
-        <ni-button v-if="displayCertificationEdition" color="primary" icon="edit" label="Modifier les certifications"
-          :disable="loading" @click="openCertificationsUpdateModal" />
-      </div>
     </div>
 
     <user-addition-modal v-model="traineeAdditionModal" v-model:new-user-registration="newTraineeRegistration"

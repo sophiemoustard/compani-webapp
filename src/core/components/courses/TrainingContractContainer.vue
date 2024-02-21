@@ -21,13 +21,13 @@
             :is-archived="!!course.archivedAt" :training-contracts="trainingContracts" :company-options="companyOptions"
             :show-delete-button="isVendorInterface" :loading="trainingContractTableLoading" />
           <div v-else class="text-center text-italic text-14 q-pa-sm">Aucune convention de formation téléversées</div>
+          <q-card-actions v-if="isVendorInterface" align="right" class="q-pa-sm">
+            <ni-button color="primary" icon="file_download" :disable="disableGenerationButton"
+              label="Générer une convention" @click="trainingContractGenerationModal = true" />
+            <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
+              icon="add" :disable="disableUploadButton" />
+          </q-card-actions>
         </q-card>
-        <div v-if="isVendorInterface" align="right" class="q-pa-sm">
-          <ni-button color="primary" icon="file_download" :disable="disableGenerationButton"
-            label="Générer une convention" @click="trainingContractGenerationModal = true" />
-          <ni-button label="Téléverser une convention" @click="trainingContractCreationModal = true" color="primary"
-            icon="add" :disable="disableUploadButton" />
-        </div>
       </template>
       <div v-else class="q-mt-md row">
         <ni-file-uploader caption="Convention de formation signée" :extensions="extensions" :url="url"
