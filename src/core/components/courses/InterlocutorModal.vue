@@ -5,7 +5,7 @@
     </template>
       <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')"
         :caption="upperCaseFirstLetter(label.interlocutor)" :options="interlocutorsOptions" option-slot
-        :error="validations.$error" :clearable="clearableInterlocutor" :required-field="!clearableInterlocutor">
+        :error="validations.$error" :required-field="!clearableInterlocutor" :clearable="clearableInterlocutor">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
             <q-item-section avatar>
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { toRefs, watch } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
@@ -60,11 +61,16 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor'],
   setup (props, { emit }) {
+    const { interlocutor } = toRefs(props);
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
-    const update = (event, path) => emit('update:interlocutor', set({ ...props.interlocutor }, path, event));
+    const update = (event, path) => emit('update:interlocutor', set({ ...interlocutor.value }, path, event));
 
+    watch(interlocutor, (newValue, oldValue) => {
+      if (oldValue && !newValue._id) interlocutor.value.isContact = false;
+    });
+    
     return {
       // Methods
       hide,

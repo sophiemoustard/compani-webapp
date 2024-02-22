@@ -101,7 +101,8 @@
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
       @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
-      :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
+      :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor"
+      clearable-interlocutor />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
@@ -635,7 +636,7 @@ export default {
       try {
         interlocutorModalLoading.value = true;
 
-        if (role !== SALES_REPRESENTATIVE) {
+        if (![SALES_REPRESENTATIVE, TRAINER].includes(role)) {
           v$.value.tmpInterlocutor.$touch();
           if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
         }
