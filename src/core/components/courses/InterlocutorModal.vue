@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { toRefs, watch } from 'vue';
+import { toRefs } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
@@ -65,11 +65,13 @@ export default {
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
-    const update = (event, path) => emit('update:interlocutor', set({ ...interlocutor.value }, path, event));
+    const update = (event, path) => {
+      const newInterlocutor = (path === '_id' && !event)
+        ? { _id: '', isContact: false }
+        : set({ ...interlocutor.value }, path, event);
 
-    watch(interlocutor, (newValue, oldValue) => {
-      if (oldValue._id && !newValue._id) interlocutor.value.isContact = false;
-    });
+      emit('update:interlocutor', newInterlocutor);
+    };
 
     return {
       // Methods
