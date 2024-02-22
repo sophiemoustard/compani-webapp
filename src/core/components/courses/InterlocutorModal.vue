@@ -68,7 +68,7 @@ export default {
     const update = (event, path) => emit('update:interlocutor', set({ ...interlocutor.value }, path, event));
 
     watch(interlocutor, (newValue, oldValue) => {
-      if (oldValue && !newValue._id) interlocutor.value.isContact = false;
+      if (oldValue._id && !newValue._id) interlocutor.value.isContact = false;
     });
 
     return {
