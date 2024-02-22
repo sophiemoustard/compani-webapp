@@ -686,9 +686,6 @@ export default {
 
     const validateTrainerUpdate = async () => {
       if (course.value.trainerMission && tmpInterlocutor.value._id !== course.value.trainer._id) {
-        v$.value.tmpInterlocutor.$touch();
-        if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
-
         const message = 'Un ordre de mission est associé au formateur actuel et sera annulé.'
           + ' Êtes-vous sûr(e) de vouloir continuer&nbsp;?';
         $q.dialog({

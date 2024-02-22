@@ -70,7 +70,7 @@ export default {
     watch(interlocutor, (newValue, oldValue) => {
       if (oldValue && !newValue._id) interlocutor.value.isContact = false;
     });
-    
+
     return {
       // Methods
       hide,
