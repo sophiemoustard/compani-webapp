@@ -786,7 +786,9 @@ export default {
 
     const removeInterlocutor = (interlocutorType) => {
       tmpInterlocutor.value = { _id: '', isContact: false };
-      updateInterlocutor(interlocutorType);
+
+      if (interlocutorType === TRAINER) validateTrainerUpdate();
+      else updateInterlocutor(interlocutorType);
     };
 
     const openInterlocutorDeletionValidationModal = (identity, interlocutorType) => {
