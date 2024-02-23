@@ -20,7 +20,10 @@
           </div>
         </div>
       </div>
-      <ni-button v-if="canUpdate" icon="edit" :disable="disable" @click="openModal(EDITION)" />
+      <div v-if="canUpdate">
+        <ni-button icon="edit" :disable="disable" @click="openModal(EDITION)" />
+        <ni-button v-if="clearable" icon="delete" :disable="disable" @click="openModal(DELETION)" />
+      </div>
     </q-card>
   </div>
   <ni-secondary-button v-else-if="canUpdate" :label="label" :disable="disable" @click="openModal(CREATION)" />
@@ -30,7 +33,7 @@
 import get from 'lodash/get';
 import Button from '@components/Button';
 import SecondaryButton from '@components/SecondaryButton';
-import { DEFAULT_AVATAR, EDITION, CREATION } from '@data/constants';
+import { DEFAULT_AVATAR, EDITION, CREATION, DELETION } from '@data/constants';
 import { formatIdentity, formatPhone } from '@helpers/utils';
 
 export default {
@@ -42,6 +45,7 @@ export default {
     canUpdate: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     label: { type: String, default: '' },
+    clearable: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
@@ -58,6 +62,7 @@ export default {
       DEFAULT_AVATAR,
       EDITION,
       CREATION,
+      DELETION,
       // Methods
       formatIdentity,
       formatPhone,

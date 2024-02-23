@@ -21,13 +21,13 @@
           @open-modal="openOperationsRepresentativeModal" />
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant" :contact="course.contact"
           :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
-          @open-modal="openTrainerModal" />
+          @open-modal="openTrainerModal" clearable />
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Chargé de formation structure"
           :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
         <interlocutor-cell v-if="canReadAndUpdateSalesRepresentative" :interlocutor="course.salesRepresentative"
           caption="Chargé d'accompagnement" can-update label="Ajouter un chargé d'accompagnement"
-          @open-modal="openSalesRepresentativeModal" />
+          @open-modal="openSalesRepresentativeModal" clearable />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
@@ -102,7 +102,7 @@
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
       @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor"
-      clearable-interlocutor />
+      clearable />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
@@ -112,7 +112,7 @@
     <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading"
       @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
-      :show-contact="false" :label="interlocutorLabel" clearable-interlocutor />
+      :show-contact="false" :label="interlocutorLabel" clearable />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
@@ -173,6 +173,7 @@ import {
   HOLDING_ADMIN,
   INTRA_HOLDING,
   DAY,
+  DELETION,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -741,14 +742,18 @@ export default {
     };
 
     const openTrainerModal = (value) => {
-      const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un ';
+      if (value === DELETION) {
+        openInterlocutorDeletionValidationModal(get(course.value, 'trainer.identity'), TRAINER);
+      } else {
+        const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un ';
 
-      tmpInterlocutor.value = {
-        _id: course.value.trainer._id,
-        isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
-      };
-      interlocutorLabel.value = { action, interlocutor: 'intervenant' };
-      trainerModal.value = true;
+        tmpInterlocutor.value = {
+          _id: course.value.trainer._id,
+          isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
+        };
+        interlocutorLabel.value = { action, interlocutor: 'intervenant' };
+        trainerModal.value = true;
+      }
     };
 
     const openCompanyRepresentativeModal = (value) => {
@@ -768,12 +773,36 @@ export default {
       contactAdditionModal.value = true;
     };
 
-    const openSalesRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const removeInterlocutor = (interlocutorType) => {
+      tmpInterlocutor.value = { _id: '', isContact: false };
+      updateInterlocutor(interlocutorType);
+    };
 
-      tmpInterlocutor.value = { _id: get(course.value, 'salesRepresentative._id') || '' };
-      interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
-      salesRepresentativeModal.value = true;
+    const openInterlocutorDeletionValidationModal = (identity, interlocutorType) => {
+      const message = `Êtes-vous sûr(e) de vouloir détacher ${formatIdentity(identity, 'FL')} de la formation&nbsp;?`;
+      $q.dialog({
+        title: 'Confirmation',
+        message,
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => removeInterlocutor(interlocutorType))
+        .onCancel(() => NotifyPositive('Détachement annulé.'));
+    };
+
+    const openSalesRepresentativeModal = (value) => {
+      if (value === DELETION) {
+        openInterlocutorDeletionValidationModal(
+          get(course.value, 'salesRepresentative.identity'),
+          SALES_REPRESENTATIVE
+        );
+      } else {
+        const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+        tmpInterlocutor.value = { _id: get(course.value, 'salesRepresentative._id') || '' };
+        interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
+        salesRepresentativeModal.value = true;
+      }
     };
 
     const copy = () => {
