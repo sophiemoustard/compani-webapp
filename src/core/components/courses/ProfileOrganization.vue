@@ -100,9 +100,8 @@
       :show-contact="canUpdateInterlocutor" :label="interlocutorLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
-      @submit="validateTrainerUpdate(TRAINER)" :loading="interlocutorModalLoading"
-      :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor"
-      clearable />
+      @submit="validateTrainerUpdate(TRAINER)" :loading="interlocutorModalLoading" :label="interlocutorLabel"
+      :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" clearable />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
       @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.companyRepresentative"
@@ -110,9 +109,8 @@
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading"
-      @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
-      :show-contact="false" :label="interlocutorLabel" clearable />
+      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading" @hide="resetInterlocutor"
+      :interlocutors-options="adminUserOptions" :show-contact="false" :label="interlocutorLabel" clearable />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
