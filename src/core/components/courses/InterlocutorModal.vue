@@ -5,7 +5,7 @@
     </template>
       <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')"
         :caption="upperCaseFirstLetter(label.interlocutor)" :options="interlocutorsOptions" option-slot
-        :error="validations.$error" :clearable="clearable" :required-field="!clearable">
+        :error="validations.$error" @blur="validations.$touch" :clearable="clearable" :required-field="!clearable">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
             <q-item-section avatar>

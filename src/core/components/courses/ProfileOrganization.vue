@@ -95,17 +95,17 @@
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
+      @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.operationsRepresentative"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
       :show-contact="canUpdateInterlocutor" :label="interlocutorLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
-      @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
+      @submit="validateTrainerUpdate(TRAINER)" :loading="interlocutorModalLoading"
       :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor"
       clearable />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
+      @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.companyRepresentative"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
@@ -280,13 +280,23 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const rules = computed(() => ({
-      tmpInterlocutor: { _id: { required } },
       tmpContactId: { required },
       tmpCourse: { maxTrainees: { strictPositiveNumber, integerNumber } },
       newSms: { content: { required }, type: { required } },
+      companyRepresentative: { _id: { required } },
+      operationsRepresentative: { _id: { required } },
     }));
 
-    const v$ = useVuelidate(rules, { tmpInterlocutor, tmpContactId, tmpCourse, newSms });
+    const v$ = useVuelidate(
+      rules,
+      {
+        tmpContactId,
+        tmpCourse,
+        newSms,
+        companyRepresentative: tmpInterlocutor,
+        operationsRepresentative: tmpInterlocutor,
+      }
+    );
 
     const loggedUserIsTrainer = computed(() => vendorRole.value === TRAINER);
 
@@ -633,21 +643,21 @@ export default {
       }
     };
 
-    const updateInterlocutor = async (role) => {
+    const updateInterlocutor = async (interlocutorType) => {
       try {
         interlocutorModalLoading.value = true;
 
-        if (![SALES_REPRESENTATIVE, TRAINER].includes(role)) {
-          v$.value.tmpInterlocutor.$touch();
-          if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (v$.value[interlocutorType]) {
+          v$.value[interlocutorType].$touch();
+          if (v$.value[interlocutorType].$error) return NotifyWarning('Champ(s) invalide(s)');
         }
 
         const payload = {
-          [role]: tmpInterlocutor.value._id,
+          [interlocutorType]: tmpInterlocutor.value._id,
           ...(
             (
               tmpInterlocutor.value.isContact ||
-              get(course.value, 'contact._id') === get(course.value, `${role}._id`)
+              get(course.value, 'contact._id') === get(course.value, `${interlocutorType}._id`)
             ) &&
             { contact: tmpInterlocutor.value.isContact ? tmpInterlocutor.value._id : '' }
           ),
@@ -655,7 +665,7 @@ export default {
 
         await Courses.update(profileId.value, payload);
 
-        switch (role) {
+        switch (interlocutorType) {
           case OPERATIONS_REPRESENTATIVE:
             operationsRepresentativeEditionModal.value = false;
             break;
@@ -725,10 +735,11 @@ export default {
       v$.value.tmpContactId.$reset();
     };
 
-    const resetInterlocutor = () => {
+    const resetInterlocutor = (interlocutorType = '') => {
       tmpInterlocutor.value = { _id: '', isContact: false };
       interlocutorLabel.value = { action: '', interlocutor: '' };
-      v$.value.tmpInterlocutor.$reset();
+
+      if (v$.value[interlocutorType]) v$.value[interlocutorType].$reset();
     };
 
     const openOperationsRepresentativeModal = () => {
@@ -762,7 +773,7 @@ export default {
       tmpInterlocutor.value = {
         _id: course.value.companyRepresentative._id,
         isContact: !!course.value.companyRepresentative._id &&
-        course.value.companyRepresentative._id === course.value.contact._id,
+          course.value.companyRepresentative._id === course.value.contact._id,
       };
       interlocutorLabel.value = { action, interlocutor: 'chargé de formation structure' };
       companyRepresentativeModal.value = true;
