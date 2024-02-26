@@ -5,7 +5,7 @@
     </template>
       <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')"
         :caption="upperCaseFirstLetter(label.interlocutor)" :options="interlocutorsOptions" option-slot
-        :error="validations.$error" :clearable="clearableInterlocutor" :required-field="!clearableInterlocutor">
+        :error="validations.$error" @blur="validations.$touch" :clearable="clearable" :required-field="!clearable">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
             <q-item-section avatar>
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { toRefs } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
@@ -51,7 +52,7 @@ export default {
     loading: { type: Boolean, default: false },
     label: { type: Object, default: () => ({}) },
     showContact: { type: Boolean, default: false },
-    clearableInterlocutor: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
@@ -60,10 +61,17 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor'],
   setup (props, { emit }) {
+    const { interlocutor } = toRefs(props);
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
-    const update = (event, path) => emit('update:interlocutor', set({ ...props.interlocutor }, path, event));
+    const update = (event, path) => {
+      const newInterlocutor = (path === '_id' && !event)
+        ? { _id: '', isContact: false }
+        : set({ ...interlocutor.value }, path, event);
+
+      emit('update:interlocutor', newInterlocutor);
+    };
 
     return {
       // Methods

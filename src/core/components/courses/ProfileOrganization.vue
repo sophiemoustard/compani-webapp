@@ -21,13 +21,13 @@
           @open-modal="openOperationsRepresentativeModal" />
         <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant" :contact="course.contact"
           :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
-          @open-modal="openTrainerModal" />
+          @open-modal="openTrainerModal" clearable />
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Chargé de formation structure"
           :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
         <interlocutor-cell v-if="canReadAndUpdateSalesRepresentative" :interlocutor="course.salesRepresentative"
           caption="Chargé d'accompagnement" can-update label="Ajouter un chargé d'accompagnement"
-          @open-modal="openSalesRepresentativeModal" />
+          @open-modal="openSalesRepresentativeModal" clearable />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
       </div>
@@ -95,23 +95,22 @@
       :message-type-options="messageTypeOptions" @submit="openSmsModal" @hide="sendSms = false" />
 
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
+      @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.operationsRepresentative"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
       :show-contact="canUpdateInterlocutor" :label="interlocutorLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutor" @hide="resetInterlocutor"
-      @submit="validateTrainerUpdate(TRAINER)" :validations="v$.tmpInterlocutor" :loading="interlocutorModalLoading"
-      :label="interlocutorLabel" :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" />
+      @submit="validateTrainerUpdate(TRAINER)" :loading="interlocutorModalLoading" :label="interlocutorLabel"
+      :interlocutors-options="trainerOptions" :show-contact="canUpdateInterlocutor" clearable />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.tmpInterlocutor"
+      @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.companyRepresentative"
       :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" :show-contact="canUpdateInterlocutor" />
 
     <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutor"
-      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading"
-      @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
-      :show-contact="false" :label="interlocutorLabel" clearable-interlocutor />
+      @submit="updateInterlocutor(SALES_REPRESENTATIVE)" :loading="interlocutorModalLoading" @hide="resetInterlocutor"
+      :interlocutors-options="adminUserOptions" :show-contact="false" :label="interlocutorLabel" clearable />
 
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
@@ -172,6 +171,7 @@ import {
   HOLDING_ADMIN,
   INTRA_HOLDING,
   DAY,
+  DELETION,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -278,13 +278,23 @@ export default {
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const rules = computed(() => ({
-      tmpInterlocutor: { _id: { required } },
       tmpContactId: { required },
       tmpCourse: { maxTrainees: { strictPositiveNumber, integerNumber } },
       newSms: { content: { required }, type: { required } },
+      companyRepresentative: { _id: { required } },
+      operationsRepresentative: { _id: { required } },
     }));
 
-    const v$ = useVuelidate(rules, { tmpInterlocutor, tmpContactId, tmpCourse, newSms });
+    const v$ = useVuelidate(
+      rules,
+      {
+        tmpContactId,
+        tmpCourse,
+        newSms,
+        companyRepresentative: tmpInterlocutor,
+        operationsRepresentative: tmpInterlocutor,
+      }
+    );
 
     const loggedUserIsTrainer = computed(() => vendorRole.value === TRAINER);
 
@@ -631,21 +641,21 @@ export default {
       }
     };
 
-    const updateInterlocutor = async (role) => {
+    const updateInterlocutor = async (interlocutorType) => {
       try {
         interlocutorModalLoading.value = true;
 
-        if (role !== SALES_REPRESENTATIVE) {
-          v$.value.tmpInterlocutor.$touch();
-          if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (v$.value[interlocutorType]) {
+          v$.value[interlocutorType].$touch();
+          if (v$.value[interlocutorType].$error) return NotifyWarning('Champ(s) invalide(s)');
         }
 
         const payload = {
-          [role]: tmpInterlocutor.value._id,
+          [interlocutorType]: tmpInterlocutor.value._id,
           ...(
             (
               tmpInterlocutor.value.isContact ||
-              get(course.value, 'contact._id') === get(course.value, `${role}._id`)
+              get(course.value, 'contact._id') === get(course.value, `${interlocutorType}._id`)
             ) &&
             { contact: tmpInterlocutor.value.isContact ? tmpInterlocutor.value._id : '' }
           ),
@@ -653,7 +663,7 @@ export default {
 
         await Courses.update(profileId.value, payload);
 
-        switch (role) {
+        switch (interlocutorType) {
           case OPERATIONS_REPRESENTATIVE:
             operationsRepresentativeEditionModal.value = false;
             break;
@@ -685,9 +695,6 @@ export default {
 
     const validateTrainerUpdate = async () => {
       if (course.value.trainerMission && tmpInterlocutor.value._id !== course.value.trainer._id) {
-        v$.value.tmpInterlocutor.$touch();
-        if (v$.value.tmpInterlocutor.$error) return NotifyWarning('Champ(s) invalide(s)');
-
         const message = 'Un ordre de mission est associé au formateur actuel et sera annulé.'
           + ' Êtes-vous sûr(e) de vouloir continuer&nbsp;?';
         $q.dialog({
@@ -726,10 +733,11 @@ export default {
       v$.value.tmpContactId.$reset();
     };
 
-    const resetInterlocutor = () => {
+    const resetInterlocutor = (interlocutorType = '') => {
       tmpInterlocutor.value = { _id: '', isContact: false };
       interlocutorLabel.value = { action: '', interlocutor: '' };
-      v$.value.tmpInterlocutor.$reset();
+
+      if (v$.value[interlocutorType]) v$.value[interlocutorType].$reset();
     };
 
     const openOperationsRepresentativeModal = () => {
@@ -743,14 +751,18 @@ export default {
     };
 
     const openTrainerModal = (value) => {
-      const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un ';
+      if (value === DELETION) {
+        openInterlocutorDeletionValidationModal(get(course.value, 'trainer.identity'), TRAINER);
+      } else {
+        const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un ';
 
-      tmpInterlocutor.value = {
-        _id: course.value.trainer._id,
-        isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
-      };
-      interlocutorLabel.value = { action, interlocutor: 'intervenant' };
-      trainerModal.value = true;
+        tmpInterlocutor.value = {
+          _id: course.value.trainer._id,
+          isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
+        };
+        interlocutorLabel.value = { action, interlocutor: 'intervenant' };
+        trainerModal.value = true;
+      }
     };
 
     const openCompanyRepresentativeModal = (value) => {
@@ -759,7 +771,7 @@ export default {
       tmpInterlocutor.value = {
         _id: course.value.companyRepresentative._id,
         isContact: !!course.value.companyRepresentative._id &&
-        course.value.companyRepresentative._id === course.value.contact._id,
+          course.value.companyRepresentative._id === course.value.contact._id,
       };
       interlocutorLabel.value = { action, interlocutor: 'chargé de formation structure' };
       companyRepresentativeModal.value = true;
@@ -770,12 +782,38 @@ export default {
       contactAdditionModal.value = true;
     };
 
-    const openSalesRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const removeInterlocutor = (interlocutorType) => {
+      tmpInterlocutor.value = { _id: '', isContact: false };
 
-      tmpInterlocutor.value = { _id: get(course.value, 'salesRepresentative._id') || '' };
-      interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
-      salesRepresentativeModal.value = true;
+      if (interlocutorType === TRAINER) validateTrainerUpdate();
+      else updateInterlocutor(interlocutorType);
+    };
+
+    const openInterlocutorDeletionValidationModal = (identity, interlocutorType) => {
+      const message = `Êtes-vous sûr(e) de vouloir détacher ${formatIdentity(identity, 'FL')} de la formation&nbsp;?`;
+      $q.dialog({
+        title: 'Confirmation',
+        message,
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => removeInterlocutor(interlocutorType))
+        .onCancel(() => NotifyPositive('Détachement annulé.'));
+    };
+
+    const openSalesRepresentativeModal = (value) => {
+      if (value === DELETION) {
+        openInterlocutorDeletionValidationModal(
+          get(course.value, 'salesRepresentative.identity'),
+          SALES_REPRESENTATIVE
+        );
+      } else {
+        const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+
+        tmpInterlocutor.value = { _id: get(course.value, 'salesRepresentative._id') || '' };
+        interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
+        salesRepresentativeModal.value = true;
+      }
     };
 
     const copy = () => {
