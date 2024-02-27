@@ -18,7 +18,7 @@ export default {
     selectedType: '',
     selectedNoAddressInSlots: false,
     selectedMissingTrainees: false,
-    selectedArchiveStatus: UNARCHIVED_COURSES,
+    selectedArchiveStatus: '',
     selectedSalesRepresentative: '',
   },
   mutations: {

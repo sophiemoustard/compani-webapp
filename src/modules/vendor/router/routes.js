@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { TRAINER } from '@data/constants';
+import { TRAINER, UNARCHIVED_COURSES } from '@data/constants';
 import { canNavigate } from '@helpers/alenvi';
 import store from 'src/store/index';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
@@ -178,6 +178,17 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',
         },
+        beforeEnter: async (_, from, next) => {
+          try {
+            if (from.name !== 'ni management blended courses info') {
+              await store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
+            }
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
       },
       {
         path: 'ni/management/blended-courses/:courseId',
@@ -248,6 +259,17 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',
+        },
+        beforeEnter: async (_, from, next) => {
+          try {
+            if (from.name !== 'trainers courses info') {
+              await store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
+            }
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
         },
       },
       {
