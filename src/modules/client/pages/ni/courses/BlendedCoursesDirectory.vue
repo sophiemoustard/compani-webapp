@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Formations" :display-search-bar="false" />
-    <div class="reset-filters" @click="resetFilters({ isClientInterface: true })">Effacer les filtres</div>
+    <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
       <ni-select v-if="companyFilterOptions.length > 2" :options="companyFilterOptions" :model-value="selectedCompany"
         clearable @update:model-value="updateSelectedCompany" />
@@ -132,7 +132,7 @@ export default {
     };
 
     onBeforeRouteLeave((to) => {
-      if (to.name !== 'ni courses info') resetFilters({ isClientInterface: true });
+      if (to.name !== 'ni courses info') resetFilters();
     });
 
     created();

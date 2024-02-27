@@ -178,10 +178,10 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',
         },
-        beforeEnter: async (_, from, next) => {
+        beforeEnter: (_, from, next) => {
           try {
             if (from.name !== 'ni management blended courses info') {
-              await store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
+              store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
             }
 
             return next();
@@ -260,10 +260,10 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',
         },
-        beforeEnter: async (_, from, next) => {
+        beforeEnter: (_, from, next) => {
           try {
             if (from.name !== 'trainers courses info') {
-              await store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
+              store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
             }
 
             return next();

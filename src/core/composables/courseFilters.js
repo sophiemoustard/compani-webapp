@@ -2,7 +2,6 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
-import get from 'lodash/get';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import {
@@ -136,8 +135,8 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     $store.dispatch('course/setSelectedArchiveStatus', { status });
   };
 
-  const resetFilters = (params) => {
-    $store.dispatch('course/resetFilters', { isClientInterface: get(params, 'isClientInterface', false) });
+  const resetFilters = () => {
+    $store.dispatch('course/resetFilters', { isClientInterface: !isVendorInterface });
   };
 
   /* SALES REPRESENTATIVE */
