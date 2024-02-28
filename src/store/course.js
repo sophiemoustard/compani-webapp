@@ -18,7 +18,7 @@ export default {
     selectedType: '',
     selectedNoAddressInSlots: false,
     selectedMissingTrainees: false,
-    selectedArchiveStatus: UNARCHIVED_COURSES,
+    selectedArchiveStatus: '',
     selectedSalesRepresentative: '',
   },
   mutations: {
@@ -76,7 +76,7 @@ export default {
     setSelectedSalesRepresentative: ({ commit }, params) => {
       commit('SET_SELECTED_SALES_REPRESENTATIVE', params.salesRepresentativeId);
     },
-    resetFilters: ({ commit }) => {
+    resetFilters: ({ commit }, params = {}) => {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
       commit('SET_SELECTED_COMPANY', '');
@@ -86,7 +86,7 @@ export default {
       commit('SET_SELECTED_TYPE', '');
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
       commit('SET_SELECTED_MISSING_TRAINEES', false);
-      commit('SET_SELECTED_ARCHIVE_STATUS', UNARCHIVED_COURSES);
+      commit('SET_SELECTED_ARCHIVE_STATUS', params.isClientInterface ? '' : UNARCHIVED_COURSES);
       commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
     },
   },

@@ -135,7 +135,9 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     $store.dispatch('course/setSelectedArchiveStatus', { status });
   };
 
-  const resetFilters = () => $store.dispatch('course/resetFilters');
+  const resetFilters = () => {
+    $store.dispatch('course/resetFilters', { isClientInterface: !isVendorInterface });
+  };
 
   /* SALES REPRESENTATIVE */
   const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);

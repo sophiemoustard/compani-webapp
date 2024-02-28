@@ -71,6 +71,7 @@ import {
 } from '@data/constants';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
+import store from 'src/store/index';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -339,6 +340,13 @@ export default {
       resetFilters,
       updateSelectedSalesRepresentative,
     };
+  },
+  beforeRouteEnter (_, from, next) {
+    if (from.name !== 'ni management blended courses info') {
+      store.dispatch('course/resetFilters', { isClientInterface: false });
+    }
+
+    next();
   },
 };
 </script>
