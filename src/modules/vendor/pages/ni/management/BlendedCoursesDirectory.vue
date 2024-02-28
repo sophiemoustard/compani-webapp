@@ -68,9 +68,11 @@ import {
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
   OPERATIONS,
+  UNARCHIVED_COURSES,
 } from '@data/constants';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
+import store from 'src/store/index';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -339,6 +341,13 @@ export default {
       resetFilters,
       updateSelectedSalesRepresentative,
     };
+  },
+  beforeRouteEnter (_, from, next) {
+    if (from.name !== 'ni management blended courses info') {
+      store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
+    }
+
+    next();
   },
 };
 </script>

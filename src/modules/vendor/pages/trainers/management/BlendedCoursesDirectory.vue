@@ -41,9 +41,10 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Trello from '@components/courses/Trello';
 import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
-import { BLENDED, OPERATIONS } from '@data/constants';
+import { BLENDED, OPERATIONS, UNARCHIVED_COURSES } from '@data/constants';
 import { useCourseFilters } from '@composables/courseFilters';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
+import store from 'src/store/index';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -163,6 +164,13 @@ export default {
       updateSelectedArchiveStatus,
       resetFilters,
     };
+  },
+  beforeRouteEnter (_, from, next) {
+    if (from.name !== 'trainers courses info') {
+      store.dispatch('course/setSelectedArchiveStatus', { status: UNARCHIVED_COURSES });
+    }
+
+    next();
   },
 };
 </script>
