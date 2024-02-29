@@ -27,7 +27,7 @@ const routes = [
         if (!userClientRole) return next({ path: '/ad' });
 
         const company = store.getters['main/getCompany'];
-        if (userClientRole === HELPER) return next({ name: 'customers agenda' });
+        if (userClientRole === HELPER) return next({ name: 'customers documents' });
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
           return next({ name: 'account client' });
         }
@@ -499,14 +499,6 @@ const routes = [
         },
       },
       // Customers view routes
-      {
-        path: 'customers/agenda',
-        name: 'customers agenda',
-        component: () => import('src/modules/client/pages/customers/CustomerAgenda'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
       {
         path: 'customers/contact',
         name: 'customers contact',

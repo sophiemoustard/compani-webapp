@@ -84,7 +84,6 @@ export const menuItemsMixin = {
     },
     customerRoutes () {
       return [
-        { name: 'customers agenda', icon: 'date_range', label: 'Planning', condition: true },
         {
           name: 'customers contact',
           icon: 'contact_support',
