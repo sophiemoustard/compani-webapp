@@ -15,7 +15,6 @@ const coachRoutes = [
   { name: 'ni exports data', subscription: ERP },
   { name: 'ni exports history', subscription: ERP },
   { name: 'ni auxiliaries', subscription: ERP },
-  { name: 'ni auxiliaries dashboard', subscription: ERP },
   { name: 'ni auxiliaries info', subscription: ERP },
   { name: 'ni customers', subscription: ERP },
   { name: 'ni customers info', subscription: ERP },

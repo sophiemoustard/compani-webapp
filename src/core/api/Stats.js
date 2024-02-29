@@ -15,14 +15,4 @@ export default {
     const stats = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/paid-intervention-stats`, { params });
     return stats.data.data.paidInterventionStats;
   },
-  async getCustomersAndDurationBySector (params = null) {
-    const stats = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-duration/sector`, { params });
-
-    return stats.data.data.customersAndDuration;
-  },
-  async getInternalAndBilledHours (params = null) {
-    const stats = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/internal-billed-hours`, { params });
-
-    return stats.data.data.internalAndBilledHours;
-  },
 };
