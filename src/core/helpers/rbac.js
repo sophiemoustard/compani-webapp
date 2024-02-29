@@ -84,7 +84,6 @@ const helperRoutes = [
   { name: 'customers agenda', subscription: ERP },
   { name: 'customers contact', subscription: ERP },
   { name: 'customers documents', subscription: ERP },
-  { name: 'customers subscription', subscription: ERP },
   { name: 'account client' },
 ];
 const trainingOrganisationManagerRoutes = [

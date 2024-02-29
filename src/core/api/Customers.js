@@ -72,22 +72,6 @@ export default {
   async addQuote (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/quotes`, data);
   },
-  async addSubscriptionHistory (id, data) {
-    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptionshistory`, data);
-  },
-  async generateMandateSignatureRequest (params, data) {
-    const signatureRequest = await alenviAxios.post(
-      `${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/esign`,
-      data
-    );
-    return signatureRequest.data.data.signatureRequest;
-  },
-  async saveSignedDoc (params, data) {
-    return alenviAxios.post(
-      `${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/savesigneddoc`,
-      data
-    );
-  },
   async deleteCertificates (id, payload) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}/certificates`, payload);
   },

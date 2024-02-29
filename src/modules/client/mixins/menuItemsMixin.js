@@ -92,7 +92,6 @@ export const menuItemsMixin = {
           condition: this.hasBillingAssistance || (this.customer && this.customer.referent),
         },
         { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
-        { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement', condition: true },
       ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs);
     },
     coachRoutes () {
