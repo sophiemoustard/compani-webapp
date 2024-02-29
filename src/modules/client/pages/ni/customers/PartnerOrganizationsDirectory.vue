@@ -66,7 +66,7 @@ export default {
       ],
       visibleColumns: ['name', 'prescriptions'],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
-      path: { name: 'ni customers partner organizations info', params: 'partnerOrganizationId' },
+      path: { name: '', params: '' },
     };
   },
   validations () {
