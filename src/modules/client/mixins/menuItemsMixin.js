@@ -203,7 +203,6 @@ export const menuItemsMixin = {
           ref: 'teams',
           label: 'Équipes',
           children: [
-            { name: 'auxiliaries teams', icon: 'contacts', label: 'Répertoire' },
             { name: 'ni auxiliaries dashboard', icon: 'dashboard', label: 'Tableau de bord' },
           ],
         },

@@ -58,7 +58,6 @@ const clientAdminRoutes = [
 ];
 const auxiliaryRoutes = [
   { name: 'ni auxiliaries dashboard', subscription: ERP },
-  { name: 'auxiliaries teams', subscription: ERP },
   { name: 'auxiliaries customers', subscription: ERP },
   { name: 'auxiliaries customers info', subscription: ERP },
   { name: 'ni customers fundings monitoring', subscription: ERP },
@@ -75,7 +74,6 @@ const auxiliaryWithoutCompanyRoutes = [
 ];
 const planningReferentRoutes = [
   ...auxiliaryRoutes,
-  { name: 'ni planning repetitions', subscription: ERP },
 ];
 const helperRoutes = [
   { name: 'customers documents', subscription: ERP },

@@ -426,15 +426,6 @@ const routes = [
       },
       // Auxiliary view routes
       {
-        path: 'auxiliaries/teams',
-        name: 'auxiliaries teams',
-        component: () => import('src/modules/client/pages/auxiliaries/teams/TeamsDirectory'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'teams',
-        },
-      },
-      {
         path: 'auxiliaries/customers',
         name: 'auxiliaries customers',
         component: () => import('src/modules/client/pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
