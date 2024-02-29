@@ -59,7 +59,6 @@ const clientAdminRoutes = [
 const auxiliaryRoutes = [
   { name: 'auxiliaries customers', subscription: ERP },
   { name: 'auxiliaries customers info', subscription: ERP },
-  { name: 'ni customers fundings monitoring', subscription: ERP },
   { name: 'auxiliaries pay', subscription: ERP },
   { name: 'auxiliaries docs', subscription: ERP },
   { name: 'auxiliaries contracts', subscription: ERP },

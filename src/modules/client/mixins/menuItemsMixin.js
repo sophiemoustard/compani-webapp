@@ -178,7 +178,6 @@ export const menuItemsMixin = {
           label: 'Bénéficiaires',
           children: [
             { name: 'auxiliaries customers', icon: 'contacts', label: 'Fiches' },
-            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },
           ],
         }, {
           ref: 'administrative',
