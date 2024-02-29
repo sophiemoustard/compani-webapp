@@ -162,15 +162,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/pay/contract-ends',
-        name: 'ni pay contract ends',
-        component: () => import('src/modules/client/pages/ni/pay/ContractEnds'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'pay',
-        },
-      },
-      {
         path: 'ni/exports/data',
         name: 'ni exports data',
         component: () => import('src/modules/client/pages/ni/exports/DataExports'),
