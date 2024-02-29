@@ -81,7 +81,6 @@ const planningReferentRoutes = [
   { name: 'ni planning repetitions', subscription: ERP },
 ];
 const helperRoutes = [
-  { name: 'customers contact', subscription: ERP },
   { name: 'customers documents', subscription: ERP },
   { name: 'account client' },
 ];

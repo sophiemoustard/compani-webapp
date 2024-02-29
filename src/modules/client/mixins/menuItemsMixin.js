@@ -84,12 +84,6 @@ export const menuItemsMixin = {
     },
     customerRoutes () {
       return [
-        {
-          name: 'customers contact',
-          icon: 'contact_support',
-          label: 'Contact',
-          condition: this.hasBillingAssistance || (this.customer && this.customer.referent),
-        },
         { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
       ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs);
     },

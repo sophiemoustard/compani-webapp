@@ -1,5 +1,4 @@
 import get from 'lodash/get';
-import Customers from '@api/Customers';
 import { canNavigate } from '@helpers/alenvi';
 import {
   HELPER,
@@ -499,21 +498,6 @@ const routes = [
         },
       },
       // Customers view routes
-      {
-        path: 'customers/contact',
-        name: 'customers contact',
-        component: () => import('src/modules/client/pages/customers/Contact'),
-        async beforeEnter (to, from, next) {
-          const { loggedUser } = store.state.main;
-          const customer = await Customers.getById(loggedUser.customers[0]);
-          return get(loggedUser, 'company.billingAssistance') || customer.referent
-            ? next()
-            : next('/404');
-        },
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
       {
         path: 'customers/documents',
         name: 'customers documents',
