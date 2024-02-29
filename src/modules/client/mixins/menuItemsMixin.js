@@ -174,14 +174,6 @@ export const menuItemsMixin = {
     auxiliaryRoutes () {
       return [
         {
-          ref: 'planning',
-          label: 'Planning',
-          children: [
-            { name: 'ni planning auxiliaries', icon: 'face', label: 'Auxiliaires' },
-            { name: 'ni planning customers', icon: 'people', label: 'Bénéficiaires' },
-            { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },
-          ],
-        }, {
           ref: 'customers',
           label: 'Bénéficiaires',
           children: [

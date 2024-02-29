@@ -1,8 +1,6 @@
 const {
   CLIENT_ADMIN,
   COACH,
-  AUXILIARY,
-  PLANNING_REFERENT,
   PLANNING,
 } = require('../../../../../src/core/data/constants');
 const UtilsHelper = require('../../../support/utils');
@@ -42,8 +40,6 @@ describe('Auxiliary planning - display', () => {
 });
 
 const loggedUsers = [
-  { email: 'planning-referent@alenvi.io', password: '123456!eR', role: PLANNING_REFERENT },
-  { email: 'auxiliary@alenvi.io', password: '123456!eR', role: AUXILIARY },
   { email: 'client-admin@alenvi.io', password: '123456!eR', role: CLIENT_ADMIN },
   { email: 'coach@alenvi.io', password: '123456!eR', role: COACH },
 ];
