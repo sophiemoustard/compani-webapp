@@ -141,7 +141,6 @@ export const menuItemsMixin = {
           ref: 'pay',
           label: 'Paie',
           children: [
-            { name: 'ni pay absences', icon: 'calendar_today', label: 'Absences' },
             { name: 'ni pay contract ends', icon: 'description', label: 'STC' },
             { name: 'ni pay to pay', icon: 'euro_symbol', label: 'Paie mensuelle' },
           ],
