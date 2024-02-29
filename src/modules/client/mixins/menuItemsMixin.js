@@ -199,12 +199,6 @@ export const menuItemsMixin = {
             },
             { name: 'auxiliaries contracts', icon: 'description', label: 'Contrats' },
           ],
-        }, {
-          ref: 'teams',
-          label: 'Équipes',
-          children: [
-            { name: 'ni auxiliaries dashboard', icon: 'dashboard', label: 'Tableau de bord' },
-          ],
         },
       ];
     },
