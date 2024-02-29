@@ -46,7 +46,6 @@ const clientAdminRoutes = [
   { name: 'ni billing tpp bill slips', subscription: ERP },
   { name: 'ni billing debits archive', subscription: ERP },
   { name: 'ni billing automatic bills', subscription: ERP },
-  { name: 'ni pay to pay', subscription: ERP },
   { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [

@@ -153,15 +153,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/pay/to-pay',
-        name: 'ni pay to pay',
-        component: () => import('src/modules/client/pages/ni/pay/ToPay'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'pay',
-        },
-      },
-      {
         path: 'ni/exports/data',
         name: 'ni exports data',
         component: () => import('src/modules/client/pages/ni/exports/DataExports'),

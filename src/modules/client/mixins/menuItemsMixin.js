@@ -138,13 +138,6 @@ export const menuItemsMixin = {
           ],
         },
         {
-          ref: 'pay',
-          label: 'Paie',
-          children: [
-            { name: 'ni pay to pay', icon: 'euro_symbol', label: 'Paie mensuelle' },
-          ],
-        },
-        {
           ref: 'exports',
           label: 'Exports',
           children: [
