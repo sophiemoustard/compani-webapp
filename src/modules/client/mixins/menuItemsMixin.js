@@ -111,7 +111,6 @@ export const menuItemsMixin = {
           label: 'Bénéficiaires',
           children: [
             { name: 'ni customers', icon: 'contacts', label: 'Répertoire bénéficiaires' },
-            { name: 'ni customers partner organizations', icon: 'apartment', label: 'Structures partenaires' },
           ],
         },
         {
