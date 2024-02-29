@@ -177,7 +177,6 @@ export const menuItemsMixin = {
           ref: 'planning',
           label: 'Planning',
           children: [
-            { name: 'auxiliaries agenda', icon: 'event', label: 'Le mien' },
             { name: 'ni planning auxiliaries', icon: 'face', label: 'Auxiliaires' },
             { name: 'ni planning customers', icon: 'people', label: 'Bénéficiaires' },
             { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },

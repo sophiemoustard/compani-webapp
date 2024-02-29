@@ -57,7 +57,6 @@ const clientAdminRoutes = [
   { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [
-  { name: 'auxiliaries agenda', subscription: ERP },
   { name: 'ni planning auxiliaries', subscription: ERP },
   { name: 'ni planning customers', subscription: ERP },
   { name: 'ni auxiliaries dashboard', subscription: ERP },

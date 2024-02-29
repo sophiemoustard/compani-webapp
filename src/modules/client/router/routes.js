@@ -31,7 +31,7 @@ const routes = [
           return next({ name: 'account client' });
         }
         if (AUXILIARY_ROLES.includes(userClientRole)) {
-          if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries agenda' });
+          if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries pay' });
           return next({ name: 'account client' });
         }
         if (COACH_ROLES.includes(userClientRole)) {
@@ -425,15 +425,6 @@ const routes = [
         },
       },
       // Auxiliary view routes
-      {
-        path: 'auxiliaries/agenda',
-        name: 'auxiliaries agenda',
-        component: () => import('src/modules/client/pages/auxiliaries/planning/AuxiliaryAgenda'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'planning',
-        },
-      },
       {
         path: 'auxiliaries/teams',
         name: 'auxiliaries teams',
