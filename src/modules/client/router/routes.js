@@ -253,15 +253,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/customers/fundings',
-        name: 'ni customers fundings monitoring',
-        component: () => import('src/modules/client/pages/ni/customers/CustomersFundingsMonitoring'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'customers',
-        },
-      },
-      {
         path: 'ni/customers/partner-organizations',
         name: 'ni customers partner organizations',
         component: () => import('src/modules/client/pages/ni/customers/PartnerOrganizationsDirectory'),
