@@ -171,15 +171,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/pay/contract-monitoring',
-        name: 'ni pay contract monitoring',
-        component: () => import('src/modules/client/pages/ni/pay/ContractMonitoring'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'pay',
-        },
-      },
-      {
         path: 'ni/pay/absences',
         name: 'ni pay absences',
         component: () => import('src/modules/client/pages/ni/pay/Absences'),

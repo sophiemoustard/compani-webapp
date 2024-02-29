@@ -12,7 +12,6 @@ import {
 } from '@data/constants';
 
 const coachRoutes = [
-  { name: 'ni pay contract monitoring', subscription: ERP },
   { name: 'ni pay absences', subscription: ERP },
   { name: 'ni exports data', subscription: ERP },
   { name: 'ni exports history', subscription: ERP },
