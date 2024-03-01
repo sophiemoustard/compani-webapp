@@ -5,9 +5,14 @@ const {
 } = require('../../../../../src/core/data/constants');
 const UtilsHelper = require('../../../support/utils');
 
-describe('Auxiliary planning - display', () => {
+const loggedUsers = [
+  { email: 'client-admin@alenvi.io', password: '123456!eR', role: CLIENT_ADMIN },
+  { email: 'coach@alenvi.io', password: '123456!eR', role: COACH },
+];
+
+loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role}`, () => {
   beforeEach(() => {
-    cy.initiateTest({ seedType: PLANNING, credentials: { email: 'auxiliary@alenvi.io', password: '123456!eR' } });
+    cy.initiateTest({ seedType: PLANNING, credentials: { email: user.email, password: user.password } });
     cy.visit('/ni/planning/auxiliaries');
   });
 
@@ -36,18 +41,6 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=planning-search]').eq(0).click();
     cy.get('[data-cy=planning-search]').eq(0).type('Customer referent{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 2);
-  });
-});
-
-const loggedUsers = [
-  { email: 'client-admin@alenvi.io', password: '123456!eR', role: CLIENT_ADMIN },
-  { email: 'coach@alenvi.io', password: '123456!eR', role: COACH },
-];
-
-loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role}`, () => {
-  beforeEach(() => {
-    cy.initiateTest({ seedType: PLANNING, credentials: { email: user.email, password: user.password } });
-    cy.visit('/ni/planning/auxiliaries');
   });
 
   it('should create event', () => {

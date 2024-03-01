@@ -19,7 +19,7 @@ describe('Login page tests', () => {
   const paramsArray = [
     { person: 'client admin', email: 'client-admin@alenvi.io', password: '123456!eR', url: 'ni/auxiliaries' },
     { person: 'coach', email: 'coach@alenvi.io', password: '123456!eR', url: 'ni/auxiliaries' },
-    { person: 'auxiliary', email: 'auxiliary@alenvi.io', password: '123456!eR', url: 'auxiliaries/agenda' },
+    { person: 'auxiliary', email: 'auxiliary@alenvi.io', password: '123456!eR', url: 'auxiliaries/pay' },
     {
       person: 'auxiliary without company',
       email: 'auxiliary-without-company@alenvi.io',
@@ -30,9 +30,9 @@ describe('Login page tests', () => {
       person: 'planning referent',
       email: 'planning-referent@alenvi.io',
       password: '123456!eR',
-      url: 'auxiliaries/agenda',
+      url: 'auxiliaries/pay',
     },
-    { person: 'helper', email: 'helper@alenvi.io', password: '123456!eR', url: 'customers/agenda' },
+    { person: 'helper', email: 'helper@alenvi.io', password: '123456!eR', url: 'customers/documents' },
     {
       person: 'vendor admin',
       email: 'vendor-admin@alenvi.io',
