@@ -180,15 +180,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/auxiliaries/staff-register',
-        name: 'ni auxiliaries staff register',
-        component: () => import('src/modules/client/pages/ni/auxiliaries/StaffRegister'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'teams',
-        },
-      },
-      {
         path: 'ni/auxiliaries/:auxiliaryId',
         name: 'ni auxiliaries info',
         component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryProfile'),

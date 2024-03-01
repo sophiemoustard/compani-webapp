@@ -32,7 +32,6 @@ const coachRoutes = [
 ];
 const clientAdminRoutes = [
   ...coachRoutes,
-  { name: 'ni auxiliaries staff register', subscription: ERP },
   { name: 'ni config company' },
   { name: 'ni config rh', subscription: ERP },
   { name: 'ni config customers', subscription: ERP },

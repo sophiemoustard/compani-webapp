@@ -94,7 +94,6 @@ export const menuItemsMixin = {
           label: 'Équipes',
           children: [
             { name: 'ni auxiliaries', icon: 'contacts', label: 'Répertoire auxiliaires' },
-            { name: 'ni auxiliaries staff register', icon: 'view_headline', label: 'Registre unique du personnel' },
           ],
         },
         {
