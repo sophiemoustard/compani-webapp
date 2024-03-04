@@ -45,6 +45,7 @@ import Trello from '@components/courses/Trello';
 import { useCourseFilters } from '@composables/courseFilters';
 import { BLENDED, OPERATIONS } from '@data/constants';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
+import store from 'src/store/index';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -171,6 +172,13 @@ export default {
       updateSelectedCompany,
       resetFilters,
     };
+  },
+  beforeRouteEnter (_, from, next) {
+    if (from.name !== 'ni courses info') {
+      store.dispatch('course/resetFilters', { isClientInterface: true });
+    }
+
+    next();
   },
 };
 </script>
