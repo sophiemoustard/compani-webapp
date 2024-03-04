@@ -342,7 +342,7 @@ export default {
     };
   },
   beforeRouteEnter (_, from, next) {
-    if (from.name !== 'ni management blended courses info') {
+    if (!['ni management blended courses info', 'ni users trainers info'].includes(from.name)) {
       store.dispatch('course/resetFilters', { isClientInterface: false });
     }
 
