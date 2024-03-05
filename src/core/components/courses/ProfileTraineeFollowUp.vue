@@ -72,10 +72,11 @@ import pick from 'lodash/pick';
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
 import Questionnaires from '@api/Questionnaires';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import AttendanceTable from '@components/table/AttendanceTable';
 import ExpandingTable from '@components/table/ExpandingTable';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
@@ -122,6 +123,7 @@ export default {
     const { profileId } = toRefs(props);
     const $store = useStore();
     const $router = useRouter();
+    const $q = useQuasar();
 
     const questionnaires = ref([]);
     const unsubscribedAttendances = ref([]);
@@ -225,6 +227,16 @@ export default {
       }
     };
 
+    const downloadCCFile = async (format, type, zipName) => {
+      try {
+        const zip = await Courses.downloadCompletionCertificates(course.value._id, { format, type });
+        downloadZip(zip, zipName);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du document.');
+      }
+    };
+
     const downloadCompletionCertificates = async (type) => {
       if (disableDownloadCompletionCertificates.value) return;
 
@@ -234,9 +246,25 @@ export default {
         const formattedName = formatDownloadName(`${docType} ${composeCourseName(course.value, true)}`);
         const zipName = `${formattedName}.zip`;
 
-        const format = (isClientInterface || !isRofOrVendorAdmin.value) ? ALL_PDF : ALL_WORD;
-        const zip = await Courses.downloadCompletionCertificates(course.value._id, { format, type });
-        downloadZip(zip, zipName);
+        if (isClientInterface || !isRofOrVendorAdmin.value) {
+          await downloadCCFile(ALL_PDF, type, zipName);
+        } else {
+          $q.dialog({
+            title: 'Définir le format des documents',
+            message: 'Choisissez l\'extension des fichiers que vous souhaitez télécharger',
+            options: {
+              type: 'radio',
+              model: ALL_WORD,
+              items: [
+                { label: 'Format word (.docx)', value: ALL_WORD },
+                { label: 'Format PDF (.pdf)', value: ALL_PDF },
+              ],
+            },
+            ok: 'OK',
+            cancel: 'Annuler',
+          }).onOk((value) => downloadCCFile(value, type, zipName))
+            .onCancel(() => NotifyWarning('Téléchargement annulé.'));
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');
