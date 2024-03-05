@@ -251,7 +251,9 @@ export default {
         } else {
           $q.dialog({
             title: 'Définir le format des documents',
-            message: 'Choisissez l\'extension des fichiers que vous souhaitez télécharger',
+            message: `<div class="text-copper-grey-600 q-mt-sm">
+              Choisir l'extension des documents que vous souhaitez télécharger
+              </div>`,
             options: {
               type: 'radio',
               model: ALL_WORD,
@@ -260,9 +262,10 @@ export default {
                 { label: 'Format PDF (.pdf)', value: ALL_PDF },
               ],
             },
+            html: true,
             ok: 'OK',
             cancel: 'Annuler',
-          }).onOk((value) => downloadCCFile(value, type, zipName))
+          }).onOk(value => downloadCCFile(value, type, zipName))
             .onCancel(() => NotifyWarning('Téléchargement annulé.'));
         }
       } catch (e) {
