@@ -18,7 +18,8 @@ export default {
     selectedType: '',
     selectedNoAddressInSlots: false,
     selectedMissingTrainees: false,
-    selectedArchiveStatus: UNARCHIVED_COURSES,
+    selectedArchiveStatus: '',
+    selectedSalesRepresentative: '',
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = data ? ({ ...data }) : data; },
@@ -32,6 +33,7 @@ export default {
     SET_SELECTED_NO_ADDRESS_IN_SLOTS: (state, data) => { state.selectedNoAddressInSlots = data; },
     SET_SELECTED_MISSING_TRAINEES: (state, data) => { state.selectedMissingTrainees = data; },
     SET_SELECTED_ARCHIVE_STATUS: (state, data) => { state.selectedArchiveStatus = data; },
+    SET_SELECTED_SALES_REPRESENTATIVE: (state, data) => { state.selectedSalesRepresentative = data; },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {
@@ -41,6 +43,7 @@ export default {
         if (!get(course, 'operationsRepresentative._id')) course.operationsRepresentative = { _id: '' };
         if (!get(course, 'contact._id')) course.contact = { _id: '' };
         if (!get(course, 'companyRepresentative._id')) course.companyRepresentative = { _id: '' };
+        if (!get(course, 'salesRepresentative._id')) course.salesRepresentative = { _id: '' };
 
         // Coachs and client admins with vendor role only see trainees from their companies on client interface
         const userClientRole = store.getters['main/getClientRole'];
@@ -70,7 +73,10 @@ export default {
     setSelectedNoAddressInSlots: ({ commit }, params) => commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', params.isSelected),
     setSelectedMissingTrainees: ({ commit }, params) => commit('SET_SELECTED_MISSING_TRAINEES', params.isSelected),
     setSelectedArchiveStatus: ({ commit }, params) => commit('SET_SELECTED_ARCHIVE_STATUS', params.status),
-    resetFilters: ({ commit }) => {
+    setSelectedSalesRepresentative: ({ commit }, params) => {
+      commit('SET_SELECTED_SALES_REPRESENTATIVE', params.salesRepresentativeId);
+    },
+    resetFilters: ({ commit }, params = {}) => {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
       commit('SET_SELECTED_COMPANY', '');
@@ -80,7 +86,8 @@ export default {
       commit('SET_SELECTED_TYPE', '');
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
       commit('SET_SELECTED_MISSING_TRAINEES', false);
-      commit('SET_SELECTED_ARCHIVE_STATUS', UNARCHIVED_COURSES);
+      commit('SET_SELECTED_ARCHIVE_STATUS', params.isClientInterface ? '' : UNARCHIVED_COURSES);
+      commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
     },
   },
   getters: {},

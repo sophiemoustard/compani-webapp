@@ -111,10 +111,11 @@ export const useLearnersCreation = (
     };
   };
 
-  const getLearnerList = async (companyId = null) => {
+  const getLearnerList = async () => {
     try {
       tableLoading.value = true;
-      const learners = await Users.learnerList({ action: DIRECTORY, ...(companyId && { companies: companyId }) });
+      const learners = await Users
+        .learnerList({ action: DIRECTORY, ...(companies.value.length && { companies: companies.value }) });
       learnerList.value = Object.freeze(learners.map(formatRow));
     } catch (e) {
       console.error(e);

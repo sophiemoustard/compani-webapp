@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <ni-profile-header :title="programName" />
-    <profile-tabs :profile-id="programId" :tabs-content="tabsContent" />
+    <profile-tabs :profile-id="programId" :tabs-content="tabsContent" @refresh="refreshProgram" />
   </q-page>
 </template>
 
@@ -72,6 +72,8 @@ export default {
       tabsContent,
       // Computed
       program,
+      // Methods
+      refreshProgram,
     };
   },
 };

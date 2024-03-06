@@ -9,7 +9,7 @@
             <q-item-section side>
               <q-icon size="12px" :name="info.icon" :class="info.iconClass" />
             </q-item-section>
-            <q-item-section>{{ info.label }}</q-item-section>
+            <q-item-section class="label">{{ info.label }}</q-item-section>
           </q-item>
         </div>
         <forthcoming-section v-if="course.status === FORTHCOMING" :course="course" />
@@ -33,6 +33,7 @@ import {
   ARCHIVED_COURSES,
   UNARCHIVED_COURSES,
   WITHOUT_TRAINER,
+  WITHOUT_SALES_REPRESENTATIVE,
 } from '@data/constants';
 import { happened, composeCourseName } from '@helpers/courses';
 import { formatQuantity } from '@helpers/utils';
@@ -72,6 +73,7 @@ export default {
     const selectedNoAddressInSlots = computed(() => $store.state.course.selectedNoAddressInSlots);
     const selectedMissingTrainees = computed(() => $store.state.course.selectedMissingTrainees);
     const selectedArchiveStatus = computed(() => $store.state.course.selectedArchiveStatus);
+    const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
 
     const isCourseAfterStartDate = computed(() => {
       const estimatedDateIsAfter = !course.value.slots.length && course.value.estimatedStartDate &&
@@ -144,6 +146,15 @@ export default {
       if (selectedNoAddressInSlots.value && !hasCourseNoAddressInOnSiteSlots.value) return false;
 
       if (selectedMissingTrainees.value && !doesCourseMissTrainees.value) return false;
+
+      if (selectedSalesRepresentative.value) {
+        const courseSalesRepresentative = get(course.value, 'salesRepresentative._id');
+        const withoutSalesRepresentativeSelected = selectedSalesRepresentative.value === WITHOUT_SALES_REPRESENTATIVE;
+        if (withoutSalesRepresentativeSelected && courseSalesRepresentative) return false;
+        if (!withoutSalesRepresentativeSelected && courseSalesRepresentative !== selectedSalesRepresentative.value) {
+          return false;
+        }
+      }
 
       return true;
     });
@@ -238,4 +249,10 @@ export default {
 .infos-course-nearest-date
   color: $copper-grey-900 !important
   font-size: 14px
+.label
+  display: inline
+  max-width: 12em
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
 </style>

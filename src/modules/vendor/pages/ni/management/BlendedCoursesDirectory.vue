@@ -11,6 +11,8 @@
         @update:model-value="updateSelectedProgram" />
       <ni-select :options="operationsRepresentativeFilterOptions" :model-value="selectedOperationsRepresentative"
         @update:model-value="updateSelectedOperationsRepresentative" clearable />
+      <ni-select :options="salesRepresentativeFilterOptions" :model-value="selectedSalesRepresentative"
+        @update:model-value="updateSelectedSalesRepresentative" clearable />
       <ni-date-input :model-value="selectedStartDate" @update:model-value="updateSelectedStartDate"
         placeholder="Début de période" :max="selectedEndDate" :error="v$.selectedStartDate.$error"
         error-message="La date de début doit être antérieure à la date de fin" @blur="v$.selectedStartDate.$touch" />
@@ -33,9 +35,8 @@
       @click="openCourseCreationModal" />
 
     <course-creation-modal v-model="courseCreationModal" v-model:new-course="newCourse" :programs="programs"
-      :company-options="companyOptions" :validations="v$.newCourse" :loading="modalLoading" @hide="resetCreationModal"
-      @submit="createCourse" :operations-representative-options="operationsRepresentativeOptions"
-      :holding-options="holdingOptions" />
+      :companies="companies" :validations="v$.newCourse" :loading="modalLoading" @hide="resetCreationModal"
+      @submit="createCourse" :admin-user-options="adminUserOptions" :holding-options="holdingOptions" />
   </q-page>
 </template>
 
@@ -70,6 +71,7 @@ import {
 } from '@data/constants';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
+import store from 'src/store/index';
 
 export default {
   name: 'BlendedCoursesDirectory',
@@ -100,11 +102,12 @@ export default {
       maxTrainees: '8',
       expectedBillsCount: '0',
       hasCertifyingTest: false,
+      salesRepresentative: '',
     });
-    const companyOptions = ref([]);
+    const companies = ref([]);
     const holdingOptions = ref([]);
     const programs = ref([]);
-    const operationsRepresentativeOptions = ref([]);
+    const adminUserOptions = ref([]);
 
     const isIntraCourse = computed(() => newCourse.value.type === INTRA);
     const isIntraHoldingCourse = computed(() => newCourse.value.type === INTRA_HOLDING);
@@ -121,11 +124,10 @@ export default {
 
     const refreshCompanies = async () => {
       try {
-        const companies = await Companies.list();
-        companyOptions.value = formatAndSortOptions(companies, 'name');
+        companies.value = await Companies.list();
       } catch (e) {
         console.error(e);
-        companyOptions.value = [];
+        companies.value = [];
       }
     };
 
@@ -139,13 +141,13 @@ export default {
       }
     };
 
-    const refreshOperationsRepresentatives = async () => {
+    const refreshAdminUsers = async () => {
       try {
-        const operationsRepresentatives = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        operationsRepresentativeOptions.value = formatAndSortIdentityOptions(operationsRepresentatives);
+        const adminUsers = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        adminUserOptions.value = formatAndSortIdentityOptions(adminUsers);
       } catch (e) {
         console.error(e);
-        operationsRepresentativeOptions.value = [];
+        adminUserOptions.value = [];
       }
     };
 
@@ -167,6 +169,7 @@ export default {
         maxTrainees: '8',
         expectedBillsCount: '0',
         hasCertifyingTest: false,
+        salesRepresentative: '',
       };
     };
 
@@ -225,6 +228,9 @@ export default {
       updateSelectedMissingTrainees,
       updateSelectedArchiveStatus,
       resetFilters,
+      selectedSalesRepresentative,
+      updateSelectedSalesRepresentative,
+      salesRepresentativeFilterOptions,
     } = useCourseFilters(activeCourses, archivedCourses);
 
     const refreshActiveCourses = async () => {
@@ -279,7 +285,7 @@ export default {
         refreshPrograms(),
         refreshCompanies(),
         refreshHoldings(),
-        refreshOperationsRepresentatives(),
+        refreshAdminUsers(),
       ]);
     };
 
@@ -292,10 +298,10 @@ export default {
       courseCreationModal,
       modalLoading,
       newCourse,
-      companyOptions,
+      companies,
       holdingOptions,
       programs,
-      operationsRepresentativeOptions,
+      adminUserOptions,
       activeCourses,
       archivedCourses,
       archiveStatusOptions,
@@ -315,6 +321,8 @@ export default {
       selectedNoAddressInSlots,
       selectedMissingTrainees,
       selectedArchiveStatus,
+      selectedSalesRepresentative,
+      salesRepresentativeFilterOptions,
       // Methods
       openCourseCreationModal,
       resetCreationModal,
@@ -330,7 +338,15 @@ export default {
       updateSelectedMissingTrainees,
       updateSelectedArchiveStatus,
       resetFilters,
+      updateSelectedSalesRepresentative,
     };
+  },
+  beforeRouteEnter (_, from, next) {
+    if (!['ni management blended courses info', 'ni users trainers info'].includes(from.name)) {
+      store.dispatch('course/resetFilters', { isClientInterface: false });
+    }
+
+    next();
   },
 };
 </script>

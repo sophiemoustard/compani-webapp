@@ -80,6 +80,7 @@ export const defineAbilitiesForCourse = (user) => {
       can('read', 'Course', 'interlocutor');
       can('update', 'Course', 'certifying_test');
       can('update', 'Courses', 'trainer_missions');
+      can('read', 'Course', 'sales_representative');
     } else if (vendorRole === TRAINER) can('update', 'Course', 'trainees', { type: INTRA });
   } else {
     const holdingRole = get(role, 'holding.name');

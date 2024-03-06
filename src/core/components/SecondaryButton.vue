@@ -27,6 +27,6 @@ export default {
 </script>
 <style lang="sass" scoped>
 .button
-  justify-self: start
+  justify-self: stretch
   align-self: end
 </style>

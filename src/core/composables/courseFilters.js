@@ -4,7 +4,13 @@ import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
-import { WITHOUT_TRAINER, ARCHIVED_COURSES, COURSE_TYPES, UNARCHIVED_COURSES } from '@data/constants';
+import {
+  WITHOUT_TRAINER,
+  ARCHIVED_COURSES,
+  COURSE_TYPES,
+  UNARCHIVED_COURSES,
+  WITHOUT_SALES_REPRESENTATIVE,
+} from '@data/constants';
 
 export const useCourseFilters = (activeCourses, archivedCourses) => {
   const $store = useStore();
@@ -129,7 +135,27 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     $store.dispatch('course/setSelectedArchiveStatus', { status });
   };
 
-  const resetFilters = () => $store.dispatch('course/resetFilters');
+  const resetFilters = () => {
+    $store.dispatch('course/resetFilters', { isClientInterface: !isVendorInterface });
+  };
+
+  /* SALES REPRESENTATIVE */
+  const selectedSalesRepresentative = computed(() => $store.state.course.selectedSalesRepresentative);
+
+  const salesRepresentativeFilterOptions = computed(() => {
+    const filteredCourses = courses.value.filter(course => !!course.salesRepresentative);
+    const salesRepresentative = formatAndSortIdentityOptions(filteredCourses, 'salesRepresentative');
+
+    return [
+      { label: 'Tous les chargés d\'accompagnement', value: '' },
+      { label: 'Sans chargé d\'accompagnement', value: WITHOUT_SALES_REPRESENTATIVE },
+      ...sortedUniqBy(salesRepresentative, 'value'),
+    ];
+  });
+
+  const updateSelectedSalesRepresentative = (salesRepresentativeId) => {
+    $store.dispatch('course/setSelectedSalesRepresentative', { salesRepresentativeId });
+  };
 
   return {
     // data
@@ -150,7 +176,8 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     selectedNoAddressInSlots,
     selectedMissingTrainees,
     selectedArchiveStatus,
-
+    selectedSalesRepresentative,
+    salesRepresentativeFilterOptions,
     // Methods
     updateSelectedTrainer,
     updateSelectedProgram,
@@ -163,5 +190,6 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     updateSelectedMissingTrainees,
     updateSelectedArchiveStatus,
     resetFilters,
+    updateSelectedSalesRepresentative,
   };
 };

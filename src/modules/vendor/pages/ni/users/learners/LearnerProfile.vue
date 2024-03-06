@@ -9,7 +9,7 @@
             label="Détacher de la structure" @click="openCompanyDetachModal" />
         </template>
       </ni-profile-header>
-      <profile-tabs :profile-id="learnerId" :tabs-content="tabsContent" />
+      <profile-tabs :profile-id="learnerId" :tabs-content="tabsContent" @refresh="refreshUserProfile" />
     </div>
 
     <company-link-modal v-model="companyLinkModal" :loading="modalLoading" @submit="createUserCompany"
@@ -188,6 +188,7 @@ export default {
       openCompanyDetachModal,
       validateCompanyDetachement,
       resetDetachmentModal,
+      refreshUserProfile,
     };
   },
 };
