@@ -76,7 +76,7 @@ import { useQuasar } from 'quasar';
 import Courses from '@api/Courses';
 import Attendances from '@api/Attendances';
 import Questionnaires from '@api/Questionnaires';
-import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import AttendanceTable from '@components/table/AttendanceTable';
 import ExpandingTable from '@components/table/ExpandingTable';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
@@ -258,7 +258,7 @@ export default {
               type: 'radio',
               model: ALL_WORD,
               items: [
-                { label: 'Format word (.docx)', value: ALL_WORD },
+                { label: 'Format Word (.docx)', value: ALL_WORD },
                 { label: 'Format PDF (.pdf)', value: ALL_PDF },
               ],
             },
@@ -266,7 +266,7 @@ export default {
             ok: 'OK',
             cancel: 'Annuler',
           }).onOk(value => downloadCCFile(value, type, zipName))
-            .onCancel(() => NotifyWarning('Téléchargement annulé.'));
+            .onCancel(() => NotifyPositive('Téléchargement annulé.'));
         }
       } catch (e) {
         console.error(e);
