@@ -234,6 +234,8 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du document.');
+      } finally {
+        pdfLoading.value = false;
       }
     };
 
@@ -271,8 +273,6 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');
-      } finally {
-        pdfLoading.value = false;
       }
     };
 
