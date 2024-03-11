@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
+import { useStore } from 'vuex';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
@@ -25,66 +27,82 @@ import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import { SURVEY_LABEL_MAX_LENGTH, QUESTION_MAX_LENGTH } from '@data/constants';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'Survey',
-  props: {
-    disableEdition: { type: Boolean, default: false },
-  },
   components: {
     'ni-input': Input,
   },
-  mixins: [templateMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+  setup (props, { emit }) {
+    const { disableEdition } = toRefs(props);
+
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         label: {
           left: {
-            required: requiredIf(!!get(this.card, 'label.right')),
+            required: requiredIf(!!get(card.value, 'label.right')),
             maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
           },
           right: {
-            required: requiredIf(!!get(this.card, 'label.left')),
+            required: requiredIf(!!get(card.value, 'label.left')),
             maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
           },
         },
       },
-    };
-  },
-  methods: {
-    labelErrorMessage (label) {
-      if (get(this.v$, `card.label.${label}.required.$response`) === false) {
+    }));
+    const v$ = useVuelidate(rules, { card });
+
+    const { tmpInput, refreshCard, saveTmp, updateCard, questionErrorMsg } = useCardTemplate(card, v$, emit);
+
+    const labelErrorMessage = (label) => {
+      if (get(v$.value, `card.label.${label}.required.$response`) === false) {
         return 'Les 2 labels doivent être renseignés ou vides.';
       }
-      if (get(this.v$, `card.label[${label}].maxLength.$response`) === false) {
+      if (get(v$.value, `card.label[${label}].maxLength.$response`) === false) {
         return `${SURVEY_LABEL_MAX_LENGTH} caractères maximum.`;
       }
 
       return '';
-    },
-    async updateCardLabel (label) {
-      try {
-        if (this.tmpInput === this.card.label[label]) return;
+    };
 
-        this.v$.card.label.$touch();
-        if (get(this.v$, `card.label[${label}].maxLength.$response`) === false) {
+    const updateCardLabel = async (label) => {
+      try {
+        if (tmpInput.value === card.value.label[label]) return;
+
+        v$.value.card.label.$touch();
+        if (get(v$.value, `card.label[${label}].maxLength.$response`) === false) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        await Cards.updateById(this.card._id, set({}, `label.${label}`, this.card.label[label].trim()));
+        await Cards.updateById(card.value._id, set({}, `label.${label}`, card.value.label[label].trim()));
 
-        await this.refreshCard();
+        await refreshCard();
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
       }
-    },
+    };
+
+    return {
+      // Data
+      disableEdition,
+      v$,
+      // Computed
+      card,
+      // Methods
+      labelErrorMessage,
+      updateCardLabel,
+      questionErrorMsg,
+      saveTmp,
+      updateCard,
+    };
   },
 };
 </script>
