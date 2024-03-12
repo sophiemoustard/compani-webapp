@@ -92,6 +92,8 @@ export const defineAbilitiesForCourse = (user) => {
     can('read', 'Course', 'history', { type: INTRA });
     can('access', 'trainee');
     can('read', 'Course', 'training_contracts');
+    can('read', 'Course', 'certificates');
+
     if ([HOLDING_ADMIN].includes(holdingRole)) {
       can('update', 'Course', 'company_representative', { type: INTRA_HOLDING });
       can('update', 'Course', 'companies', { type: INTRA_HOLDING });
@@ -100,7 +102,6 @@ export const defineAbilitiesForCourse = (user) => {
       can('read', 'Course', 'history', { type: INTRA_HOLDING });
     } else if ([COACH, CLIENT_ADMIN].includes(clientRole)) {
       can('read', 'Course', 'all_trainees', { type: INTRA });
-      can('read', 'Course', 'certificates');
     }
   }
 
