@@ -21,7 +21,7 @@ import { toRefs, computed } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf, maxLength } from '@vuelidate/validators';
+import { required, maxLength } from '@vuelidate/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
@@ -73,7 +73,7 @@ export default {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        await Cards.updateById(card.value._id, { labels: card.value.labels } );
+        await Cards.updateById(card.value._id, { labels: card.value.labels });
 
         await refreshCard();
         NotifyPositive('Carte mise à jour.');
