@@ -6,12 +6,12 @@
     <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
       class="q-mb-lg" dense :disable="disableEdition" />
     <div class="row gutter-profile">
-      <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model="card.label.left"
-        @focus="saveTmp('label.left')" @blur="updateCardLabel('left')" :error="v$.card.label.left.$error"
-        :error-message="labelErrorMessage('left')" :disable="disableEdition" />
-      <ni-input class="col-md-6 col-xs-12" caption="Label droit" v-model="card.label.right"
-        @focus="saveTmp('label.right')" @blur="updateCardLabel('right')" :error="v$.card.label.right.$error"
-        :error-message="labelErrorMessage('right')" :disable="disableEdition" />
+      <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 1" v-model="card.labels['1']"
+        @focus="saveTmp('labels.1')" @blur="updateCardLabels('1')" :error="v$.card.labels['1'].$error"
+        :error-message="labelErrorMessage('1')" :disable="disableEdition" />
+      <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 5" v-model="card.labels['5']"
+        @focus="saveTmp('labels.5')" @blur="updateCardLabels('5')" :error="v$.card.labels['5'].$error"
+        :error-message="labelErrorMessage('5')" :disable="disableEdition" />
     </div>
   </div>
 </template>
@@ -19,7 +19,6 @@
 <script>
 import { toRefs, computed } from 'vue';
 import { useStore } from 'vuex';
-import set from 'lodash/set';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf, maxLength } from '@vuelidate/validators';
@@ -44,15 +43,9 @@ export default {
     const rules = computed(() => ({
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
-        label: {
-          left: {
-            required: requiredIf(!!get(card.value, 'label.right')),
-            maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
-          },
-          right: {
-            required: requiredIf(!!get(card.value, 'label.left')),
-            maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
-          },
+        labels: {
+          1: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+          5: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
         },
       },
     }));
@@ -60,27 +53,27 @@ export default {
 
     const { tmpInput, refreshCard, saveTmp, updateCard, questionErrorMsg } = useCardTemplate(card, v$, emit);
 
-    const labelErrorMessage = (label) => {
-      if (get(v$.value, `card.label.${label}.required.$response`) === false) {
-        return 'Les 2 labels doivent être renseignés ou vides.';
+    const labelErrorMessage = (labelKey) => {
+      if (get(v$.value, `card.labels[${labelKey}].required.$response`) === false) {
+        return 'Toutes les légendes doivent être renseignées.';
       }
-      if (get(v$.value, `card.label[${label}].maxLength.$response`) === false) {
+      if (get(v$.value, `card.labels[${labelKey}].maxLength.$response`) === false) {
         return `${SURVEY_LABEL_MAX_LENGTH} caractères maximum.`;
       }
 
       return '';
     };
 
-    const updateCardLabel = async (label) => {
+    const updateCardLabels = async (labelKey) => {
       try {
-        if (tmpInput.value === card.value.label[label]) return;
+        if (tmpInput.value === get(card.value, `labels.${labelKey}`)) return;
 
-        v$.value.card.label.$touch();
-        if (get(v$.value, `card.label[${label}].maxLength.$response`) === false) {
+        v$.value.card.labels.$touch();
+        if (get(v$.value, `card.labels.${labelKey}.maxLength.$response`) === false) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        await Cards.updateById(card.value._id, set({}, `label.${label}`, card.value.label[label].trim()));
+        await Cards.updateById(card.value._id, { labels: card.value.labels } );
 
         await refreshCard();
         NotifyPositive('Carte mise à jour.');
@@ -98,10 +91,11 @@ export default {
       card,
       // Methods
       labelErrorMessage,
-      updateCardLabel,
+      updateCardLabels,
       questionErrorMsg,
       saveTmp,
       updateCard,
+      get,
     };
   },
 };
