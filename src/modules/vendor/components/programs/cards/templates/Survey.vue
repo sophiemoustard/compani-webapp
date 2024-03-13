@@ -33,6 +33,7 @@ export default {
   components: {
     'ni-input': Input,
   },
+  emits: ['refresh'],
   setup (props, { emit }) {
     const { disableEdition } = toRefs(props);
 

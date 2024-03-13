@@ -48,7 +48,6 @@ export const useCardTemplate = (card, v$, refreshCard) => {
     // Computed
     questionErrorMsg,
     // Methods
-    refreshCard,
     saveTmp,
     updateCard,
   };
