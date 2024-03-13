@@ -21,6 +21,8 @@
 
 <script>
 import { useMeta } from 'quasar';
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import groupBy from 'lodash/groupBy';
@@ -43,34 +45,25 @@ export default {
     const metaInfo = { title: 'Questionnaires' };
     useMeta(metaInfo);
 
-    return { v$: useVuelidate() };
-  },
-  data () {
-    return {
-      loading: false,
-      questionnairesByType: [],
-      modalLoading: false,
-      questionnaireCreationModal: false,
-      newQuestionnaire: { name: '', type: '' },
-      questionnaireTypes: [],
-      QUESTIONNAIRE_TYPES,
+    const $router = useRouter();
+
+    const loading = ref(false);
+    const questionnairesByType = ref([]);
+    const modalLoading = ref(false);
+    const questionnaireCreationModal = ref(false);
+    const newQuestionnaire = ref({ name: '', type: '' });
+    const questionnaireTypes = ref([]);
+
+    const rules = computed(() => ({ newQuestionnaire: { name: { required }, type: { required } } }));
+    const v$ = useVuelidate(rules, { newQuestionnaire });
+
+    const goToQuestionnaireProfile = (questionnaireId) => {
+      $router.push({ name: 'ni pedagogy questionnaire profile', params: { questionnaireId } });
     };
-  },
-  validations () {
-    return {
-      newQuestionnaire: { name: { required }, type: { required } },
-    };
-  },
-  async created () {
-    await this.refreshQuestionnaires();
-  },
-  methods: {
-    goToQuestionnaireProfile (questionnaireId) {
-      this.$router.push({ name: 'ni pedagogy questionnaire profile', params: { questionnaireId } });
-    },
-    async refreshQuestionnaires () {
+
+    const refreshQuestionnaires = async () => {
       try {
-        this.loading = true;
+        loading.value = true;
         const questionnaires = await Questionnaires.list();
 
         const questionnairesGroups = groupBy(
@@ -78,39 +71,65 @@ export default {
           q => q.type
         );
 
-        this.questionnairesByType = Object.keys(QUESTIONNAIRE_TYPES)
+        questionnairesByType.value = Object.keys(QUESTIONNAIRE_TYPES)
           .map(type => ({ type, list: questionnairesGroups[type] }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
-        this.questionnairesByType = [];
+        questionnairesByType.value = [];
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    resetCreationModal () {
-      this.v$.newQuestionnaire.$reset();
-      this.newQuestionnaire = { name: '', type: '' };
-    },
-    async createQuestionnaire () {
+    };
+
+    const resetCreationModal = () => {
+      v$.value.newQuestionnaire.$reset();
+      newQuestionnaire.value = { name: '', type: '' };
+    };
+
+    const createQuestionnaire = async () => {
       try {
-        this.v$.newQuestionnaire.$touch();
-        if (this.v$.newQuestionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
+        v$.value.newQuestionnaire.$touch();
+        if (v$.value.newQuestionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        this.modalLoading = true;
-        await Questionnaires.create(this.newQuestionnaire);
+        modalLoading.value = true;
+        await Questionnaires.create(newQuestionnaire.value);
 
-        this.questionnaireCreationModal = false;
+        questionnaireCreationModal.value = false;
         NotifyPositive('Questionnaire créé.');
-        await this.refreshQuestionnaires();
+        await refreshQuestionnaires();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la création du questionnaire.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
+    };
+
+    const created = async () => {
+      await refreshQuestionnaires();
+    };
+
+    created();
+
+    return {
+      // Data
+      loading,
+      questionnairesByType,
+      QUESTIONNAIRE_TYPES,
+      modalLoading,
+      questionnaireCreationModal,
+      newQuestionnaire,
+      questionnaireTypes,
+      // Methods
+      goToQuestionnaireProfile,
+      refreshQuestionnaires,
+      resetCreationModal,
+      createQuestionnaire,
+      // Validations
+      v$,
+    };
   },
 };
 </script>
