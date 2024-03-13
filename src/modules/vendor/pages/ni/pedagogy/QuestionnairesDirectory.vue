@@ -4,9 +4,11 @@
     <div v-for="group in questionnairesByType" :key="group.type" class="q-mb-lg ">
       <div class="text-weight-bold">{{ QUESTIONNAIRE_TYPES[group.type] }}</div>
       <div v-if="group.list" class="row">
-        <questionnaire-cell v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
-          :index="group.list.length - index" :questionnaire="questionnaire" class="q-my-md q-mr-md"
-          @click="goToQuestionnaireProfile(questionnaire._id)" />
+        <router-link v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
+          :to="goToQuestionnaireProfile">
+          <questionnaire-cell :index="group.list.length - index" :questionnaire="questionnaire"
+            class="q-my-md q-mr-md" />
+        </router-link>
       </div>
       <div v-else class="text-italic q-mb-md">Aucun questionnaire "{{ QUESTIONNAIRE_TYPES[group.type] }}"</div>
     </div>
@@ -22,7 +24,6 @@
 <script>
 import { useMeta } from 'quasar';
 import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import groupBy from 'lodash/groupBy';
@@ -45,8 +46,6 @@ export default {
     const metaInfo = { title: 'Questionnaires' };
     useMeta(metaInfo);
 
-    const $router = useRouter();
-
     const loading = ref(false);
     const questionnairesByType = ref([]);
     const modalLoading = ref(false);
@@ -57,9 +56,9 @@ export default {
     const rules = computed(() => ({ newQuestionnaire: { name: { required }, type: { required } } }));
     const v$ = useVuelidate(rules, { newQuestionnaire });
 
-    const goToQuestionnaireProfile = (questionnaireId) => {
-      $router.push({ name: 'ni pedagogy questionnaire profile', params: { questionnaireId } });
-    };
+    const goToQuestionnaireProfile = questionnaireId => (
+      { name: 'ni pedagogy questionnaire profile', params: { questionnaireId } }
+    );
 
     const refreshQuestionnaires = async () => {
       try {
