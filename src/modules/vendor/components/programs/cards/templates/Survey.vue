@@ -51,7 +51,11 @@ export default {
     }));
     const v$ = useVuelidate(rules, { card });
 
-    const { tmpInput, refreshCard, saveTmp, updateCard, questionErrorMsg } = useCardTemplate(card, v$, emit);
+    const refreshCard = () => {
+      emit('refresh');
+    };
+
+    const { tmpInput, saveTmp, updateCard, questionErrorMsg } = useCardTemplate(card, v$, refreshCard);
 
     const labelErrorMessage = (labelKey) => {
       if (get(v$.value, `card.labels[${labelKey}].required.$response`) === false) {

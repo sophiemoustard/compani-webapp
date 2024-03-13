@@ -5,21 +5,17 @@ import Cards from '@api/Cards';
 import { QUESTION_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
-export const useCardTemplate = (card, v$, emit) => {
+export const useCardTemplate = (card, v$, refreshCard) => {
   const tmpInput = ref('');
 
   const questionErrorMsg = computed(() => {
-    if (get(v$, 'card.question.required.$response') === false) return REQUIRED_LABEL;
-    if (get(v$, 'card.question.maxLength.$response') === false) {
+    if (get(v$.value, 'card.question.required.$response') === false) return REQUIRED_LABEL;
+    if (get(v$.value, 'card.question.maxLength.$response') === false) {
       return `${QUESTION_MAX_LENGTH} caractères maximum.`;
     }
 
     return '';
   });
-
-  const refreshCard = () => {
-    emit('refresh');
-  };
 
   const saveTmp = (path) => {
     tmpInput.value = get(card.value, path);
