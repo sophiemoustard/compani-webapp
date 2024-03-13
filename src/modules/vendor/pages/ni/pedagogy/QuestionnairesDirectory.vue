@@ -5,7 +5,7 @@
       <div class="text-weight-bold">{{ QUESTIONNAIRE_TYPES[group.type] }}</div>
       <div v-if="group.list" class="row">
         <router-link v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
-          :to="goToQuestionnaireProfile">
+          :to="goToQuestionnaireProfile(questionnaire._id)">
           <questionnaire-cell :index="group.list.length - index" :questionnaire="questionnaire"
             class="q-my-md q-mr-md" />
         </router-link>
@@ -51,7 +51,6 @@ export default {
     const modalLoading = ref(false);
     const questionnaireCreationModal = ref(false);
     const newQuestionnaire = ref({ name: '', type: '' });
-    const questionnaireTypes = ref([]);
 
     const rules = computed(() => ({ newQuestionnaire: { name: { required }, type: { required } } }));
     const v$ = useVuelidate(rules, { newQuestionnaire });
@@ -120,7 +119,6 @@ export default {
       modalLoading,
       questionnaireCreationModal,
       newQuestionnaire,
-      questionnaireTypes,
       // Methods
       goToQuestionnaireProfile,
       refreshQuestionnaires,
