@@ -268,7 +268,10 @@ export default {
             ok: 'OK',
             cancel: 'Annuler',
           }).onOk(value => downloadCCFile(value, type, zipName))
-            .onCancel(() => NotifyPositive('Téléchargement annulé.'));
+            .onCancel(() => {
+              NotifyPositive('Téléchargement annulé.');
+              pdfLoading.value = false;
+            });
         }
       } catch (e) {
         console.error(e);
