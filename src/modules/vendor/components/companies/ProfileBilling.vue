@@ -144,7 +144,7 @@ import {
   HOLDING_ADMIN,
 } from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
-import { ascendingSortBy, ascendingSort } from '@helpers/dates/utils';
+import { ascendingSortBy, descendingSortBy } from '@helpers/dates/utils';
 import {
   formatPrice,
   formatPriceWithSign,
@@ -277,15 +277,9 @@ export default {
     const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBillList);
 
     const sortCourseBills = (a, b) => {
-      const payerCompare = a.payer.name.localeCompare(b.payer.name);
+      const billedAtCompare = descendingSortBy('billedAt')(a, b);
 
-      if (payerCompare === 0) {
-        const billedAtCompare = ascendingSort(a.billedAt, b.billedAt);
-
-        return billedAtCompare === 0 ? ascendingSort(a.createdAt, b.createdAt) : billedAtCompare;
-      }
-
-      return payerCompare;
+      return billedAtCompare === 0 ? descendingSortBy('createdAt')(a, b) : billedAtCompare;
     };
 
     const refreshCourseBills = async () => {
