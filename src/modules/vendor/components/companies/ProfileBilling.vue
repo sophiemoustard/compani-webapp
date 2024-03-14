@@ -141,6 +141,7 @@ import {
   DD_MM_YYYY,
   CLIENT_ADMIN,
   EDITION,
+  HOLDING_ADMIN,
 } from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
 import { ascendingSortBy, ascendingSort } from '@helpers/dates/utils';
@@ -457,9 +458,10 @@ export default {
     };
 
     const refreshBillingRepresentativeOptions = async () => {
-      const vendorUsers = await Users.list({ role: [CLIENT_ADMIN], company: company.value._id });
+      const usersOptions = await Users
+        .list({ role: [CLIENT_ADMIN, HOLDING_ADMIN], includeHoldingAdmins: true, company: company.value._id });
 
-      billingRepresentativeOptions.value = formatAndSortUserOptions(vendorUsers, false);
+      billingRepresentativeOptions.value = formatAndSortUserOptions(usersOptions, false);
     };
 
     const refreshCompany = async () => {
