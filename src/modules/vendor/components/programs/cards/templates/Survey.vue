@@ -8,10 +8,10 @@
     <div class="row gutter-profile">
       <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 1" v-model="card.labels['1']"
         @focus="saveTmp('labels.1')" @blur="updateCardLabels('1')" :error="v$.card.labels['1'].$error"
-        :error-message="labelErrorMessage('1')" :disable="disableEdition" />
+        :error-message="labelErrorMessage('1')" :disable="disableEdition" required-field />
       <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 5" v-model="card.labels['5']"
         @focus="saveTmp('labels.5')" @blur="updateCardLabels('5')" :error="v$.card.labels['5'].$error"
-        :error-message="labelErrorMessage('5')" :disable="disableEdition" />
+        :error-message="labelErrorMessage('5')" :disable="disableEdition" required-field />
     </div>
   </div>
 </template>
