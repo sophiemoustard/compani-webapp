@@ -460,7 +460,8 @@ export default {
 
     const refreshCompany = async () => {
       try {
-        await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
+        if (canUpdateBilling.value) await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
+        else await $store.dispatch('main/fetchLoggedUser', loggedUser.value._id);
       } catch (e) {
         console.error(e);
       }
