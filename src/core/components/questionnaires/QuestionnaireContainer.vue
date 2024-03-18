@@ -15,11 +15,11 @@
 
   <questionnaire-creation-modal v-model="questionnaireCreationModal" @hide="resetCreationModal"
     :loading="modalLoading" @submit="createQuestionnaire" :validations="v$.newQuestionnaire"
-    v-model:new-questionnaire="newQuestionnaire" />
+    v-model:new-questionnaire="newQuestionnaire" :program-id="programId" />
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, toRefs } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import groupBy from 'lodash/groupBy';
@@ -27,7 +27,7 @@ import Questionnaires from '@api/Questionnaires';
 import QuestionnaireCell from '@components/courses/QuestionnaireCell';
 import QuestionnaireCreationModal from 'src/modules/vendor/components/programs/QuestionnaireCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { QUESTIONNAIRE_TYPES } from '@data/constants';
+import { QUESTIONNAIRE_TYPES, SELF_POSITIONNING } from '@data/constants';
 import { descendingSortBy } from '@helpers/dates/utils';
 
 export default {
@@ -36,12 +36,18 @@ export default {
     'questionnaire-creation-modal': QuestionnaireCreationModal,
     'questionnaire-cell': QuestionnaireCell,
   },
-  setup () {
+  props: {
+    profileId: { type: String, default: '' },
+  },
+  setup (props) {
+    const { profileId: programId } = toRefs(props);
     const loading = ref(false);
     const questionnairesByType = ref([]);
     const modalLoading = ref(false);
     const questionnaireCreationModal = ref(false);
-    const newQuestionnaire = ref({ name: '', type: '' });
+    const newQuestionnaire = ref(programId.value
+      ? { name: '', type: SELF_POSITIONNING, program: programId.value }
+      : { name: '', type: '' });
 
     const rules = computed(() => ({ newQuestionnaire: { name: { required }, type: { required } } }));
     const v$ = useVuelidate(rules, { newQuestionnaire });
@@ -53,14 +59,18 @@ export default {
     const refreshQuestionnaires = async () => {
       try {
         loading.value = true;
-        const questionnaires = await Questionnaires.list();
+        const query = programId.value ? { program: programId.value } : {};
+        const questionnaires = await Questionnaires.list(query);
 
         const questionnairesGroups = groupBy(
           questionnaires.sort(descendingSortBy('createdAt')),
           q => q.type
         );
 
-        questionnairesByType.value = Object.keys(QUESTIONNAIRE_TYPES)
+        const questionnaireTypes = programId.value
+          ? Object.keys(QUESTIONNAIRE_TYPES).filter(type => type === SELF_POSITIONNING)
+          : Object.keys(QUESTIONNAIRE_TYPES).filter(type => type !== SELF_POSITIONNING);
+        questionnairesByType.value = questionnaireTypes
           .map(type => ({ type, list: questionnairesGroups[type] }));
       } catch (e) {
         console.error(e);
@@ -73,7 +83,9 @@ export default {
 
     const resetCreationModal = () => {
       v$.value.newQuestionnaire.$reset();
-      newQuestionnaire.value = { name: '', type: '' };
+      newQuestionnaire.value = programId.value
+        ? { name: '', type: SELF_POSITIONNING, program: programId.value }
+        : { name: '', type: '' };
     };
 
     const createQuestionnaire = async () => {
@@ -110,6 +122,7 @@ export default {
       modalLoading,
       questionnaireCreationModal,
       newQuestionnaire,
+      programId,
       // Methods
       goToQuestionnaireProfile,
       refreshQuestionnaires,

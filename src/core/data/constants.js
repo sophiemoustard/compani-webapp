@@ -498,8 +498,13 @@ export const TRAINEE = 'trainee';
 // QUESTIONNAIRE TYPES
 export const EXPECTATIONS = 'expectations';
 export const END_OF_COURSE = 'end_of_course';
+export const SELF_POSITIONNING = 'self_positionning';
 export const DRAFT = 'draft';
-export const QUESTIONNAIRE_TYPES = { [EXPECTATIONS]: 'Recueil des attentes', [END_OF_COURSE]: 'Fin de formation' };
+export const QUESTIONNAIRE_TYPES = {
+  [EXPECTATIONS]: 'Recueil des attentes',
+  [END_OF_COURSE]: 'Fin de formation',
+  [SELF_POSITIONNING]: 'Auto-positionnement',
+};
 
 // EXPORTS
 export const SERVICE = 'service';
