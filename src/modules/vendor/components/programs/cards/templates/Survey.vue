@@ -6,85 +6,102 @@
     <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
       class="q-mb-lg" dense :disable="disableEdition" />
     <div class="row gutter-profile">
-      <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model="card.label.left"
-        @focus="saveTmp('label.left')" @blur="updateCardLabel('left')" :error="v$.card.label.left.$error"
-        :error-message="labelErrorMessage('left')" :disable="disableEdition" />
-      <ni-input class="col-md-6 col-xs-12" caption="Label droit" v-model="card.label.right"
-        @focus="saveTmp('label.right')" @blur="updateCardLabel('right')" :error="v$.card.label.right.$error"
-        :error-message="labelErrorMessage('right')" :disable="disableEdition" />
+      <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 1" v-model="card.labels['1']"
+        @focus="saveTmp('labels.1')" @blur="updateCardLabels('1')" :error="v$.card.labels['1'].$error"
+        :error-message="labelErrorMessage('1')" :disable="disableEdition" required-field />
+      <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 5" v-model="card.labels['5']"
+        @focus="saveTmp('labels.5')" @blur="updateCardLabels('5')" :error="v$.card.labels['5'].$error"
+        :error-message="labelErrorMessage('5')" :disable="disableEdition" required-field />
     </div>
   </div>
 </template>
 
 <script>
-import set from 'lodash/set';
+import { toRefs, computed } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
-import { required, requiredIf, maxLength } from '@vuelidate/validators';
+import { required, maxLength } from '@vuelidate/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import { SURVEY_LABEL_MAX_LENGTH, QUESTION_MAX_LENGTH } from '@data/constants';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'Survey',
-  props: {
-    disableEdition: { type: Boolean, default: false },
-  },
   components: {
     'ni-input': Input,
   },
-  mixins: [templateMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+  emits: ['refresh'],
+  setup (props, { emit }) {
+    const { disableEdition } = toRefs(props);
+
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
-        label: {
-          left: {
-            required: requiredIf(!!get(this.card, 'label.right')),
-            maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
-          },
-          right: {
-            required: requiredIf(!!get(this.card, 'label.left')),
-            maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH),
-          },
+        labels: {
+          1: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+          5: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
         },
       },
+    }));
+    const v$ = useVuelidate(rules, { card });
+
+    const refreshCard = () => {
+      emit('refresh');
     };
-  },
-  methods: {
-    labelErrorMessage (label) {
-      if (get(this.v$, `card.label.${label}.required.$response`) === false) {
-        return 'Les 2 labels doivent être renseignés ou vides.';
+
+    const { tmpInput, saveTmp, updateCard, questionErrorMsg } = useCardTemplate(card, v$, refreshCard);
+
+    const labelErrorMessage = (labelKey) => {
+      if (get(v$.value, `card.labels[${labelKey}].required.$response`) === false) {
+        return 'Toutes les légendes doivent être renseignées.';
       }
-      if (get(this.v$, `card.label[${label}].maxLength.$response`) === false) {
+      if (get(v$.value, `card.labels[${labelKey}].maxLength.$response`) === false) {
         return `${SURVEY_LABEL_MAX_LENGTH} caractères maximum.`;
       }
 
       return '';
-    },
-    async updateCardLabel (label) {
+    };
+
+    const updateCardLabels = async (labelKey) => {
       try {
-        if (this.tmpInput === this.card.label[label]) return;
+        if (tmpInput.value === get(card.value, `labels.${labelKey}`)) return;
 
-        this.v$.card.label.$touch();
-        if (get(this.v$, `card.label[${label}].maxLength.$response`) === false) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        v$.value.card.labels.$touch();
+        const atLeastOneLabelIsTooLong = Object.keys(card.value.labels)
+          .some(labKey => get(v$.value, `card.labels.${labKey}.maxLength.$response`) === false);
+        if (atLeastOneLabelIsTooLong) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Cards.updateById(this.card._id, set({}, `label.${label}`, this.card.label[label].trim()));
+        await Cards.updateById(card.value._id, { labels: card.value.labels });
 
-        await this.refreshCard();
+        await refreshCard();
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
       }
-    },
+    };
+
+    return {
+      // Data
+      disableEdition,
+      v$,
+      // Computed
+      card,
+      // Methods
+      labelErrorMessage,
+      updateCardLabels,
+      questionErrorMsg,
+      saveTmp,
+      updateCard,
+      get,
+    };
   },
 };
 </script>
