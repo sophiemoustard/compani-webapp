@@ -14,12 +14,6 @@ import { defineAbilitiesFor } from '@helpers/ability';
 export const menuItemsMixin = {
   data () {
     return {
-      customerActiveRoutes: {
-        planning: { open: false },
-        customers: { open: false },
-        administrative: { open: false },
-        teams: { open: false },
-      },
       coachActiveRoutes: {
         courses: { open: false },
         planning: { open: false },
@@ -31,10 +25,8 @@ export const menuItemsMixin = {
         configuration: { open: false },
       },
       auxiliaryActiveRoutes: {
-        planning: { open: false },
         customers: { open: false },
         administrative: { open: false },
-        teams: { open: false },
       },
     };
   },
@@ -77,7 +69,7 @@ export const menuItemsMixin = {
         .filter(r => (r.children ? r.children.length : ability.can('read', r.name)));
     },
     activeRoutes () {
-      if (this.isHelper) return this.customerActiveRoutes;
+      if (this.isHelper) return null;
       if (this.isCoach) return this.coachActiveRoutes;
       if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
       return {};
