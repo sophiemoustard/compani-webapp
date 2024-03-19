@@ -141,9 +141,10 @@ import {
   DD_MM_YYYY,
   CLIENT_ADMIN,
   EDITION,
+  HOLDING_ADMIN,
 } from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
-import { ascendingSortBy, ascendingSort } from '@helpers/dates/utils';
+import { ascendingSortBy, descendingSortBy } from '@helpers/dates/utils';
 import {
   formatPrice,
   formatPriceWithSign,
@@ -276,15 +277,9 @@ export default {
     const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBillList);
 
     const sortCourseBills = (a, b) => {
-      const payerCompare = a.payer.name.localeCompare(b.payer.name);
+      const billedAtCompare = descendingSortBy('billedAt')(a, b);
 
-      if (payerCompare === 0) {
-        const billedAtCompare = ascendingSort(a.billedAt, b.billedAt);
-
-        return billedAtCompare === 0 ? ascendingSort(a.createdAt, b.createdAt) : billedAtCompare;
-      }
-
-      return payerCompare;
+      return billedAtCompare === 0 ? descendingSortBy('createdAt')(a, b) : billedAtCompare;
     };
 
     const refreshCourseBills = async () => {
@@ -457,14 +452,16 @@ export default {
     };
 
     const refreshBillingRepresentativeOptions = async () => {
-      const vendorUsers = await Users.list({ role: [CLIENT_ADMIN], company: company.value._id });
+      const usersOptions = await Users
+        .list({ role: [CLIENT_ADMIN, HOLDING_ADMIN], includeHoldingAdmins: true, company: company.value._id });
 
-      billingRepresentativeOptions.value = formatAndSortUserOptions(vendorUsers, false);
+      billingRepresentativeOptions.value = formatAndSortUserOptions(usersOptions, false);
     };
 
     const refreshCompany = async () => {
       try {
-        await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
+        if (canUpdateBilling.value) await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
+        else await $store.dispatch('main/fetchLoggedUser', loggedUser.value._id);
       } catch (e) {
         console.error(e);
       }

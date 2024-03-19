@@ -4,9 +4,11 @@
     <div v-for="group in questionnairesByType" :key="group.type" class="q-mb-lg ">
       <div class="text-weight-bold">{{ QUESTIONNAIRE_TYPES[group.type] }}</div>
       <div v-if="group.list" class="row">
-        <questionnaire-cell v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
-          :index="group.list.length - index" :questionnaire="questionnaire" class="q-my-md q-mr-md"
-          @click="goToQuestionnaireProfile(questionnaire._id)" />
+        <router-link v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
+          :to="goToQuestionnaireProfile(questionnaire._id)">
+          <questionnaire-cell :index="group.list.length - index" :questionnaire="questionnaire"
+            class="q-my-md q-mr-md" />
+        </router-link>
       </div>
       <div v-else class="text-italic q-mb-md">Aucun questionnaire "{{ QUESTIONNAIRE_TYPES[group.type] }}"</div>
     </div>
@@ -21,6 +23,7 @@
 
 <script>
 import { useMeta } from 'quasar';
+import { ref, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import groupBy from 'lodash/groupBy';
@@ -43,34 +46,22 @@ export default {
     const metaInfo = { title: 'Questionnaires' };
     useMeta(metaInfo);
 
-    return { v$: useVuelidate() };
-  },
-  data () {
-    return {
-      loading: false,
-      questionnairesByType: [],
-      modalLoading: false,
-      questionnaireCreationModal: false,
-      newQuestionnaire: { name: '', type: '' },
-      questionnaireTypes: [],
-      QUESTIONNAIRE_TYPES,
-    };
-  },
-  validations () {
-    return {
-      newQuestionnaire: { name: { required }, type: { required } },
-    };
-  },
-  async created () {
-    await this.refreshQuestionnaires();
-  },
-  methods: {
-    goToQuestionnaireProfile (questionnaireId) {
-      this.$router.push({ name: 'ni pedagogy questionnaire profile', params: { questionnaireId } });
-    },
-    async refreshQuestionnaires () {
+    const loading = ref(false);
+    const questionnairesByType = ref([]);
+    const modalLoading = ref(false);
+    const questionnaireCreationModal = ref(false);
+    const newQuestionnaire = ref({ name: '', type: '' });
+
+    const rules = computed(() => ({ newQuestionnaire: { name: { required }, type: { required } } }));
+    const v$ = useVuelidate(rules, { newQuestionnaire });
+
+    const goToQuestionnaireProfile = questionnaireId => (
+      { name: 'ni pedagogy questionnaire profile', params: { questionnaireId } }
+    );
+
+    const refreshQuestionnaires = async () => {
       try {
-        this.loading = true;
+        loading.value = true;
         const questionnaires = await Questionnaires.list();
 
         const questionnairesGroups = groupBy(
@@ -78,39 +69,64 @@ export default {
           q => q.type
         );
 
-        this.questionnairesByType = Object.keys(QUESTIONNAIRE_TYPES)
+        questionnairesByType.value = Object.keys(QUESTIONNAIRE_TYPES)
           .map(type => ({ type, list: questionnairesGroups[type] }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
-        this.questionnairesByType = [];
+        questionnairesByType.value = [];
       } finally {
-        this.loading = false;
+        loading.value = false;
       }
-    },
-    resetCreationModal () {
-      this.v$.newQuestionnaire.$reset();
-      this.newQuestionnaire = { name: '', type: '' };
-    },
-    async createQuestionnaire () {
+    };
+
+    const resetCreationModal = () => {
+      v$.value.newQuestionnaire.$reset();
+      newQuestionnaire.value = { name: '', type: '' };
+    };
+
+    const createQuestionnaire = async () => {
       try {
-        this.v$.newQuestionnaire.$touch();
-        if (this.v$.newQuestionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
+        v$.value.newQuestionnaire.$touch();
+        if (v$.value.newQuestionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        this.modalLoading = true;
-        await Questionnaires.create(this.newQuestionnaire);
+        modalLoading.value = true;
+        await Questionnaires.create(newQuestionnaire.value);
 
-        this.questionnaireCreationModal = false;
+        questionnaireCreationModal.value = false;
         NotifyPositive('Questionnaire créé.');
-        await this.refreshQuestionnaires();
+        await refreshQuestionnaires();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la création du questionnaire.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
+    };
+
+    const created = async () => {
+      await refreshQuestionnaires();
+    };
+
+    created();
+
+    return {
+      // Data
+      loading,
+      questionnairesByType,
+      QUESTIONNAIRE_TYPES,
+      modalLoading,
+      questionnaireCreationModal,
+      newQuestionnaire,
+      // Methods
+      goToQuestionnaireProfile,
+      refreshQuestionnaires,
+      resetCreationModal,
+      createQuestionnaire,
+      // Validations
+      v$,
+    };
   },
 };
 </script>

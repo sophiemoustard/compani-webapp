@@ -13,8 +13,8 @@
         </div>
       </div>
       <div class="chart-footer">
-        <div class="left-label">{{ this.card.label.left }}</div>
-        <div class="right-label">{{ this.card.label.right }}</div>
+        <div class="first-label">{{ this.card.labels['1'] }}</div>
+        <div class="last-label">{{ this.card.labels['5'] }}</div>
       </div>
     </div>
   </q-card>
@@ -87,10 +87,10 @@ export default {
   @media screen and (max-width: 420px)
     width: 100%
 
-.left-label
+.first-label
   width: 30%
 
-.right-label
+.last-label
   width: 30%
   text-align: right
 

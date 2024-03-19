@@ -128,7 +128,7 @@ import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import InterlocutorCell from '@components/courses/InterlocutorCell';
 import InterlocutorModal from '@components/courses/InterlocutorModal';
-import { COMPANY, ASSOCIATION, EDITION, CLIENT_ADMIN } from '@data/constants';
+import { COMPANY, ASSOCIATION, EDITION, CLIENT_ADMIN, HOLDING_ADMIN } from '@data/constants';
 import { urssafCodes as urssafCodeList } from '@data/urssafCodes';
 import { workHealthServices as workHealthServiceList } from '@data/workHealthServices';
 import {
@@ -188,7 +188,8 @@ export default {
     };
 
     const refreshBillingRepresentativeOptions = async () => {
-      const clientAdminUsers = await Users.list({ role: [CLIENT_ADMIN], company: company.value._id });
+      const clientAdminUsers = await Users
+        .list({ role: [CLIENT_ADMIN, HOLDING_ADMIN], includeHoldingAdmins: true, company: company.value._id });
 
       billingRepresentativeOptions.value = formatAndSortUserOptions(clientAdminUsers, false);
     };
