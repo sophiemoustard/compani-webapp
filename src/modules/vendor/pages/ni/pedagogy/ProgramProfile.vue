@@ -13,6 +13,7 @@ import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
+import QuestionnaireContainer from '@components/questionnaires/QuestionnaireContainer';
 import ProfileInfo from 'src/modules/vendor/components/programs/ProfileInfo';
 import ProfileContent from 'src/modules/vendor/components/programs/ProfileContent';
 
@@ -35,6 +36,12 @@ export default {
     const tabsContent = [
       { label: 'Infos', name: 'infos', default: defaultTab.value === 'infos', component: ProfileInfo },
       { label: 'Sous-programmes', name: 'content', default: defaultTab.value === 'content', component: ProfileContent },
+      {
+        label: 'Questionnaires',
+        name: 'questionnaire',
+        default: defaultTab.value === 'questionnaire',
+        component: QuestionnaireContainer,
+      },
     ];
 
     const $route = useRoute();
