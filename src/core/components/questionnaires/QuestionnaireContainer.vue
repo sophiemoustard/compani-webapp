@@ -68,8 +68,9 @@ export default {
         );
 
         const questionnaireTypes = programId.value
-          ? Object.keys(QUESTIONNAIRE_TYPES).filter(type => type === SELF_POSITIONNING)
+          ? [SELF_POSITIONNING]
           : Object.keys(QUESTIONNAIRE_TYPES).filter(type => type !== SELF_POSITIONNING);
+
         questionnairesByType.value = questionnaireTypes
           .map(type => ({ type, list: questionnairesGroups[type] }));
       } catch (e) {
