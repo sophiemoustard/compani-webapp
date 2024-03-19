@@ -8,7 +8,7 @@ import { useStore } from 'vuex';
 import CourseBillingInfos from '@components/courseBilling/CourseBillingInfos';
 
 export default {
-  name: 'BillingInfos',
+  name: 'ProfileBilling',
   props: {
     profileId: { type: String, required: true },
   },

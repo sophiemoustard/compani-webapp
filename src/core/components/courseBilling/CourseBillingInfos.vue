@@ -1,5 +1,5 @@
 <template>
-  <div v-if="company">
+  <div v-if="company._id">
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact</p>
       <div class="interlocutor-container">
@@ -500,13 +500,13 @@ export default {
     };
 
     watch(company, async () => {
-      if (!courseBillList.value.length && company.value) {
+      if (!courseBillList.value.length && company.value._id) {
         await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
       }
     });
 
     const created = async () => {
-      if (company.value) await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
+      if (company.value._id) await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
     };
 
     created();

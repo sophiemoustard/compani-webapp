@@ -3,8 +3,8 @@
     <ni-title-header title="Factures" />
     <div v-if="loggedUser">
       <ni-select v-if="hasHoldingRole" caption="Structure" :model-value="selectedCompany._id"
-        :options="companiesOptions" @update:model-value="setCompany($event)" class="q-mt-xl" />
-      <course-billing-infos v-if="company._id" :company="company" @refresh-company="refreshCompany" />
+        :options="companiesOptions" @update:model-value="setCompany($event)" clearable class="q-mt-xl" />
+      <course-billing-infos :company="company" @refresh-company="refreshCompany" />
     </div>
   </q-page>
 </template>
@@ -12,8 +12,9 @@
 <script>
 import get from 'lodash/get';
 import { useMeta } from 'quasar';
-import { computed, ref } from 'vue';
+import { computed, ref, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
+import { useRoute } from 'vue-router';
 import Companies from '@api/Companies';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
@@ -32,6 +33,8 @@ export default {
     const metaInfo = { title: 'Factures' };
     useMeta(metaInfo);
 
+    const $route = useRoute();
+
     const holdingCompanies = ref([]);
     const selectedCompany = ref({});
     const companiesOptions = ref([]);
@@ -41,12 +44,13 @@ export default {
 
     const hasHoldingRole = computed(() => !!get(loggedUser.value, 'role.holding'));
 
-    const company = computed(() => {
-      if (hasHoldingRole.value) return selectedCompany.value;
-      return loggedUser.value.company;
-    });
+    const company = computed(() => (hasHoldingRole.value ? selectedCompany.value : loggedUser.value.company));
 
     const setCompany = async (companyId) => {
+      if (!companyId) {
+        selectedCompany.value = {};
+        return;
+      }
       selectedCompany.value = holdingCompanies.value.find(c => c._id === companyId);
       await $store.dispatch('company/fetchCompany', { companyId });
     };
@@ -79,6 +83,10 @@ export default {
     };
 
     created();
+
+    onBeforeUnmount(() => {
+      if ($route.name !== 'ni courses info') $store.dispatch('company/resetCompany');
+    });
 
     return {
       // Data
