@@ -746,7 +746,7 @@ export default {
         isContact: course.value.operationsRepresentative._id === course.value.contact._id,
       };
 
-      interlocutorLabel.value = { action: 'Modifier le', interlocutor: 'chargé d\'accompagnement' };
+      interlocutorLabel.value = { action: 'Modifier le ', interlocutor: 'chargé des opérations' };
       operationsRepresentativeEditionModal.value = true;
     };
 
