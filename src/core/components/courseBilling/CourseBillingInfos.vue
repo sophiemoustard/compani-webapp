@@ -22,8 +22,7 @@
                 <div @click="$event.stopPropagation()">
                   <router-link :to="goToCourse(get(props.row, 'course'))"
                     :class="getCourseNameClass(get(props.row, 'course'))">
-                    <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}&nbsp;</div>
-                    <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
+                    <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}</div>
                   </router-link>
                 </div>
                 <div class="row items-center" v-if="props.row.courseCreditNote">
@@ -443,17 +442,17 @@ export default {
 
     const getProgramName = (course) => {
       const programName = get(course, 'subProgram.program.name');
-      const misc = get(course, 'misc');
+      const misc = get(course, 'misc') ? `\u00A0- ${get(course, 'misc')}` : '';
       const miscLength = misc ? misc.length : 0;
       const length = programName.length + miscLength;
       const tableSize = Screen.width >= 1024 ? Screen.width * (70 / 100) : Screen.width * (90 / 100);
       // table width : 70(or 90)% of screen width; program name column width : 30% of table width; letter width : 6.5px
-      const maxLength = ((30 / 100) * tableSize) / 6.5;
+      const maxLength = Math.floor(((30 / 100) * tableSize) / 6.5);
       if (length > maxLength) {
         const limit = maxLength - miscLength - 3;
-        return `${programName.slice(0, limit)}...`;
+        return `${programName.slice(0, limit)}...${misc}`;
       }
-      return programName;
+      return `${programName}${misc}`;
     };
 
     const openBillingRepresentativeModal = (value) => {

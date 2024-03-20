@@ -48,12 +48,16 @@ export default {
     const company = computed(() => (hasHoldingRole.value ? selectedCompany.value : loggedUser.value.company));
 
     const setCompany = async (companyId) => {
-      if (!companyId) {
-        selectedCompany.value = {};
-        return;
+      try {
+        if (!companyId) {
+          selectedCompany.value = {};
+          return;
+        }
+        selectedCompany.value = holdingCompanies.value[companyId];
+        if (!$store.state.company.company) await $store.dispatch('company/fetchCompany', { companyId });
+      } catch (e) {
+        console.error(e);
       }
-      selectedCompany.value = holdingCompanies.value[companyId];
-      if (!$store.state.company.company) await $store.dispatch('company/fetchCompany', { companyId });
     };
 
     const refreshHoldingCompanies = async () => {
