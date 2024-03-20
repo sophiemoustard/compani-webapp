@@ -12,21 +12,14 @@ import {
 } from '@data/constants';
 
 const coachRoutes = [
-  { name: 'ni pay contract monitoring', subscription: ERP },
-  { name: 'ni pay absences', subscription: ERP },
   { name: 'ni exports data', subscription: ERP },
   { name: 'ni exports history', subscription: ERP },
   { name: 'ni auxiliaries', subscription: ERP },
-  { name: 'ni auxiliaries dashboard', subscription: ERP },
   { name: 'ni auxiliaries info', subscription: ERP },
   { name: 'ni customers', subscription: ERP },
-  { name: 'ni customers fundings monitoring', subscription: ERP },
   { name: 'ni customers info', subscription: ERP },
-  { name: 'ni customers partner organizations', subscription: ERP },
-  { name: 'ni customers partner organizations info', subscription: ERP },
   { name: 'ni planning auxiliaries', subscription: ERP },
   { name: 'ni planning customers', subscription: ERP },
-  { name: 'ni planning repetitions', subscription: ERP },
   { name: 'account client' },
   { name: 'ni courses' },
   { name: 'ni courses dashboard' },
@@ -39,7 +32,6 @@ const coachRoutes = [
 ];
 const clientAdminRoutes = [
   ...coachRoutes,
-  { name: 'ni auxiliaries staff register', subscription: ERP },
   { name: 'ni config company' },
   { name: 'ni config rh', subscription: ERP },
   { name: 'ni config customers', subscription: ERP },
@@ -52,19 +44,11 @@ const clientAdminRoutes = [
   { name: 'ni billing tpp bill slips', subscription: ERP },
   { name: 'ni billing debits archive', subscription: ERP },
   { name: 'ni billing automatic bills', subscription: ERP },
-  { name: 'ni pay to pay', subscription: ERP },
-  { name: 'ni pay contract ends', subscription: ERP },
   { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [
-  { name: 'auxiliaries agenda', subscription: ERP },
-  { name: 'ni planning auxiliaries', subscription: ERP },
-  { name: 'ni planning customers', subscription: ERP },
-  { name: 'ni auxiliaries dashboard', subscription: ERP },
-  { name: 'auxiliaries teams', subscription: ERP },
   { name: 'auxiliaries customers', subscription: ERP },
   { name: 'auxiliaries customers info', subscription: ERP },
-  { name: 'ni customers fundings monitoring', subscription: ERP },
   { name: 'auxiliaries pay', subscription: ERP },
   { name: 'auxiliaries docs', subscription: ERP },
   { name: 'auxiliaries contracts', subscription: ERP },
@@ -78,13 +62,9 @@ const auxiliaryWithoutCompanyRoutes = [
 ];
 const planningReferentRoutes = [
   ...auxiliaryRoutes,
-  { name: 'ni planning repetitions', subscription: ERP },
 ];
 const helperRoutes = [
-  { name: 'customers agenda', subscription: ERP },
-  { name: 'customers contact', subscription: ERP },
   { name: 'customers documents', subscription: ERP },
-  { name: 'customers subscription', subscription: ERP },
   { name: 'account client' },
 ];
 const trainingOrganisationManagerRoutes = [
