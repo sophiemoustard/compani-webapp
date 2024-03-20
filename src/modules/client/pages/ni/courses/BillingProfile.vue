@@ -11,6 +11,7 @@
 
 <script>
 import get from 'lodash/get';
+import keyBy from 'lodash/keyBy';
 import { useMeta } from 'quasar';
 import { computed, ref, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
@@ -35,7 +36,7 @@ export default {
 
     const $route = useRoute();
 
-    const holdingCompanies = ref([]);
+    const holdingCompanies = ref({});
     const selectedCompany = ref({});
     const companiesOptions = ref([]);
 
@@ -51,17 +52,19 @@ export default {
         selectedCompany.value = {};
         return;
       }
-      selectedCompany.value = holdingCompanies.value.find(c => c._id === companyId);
-      await $store.dispatch('company/fetchCompany', { companyId });
+      selectedCompany.value = holdingCompanies.value[companyId];
+      if (!$store.state.company.company) await $store.dispatch('company/fetchCompany', { companyId });
     };
 
     const refreshHoldingCompanies = async () => {
       try {
-        holdingCompanies.value = await Companies.list({ holding: loggedUser.value.holding._id });
-        companiesOptions.value = formatAndSortOptions(holdingCompanies.value, 'name');
+        const companies = await Companies.list({ holding: loggedUser.value.holding._id });
+        holdingCompanies.value = keyBy(companies, '_id');
+        companiesOptions.value = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
-        holdingCompanies.value = [];
+        holdingCompanies.value = {};
+        companiesOptions.value = [];
         NotifyNegative('Erreur lors de la récupération des structures.');
       }
     };
@@ -70,7 +73,10 @@ export default {
       try {
         if (hasHoldingRole.value) {
           if (company.value._id) await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
-          if ($store.state.company.company) selectedCompany.value = $store.state.company.company;
+          if ($store.state.company.company) {
+            holdingCompanies.value[$store.state.company.company._id] = $store.state.company.company;
+            setCompany($store.state.company.company._id);
+          }
         } else await $store.dispatch('main/fetchLoggedUser', loggedUser.value._id);
       } catch (e) {
         console.error(e);
