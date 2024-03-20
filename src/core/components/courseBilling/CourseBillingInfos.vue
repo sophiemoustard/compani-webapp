@@ -19,10 +19,12 @@
                 <div class="clickable-name" @click.stop="downloadBill(props.row)" :disable="pdfLoading">
                   {{ col.value }}
                 </div>
-                <div :class="getCourseNameClass(get(props.row, 'course'))"
-                  @click="goToCourse(get(props.row, 'course'))">
-                  <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}&nbsp;</div>
-                  <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
+                <div @click="$event.stopPropagation()">
+                  <router-link :to="goToCourse(get(props.row, 'course'))"
+                    :class="getCourseNameClass(get(props.row, 'course'))">
+                    <div class="program">{{ `${getProgramName(get(props.row, 'course'))}` }}&nbsp;</div>
+                    <div v-if="get(props.row, 'course.misc')" class="misc">- {{ get(props.row, 'course.misc') }}</div>
+                  </router-link>
                 </div>
                 <div class="row items-center" v-if="props.row.courseCreditNote">
                   <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
@@ -119,7 +121,6 @@ import pick from 'lodash/pick';
 import { Screen } from 'quasar';
 import { ref, computed, watch, toRefs } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import CourseBills from '@api/CourseBills';
@@ -181,7 +182,6 @@ export default {
     const { company } = toRefs(props);
 
     const $store = useStore();
-    const $router = useRouter();
     const courseBillsGroupedByCompany = ref({});
     const loading = ref(false);
     const paymentCreationLoading = ref(false);
@@ -406,21 +406,22 @@ export default {
 
     const goToCourse = (course) => {
       if (canUpdateBilling.value) {
-        return $router.push({
+        return {
           name: 'ni management blended courses info',
           params: { courseId: course._id },
           query: { defaultTab: 'billing' },
-        });
+        };
       }
       if (course.companies.find(comp => hasUserAccessToCompany(loggedUser.value, comp))) {
-        return $router.push({ name: 'ni courses info', params: { courseId: course._id } });
+        return { name: 'ni courses info', params: { courseId: course._id } };
       }
+      return {};
     };
 
     const getCourseNameClass = course => (
       (canUpdateBilling.value || course.companies.find(comp => hasUserAccessToCompany(loggedUser.value, comp)))
         ? 'course redirection'
-        : 'course'
+        : 'course no-event'
     );
 
     const getTableName = (index) => {
@@ -585,6 +586,8 @@ export default {
   &:hover
     text-decoration: underline
     text-decoration-color: $copper-grey-600
+.no-event
+  pointer-events: none
 .add-payment
   background-color: $copper-grey-500
   width: 20px
