@@ -11,7 +11,6 @@
 
 <script>
 import get from 'lodash/get';
-import keyBy from 'lodash/keyBy';
 import { useMeta } from 'quasar';
 import { computed, ref, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
@@ -36,7 +35,6 @@ export default {
 
     const $route = useRoute();
 
-    const holdingCompanies = ref({});
     const selectedCompany = ref({});
     const companiesOptions = ref([]);
 
@@ -53,8 +51,8 @@ export default {
           selectedCompany.value = {};
           return;
         }
-        selectedCompany.value = holdingCompanies.value[companyId];
-        if (!$store.state.company.company) await $store.dispatch('company/fetchCompany', { companyId });
+        await $store.dispatch('company/fetchCompany', { companyId });
+        selectedCompany.value = $store.state.company.company;
       } catch (e) {
         console.error(e);
       }
@@ -63,11 +61,9 @@ export default {
     const refreshHoldingCompanies = async () => {
       try {
         const companies = await Companies.list({ holding: loggedUser.value.holding._id });
-        holdingCompanies.value = keyBy(companies, '_id');
         companiesOptions.value = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
-        holdingCompanies.value = {};
         companiesOptions.value = [];
         NotifyNegative('Erreur lors de la récupération des structures.');
       }
@@ -77,10 +73,7 @@ export default {
       try {
         if (hasHoldingRole.value) {
           if (company.value._id) await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
-          if ($store.state.company.company) {
-            holdingCompanies.value[$store.state.company.company._id] = $store.state.company.company;
-            setCompany($store.state.company.company._id);
-          }
+          if ($store.state.company.company) selectedCompany.value = $store.state.company.company;
         } else await $store.dispatch('main/fetchLoggedUser', loggedUser.value._id);
       } catch (e) {
         console.error(e);
