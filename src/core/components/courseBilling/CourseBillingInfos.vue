@@ -1,5 +1,5 @@
 <template>
-  <div v-if="company._id">
+  <div v-if="get(company, '_id')">
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact</p>
       <div class="interlocutor-container">
@@ -10,8 +10,8 @@
     </div>
     <template v-if="groupedCourseBills.flat().length">
       <div v-for="(billList, index) of groupedCourseBills" :key="index" class="q-mb-xl">
-        <p v-if="billList.length" class="text-weight-bold">{{ getTableName(index) }}</p>
-        <ni-expanding-table v-if="billList.length" :data="billList" :columns="columns" v-model:pagination="pagination"
+        <p class="text-weight-bold">{{ getTableName(index) }}</p>
+        <ni-expanding-table :data="billList" :columns="columns" v-model:pagination="pagination"
           :hide-bottom="false" :loading="loading">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -281,14 +281,11 @@ export default {
         .filter(bill => bill.payer._id === company.value._id &&
           !bill.companies.map(c => c._id).includes(company.value._id));
 
-      return [companyBillsPayedByCompany, companyBillsPayedByOther, otherBillsPayedByCompany];
+      return [companyBillsPayedByCompany, companyBillsPayedByOther, otherBillsPayedByCompany]
+        .filter(billList => billList.length);
     });
 
-    const {
-      pdfLoading,
-      downloadBill,
-      downloadCreditNote,
-    } = useCourseBilling(courseBillList);
+    const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBillList);
 
     const sortCourseBills = (a, b) => {
       const billedAtCompare = descendingSortBy('billedAt')(a, b);
@@ -362,7 +359,7 @@ export default {
           paymentEditionLoading.value = true;
           await CoursePayments.update(
             editedCoursePayment.value._id,
-            { ...omit(editedCoursePayment.value, ['_id', 'nature']) }
+            omit(editedCoursePayment.value, ['_id', 'nature'])
           );
           NotifyPositive('Règlement modifié.');
 
@@ -403,6 +400,8 @@ export default {
       return formatPriceWithSign(total);
     };
 
+    const hasUserAccessToCourse = course => course.companies.find(c => hasUserAccessToCompany(loggedUser.value, c));
+
     const goToCourse = (course) => {
       if (canUpdateBilling.value) {
         return {
@@ -411,16 +410,12 @@ export default {
           query: { defaultTab: 'billing' },
         };
       }
-      if (course.companies.find(comp => hasUserAccessToCompany(loggedUser.value, comp))) {
-        return { name: 'ni courses info', params: { courseId: course._id } };
-      }
+      if (hasUserAccessToCourse(course)) return { name: 'ni courses info', params: { courseId: course._id } };
       return {};
     };
 
     const getCourseNameClass = course => (
-      (canUpdateBilling.value || course.companies.find(comp => hasUserAccessToCompany(loggedUser.value, comp)))
-        ? 'course redirection'
-        : 'course no-event'
+      canUpdateBilling.value || hasUserAccessToCourse(course) ? 'course redirection' : 'course no-event'
     );
 
     const getTableName = (index) => {
@@ -506,7 +501,7 @@ export default {
     });
 
     const created = async () => {
-      if (company.value._id) await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
+      if (get(company.value, '_id')) await Promise.all([refreshCourseBills(), refreshBillingRepresentativeOptions()]);
     };
 
     created();

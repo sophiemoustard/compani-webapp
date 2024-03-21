@@ -1,11 +1,12 @@
 <template>
   <q-page padding class="client-background">
-    <ni-title-header title="Factures" />
-    <div v-if="loggedUser">
-      <ni-select v-if="hasHoldingRole" caption="Structure" :model-value="selectedCompany._id"
-        :options="companiesOptions" @update:model-value="setCompany($event)" clearable class="q-mt-xl" />
-      <course-billing-infos :company="company" @refresh-company="refreshCompany" />
-    </div>
+    <ni-title-header title="Factures">
+      <template v-if="hasHoldingRole" #content>
+        <ni-select caption="Structure" :model-value="selectedCompany._id"
+          :options="companiesOptions" @update:model-value="setCompany($event)" clearable class="selector" />
+      </template>
+    </ni-title-header>
+    <course-billing-infos :company="currentCompany" @refresh-company="refreshCompany" />
   </q-page>
 </template>
 
@@ -43,7 +44,7 @@ export default {
 
     const hasHoldingRole = computed(() => !!get(loggedUser.value, 'role.holding'));
 
-    const company = computed(() => (hasHoldingRole.value ? selectedCompany.value : loggedUser.value.company));
+    const currentCompany = computed(() => (hasHoldingRole.value ? selectedCompany.value : loggedUser.value.company));
 
     const setCompany = async (companyId) => {
       try {
@@ -72,7 +73,9 @@ export default {
     const refreshCompany = async () => {
       try {
         if (hasHoldingRole.value) {
-          if (company.value._id) await $store.dispatch('company/fetchCompany', { companyId: company.value._id });
+          if (currentCompany.value._id) {
+            await $store.dispatch('company/fetchCompany', { companyId: currentCompany.value._id });
+          }
           if ($store.state.company.company) selectedCompany.value = $store.state.company.company;
         } else await $store.dispatch('main/fetchLoggedUser', loggedUser.value._id);
       } catch (e) {
@@ -97,7 +100,7 @@ export default {
       companiesOptions,
       // Computed
       loggedUser,
-      company,
+      currentCompany,
       hasHoldingRole,
       // Methods
       setCompany,
@@ -106,3 +109,8 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.selector
+  width: 50%
+</style>
