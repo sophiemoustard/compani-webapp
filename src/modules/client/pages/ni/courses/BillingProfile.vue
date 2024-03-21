@@ -44,7 +44,11 @@ export default {
 
     const hasHoldingRole = computed(() => !!get(loggedUser.value, 'role.holding'));
 
-    const currentCompany = computed(() => (hasHoldingRole.value ? selectedCompany.value : loggedUser.value.company));
+    const currentCompany = computed(() => (
+      hasHoldingRole.value
+        ? selectedCompany.value
+        : $store.state.company.company
+    ));
 
     const setCompany = async (companyId) => {
       try {
@@ -77,7 +81,7 @@ export default {
             await $store.dispatch('company/fetchCompany', { companyId: currentCompany.value._id });
           }
           if ($store.state.company.company) selectedCompany.value = $store.state.company.company;
-        } else await $store.dispatch('main/fetchLoggedUser', loggedUser.value._id);
+        } else await $store.dispatch('company/fetchCompany', { companyId: loggedUser.value.company._id });
       } catch (e) {
         console.error(e);
       }
@@ -99,7 +103,6 @@ export default {
       selectedCompany,
       companiesOptions,
       // Computed
-      loggedUser,
       currentCompany,
       hasHoldingRole,
       // Methods
