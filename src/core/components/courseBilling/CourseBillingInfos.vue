@@ -8,10 +8,10 @@
           @open-modal="openBillingRepresentativeModal" />
       </div>
     </div>
-    <template v-if="groupedCourseBills.flat().length">
-      <div v-for="(billList, index) of groupedCourseBills" :key="index" class="q-mb-xl">
+    <template v-if="Object.keys(groupedCourseBills).length">
+      <div v-for="index of Object.keys(groupedCourseBills)" :key="index" class="q-mb-xl">
         <p class="text-weight-bold">{{ getTableName(index) }}</p>
-        <ni-expanding-table :data="billList" :columns="columns" v-model:pagination="pagination"
+        <ni-expanding-table :data="groupedCourseBills[index]" :columns="columns" v-model:pagination="pagination"
           :hide-bottom="false" :loading="loading">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -89,7 +89,7 @@
               <q-td />
               <q-td />
               <q-td><div class="flex justify-end items-center">Total</div></q-td>
-              <q-td><div class="flex justify-end items-center">{{ getTotal(billList) }}</div></q-td>
+              <q-td><div class="flex justify-end items-center">{{ getTotal(groupedCourseBills[index]) }}</div></q-td>
               <q-td />
               <q-td />
             </q-tr>
@@ -281,8 +281,11 @@ export default {
         .filter(bill => bill.payer._id === company.value._id &&
           !bill.companies.map(c => c._id).includes(company.value._id));
 
-      return [companyBillsPayedByCompany, companyBillsPayedByOther, otherBillsPayedByCompany]
-        .filter(billList => billList.length);
+      return {
+        ...companyBillsPayedByCompany.length && { 0: companyBillsPayedByCompany },
+        ...companyBillsPayedByOther.length && { 1: companyBillsPayedByOther },
+        ...otherBillsPayedByCompany.length && { 2: otherBillsPayedByCompany },
+      };
     });
 
     const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBillList);
@@ -420,15 +423,15 @@ export default {
 
     const getTableName = (index) => {
       switch (index) {
-        case 0:
+        case '0':
           return isVendorInterface || hasHoldingRole.value
             ? `Formation de ${company.value.name} facturées à ${company.value.name}`
             : 'Mes formations facturées à ma structure';
-        case 1:
+        case '1':
           return isVendorInterface || hasHoldingRole.value
             ? `Formations de ${company.value.name} facturées à un tiers`
             : 'Mes formations facturées à un tiers';
-        case 2:
+        case '2':
           return isVendorInterface || hasHoldingRole.value
             ? `Autres formations facturées à ${company.value.name}`
             : 'Autres formations facturées à ma structure';
