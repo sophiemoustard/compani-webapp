@@ -1,14 +1,25 @@
 <template>
-  <div>
+  <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
     <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
       class="q-mb-lg" dense :disable="disableEdition" />
+    <q-checkbox :model-value="displayAllLabels" @update:model-value="initializeCardLabels"
+      label="Définir les légendes de chaque niveau" class="q-mb-lg" dense :disable="disableEdition" />
     <div class="row gutter-profile">
       <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 1" v-model="card.labels['1']"
         @focus="saveTmp('labels.1')" @blur="updateCardLabels('1')" :error="v$.card.labels['1'].$error"
         :error-message="labelErrorMessage('1')" :disable="disableEdition" required-field />
+      <ni-input v-if="displayAllLabels" class="col-md-6 col-xs-12" caption="Légende niveau 2" v-model="card.labels['2']"
+        @focus="saveTmp('labels.2')" @blur="updateCardLabels('2')" :error="v$.card.labels['2'].$error"
+        :error-message="labelErrorMessage('2')" :disable="disableEdition" required-field />
+      <ni-input v-if="displayAllLabels" class="col-md-6 col-xs-12" caption="Légende niveau 3" v-model="card.labels['3']"
+        @focus="saveTmp('labels.3')" @blur="updateCardLabels('3')" :error="v$.card.labels['3'].$error"
+        :error-message="labelErrorMessage('3')" :disable="disableEdition" required-field />
+      <ni-input v-if="displayAllLabels" class="col-md-6 col-xs-12" caption="Légende niveau 4" v-model="card.labels['4']"
+        @focus="saveTmp('labels.4')" @blur="updateCardLabels('4')" :error="v$.card.labels['4'].$error"
+        :error-message="labelErrorMessage('4')" :disable="disableEdition" required-field />
       <ni-input class="col-md-6 col-xs-12" caption="Légende niveau 5" v-model="card.labels['5']"
         @focus="saveTmp('labels.5')" @blur="updateCardLabels('5')" :error="v$.card.labels['5'].$error"
         :error-message="labelErrorMessage('5')" :disable="disableEdition" required-field />
@@ -19,6 +30,7 @@
 <script>
 import { toRefs, computed } from 'vue';
 import { useStore } from 'vuex';
+import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength } from '@vuelidate/validators';
@@ -38,14 +50,20 @@ export default {
     const { disableEdition } = toRefs(props);
 
     const $store = useStore();
+    const $q = useQuasar();
 
     const card = computed(() => $store.state.card.card);
+
+    const displayAllLabels = computed(() => Object.keys(card.value.labels).length > 2);
 
     const rules = computed(() => ({
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         labels: {
           1: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+          2: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+          3: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+          4: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
           5: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
         },
       },
@@ -88,12 +106,44 @@ export default {
       }
     };
 
+    const setLabels = async (labels) => {
+      try {
+        await Cards.updateById(card.value._id, { labels });
+
+        await refreshCard();
+        NotifyPositive('Carte mise à jour.');
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const initializeCardLabels = async (value) => {
+      try {
+        if (!value) {
+          $q.dialog({
+            title: 'Confirmation',
+            message: 'Êtes-vous sûr(e) de vouloir définir moins de légendes&nbsp;? '
+              + 'Les légendes des niveaux 2, 3 et 4 seront perdues.',
+            ok: true,
+            html: true,
+            cancel: 'Annuler',
+          }).onOk(() => setLabels({ 2: null, 3: null, 4: null }))
+            .onCancel(() => NotifyPositive('Action annulée.'));
+        } else {
+          setLabels({ 2: '', 3: '', 4: '' });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
     return {
       // Data
       disableEdition,
       v$,
       // Computed
       card,
+      displayAllLabels,
       // Methods
       labelErrorMessage,
       updateCardLabels,
@@ -101,7 +151,13 @@ export default {
       saveTmp,
       updateCard,
       get,
+      initializeCardLabels,
     };
   },
 };
 </script>
+<style lang="sass" scoped>
+.container
+  display: flex
+  flex-direction: column
+</style>
