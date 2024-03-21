@@ -28,12 +28,6 @@ export default {
       }
     };
 
-    const created = async () => {
-      await refreshCompany();
-    };
-
-    created();
-
     return {
       // Computed
       company,
