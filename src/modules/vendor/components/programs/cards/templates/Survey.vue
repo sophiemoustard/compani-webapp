@@ -13,15 +13,17 @@
       <ni-input class="input" caption="Légende niveau 1" v-model="card.labels['1']" @focus="saveTmp('labels.1')"
         @blur="updateCardLabels('1')" :error="v$.card.labels['1'].$error" :error-message="labelErrorMessage('1')"
         :disable="disableEdition" required-field />
-      <ni-input v-if="displayAllLabels" caption="Légende niveau 2" v-model="card.labels['2']"
-        @focus="saveTmp('labels.2')" @blur="updateCardLabels('2')" :error="v$.card.labels['2'].$error"
-        :error-message="labelErrorMessage('2')" :disable="disableEdition" required-field />
-      <ni-input v-if="displayAllLabels" caption="Légende niveau 3" v-model="card.labels['3']"
-        @focus="saveTmp('labels.3')" @blur="updateCardLabels('3')" :error="v$.card.labels['3'].$error"
-        :error-message="labelErrorMessage('3')" :disable="disableEdition" required-field />
-      <ni-input v-if="displayAllLabels" caption="Légende niveau 4" v-model="card.labels['4']"
-        @focus="saveTmp('labels.4')" @blur="updateCardLabels('4')" :error="v$.card.labels['4'].$error"
-        :error-message="labelErrorMessage('4')" :disable="disableEdition" required-field />
+      <template v-if="displayAllLabels">
+        <ni-input caption="Légende niveau 2" v-model="card.labels['2']"
+          @focus="saveTmp('labels.2')" @blur="updateCardLabels('2')" :error="v$.card.labels['2'].$error"
+          :error-message="labelErrorMessage('2')" :disable="disableEdition" required-field />
+        <ni-input caption="Légende niveau 3" v-model="card.labels['3']"
+          @focus="saveTmp('labels.3')" @blur="updateCardLabels('3')" :error="v$.card.labels['3'].$error"
+          :error-message="labelErrorMessage('3')" :disable="disableEdition" required-field />
+        <ni-input v-if="displayAllLabels" caption="Légende niveau 4" v-model="card.labels['4']"
+          @focus="saveTmp('labels.4')" @blur="updateCardLabels('4')" :error="v$.card.labels['4'].$error"
+          :error-message="labelErrorMessage('4')" :disable="disableEdition" required-field />
+      </template>
       <ni-input caption="Légende niveau 5" v-model="card.labels['5']" @focus="saveTmp('labels.5')"
         @blur="updateCardLabels('5')" :error="v$.card.labels['5'].$error" :error-message="labelErrorMessage('5')"
         :disable="disableEdition" required-field />
@@ -30,7 +32,7 @@
 </template>
 
 <script>
-import { toRefs, computed } from 'vue';
+import { toRefs, computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
@@ -56,7 +58,7 @@ export default {
 
     const card = computed(() => $store.state.card.card);
 
-    const displayAllLabels = computed(() => Object.keys(card.value.labels).length > 2);
+    const displayAllLabels = ref(Object.keys(card.value.labels).length > 2);
 
     const rules = computed(() => ({
       card: {
@@ -108,11 +110,12 @@ export default {
       }
     };
 
-    const setLabels = async (labels) => {
+    const setLabels = async (labels, displayAllLabelsValue) => {
       try {
         await Cards.updateById(card.value._id, { labels });
 
         await refreshCard();
+        displayAllLabels.value = displayAllLabelsValue;
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);
@@ -129,10 +132,10 @@ export default {
             ok: true,
             html: true,
             cancel: 'Annuler',
-          }).onOk(() => setLabels({ 2: null, 3: null, 4: null }))
+          }).onOk(() => setLabels({ 2: null, 3: null, 4: null }, value))
             .onCancel(() => NotifyPositive('Action annulée.'));
         } else {
-          setLabels({ 2: '', 3: '', 4: '' });
+          setLabels({ 2: '', 3: '', 4: '' }, value);
         }
       } catch (e) {
         console.error(e);
