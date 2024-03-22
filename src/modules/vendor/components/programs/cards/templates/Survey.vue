@@ -25,7 +25,7 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, requiredIf } from '@vuelidate/validators';
 import Cards from '@api/Cards';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import { QUESTION_MAX_LENGTH } from '@data/constants';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
