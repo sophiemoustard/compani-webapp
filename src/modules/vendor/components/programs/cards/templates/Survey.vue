@@ -37,11 +37,11 @@ import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
-import { required, maxLength } from '@vuelidate/validators';
+import { required, maxLength, requiredIf } from '@vuelidate/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import { SURVEY_LABEL_MAX_LENGTH, QUESTION_MAX_LENGTH } from '@data/constants';
+import { QUESTION_MAX_LENGTH } from '@data/constants';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
@@ -64,11 +64,11 @@ export default {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         labels: {
-          1: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
-          2: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
-          3: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
-          4: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
-          5: { required, maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+          1: { required },
+          2: { required: requiredIf(displayAllLabels.value) },
+          3: { required: requiredIf(displayAllLabels.value) },
+          4: { required: requiredIf(displayAllLabels.value) },
+          5: { required },
         },
       },
     }));
@@ -83,9 +83,6 @@ export default {
     const labelErrorMessage = (labelKey) => {
       if (get(v$.value, `card.labels[${labelKey}].required.$response`) === false) {
         return 'Toutes les légendes doivent être renseignées.';
-      }
-      if (get(v$.value, `card.labels[${labelKey}].maxLength.$response`) === false) {
-        return `${SURVEY_LABEL_MAX_LENGTH} caractères maximum.`;
       }
 
       return '';
