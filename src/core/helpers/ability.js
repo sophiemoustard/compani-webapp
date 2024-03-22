@@ -21,20 +21,22 @@ const getClientAbilities = (role, subscriptions) => roleBasedAccessControl[role]
   .filter(r => !r.subscription || subscriptions.includes(r.subscription))
   .map(r => r.name);
 
-const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name);
+const getRoleAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 
 export const defineAbilitiesFor = (user) => {
   const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
   const { role, company, _id, sector } = user;
   const clientRole = get(role, 'client.name');
   const vendorRole = get(role, 'vendor.name');
+  const holdingRole = get(role, 'holding.name');
   const { can, rules } = new AbilityBuilder(createMongoAbility);
 
   const companySubscriptions = company
     ? Object.keys(company.subscriptions).filter(key => company.subscriptions[key])
     : [];
   if (clientRole) can('read', getClientAbilities(clientRole, companySubscriptions));
-  if (vendorRole) can('read', getVendorAbilities(vendorRole));
+  if (holdingRole) can('read', getRoleAbilities(holdingRole));
+  if (vendorRole) can('read', getRoleAbilities(vendorRole));
   if (!clientRole && !vendorRole) can('read', 'account client');
   if (isVendorInterface && [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) {
     can('set', 'user_company');

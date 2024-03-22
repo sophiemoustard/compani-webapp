@@ -9,6 +9,7 @@ import {
   TRAINING_ORGANISATION_MANAGER,
   AUXILIARY_WITHOUT_COMPANY,
   ERP,
+  HOLDING_ADMIN,
 } from '@data/constants';
 
 const coachRoutes = [
@@ -102,6 +103,7 @@ const trainerRoutes = [
 ];
 
 export const roleBasedAccessControl = {
+  [HOLDING_ADMIN]: clientAdminRoutes,
   [CLIENT_ADMIN]: clientAdminRoutes,
   [COACH]: coachRoutes,
   [AUXILIARY_WITHOUT_COMPANY]: auxiliaryWithoutCompanyRoutes,
