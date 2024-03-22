@@ -79,10 +79,6 @@ export default {
         if (tmpInput.value === get(card.value, `labels.${labelKey}`)) return;
 
         v$.value.card.labels.$touch();
-        const atLeastOneLabelIsTooLong = Object.keys(card.value.labels)
-          .some(labKey => get(v$.value, `card.labels.${labKey}.maxLength.$response`) === false);
-        if (atLeastOneLabelIsTooLong) return NotifyWarning('Champ(s) invalide(s)');
-
         await Cards.updateById(card.value._id, { labels: card.value.labels });
 
         await refreshCard();
