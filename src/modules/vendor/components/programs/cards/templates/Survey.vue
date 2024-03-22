@@ -9,24 +9,10 @@
       <q-checkbox :model-value="displayAllLabels" @update:model-value="validateInitialization"
         label="Définir les légendes de chaque niveau" class="q-mb-lg" dense :disable="disableEdition" />
     </div>
-    <div class="input-container">
-      <ni-input class="input" caption="Légende niveau 1" v-model="card.labels['1']" @focus="saveTmp('labels.1')"
-        @blur="updateCardLabels('1')" :error="v$.card.labels['1'].$error" :error-message="labelErrorMessage('1')"
-        :disable="disableEdition" required-field />
-      <template v-if="displayAllLabels">
-        <ni-input caption="Légende niveau 2" v-model="card.labels['2']"
-          @focus="saveTmp('labels.2')" @blur="updateCardLabels('2')" :error="v$.card.labels['2'].$error"
-          :error-message="labelErrorMessage('2')" :disable="disableEdition" required-field />
-        <ni-input caption="Légende niveau 3" v-model="card.labels['3']"
-          @focus="saveTmp('labels.3')" @blur="updateCardLabels('3')" :error="v$.card.labels['3'].$error"
-          :error-message="labelErrorMessage('3')" :disable="disableEdition" required-field />
-        <ni-input v-if="displayAllLabels" caption="Légende niveau 4" v-model="card.labels['4']"
-          @focus="saveTmp('labels.4')" @blur="updateCardLabels('4')" :error="v$.card.labels['4'].$error"
-          :error-message="labelErrorMessage('4')" :disable="disableEdition" required-field />
-      </template>
-      <ni-input caption="Légende niveau 5" v-model="card.labels['5']" @focus="saveTmp('labels.5')"
-        @blur="updateCardLabels('5')" :error="v$.card.labels['5'].$error" :error-message="labelErrorMessage('5')"
-        :disable="disableEdition" required-field />
+    <div class="input-container" v-for="label in Object.keys(card.labels)" :key="label">
+      <ni-input :caption="`Légende niveau ${label}`" v-model="card.labels[label]"
+        @focus="saveTmp(`labels.${label}`)" @blur="updateCardLabels(label)" :error="v$.card.labels[label].$error"
+        :error-message="labelErrorMessage(label)" :disable="disableEdition" required-field />
     </div>
   </div>
 </template>
