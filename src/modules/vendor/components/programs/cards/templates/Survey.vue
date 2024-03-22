@@ -6,7 +6,7 @@
     <div class="checkbox-container">
       <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
         class="q-mb-lg" dense :disable="disableEdition" />
-      <q-checkbox :model-value="displayAllLabels" @update:model-value="initializeCardLabels"
+      <q-checkbox :model-value="displayAllLabels" @update:model-value="validateInitialization"
         label="Définir les légendes de chaque niveau" class="q-mb-lg" dense :disable="disableEdition" />
     </div>
     <div class="input-container">
@@ -107,7 +107,7 @@ export default {
       }
     };
 
-    const setLabels = async (labels, displayAllLabelsValue) => {
+    const initializeLabels = async (labels, displayAllLabelsValue) => {
       try {
         await Cards.updateById(card.value._id, { labels });
 
@@ -119,7 +119,7 @@ export default {
       }
     };
 
-    const initializeCardLabels = async (value) => {
+    const validateInitialization = async (value) => {
       try {
         if (!value) {
           $q.dialog({
@@ -129,10 +129,10 @@ export default {
             ok: true,
             html: true,
             cancel: 'Annuler',
-          }).onOk(() => setLabels({ 2: null, 3: null, 4: null }, value))
+          }).onOk(() => initializeLabels({ 2: null, 3: null, 4: null }, value))
             .onCancel(() => NotifyPositive('Action annulée.'));
         } else {
-          setLabels({ 2: '', 3: '', 4: '' }, value);
+          initializeLabels({ 2: '', 3: '', 4: '' }, value);
         }
       } catch (e) {
         console.error(e);
@@ -153,7 +153,7 @@ export default {
       saveTmp,
       updateCard,
       get,
-      initializeCardLabels,
+      validateInitialization,
     };
   },
 };
