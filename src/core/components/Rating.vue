@@ -62,14 +62,9 @@ export default {
   flex: 1
 .container
   display: flex
-  flex-direction: column
-  align-items: center
   justify-content: center
 .labels
-  display: flex
-  flex-direction: row
-  justify-content: flex-start
-  align-items: flex-start
-  margin: 0 0 4px 0
+  margin: 0 0 8px 0
   color: $copper-grey-500
+  font-size: 12px
 </style>
