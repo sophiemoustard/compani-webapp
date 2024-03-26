@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-center">
+  <div class="row">
     <div class="caption input-caption">
       <p :class="[{ required: requiredField }]">{{ caption }}</p>
     </div>
@@ -8,20 +8,8 @@
   <div borderless :error="error" :error-message="errorMessage" class="container">
     <q-rating :model-value="modelValue" @update:model-value="update" :icon="icon" max="5" color="primary"
       size="lg" class="q-ma-md">
-      <template #tip-1>
-        <q-tooltip>{{ labels['1'] }}</q-tooltip>
-      </template>
-      <template v-if="labels['2']" #tip-2>
-        <q-tooltip>{{ labels['2'] }}</q-tooltip>
-      </template>
-      <template v-if="labels['3']" #tip-3>
-        <q-tooltip>{{ labels['3'] }}</q-tooltip>
-      </template>
-      <template v-if="labels['4']" #tip-4>
-        <q-tooltip>{{ labels['4'] }}</q-tooltip>
-      </template>
-      <template #tip-5>
-        <q-tooltip>{{ labels['5'] }}</q-tooltip>
+      <template v-for="[tipKey, label] in formattedTipAndLabels" #[tipKey] :key="label">
+        <q-tooltip v-if="label">{{ label }}</q-tooltip>
       </template>
     </q-rating>
   </div>
@@ -31,13 +19,14 @@
 </template>
 
 <script>
+import { toRefs } from 'vue';
 import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'Rating',
   props: {
     modelValue: { type: Number, default: 0 },
-    labels: { type: [Object], default: () => {} },
+    labels: { type: Object, default: () => ({}) },
     icon: { type: [String, Array], default: 'circle' },
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
@@ -45,12 +34,18 @@ export default {
     requiredField: { type: Boolean, default: false },
   },
   emits: ['update:model-value'],
-  setup (_, { emit }) {
+  setup (props, { emit }) {
+    const { labels } = toRefs(props);
+
     const update = (value) => {
       emit('update:model-value', value);
     };
 
+    const formattedTipAndLabels = Object.entries(labels.value).map(([key, label]) => [`tip-${key}`, label]);
+
     return {
+      // Data
+      formattedTipAndLabels,
       // Methods
       update,
     };
