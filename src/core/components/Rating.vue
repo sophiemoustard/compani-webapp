@@ -7,7 +7,23 @@
   </div>
   <div borderless :error="error" :error-message="errorMessage" class="container">
     <q-rating :model-value="modelValue" @update:model-value="update" :icon="icon" max="5" color="primary"
-      size="lg" class="q-ma-md" />
+      size="lg" class="q-ma-md">
+      <template #tip-1>
+        <q-tooltip>{{ labels['1'] }}</q-tooltip>
+      </template>
+      <template v-if="labels['2']" #tip-2>
+        <q-tooltip>{{ labels['2'] }}</q-tooltip>
+      </template>
+      <template v-if="labels['3']" #tip-3>
+        <q-tooltip>{{ labels['3'] }}</q-tooltip>
+      </template>
+      <template v-if="labels['4']" #tip-4>
+        <q-tooltip>{{ labels['4'] }}</q-tooltip>
+      </template>
+      <template #tip-5>
+        <q-tooltip>{{ labels['5'] }}</q-tooltip>
+      </template>
+    </q-rating>
   </div>
   <div class="labels" v-for="labelKey in Object.keys(labels)" :key="labelKey">
     {{ labelKey }} : {{ labels[labelKey] }}
