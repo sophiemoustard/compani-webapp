@@ -1,22 +1,17 @@
 <template>
-  <div class="row items-start">
+  <div class="row justify-center">
     <div class="caption input-caption">
       <p :class="[{ required: requiredField }]">{{ caption }}</p>
-      <span class="q-mx-sm">(1 : {{ firstLabel }} - 5 : {{ lastLabel }})</span>
     </div>
     <q-icon v-if="error" name="error_outline" color="secondary" class="col-1" />
   </div>
-  <q-field borderless :error="error" :error-message="errorMessage">
+  <div borderless :error="error" :error-message="errorMessage" class="container">
     <q-rating :model-value="modelValue" @update:model-value="update" :icon="icon" max="5" color="primary"
-      size="lg" class="q-mx-sm">
-      <template #tip-1>
-        <q-tooltip>{{ firstLabel }}</q-tooltip>
-      </template>
-      <template #tip-5>
-        <q-tooltip>{{ lastLabel }}</q-tooltip>
-      </template>
-    </q-rating>
-  </q-field>
+      size="lg" class="q-ma-md" />
+  </div>
+  <div class="labels" v-for="labelKey in Object.keys(labels)" :key="labelKey">
+    {{ labelKey }} : {{ labels[labelKey] }}
+  </div>
 </template>
 
 <script>
@@ -26,8 +21,7 @@ export default {
   name: 'Rating',
   props: {
     modelValue: { type: Number, default: 0 },
-    firstLabel: { type: String, required: true },
-    lastLabel: { type: String, required: true },
+    labels: { type: [Object], default: () => {} },
     icon: { type: [String, Array], default: 'circle' },
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
@@ -50,4 +44,16 @@ export default {
 <style lang="sass" scoped>
 .caption
   flex: 1
+.container
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+.labels
+  display: flex
+  flex-direction: row
+  justify-content: flex-start
+  align-items: flex-start
+  margin: 0 0 4px 0
+  color: $copper-grey-500
 </style>
