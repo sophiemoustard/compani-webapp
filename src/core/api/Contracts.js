@@ -35,8 +35,4 @@ export default {
   async deleteVersion (contractId, versionId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/contracts/${contractId}/versions/${versionId}`);
   },
-  async getStaffRegister () {
-    const staffRegister = await alenviAxios.get(`${process.env.API_HOSTNAME}/contracts/staff-register`);
-    return staffRegister.data.data.staffRegister;
-  },
 };

@@ -14,12 +14,6 @@ import { defineAbilitiesFor } from '@helpers/ability';
 export const menuItemsMixin = {
   data () {
     return {
-      customerActiveRoutes: {
-        planning: { open: false },
-        customers: { open: false },
-        administrative: { open: false },
-        teams: { open: false },
-      },
       coachActiveRoutes: {
         courses: { open: false },
         planning: { open: false },
@@ -31,10 +25,8 @@ export const menuItemsMixin = {
         configuration: { open: false },
       },
       auxiliaryActiveRoutes: {
-        planning: { open: false },
         customers: { open: false },
         administrative: { open: false },
-        teams: { open: false },
       },
     };
   },
@@ -77,22 +69,14 @@ export const menuItemsMixin = {
         .filter(r => (r.children ? r.children.length : ability.can('read', r.name)));
     },
     activeRoutes () {
-      if (this.isHelper) return this.customerActiveRoutes;
+      if (this.isHelper) return null;
       if (this.isCoach) return this.coachActiveRoutes;
       if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
       return {};
     },
     customerRoutes () {
       return [
-        { name: 'customers agenda', icon: 'date_range', label: 'Planning', condition: true },
-        {
-          name: 'customers contact',
-          icon: 'contact_support',
-          label: 'Contact',
-          condition: this.hasBillingAssistance || (this.customer && this.customer.referent),
-        },
         { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
-        { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement', condition: true },
       ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs);
     },
     coachRoutes () {
@@ -102,8 +86,6 @@ export const menuItemsMixin = {
           label: 'Équipes',
           children: [
             { name: 'ni auxiliaries', icon: 'contacts', label: 'Répertoire auxiliaires' },
-            { name: 'ni auxiliaries staff register', icon: 'view_headline', label: 'Registre unique du personnel' },
-            { name: 'ni auxiliaries dashboard', icon: 'dashboard', label: 'Tableau de bord' },
           ],
         },
         {
@@ -112,15 +94,12 @@ export const menuItemsMixin = {
           children: [
             { name: 'ni planning auxiliaries', icon: 'date_range', label: 'Auxiliaires' },
             { name: 'ni planning customers', icon: 'date_range', label: 'Bénéficiaires' },
-            { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },
           ],
         }, {
           ref: 'customers',
           label: 'Bénéficiaires',
           children: [
             { name: 'ni customers', icon: 'contacts', label: 'Répertoire bénéficiaires' },
-            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },
-            { name: 'ni customers partner organizations', icon: 'apartment', label: 'Structures partenaires' },
           ],
         },
         {
@@ -149,16 +128,6 @@ export const menuItemsMixin = {
           ],
         },
         {
-          ref: 'pay',
-          label: 'Paie',
-          children: [
-            { name: 'ni pay contract monitoring', icon: 'insert_drive_file', label: 'Suivi Contracts/Avenants' },
-            { name: 'ni pay absences', icon: 'calendar_today', label: 'Absences' },
-            { name: 'ni pay contract ends', icon: 'description', label: 'STC' },
-            { name: 'ni pay to pay', icon: 'euro_symbol', label: 'Paie mensuelle' },
-          ],
-        },
-        {
           ref: 'exports',
           label: 'Exports',
           children: [
@@ -182,20 +151,10 @@ export const menuItemsMixin = {
     auxiliaryRoutes () {
       return [
         {
-          ref: 'planning',
-          label: 'Planning',
-          children: [
-            { name: 'auxiliaries agenda', icon: 'event', label: 'Le mien' },
-            { name: 'ni planning auxiliaries', icon: 'face', label: 'Auxiliaires' },
-            { name: 'ni planning customers', icon: 'people', label: 'Bénéficiaires' },
-            { name: 'ni planning repetitions', icon: 'event_repeat', label: 'Gérer les répétitions' },
-          ],
-        }, {
           ref: 'customers',
           label: 'Bénéficiaires',
           children: [
             { name: 'auxiliaries customers', icon: 'contacts', label: 'Fiches' },
-            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },
           ],
         }, {
           ref: 'administrative',
@@ -215,13 +174,6 @@ export const menuItemsMixin = {
               label: 'Documents',
             },
             { name: 'auxiliaries contracts', icon: 'description', label: 'Contrats' },
-          ],
-        }, {
-          ref: 'teams',
-          label: 'Équipes',
-          children: [
-            { name: 'auxiliaries teams', icon: 'contacts', label: 'Répertoire' },
-            { name: 'ni auxiliaries dashboard', icon: 'dashboard', label: 'Tableau de bord' },
           ],
         },
       ];

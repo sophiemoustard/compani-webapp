@@ -148,6 +148,7 @@ const routes = [
         beforeEnter: async (to, from, next) => {
           try {
             if (from.name === 'ni pedagogy activity info') to.query.defaultTab = 'content';
+            else if (from.name === 'ni pedagogy questionnaire profile') to.query.defaultTab = 'questionnaire';
 
             return next();
           } catch (e) {
