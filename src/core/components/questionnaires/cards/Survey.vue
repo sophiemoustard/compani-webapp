@@ -2,7 +2,7 @@
   <div class="card-container">
     <div class="elm-width items-center">
       <ni-rating v-model="answer" :icon="iconTab" :caption="card.question" :error="v$.answer.$error"
-        :first-label="card.labels['1']" :last-label="card.labels['5']" :required-field="isRequired" />
+        :labels="card.labels" :required-field="isRequired" />
     </div>
     <ni-footer label="Suivant" @submit="updateQuestionnaireAnswer" />
   </div>
