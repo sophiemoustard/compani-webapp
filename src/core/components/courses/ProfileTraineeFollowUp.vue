@@ -90,7 +90,6 @@ import {
   DD_MM_YYYY,
   END_OF_COURSE,
   EXPECTATIONS,
-  PUBLISHED,
   OFFICIAL,
   CUSTOM,
 } from '@data/constants';
@@ -281,7 +280,7 @@ export default {
 
     const refreshQuestionnaireLinks = async () => {
       try {
-        const publishedQuestionnnaires = await Questionnaires.list({ status: PUBLISHED });
+        const publishedQuestionnnaires = await Questionnaires.list({ course: course.value._id });
 
         expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
         if (expectationsQuestionnaireId.value) {
