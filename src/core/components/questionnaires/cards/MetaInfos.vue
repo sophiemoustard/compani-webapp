@@ -9,7 +9,7 @@
         <q-item-section>{{ info.label }}</q-item-section>
       </q-item>
     </div>
-    <span class="questionnaire-type">Questionnaire de {{ questionnaireType }}</span>
+    <span class="questionnaire-type">Questionnaire {{ questionnaireType }}</span>
     <span v-if="displayName" class="trainee-identity">
       Vous complétez ce questionnnaire en tant que: {{ traineeName }}
     </span>
@@ -20,7 +20,7 @@
 import { toRefs, computed } from 'vue';
 import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
-import { EXPECTATIONS } from '@data/constants';
+import { EXPECTATIONS, END_OF_COURSE } from '@data/constants';
 
 export default {
   name: 'MetaInfos',
@@ -38,9 +38,16 @@ export default {
 
     const programName = computed(() => (course.value.subProgram ? composeCourseName(course.value) : ''));
 
-    const questionnaireType = computed(() => (questionnaire.value.type === EXPECTATIONS
-      ? 'recueil des attentes'
-      : 'fin de formation'));
+    const questionnaireType = computed(() => {
+      switch (questionnaire.value.type) {
+        case EXPECTATIONS:
+          return 'de recueil des attentes';
+        case END_OF_COURSE:
+          return 'de fin de formation';
+        default:
+          return 'd\'auto-positionnement';
+      }
+    });
 
     return {
       // Computed
