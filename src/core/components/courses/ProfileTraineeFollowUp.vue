@@ -278,13 +278,12 @@ export default {
         const publishedQuestionnnaires = await Questionnaires.list({ course: profileId.value });
         const questionnairesByType = keyBy(publishedQuestionnnaires, 'type');
 
-        questionnaireLinks.value = Object.entries(questionnairesByType)
-          .map(([type, questionnaire]) => ({ _id: questionnaire._id, type }));
+        const promises = Object.entries(questionnairesByType).map(async ([type, questionnaire]) => {
+          const img = await Questionnaires.getQRCode(questionnaire._id, { course: profileId.value });
+          return { _id: questionnaire._id, type, img };
+        });
 
-        for (const [index, q] of questionnaireLinks.value.entries()) {
-          const img = await Questionnaires.getQRCode(q._id, { course: profileId.value });
-          questionnaireLinks.value[index] = { ...q, img };
-        }
+        questionnaireLinks.value = await Promise.all(promises);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
