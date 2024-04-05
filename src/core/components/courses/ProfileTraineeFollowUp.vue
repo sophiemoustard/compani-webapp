@@ -17,10 +17,8 @@
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
       <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
-          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
-        <ni-questionnaire-qrcode-cell v-if="endOfCourseQuestionnaireId" :img="endOfCourseQRCode" :type="END_OF_COURSE"
-          @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)" />
+        <ni-questionnaire-qrcode-cell v-for="questionnaire in questionnaireLinks" :key="questionnaire._id"
+          :img="questionnaire.img" :type="questionnaire.type" @click="goToQuestionnaireProfile(questionnaire._id)" />
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
@@ -69,6 +67,7 @@
 import { subject } from '@casl/ability';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
+import keyBy from 'lodash/keyBy';
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -90,7 +89,6 @@ import {
   DD_MM_YYYY,
   END_OF_COURSE,
   EXPECTATIONS,
-  PUBLISHED,
   OFFICIAL,
   CUSTOM,
 } from '@data/constants';
@@ -134,10 +132,7 @@ export default {
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
-    const expectationsQuestionnaireId = ref();
-    const endOfCourseQuestionnaireId = ref();
-    const expectationsQRCode = ref('');
-    const endOfCourseQRCode = ref('');
+    const questionnaireLinks = ref([]);
 
     const course = computed(() => $store.state.course.course);
 
@@ -160,8 +155,7 @@ export default {
 
     const areQuestionnaireAnswersVisible = computed(() => questionnaires.value.length);
 
-    const areQuestionnaireQRCodeVisible = computed(() => expectationsQuestionnaireId.value ||
-      endOfCourseQuestionnaireId.value);
+    const areQuestionnaireQRCodeVisible = computed(() => questionnaireLinks.value.length);
 
     const areQuestionnaireVisible = computed(() => (!isClientInterface &&
       (areQuestionnaireAnswersVisible.value || areQuestionnaireQRCodeVisible.value)));
@@ -281,21 +275,15 @@ export default {
 
     const refreshQuestionnaireLinks = async () => {
       try {
-        const publishedQuestionnnaires = await Questionnaires.list({ status: PUBLISHED });
+        const publishedQuestionnnaires = await Questionnaires.list({ course: profileId.value });
+        const questionnairesByType = keyBy(publishedQuestionnnaires, 'type');
 
-        expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
-        if (expectationsQuestionnaireId.value) {
-          const expectationsCode = await Questionnaires
-            .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
-          expectationsQRCode.value = expectationsCode;
-        }
+        const promises = Object.entries(questionnairesByType).map(async ([type, questionnaire]) => {
+          const img = await Questionnaires.getQRCode(questionnaire._id, { course: profileId.value });
+          return { _id: questionnaire._id, type, img };
+        });
 
-        endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
-        if (endOfCourseQuestionnaireId.value) {
-          const endOfCourseCode = await Questionnaires
-            .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
-          endOfCourseQRCode.value = endOfCourseCode;
-        }
+        questionnaireLinks.value = await Promise.all(promises);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
@@ -330,10 +318,7 @@ export default {
       isIntraOrIntraHoldingOrVendor,
       learners,
       learnersLoading,
-      expectationsQuestionnaireId,
-      endOfCourseQuestionnaireId,
-      expectationsQRCode,
-      endOfCourseQRCode,
+      questionnaireLinks,
       isClientInterface,
       EXPECTATIONS,
       END_OF_COURSE,
