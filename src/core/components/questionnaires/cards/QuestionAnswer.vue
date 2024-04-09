@@ -98,3 +98,11 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+:deep(.input-caption)
+  font-size: 16px
+:deep(.q-option-group)
+  .q-checkbox__label
+    font-size: 16px !important
+</style>

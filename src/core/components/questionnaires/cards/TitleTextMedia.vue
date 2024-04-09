@@ -43,6 +43,7 @@ export default {
 .title
   color: $copper-grey-700
   font-weight: bold
+  font-size:20px
   text-align: center
 .img
   width: 30vw

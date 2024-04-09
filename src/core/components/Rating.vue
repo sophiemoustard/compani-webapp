@@ -55,11 +55,12 @@ export default {
 <style lang="sass" scoped>
 .caption
   flex: 1
+  font-size: 16px
 .container
   display: flex
   justify-content: center
 .labels
   margin: 0 0 8px 0
   color: $copper-grey-500
-  font-size: 12px
+  font-size: 16px
 </style>
