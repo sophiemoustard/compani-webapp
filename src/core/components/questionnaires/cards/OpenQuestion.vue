@@ -75,8 +75,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-:deep(.input-caption)
-  font-size: 16px
-</style>
