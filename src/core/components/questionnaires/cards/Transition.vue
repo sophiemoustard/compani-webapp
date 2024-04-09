@@ -37,5 +37,4 @@ export default {
 .title
   color: $copper-grey-700
   font-weight: bold
-  font-size: 18px
 </style>
