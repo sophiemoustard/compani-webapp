@@ -61,5 +61,4 @@ export default {
 .labels
   margin: 0 0 8px 0
   color: $copper-grey-500
-  font-size: 12px
 </style>

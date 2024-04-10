@@ -1,6 +1,6 @@
 <template>
   <div class="card-container">
-    <q-card class="elm-width card" flat>
+    <q-card class="elm-width card text-center" flat>
       <span class="title">{{ card.title }}</span>
     </q-card>
     <ni-footer label="Suivant" @submit="updateCardIndex" />

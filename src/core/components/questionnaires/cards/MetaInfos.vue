@@ -66,7 +66,7 @@ export default {
   padding: 0 0 16px 0
 .title
   @media screen and (max-width: $breakpoint-md)
-    font-size: 12px
+    font-size: 20px
   text-align: center
   color: $copper-grey-700
 .items-container
@@ -82,10 +82,10 @@ export default {
   font-weight: bold
   color: $copper-grey-700
   @media screen and (max-width: $breakpoint-md)
-    font-size: 14px
+    font-size: 16px
 .trainee-identity
   font-style: italic
-  font-size: 12px
+  font-size: 14px
   color: $copper-grey-500
   text-align: center
 </style>
