@@ -17,7 +17,8 @@
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
       <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" @click="goToQuestionnaireProfile" />
+        <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" :types="questionnaireTypes"
+          @click="goToQuestionnaireProfile" />
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
@@ -93,7 +94,7 @@ import {
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
-import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
+import { formatIdentity, formatQuantity, formatDownloadName, sortStrings } from '@helpers/utils';
 import { composeCourseName, formatSlotSchedule } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
 import { defineAbilitiesForCourse } from '@helpers/ability';
@@ -131,6 +132,7 @@ export default {
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
     const questionnaireQRCode = ref('');
+    const questionnaireTypes = ref([]);
 
     const course = computed(() => $store.state.course.course);
 
@@ -273,7 +275,12 @@ export default {
 
     const getQuestionnaireQRCode = async () => {
       try {
-        questionnaireQRCode.value = await Questionnaires.getQRCode({ course: profileId.value });
+        const publishedQuestionnnaires = await Questionnaires.list({ course: profileId.value });
+        questionnaireTypes.value = publishedQuestionnnaires.map(q => q.type).sort((a, b) => sortStrings(a, b));
+
+        if (publishedQuestionnnaires.length) {
+          questionnaireQRCode.value = await Questionnaires.getQRCode({ course: profileId.value });
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
@@ -306,6 +313,7 @@ export default {
       learnersLoading,
       questionnaireQRCode,
       isClientInterface,
+      questionnaireTypes,
       EXPECTATIONS,
       END_OF_COURSE,
       OFFICIAL,
