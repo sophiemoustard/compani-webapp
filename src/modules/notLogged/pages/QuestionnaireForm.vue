@@ -1,11 +1,11 @@
 <template>
   <compani-header />
   <div class="questionnaire-container">
-    <meta-infos v-if="!isQuestionnaireAnswered" :course="course" :questionnaire="questionnaire"
+    <meta-infos v-if="!isQuestionnaireAnswered" :course="course" :questionnaires="questionnaires"
       :trainee-name="traineeName" :display-name="!isStartorEndCard" />
     <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
       :end-card-index="endCardIndex" @update-trainee="updateTrainee" />
-    <template v-for="(card, index) of questionnaire.cards" :key="card._id">
+    <template v-for="(card, index) of questionnaires.map(q => q.cards).flat()" :key="card._id">
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
     <end v-if="cardIndex === endCardIndex && !isQuestionnaireAnswered" :trainee-name="traineeName" :loading="btnLoading"
@@ -33,12 +33,11 @@ import End from '@components/questionnaires/cards/End';
 import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { INCREMENT, START_CARD_INDEX } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, sortStrings } from '@helpers/utils';
 
 export default {
   name: 'QuestionnaireForm',
   props: {
-    questionnaireId: { type: String, required: true },
     courseId: { type: String, required: true },
   },
   components: {
@@ -52,9 +51,9 @@ export default {
     const metaInfo = { title: 'Formulaire de réponse au questionnaire' };
     useMeta(metaInfo);
 
-    const { courseId, questionnaireId } = toRefs(props);
+    const { courseId } = toRefs(props);
     const course = ref({});
-    const questionnaire = ref({});
+    const questionnaires = ref([]);
     const trainee = ref('');
     const btnLoading = ref(false);
     const startCardIndex = ref(START_CARD_INDEX);
@@ -77,12 +76,12 @@ export default {
       }
     };
 
-    const getQuestionnaire = async () => {
+    const getQuestionnaires = async () => {
       try {
-        const fetchedQuestionnaire = await Questionnaires.getFromNotLogged(questionnaireId.value);
-        questionnaire.value = fetchedQuestionnaire;
+        const fetchedQuestionnaires = await Questionnaires.getFromNotLogged({ course: courseId.value });
+        questionnaires.value = fetchedQuestionnaires.sort((a, b) => sortStrings(a.type, b.type));
 
-        endCardIndex.value = get(questionnaire.value, 'cards').length;
+        endCardIndex.value = questionnaires.value.map(q => q.cards).flat().length;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des informations de la formation.');
@@ -94,14 +93,35 @@ export default {
     const createHistory = async () => {
       try {
         btnLoading.value = true;
-        const payload = {
-          course: course.value._id,
-          questionnaire: questionnaire.value._id,
-          user: trainee.value,
-          questionnaireAnswersList: $store.state.questionnaire.answerList,
-        };
 
-        await QuestionnaireHistories.create(payload);
+        if (questionnaires.value.length === 1) {
+          const payload = {
+            course: course.value._id,
+            questionnaire: questionnaires.value[0]._id,
+            user: trainee.value,
+            questionnaireAnswersList: $store.state.questionnaire.answerList,
+          };
+          await QuestionnaireHistories.create(payload);
+        } else {
+          const cardQuestionnaireList = Object
+            .fromEntries(questionnaires.value.map(q => q.cards.map(c => [c._id, q._id])).flat());
+          const answersGroupedByQuestionnaire = Object.fromEntries(questionnaires.value.map(q => [q._id, []]));
+
+          for (const answer of $store.state.questionnaire.answerList) {
+            answersGroupedByQuestionnaire[cardQuestionnaireList[answer.card]].push(answer);
+          }
+
+          for (const [questionnaireId, answers] of Object.entries(answersGroupedByQuestionnaire)) {
+            const payload = {
+              course: course.value._id,
+              questionnaire: questionnaireId,
+              user: trainee.value,
+              questionnaireAnswersList: answers,
+            };
+            await QuestionnaireHistories.create(payload);
+          }
+        }
+
         NotifyPositive('Réponse enregistrée.');
         isQuestionnaireAnswered.value = true;
       } catch (e) {
@@ -124,7 +144,7 @@ export default {
     const isStartorEndCard = computed(() => [startCardIndex.value, endCardIndex.value].includes(cardIndex.value));
 
     const created = async () => {
-      await Promise.all([getCourse(), getQuestionnaire()]);
+      await Promise.all([getCourse(), getQuestionnaires()]);
     };
 
     created();
@@ -132,7 +152,7 @@ export default {
     return {
       // Data
       course,
-      questionnaire,
+      questionnaires,
       trainee,
       INCREMENT,
       btnLoading,

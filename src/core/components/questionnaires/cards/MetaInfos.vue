@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { toRefs, computed } from 'vue';
 import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
@@ -27,26 +28,33 @@ export default {
   components: { },
   props: {
     course: { type: Object, required: true },
-    questionnaire: { type: Object, required: true },
+    questionnaires: { type: Array, required: true },
     traineeName: { type: String, required: true },
     displayName: { type: Boolean, default: true },
   },
   setup (props) {
-    const { course, questionnaire } = toRefs(props);
+    const { course, questionnaires } = toRefs(props);
 
     const { headerInfo } = useCourses(course);
 
     const programName = computed(() => (course.value.subProgram ? composeCourseName(course.value) : ''));
 
     const questionnaireType = computed(() => {
-      switch (questionnaire.value.type) {
+      let mainQuestionnaireLabel = '';
+      switch (get(questionnaires.value[0], 'type')) {
         case EXPECTATIONS:
-          return 'de recueil des attentes';
+          mainQuestionnaireLabel = 'de recueil des attentes';
+          break;
         case END_OF_COURSE:
-          return 'de fin de formation';
+          mainQuestionnaireLabel = 'de fin de formation';
+          break;
         default:
-          return 'd\'auto-positionnement';
+          mainQuestionnaireLabel = '';
       }
+      if (questionnaires.value.length === 1) {
+        return mainQuestionnaireLabel;
+      }
+      return `${mainQuestionnaireLabel} et d'auto-positionnement`;
     });
 
     return {
