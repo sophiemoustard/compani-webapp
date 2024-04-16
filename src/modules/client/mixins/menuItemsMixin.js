@@ -167,12 +167,6 @@ export const menuItemsMixin = {
               label: 'Infos personnelles',
             },
             { name: 'auxiliaries pay', params: { id: this.loggedUser._id }, icon: 'layers', label: 'Paie' },
-            {
-              name: 'auxiliaries docs',
-              params: { id: this.loggedUser._id },
-              icon: 'insert_drive_file',
-              label: 'Documents',
-            },
           ],
         },
       ];

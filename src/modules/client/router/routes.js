@@ -361,15 +361,6 @@ const routes = [
         },
       },
       {
-        path: 'auxiliaries/docs',
-        name: 'auxiliaries docs',
-        component: () => import('src/modules/client/pages/auxiliaries/administrative/Documents'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'administrative',
-        },
-      },
-      {
         path: 'auxiliaries/info',
         name: 'auxiliaries info',
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Info'),
