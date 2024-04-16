@@ -156,12 +156,6 @@ export const menuItemsMixin = {
           children: [
             { name: 'auxiliaries customers', icon: 'contacts', label: 'Fiches' },
           ],
-        }, {
-          ref: 'administrative',
-          label: 'Administratif',
-          children: [
-            { name: 'auxiliaries pay', params: { id: this.loggedUser._id }, icon: 'layers', label: 'Paie' },
-          ],
         },
       ];
     },

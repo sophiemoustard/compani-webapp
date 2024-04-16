@@ -50,11 +50,9 @@ const clientAdminRoutes = [
 const auxiliaryRoutes = [
   { name: 'auxiliaries customers', subscription: ERP },
   { name: 'auxiliaries customers info', subscription: ERP },
-  { name: 'auxiliaries pay', subscription: ERP },
   { name: 'account client' },
 ];
 const auxiliaryWithoutCompanyRoutes = [
-  { name: 'auxiliaries pay', subscription: ERP },
   { name: 'account client' },
 ];
 const planningReferentRoutes = [

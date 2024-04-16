@@ -30,10 +30,7 @@ const routes = [
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
           return next({ name: 'account client' });
         }
-        if (AUXILIARY_ROLES.includes(userClientRole)) {
-          if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries pay' });
-          return next({ name: 'account client' });
-        }
+        if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'account client' });
         if (COACH_ROLES.includes(userClientRole)) {
           if (get(company, 'subscriptions.erp')) return next({ name: 'ni auxiliaries' });
           return next({ name: 'ni courses' });
@@ -349,15 +346,6 @@ const routes = [
         component: () => import('src/modules/client/pages/auxiliaries/customers/CustomerInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
-      {
-        path: 'auxiliaries/pay',
-        name: 'auxiliaries pay',
-        component: () => import('src/modules/client/pages/auxiliaries/administrative/Salaries'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'administrative',
         },
       },
       // Customers view routes
