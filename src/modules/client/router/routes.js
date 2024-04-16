@@ -66,15 +66,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/tags',
-        name: 'ni config tags',
-        component: () => import('src/modules/client/pages/ni/config/TagConfig'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
-        },
-      },
-      {
         path: 'ni/billing/to-bill',
         name: 'ni billing to bill',
         component: () => import('src/modules/client/pages/ni/billing/ToBill'),

@@ -129,7 +129,6 @@ export const menuItemsMixin = {
             { name: 'ni config company', icon: 'settings', label: 'Configuration générale' },
             { name: 'ni config customers', icon: 'house', label: 'Configuration bénéficiaires' },
             { name: 'ni config coach', icon: 'people', label: 'Coachs' },
-            { name: 'ni config tags', icon: 'list_alt', label: 'Tags' },
           ],
         },
       ];
