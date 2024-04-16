@@ -1,8 +1,5 @@
 export const TOKEN_EXPIRE_DAY = 1; // in days
 
-export const IDENTIFICATION = 'identification';
-export const CONTRACT_END = 'contract_end';
-
 // MEDIA
 export const BLUE_TEXT_LOGO = 'https://storage.googleapis.com/compani-main/icons/compani_texte_bleu.png';
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';

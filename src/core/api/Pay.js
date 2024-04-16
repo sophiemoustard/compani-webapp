@@ -8,12 +8,4 @@ export default {
     );
     return hoursBalanceDetail.data.data.hoursBalanceDetail;
   },
-  async export (type, params) {
-    return alenviAxios({
-      url: `${process.env.API_HOSTNAME}/pay/export/${type}`,
-      method: 'GET',
-      responseType: 'blob',
-      params,
-    });
-  },
 };
