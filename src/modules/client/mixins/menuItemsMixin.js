@@ -160,12 +160,6 @@ export const menuItemsMixin = {
           ref: 'administrative',
           label: 'Administratif',
           children: [
-            {
-              name: 'auxiliaries info',
-              params: { id: this.loggedUser._id },
-              icon: 'person',
-              label: 'Infos personnelles',
-            },
             { name: 'auxiliaries pay', params: { id: this.loggedUser._id }, icon: 'layers', label: 'Paie' },
           ],
         },

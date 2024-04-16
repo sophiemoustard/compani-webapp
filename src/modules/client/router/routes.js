@@ -360,15 +360,6 @@ const routes = [
           parent: 'administrative',
         },
       },
-      {
-        path: 'auxiliaries/info',
-        name: 'auxiliaries info',
-        component: () => import('src/modules/client/pages/auxiliaries/administrative/Info'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'administrative',
-        },
-      },
       // Customers view routes
       {
         path: 'customers/documents',
