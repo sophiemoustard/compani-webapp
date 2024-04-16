@@ -48,15 +48,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/rh',
-        name: 'ni config rh',
-        component: () => import('src/modules/client/pages/ni/config/RhConfig'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
-        },
-      },
-      {
         path: 'ni/config/customers',
         name: 'ni config customers',
         component: () => import('src/modules/client/pages/ni/config/CustomersConfig'),

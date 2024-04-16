@@ -76,13 +76,6 @@ export const menuItemsMixin = {
     coachRoutes () {
       return [
         {
-          ref: 'teams',
-          label: 'Équipes',
-          children: [
-            { name: 'ni auxiliaries', icon: 'contacts', label: 'Répertoire auxiliaires' },
-          ],
-        },
-        {
           ref: 'planning',
           label: 'Planning',
           children: [
@@ -134,7 +127,6 @@ export const menuItemsMixin = {
           label: 'Configuration',
           children: [
             { name: 'ni config company', icon: 'settings', label: 'Configuration générale' },
-            { name: 'ni config rh', icon: 'accessibility', label: 'Configuration RH' },
             { name: 'ni config customers', icon: 'house', label: 'Configuration bénéficiaires' },
             { name: 'ni config coach', icon: 'people', label: 'Coachs' },
             { name: 'ni config tags', icon: 'list_alt', label: 'Tags' },
