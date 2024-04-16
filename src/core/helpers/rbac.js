@@ -48,15 +48,7 @@ const clientAdminRoutes = [
   { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [
-  { name: 'auxiliaries customers', subscription: ERP },
-  { name: 'auxiliaries customers info', subscription: ERP },
   { name: 'account client' },
-];
-const auxiliaryWithoutCompanyRoutes = [
-  { name: 'account client' },
-];
-const planningReferentRoutes = [
-  ...auxiliaryRoutes,
 ];
 const helperRoutes = [
   { name: 'customers documents', subscription: ERP },
@@ -100,9 +92,9 @@ export const roleBasedAccessControl = {
   [HOLDING_ADMIN]: clientAdminRoutes,
   [CLIENT_ADMIN]: clientAdminRoutes,
   [COACH]: coachRoutes,
-  [AUXILIARY_WITHOUT_COMPANY]: auxiliaryWithoutCompanyRoutes,
+  [AUXILIARY_WITHOUT_COMPANY]: auxiliaryRoutes,
   [AUXILIARY]: auxiliaryRoutes,
-  [PLANNING_REFERENT]: planningReferentRoutes,
+  [PLANNING_REFERENT]: auxiliaryRoutes,
   [HELPER]: helperRoutes,
   [VENDOR_ADMIN]: vendorAdminRoutes,
   [TRAINING_ORGANISATION_MANAGER]: trainingOrganisationManagerRoutes,

@@ -329,25 +329,6 @@ const routes = [
           parent: 'courses',
         },
       },
-      // Auxiliary view routes
-      {
-        path: 'auxiliaries/customers',
-        name: 'auxiliaries customers',
-        component: () => import('src/modules/client/pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'customers',
-        },
-      },
-      {
-        path: 'auxiliaries/customers/:customerId',
-        name: 'auxiliaries customers info',
-        props: true,
-        component: () => import('src/modules/client/pages/auxiliaries/customers/CustomerInfo'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
       // Customers view routes
       {
         path: 'customers/documents',

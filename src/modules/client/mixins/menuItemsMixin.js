@@ -24,10 +24,6 @@ export const menuItemsMixin = {
         exports: { open: false },
         configuration: { open: false },
       },
-      auxiliaryActiveRoutes: {
-        customers: { open: false },
-        administrative: { open: false },
-      },
     };
   },
   computed: {
@@ -62,7 +58,6 @@ export const menuItemsMixin = {
 
       if (this.isHelper) routes = this.customerRoutes;
       else if (this.isCoach) routes = this.coachRoutes;
-      else if (this.isAuxiliary) routes = this.auxiliaryRoutes;
 
       return routes
         .map(r => (this.isHelper ? r : { ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
@@ -71,7 +66,6 @@ export const menuItemsMixin = {
     activeRoutes () {
       if (this.isHelper) return null;
       if (this.isCoach) return this.coachActiveRoutes;
-      if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
       return {};
     },
     customerRoutes () {
@@ -144,17 +138,6 @@ export const menuItemsMixin = {
             { name: 'ni config customers', icon: 'house', label: 'Configuration bénéficiaires' },
             { name: 'ni config coach', icon: 'people', label: 'Coachs' },
             { name: 'ni config tags', icon: 'list_alt', label: 'Tags' },
-          ],
-        },
-      ];
-    },
-    auxiliaryRoutes () {
-      return [
-        {
-          ref: 'customers',
-          label: 'Bénéficiaires',
-          children: [
-            { name: 'auxiliaries customers', icon: 'contacts', label: 'Fiches' },
           ],
         },
       ];
