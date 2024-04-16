@@ -9,7 +9,7 @@
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
     <end v-if="cardIndex === endCardIndex && !isQuestionnaireAnswered" :trainee-name="traineeName" :loading="btnLoading"
-      @submit="formatPayload" />
+      @submit="createHistory" />
     <span v-if="cardIndex === endCardIndex && isQuestionnaireAnswered" class="end-text">
       Merci d'avoir répondu au questionnaire ! Vous pouvez à présent fermer la fenêtre.
     </span>
@@ -20,6 +20,7 @@
 import { useMeta } from 'quasar';
 import { toRefs, ref, computed } from 'vue';
 import get from 'lodash/get';
+import { AxiosError } from 'axios';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -90,56 +91,53 @@ export default {
 
     const updateTrainee = (t) => { trainee.value = t; };
 
-    const createHistory = async (payload) => {
+    const createHistory = async () => {
       try {
-        await QuestionnaireHistories.create(payload);
+        btnLoading.value = true;
+        const promises = [];
+
+        if (questionnaires.value.length === 1) {
+          const payload = {
+            course: course.value._id,
+            questionnaire: questionnaires.value[0]._id,
+            user: trainee.value,
+            questionnaireAnswersList: $store.state.questionnaire.answerList,
+          };
+          promises.push(QuestionnaireHistories.create(payload));
+        } else {
+          const cardQuestionnaireList = Object
+            .fromEntries(questionnaires.value.map(q => q.cards.map(c => [c._id, q._id])).flat());
+          const answersGroupedByQuestionnaire = Object.fromEntries(questionnaires.value.map(q => [q._id, []]));
+
+          for (const answer of $store.state.questionnaire.answerList) {
+            answersGroupedByQuestionnaire[cardQuestionnaireList[answer.card]].push(answer);
+          }
+
+          for (const [questionnaireId, answers] of Object.entries(answersGroupedByQuestionnaire)) {
+            const payload = {
+              course: course.value._id,
+              questionnaire: questionnaireId,
+              user: trainee.value,
+              questionnaireAnswersList: answers,
+            };
+            promises.push(QuestionnaireHistories.create(payload));
+          }
+        }
+
+        const results = await Promise.allSettled(promises);
+        if (results.every(r => r.status === 'rejected')) throw new AxiosError(results[0].reason);
+
+        NotifyPositive('Réponse enregistrée.');
+        isQuestionnaireAnswered.value = true;
       } catch (e) {
         console.error(e);
 
-        if (e.response.status === 409) return NotifyNegative(e.response.data.message);
+        if (get(e, 'response.status') === 409) return NotifyNegative(e.response.data.message);
+        if (get(e, 'message.response.status') === 409) return NotifyNegative(e.message.response.data.message);
         NotifyNegative('Erreur lors de l\'enregistrement des réponses au questionnaire.');
+      } finally {
+        btnLoading.value = false;
       }
-    };
-
-    const formatPayload = async () => {
-      btnLoading.value = true;
-      const promises = [];
-
-      if (questionnaires.value.length === 1) {
-        const payload = {
-          course: course.value._id,
-          questionnaire: questionnaires.value[0]._id,
-          user: trainee.value,
-          questionnaireAnswersList: $store.state.questionnaire.answerList,
-        };
-        promises.push(createHistory(payload));
-      } else {
-        const cardQuestionnaireList = Object
-          .fromEntries(questionnaires.value.map(q => q.cards.map(c => [c._id, q._id])).flat());
-        const answersGroupedByQuestionnaire = Object.fromEntries(questionnaires.value.map(q => [q._id, []]));
-
-        for (const answer of $store.state.questionnaire.answerList) {
-          answersGroupedByQuestionnaire[cardQuestionnaireList[answer.card]].push(answer);
-        }
-
-        for (const [questionnaireId, answers] of Object.entries(answersGroupedByQuestionnaire)) {
-          const payload = {
-            course: course.value._id,
-            questionnaire: questionnaireId,
-            user: trainee.value,
-            questionnaireAnswersList: answers,
-          };
-          promises.push(createHistory(payload));
-        }
-      }
-
-      const results = await Promise.all(promises);
-      if (results.includes(undefined)) {
-        NotifyPositive('Réponse enregistrée.');
-        isQuestionnaireAnswered.value = true;
-      }
-
-      btnLoading.value = false;
     };
 
     const traineeName = computed(() => {
@@ -173,7 +171,7 @@ export default {
       isStartorEndCard,
       // Methods
       updateTrainee,
-      formatPayload,
+      createHistory,
       // Validations
       v$,
     };
