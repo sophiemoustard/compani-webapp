@@ -49,12 +49,6 @@ export default {
     const updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data);
     return updatedUser;
   },
-  async updateCertificates (userId, data) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/certificates`, data);
-  },
-  async createDriveFolder (userId) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`);
-  },
   async uploadImage (userId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/upload`, payload);
   },

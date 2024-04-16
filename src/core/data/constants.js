@@ -73,31 +73,6 @@ export const CUSTOMER_ABSENCE_TYPES = [
 
 // CONTRACTS
 export const CONTRACT = 'contract';
-export const CONTRACT_VERSION = 'contract_version';
-export const END_CONTRACT_REASONS = [
-  { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
-  { label: 'Rupture période d’essai salarié(e)', value: 'employee_trial_period_termination' },
-  { label: 'Démission', value: 'resignation' },
-  { label: 'Licenciement faute grave', value: 'serious_misconduct_layoff' },
-  { label: 'Licenciement faute lourde', value: 'gross_fault_layoff' },
-  { label: 'Licenciement autre motif', value: 'other_reason_layoff' },
-  { label: 'Mutation', value: 'mutation' },
-  { label: 'Rupture conventionnelle', value: 'contractual_termination' },
-  { label: 'Fin de stage', value: 'internship_end' },
-  { label: 'Fin de contrat CDD', value: 'cdd_end' },
-  { label: 'Autres', value: OTHER },
-];
-export const CONTRACT_CREATION_MANDATORY_INFO = {
-  'identity.lastname': 'nom',
-  'identity.firstname': 'prénom',
-  'identity.birthDate': 'date de naissance',
-  'identity.birthCity': 'ville de naissance',
-  'identity.birthState': 'département de naissance',
-  'identity.nationality': 'nationalité',
-  'identity.socialSecurityNumber': 'numéro de sécurité sociale',
-  'contact.address.fullAddress': 'adresse',
-  establishment: 'établissement',
-};
 
 // EVENTS
 export const INTERVENTION = 'intervention';
@@ -328,15 +303,6 @@ export const OGUST = 'ogust';
 
 export const WEEKS_PER_MONTH = (52 / 12);
 
-// PAY DOCUMENT NATURE
-export const PAYSLIP = 'payslip';
-export const CERTIFICATE = 'certificate';
-export const PAY_DOCUMENT_NATURES = [
-  { label: 'Bulletin de paie', value: PAYSLIP },
-  { label: 'Attestation', value: CERTIFICATE },
-  { label: 'Autre', value: OTHER },
-];
-
 // COMPANY
 export const COMPANY = 'company';
 export const ASSOCIATION = 'association';
@@ -348,7 +314,6 @@ export const COMPANY_TYPES = [
 // SMS
 export const CONVOCATION = 'convocation';
 export const REMINDER = 'reminder';
-export const HR_SMS = 'RH';
 export const COURSE_SMS = 'Formation';
 
 // COURSE

@@ -31,10 +31,6 @@ export default {
     );
     return check.data.data;
   },
-  async createPasswordToken (id, data) {
-    const passwordToken = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${id}/passwordtoken`, data);
-    return passwordToken.data.data.passwordToken;
-  },
   async updatePassword (userId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/password`, data);
   },
