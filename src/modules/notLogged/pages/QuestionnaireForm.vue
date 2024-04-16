@@ -9,7 +9,7 @@
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
     <end v-if="cardIndex === endCardIndex && !isQuestionnaireAnswered" :trainee-name="traineeName" :loading="btnLoading"
-      @submit="createHistory" />
+      @submit="formatPayload" />
     <span v-if="cardIndex === endCardIndex && isQuestionnaireAnswered" class="end-text">
       Merci d'avoir répondu au questionnaire ! Vous pouvez à présent fermer la fenêtre.
     </span>
@@ -90,48 +90,56 @@ export default {
 
     const updateTrainee = (t) => { trainee.value = t; };
 
-    const createHistory = async () => {
+    const createHistory = async (payload) => {
       try {
-        btnLoading.value = true;
-
-        if (questionnaires.value.length === 1) {
-          const payload = {
-            course: course.value._id,
-            questionnaire: questionnaires.value[0]._id,
-            user: trainee.value,
-            questionnaireAnswersList: $store.state.questionnaire.answerList,
-          };
-          await QuestionnaireHistories.create(payload);
-        } else {
-          const cardQuestionnaireList = Object
-            .fromEntries(questionnaires.value.map(q => q.cards.map(c => [c._id, q._id])).flat());
-          const answersGroupedByQuestionnaire = Object.fromEntries(questionnaires.value.map(q => [q._id, []]));
-
-          for (const answer of $store.state.questionnaire.answerList) {
-            answersGroupedByQuestionnaire[cardQuestionnaireList[answer.card]].push(answer);
-          }
-
-          for (const [questionnaireId, answers] of Object.entries(answersGroupedByQuestionnaire)) {
-            const payload = {
-              course: course.value._id,
-              questionnaire: questionnaireId,
-              user: trainee.value,
-              questionnaireAnswersList: answers,
-            };
-            await QuestionnaireHistories.create(payload);
-          }
-        }
-
-        NotifyPositive('Réponse enregistrée.');
-        isQuestionnaireAnswered.value = true;
+        await QuestionnaireHistories.create(payload);
       } catch (e) {
         console.error(e);
 
         if (e.response.status === 409) return NotifyNegative(e.response.data.message);
         NotifyNegative('Erreur lors de l\'enregistrement des réponses au questionnaire.');
-      } finally {
-        btnLoading.value = false;
       }
+    };
+
+    const formatPayload = async () => {
+      btnLoading.value = true;
+      const promises = [];
+
+      if (questionnaires.value.length === 1) {
+        const payload = {
+          course: course.value._id,
+          questionnaire: questionnaires.value[0]._id,
+          user: trainee.value,
+          questionnaireAnswersList: $store.state.questionnaire.answerList,
+        };
+        promises.push(createHistory(payload));
+      } else {
+        const cardQuestionnaireList = Object
+          .fromEntries(questionnaires.value.map(q => q.cards.map(c => [c._id, q._id])).flat());
+        const answersGroupedByQuestionnaire = Object.fromEntries(questionnaires.value.map(q => [q._id, []]));
+
+        for (const answer of $store.state.questionnaire.answerList) {
+          answersGroupedByQuestionnaire[cardQuestionnaireList[answer.card]].push(answer);
+        }
+
+        for (const [questionnaireId, answers] of Object.entries(answersGroupedByQuestionnaire)) {
+          const payload = {
+            course: course.value._id,
+            questionnaire: questionnaireId,
+            user: trainee.value,
+            questionnaireAnswersList: answers,
+          };
+          promises.push(createHistory(payload));
+        }
+      }
+
+      const results = await Promise.all(promises);
+      if (results.includes(undefined)) {
+        NotifyPositive('Réponse enregistrée.');
+        isQuestionnaireAnswered.value = true;
+      }
+
+      btnLoading.value = false;
     };
 
     const traineeName = computed(() => {
@@ -165,7 +173,7 @@ export default {
       isStartorEndCard,
       // Methods
       updateTrainee,
-      createHistory,
+      formatPayload,
       // Validations
       v$,
     };
