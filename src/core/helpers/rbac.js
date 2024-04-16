@@ -52,13 +52,11 @@ const auxiliaryRoutes = [
   { name: 'auxiliaries customers info', subscription: ERP },
   { name: 'auxiliaries pay', subscription: ERP },
   { name: 'auxiliaries docs', subscription: ERP },
-  { name: 'auxiliaries contracts', subscription: ERP },
   { name: 'auxiliaries info', subscription: ERP },
   { name: 'account client' },
 ];
 const auxiliaryWithoutCompanyRoutes = [
   { name: 'auxiliaries pay', subscription: ERP },
-  { name: 'auxiliaries contracts', subscription: ERP },
   { name: 'account client' },
 ];
 const planningReferentRoutes = [

@@ -173,7 +173,6 @@ export const menuItemsMixin = {
               icon: 'insert_drive_file',
               label: 'Documents',
             },
-            { name: 'auxiliaries contracts', icon: 'description', label: 'Contrats' },
           ],
         },
       ];

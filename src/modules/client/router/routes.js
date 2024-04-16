@@ -370,15 +370,6 @@ const routes = [
         },
       },
       {
-        path: 'auxiliaries/contracts',
-        name: 'auxiliaries contracts',
-        component: () => import('src/modules/client/pages/auxiliaries/administrative/Contracts'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'administrative',
-        },
-      },
-      {
         path: 'auxiliaries/info',
         name: 'auxiliaries info',
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Info'),
