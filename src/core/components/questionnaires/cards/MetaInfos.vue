@@ -17,11 +17,9 @@
 </template>
 
 <script>
-import get from 'lodash/get';
 import { toRefs, computed } from 'vue';
-import { composeCourseName } from '@helpers/courses';
+import { composeCourseName, getQuestionnaireTypeTitle } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
-import { EXPECTATIONS, END_OF_COURSE } from '@data/constants';
 
 export default {
   name: 'MetaInfos',
@@ -39,23 +37,7 @@ export default {
 
     const programName = computed(() => (course.value.subProgram ? composeCourseName(course.value) : ''));
 
-    const questionnaireType = computed(() => {
-      let mainQuestionnaireLabel = '';
-      switch (get(questionnaires.value[0], 'type')) {
-        case EXPECTATIONS:
-          mainQuestionnaireLabel = 'de recueil des attentes';
-          break;
-        case END_OF_COURSE:
-          mainQuestionnaireLabel = 'de fin de formation';
-          break;
-        default:
-          mainQuestionnaireLabel = '';
-      }
-      if (questionnaires.value.length === 1) {
-        return mainQuestionnaireLabel;
-      }
-      return `${mainQuestionnaireLabel} et d'auto-positionnement`;
-    });
+    const questionnaireType = computed(() => getQuestionnaireTypeTitle(questionnaires.value.map(q => q.type)));
 
     return {
       // Computed

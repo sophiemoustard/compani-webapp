@@ -80,7 +80,7 @@ export default {
     const getQuestionnaires = async () => {
       try {
         const fetchedQuestionnaires = await Questionnaires.getFromNotLogged({ course: courseId.value });
-        questionnaires.value = fetchedQuestionnaires.sort((a, b) => sortStrings(a.type, b.type));
+        questionnaires.value = [...fetchedQuestionnaires].sort((a, b) => sortStrings(a.type, b.type));
 
         endCardIndex.value = questionnaires.value.map(q => q.cards).flat().length;
       } catch (e) {

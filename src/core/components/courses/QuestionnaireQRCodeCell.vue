@@ -12,7 +12,7 @@
 
 <script>
 import { toRefs, computed } from 'vue';
-import { END_OF_COURSE, EXPECTATIONS } from '../../data/constants';
+import { getQuestionnaireTypeTitle } from '@helpers/courses';
 
 export default {
   name: 'QuestionnaireQRCodeCell',
@@ -24,23 +24,7 @@ export default {
   setup (props, { emit }) {
     const { types } = toRefs(props);
 
-    const questionnaireTypeTitle = computed(() => {
-      let mainQuestionnaireLabel = '';
-      switch (types.value[0]) {
-        case EXPECTATIONS:
-          mainQuestionnaireLabel = 'de recueil des attentes';
-          break;
-        case END_OF_COURSE:
-          mainQuestionnaireLabel = 'de fin de formation';
-          break;
-        default:
-          mainQuestionnaireLabel = '';
-      }
-      if (types.value.length === 1) {
-        return mainQuestionnaireLabel;
-      }
-      return `${mainQuestionnaireLabel} et d'auto-positionnement`;
-    });
+    const questionnaireTypeTitle = computed(() => getQuestionnaireTypeTitle(types.value));
 
     const qrCodePlaceHolder = computed(() => `QR Code pour répondre au questionnaire ${questionnaireTypeTitle.value}`);
 
