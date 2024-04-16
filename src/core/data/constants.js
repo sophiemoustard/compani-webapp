@@ -52,13 +52,6 @@ export const HOME = 'home';
 export const NURSING_HOME = 'nursing_home';
 export const HOSPITALIZED = 'hospitalized';
 export const DECEASED = 'deceased';
-export const SITUATION_OPTIONS = [
-  { label: 'Non renseigné', value: UNKNOWN },
-  { label: 'Domicile', value: HOME },
-  { label: 'EHPAD', value: NURSING_HOME },
-  { label: 'Hospitalisé', value: HOSPITALIZED },
-  { label: 'Décédé', value: DECEASED },
-];
 
 // CUSTOMER ABSENCE
 export const CUSTOMER_ABSENCE = 'customer_absence';
@@ -508,19 +501,6 @@ export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Questionnaires de satisfaction', value: END_OF_COURSE },
   { label: 'Factures et avoirs', value: COURSE_BILL },
   { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
-];
-
-// PARTNER
-export const JOB_OPTIONS = [
-  { label: 'Assistante sociale', value: 'social_worker' },
-  { label: 'Évaluateur médico-social', value: 'medico_social_assessor' },
-  { label: 'Docteur', value: 'doctor' },
-  { label: 'Gériatre', value: 'geriatrician' },
-  { label: 'Coordinateur', value: 'coordinator' },
-  { label: 'Directeur', value: 'director' },
-  { label: 'Gestionnaire de cas', value: 'case_manager' },
-  { label: 'Infirmier', value: 'nurse' },
-  { label: 'Psychologue', value: 'psychologist' },
 ];
 
 // CUSTOMER STATUS
