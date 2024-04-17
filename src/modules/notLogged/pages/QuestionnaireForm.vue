@@ -5,7 +5,7 @@
       :trainee-name="traineeName" :display-name="!isStartorEndCard" />
     <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
       :end-card-index="endCardIndex" @update-trainee="updateTrainee" />
-    <template v-for="(card, index) of questionnaires.map(q => q.cards).flat()" :key="card._id">
+    <template v-for="(card, index) of cards" :key="card._id">
       <card-template v-if="cardIndex === index" :card="card" />
     </template>
     <end v-if="cardIndex === endCardIndex && !isQuestionnaireAnswered" :trainee-name="traineeName" :loading="btnLoading"
@@ -55,6 +55,7 @@ export default {
     const { courseId } = toRefs(props);
     const course = ref({});
     const questionnaires = ref([]);
+    const cards = ref([]);
     const trainee = ref('');
     const btnLoading = ref(false);
     const startCardIndex = ref(START_CARD_INDEX);
@@ -81,8 +82,8 @@ export default {
       try {
         const fetchedQuestionnaires = await Questionnaires.getFromNotLogged({ course: courseId.value });
         questionnaires.value = [...fetchedQuestionnaires].sort((a, b) => sortStrings(a.type, b.type));
-
-        endCardIndex.value = questionnaires.value.map(q => q.cards).flat().length;
+        cards.value = questionnaires.value.map(q => q.cards).flat();
+        endCardIndex.value = cards.value.length;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des informations de la formation.');
@@ -159,6 +160,7 @@ export default {
       // Data
       course,
       questionnaires,
+      cards,
       trainee,
       INCREMENT,
       btnLoading,

@@ -7,6 +7,7 @@ import {
   PT0S,
   EXPECTATIONS,
   END_OF_COURSE,
+  SELF_POSITIONNING,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -40,23 +41,22 @@ export const computeDuration = steps => (steps.length
 );
 
 export const getQuestionnaireTypeTitle = (types) => {
-  let mainQuestionnaireLabel = '';
+  const labels = [];
   for (const type of types) {
-    if (!mainQuestionnaireLabel) {
-      switch (type) {
-        case EXPECTATIONS:
-          mainQuestionnaireLabel = 'de recueil des attentes';
-          break;
-        case END_OF_COURSE:
-          mainQuestionnaireLabel = 'de fin de formation';
-          break;
-        default:
-          mainQuestionnaireLabel = '';
-      }
+    switch (type) {
+      case EXPECTATIONS:
+        labels.push('de recueil des attentes');
+        break;
+      case END_OF_COURSE:
+        labels.push('de fin de formation');
+        break;
+      case SELF_POSITIONNING:
+        labels.push('d\'auto-positionnement');
+        break;
+      default:
+        break;
     }
   }
-  if (types.length === 1) {
-    return mainQuestionnaireLabel;
-  }
-  return `${mainQuestionnaireLabel} et d'auto-positionnement`;
+
+  return labels.join(' et ');
 };
