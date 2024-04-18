@@ -17,8 +17,8 @@
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
       <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell v-for="questionnaire in questionnaireLinks" :key="questionnaire._id"
-          :img="questionnaire.img" :type="questionnaire.type" @click="goToQuestionnaireProfile(questionnaire._id)" />
+        <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" :types="questionnaireTypes"
+          @click="goToQuestionnaireProfile" />
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
@@ -67,7 +67,6 @@
 import { subject } from '@casl/ability';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
-import keyBy from 'lodash/keyBy';
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
@@ -95,7 +94,7 @@ import {
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
-import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
+import { formatIdentity, formatQuantity, formatDownloadName, sortStrings } from '@helpers/utils';
 import { composeCourseName, formatSlotSchedule } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
 import { defineAbilitiesForCourse } from '@helpers/ability';
@@ -132,7 +131,8 @@ export default {
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
-    const questionnaireLinks = ref([]);
+    const questionnaireQRCode = ref('');
+    const questionnaireTypes = ref([]);
 
     const course = computed(() => $store.state.course.course);
 
@@ -155,7 +155,7 @@ export default {
 
     const areQuestionnaireAnswersVisible = computed(() => questionnaires.value.length);
 
-    const areQuestionnaireQRCodeVisible = computed(() => questionnaireLinks.value.length);
+    const areQuestionnaireQRCodeVisible = computed(() => questionnaireQRCode.value);
 
     const areQuestionnaireVisible = computed(() => (!isClientInterface &&
       (areQuestionnaireAnswersVisible.value || areQuestionnaireQRCodeVisible.value)));
@@ -273,36 +273,29 @@ export default {
       }
     };
 
-    const refreshQuestionnaireLinks = async () => {
+    const getQuestionnaireQRCode = async () => {
       try {
         const publishedQuestionnnaires = await Questionnaires.list({ course: profileId.value });
-        const questionnairesByType = keyBy(publishedQuestionnnaires, 'type');
+        questionnaireTypes.value = publishedQuestionnnaires.map(q => q.type).sort((a, b) => sortStrings(a, b));
 
-        const promises = Object.entries(questionnairesByType).map(async ([type, questionnaire]) => {
-          const img = await Questionnaires.getQRCode(questionnaire._id, { course: profileId.value });
-          return { _id: questionnaire._id, type, img };
-        });
-
-        questionnaireLinks.value = await Promise.all(promises);
+        if (publishedQuestionnnaires.length) {
+          questionnaireQRCode.value = await Questionnaires.getQRCode({ course: profileId.value });
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
       }
     };
 
-    const goToQuestionnaireProfile = (questionnaireId) => {
-      const questionnaire = $router.resolve({
-        name: 'ni questionnaires',
-        params: { questionnaireId },
-        query: { courseId: profileId.value },
-      });
+    const goToQuestionnaireProfile = () => {
+      const questionnaire = $router.resolve({ name: 'ni questionnaires', query: { courseId: profileId.value } });
 
       window.open(questionnaire.href, '_blank');
     };
 
     const created = async () => {
       const promises = [getFollowUp(), getUnsubscribedAttendances()];
-      if (!isClientInterface) promises.push(refreshQuestionnaires(), refreshQuestionnaireLinks());
+      if (!isClientInterface) promises.push(refreshQuestionnaires(), getQuestionnaireQRCode());
 
       await Promise.all(promises);
     };
@@ -318,8 +311,9 @@ export default {
       isIntraOrIntraHoldingOrVendor,
       learners,
       learnersLoading,
-      questionnaireLinks,
+      questionnaireQRCode,
       isClientInterface,
+      questionnaireTypes,
       EXPECTATIONS,
       END_OF_COURSE,
       OFFICIAL,

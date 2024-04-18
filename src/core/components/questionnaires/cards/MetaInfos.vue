@@ -18,36 +18,26 @@
 
 <script>
 import { toRefs, computed } from 'vue';
-import { composeCourseName } from '@helpers/courses';
+import { composeCourseName, getQuestionnaireTypeTitle } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
-import { EXPECTATIONS, END_OF_COURSE } from '@data/constants';
 
 export default {
   name: 'MetaInfos',
   components: { },
   props: {
     course: { type: Object, required: true },
-    questionnaire: { type: Object, required: true },
+    questionnaires: { type: Array, required: true },
     traineeName: { type: String, required: true },
     displayName: { type: Boolean, default: true },
   },
   setup (props) {
-    const { course, questionnaire } = toRefs(props);
+    const { course, questionnaires } = toRefs(props);
 
     const { headerInfo } = useCourses(course);
 
     const programName = computed(() => (course.value.subProgram ? composeCourseName(course.value) : ''));
 
-    const questionnaireType = computed(() => {
-      switch (questionnaire.value.type) {
-        case EXPECTATIONS:
-          return 'de recueil des attentes';
-        case END_OF_COURSE:
-          return 'de fin de formation';
-        default:
-          return 'd\'auto-positionnement';
-      }
-    });
+    const questionnaireType = computed(() => getQuestionnaireTypeTitle(questionnaires.value.map(q => q.type)));
 
     return {
       // Computed
