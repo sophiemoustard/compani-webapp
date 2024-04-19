@@ -275,10 +275,10 @@ export default {
 
     const getQuestionnaireQRCode = async () => {
       try {
-        const publishedQuestionnnaires = await Questionnaires.list({ course: profileId.value });
-        questionnaireTypes.value = publishedQuestionnnaires.map(q => q.type).sort((a, b) => sortStrings(a, b));
+        const publishedQuestionnaires = await Questionnaires.list({ course: profileId.value });
+        questionnaireTypes.value = publishedQuestionnaires.map(q => q.type).sort((a, b) => sortStrings(a, b));
 
-        if (publishedQuestionnnaires.length) {
+        if (publishedQuestionnaires.length) {
           questionnaireQRCode.value = await Questionnaires.getQRCode({ course: profileId.value });
         }
       } catch (e) {

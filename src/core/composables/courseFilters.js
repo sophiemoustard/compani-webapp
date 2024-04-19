@@ -51,7 +51,7 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
 
   const updateSelectedProgram = programId => $store.dispatch('course/setSelectedProgram', { programId });
 
-  /* COMPANY */
+  /* HOLDING */
   const selectedHolding = computed(() => $store.state.course.selectedHolding);
 
   const holdingFilterOptions = computed(() => [

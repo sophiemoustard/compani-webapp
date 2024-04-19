@@ -11,7 +11,7 @@
     </div>
     <span class="questionnaire-type">Questionnaire {{ questionnaireType }}</span>
     <span v-if="displayName" class="trainee-identity">
-      Vous complétez ce questionnnaire en tant que: {{ traineeName }}
+      Vous complétez ce questionnaire en tant que: {{ traineeName }}
     </span>
   </div>
 </template>
