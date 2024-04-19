@@ -12,7 +12,7 @@ import {
   WITHOUT_SALES_REPRESENTATIVE,
 } from '@data/constants';
 
-export const useCourseFilters = (activeCourses, archivedCourses) => {
+export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions = []) => {
   const $store = useStore();
   const $router = useRouter();
 
@@ -50,6 +50,16 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
   });
 
   const updateSelectedProgram = programId => $store.dispatch('course/setSelectedProgram', { programId });
+
+  /* COMPANY */
+  const selectedHolding = computed(() => $store.state.course.selectedHolding);
+
+  const holdingFilterOptions = computed(() => [
+    { label: 'Toutes les sociétés mères', value: '' },
+    ...sortedUniqBy(holdingsOptions.value, 'value'),
+  ]);
+
+  const updateSelectedHolding = holdingId => $store.dispatch('course/setSelectedHolding', { holdingId });
 
   /* COMPANY */
   const selectedCompany = computed(() => $store.state.course.selectedCompany);
@@ -166,6 +176,8 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     trainerFilterOptions,
     selectedProgram,
     programFilterOptions,
+    selectedHolding,
+    holdingFilterOptions,
     selectedCompany,
     companyFilterOptions,
     selectedOperationsRepresentative,
@@ -181,6 +193,7 @@ export const useCourseFilters = (activeCourses, archivedCourses) => {
     // Methods
     updateSelectedTrainer,
     updateSelectedProgram,
+    updateSelectedHolding,
     updateSelectedCompany,
     updateSelectedOperationsRepresentative,
     updateSelectedStartDate,

@@ -9,8 +9,10 @@ export default {
   namespaced: true,
   state: {
     course: null,
+    companiesHoldings: null,
     selectedTrainer: '',
     selectedProgram: '',
+    selectedHolding: '',
     selectedCompany: '',
     selectedOperationsRepresentative: '',
     selectedStartDate: '',
@@ -23,8 +25,10 @@ export default {
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = data ? ({ ...data }) : data; },
+    SET_COMPANIES_HOLDINGS: (state, data) => { state.companiesHoldings = data ? ({ ...data }) : data; },
     SET_SELECTED_TRAINER: (state, data) => { state.selectedTrainer = data; },
     SET_SELECTED_PROGRAM: (state, data) => { state.selectedProgram = data; },
+    SET_SELECTED_HOLDING: (state, data) => { state.selectedHolding = data; },
     SET_SELECTED_COMPANY: (state, data) => { state.selectedCompany = data; },
     SET_SELECTED_OPERATIONS_REPRESENTATIVE: (state, data) => { state.selectedOperationsRepresentative = data; },
     SET_SELECTED_START_DATE: (state, data) => { state.selectedStartDate = data; },
@@ -61,8 +65,11 @@ export default {
       }
     },
     resetCourse: ({ commit }) => { commit('SET_COURSE', null); },
+    setCompaniesHoldings: ({ commit }, params) => { commit('SET_COMPANIES_HOLDINGS', params.companiesHoldings); },
+    resetCompaniesHoldings: ({ commit }) => { commit('SET_COMPANIES_HOLDINGS', null); },
     setSelectedTrainer: ({ commit }, params) => { commit('SET_SELECTED_TRAINER', params.trainerId); },
     setSelectedProgram: ({ commit }, params) => { commit('SET_SELECTED_PROGRAM', params.programId); },
+    setSelectedHolding: ({ commit }, params) => { commit('SET_SELECTED_HOLDING', params.holdingId); },
     setSelectedCompany: ({ commit }, params) => { commit('SET_SELECTED_COMPANY', params.companyId); },
     setSelectedOperationsRepresentative: ({ commit }, params) => {
       commit('SET_SELECTED_OPERATIONS_REPRESENTATIVE', params.operationsRepresentativeId);
@@ -79,6 +86,7 @@ export default {
     resetFilters: ({ commit }, params = {}) => {
       commit('SET_SELECTED_TRAINER', '');
       commit('SET_SELECTED_PROGRAM', '');
+      commit('SET_SELECTED_HOLDING', '');
       commit('SET_SELECTED_COMPANY', '');
       commit('SET_SELECTED_OPERATIONS_REPRESENTATIVE', '');
       commit('SET_SELECTED_START_DATE', '');

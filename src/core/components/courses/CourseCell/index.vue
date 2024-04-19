@@ -56,6 +56,7 @@ export default {
   setup (props) {
     const $store = useStore();
     const { course } = toRefs(props);
+    const companiesIds = course.value.companies.map(company => company._id);
 
     const { headerInfo, isVendorInterface, vendorRole } = useCourses(course);
 
@@ -63,8 +64,15 @@ export default {
 
     const attachCompany = computed(() => isVendorInterface || loggedUser.value.role.holding);
 
+    const companiesHoldings = computed(() => {
+      const companiesHoldingsList = $store.state.course.companiesHoldings;
+
+      return companiesIds.map(companyId => companiesHoldingsList[companyId]);
+    });
+
     const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
     const selectedProgram = computed(() => $store.state.course.selectedProgram);
+    const selectedHolding = computed(() => $store.state.course.selectedHolding);
     const selectedCompany = computed(() => $store.state.course.selectedCompany);
     const selectedOperationsRepresentative = computed(() => $store.state.course.selectedOperationsRepresentative);
     const selectedStartDate = computed(() => $store.state.course.selectedStartDate);
@@ -123,8 +131,13 @@ export default {
         if (selectedTrainer.value !== WITHOUT_TRAINER && courseTrainer !== selectedTrainer.value) return false;
       }
 
-      const companiesIds = course.value.companies.map(company => company._id);
       if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
+
+      const holdingId = get(course.value, 'holding._id');
+      if (selectedHolding.value && holdingId !== selectedHolding.value &&
+        !companiesHoldings.value.includes(selectedHolding.value)) {
+        return false;
+      }
 
       if (selectedOperationsRepresentative.value &&
         course.value.operationsRepresentative._id !== selectedOperationsRepresentative.value) {
