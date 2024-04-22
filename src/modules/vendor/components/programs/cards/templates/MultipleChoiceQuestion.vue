@@ -37,8 +37,8 @@ import {
 } from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import Button from '@components/Button';
+import { useCardTemplate } from '../../../../composables/CardTemplate';
 
 export default {
   name: 'MultipleChoiceQuestion',
@@ -50,7 +50,6 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
   },
-  mixins: [templateMixin],
   emits: ['refresh'],
   setup (props, { emit }) {
     const { disableEdition, cardParent } = toRefs(props);
@@ -74,6 +73,20 @@ export default {
 
     const v$ = useVuelidate(rules, { card });
 
+    const refreshCard = () => {
+      emit('refresh');
+    };
+
+    const {
+      updateCard,
+      getError,
+      saveTmp,
+      addAnswer,
+      updateTextAnswer,
+      validateAnswerDeletion,
+      questionErrorMsg,
+    } = useCardTemplate(card, v$, refreshCard);
+
     const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
       card.value.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT);
 
@@ -82,10 +95,6 @@ export default {
 
     const requiredOneCorrectAnswer = index => !get(v$.value, 'card.qcAnswers.minOneCorrectAnswer.$response') &&
       !!card.value.qcAnswers[index].text;
-
-    const refreshCard = () => {
-      emit('refresh');
-    };
 
     const updateCorrectAnswer = async (index) => {
       try {
@@ -123,11 +132,18 @@ export default {
       card,
       disableAnswerCreation,
       disableAnswerDeletion,
+      questionErrorMsg,
       // Methods
       requiredOneCorrectAnswer,
       updateCorrectAnswer,
       answersErrorMsg,
       answerIsRequired,
+      updateCard,
+      getError,
+      saveTmp,
+      addAnswer,
+      updateTextAnswer,
+      validateAnswerDeletion,
     };
   },
 };
