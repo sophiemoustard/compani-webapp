@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength } from '@vuelidate/validators';
@@ -27,23 +29,32 @@ export default {
   },
   mixins: [templateMixin],
   setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: {
         text: { required, maxLength: maxLength(FLASHCARD_TEXT_MAX_LENGTH) },
         backText: { required, maxLength: maxLength(FLASHCARD_TEXT_MAX_LENGTH) },
       },
-    };
-  },
-  methods: {
-    textErrorMessage (modifiedText) {
+    }));
+
+    const v$ = useVuelidate(rules, { card });
+
+    const textErrorMessage = (modifiedText) => {
       if (get(modifiedText, 'required.$response') === false) return REQUIRED_LABEL;
       if (get(modifiedText, 'maxLength.$response') === false) return `${FLASHCARD_TEXT_MAX_LENGTH} caractères maximum.`;
 
       return '';
-    },
+    };
+
+    return {
+      // Validation
+      v$,
+      // Methods
+      textErrorMessage,
+    };
   },
 };
 </script>
