@@ -44,7 +44,7 @@ import {
   validCaracters,
 } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { useCardTemplate } from '../../../../composables/CardTemplate';
 
 export default {
   name: 'FillTheGaps',
@@ -56,8 +56,8 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
   },
-  mixins: [templateMixin],
-  setup (props) {
+  emits: ['refresh'],
+  setup (props, { emit }) {
     const { disableEdition, cardParent } = toRefs(props);
     const $store = useStore();
 
@@ -76,6 +76,18 @@ export default {
     }));
 
     const v$ = useVuelidate(rules, { card });
+
+    const refreshCard = () => {
+      emit('refresh');
+    };
+
+    const {
+      updateCard,
+      getError,
+      saveTmp,
+      addAnswer, updateTextAnswer,
+      validateAnswerDeletion,
+    } = useCardTemplate(card, v$, refreshCard);
 
     const gappedTextTagCodeErrorMsg = computed(() => {
       const modifiedText = v$.value.card.gappedText;
@@ -132,6 +144,12 @@ export default {
       // Methods
       answerIsRequired,
       falsyGapAnswersErrorMsg,
+      updateCard,
+      getError,
+      saveTmp,
+      addAnswer,
+      updateTextAnswer,
+      validateAnswerDeletion,
     };
   },
 };
