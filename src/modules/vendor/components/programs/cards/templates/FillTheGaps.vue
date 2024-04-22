@@ -85,7 +85,8 @@ export default {
       updateCard,
       getError,
       saveTmp,
-      addAnswer, updateTextAnswer,
+      addAnswer,
+      updateTextAnswer,
       validateAnswerDeletion,
     } = useCardTemplate(card, v$, refreshCard);
 

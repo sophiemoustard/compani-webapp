@@ -16,8 +16,8 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength } from '@vuelidate/validators';
 import Input from '@components/form/Input';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import { REQUIRED_LABEL, FLASHCARD_TEXT_MAX_LENGTH } from '@data/constants';
+import { useCardTemplate } from '../../../../composables/CardTemplate';
 
 export default {
   name: 'Flashcard',
@@ -27,8 +27,8 @@ export default {
   components: {
     'ni-input': Input,
   },
-  mixins: [templateMixin],
-  setup () {
+  emits: ['refresh'],
+  setup (_, { emit }) {
     const $store = useStore();
 
     const card = computed(() => $store.state.card.card);
@@ -42,6 +42,12 @@ export default {
 
     const v$ = useVuelidate(rules, { card });
 
+    const refreshCard = () => {
+      emit('refresh');
+    };
+
+    const { updateCard, saveTmp } = useCardTemplate(card, v$, refreshCard);
+
     const textErrorMessage = (modifiedText) => {
       if (get(modifiedText, 'required.$response') === false) return REQUIRED_LABEL;
       if (get(modifiedText, 'maxLength.$response') === false) return `${FLASHCARD_TEXT_MAX_LENGTH} caractères maximum.`;
@@ -52,8 +58,12 @@ export default {
     return {
       // Validation
       v$,
+      // Computed
+      card,
       // Methods
       textErrorMessage,
+      updateCard,
+      saveTmp,
     };
   },
 };
