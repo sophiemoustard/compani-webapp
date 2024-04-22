@@ -22,6 +22,8 @@
 </template>
 
 <script>
+import { computed, toRefs } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
@@ -55,11 +57,13 @@ export default {
     'ni-button': Button,
   },
   mixins: [templateMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+  setup (props) {
+    const { disableEdition, cardParent } = toRefs(props);
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: {
         gappedText: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
         falsyGapAnswers: {
@@ -69,11 +73,12 @@ export default {
         },
         explanation: { required },
       },
-    };
-  },
-  computed: {
-    gappedTextTagCodeErrorMsg () {
-      const modifiedText = this.v$.card.gappedText;
+    }));
+
+    const v$ = useVuelidate(rules, { card });
+
+    const gappedTextTagCodeErrorMsg = computed(() => {
+      const modifiedText = v$.value.card.gappedText;
       if (get(modifiedText, 'required.$response') === false) return REQUIRED_LABEL;
       if (get(modifiedText, 'validTagsCount.$response') === false) return 'Le nombre de trous doit être de 1 ou 2';
       if (get(modifiedText, 'validTagging.$response') === false) {
@@ -91,31 +96,43 @@ export default {
       }
 
       return '';
-    },
-    disableAnswerCreation () {
-      return this.card.falsyGapAnswers.length >= FILL_THE_GAPS_MAX_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-    disableAnswerDeletion () {
-      return this.card.falsyGapAnswers.length <= FILL_THE_GAPS_MIN_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-  },
-  methods: {
-    falsyGapAnswersErrorMsg (index) {
-      const validation = this.v$.card.falsyGapAnswers.$each.$response.$errors[index].text;
+    });
 
-      if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
-      if (get(validation, '0.$validator') === 'maxLength') return `${GAP_ANSWER_MAX_LENGTH} caractères maximum.`;
-      if (get(validation, '0.$validator') === 'validCaracters') {
-        return 'Caractère invalide détecté (seuls - \' ESPACE permis)';
+    const disableAnswerCreation = computed(() => card.value.falsyGapAnswers.length >= FILL_THE_GAPS_MAX_ANSWERS_COUNT ||
+        disableEdition.value || cardParent.value.status === PUBLISHED);
+
+    const disableAnswerDeletion = computed(() => card.value.falsyGapAnswers.length <= FILL_THE_GAPS_MIN_ANSWERS_COUNT ||
+        disableEdition.value || cardParent.value.status === PUBLISHED);
+
+    const falsyGapAnswersErrorMsg = (index) => {
+      const validation = v$.value.card.falsyGapAnswers.$each.$response.$errors[index].text;
+
+      switch (get(validation, '0.$validator')) {
+        case 'required':
+          return REQUIRED_LABEL;
+        case 'maxLength':
+          return `${GAP_ANSWER_MAX_LENGTH} caractères maximum.`;
+        case 'validCaracters':
+          return 'Caractère invalide détecté (seuls - \' ESPACE permis)';
+        default:
+          return '';
       }
+    };
 
-      return '';
-    },
-    answerIsRequired (index) {
-      return index < FILL_THE_GAPS_MIN_ANSWERS_COUNT;
-    },
+    const answerIsRequired = index => index < FILL_THE_GAPS_MIN_ANSWERS_COUNT;
+
+    return {
+      // Validation
+      v$,
+      // Computed
+      gappedTextTagCodeErrorMsg,
+      disableAnswerCreation,
+      disableAnswerDeletion,
+      card,
+      // Methods
+      answerIsRequired,
+      falsyGapAnswersErrorMsg,
+    };
   },
 };
 </script>
