@@ -83,7 +83,10 @@ export default {
 
     onBeforeUnmount(() => {
       $store.dispatch('course/resetCourse');
-      if ($route.name !== 'ni courses') $store.dispatch('course/resetFilters');
+      if ($route.name !== 'ni courses') {
+        $store.dispatch('course/resetFilters');
+        $store.dispatch('course/resetCompaniesHoldings');
+      }
       if ($route.name !== 'ni courses bills') $store.dispatch('company/resetCompany');
     });
 
