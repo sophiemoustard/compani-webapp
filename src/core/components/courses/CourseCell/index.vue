@@ -22,6 +22,7 @@
 <script>
 import { computed, toRefs } from 'vue';
 import get from 'lodash/get';
+import compact from 'lodash/compact';
 import { useStore } from 'vuex';
 import {
   FORTHCOMING,
@@ -64,10 +65,10 @@ export default {
 
     const attachCompany = computed(() => isVendorInterface || loggedUser.value.role.holding);
 
-    const companiesHoldings = computed(() => {
+    const holdingsLinkedToCourse = computed(() => {
       const companiesHoldingsList = $store.state.course.companiesHoldings;
 
-      return companiesIds.map(companyId => companiesHoldingsList[companyId]);
+      return compact([...new Set(companiesIds.map(companyId => companiesHoldingsList[companyId]))]);
     });
 
     const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
@@ -135,7 +136,7 @@ export default {
 
       const holdingId = get(course.value, 'holding._id');
       if (selectedHolding.value && holdingId !== selectedHolding.value &&
-        !companiesHoldings.value.includes(selectedHolding.value)) {
+        !holdingsLinkedToCourse.value.includes(selectedHolding.value)) {
         return false;
       }
 
