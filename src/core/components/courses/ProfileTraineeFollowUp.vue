@@ -17,10 +17,8 @@
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
       <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell v-if="expectationsQuestionnaireId" :img="expectationsQRCode" :type="EXPECTATIONS"
-          @click="goToQuestionnaireProfile(expectationsQuestionnaireId)" />
-        <ni-questionnaire-qrcode-cell v-if="endOfCourseQuestionnaireId" :img="endOfCourseQRCode" :type="END_OF_COURSE"
-          @click="goToQuestionnaireProfile(endOfCourseQuestionnaireId)" />
+        <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" :types="questionnaireTypes"
+          @click="goToQuestionnaireProfile" />
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
@@ -90,14 +88,13 @@ import {
   DD_MM_YYYY,
   END_OF_COURSE,
   EXPECTATIONS,
-  PUBLISHED,
   OFFICIAL,
   CUSTOM,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
 import { getISOTotalDuration, ascendingSort } from '@helpers/dates/utils';
-import { formatIdentity, formatQuantity, formatDownloadName } from '@helpers/utils';
+import { formatIdentity, formatQuantity, formatDownloadName, sortStrings } from '@helpers/utils';
 import { composeCourseName, formatSlotSchedule } from '@helpers/courses';
 import { downloadZip } from '@helpers/file';
 import { defineAbilitiesForCourse } from '@helpers/ability';
@@ -134,10 +131,8 @@ export default {
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
-    const expectationsQuestionnaireId = ref();
-    const endOfCourseQuestionnaireId = ref();
-    const expectationsQRCode = ref('');
-    const endOfCourseQRCode = ref('');
+    const questionnaireQRCode = ref('');
+    const questionnaireTypes = ref([]);
 
     const course = computed(() => $store.state.course.course);
 
@@ -160,8 +155,7 @@ export default {
 
     const areQuestionnaireAnswersVisible = computed(() => questionnaires.value.length);
 
-    const areQuestionnaireQRCodeVisible = computed(() => expectationsQuestionnaireId.value ||
-      endOfCourseQuestionnaireId.value);
+    const areQuestionnaireQRCodeVisible = computed(() => questionnaireQRCode.value);
 
     const areQuestionnaireVisible = computed(() => (!isClientInterface &&
       (areQuestionnaireAnswersVisible.value || areQuestionnaireQRCodeVisible.value)));
@@ -279,22 +273,13 @@ export default {
       }
     };
 
-    const refreshQuestionnaireLinks = async () => {
+    const getQuestionnaireQRCode = async () => {
       try {
-        const publishedQuestionnnaires = await Questionnaires.list({ status: PUBLISHED });
+        const publishedQuestionnaires = await Questionnaires.list({ course: profileId.value });
+        questionnaireTypes.value = publishedQuestionnaires.map(q => q.type).sort((a, b) => sortStrings(a, b));
 
-        expectationsQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === EXPECTATIONS), '_id');
-        if (expectationsQuestionnaireId.value) {
-          const expectationsCode = await Questionnaires
-            .getQRCode(expectationsQuestionnaireId.value, { course: profileId.value });
-          expectationsQRCode.value = expectationsCode;
-        }
-
-        endOfCourseQuestionnaireId.value = get(publishedQuestionnnaires.find(q => q.type === END_OF_COURSE), '_id');
-        if (endOfCourseQuestionnaireId.value) {
-          const endOfCourseCode = await Questionnaires
-            .getQRCode(endOfCourseQuestionnaireId.value, { course: profileId.value });
-          endOfCourseQRCode.value = endOfCourseCode;
+        if (publishedQuestionnaires.length) {
+          questionnaireQRCode.value = await Questionnaires.getQRCode({ course: profileId.value });
         }
       } catch (e) {
         console.error(e);
@@ -302,19 +287,15 @@ export default {
       }
     };
 
-    const goToQuestionnaireProfile = (questionnaireId) => {
-      const questionnaire = $router.resolve({
-        name: 'ni questionnaires',
-        params: { questionnaireId },
-        query: { courseId: profileId.value },
-      });
+    const goToQuestionnaireProfile = () => {
+      const questionnaire = $router.resolve({ name: 'ni questionnaires', query: { courseId: profileId.value } });
 
       window.open(questionnaire.href, '_blank');
     };
 
     const created = async () => {
       const promises = [getFollowUp(), getUnsubscribedAttendances()];
-      if (!isClientInterface) promises.push(refreshQuestionnaires(), refreshQuestionnaireLinks());
+      if (!isClientInterface) promises.push(refreshQuestionnaires(), getQuestionnaireQRCode());
 
       await Promise.all(promises);
     };
@@ -330,11 +311,9 @@ export default {
       isIntraOrIntraHoldingOrVendor,
       learners,
       learnersLoading,
-      expectationsQuestionnaireId,
-      endOfCourseQuestionnaireId,
-      expectationsQRCode,
-      endOfCourseQRCode,
+      questionnaireQRCode,
       isClientInterface,
+      questionnaireTypes,
       EXPECTATIONS,
       END_OF_COURSE,
       OFFICIAL,

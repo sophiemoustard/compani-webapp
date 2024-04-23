@@ -3,7 +3,7 @@
   display: flex
   flex-direction: column
   flex: 1
-  height: 100vh
+  min-height: 100vh
   align-items: center
   padding: 5% 10%
   @media screen and (max-width: $breakpoint-md)
@@ -34,6 +34,13 @@
   padding: 2% 10% 5% 10%
   @media screen and (max-width: $breakpoint-md)
     padding: 10%
+  & .input-caption
+    font-size: 16px
+  & .q-option-group
+    .q-checkbox__label
+      font-size: 16px !important
+  & .title
+    font-size: 20px
 
 .card
   padding: 16px 32px

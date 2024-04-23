@@ -1,35 +1,32 @@
 <template>
   <q-card class="questionnaire-link">
-    <text class="questionnaire-info">Répondre au questionnaire de {{ questionnaireTypeTitle }}</text>
+    <text class="questionnaire-info">Répondre au questionnaire {{ questionnaireTypeTitle }}</text>
     <div class="questionnaire-qrcode">
       <img :src="img" width="160" :alt="qrCodePlaceHolder">
     </div>
     <a class="clickable-name cursor-pointer text-link" @click="onClick">
-      Lien pour répondre au questionnaire de {{ questionnaireTypeTitle }}
+      Lien pour répondre au questionnaire {{ questionnaireTypeTitle }}
     </a>
   </q-card>
 </template>
 
 <script>
 import { toRefs, computed } from 'vue';
-import { EXPECTATIONS } from '../../data/constants';
+import { getQuestionnaireTypeTitle } from '@helpers/courses';
 
 export default {
   name: 'QuestionnaireQRCodeCell',
   props: {
     img: { type: String, required: true },
-    type: { type: String, required: true },
+    types: { type: Array, required: true },
   },
   emits: ['click'],
   setup (props, { emit }) {
-    const { type } = toRefs(props);
+    const { types } = toRefs(props);
 
-    const questionnaireTypeTitle = computed(() => (type.value === EXPECTATIONS
-      ? 'recueil des attentes'
-      : 'fin de formation'));
+    const questionnaireTypeTitle = computed(() => getQuestionnaireTypeTitle(types.value));
 
-    const qrCodePlaceHolder = computed(() => `QR Code pour répondre au questionnaire
-      de ${questionnaireTypeTitle.value}`);
+    const qrCodePlaceHolder = computed(() => `QR Code pour répondre au questionnaire ${questionnaireTypeTitle.value}`);
 
     const onClick = () => emit('click');
 

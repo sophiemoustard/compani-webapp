@@ -9,38 +9,35 @@
         <q-item-section>{{ info.label }}</q-item-section>
       </q-item>
     </div>
-    <span class="questionnaire-type">Questionnaire de {{ questionnaireType }}</span>
+    <span class="questionnaire-type">Questionnaire {{ questionnaireType }}</span>
     <span v-if="displayName" class="trainee-identity">
-      Vous complétez ce questionnnaire en tant que: {{ traineeName }}
+      Vous complétez ce questionnaire en tant que: {{ traineeName }}
     </span>
   </div>
 </template>
 
 <script>
 import { toRefs, computed } from 'vue';
-import { composeCourseName } from '@helpers/courses';
+import { composeCourseName, getQuestionnaireTypeTitle } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
-import { EXPECTATIONS } from '@data/constants';
 
 export default {
   name: 'MetaInfos',
   components: { },
   props: {
     course: { type: Object, required: true },
-    questionnaire: { type: Object, required: true },
+    questionnaires: { type: Array, required: true },
     traineeName: { type: String, required: true },
     displayName: { type: Boolean, default: true },
   },
   setup (props) {
-    const { course, questionnaire } = toRefs(props);
+    const { course, questionnaires } = toRefs(props);
 
     const { headerInfo } = useCourses(course);
 
     const programName = computed(() => (course.value.subProgram ? composeCourseName(course.value) : ''));
 
-    const questionnaireType = computed(() => (questionnaire.value.type === EXPECTATIONS
-      ? 'recueil des attentes'
-      : 'fin de formation'));
+    const questionnaireType = computed(() => getQuestionnaireTypeTitle(questionnaires.value.map(q => q.type)));
 
     return {
       // Computed
@@ -59,7 +56,7 @@ export default {
   padding: 0 0 16px 0
 .title
   @media screen and (max-width: $breakpoint-md)
-    font-size: 12px
+    font-size: 20px
   text-align: center
   color: $copper-grey-700
 .items-container
@@ -75,10 +72,10 @@ export default {
   font-weight: bold
   color: $copper-grey-700
   @media screen and (max-width: $breakpoint-md)
-    font-size: 14px
+    font-size: 16px
 .trainee-identity
   font-style: italic
-  font-size: 12px
+  font-size: 14px
   color: $copper-grey-500
   text-align: center
 </style>

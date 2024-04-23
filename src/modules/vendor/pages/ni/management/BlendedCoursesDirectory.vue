@@ -3,6 +3,8 @@
     <ni-directory-header title="Formations" :display-search-bar="false" />
     <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     <div class="filters-container">
+      <ni-select :options="holdingFilterOptions" :model-value="selectedHolding" clearable
+        @update:model-value="updateSelectedHolding" />
       <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
         @update:model-value="updateSelectedCompany" />
       <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
@@ -134,6 +136,10 @@ export default {
     const refreshHoldings = async () => {
       try {
         const holdings = await Holdings.list();
+        const companiesHoldings = holdings
+          .flatMap(h => h.companies.map(c => ({ [c]: h._id })))
+          .reduce((acc, obj) => ({ ...acc, ...obj }), {});
+        $store.dispatch('course/setCompaniesHoldings', { companiesHoldings });
         holdingOptions.value = formatAndSortOptions(holdings, 'name');
       } catch (e) {
         console.error(e);
@@ -202,6 +208,8 @@ export default {
 
     const {
       typeFilterOptions,
+      selectedHolding,
+      holdingFilterOptions,
       selectedCompany,
       companyFilterOptions,
       selectedTrainer,
@@ -217,6 +225,7 @@ export default {
       selectedMissingTrainees,
       archiveStatusOptions,
       selectedArchiveStatus,
+      updateSelectedHolding,
       updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,
@@ -231,7 +240,7 @@ export default {
       selectedSalesRepresentative,
       updateSelectedSalesRepresentative,
       salesRepresentativeFilterOptions,
-    } = useCourseFilters(activeCourses, archivedCourses);
+    } = useCourseFilters(activeCourses, archivedCourses, holdingOptions);
 
     const refreshActiveCourses = async () => {
       try {
@@ -254,7 +263,10 @@ export default {
     };
 
     onBeforeRouteLeave((to) => {
-      if (to.name !== 'ni management blended courses info') resetFilters();
+      if (to.name !== 'ni management blended courses info') {
+        resetFilters();
+        $store.dispatch('course/resetCompaniesHoldings');
+      }
     });
 
     /* MAIN */
@@ -307,6 +319,8 @@ export default {
       archiveStatusOptions,
       typeFilterOptions,
       // Computed
+      selectedHolding,
+      holdingFilterOptions,
       selectedCompany,
       companyFilterOptions,
       selectedTrainer,
@@ -327,6 +341,7 @@ export default {
       openCourseCreationModal,
       resetCreationModal,
       createCourse,
+      updateSelectedHolding,
       updateSelectedCompany,
       updateSelectedTrainer,
       updateSelectedProgram,

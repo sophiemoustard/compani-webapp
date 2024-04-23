@@ -1,4 +1,14 @@
-import { E_LEARNING, ON_SITE, STEP_TYPES, INTRA, SHORT_DURATION_H_MM, PT0S } from '@data/constants';
+import {
+  E_LEARNING,
+  ON_SITE,
+  STEP_TYPES,
+  INTRA,
+  SHORT_DURATION_H_MM,
+  PT0S,
+  EXPECTATIONS,
+  END_OF_COURSE,
+  SELF_POSITIONNING,
+} from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { formatIntervalHourly, getISODuration } from './dates/utils';
@@ -29,3 +39,24 @@ export const computeDuration = steps => (steps.length
   ? steps.reduce((acc, s) => (s.theoreticalDuration ? acc.add(s.theoreticalDuration) : acc), CompaniDuration()).toISO()
   : PT0S
 );
+
+export const getQuestionnaireTypeTitle = (types) => {
+  const labels = [];
+  for (const type of types) {
+    switch (type) {
+      case EXPECTATIONS:
+        labels.push('de recueil des attentes');
+        break;
+      case END_OF_COURSE:
+        labels.push('de fin de formation');
+        break;
+      case SELF_POSITIONNING:
+        labels.push('d\'auto-positionnement');
+        break;
+      default:
+        break;
+    }
+  }
+
+  return labels.join(' et ');
+};
