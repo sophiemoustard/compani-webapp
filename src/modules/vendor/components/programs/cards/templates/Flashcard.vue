@@ -17,7 +17,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, maxLength } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import { REQUIRED_LABEL, FLASHCARD_TEXT_MAX_LENGTH } from '@data/constants';
-import { useCardTemplate } from '../../../../composables/CardTemplate';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'Flashcard',

@@ -38,7 +38,7 @@ import {
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
 import Button from '@components/Button';
-import { useCardTemplate } from '../../../../composables/CardTemplate';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'MultipleChoiceQuestion',

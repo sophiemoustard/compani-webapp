@@ -44,7 +44,7 @@ import {
   validCaracters,
 } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
-import { useCardTemplate } from '../../../../composables/CardTemplate';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'FillTheGaps',

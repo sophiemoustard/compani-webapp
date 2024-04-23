@@ -3,7 +3,6 @@ import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
-import { QUESTION_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
   FILL_THE_GAPS,
@@ -11,7 +10,9 @@ import {
   ORDER_THE_SEQUENCE,
   QUESTION_ANSWER,
   SINGLE_CHOICE_QUESTION,
-} from '../../../core/data/constants';
+  QUESTION_MAX_LENGTH,
+  REQUIRED_LABEL,
+} from '@data/constants';
 
 export const useCardTemplate = (card, v$, refreshCard) => {
   const tmpInput = ref('');
