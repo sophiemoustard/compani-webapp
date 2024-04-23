@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "~7.23.10",
-    "@quasar/app-webpack": "~3.4.7",
+    "@quasar/app-webpack": "~3.12.6",
     "@quasar/cli": "~2.3.0",
     "@quasar/quasar-app-extension-testing-e2e-cypress": "~4.1.2",
     "@vue/cli-service": "~5.0.4",
