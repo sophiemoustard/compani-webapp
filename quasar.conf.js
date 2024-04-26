@@ -71,9 +71,7 @@ module.exports = configure(ctx => ({
     directives: ['Ripple', 'ClosePopup'],
     plugins: ['Notify', 'Cookies', 'Loading', 'Dialog', 'LocalStorage', 'Meta'],
   },
-  boot: [
-    ctx.dev ? 'localEntry' : '',
-  ],
+  boot: [ctx && ctx.dev ? 'localEntry' : ''],
   animations: ['fadeIn', 'fadeOut'],
   supportIE: true,
   build: {
