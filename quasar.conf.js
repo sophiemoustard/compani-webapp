@@ -71,6 +71,9 @@ module.exports = configure(ctx => ({
     directives: ['Ripple', 'ClosePopup'],
     plugins: ['Notify', 'Cookies', 'Loading', 'Dialog', 'LocalStorage', 'Meta'],
   },
+  boot: [
+    ctx.dev ? 'localEntry' : '',
+  ],
   animations: ['fadeIn', 'fadeOut'],
   supportIE: true,
   build: {
@@ -107,8 +110,7 @@ module.exports = configure(ctx => ({
 
             return false;
           },
-        }),
-        new webpack.DefinePlugin({ __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false' })
+        })
       );
     },
     env: {
