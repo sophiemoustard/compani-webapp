@@ -1,5 +1,3 @@
 import { boot } from 'quasar/wrappers';
 
-export default boot(async ({ app }) => {
-  app.config.performance = false;
-});
+export default boot(({ app }) => { app.config.performance = false; });
