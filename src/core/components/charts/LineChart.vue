@@ -2,7 +2,7 @@
   <div>
     <q-card flat class="q-pa-md">
       <div class="text-weight-bold q-mb-md">{{ title }}</div>
-      <vue-chart-line-chart v-bind="lineChartProps" class="line-chart" />
+      <vue-chart-line-chart :options="options" :data="chartData" class="line-chart" />
     </q-card>
   </div>
 </template>
@@ -10,7 +10,7 @@
 <script>
 import { getCssVar } from 'quasar';
 import { toRefs, computed } from 'vue';
-import { LineChart as VueChartLineChart, useLineChart } from 'vue-chart-3';
+import { Line as VueChartLineChart } from 'vue-chartjs';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -48,10 +48,10 @@ export default {
       maintainAspectRatio: false,
     }));
 
-    const { lineChartProps } = useLineChart({ options, chartData });
-
     return {
-      lineChartProps,
+      // Computed
+      options,
+      chartData,
     };
   },
 };

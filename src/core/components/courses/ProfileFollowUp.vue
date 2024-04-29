@@ -8,11 +8,11 @@
           <div class="self-center justify-center column learners-data">
             <div class="row items-center">
               <ni-e-learning-indicator :indicator="traineesOnGoingCount" class="q-pr-sm" />
-              <div>apprenant{{ traineesOnGoingCount > 1 ? 's' : '' }} en cours</div>
+              <div>{{ formatQuantity('apprenant',traineesOnGoingCount, 's', false) }} en cours</div>
             </div>
             <div class="row items-center">
               <ni-e-learning-indicator :indicator="traineesFinishedCount" class="q-pr-sm" />
-              <div>apprenant{{ traineesFinishedCount > 1 ? 's' : '' }} ayant terminé</div>
+              <div>{{ formatQuantity('apprenant', traineesFinishedCount, 's', false) }} ayant terminé</div>
             </div>
           </div>
         </q-card>
@@ -33,6 +33,7 @@ import { useTraineeFollowUp } from '@composables/traineeFollowUp';
 import { useCharts } from '@composables/charts';
 import CompaniDate from '@helpers/dates/companiDates';
 import { MONTH, DAY } from '@data/constants';
+import { formatQuantity } from '@helpers/utils';
 
 export default {
   name: 'ProfileFollowUp',
@@ -85,6 +86,7 @@ export default {
       traineesOnGoingCount,
       traineesFinishedCount,
       // Methods
+      formatQuantity,
     };
   },
 };
