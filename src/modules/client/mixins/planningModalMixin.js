@@ -23,7 +23,6 @@ import {
   HOURLY,
   ILLNESS,
   WORK_ACCIDENT,
-  COACH_ROLES,
   EVENT_TYPES,
   CUSTOMER,
   UNKNOWN_AVATAR,
@@ -93,9 +92,7 @@ export const planningModalMixin = {
       return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
     },
     customerProfileRedirect () {
-      return COACH_ROLES.includes(this.clientRole)
-        ? { name: 'ni customers info', params: { customerId: this.selectedCustomer._id } }
-        : { name: 'auxiliaries customers info', params: { customerId: this.selectedCustomer._id } };
+      return { name: 'ni customers info', params: { customerId: this.selectedCustomer._id } };
     },
     // Event creation
     customerSubscriptionsOptions () {

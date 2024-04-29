@@ -15,8 +15,6 @@ import {
 const coachRoutes = [
   { name: 'ni exports data', subscription: ERP },
   { name: 'ni exports history', subscription: ERP },
-  { name: 'ni auxiliaries', subscription: ERP },
-  { name: 'ni auxiliaries info', subscription: ERP },
   { name: 'ni customers', subscription: ERP },
   { name: 'ni customers info', subscription: ERP },
   { name: 'ni planning auxiliaries', subscription: ERP },
@@ -34,10 +32,8 @@ const coachRoutes = [
 const clientAdminRoutes = [
   ...coachRoutes,
   { name: 'ni config company' },
-  { name: 'ni config rh', subscription: ERP },
   { name: 'ni config customers', subscription: ERP },
   { name: 'ni config coach' },
-  { name: 'ni config tags', subscription: ERP },
   { name: 'ni billing to bill', subscription: ERP },
   { name: 'ni billing manual bills', subscription: ERP },
   { name: 'ni billing credit note', subscription: ERP },
@@ -48,21 +44,7 @@ const clientAdminRoutes = [
   { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [
-  { name: 'auxiliaries customers', subscription: ERP },
-  { name: 'auxiliaries customers info', subscription: ERP },
-  { name: 'auxiliaries pay', subscription: ERP },
-  { name: 'auxiliaries docs', subscription: ERP },
-  { name: 'auxiliaries contracts', subscription: ERP },
-  { name: 'auxiliaries info', subscription: ERP },
   { name: 'account client' },
-];
-const auxiliaryWithoutCompanyRoutes = [
-  { name: 'auxiliaries pay', subscription: ERP },
-  { name: 'auxiliaries contracts', subscription: ERP },
-  { name: 'account client' },
-];
-const planningReferentRoutes = [
-  ...auxiliaryRoutes,
 ];
 const helperRoutes = [
   { name: 'customers documents', subscription: ERP },
@@ -106,9 +88,9 @@ export const roleBasedAccessControl = {
   [HOLDING_ADMIN]: clientAdminRoutes,
   [CLIENT_ADMIN]: clientAdminRoutes,
   [COACH]: coachRoutes,
-  [AUXILIARY_WITHOUT_COMPANY]: auxiliaryWithoutCompanyRoutes,
+  [AUXILIARY_WITHOUT_COMPANY]: auxiliaryRoutes,
   [AUXILIARY]: auxiliaryRoutes,
-  [PLANNING_REFERENT]: planningReferentRoutes,
+  [PLANNING_REFERENT]: auxiliaryRoutes,
   [HELPER]: helperRoutes,
   [VENDOR_ADMIN]: vendorAdminRoutes,
   [TRAINING_ORGANISATION_MANAGER]: trainingOrganisationManagerRoutes,

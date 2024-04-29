@@ -18,14 +18,6 @@ export default {
       console.error(e.response);
     }
   },
-  async listActive (params = null) {
-    try {
-      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
-      return usersRaw.data.data.users;
-    } catch (e) {
-      console.error(e.response);
-    }
-  },
   async learnerList (params = null) {
     const learners = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/learners`, { params });
     return learners.data.data.users;
@@ -48,12 +40,6 @@ export default {
   async updateById (userId, data) {
     const updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data);
     return updatedUser;
-  },
-  async updateCertificates (userId, data) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/certificates`, data);
-  },
-  async createDriveFolder (userId) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`);
   },
   async uploadImage (userId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/upload`, payload);
