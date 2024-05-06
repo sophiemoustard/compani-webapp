@@ -1,17 +1,22 @@
 <template>
   <compani-header />
   <div class="questionnaire-container">
-    <meta-infos v-if="!isQuestionnaireAnswered" :course="course" :questionnaires="questionnaires"
-      :trainee-name="traineeName" :display-name="!isStartorEndCard" />
-    <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
-      :end-card-index="endCardIndex" @update-trainee="updateTrainee" />
-    <template v-for="(card, index) of cards" :key="card._id">
-      <card-template v-if="cardIndex === index" :card="card" />
+    <template v-if="cards.length">
+      <meta-infos v-if="!isQuestionnaireAnswered" :course="course" :questionnaires="questionnaires"
+        :trainee-name="traineeName" :display-name="!isStartorEndCard" />
+      <start v-if="cardIndex === startCardIndex" :course="course" :trainee="trainee" :validations="v$"
+        :end-card-index="endCardIndex" @update-trainee="updateTrainee" />
+      <template v-for="(card, index) of cards" :key="card._id">
+        <card-template v-if="cardIndex === index" :card="card" />
+      </template>
+      <end v-if="cardIndex === endCardIndex && !isQuestionnaireAnswered" :trainee-name="traineeName"
+        :loading="btnLoading" @submit="createHistory" />
+      <span v-if="cardIndex === endCardIndex && isQuestionnaireAnswered" class="end-text">
+        Merci d'avoir répondu au questionnaire ! Vous pouvez à présent fermer la fenêtre.
+      </span>
     </template>
-    <end v-if="cardIndex === endCardIndex && !isQuestionnaireAnswered" :trainee-name="traineeName" :loading="btnLoading"
-      @submit="createHistory" />
-    <span v-if="cardIndex === endCardIndex && isQuestionnaireAnswered" class="end-text">
-      Merci d'avoir répondu au questionnaire ! Vous pouvez à présent fermer la fenêtre.
+    <span v-else class="end-text">
+      Oups, une erreur est survenue. Ce questionnaire n'est plus accessible, merci de fermer cette page.
     </span>
   </div>
 </template>
