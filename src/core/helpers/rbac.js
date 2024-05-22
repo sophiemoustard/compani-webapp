@@ -73,6 +73,7 @@ const trainingOrganisationManagerRoutes = [
   { name: 'account vendor' },
   { name: 'ni exports history vendor' },
   { name: 'ni config main' },
+  { name: 'trainers questionnaire answers' },
 ];
 const vendorAdminRoutes = [...trainingOrganisationManagerRoutes];
 const trainerRoutes = [
@@ -82,6 +83,7 @@ const trainerRoutes = [
   { name: 'trainers contracts' },
   { name: 'account vendor' },
   { name: 'ni management questionnaire answers' },
+  { name: 'trainers questionnaire answers' },
 ];
 
 export const roleBasedAccessControl = {

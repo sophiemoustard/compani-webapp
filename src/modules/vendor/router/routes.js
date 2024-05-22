@@ -273,6 +273,16 @@ const routes = [
         },
       },
       {
+        path: 'trainers/management/questionnaires/:questionnaireId',
+        name: 'trainers questionnaire answers',
+        component: () => import('src/modules/vendor/pages/trainers/management/SelfPositionningAnswersProfile'),
+        props: route => ({ courseId: route.query.courseId }),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'management',
+        },
+      },
+      {
         path: 'trainers/info',
         name: 'trainers info',
         component: () => import('src/modules/vendor/pages/trainers/administrative/Info'),
