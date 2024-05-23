@@ -276,7 +276,7 @@ const routes = [
         path: 'trainers/management/questionnaires/:questionnaireId',
         name: 'trainers questionnaire answers',
         component: () => import('src/modules/vendor/pages/trainers/management/SelfPositionningAnswersProfile'),
-        props: route => ({ courseId: route.query.courseId }),
+        props: route => ({ ...route.params, ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',
