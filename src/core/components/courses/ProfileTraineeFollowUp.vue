@@ -90,6 +90,11 @@ import {
   EXPECTATIONS,
   OFFICIAL,
   CUSTOM,
+  ALL_PDF,
+  ALL_WORD,
+  SELF_POSITIONNING,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -100,13 +105,6 @@ import { downloadZip } from '@helpers/file';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
-import {
-  ALL_PDF,
-  ALL_WORD,
-  SELF_POSITIONNING,
-  TRAINING_ORGANISATION_MANAGER,
-  VENDOR_ADMIN,
-} from '../../data/constants';
 
 export default {
   name: 'ProfileTraineeFollowUp',
