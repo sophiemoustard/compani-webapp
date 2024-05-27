@@ -6,7 +6,7 @@
           @update:model-value="updateSelectedTrainee" class="selector" clearable />
       </template>
     </ni-profile-header>
-    {{ get(questionnaireAnswers, 'followUp', []).length }}
+    <span>{{ filteredQuestionnaireAnswers.length }} / {{ get(questionnaireAnswers, 'followUp', []).length }}</span>
   </q-page>
 </template>
 
@@ -62,6 +62,11 @@ export default {
       return formatAndSortIdentityOptions(trainees);
     });
 
+    const filteredQuestionnaireAnswers = computed(() => {
+      const followUp = get(questionnaireAnswers.value, 'followUp', []);
+      return followUp.filter(qa => qa.user === selectedTrainee.value);
+    });
+
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const created = async () => {
@@ -80,6 +85,7 @@ export default {
       // Computed
       headerInfo,
       traineeOptions,
+      filteredQuestionnaireAnswers,
     };
   },
 };
