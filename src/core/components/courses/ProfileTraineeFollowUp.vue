@@ -21,7 +21,7 @@
           @click="goToQuestionnaireProfile" />
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
-        <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
+        <questionnaire-answers-cell v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
     </div>
@@ -90,6 +90,11 @@ import {
   EXPECTATIONS,
   OFFICIAL,
   CUSTOM,
+  ALL_PDF,
+  ALL_WORD,
+  SELF_POSITIONNING,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -100,7 +105,6 @@ import { downloadZip } from '@helpers/file';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
-import { ALL_PDF, ALL_WORD, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '../../data/constants';
 
 export default {
   name: 'ProfileTraineeFollowUp',
@@ -180,6 +184,14 @@ export default {
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
       }
     };
+
+    const filteredQuestionnaires = computed(() => {
+      const loggedUserIsCourseTrainer = loggedUser.value._id === course.value.trainer._id;
+
+      return loggedUserIsCourseTrainer
+        ? questionnaires.value.filter(q => q.type !== SELF_POSITIONNING)
+        : questionnaires.value;
+    });
 
     const goToQuestionnaireAnswers = questionnaireId => $router.push(
       { name: 'ni management questionnaire answers', params: { courseId: course.value._id, questionnaireId } }
@@ -331,6 +343,7 @@ export default {
       areQuestionnaireQRCodeVisible,
       isRofOrVendorAdmin,
       canReadCompletionCertificate,
+      filteredQuestionnaires,
       // Methods
       get,
       formatQuantity,

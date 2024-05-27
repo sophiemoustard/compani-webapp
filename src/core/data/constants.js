@@ -449,7 +449,7 @@ export const OFFICIAL = 'official';
 // Email
 export const TRAINEE = 'trainee';
 
-// QUESTIONNAIRE TYPES
+// QUESTIONNAIRE
 export const EXPECTATIONS = 'expectations';
 export const END_OF_COURSE = 'end_of_course';
 export const SELF_POSITIONNING = 'self_positionning';
@@ -459,6 +459,7 @@ export const QUESTIONNAIRE_TYPES = {
   [END_OF_COURSE]: 'Fin de formation',
   [SELF_POSITIONNING]: 'Auto-positionnement',
 };
+export const REVIEW = 'review';
 
 // EXPORTS
 export const SERVICE = 'service';
