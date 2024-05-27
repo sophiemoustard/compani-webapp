@@ -1,7 +1,12 @@
 <template>
   <q-page padding class="vendor-background">
-    <ni-profile-header title="Auto-positionnement : réponses" :header-info="headerInfo" class="q-mb-xl" />
-    {{ get(questionnaireAnswers, 'followUp', []).length }}
+    <ni-profile-header title="Auto-positionnement : réponses" :header-info="headerInfo" class="q-mb-xl">
+      <template #title>
+        <ni-select caption="Apprenant(e)" :options="traineeOptions" :model-value="selectedTrainee"
+          @update:model-value="updateSelectedTrainee" class="selector" clearable />
+      </template>
+    </ni-profile-header>
+    <span>{{ filteredQuestionnaireAnswers.length }} / {{ get(questionnaireAnswers, 'followUp', []).length }}</span>
   </q-page>
 </template>
 
@@ -11,8 +16,10 @@ import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
 import { REVIEW, INTRA, INTRA_HOLDING } from '@data/constants';
 import { NotifyNegative } from '@components/popup/notify';
-import ProfileHeader from '@components/ProfileHeader.vue';
+import ProfileHeader from '@components/ProfileHeader';
+import Select from '@components/form/Select';
 import { composeCourseName } from '@helpers/courses';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 
 export default {
   name: 'SelfPositionningAnswersProfile',
@@ -22,10 +29,12 @@ export default {
   },
   components: {
     'ni-profile-header': ProfileHeader,
+    'ni-select': Select,
   },
   setup (props) {
     const { courseId, questionnaireId } = toRefs(props);
     const questionnaireAnswers = ref({});
+    const selectedTrainee = ref('');
 
     const getQuestionnaireAnswers = async () => {
       try {
@@ -48,6 +57,18 @@ export default {
       return infos;
     });
 
+    const traineeOptions = computed(() => {
+      const trainees = get(questionnaireAnswers.value, 'course.trainees', []);
+      return formatAndSortIdentityOptions(trainees);
+    });
+
+    const filteredQuestionnaireAnswers = computed(() => {
+      const followUp = get(questionnaireAnswers.value, 'followUp', []);
+      return followUp.filter(qa => qa.user === selectedTrainee.value);
+    });
+
+    const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
+
     const created = async () => {
       await getQuestionnaireAnswers();
     };
@@ -58,9 +79,19 @@ export default {
       // Data
       questionnaireAnswers,
       get,
+      selectedTrainee,
+      // Methods
+      updateSelectedTrainee,
       // Computed
       headerInfo,
+      traineeOptions,
+      filteredQuestionnaireAnswers,
     };
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.selector
+  width: 40%
+</style>
