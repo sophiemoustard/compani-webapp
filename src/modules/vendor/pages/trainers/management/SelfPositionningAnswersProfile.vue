@@ -6,6 +6,7 @@
           @update:model-value="updateSelectedTrainee" class="selector" clearable />
       </template>
     </ni-profile-header>
+    {{ filteredQuestionnaireAnswers }}
     <span>{{ filteredQuestionnaireAnswers.length }} / {{ get(questionnaireAnswers, 'followUp', []).length }}</span>
   </q-page>
 </template>
@@ -62,9 +63,22 @@ export default {
       return formatAndSortIdentityOptions(trainees);
     });
 
+    const formatHistory = (history) => {
+      const questionnaireAnswersList = history.questionnaireAnswersList
+        .map((a) => {
+          const { question, labels, _id } = a.card;
+          return { cardId: _id, question, labels, answer: a.answerList[0], timeline: history.timeline };
+        });
+
+      return { ...history, questionnaireAnswersList };
+    };
+
     const filteredQuestionnaireAnswers = computed(() => {
       const followUp = get(questionnaireAnswers.value, 'followUp', []);
-      return followUp.filter(qa => qa.user === selectedTrainee.value);
+
+      const traineeFollowUp = followUp.filter(qa => qa.user === selectedTrainee.value);
+
+      return traineeFollowUp.map(history => formatHistory(history));
     });
 
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
