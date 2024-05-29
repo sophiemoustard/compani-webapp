@@ -356,8 +356,9 @@ export const ACTIVITY_TYPES = [
   { label: 'Vidéo', value: VIDEO },
 ];
 
-// CARD CATEGORIES
+// QUESTIONNAIRE
 export const QUESTIONNAIRE = 'questionnaire';
+export const START_COURSE = 'start_course';
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';

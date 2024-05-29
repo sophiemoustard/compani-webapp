@@ -6,8 +6,9 @@
           @update:model-value="updateSelectedTrainee" class="selector" clearable />
       </template>
     </ni-profile-header>
-    {{ filteredQuestionnaireAnswers }}
-    <span>{{ filteredQuestionnaireAnswers.length }} / {{ get(questionnaireAnswers, 'followUp', []).length }}</span>
+    <q-card v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" class="q-mb-lg">
+      {{ card }}
+    </q-card>
   </q-page>
 </template>
 
@@ -15,7 +16,7 @@
 import { toRefs, ref, computed } from 'vue';
 import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
-import { REVIEW, INTRA, INTRA_HOLDING } from '@data/constants';
+import { REVIEW, INTRA, INTRA_HOLDING, START_COURSE } from '@data/constants';
 import { NotifyNegative } from '@components/popup/notify';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
@@ -75,10 +76,35 @@ export default {
 
     const filteredQuestionnaireAnswers = computed(() => {
       const followUp = get(questionnaireAnswers.value, 'followUp', []);
-
       const traineeFollowUp = followUp.filter(qa => qa.user === selectedTrainee.value);
+      const formattedTraineeQuestionnaireHistories = traineeFollowUp.map(history => formatHistory(history), 'user');
 
-      return traineeFollowUp.map(history => formatHistory(history));
+      const historiesByQuestion = {};
+      for (const history of formattedTraineeQuestionnaireHistories) {
+        const { questionnaireAnswersList } = history;
+
+        for (const card of questionnaireAnswersList) {
+          if (!historiesByQuestion[card.cardId]) {
+            historiesByQuestion[card.cardId] = {
+              answers: history.timeline === START_COURSE ? { startCourse: card.answer } : { endCourse: card.answer },
+              question: card.question,
+              labels: card.labels,
+            };
+          } else if (Object.keys(historiesByQuestion[card.cardId].answers).includes('startCourse')) {
+            historiesByQuestion[card.cardId].answers = {
+              ...historiesByQuestion[card.cardId].answers,
+              endCourse: card.answer,
+            };
+          } else if (Object.keys(historiesByQuestion[card.cardId].answers).includes('endCourse')) {
+            historiesByQuestion[card.cardId].answers = {
+              ...historiesByQuestion[card.cardId].answers,
+              startCourse: card.answer,
+            };
+          }
+        }
+      }
+
+      return historiesByQuestion;
     });
 
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
