@@ -6,8 +6,9 @@
           @update:model-value="updateSelectedTrainee" class="selector" clearable />
       </template>
     </ni-profile-header>
-    <q-card v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" class="q-mb-lg">
+    <q-card v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id">
       {{ card }}
+      <survey-labels-details :labels="card.labels" />
     </q-card>
   </q-page>
 </template>
@@ -16,12 +17,13 @@
 import { toRefs, ref, computed } from 'vue';
 import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
+import { composeCourseName } from '@helpers/courses';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { REVIEW, INTRA, INTRA_HOLDING, START_COURSE } from '@data/constants';
 import { NotifyNegative } from '@components/popup/notify';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
-import { composeCourseName } from '@helpers/courses';
-import { formatAndSortIdentityOptions } from '@helpers/utils';
+import SurveyLabelsDetails from '../../../components/questionnaires/SurveyLabelsDetails';
 
 export default {
   name: 'SelfPositionningAnswersProfile',
@@ -32,6 +34,7 @@ export default {
   components: {
     'ni-profile-header': ProfileHeader,
     'ni-select': Select,
+    'survey-labels-details': SurveyLabelsDetails,
   },
   setup (props) {
     const { courseId, questionnaireId } = toRefs(props);
