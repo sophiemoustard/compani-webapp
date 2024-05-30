@@ -1,16 +1,16 @@
 <template>
-  <div class="container">
-    <q-separator color="orange-100" />
-    <q-item-section @click="showDetails()" class="header">
-      Afficher le détail des légendes
-      <q-icon size="xs" :name="iconName" color="orange-300" />
-    </q-item-section>
-    <q-separator color="orange-100" />
-    <div v-if="showLabels" class="labels">
-      <template v-for="labelKey of Object.keys(labels)" :key="labelKey">
-        <div>{{ labelKey }} : {{ labels[labelKey] }}</div>
-      </template>
-    </div>
+  <div>
+    <q-card class="container clickable cursor-pointer" flat>
+      <q-item-section @click="showDetails()" class="header">
+        {{ showLabels ? 'Cacher' : 'Afficher' }} le détail des légendes
+        <q-icon size="xs" :name="iconName" color="copper-grey-700" />
+      </q-item-section>
+      <div v-if="showLabels" class="labels">
+        <template v-for="labelKey of Object.keys(labels)" :key="labelKey">
+          <div>{{ labelKey }} : {{ labels[labelKey] }}</div>
+        </template>
+      </div>
+    </q-card>
   </div>
 </template>
 
@@ -48,7 +48,7 @@ export default {
 <style lang="sass" scoped>
 .container
   margin: 16px
-  padding: 8px
+  background-color: $copper-grey-100
 .header
   display: flex
   flex-direction: row
@@ -57,6 +57,7 @@ export default {
   margin: 0px
   padding: 12px
 .labels
-  padding: 12px
-  font-size: 12px
+  padding: 0px 16px
+  font-size: 14px
+  color: $copper-grey-500
 </style>

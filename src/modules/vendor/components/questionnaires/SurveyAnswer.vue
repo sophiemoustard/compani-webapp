@@ -3,8 +3,8 @@
     <q-card class="container" flat>
       <q-card-section class="title">{{ title }}</q-card-section>
       <q-card-section>
-        <ni-rating v-if="answer" readonly :model-value="Number(answer)" :icon="icon" color="copper-500" />
-        <div class="answer q-px-md q-py-sm" v-else>Pas de note</div>
+        <ni-rating v-if="answer" readonly :model-value="Number(answer)" :icon="icon" color="copper-grey-500" />
+        <div class="answer q-px-md q-pb-md" v-else>Pas de note</div>
       </q-card-section>
     </q-card>
   </div>
@@ -41,6 +41,11 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.q-card
+  padding: 0px 16px
+  &__section
+    margin: 0px
+    padding: 0px
 .container
   margin: 16px
   padding: 16px 24px
@@ -50,14 +55,17 @@ export default {
   flex-direction: column
   flex: 1
 .answer
-  font-size: 36px
-  color: $primary
+  font-size: 24px
+  font-style: italic
+  color: $copper-600
   opacity: 0.8
   justify-content: center
+  padding: 20px 56px
 .title
   display: flex
   flex: 1
-  color: $primary
+  color: $copper-grey-700
   font-size: 24px
   justify-content: center
+  padding: 8px 0px 0px 0px
 </style>
