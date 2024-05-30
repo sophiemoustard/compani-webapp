@@ -6,6 +6,19 @@
           @update:model-value="updateSelectedTrainee" class="selector" clearable />
       </template>
     </ni-profile-header>
+    <ni-banner v-if="selectedTrainee" class="bg-peach-200" icon="info_outline">
+      <template #message>
+        Pour valider les réponses aux questionnaires d’auto-positionnement de fin, veuillez : <br>
+        <div class="q-pl-md">
+          <li>
+          pour chaque question : cocher “Je valide la note” ou cliquer sur “Ajuster la note” pour définir une
+          nouvelle note
+          </li>
+          <li>renseigner un commentaire si nécessaire</li>
+          <li>cliquer sur le bouton “Valider” pour enregistrer votre correction</li>
+        </div>
+      </template>
+    </ni-banner>
     <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card" />
   </q-page>
 </template>
@@ -20,6 +33,7 @@ import { REVIEW, INTRA, INTRA_HOLDING, START_COURSE } from '@data/constants';
 import { NotifyNegative } from '@components/popup/notify';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
+import Banner from '@components/Banner';
 import SelfPositionningItem from '../../../components/questionnaires/SelfPositionningItem';
 
 export default {
@@ -32,6 +46,7 @@ export default {
     'ni-profile-header': ProfileHeader,
     'ni-select': Select,
     'self-positionning-item': SelfPositionningItem,
+    'ni-banner': Banner,
   },
   setup (props) {
     const { courseId, questionnaireId } = toRefs(props);
