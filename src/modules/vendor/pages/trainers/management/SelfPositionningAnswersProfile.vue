@@ -6,13 +6,7 @@
           @update:model-value="updateSelectedTrainee" class="selector" clearable />
       </template>
     </ni-profile-header>
-    <q-card v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id">
-      <survey-labels-details :labels="card.labels" />
-      <div class="row">
-        <survey-answer title="Note de début" :answer="card.answers['startCourse'] || ''" />
-        <survey-answer title="Note de fin" :answer="card.answers['endCourse'] || ''" />
-      </div>
-    </q-card>
+    <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card" />
   </q-page>
 </template>
 
@@ -26,8 +20,7 @@ import { REVIEW, INTRA, INTRA_HOLDING, START_COURSE } from '@data/constants';
 import { NotifyNegative } from '@components/popup/notify';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
-import SurveyLabelsDetails from '../../../components/questionnaires/SurveyLabelsDetails';
-import SurveyAnswer from '../../../components/questionnaires/SurveyAnswer';
+import SelfPositionningItem from '../../../components/questionnaires/SelfPositionningItem';
 
 export default {
   name: 'SelfPositionningAnswersProfile',
@@ -38,8 +31,7 @@ export default {
   components: {
     'ni-profile-header': ProfileHeader,
     'ni-select': Select,
-    'survey-labels-details': SurveyLabelsDetails,
-    'survey-answer': SurveyAnswer,
+    'self-positionning-item': SelfPositionningItem,
   },
   setup (props) {
     const { courseId, questionnaireId } = toRefs(props);
