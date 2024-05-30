@@ -7,8 +7,11 @@
       </template>
     </ni-profile-header>
     <q-card v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id">
-      {{ card }}
       <survey-labels-details :labels="card.labels" />
+      <div class="row">
+        <survey-answer title="Note de début" :answer="card.answers['startCourse'] || ''" />
+        <survey-answer title="Note de fin" :answer="card.answers['endCourse'] || ''" />
+      </div>
     </q-card>
   </q-page>
 </template>
@@ -24,6 +27,7 @@ import { NotifyNegative } from '@components/popup/notify';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
 import SurveyLabelsDetails from '../../../components/questionnaires/SurveyLabelsDetails';
+import SurveyAnswer from '../../../components/questionnaires/SurveyAnswer';
 
 export default {
   name: 'SelfPositionningAnswersProfile',
@@ -35,6 +39,7 @@ export default {
     'ni-profile-header': ProfileHeader,
     'ni-select': Select,
     'survey-labels-details': SurveyLabelsDetails,
+    'survey-answer': SurveyAnswer,
   },
   setup (props) {
     const { courseId, questionnaireId } = toRefs(props);
