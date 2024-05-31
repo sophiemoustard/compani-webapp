@@ -42,30 +42,25 @@ export default {
 
 <style lang="sass" scoped>
 .q-card
-  padding: 0px 16px
+  padding: 16px 40px
+  margin: 16px
   &__section
     margin: 0px
     padding: 0px
 .container
-  margin: 16px
-  padding: 16px 24px
+  flex-direction: column
+  display: flex
+  flex: 1
+  align-items: center
   background-color: $peach-100
   border-radius: 8px
-  display: flex
-  flex-direction: column
-  flex: 1
 .answer
   font-size: 24px
   font-style: italic
-  color: $copper-600
-  opacity: 0.8
-  justify-content: center
+  color: $copper-grey-500
   padding: 20px 56px
 .title
-  display: flex
-  flex: 1
   color: $copper-grey-700
   font-size: 24px
-  justify-content: center
-  padding: 8px 0px 0px 0px
+  padding: 4px 0px
 </style>

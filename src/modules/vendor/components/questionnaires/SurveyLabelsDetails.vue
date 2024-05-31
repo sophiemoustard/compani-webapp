@@ -5,9 +5,9 @@
         {{ showLabels ? 'Cacher' : 'Afficher' }} le détail des légendes
         <q-icon size="xs" :name="iconName" color="copper-grey-700" />
       </q-item-section>
-      <div v-if="showLabels" class="labels">
+      <div v-if="showLabels" class="q-pb-md">
         <template v-for="labelKey of Object.keys(labels)" :key="labelKey">
-          <div>{{ labelKey }} : {{ labels[labelKey] }}</div>
+          <div class="label">{{ labelKey }} : {{ labels[labelKey] }}</div>
         </template>
       </div>
     </q-card>
@@ -46,6 +46,9 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+.q-item__section
+  margin: 0px
+  padding: 16px
 .container
   margin: 16px
   background-color: $copper-grey-100
@@ -53,11 +56,8 @@ export default {
   display: flex
   flex-direction: row
   justify-content: space-between
-.q-item__section
-  margin: 0px
-  padding: 12px
-.labels
-  padding: 0px 16px
+.label
+  padding: 4px 32px
   font-size: 14px
   color: $copper-grey-500
 </style>
