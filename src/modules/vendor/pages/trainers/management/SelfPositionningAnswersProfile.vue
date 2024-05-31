@@ -7,7 +7,7 @@
       </template>
     </ni-profile-header>
     <ni-banner v-if="selectedTrainee" class="bg-peach-200" icon="info_outline">
-      <template #message>
+      <template #message v-if="selectedTraineeHasEndQuestionnaireHistory">
         Pour valider les réponses aux questionnaires d’auto-positionnement de fin, veuillez : <br>
         <div class="q-pl-md">
           <li>
@@ -17,6 +17,12 @@
           <li>renseigner un commentaire si nécessaire</li>
           <li>cliquer sur le bouton “Valider” pour enregistrer votre correction</li>
         </div>
+      </template>
+      <template #message v-else-if="Object.keys(filteredQuestionnaireAnswers).length">
+        L'apprenant sélectionné n'a pas répondu au questionnaire d'auto-positionnement de fin de formation.
+      </template>
+      <template #message v-else>
+        L'apprenant sélectionné n'a répondu à aucun questionnaire d'auto-positionnement pour cette formation.
       </template>
     </ni-banner>
     <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card" />
@@ -52,17 +58,6 @@ export default {
     const { courseId, questionnaireId } = toRefs(props);
     const questionnaireAnswers = ref({});
     const selectedTrainee = ref('');
-
-    const getQuestionnaireAnswers = async () => {
-      try {
-        const query = { course: courseId.value, action: REVIEW };
-        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(questionnaireId.value, query);
-      } catch (e) {
-        questionnaireAnswers.value = {};
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des réponses au questionnaire.');
-      }
-    };
 
     const headerInfo = computed(() => {
       const { course } = questionnaireAnswers.value;
@@ -122,6 +117,19 @@ export default {
       return historiesByQuestion;
     });
 
+    const selectedTraineeHasEndQuestionnaireHistory = computed(() => Object.keys(filteredQuestionnaireAnswers).length &&
+      Object.values(filteredQuestionnaireAnswers.value).filter(a => !!get(a, 'answers.endCourse')).length);
+
+    const getQuestionnaireAnswers = async () => {
+      try {
+        const query = { course: courseId.value, action: REVIEW };
+        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(questionnaireId.value, query);
+      } catch (e) {
+        questionnaireAnswers.value = {};
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des réponses au questionnaire.');
+      }
+    };
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const created = async () => {
@@ -141,6 +149,7 @@ export default {
       headerInfo,
       traineeOptions,
       filteredQuestionnaireAnswers,
+      selectedTraineeHasEndQuestionnaireHistory,
     };
   },
 };
