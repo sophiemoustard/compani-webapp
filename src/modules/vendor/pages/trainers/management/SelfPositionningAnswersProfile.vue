@@ -7,8 +7,8 @@
       </template>
     </ni-profile-header>
     <ni-banner v-if="selectedTrainee" class="bg-peach-200" icon="info_outline">
-      <template #message v-if="selectedTraineeHasEndQuestionnaireHistory">
-        Pour valider les réponses aux questionnaires d’auto-positionnement de fin, veuillez : <br>
+      <template #message v-if="traineeHasEndQuestionnaireHistory">
+        Pour valider les réponses au questionnaire d’auto-positionnement de fin, veuillez : <br>
         <div class="q-pl-md">
           <li>
           pour chaque question : cocher “Je valide la note” ou cliquer sur “Ajuster la note” pour définir une
@@ -117,7 +117,7 @@ export default {
       return historiesByQuestion;
     });
 
-    const selectedTraineeHasEndQuestionnaireHistory = computed(() => Object.keys(filteredQuestionnaireAnswers).length &&
+    const traineeHasEndQuestionnaireHistory = computed(() => Object.keys(filteredQuestionnaireAnswers).length &&
       Object.values(filteredQuestionnaireAnswers.value).filter(a => !!get(a, 'answers.endCourse')).length);
 
     const getQuestionnaireAnswers = async () => {
@@ -149,7 +149,7 @@ export default {
       headerInfo,
       traineeOptions,
       filteredQuestionnaireAnswers,
-      selectedTraineeHasEndQuestionnaireHistory,
+      traineeHasEndQuestionnaireHistory,
     };
   },
 };
