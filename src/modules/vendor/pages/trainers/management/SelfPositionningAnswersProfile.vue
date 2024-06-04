@@ -25,7 +25,9 @@
         L'apprenant sélectionné n'a répondu à aucun questionnaire d'auto-positionnement pour cette formation.
       </template>
     </ni-banner>
-    <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card" />
+    {{ trainerAnswers }}
+    <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card"
+      @update-trainer-answers="updateTrainerAnswers" />
   </q-page>
 </template>
 
@@ -58,6 +60,7 @@ export default {
     const { courseId, questionnaireId } = toRefs(props);
     const questionnaireAnswers = ref({});
     const selectedTrainee = ref('');
+    const trainerAnswers = ref([]);
 
     const headerInfo = computed(() => {
       const { course } = questionnaireAnswers.value;
@@ -99,6 +102,7 @@ export default {
             },
             question: card.question,
             labels: card.labels,
+            card: card.cardId,
           };
         }
       }
@@ -121,6 +125,12 @@ export default {
     };
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
+    const updateTrainerAnswers = ({ card, isValidated }) => {
+      const answer = trainerAnswers.value.find(a => a.card === card);
+      if (answer) answer.isValidated = isValidated;
+      else trainerAnswers.value.push({ card, isValidated });
+    };
+
     const created = async () => {
       await getQuestionnaireAnswers();
     };
@@ -132,8 +142,10 @@ export default {
       questionnaireAnswers,
       get,
       selectedTrainee,
+      trainerAnswers,
       // Methods
       updateSelectedTrainee,
+      updateTrainerAnswers,
       // Computed
       headerInfo,
       traineeOptions,
