@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <q-card class="container" flat>
+  <div class="container">
+    <q-card class="cell-container" flat>
       <q-card-section class="title">{{ title }}</q-card-section>
       <q-card-section>
         <ni-rating v-if="answer" readonly :model-value="Number(answer)" :icon="icon" color="copper-grey-500" />
@@ -48,9 +48,12 @@ export default {
     margin: 0px
     padding: 0px
 .container
-  flex-direction: column
   display: flex
   flex: 1
+.cell-container
+  display: flex
+  flex: 1
+  flex-direction: column
   align-items: center
   background-color: $peach-100
   border-radius: 8px
@@ -58,7 +61,7 @@ export default {
   font-size: 16px
   font-style: italic
   color: $copper-grey-500
-  padding: 24px 56px
+  padding: 16px 0px
 .title
   color: $copper-grey-700
   font-size: 20px

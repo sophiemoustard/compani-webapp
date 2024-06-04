@@ -2,7 +2,7 @@
   <q-card class="q-mb-md q-pa-lg">
     <span class="title">{{ item.question }}</span>
     <survey-labels-details :labels="item.labels" />
-    <div class="row">
+    <div class="answers">
       <survey-answer title="Note de début" :answer="item.answers['startCourse'] || ''" />
       <survey-answer title="Note de fin" :answer="item.answers['endCourse'] || ''" />
     </div>
@@ -34,4 +34,10 @@ export default {
 .title
   font-size: 16px
   color: $copper-grey-700
+
+.answers
+  display: flex
+  flex-direction: row
+  @media screen and (max-width: 768px)
+    flex-direction: column
 </style>
