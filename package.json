@@ -38,10 +38,10 @@
     "node-polyfill-webpack-plugin": "~4.0.0",
     "qs": "~6.11.0",
     "quasar": "~2.16.4",
-    "vue": "~3.4.25",
+    "vue": "~3.4.27",
     "vue-advanced-cropper": "~2.8.1",
     "vue-chartjs": "~5.3.1",
-    "vue-router": "~4.2.5",
+    "vue-router": "~4.3.2",
     "vuedraggable": "~4.1.0",
     "vuelidate": "~0.7.6",
     "vuex": "~4.1.0"
