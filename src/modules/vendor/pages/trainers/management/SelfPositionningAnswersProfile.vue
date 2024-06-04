@@ -91,26 +91,15 @@ export default {
 
       const historiesByQuestion = {};
       for (const history of formattedTraineeQuestionnaireHistories) {
-        const { questionnaireAnswersList } = history;
-
-        for (const card of questionnaireAnswersList) {
-          if (!historiesByQuestion[card.cardId]) {
-            historiesByQuestion[card.cardId] = {
-              answers: history.timeline === START_COURSE ? { startCourse: card.answer } : { endCourse: card.answer },
-              question: card.question,
-              labels: card.labels,
-            };
-          } else if (Object.keys(historiesByQuestion[card.cardId].answers).includes('startCourse')) {
-            historiesByQuestion[card.cardId].answers = {
-              ...historiesByQuestion[card.cardId].answers,
-              endCourse: card.answer,
-            };
-          } else if (Object.keys(historiesByQuestion[card.cardId].answers).includes('endCourse')) {
-            historiesByQuestion[card.cardId].answers = {
-              ...historiesByQuestion[card.cardId].answers,
-              startCourse: card.answer,
-            };
-          }
+        for (const card of history.questionnaireAnswersList) {
+          historiesByQuestion[card.cardId] = {
+            answers: {
+              ...get(historiesByQuestion[card.cardId], 'answers'),
+              ...(history.timeline === START_COURSE ? { startCourse: card.answer } : { endCourse: card.answer }),
+            },
+            question: card.question,
+            labels: card.labels,
+          };
         }
       }
 
