@@ -4,7 +4,7 @@
       <q-card-section class="title">{{ title }}</q-card-section>
       <q-card-section>
         <ni-rating v-if="answer" readonly :model-value="Number(answer)" :icon="icon" color="copper-grey-500" />
-        <div class="answer q-px-md q-pb-md" v-else>Pas de note</div>
+        <div class="answer" v-else>Pas de note</div>
       </q-card-section>
     </q-card>
   </div>
@@ -55,12 +55,12 @@ export default {
   background-color: $peach-100
   border-radius: 8px
 .answer
-  font-size: 24px
+  font-size: 16px
   font-style: italic
   color: $copper-grey-500
-  padding: 20px 56px
+  padding: 24px 56px
 .title
   color: $copper-grey-700
-  font-size: 24px
+  font-size: 20px
   padding: 4px 0px
 </style>

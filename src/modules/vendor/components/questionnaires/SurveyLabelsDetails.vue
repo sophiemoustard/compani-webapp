@@ -56,6 +56,7 @@ export default {
   display: flex
   flex-direction: row
   justify-content: space-between
+  font-size: 14px
 .label
   padding: 4px 32px
   font-size: 14px

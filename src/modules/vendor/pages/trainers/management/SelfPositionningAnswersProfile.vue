@@ -87,7 +87,7 @@ export default {
     const filteredQuestionnaireAnswers = computed(() => {
       const followUp = get(questionnaireAnswers.value, 'followUp', []);
       const traineeFollowUp = followUp.filter(qa => qa.user === selectedTrainee.value);
-      const formattedTraineeQuestionnaireHistories = traineeFollowUp.map(history => formatHistory(history), 'user');
+      const formattedTraineeQuestionnaireHistories = traineeFollowUp.map(history => formatHistory(history));
 
       const historiesByQuestion = {};
       for (const history of formattedTraineeQuestionnaireHistories) {

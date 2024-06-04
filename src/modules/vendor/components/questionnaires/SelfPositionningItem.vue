@@ -32,6 +32,6 @@ export default {
 
 <style lang="sass" scoped>
 .title
-  font-size: 20px
+  font-size: 16px
   color: $copper-grey-700
 </style>

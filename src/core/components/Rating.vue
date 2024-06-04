@@ -7,7 +7,7 @@
   </div>
   <div borderless :error="error" :error-message="errorMessage" class="container">
     <q-rating :model-value="modelValue" @update:model-value="update" :icon="icon" max="5" :color="color"
-      size="xl" class="q-my-md" :readonly="readonly">
+      size="lg" class="q-my-md" :readonly="readonly">
       <template v-for="[tipKey, label] in formattedTipAndLabels" #[tipKey] :key="label">
         <q-tooltip v-if="label">{{ label }}</q-tooltip>
       </template>
