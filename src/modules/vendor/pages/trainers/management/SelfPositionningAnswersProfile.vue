@@ -3,10 +3,11 @@
     <ni-profile-header title="Auto-positionnement : réponses" :header-info="headerInfo" class="q-mb-xl">
       <template #title>
         <ni-select caption="Apprenant(e)" :options="traineeOptions" :model-value="selectedTrainee"
-          @update:model-value="updateSelectedTrainee" class="selector" clearable />
+          @update:model-value="(value) => validateTraineeSelection(value)" class="selector" clearable
+          :blur-on-selection="false" />
       </template>
     </ni-profile-header>
-    {{ trainerAnswers }}
+    {{ traineeOptions.find(t => t.value === selectedTrainee) }}
     <ni-banner v-if="selectedTrainee" class="bg-peach-200" icon="info_outline">
       <template #message v-if="!!endQuestionnaireHistoryId">
         Pour valider les réponses au questionnaire d’auto-positionnement de fin, veuillez : <br>
@@ -36,6 +37,7 @@
 
 <script>
 import { toRefs, ref, computed } from 'vue';
+import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import Questionnaires from '@api/Questionnaires';
@@ -64,6 +66,7 @@ export default {
     'ni-button': Button,
   },
   setup (props) {
+    const $q = useQuasar();
     const { courseId, questionnaireId } = toRefs(props);
     const questionnaireAnswers = ref({});
     const selectedTrainee = ref('');
@@ -137,6 +140,26 @@ export default {
 
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
+    const validateTraineeSelection = (traineeId) => {
+      if (trainerAnswers.value.some(a => a.isValidated)) {
+        $q.dialog({
+          title: 'Confirmation',
+          message: `Êtes-vous sûr(e) de vouloir changer de stagiaire &nbsp;? Les informations renseignées pour
+            ${traineeOptions.value.find(t => t.value === selectedTrainee.value).label} seront perdues.`,
+          html: true,
+          ok: true,
+          cancel: 'Annuler',
+        }).onOk(() => {
+          trainerAnswers.value = [];
+          updateSelectedTrainee(traineeId);
+        })
+          .onCancel(() => NotifyPositive('Changement de stagiaire annulé.'));
+      } else {
+        trainerAnswers.value = [];
+        updateSelectedTrainee(traineeId);
+      }
+    };
+
     const updateTrainerAnswers = ({ card, isValidated }) => {
       const answer = trainerAnswers.value.find(a => a.card === card);
       if (answer) answer.isValidated = isValidated;
@@ -174,9 +197,9 @@ export default {
       selectedTrainee,
       trainerAnswers,
       // Methods
-      updateSelectedTrainee,
       updateTrainerAnswers,
       validateTrainerAnswers,
+      validateTraineeSelection,
       // Computed
       headerInfo,
       traineeOptions,
