@@ -359,6 +359,7 @@ export const ACTIVITY_TYPES = [
 // QUESTIONNAIRE
 export const QUESTIONNAIRE = 'questionnaire';
 export const START_COURSE = 'start_course';
+export const END_COURSE = 'end_course';
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
