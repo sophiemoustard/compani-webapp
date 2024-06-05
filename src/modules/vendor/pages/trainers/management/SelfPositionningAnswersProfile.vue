@@ -3,8 +3,7 @@
     <ni-profile-header title="Auto-positionnement : réponses" :header-info="headerInfo" class="q-mb-xl">
       <template #title>
         <ni-select caption="Apprenant(e)" :options="traineeOptions" :model-value="selectedTrainee"
-          @update:model-value="(value) => validateTraineeSelection(value)" class="selector" clearable
-          :blur-on-selection="false" />
+          @update:model-value="validateTraineeSelection" class="selector" clearable :blur-on-selection="false" />
       </template>
     </ni-profile-header>
     <template v-if="selectedTrainee">
@@ -35,7 +34,7 @@
         </ni-banner>
         <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card"
           @update-trainer-answers="updateTrainerAnswers" />
-        <div v-if="get(endQuestionnaireHistory, '_id')" class="flex justify-end">
+        <div v-if="get(endQuestionnaireHistory, '_id')" class="flex justify-end q-pa-lg">
           <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerAnswers" />
         </div>
       </template>
