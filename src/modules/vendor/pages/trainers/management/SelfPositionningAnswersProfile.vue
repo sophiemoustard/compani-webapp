@@ -152,7 +152,7 @@ export default {
       if (trainerAnswers.value.some(a => a.isValidated)) {
         $q.dialog({
           title: 'Confirmation',
-          message: `Êtes-vous sûr(e) de vouloir changer de stagiaire &nbsp;? Les informations renseignées pour
+          message: `Êtes-vous sûr(e) de vouloir changer d'apprenant &nbsp;? Les informations renseignées pour
             ${traineeOptions.value.find(t => t.value === selectedTrainee.value).label} seront perdues.`,
           html: true,
           ok: true,
@@ -161,7 +161,7 @@ export default {
           trainerAnswers.value = [];
           updateSelectedTrainee(traineeId);
         })
-          .onCancel(() => NotifyPositive('Changement de stagiaire annulé.'));
+          .onCancel(() => NotifyPositive('Changement d\'apprenant annulé.'));
       } else {
         trainerAnswers.value = [];
         updateSelectedTrainee(traineeId);
