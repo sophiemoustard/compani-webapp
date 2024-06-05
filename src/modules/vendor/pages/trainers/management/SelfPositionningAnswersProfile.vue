@@ -40,7 +40,7 @@ import { NotifyNegative } from '@components/popup/notify';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
 import Banner from '@components/Banner';
-import SelfPositionningItem from '../../../components/questionnaires/SelfPositionningItem';
+import SelfPositionningItem from 'src/modules/vendor/components/questionnaires/SelfPositionningItem';
 
 export default {
   name: 'SelfPositionningAnswersProfile',

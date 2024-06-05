@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import SurveyLabelsDetails from './SurveyLabelsDetails';
-import SurveyAnswer from './SurveyAnswer';
+import SurveyLabelsDetails from 'src/modules/vendor/components/questionnaires/SurveyLabelsDetails';
+import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
 
 export default {
   name: 'SurveyItem',
