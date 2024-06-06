@@ -178,7 +178,9 @@ export default {
         const traineeAnswersLength = Object.values(filteredQuestionnaireAnswers.value).length;
         const trainerAnswersLength = trainerAnswers.value.filter(a => a.isValidated).length;
 
-        if (trainerAnswersLength !== traineeAnswersLength) return NotifyWarning('Champ(s) invalide(s)');
+        if (trainerAnswersLength !== traineeAnswersLength) {
+          return NotifyWarning('Champ(s) invalide(s) : vous devez valider ou ajuster la note pour chaque question.');
+        }
 
         const formattedAnswers = trainerAnswers.value.map(a => omit(a, ['isValidated']));
         await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, { trainerAnswers: formattedAnswers });

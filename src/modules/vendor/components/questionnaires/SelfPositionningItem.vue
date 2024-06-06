@@ -7,7 +7,7 @@
       <survey-answer title="Note de fin" :answer="item.answers['endCourse'] || ''" />
       <div class="flex column justify-end q-pa-md">
         <q-checkbox v-if="item.answers['endCourse']" :model-value="validation" label="Je valide la note de fin"
-          keep-color color="peach-200" @update:model-value="updateValidation" />
+          keep-color color="primary" @update:model-value="updateValidation" />
       </div>
     </div>
   </q-card>
@@ -51,10 +51,12 @@ export default {
 .title
   font-size: 16px
   color: $copper-grey-700
-
 .answers
   display: flex
   flex-direction: row
   @media screen and (max-width: 768px)
     flex-direction: column
+:deep(.q-checkbox__label)
+  opacity: 1
+  color: $primary
 </style>
