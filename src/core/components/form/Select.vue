@@ -52,6 +52,7 @@ export default {
     dataCy: { type: String, default: '' },
     optionSlot: { type: Boolean, default: false },
     noBorder: { type: Boolean, default: false },
+    blurOnSelection: { type: Boolean, default: true },
   },
   emits: ['focus', 'blur', 'update:model-value'],
   components: {
@@ -92,7 +93,7 @@ export default {
     },
     onInput (val) {
       this.$emit('update:model-value', val);
-      this.$refs.selectInput.blur();
+      if (this.blurOnSelection) this.$refs.selectInput.blur();
     },
     formatStringForFiltering (str) {
       return escapeRegExp(removeDiacritics(str.toLowerCase()));
