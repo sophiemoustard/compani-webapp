@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { ref, toRefs } from 'vue';
+import { ref, toRefs, watch } from 'vue';
 import SurveyLabelsDetails from 'src/modules/vendor/components/questionnaires/SurveyLabelsDetails';
 import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
 
@@ -31,6 +31,8 @@ export default {
   setup (props, { emit }) {
     const { item } = toRefs(props);
     const validation = ref(false);
+
+    watch(() => item.value.answers, () => { validation.value = false; });
 
     const updateValidation = () => {
       validation.value = !validation.value;
