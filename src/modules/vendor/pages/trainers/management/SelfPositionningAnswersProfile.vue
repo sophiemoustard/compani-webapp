@@ -188,8 +188,12 @@ export default {
           return NotifyWarning('Champ(s) invalide(s) : vous devez valider ou ajuster la note pour chaque question.');
         }
 
-        const formattedAnswers = trainerAnswers.value.map(a => omit(a, ['isValidated']));
-        await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, { trainerAnswers: formattedAnswers });
+        const payload = {
+          trainerAnswers: trainerAnswers.value.map(a => omit(a, ['isValidated'])),
+          ...(trainerComment.value && { trainerComment: trainerComment.value }),
+        };
+
+        await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, payload);
 
         NotifyPositive('Validation enregistrée.');
         await refreshQuestionnaireAnswers();
