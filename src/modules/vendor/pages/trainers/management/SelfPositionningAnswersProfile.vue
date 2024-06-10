@@ -35,7 +35,8 @@
         <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card"
           @update-trainer-answers="updateTrainerAnswers" />
         <div v-if="get(endQuestionnaireHistory, '_id')" class="q-py-md">
-          <ni-input caption="Commentaire général sur la progression de l’apprenant" v-model="trainerComment" />
+          <ni-input caption="Commentaire général sur la progression de l’apprenant" v-model="trainerComment"
+            type="textarea" :rows="5" />
           <div class="flex justify-end">
             <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerAnswers" />
           </div>

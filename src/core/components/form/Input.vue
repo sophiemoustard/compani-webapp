@@ -23,7 +23,7 @@
       <q-input borderless dense :ref="name" :model-value="modelValue" bg-color="white" @focus="onFocus"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @update:model-value="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage"
-        :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
+        :autogrow="autogrow" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
         :data-cy="dataCy" @click="onClick" :hide-bottom-space="readOnly" :input-class="inputClass" :mask="mask"
         :class="{ 'no-border': noBorder }" :disable="disable">
         <template v-if="icon" #prepend>
@@ -88,6 +88,9 @@ export default {
     },
     passwordIcon () {
       return this.isPassword && this.showPassword ? 'visibility' : 'visibility_off';
+    },
+    autogrow () {
+      return this.type === 'textarea' && this.rows === 1;
     },
   },
   methods: {
