@@ -34,8 +34,12 @@
         </ni-banner>
         <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card"
           @update-trainer-answers="updateTrainerAnswers" />
-        <div v-if="get(endQuestionnaireHistory, '_id')" class="flex justify-end q-pa-lg">
-          <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerAnswers" />
+        <div v-if="get(endQuestionnaireHistory, '_id')" class="q-py-md">
+          <ni-input caption="Commentaire général sur la progression de l’apprenant" v-model="trainerComment"
+            type="textarea" :rows="5" />
+          <div class="flex justify-end">
+            <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerAnswers" />
+          </div>
         </div>
       </template>
     </template>
@@ -57,6 +61,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
 import Banner from '@components/Banner';
 import Button from '@components/Button';
+import Input from '@components/form/Input';
 import SelfPositionningItem from 'src/modules/vendor/components/questionnaires/SelfPositionningItem';
 
 export default {
@@ -71,6 +76,7 @@ export default {
     'self-positionning-item': SelfPositionningItem,
     'ni-banner': Banner,
     'ni-button': Button,
+    'ni-input': Input,
   },
   setup (props) {
     const $q = useQuasar();
@@ -78,6 +84,7 @@ export default {
     const questionnaireAnswers = ref({});
     const selectedTrainee = ref('');
     const trainerAnswers = ref([]);
+    const trainerComment = ref('');
 
     const headerInfo = computed(() => {
       const { course } = questionnaireAnswers.value;
@@ -182,8 +189,12 @@ export default {
           return NotifyWarning('Champ(s) invalide(s) : vous devez valider ou ajuster la note pour chaque question.');
         }
 
-        const formattedAnswers = trainerAnswers.value.map(a => omit(a, ['isValidated']));
-        await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, { trainerAnswers: formattedAnswers });
+        const payload = {
+          trainerAnswers: trainerAnswers.value.map(a => omit(a, ['isValidated'])),
+          ...(trainerComment.value && { trainerComment: trainerComment.value }),
+        };
+
+        await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, payload);
 
         NotifyPositive('Validation enregistrée.');
         await refreshQuestionnaireAnswers();
@@ -208,6 +219,7 @@ export default {
       get,
       selectedTrainee,
       trainerAnswers,
+      trainerComment,
       // Methods
       updateTrainerAnswers,
       validateTrainerAnswers,
