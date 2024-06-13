@@ -176,10 +176,12 @@ export default {
       }
     };
 
-    const updateTrainerAnswers = ({ card, isValidated }) => {
-      const answer = trainerAnswers.value.find(a => a.card === card);
-      if (answer) answer.isValidated = isValidated;
-      else trainerAnswers.value.push({ card, isValidated });
+    const updateTrainerAnswers = (trainerReview) => {
+      const { card } = trainerReview;
+      const existingTrainerAnswer = trainerAnswers.value.find(a => a.card === card);
+      if (existingTrainerAnswer) {
+        trainerAnswers.value = trainerAnswers.value.map(a => (a.card === card ? trainerReview : a));
+      } else trainerAnswers.value.push(trainerReview);
     };
 
     const validateTrainerAnswers = async () => {
