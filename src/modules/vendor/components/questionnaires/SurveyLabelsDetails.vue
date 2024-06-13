@@ -50,7 +50,7 @@ export default {
   margin: 0px
   padding: 16px
 .container
-  margin: 16px
+  margin: 16px 0px
   background-color: $copper-grey-100
 .header
   display: flex

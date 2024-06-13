@@ -7,9 +7,8 @@
       <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="help_outline">
         <template #message>Objectif pédagogique : {{ question }}</template>
       </ni-banner>
-      <ni-rating v-model="answer" :icon="iconTab" required-field caption="Note de l'apprenant : "
-        :error="validations.$error" />
-      <survey-labels-details :labels="labels" are-details-visible />
+      <ni-rating v-model="answer" :icon="iconTab" required-field caption="Veuillez selectionner la note ajustée : "
+        :error="validations.$error" :labels="labels" />
     </div>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajuster la note" color="primary" @click="submit" />
@@ -22,7 +21,6 @@ import { ref, toRefs } from 'vue';
 import Modal from '@components/modal/Modal';
 import Banner from '@components/Banner';
 import Rating from '@components/Rating';
-import SurveyLabelsDetails from 'src/modules/vendor/components/questionnaires/SurveyLabelsDetails';
 
 export default {
   name: 'TrainerAnswerModal',
@@ -37,7 +35,6 @@ export default {
     'ni-modal': Modal,
     'ni-banner': Banner,
     'ni-rating': Rating,
-    'survey-labels-details': SurveyLabelsDetails,
   },
   emits: ['hide', 'update:model-value', 'submit'],
   setup (props, { emit }) {

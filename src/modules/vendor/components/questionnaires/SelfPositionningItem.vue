@@ -1,7 +1,7 @@
 <template>
   <q-card class="q-mb-md q-pa-lg">
     <span class="title">{{ item.question }}</span>
-    <survey-labels-details :labels="item.labels" />
+    <survey-labels-details :labels="item.labels" class="q-px-md" />
     <div class="answers">
       <survey-answer title="Note de début" :answer="Number(item.answers.startCourse) || 0" />
       <survey-answer title="Note de fin" :answer="Number(item.answers.endCourse) || 0" />
