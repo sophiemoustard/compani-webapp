@@ -206,8 +206,6 @@ export default {
         trainerReview.value = [];
         trainerComment.value = '';
       } catch (e) {
-        trainerReview.value = [];
-
         console.error(e);
         NotifyNegative('Erreur lors de la validation des réponses au questionnaire.');
       }
