@@ -3,13 +3,20 @@
     <span class="title">{{ item.question }}</span>
     <survey-labels-details :labels="item.labels" />
     <div class="answers">
-      <survey-answer title="Note de début" :answer="item.answers['startCourse'] || ''" />
-      <survey-answer title="Note de fin" :answer="item.answers['endCourse'] || ''" />
-      <div v-if="item.answers['endCourse']" class="flex column justify-end q-pa-md">
+      <survey-answer title="Note de début" :answer="Number(item.answers.startCourse) || 0" />
+      <survey-answer title="Note de fin" :answer="Number(item.answers.endCourse) || 0" />
+      <div v-if="displayReviewButtons" class="flex column justify-end q-pa-md">
         <ni-button label="Ajuster la note" class="bg-primary" color="white" @click="openTrainerReviewModal" />
-        <q-checkbox :model-value="trainerValidation" label="Je valide la note de fin" keep-color color="primary"
-          @update:model-value="() => updateTrainerReview(VALIDATE)" />
+        <q-checkbox class="q-py-sm" :model-value="trainerValidation" label="Je valide la note de fin"
+          keep-color color="primary" @update:model-value="() => updateTrainerReview(VALIDATE)" />
       </div>
+      <template v-else>
+        <survey-answer v-if="trainerAnswer" title="Note ajustée" :answer="trainerAnswer" />
+        <div v-else-if="trainerValidation" class="validate">
+          <q-icon class="q-py-xs q-pr-md" name="check" />
+          <span>La note de fin est validée</span>
+        </div>
+      </template>
     </div>
   </q-card>
   <trainer-review-modal v-model="trainerReviewModal" :trainer-answer="trainerAnswer" :labels="item.labels"
@@ -52,7 +59,13 @@ export default {
     }));
     const v$ = useVuelidate(rules, { trainerAnswer });
 
-    watch(() => item.value.answers, () => { trainerValidation.value = false; });
+    const displayReviewButtons = computed(() => item.value.answers.endCourse &&
+      !(trainerAnswer.value || trainerValidation.value));
+
+    watch(() => item.value.answers, () => {
+      trainerValidation.value = false;
+      trainerAnswer.value = 0;
+    });
 
     const openTrainerReviewModal = () => { trainerReviewModal.value = true; };
 
@@ -87,6 +100,8 @@ export default {
       trainerAnswer,
       // Validations
       v$,
+      // Computed
+      displayReviewButtons,
       // Methods
       updateTrainerReview,
       openTrainerReviewModal,
@@ -107,5 +122,11 @@ export default {
     flex-direction: column
 :deep(.q-checkbox__label)
   opacity: 1
+  color: $primary
+.validate
+  padding: 32px 8px
+  display: flex
+  justify-content: center
+  align-items: end
   color: $primary
 </style>
