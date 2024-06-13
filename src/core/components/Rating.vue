@@ -63,9 +63,6 @@ export default {
 .container
   display: flex
   justify-content: center
-.labels
-  margin: 0 0 8px 0
-  color: $copper-grey-500
 .error-message
   color: $secondary
   line-height: 1

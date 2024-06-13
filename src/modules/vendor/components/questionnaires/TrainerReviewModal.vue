@@ -7,7 +7,7 @@
       <ni-banner class="bg-copper-grey-100 q-mt-sm" icon="help_outline">
         <template #message>Objectif pédagogique : {{ question }}</template>
       </ni-banner>
-      <ni-rating v-model="answer" :icon="iconTab" required-field caption="Veuillez selectionner la note ajustée : "
+      <ni-rating v-model="answer" :icon="iconTab" required-field caption="Veuillez sélectionner la note ajustée : "
         :error="validations.$error" :labels="labels" />
     </div>
     <template #footer>
