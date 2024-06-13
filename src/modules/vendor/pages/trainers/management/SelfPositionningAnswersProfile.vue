@@ -188,7 +188,7 @@ export default {
     const validateTrainerReview = async () => {
       try {
         const traineeAnswersLength = Object.values(filteredQuestionnaireAnswers.value).length;
-        const trainerAnswersLength = trainerReview.value.filter(a => a.isValidated).length;
+        const trainerAnswersLength = trainerReview.value.filter(a => a.isValidated || a.answer).length;
 
         if (trainerAnswersLength !== traineeAnswersLength) {
           return NotifyWarning('Champ(s) invalide(s) : vous devez valider ou ajuster la note pour chaque question.');

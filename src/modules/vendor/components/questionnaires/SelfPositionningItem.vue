@@ -82,7 +82,7 @@ export default {
         v$.value.trainerAnswer.$touch();
         if (v$.value.trainerAnswer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        emit('update-trainer-review', { card: item.value.card, answer: trainerAnswer.value });
+        emit('update-trainer-review', { card: item.value.card, answer: trainerAnswer.value.toString() });
       } else if (type === VALIDATE) {
         trainerValidation.value = !trainerValidation.value;
         emit('update-trainer-review', { card: item.value.card, isValidated: trainerValidation.value });
