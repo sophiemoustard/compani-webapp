@@ -33,12 +33,12 @@
           </template>
         </ni-banner>
         <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card"
-          @update-trainer-answers="updateTrainerAnswers" />
+          @update-trainer-review="updateTrainerReview" />
         <div v-if="get(endQuestionnaireHistory, '_id')" class="q-py-md">
           <ni-input caption="Commentaire général sur la progression de l’apprenant" v-model="trainerComment"
             type="textarea" :rows="5" />
           <div class="flex justify-end">
-            <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerAnswers" />
+            <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerReview" />
           </div>
         </div>
       </template>
@@ -83,7 +83,7 @@ export default {
     const { courseId, questionnaireId } = toRefs(props);
     const questionnaireAnswers = ref({});
     const selectedTrainee = ref('');
-    const trainerAnswers = ref([]);
+    const trainerReview = ref([]);
     const trainerComment = ref('');
 
     const headerInfo = computed(() => {
@@ -155,7 +155,7 @@ export default {
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const validateTraineeSelection = (traineeId) => {
-      if (trainerAnswers.value.some(a => a.isValidated) || trainerComment.value) {
+      if (trainerReview.value.some(a => a.isValidated) || trainerComment.value) {
         $q.dialog({
           title: 'Confirmation',
           message: `Êtes-vous sûr(e) de vouloir changer d'apprenant &nbsp;? Les informations renseignées pour
@@ -164,37 +164,38 @@ export default {
           ok: true,
           cancel: 'Annuler',
         }).onOk(() => {
-          trainerAnswers.value = [];
+          trainerReview.value = [];
           trainerComment.value = '';
 
           updateSelectedTrainee(traineeId);
         })
           .onCancel(() => NotifyPositive('Changement d\'apprenant annulé.'));
       } else {
-        trainerAnswers.value = [];
+        trainerReview.value = [];
         updateSelectedTrainee(traineeId);
       }
     };
 
-    const updateTrainerAnswers = (trainerReview) => {
-      const { card } = trainerReview;
-      const existingTrainerAnswer = trainerAnswers.value.find(a => a.card === card);
-      if (existingTrainerAnswer) {
-        trainerAnswers.value = trainerAnswers.value.map(a => (a.card === card ? trainerReview : a));
-      } else trainerAnswers.value.push(trainerReview);
+    const updateTrainerReview = (trainerReviewItem) => {
+      const { card } = trainerReviewItem;
+
+      const existingTrainerReviewItem = trainerReview.value.find(a => a.card === card);
+      if (existingTrainerReviewItem) {
+        trainerReview.value = trainerReview.value.map(a => (a.card === card ? trainerReviewItem : a));
+      } else trainerReview.value.push(trainerReviewItem);
     };
 
-    const validateTrainerAnswers = async () => {
+    const validateTrainerReview = async () => {
       try {
         const traineeAnswersLength = Object.values(filteredQuestionnaireAnswers.value).length;
-        const trainerAnswersLength = trainerAnswers.value.filter(a => a.isValidated).length;
+        const trainerAnswersLength = trainerReview.value.filter(a => a.isValidated).length;
 
         if (trainerAnswersLength !== traineeAnswersLength) {
           return NotifyWarning('Champ(s) invalide(s) : vous devez valider ou ajuster la note pour chaque question.');
         }
 
         const payload = {
-          trainerAnswers: trainerAnswers.value.map(a => omit(a, ['isValidated'])),
+          trainerAnswers: trainerReview.value.map(a => omit(a, ['isValidated'])),
           ...(trainerComment.value && { trainerComment: trainerComment.value }),
         };
 
@@ -202,10 +203,10 @@ export default {
 
         NotifyPositive('Validation enregistrée.');
         await refreshQuestionnaireAnswers();
-        trainerAnswers.value = [];
+        trainerReview.value = [];
         trainerComment.value = '';
       } catch (e) {
-        trainerAnswers.value = [];
+        trainerReview.value = [];
 
         console.error(e);
         NotifyNegative('Erreur lors de la validation des réponses au questionnaire.');
@@ -223,11 +224,11 @@ export default {
       questionnaireAnswers,
       get,
       selectedTrainee,
-      trainerAnswers,
+      trainerReview,
       trainerComment,
       // Methods
-      updateTrainerAnswers,
-      validateTrainerAnswers,
+      updateTrainerReview,
+      validateTrainerReview,
       validateTraineeSelection,
       // Computed
       headerInfo,

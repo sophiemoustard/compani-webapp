@@ -6,15 +6,15 @@
       <survey-answer title="Note de début" :answer="item.answers['startCourse'] || ''" />
       <survey-answer title="Note de fin" :answer="item.answers['endCourse'] || ''" />
       <div v-if="item.answers['endCourse']" class="flex column justify-end q-pa-md">
-        <ni-button label="Ajuster la note" class="bg-primary" color="white" @click="openTrainerAnswerModal" />
-        <q-checkbox :model-value="validation" label="Je valide la note de fin" keep-color color="primary"
-          @update:model-value="() => updateTrainerAnswers(VALIDATE)" />
+        <ni-button label="Ajuster la note" class="bg-primary" color="white" @click="openTrainerReviewModal" />
+        <q-checkbox :model-value="trainerValidation" label="Je valide la note de fin" keep-color color="primary"
+          @update:model-value="() => updateTrainerReview(VALIDATE)" />
       </div>
     </div>
   </q-card>
-  <trainer-answer-modal v-model="trainerAnswerModal" :trainer-answer="trainerAnswer" :labels="item.labels"
-    :question="item.question" :validations="v$.trainerAnswer" @hide="closeTrainerAnswerModal"
-    @submit="(answer) => updateTrainerAnswers(ADJUST, answer)" />
+  <trainer-review-modal v-model="trainerReviewModal" :trainer-answer="trainerAnswer" :labels="item.labels"
+    :question="item.question" :validations="v$.trainerAnswer" @hide="closeTrainerReviewModal"
+    @submit="(answer) => updateTrainerReview(ADJUST, answer)" />
 </template>
 
 <script>
@@ -23,7 +23,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import SurveyLabelsDetails from 'src/modules/vendor/components/questionnaires/SurveyLabelsDetails';
 import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
-import TrainerAnswerModal from 'src/modules/vendor/components/questionnaires/trainerAnswerModal';
+import TrainerReviewModal from 'src/modules/vendor/components/questionnaires/TrainerReviewModal';
 import Button from '@components/Button';
 import { NotifyWarning } from '@components/popup/notify';
 import { ADJUST, VALIDATE } from '@data/constants';
@@ -38,13 +38,13 @@ export default {
     'survey-labels-details': SurveyLabelsDetails,
     'survey-answer': SurveyAnswer,
     'ni-button': Button,
-    'trainer-answer-modal': TrainerAnswerModal,
+    'trainer-review-modal': TrainerReviewModal,
   },
-  emits: ['update-trainer-answers'],
+  emits: ['update-trainer-review'],
   setup (props, { emit }) {
     const { item } = toRefs(props);
-    const validation = ref(false);
-    const trainerAnswerModal = ref(false);
+    const trainerValidation = ref(false);
+    const trainerReviewModal = ref(false);
     const trainerAnswer = ref(0);
 
     const rules = computed(() => ({
@@ -52,45 +52,45 @@ export default {
     }));
     const v$ = useVuelidate(rules, { trainerAnswer });
 
-    watch(() => item.value.answers, () => { validation.value = false; });
+    watch(() => item.value.answers, () => { trainerValidation.value = false; });
 
-    const openTrainerAnswerModal = () => { trainerAnswerModal.value = true; };
+    const openTrainerReviewModal = () => { trainerReviewModal.value = true; };
 
-    const closeTrainerAnswerModal = () => {
+    const closeTrainerReviewModal = () => {
       v$.value.trainerAnswer.$reset();
 
-      trainerAnswerModal.value = false;
+      trainerReviewModal.value = false;
     };
 
-    const updateTrainerAnswers = (type, answer = 0) => {
+    const updateTrainerReview = (type, answer = 0) => {
       if (type === ADJUST) {
         trainerAnswer.value = answer;
 
         v$.value.trainerAnswer.$touch();
         if (v$.value.trainerAnswer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        emit('update-trainer-answers', { card: item.value.card, answer: trainerAnswer.value });
+        emit('update-trainer-review', { card: item.value.card, answer: trainerAnswer.value });
       } else if (type === VALIDATE) {
-        validation.value = !validation.value;
-        emit('update-trainer-answers', { card: item.value.card, isValidated: validation.value });
+        trainerValidation.value = !trainerValidation.value;
+        emit('update-trainer-review', { card: item.value.card, isValidated: trainerValidation.value });
       }
 
-      closeTrainerAnswerModal();
+      closeTrainerReviewModal();
     };
 
     return {
       // Data
-      validation,
-      trainerAnswerModal,
+      trainerValidation,
+      trainerReviewModal,
       VALIDATE,
       ADJUST,
       trainerAnswer,
       // Validations
       v$,
       // Methods
-      updateTrainerAnswers,
-      openTrainerAnswerModal,
-      closeTrainerAnswerModal,
+      updateTrainerReview,
+      openTrainerReviewModal,
+      closeTrainerReviewModal,
     };
   },
 };
