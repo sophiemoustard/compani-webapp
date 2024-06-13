@@ -51,7 +51,10 @@ export default {
     const { trainerAnswer } = toRefs(props);
     const answer = ref(trainerAnswer.value);
 
-    const hide = () => { emit('hide'); };
+    const hide = () => {
+      emit('hide');
+      answer.value = 0;
+    };
 
     const input = event => emit('update:model-value', event);
 
@@ -61,7 +64,6 @@ export default {
       // Data
       iconTab,
       answer,
-      // Computed
       // Methods
       hide,
       input,
