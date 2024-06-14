@@ -155,7 +155,7 @@ export default {
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const validateTraineeSelection = (traineeId) => {
-      if (trainerAnswers.value.some(a => a.isValidated)) {
+      if (trainerAnswers.value.some(a => a.isValidated) || trainerComment.value) {
         $q.dialog({
           title: 'Confirmation',
           message: `Êtes-vous sûr(e) de vouloir changer d'apprenant &nbsp;? Les informations renseignées pour
@@ -165,6 +165,8 @@ export default {
           cancel: 'Annuler',
         }).onOk(() => {
           trainerAnswers.value = [];
+          trainerComment.value = '';
+
           updateSelectedTrainee(traineeId);
         })
           .onCancel(() => NotifyPositive('Changement d\'apprenant annulé.'));
@@ -199,6 +201,7 @@ export default {
         NotifyPositive('Validation enregistrée.');
         await refreshQuestionnaireAnswers();
         trainerAnswers.value = [];
+        trainerComment.value = '';
       } catch (e) {
         trainerAnswers.value = [];
 
