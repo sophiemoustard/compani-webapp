@@ -20,6 +20,14 @@
         <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" :types="questionnaireTypes"
           @click="goToQuestionnaireProfile" />
       </div>
+      <div v-if="endSelfPositionningQuestionnaireId">
+        <ni-banner icon="edit">
+          <template #message>
+            Pour valider les réponses aux questionnaires d’auto-positionnement de fin de formation, veuillez
+              <a class="clickable-name cursor-pointer" @click="goToSelfPositionningAnswers">cliquer ici</a>
+          </template>
+        </ni-banner>
+      </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
@@ -95,6 +103,7 @@ import {
   SELF_POSITIONNING,
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
+  END_COURSE,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -191,6 +200,13 @@ export default {
       return loggedUserIsCourseTrainer
         ? questionnaires.value.filter(q => q.type !== SELF_POSITIONNING)
         : questionnaires.value;
+    });
+
+    const endSelfPositionningQuestionnaireId = computed(() => {
+      const selfPositionningQH = questionnaires.value
+        .find(q => q.type === SELF_POSITIONNING && q.histories.some(h => h.timeline === END_COURSE));
+
+      return get(selfPositionningQH, '_id') || '';
     });
 
     const goToQuestionnaireAnswers = questionnaireId => $router.push(
@@ -305,6 +321,14 @@ export default {
       window.open(questionnaire.href, '_blank');
     };
 
+    const goToSelfPositionningAnswers = () => $router.push(
+      {
+        name: 'trainers questionnaire answers',
+        params: { questionnaireId: endSelfPositionningQuestionnaireId.value },
+        query: { courseId: course.value._id },
+      }
+    );
+
     const created = async () => {
       const promises = [getFollowUp(), getUnsubscribedAttendances()];
       if (!isClientInterface) promises.push(refreshQuestionnaires(), getQuestionnaireQRCode());
@@ -344,6 +368,7 @@ export default {
       isRofOrVendorAdmin,
       canReadCompletionCertificate,
       filteredQuestionnaires,
+      endSelfPositionningQuestionnaireId,
       // Methods
       get,
       formatQuantity,
@@ -351,6 +376,7 @@ export default {
       downloadCompletionCertificates,
       downloadAttendanceSheet,
       goToQuestionnaireProfile,
+      goToSelfPositionningAnswers,
     };
   },
 };
