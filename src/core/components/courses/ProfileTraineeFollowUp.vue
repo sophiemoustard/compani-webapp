@@ -20,7 +20,7 @@
         <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" :types="questionnaireTypes"
           @click="goToQuestionnaireProfile" />
       </div>
-      <div v-if="endSelfPositionningQuestionnaireId">
+      <div v-if="loggedUserIsCourseTrainer && endSelfPositionningQuestionnaireId">
         <ni-banner icon="edit">
           <template #message>
             Pour valider les réponses aux questionnaires d’auto-positionnement de fin de formation, veuillez
@@ -103,7 +103,6 @@ import {
   SELF_POSITIONNING,
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
-  END_COURSE,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -194,19 +193,16 @@ export default {
       }
     };
 
-    const filteredQuestionnaires = computed(() => {
-      const loggedUserIsCourseTrainer = loggedUser.value._id === course.value.trainer._id;
+    const loggedUserIsCourseTrainer = computed(() => loggedUser.value._id === course.value.trainer._id);
 
-      return loggedUserIsCourseTrainer
-        ? questionnaires.value.filter(q => q.type !== SELF_POSITIONNING)
-        : questionnaires.value;
-    });
+    const filteredQuestionnaires = computed(() => (loggedUserIsCourseTrainer.value
+      ? questionnaires.value.filter(q => q.type !== SELF_POSITIONNING)
+      : questionnaires.value));
 
     const endSelfPositionningQuestionnaireId = computed(() => {
-      const selfPositionningQH = questionnaires.value
-        .find(q => q.type === SELF_POSITIONNING && q.histories.some(h => h.timeline === END_COURSE));
+      const selfPositionningQ = questionnaires.value.find(q => q.type === SELF_POSITIONNING && q.histories.length);
 
-      return get(selfPositionningQH, '_id') || '';
+      return get(selfPositionningQ, '_id') || '';
     });
 
     const goToQuestionnaireAnswers = questionnaireId => $router.push(
@@ -369,6 +365,7 @@ export default {
       canReadCompletionCertificate,
       filteredQuestionnaires,
       endSelfPositionningQuestionnaireId,
+      loggedUserIsCourseTrainer,
       // Methods
       get,
       formatQuantity,
