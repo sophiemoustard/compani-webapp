@@ -1,7 +1,7 @@
 <template>
   <q-card class="q-mb-md q-pa-lg">
     <span class="title">{{ item.question }}</span>
-    <survey-labels-details :labels="item.labels" class="q-px-md" />
+    <ni-labels-details :labels="item.labels" class="q-px-md" />
     <div class="answers">
       <survey-answer title="Note de début" :answer="Number(item.answers.startCourse) || 0" />
       <survey-answer title="Note de fin" :answer="Number(item.answers.endCourse) || 0" />
@@ -28,9 +28,9 @@
 import { ref, toRefs, watch, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import SurveyLabelsDetails from 'src/modules/vendor/components/questionnaires/SurveyLabelsDetails';
 import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
 import TrainerReviewModal from 'src/modules/vendor/components/questionnaires/TrainerReviewModal';
+import LabelsDetails from '@components/LabelsDetails';
 import Button from '@components/Button';
 import { NotifyWarning } from '@components/popup/notify';
 import { ADJUST, VALIDATE } from '@data/constants';
@@ -42,7 +42,7 @@ export default {
     item: { type: Object, required: true },
   },
   components: {
-    'survey-labels-details': SurveyLabelsDetails,
+    'ni-labels-details': LabelsDetails,
     'survey-answer': SurveyAnswer,
     'ni-button': Button,
     'trainer-review-modal': TrainerReviewModal,

@@ -14,13 +14,13 @@
     </q-rating>
   </div>
   <div class="error-message" v-if="error">{{ errorMessage }}</div>
-  <survey-labels-details v-if="Object.keys(labels).length" :labels="labels" are-details-visible />
+  <ni-labels-details v-if="Object.keys(labels).length" :labels="labels" are-details-visible />
 </template>
 
 <script>
 import { toRefs } from 'vue';
 import { REQUIRED_LABEL } from '@data/constants';
-import SurveyLabelsDetails from 'src/modules/vendor/components/questionnaires/SurveyLabelsDetails';
+import LabelsDetails from '@components/LabelsDetails';
 
 export default {
   name: 'Rating',
@@ -37,7 +37,7 @@ export default {
   },
   emits: ['update:model-value'],
   components: {
-    'survey-labels-details': SurveyLabelsDetails,
+    'ni-labels-details': LabelsDetails,
   },
   setup (props, { emit }) {
     const { labels } = toRefs(props);

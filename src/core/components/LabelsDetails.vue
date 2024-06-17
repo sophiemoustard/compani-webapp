@@ -18,12 +18,10 @@
 import { computed, toRefs, ref } from 'vue';
 
 export default {
-  name: 'SurveyLabelsDetails',
+  name: 'LabelsDetails',
   props: {
     areDetailsVisible: { type: Boolean, default: false },
     labels: { type: Object, default: () => {}, required: true },
-  },
-  components: {
   },
   setup (props) {
     const { areDetailsVisible } = toRefs(props);
