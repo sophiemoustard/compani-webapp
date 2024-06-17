@@ -5,18 +5,12 @@
     <div class="answers">
       <survey-answer title="Note de début" :answer="Number(item.answers.startCourse) || 0" />
       <survey-answer title="Note de fin" :answer="Number(item.answers.endCourse) || 0" />
-      <div v-if="displayReviewButtons" class="flex column justify-end q-pa-md">
+      <survey-answer v-if="trainerAnswer" title="Note ajustée" :answer="trainerAnswer" />
+      <div v-else class="flex column justify-end q-py-md">
         <ni-button label="Ajuster la note" class="bg-primary" color="white" @click="openTrainerReviewModal" />
         <q-checkbox class="q-py-sm" :model-value="trainerValidation" label="Je valide la note de fin"
           keep-color color="primary" @update:model-value="() => updateTrainerReview(VALIDATE)" />
       </div>
-      <template v-else>
-        <survey-answer v-if="trainerAnswer" title="Note ajustée" :answer="trainerAnswer" />
-        <div v-else-if="trainerValidation" class="validate">
-          <q-icon class="q-py-xs q-pr-md" name="check" />
-          <span>La note de fin est validée</span>
-        </div>
-      </template>
     </div>
   </q-card>
   <trainer-review-modal v-model="trainerReviewModal" :trainer-answer="trainerAnswer" :labels="item.labels"
@@ -25,7 +19,7 @@
 </template>
 
 <script>
-import { ref, toRefs, watch, computed } from 'vue';
+import { ref, toRefs, computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
@@ -58,14 +52,6 @@ export default {
       trainerAnswer: { required, strictPositiveNumber, integerNumber },
     }));
     const v$ = useVuelidate(rules, { trainerAnswer });
-
-    const displayReviewButtons = computed(() => item.value.answers.endCourse &&
-      !(trainerAnswer.value || trainerValidation.value));
-
-    watch(() => item.value.answers, () => {
-      trainerValidation.value = false;
-      trainerAnswer.value = 0;
-    });
 
     const openTrainerReviewModal = () => { trainerReviewModal.value = true; };
 
@@ -100,8 +86,6 @@ export default {
       trainerAnswer,
       // Validations
       v$,
-      // Computed
-      displayReviewButtons,
       // Methods
       updateTrainerReview,
       openTrainerReviewModal,
