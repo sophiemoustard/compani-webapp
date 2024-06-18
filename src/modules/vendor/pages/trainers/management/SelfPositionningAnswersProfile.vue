@@ -185,15 +185,8 @@ export default {
       } else trainerReview.value.push(trainerReviewItem);
     };
 
-    const validateTrainerReview = async () => {
+    const updateQuestionnaireHistory = async () => {
       try {
-        const traineeAnswersLength = Object.values(filteredQuestionnaireAnswers.value).length;
-        const trainerAnswersLength = trainerReview.value.filter(a => a.isValidated || a.answer).length;
-
-        if (trainerAnswersLength !== traineeAnswersLength) {
-          return NotifyWarning('Champ(s) invalide(s) : vous devez valider ou ajuster la note pour chaque question.');
-        }
-
         const payload = {
           trainerAnswers: trainerReview.value.map(a => omit(a, ['isValidated'])),
           ...(trainerComment.value && { trainerComment: trainerComment.value }),
@@ -201,7 +194,8 @@ export default {
 
         await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, payload);
 
-        NotifyPositive('Validation enregistrée.');
+        NotifyPositive('Validation des réponses enregistrée.');
+
         await refreshQuestionnaireAnswers();
         trainerReview.value = [];
         trainerComment.value = '';
@@ -209,6 +203,26 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la validation des réponses au questionnaire.');
       }
+    };
+
+    const validateTrainerReview = async () => {
+      const traineeAnswersLength = Object.values(filteredQuestionnaireAnswers.value).length;
+      const trainerAnswersLength = trainerReview.value.filter(a => a.isValidated || a.answer).length;
+
+      if (trainerAnswersLength !== traineeAnswersLength) {
+        return NotifyWarning('Champ(s) invalide(s) : vous devez valider ou ajuster la note pour chaque question.');
+      }
+
+      const traineeName = traineeOptions.value.find(t => t.value === selectedTrainee.value).label;
+      $q.dialog({
+        title: 'Confirmation',
+        message: `Êtes-vous sûr(e) de vouloir valider les réponses de ${traineeName}&nbsp;? Les informations
+          renseignées seront enregistrées et non éditables.`,
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(updateQuestionnaireHistory)
+        .onCancel(() => NotifyPositive('Validation des réponses annulée.'));
     };
 
     const created = async () => {

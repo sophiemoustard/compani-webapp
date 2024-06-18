@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { ref, toRefs, computed } from 'vue';
+import { ref, toRefs, computed, watch } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
@@ -52,6 +52,11 @@ export default {
       trainerAnswer: { required, strictPositiveNumber, integerNumber },
     }));
     const v$ = useVuelidate(rules, { trainerAnswer });
+
+    watch(() => item.value.answers, () => {
+      trainerValidation.value = false;
+      trainerAnswer.value = 0;
+    });
 
     const openTrainerReviewModal = () => { trainerReviewModal.value = true; };
 
