@@ -1,41 +1,7 @@
 import get from 'lodash/get';
-import { CIVILITY_OPTIONS, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
-import nationalities from '@data/nationalities';
+import { CIVILITY_OPTIONS, NATURE_OPTIONS } from '@data/constants';
 import { formatPrice, getBillingItemsName, getBillingItemsPrice } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-
-const getMonthlyHours = contract => Number.parseFloat(contract.weeklyHours * WEEKS_PER_MONTH).toFixed(1);
-
-export const getContractTags = (data) => {
-  const monthlyHours = getMonthlyHours(data.version);
-  const civility = CIVILITY_OPTIONS.find(opt => opt.value === get(data, 'user.identity.title'));
-
-  return {
-    auxiliaryTitle: civility ? civility.label : '',
-    auxiliaryFirstname: get(data, 'user.identity.firstname') || '',
-    auxiliaryLastname: get(data, 'user.identity.lastname') || '',
-    auxiliaryAddress: get(data, 'user.contact.address.fullAddress') || '',
-    auxiliaryStreet: get(data, 'user.contact.address.street') || '',
-    auxiliaryCity: get(data, 'user.contact.address.city') || '',
-    auxiliaryZipCode: get(data, 'user.contact.address.zipCode') || '',
-    auxiliaryBirthCountry: get(data, 'user.identity.birthCountry') || '',
-    auxiliaryBirthState: get(data, 'user.identity.birthState') || '',
-    auxiliaryBirthDate: get(data, 'user.identity.birthDate') ? formatDate(data.user.identity.birthDate) : '',
-    auxiliaryNationality: get(data, 'user.identity.nationality') ? nationalities[data.user.identity.nationality] : '',
-    auxiliarySSN: get(data, 'user.identity.socialSecurityNumber') || '',
-    grossHourlyRate: get(data, 'version.grossHourlyRate') || '',
-    monthlyHours,
-    salary: get(data, 'version.grossHourlyRate') ? monthlyHours * data.version.grossHourlyRate : '',
-    startDate: get(data, 'version.startDate') ? formatDate(data.version.startDate) : '',
-    weeklyHours: get(data, 'version.weeklyHours') || '',
-    yearlyHours: get(data, 'version.weeklyHours') ? data.version.weeklyHours * 52 : '',
-    uploadDate: formatDate(Date.now()),
-    initialContractStartDate: get(data, 'contract.startDate') ? formatDate(data.contract.startDate) : '',
-    initialContractMonthlyHours: get(data, 'contract.versions[0]') ? getMonthlyHours(data.contract.versions[0]) : '',
-    companySIRET: get(data, 'user.establishment.siret') || '',
-    auxiliaryBirthCity: get(data, 'user.identity.birthCity') || '',
-  };
-};
 
 export const getCustomerDocumentTags = (data) => {
   const civility = CIVILITY_OPTIONS.find(opt => opt.value === get(data, 'customer.identity.title'));

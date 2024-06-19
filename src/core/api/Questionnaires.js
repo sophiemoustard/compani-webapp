@@ -27,11 +27,12 @@ export default {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/questionnaires/cards/${cardId}`);
   },
   async getQuestionnaireAnswers (id, params = null) {
-    const questionnaire = await alenviAxios.get(
+    const questionnaireAnswers = await alenviAxios.get(
       `${process.env.API_HOSTNAME}/questionnaires/${id}/follow-up`,
       { params }
     );
-    return questionnaire.data.data.followUp;
+
+    return questionnaireAnswers.data.data;
   },
   async getQRCode (params = null) {
     const qrCode = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires/qrcode`, { params });

@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { computed, toRefs } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
@@ -35,8 +37,8 @@ import {
 } from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import Button from '@components/Button';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'MultipleChoiceQuestion',
@@ -48,12 +50,15 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
   },
-  mixins: [templateMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+  emits: ['refresh'],
+  setup (props, { emit }) {
+    const { disableEdition, cardParent } = toRefs(props);
+
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcAnswers: {
@@ -64,51 +69,82 @@ export default {
         },
         explanation: { required },
       },
+    }));
+
+    const v$ = useVuelidate(rules, { card });
+
+    const refreshCard = () => {
+      emit('refresh');
     };
-  },
-  computed: {
-    disableAnswerCreation () {
-      return this.card.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-    disableAnswerDeletion () {
-      return this.card.qcAnswers.length <= MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-  },
-  methods: {
-    requiredOneCorrectAnswer (index) {
-      return get(this.v$, 'card.qcAnswers.minOneCorrectAnswer.$response') === false &&
-        !!this.card.qcAnswers[index].text;
-    },
-    async updateCorrectAnswer (index) {
+
+    const {
+      updateCard,
+      getError,
+      saveTmp,
+      addAnswer,
+      updateTextAnswer,
+      validateAnswerDeletion,
+      questionErrorMsg,
+    } = useCardTemplate(card, v$, refreshCard);
+
+    const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
+      card.value.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT);
+
+    const disableAnswerDeletion = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
+      card.value.qcAnswers.length <= MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT);
+
+    const requiredOneCorrectAnswer = index => !get(v$.value, 'card.qcAnswers.minOneCorrectAnswer.$response') &&
+      !!card.value.qcAnswers[index].text;
+
+    const updateCorrectAnswer = async (index) => {
       try {
-        const editedAnswer = get(this.card, `qcAnswers[${index}]`);
+        const editedAnswer = get(card.value, `qcAnswers[${index}]`);
 
         await Cards.updateAnswer(
-          { cardId: this.card._id, answerId: editedAnswer._id },
+          { cardId: card.value._id, answerId: editedAnswer._id },
           { correct: editedAnswer.correct }
         );
 
-        await this.refreshCard();
+        await refreshCard();
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
       }
-    },
-    answersErrorMsg (index) {
-      const validation = this.v$.card.qcAnswers.$each.$response.$errors[index].text;
+    };
+
+    const answersErrorMsg = (index) => {
+      const validation = v$.value.card.qcAnswers.$each.$response.$errors[index].text;
 
       if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
-      if (this.requiredOneCorrectAnswer(index)) return 'Une bonne réponse est nécessaire.';
+      if (requiredOneCorrectAnswer(index)) return 'Une bonne réponse est nécessaire.';
       if (get(validation, '0.$validator') === 'maxLength') return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
-    },
-    answerIsRequired (index) {
-      return index < MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT;
-    },
+    };
+
+    const answerIsRequired = index => index < MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT;
+
+    return {
+      // Validations
+      v$,
+      // Computed
+      card,
+      disableAnswerCreation,
+      disableAnswerDeletion,
+      questionErrorMsg,
+      // Methods
+      requiredOneCorrectAnswer,
+      updateCorrectAnswer,
+      answersErrorMsg,
+      answerIsRequired,
+      updateCard,
+      getError,
+      saveTmp,
+      addAnswer,
+      updateTextAnswer,
+      validateAnswerDeletion,
+    };
   },
 };
 </script>

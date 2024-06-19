@@ -1,8 +1,5 @@
 export const TOKEN_EXPIRE_DAY = 1; // in days
 
-export const IDENTIFICATION = 'identification';
-export const CONTRACT_END = 'contract_end';
-
 // MEDIA
 export const BLUE_TEXT_LOGO = 'https://storage.googleapis.com/compani-main/icons/compani_texte_bleu.png';
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
@@ -52,13 +49,6 @@ export const HOME = 'home';
 export const NURSING_HOME = 'nursing_home';
 export const HOSPITALIZED = 'hospitalized';
 export const DECEASED = 'deceased';
-export const SITUATION_OPTIONS = [
-  { label: 'Non renseigné', value: UNKNOWN },
-  { label: 'Domicile', value: HOME },
-  { label: 'EHPAD', value: NURSING_HOME },
-  { label: 'Hospitalisé', value: HOSPITALIZED },
-  { label: 'Décédé', value: DECEASED },
-];
 
 // CUSTOMER ABSENCE
 export const CUSTOMER_ABSENCE = 'customer_absence';
@@ -73,31 +63,6 @@ export const CUSTOMER_ABSENCE_TYPES = [
 
 // CONTRACTS
 export const CONTRACT = 'contract';
-export const CONTRACT_VERSION = 'contract_version';
-export const END_CONTRACT_REASONS = [
-  { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
-  { label: 'Rupture période d’essai salarié(e)', value: 'employee_trial_period_termination' },
-  { label: 'Démission', value: 'resignation' },
-  { label: 'Licenciement faute grave', value: 'serious_misconduct_layoff' },
-  { label: 'Licenciement faute lourde', value: 'gross_fault_layoff' },
-  { label: 'Licenciement autre motif', value: 'other_reason_layoff' },
-  { label: 'Mutation', value: 'mutation' },
-  { label: 'Rupture conventionnelle', value: 'contractual_termination' },
-  { label: 'Fin de stage', value: 'internship_end' },
-  { label: 'Fin de contrat CDD', value: 'cdd_end' },
-  { label: 'Autres', value: OTHER },
-];
-export const CONTRACT_CREATION_MANDATORY_INFO = {
-  'identity.lastname': 'nom',
-  'identity.firstname': 'prénom',
-  'identity.birthDate': 'date de naissance',
-  'identity.birthCity': 'ville de naissance',
-  'identity.birthState': 'département de naissance',
-  'identity.nationality': 'nationalité',
-  'identity.socialSecurityNumber': 'numéro de sécurité sociale',
-  'contact.address.fullAddress': 'adresse',
-  establishment: 'établissement',
-};
 
 // EVENTS
 export const INTERVENTION = 'intervention';
@@ -328,15 +293,6 @@ export const OGUST = 'ogust';
 
 export const WEEKS_PER_MONTH = (52 / 12);
 
-// PAY DOCUMENT NATURE
-export const PAYSLIP = 'payslip';
-export const CERTIFICATE = 'certificate';
-export const PAY_DOCUMENT_NATURES = [
-  { label: 'Bulletin de paie', value: PAYSLIP },
-  { label: 'Attestation', value: CERTIFICATE },
-  { label: 'Autre', value: OTHER },
-];
-
 // COMPANY
 export const COMPANY = 'company';
 export const ASSOCIATION = 'association';
@@ -348,7 +304,6 @@ export const COMPANY_TYPES = [
 // SMS
 export const CONVOCATION = 'convocation';
 export const REMINDER = 'reminder';
-export const HR_SMS = 'RH';
 export const COURSE_SMS = 'Formation';
 
 // COURSE
@@ -401,8 +356,12 @@ export const ACTIVITY_TYPES = [
   { label: 'Vidéo', value: VIDEO },
 ];
 
-// CARD CATEGORIES
+// QUESTIONNAIRE
 export const QUESTIONNAIRE = 'questionnaire';
+export const START_COURSE = 'start_course';
+export const END_COURSE = 'end_course';
+export const VALIDATE = 'validate';
+export const ADJUST = 'adjust';
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
@@ -494,7 +453,7 @@ export const OFFICIAL = 'official';
 // Email
 export const TRAINEE = 'trainee';
 
-// QUESTIONNAIRE TYPES
+// QUESTIONNAIRE
 export const EXPECTATIONS = 'expectations';
 export const END_OF_COURSE = 'end_of_course';
 export const SELF_POSITIONNING = 'self_positionning';
@@ -504,6 +463,7 @@ export const QUESTIONNAIRE_TYPES = {
   [END_OF_COURSE]: 'Fin de formation',
   [SELF_POSITIONNING]: 'Auto-positionnement',
 };
+export const REVIEW = 'review';
 
 // EXPORTS
 export const SERVICE = 'service';
@@ -543,19 +503,6 @@ export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Questionnaires de satisfaction', value: END_OF_COURSE },
   { label: 'Factures et avoirs', value: COURSE_BILL },
   { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
-];
-
-// PARTNER
-export const JOB_OPTIONS = [
-  { label: 'Assistante sociale', value: 'social_worker' },
-  { label: 'Évaluateur médico-social', value: 'medico_social_assessor' },
-  { label: 'Docteur', value: 'doctor' },
-  { label: 'Gériatre', value: 'geriatrician' },
-  { label: 'Coordinateur', value: 'coordinator' },
-  { label: 'Directeur', value: 'director' },
-  { label: 'Gestionnaire de cas', value: 'case_manager' },
-  { label: 'Infirmier', value: 'nurse' },
-  { label: 'Psychologue', value: 'psychologist' },
 ];
 
 // CUSTOMER STATUS

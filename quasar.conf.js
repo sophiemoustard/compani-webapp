@@ -107,8 +107,7 @@ module.exports = configure(ctx => ({
 
             return false;
           },
-        }),
-        new webpack.DefinePlugin({ __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false' })
+        })
       );
     },
     env: {
@@ -125,4 +124,5 @@ module.exports = configure(ctx => ({
     },
   },
   devServer: { open: true },
+  ...(ctx && ctx.dev && { boot: ['localEntry'] }),
 }));

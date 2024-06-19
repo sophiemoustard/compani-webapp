@@ -186,7 +186,11 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (['ni users learners info', 'ni management questionnaire answers'].includes(from.name)) {
+            if ([
+              'ni users learners info',
+              'ni management questionnaire answers',
+              'trainers questionnaire answers',
+            ].includes(from.name)) {
               to.query.defaultTab = 'traineeFollowUp';
             } else if (from.name === 'ni users companies info' && from.query.defaultTab === 'bills') {
               to.query.defaultTab = 'billing';
@@ -267,6 +271,16 @@ const routes = [
           }
         },
         props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'management',
+        },
+      },
+      {
+        path: 'trainers/management/questionnaires/:questionnaireId',
+        name: 'trainers questionnaire answers',
+        component: () => import('src/modules/vendor/pages/trainers/management/SelfPositionningAnswersProfile'),
+        props: route => ({ ...route.params, ...route.query }),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',

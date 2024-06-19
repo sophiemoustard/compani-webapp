@@ -20,8 +20,16 @@
         <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" :types="questionnaireTypes"
           @click="goToQuestionnaireProfile" />
       </div>
+      <div v-if="loggedUserIsCourseTrainer && endSelfPositionningQuestionnaireId">
+        <ni-banner icon="edit">
+          <template #message>
+            Pour valider les réponses aux questionnaires d’auto-positionnement de fin de formation, veuillez
+              <a class="clickable-name cursor-pointer" @click="goToSelfPositionningAnswers">cliquer ici</a>
+          </template>
+        </ni-banner>
+      </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
-        <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
+        <questionnaire-answers-cell v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
           :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
     </div>
@@ -90,6 +98,11 @@ import {
   EXPECTATIONS,
   OFFICIAL,
   CUSTOM,
+  ALL_PDF,
+  ALL_WORD,
+  SELF_POSITIONNING,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -100,7 +113,6 @@ import { downloadZip } from '@helpers/file';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { useCourses } from '@composables/courses';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
-import { ALL_PDF, ALL_WORD, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '../../data/constants';
 
 export default {
   name: 'ProfileTraineeFollowUp',
@@ -180,6 +192,18 @@ export default {
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
       }
     };
+
+    const loggedUserIsCourseTrainer = computed(() => loggedUser.value._id === course.value.trainer._id);
+
+    const filteredQuestionnaires = computed(() => (loggedUserIsCourseTrainer.value
+      ? questionnaires.value.filter(q => q.type !== SELF_POSITIONNING)
+      : questionnaires.value));
+
+    const endSelfPositionningQuestionnaireId = computed(() => {
+      const selfPositionningQ = questionnaires.value.find(q => q.type === SELF_POSITIONNING && q.histories.length);
+
+      return get(selfPositionningQ, '_id') || '';
+    });
 
     const goToQuestionnaireAnswers = questionnaireId => $router.push(
       { name: 'ni management questionnaire answers', params: { courseId: course.value._id, questionnaireId } }
@@ -293,6 +317,14 @@ export default {
       window.open(questionnaire.href, '_blank');
     };
 
+    const goToSelfPositionningAnswers = () => $router.push(
+      {
+        name: 'trainers questionnaire answers',
+        params: { questionnaireId: endSelfPositionningQuestionnaireId.value },
+        query: { courseId: course.value._id },
+      }
+    );
+
     const created = async () => {
       const promises = [getFollowUp(), getUnsubscribedAttendances()];
       if (!isClientInterface) promises.push(refreshQuestionnaires(), getQuestionnaireQRCode());
@@ -331,6 +363,9 @@ export default {
       areQuestionnaireQRCodeVisible,
       isRofOrVendorAdmin,
       canReadCompletionCertificate,
+      filteredQuestionnaires,
+      endSelfPositionningQuestionnaireId,
+      loggedUserIsCourseTrainer,
       // Methods
       get,
       formatQuantity,
@@ -338,6 +373,7 @@ export default {
       downloadCompletionCertificates,
       downloadAttendanceSheet,
       goToQuestionnaireProfile,
+      goToSelfPositionningAnswers,
     };
   },
 };

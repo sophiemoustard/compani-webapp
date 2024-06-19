@@ -21,12 +21,6 @@ const routes = [
     props: route => ({ courseId: route.query.courseId }),
   },
   {
-    path: '/ni/questionnaires/:questionnaireId',
-    name: 'ni questionnaires old',
-    component: () => import('src/modules/notLogged/pages/QuestionnaireForm'),
-    props: route => ({ questionnaireId: route.params.questionnaireId, courseId: route.query.courseId }),
-  },
-  {
     // Always leave this as last one
     path: '/:catchAll(.*)*',
     name: '404',

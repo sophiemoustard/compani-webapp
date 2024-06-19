@@ -15,14 +15,13 @@ import get from 'lodash/get';
 import ProfileTabs from '@components/ProfileTabs';
 import { formatIdentity } from '@helpers/utils';
 import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
-import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 import ProfileInfo from 'src/modules/client/components/customers/infos/ProfileInfo';
 import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling';
 
 export default {
   props: {
     customerId: { type: String, required: true },
-    defaultTab: { type: String, default: () => 'followUp' },
+    defaultTab: { type: String, default: () => 'info' },
   },
   components: {
     'customer-profile-header': CustomerProfileHeader,
@@ -34,12 +33,6 @@ export default {
     const { defaultTab, customerId } = toRefs(props);
 
     const tabsContent = [
-      {
-        label: 'Accompagnement',
-        name: 'followUp',
-        default: defaultTab.value === 'followUp',
-        component: ProfileFollowUp,
-      },
       {
         label: 'Infos',
         name: 'info',
