@@ -155,7 +155,7 @@ export default {
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const validateTraineeSelection = (traineeId) => {
-      if (trainerReview.value.some(a => a.isValidated) || trainerComment.value) {
+      if (trainerReview.value.some(a => a.isValidated || a.answer) || trainerComment.value) {
         $q.dialog({
           title: 'Confirmation',
           message: `Êtes-vous sûr(e) de vouloir changer d'apprenant &nbsp;? Les informations renseignées pour
