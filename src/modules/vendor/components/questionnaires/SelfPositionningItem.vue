@@ -6,7 +6,7 @@
       <survey-answer title="Note de début" :answer="Number(item.answers.startCourse) || 0" />
       <survey-answer title="Note de fin" :answer="Number(item.answers.endCourse) || 0" />
       <survey-answer v-if="trainerAnswer" title="Note ajustée" :answer="trainerAnswer" />
-      <div v-else class="flex column justify-end q-py-md">
+      <div v-else-if="item.answers.endCourse" class="flex column justify-end q-py-md">
         <ni-button label="Ajuster la note" class="bg-primary" color="white" @click="openTrainerReviewModal" />
         <q-checkbox class="q-py-sm" :model-value="trainerValidation" label="Je valide la note de fin"
           keep-color color="primary" @update:model-value="() => updateTrainerReview(VALIDATE)" />
