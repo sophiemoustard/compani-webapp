@@ -5,7 +5,7 @@
     </div>
     <q-icon v-if="error" name="error_outline" color="secondary" class="col-1" />
   </div>
-  <div borderless :error="error" :error-message="errorMessage" class="container">
+  <div borderless class="container">
     <q-rating :model-value="modelValue" @update:model-value="update" :icon="icon" max="5" :color="color"
       size="lg" class="q-my-md" :readonly="readonly">
       <template v-for="[tipKey, label] in formattedTipAndLabels" #[tipKey] :key="label">
@@ -13,14 +13,14 @@
       </template>
     </q-rating>
   </div>
-  <div class="labels" v-for="labelKey in Object.keys(labels)" :key="labelKey">
-    {{ labelKey }} : {{ labels[labelKey] }}
-  </div>
+  <div class="error-message" v-if="error">{{ errorMessage }}</div>
+  <ni-labels-details v-if="Object.keys(labels).length" :labels="labels" are-details-visible />
 </template>
 
 <script>
 import { toRefs } from 'vue';
 import { REQUIRED_LABEL } from '@data/constants';
+import LabelsDetails from '@components/LabelsDetails';
 
 export default {
   name: 'Rating',
@@ -36,6 +36,9 @@ export default {
     readonly: { type: Boolean, default: false },
   },
   emits: ['update:model-value'],
+  components: {
+    'ni-labels-details': LabelsDetails,
+  },
   setup (props, { emit }) {
     const { labels } = toRefs(props);
 
@@ -60,7 +63,9 @@ export default {
 .container
   display: flex
   justify-content: center
-.labels
-  margin: 0 0 8px 0
-  color: $copper-grey-500
+.error-message
+  color: $secondary
+  line-height: 1
+  font-size: 11px
+  padding: 8px 0px
 </style>

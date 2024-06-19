@@ -3,7 +3,7 @@
     <q-card class="cell-container" flat>
       <q-card-section class="title">{{ title }}</q-card-section>
       <q-card-section>
-        <ni-rating v-if="answer" readonly :model-value="Number(answer)" :icon="icon" color="copper-grey-500" />
+        <ni-rating v-if="answer" readonly :model-value="answer" :icon="icon" color="copper-grey-500" />
         <div class="answer" v-else>Pas de note</div>
       </q-card-section>
     </q-card>
@@ -18,7 +18,7 @@ export default {
   name: 'SurveyAnswer',
   props: {
     title: { type: String, required: true },
-    answer: { type: String, required: true },
+    answer: { type: Number, required: true },
   },
   components: {
     'ni-rating': Rating,
