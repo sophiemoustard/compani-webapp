@@ -4,19 +4,21 @@
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="v$.card.question.$error" type="textarea"
       :error-message="questionErrorMsg" />
     <div v-for="(orderedAnswers, i) in card.orderedAnswers" :key="i" class="answers">
-      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.orderedAnswers[i].text"
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="orderedAnswers.text"
         @focus="saveTmp(`orderedAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :disable="disableEdition"
         :error="getError('orderedAnswers', i)" class="input" :required-field="answerIsRequired(i)" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
-    :disable="disableAnswerCreation" />
+      :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="v$.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
 <script>
+import { useStore } from 'vuex';
+import { computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
@@ -26,8 +28,8 @@ import {
   ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT,
   PUBLISHED,
 } from '@data/constants';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import Button from '@components/Button';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'OrderTheSequence',
@@ -39,17 +41,47 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
   },
-  mixins: [templateMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+  emits: ['refresh'],
+  setup (_, { emit }) {
+    const $store = useStore();
+
+    const refreshCard = () => { emit('refresh'); };
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         orderedAnswers: { $each: helpers.forEach({ text: { required } }) },
         explanation: { required },
       },
+    };
+    const v$ = useVuelidate(rules, { card });
+
+    const {
+      questionErrorMsg,
+      saveTmp,
+      updateCard,
+      updateTextAnswer,
+      getError,
+      validateAnswerDeletion,
+      addAnswer,
+    } = useCardTemplate(card, v$, refreshCard);
+
+    return {
+      // Validations
+      v$,
+      // Computed
+      card,
+      questionErrorMsg,
+      // Methods
+      saveTmp,
+      updateCard,
+      useCardTemplate,
+      updateTextAnswer,
+      getError,
+      validateAnswerDeletion,
+      addAnswer,
     };
   },
   computed: {
