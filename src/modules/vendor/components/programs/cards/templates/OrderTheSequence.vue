@@ -18,7 +18,7 @@
 
 <script>
 import { useStore } from 'vuex';
-import { computed } from 'vue';
+import { computed, toRefs } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
@@ -42,12 +42,19 @@ export default {
     'ni-button': Button,
   },
   emits: ['refresh'],
-  setup (_, { emit }) {
+  setup (props, { emit }) {
+    const { disableEdition, cardParent } = toRefs(props);
     const $store = useStore();
 
     const refreshCard = () => { emit('refresh'); };
 
     const card = computed(() => $store.state.card.card);
+
+    const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
+      card.value.orderedAnswers.length >= ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT);
+
+    const disableAnswerDeletion = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
+      card.value.orderedAnswers.length <= ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT);
 
     const rules = {
       card: {
@@ -68,12 +75,16 @@ export default {
       addAnswer,
     } = useCardTemplate(card, v$, refreshCard);
 
+    const answerIsRequired = index => index < ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT;
+
     return {
       // Validations
       v$,
       // Computed
       card,
       questionErrorMsg,
+      disableAnswerCreation,
+      disableAnswerDeletion,
       // Methods
       saveTmp,
       updateCard,
@@ -82,22 +93,8 @@ export default {
       getError,
       validateAnswerDeletion,
       addAnswer,
+      answerIsRequired,
     };
-  },
-  computed: {
-    disableAnswerCreation () {
-      return this.card.orderedAnswers.length >= ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-    disableAnswerDeletion () {
-      return this.card.orderedAnswers.length <= ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-  },
-  methods: {
-    answerIsRequired (index) {
-      return index < ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT;
-    },
   },
 };
 </script>
