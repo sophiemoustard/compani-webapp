@@ -41,19 +41,17 @@
             error-message="Fonction invalide" @blur="updateCompany('legalRepresentative.position')" />
         </div>
       </div>
-      <div class="q-mb-xl" v-if="canUpdateErpConfig">
-        <p class="text-weight-bold">Facturation</p>
-        <div class="row gutter-profile">
-          <ni-input caption="IBAN" :error="v$.company.iban.$error" :error-message="ibanError"
-            v-model.trim="company.iban" @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
-          <ni-input caption="BIC" :error="v$.company.bic.$error" :error-message="bicError" upper-case
-            v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
-          <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')"
-            :error="v$.company.ics.$error" />
-          <ni-input caption="Support facturation" :error="v$.company.billingAssistance.$error"
+      <p class="text-weight-bold">Facturation</p>
+      <div class="row gutter-profile q-mb-xl">
+        <ni-input caption="IBAN" :error="v$.company.iban.$error" :error-message="ibanError"
+        v-model.trim="company.iban" @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
+        <ni-input caption="BIC" :error="v$.company.bic.$error" :error-message="bicError" upper-case
+        v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
+          <ni-input v-if="canUpdateErpConfig" caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')"
+            @blur="updateCompany('ics')" :error="v$.company.ics.$error" />
+          <ni-input v-if="canUpdateErpConfig" caption="Support facturation" :error="v$.company.billingAssistance.$error"
             :error-message="billingAssistanceError" v-model.trim="company.billingAssistance"
             @focus="saveTmp('billingAssistance')" @blur="updateCompany('billingAssistance')" />
-        </div>
       </div>
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Paie</p>

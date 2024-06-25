@@ -6,7 +6,7 @@
           :options="companiesOptions" @update:model-value="setCompany($event)" clearable class="selector" />
       </template>
     </ni-title-header>
-    <course-billing-infos :company="currentCompany" @refresh-company="refreshCompany" />
+    <course-billing-infos :profile-id="get(currentCompany, '_id')" @refresh-company="refreshCompany" />
   </q-page>
 </template>
 
@@ -108,6 +108,7 @@ export default {
       // Methods
       setCompany,
       refreshCompany,
+      get,
     };
   },
 };

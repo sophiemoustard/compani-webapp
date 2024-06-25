@@ -1,12 +1,20 @@
 <template>
   <div v-if="get(company, '_id')">
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Contact</p>
+      <p class="text-weight-bold">Informations de facturation</p>
       <div class="interlocutor-container">
         <ni-interlocutor-cell :interlocutor="company.billingRepresentative" can-update
           caption="Chargé de facturation dans la structure" label="Ajouter un chargé de facturation"
           @open-modal="openBillingRepresentativeModal" />
-      </div>
+        </div>
+        <div class="q-mt-md">
+          <div class="row gutter-profile">
+            <ni-input caption="IBAN" v-model.trim="company.iban" @focus="saveTmp('iban')"
+              @blur="updateCompany('iban')" :error="validations.company.iban.$error" :error-message="ibanError" />
+            <ni-input caption="BIC" v-model.trim="company.bic" @focus="saveTmp('bic')"
+              @blur="updateCompany('bic')" :error="validations.company.bic.$error" :error-message="bicError" />
+          </div>
+        </div>
     </div>
     <template v-if="Object.keys(groupedCourseBills).length">
       <div v-for="index of Object.keys(groupedCourseBills)" :key="index" class="q-mb-xl">
@@ -107,14 +115,15 @@
     </template>
     <div v-else class="text-italic">Pas de factures</div>
     <ni-interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
-      @submit="updateCompany" :label="billingRepresentativeModalLabel" :loading="billingRepresentativeModalLoading"
-      :interlocutors-options="billingRepresentativeGroupedByCompany[company._id]" @hide="resetBillingRepresentative"
-      :validations="validations.tmpBillingRepresentative" />
+      @submit="updateCompany('billingRepresentative')" :label="billingRepresentativeModalLabel"
+      :loading="billingRepresentativeModalLoading" :validations="validations.tmpBillingRepresentative"
+      :interlocutors-options="billingRepresentativeGroupedByCompany[company._id]" @hide="resetBillingRepresentative" />
   </div>
 </template>
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import { Screen } from 'quasar';
@@ -127,6 +136,7 @@ import CoursePayments from '@api/CoursePayments';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Button from '@components/Button';
+import Input from '@components/form/Input';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -142,6 +152,7 @@ import {
   CLIENT_ADMIN,
   EDITION,
   HOLDING_ADMIN,
+  REQUIRED_LABEL,
 } from '@data/constants.js';
 import CompaniDate from '@helpers/dates/companiDates';
 import { ascendingSortBy, descendingSortBy } from '@helpers/dates/utils';
@@ -153,11 +164,12 @@ import {
   formatName,
   formatQuantity,
 } from '@helpers/utils';
-import { positiveNumber } from '@helpers/vuelidateCustomVal';
+import { positiveNumber, iban, bic } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
 import { useCourses } from '@composables/courses';
 import { useCourseBilling } from '@composables/courseBills';
+import { useValidations } from '@composables/validations';
 import CoursePaymentCreationModal from 'src/modules/vendor/components/billing/CoursePaymentCreationModal';
 import CoursePaymentEditionModal from 'src/modules/vendor/components/billing/CoursePaymentEditionModal';
 import { hasUserAccessToCompany } from '@helpers/userCompanies';
@@ -165,12 +177,13 @@ import { hasUserAccessToCompany } from '@helpers/userCompanies';
 export default {
   name: 'CourseBillingInfos',
   props: {
-    company: { type: Object, default: () => ({}) },
+    profileId: { type: String, default: '' },
   },
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
     'ni-button': Button,
+    'ni-input': Input,
     'ni-course-payment-creation-modal': CoursePaymentCreationModal,
     'ni-course-payment-edition-modal': CoursePaymentEditionModal,
     'ni-interlocutor-cell': InterlocutorCell,
@@ -178,11 +191,11 @@ export default {
   },
   emits: ['refresh-company'],
   setup (props, { emit }) {
-    const { company } = toRefs(props);
-
+    const { profileId } = toRefs(props);
     const $store = useStore();
     const courseBillsGroupedByCompany = ref({});
     const loading = ref(false);
+    const tmpInput = ref('');
     const paymentCreationLoading = ref(false);
     const paymentEditionLoading = ref(false);
     const coursePaymentMetaInfo = ref({ number: '', courseName: '', netInclTaxes: '', companiesName: '' });
@@ -235,7 +248,13 @@ export default {
     const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
     const tmpBillingRepresentative = ref({});
 
+    const company = computed(() => (profileId.value ? $store.state.company.company : {}));
+
     const rules = {
+      company: {
+        iban: { required, iban },
+        bic: { required, bic },
+      },
       newCoursePayment: {
         nature: { required },
         netInclTaxes: { required, positiveNumber },
@@ -252,7 +271,12 @@ export default {
 
     const { isVendorInterface } = useCourses();
 
-    const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment, tmpBillingRepresentative });
+    const validations = useVuelidate(
+      rules,
+      { company, newCoursePayment, editedCoursePayment, tmpBillingRepresentative }
+    );
+
+    const { waitForValidation } = useValidations();
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -288,6 +312,24 @@ export default {
       };
     });
 
+    const ibanError = computed(() => {
+      const validation = get(validations, 'value.company.iban');
+
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'iban.$response') === false) return 'IBAN non valide';
+
+      return '';
+    });
+
+    const bicError = computed(() => {
+      const validation = get(validations, 'value.company.bic');
+
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'bic.$response') === false) return 'BIC non valide';
+
+      return '';
+    });
+
     const { pdfLoading, downloadBill, downloadCreditNote } = useCourseBilling(courseBillList);
 
     const sortCourseBills = (a, b) => {
@@ -295,6 +337,8 @@ export default {
 
       return billedAtCompare === 0 ? descendingSortBy('createdAt')(a, b) : billedAtCompare;
     };
+
+    const saveTmp = (path) => { tmpInput.value = get(company.value, path); };
 
     const refreshCourseBills = async () => {
       try {
@@ -471,13 +515,27 @@ export default {
       billingRepresentativeGroupedByCompany.value[company.value._id] = formatAndSortUserOptions(usersOptions, false);
     };
 
-    const updateCompany = async () => {
+    const updateCompany = async (path) => {
       try {
-        billingRepresentativeModalLoading.value = true;
-        validations.value.tmpBillingRepresentative.$touch();
-        if (validations.value.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+        const value = get(company.value, path);
+        if (tmpInput.value === value) return;
 
-        await Companies.updateById(company.value._id, { billingRepresentative: tmpBillingRepresentative.value._id });
+        let payload;
+        if (path === 'billingRepresentative') {
+          billingRepresentativeModalLoading.value = true;
+          validations.value.tmpBillingRepresentative.$touch();
+          if (validations.value.tmpBillingRepresentative.$error) return NotifyWarning('Champ invalide');
+
+          payload = { billingRepresentative: tmpBillingRepresentative.value._id };
+        } else {
+          validations.value.company.$touch();
+          const isValid = await waitForValidation(validations.value.company, path);
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+
+          payload = set({}, path, value);
+        }
+
+        await Companies.updateById(company.value._id, payload);
         NotifyPositive('Modification enregistrée.');
 
         emit('refresh-company');
@@ -486,6 +544,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
+        tmpInput.value = '';
         tmpBillingRepresentative.value = {};
         billingRepresentativeModalLoading.value = false;
       }
@@ -534,9 +593,13 @@ export default {
       tmpBillingRepresentative,
       // Computed
       validations,
+      ibanError,
+      bicError,
       canUpdateBilling,
       groupedCourseBills,
+      company,
       // Methods
+      saveTmp,
       refreshCourseBills,
       formatPrice,
       formatName,
