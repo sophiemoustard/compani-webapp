@@ -2,31 +2,30 @@
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
-    <div class="chart">
-      <div class="bar-container">
-        <div v-for="(line, index) in lines" :key="index">
-          <div class="bar bg-peach-100">
-            <div class="bar-fill bg-peach-200" :style="`height: ${line.percentage * 100}%`" />
-            <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
-          </div>
-          <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
+    <div class="bar-container">
+      <div v-for="(line, index) in lines" :key="index">
+        <div class="bar bg-peach-100">
+          <div class="bar-fill bg-peach-200" :style="`height: ${line.percentage * 100}%`" />
+          <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
         </div>
-      </div>
-      <div class="chart-footer">
-        <div class="first-label">{{ this.card.labels['1'] }}</div>
-        <div class="last-label">{{ this.card.labels['5'] }}</div>
+        <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
       </div>
     </div>
+    <ni-labels-details are-details-visible :labels="card.labels" />
   </q-card>
 </template>
 
 <script>
 import { formatQuantity, roundFrenchPercentage } from '@helpers/utils';
+import LabelsDetails from '@components/LabelsDetails';
 
 export default {
   name: 'SurveyChart',
   props: {
     card: { type: Object, default: () => ({}) },
+  },
+  components: {
+    'ni-labels-details': LabelsDetails,
   },
   computed: {
     subtitle () {
@@ -67,10 +66,6 @@ export default {
   width: 312px
   @media screen and (max-width: 420px)
     width: 100%
-
-.chart
-  display: flex
-  flex-direction: column
 
 .bar
   position: relative
