@@ -6,15 +6,15 @@
         <ni-interlocutor-cell :interlocutor="company.billingRepresentative" can-update
           caption="Chargé de facturation dans la structure" label="Ajouter un chargé de facturation"
           @open-modal="openBillingRepresentativeModal" />
+      </div>
+      <div class="q-mt-md">
+        <div class="row gutter-profile">
+          <ni-input caption="IBAN" v-model.trim="company.iban" @focus="saveTmp('iban')"
+            @blur="updateCompany('iban')" :error="validations.company.iban.$error" :error-message="ibanError" />
+          <ni-input caption="BIC" v-model.trim="company.bic" @focus="saveTmp('bic')"
+            @blur="updateCompany('bic')" :error="validations.company.bic.$error" :error-message="bicError" />
         </div>
-        <div class="q-mt-md">
-          <div class="row gutter-profile">
-            <ni-input caption="IBAN" v-model.trim="company.iban" @focus="saveTmp('iban')"
-              @blur="updateCompany('iban')" :error="validations.company.iban.$error" :error-message="ibanError" />
-            <ni-input caption="BIC" v-model.trim="company.bic" @focus="saveTmp('bic')"
-              @blur="updateCompany('bic')" :error="validations.company.bic.$error" :error-message="bicError" />
-          </div>
-        </div>
+      </div>
     </div>
     <template v-if="Object.keys(groupedCourseBills).length">
       <div v-for="index of Object.keys(groupedCourseBills)" :key="index" class="q-mb-xl">
@@ -251,10 +251,7 @@ export default {
     const company = computed(() => (profileId.value ? $store.state.company.company : {}));
 
     const rules = {
-      company: {
-        iban: { required, iban },
-        bic: { required, bic },
-      },
+      company: { iban: { required, iban }, bic: { required, bic } },
       newCoursePayment: {
         nature: { required },
         netInclTaxes: { required, positiveNumber },
@@ -517,9 +514,6 @@ export default {
 
     const updateCompany = async (path) => {
       try {
-        const value = get(company.value, path);
-        if (tmpInput.value === value) return;
-
         let payload;
         if (path === 'billingRepresentative') {
           billingRepresentativeModalLoading.value = true;
@@ -528,6 +522,9 @@ export default {
 
           payload = { billingRepresentative: tmpBillingRepresentative.value._id };
         } else {
+          const value = get(company.value, path);
+          if (tmpInput.value === value) return;
+
           validations.value.company.$touch();
           const isValid = await waitForValidation(validations.value.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
