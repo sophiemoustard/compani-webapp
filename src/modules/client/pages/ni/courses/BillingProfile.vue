@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="client-background">
-    <ni-title-header title="Facturation">
+    <ni-title-header title="Facturation" padding>
       <template v-if="hasHoldingRole" #content>
         <ni-select caption="Structure" :model-value="selectedCompany._id"
           :options="companiesOptions" @update:model-value="setCompany($event)" clearable class="selector" />
