@@ -1,12 +1,14 @@
 <template>
   <q-page padding class="client-background">
-    <ni-title-header title="Facturation" padding>
+    <ni-title-header title="Facturation">
       <template v-if="hasHoldingRole" #content>
         <ni-select caption="Structure" :model-value="selectedCompany._id"
           :options="companiesOptions" @update:model-value="setCompany($event)" clearable class="selector" />
       </template>
     </ni-title-header>
-    <course-billing-infos :profile-id="get(currentCompany, '_id')" @refresh-company="refreshCompany" />
+    <div class="q-mt-lg">
+      <course-billing-infos :profile-id="get(currentCompany, '_id')" @refresh-company="refreshCompany" />
+    </div>
   </q-page>
 </template>
 
@@ -31,7 +33,7 @@ export default {
     'ni-select': Select,
   },
   setup () {
-    const metaInfo = { title: 'Factures' };
+    const metaInfo = { title: 'Facturation' };
     useMeta(metaInfo);
 
     const $route = useRoute();
