@@ -80,13 +80,6 @@ export default {
   @media screen and (max-width: 420px)
     width: 32px
 
-.chart-footer
-  display: flex
-  justify-content: space-between
-  width: 312px
-  @media screen and (max-width: 420px)
-    width: 100%
-
 .first-label
   width: 30%
 
@@ -108,10 +101,13 @@ export default {
 
 .container
   display: flex
-  flex: 1
-  flex-direction: row
   justify-content: space-around
+  align-items: center
+  @media screen and (max-width: 767px)
+    flex-direction: column
 
 .labels-container
   width: 40vw
+  @media screen and (max-width: 767px)
+    width: 75vw
 </style>

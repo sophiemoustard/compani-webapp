@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <q-card class="container clickable cursor-pointer" flat>
       <q-item-section @click="showDetails()" class="header">
         {{ showLabels ? 'Cacher' : 'Afficher' }} le détail des légendes
@@ -59,9 +59,4 @@ export default {
   padding: 4px 32px
   font-size: 14px
   color: $copper-grey-500
-.container
-  display: flex
-  flex-direction: column
-  flex: 1
-  margin: 16px
 </style>
