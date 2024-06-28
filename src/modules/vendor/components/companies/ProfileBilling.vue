@@ -1,5 +1,5 @@
 <template>
-  <course-billing-infos :profile-id="company._id" @refresh-company="refreshCompany" />
+  <course-billing-infos :company="company" @refresh-company="refreshCompany" />
 </template>
 
 <script>
