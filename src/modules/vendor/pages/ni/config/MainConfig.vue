@@ -16,6 +16,10 @@
           <ni-input caption="Numéro de déclaration d'activité" v-model="vendorCompany.activityDeclarationNumber"
             @focus="saveTmp('activityDeclarationNumber')" @blur="updateVendorCompany('activityDeclarationNumber')"
             :error="validations.vendorCompany.activityDeclarationNumber.$error" />
+          <ni-input caption="IBAN" v-model="vendorCompany.iban" @blur="updateVendorCompany('iban')"
+            :error="validations.vendorCompany.iban.$error" :error-message="ibanErrorMessage" @focus="saveTmp('iban')" />
+          <ni-input caption="BIC" v-model="vendorCompany.bic" @focus="saveTmp('bic')" @blur="updateVendorCompany('bic')"
+            :error="validations.vendorCompany.bic.$error" :error-message="bicErrorMessage" />
         </div>
       </div>
       <p class="text-weight-bold">Contacts</p>
@@ -80,7 +84,7 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { frAddress, validSiret } from '@helpers/vuelidateCustomVal';
+import { frAddress, validSiret, iban, bic } from '@helpers/vuelidateCustomVal';
 import { sortStrings, formatAndSortUserOptions } from '@helpers/utils';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
 import VendorCompanies from '@api/VendorCompanies';
@@ -124,7 +128,15 @@ export default {
       { name: 'address', label: 'Adresse', align: 'left', field: 'address' },
       { name: 'actions', label: '', align: 'left', field: '_id' },
     ];
-    const vendorCompany = ref({ name: '', address: { fullAddress: '' }, siret: '', billingRepresentative: {} });
+    const vendorCompany = ref({
+      name: '',
+      address: { fullAddress: '' },
+      siret: '',
+      billingRepresentative: {},
+      activityDeclarationNumber: '',
+      iban: '',
+      bic: '',
+    });
     const courseBillingItems = ref([]);
     const courseBillingItemColumns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name' }];
     const pagination = { rowsPerPage: 0 };
@@ -147,6 +159,8 @@ export default {
         siret: { required, validSiret },
         address: { fullAddress: { required, frAddress } },
         activityDeclarationNumber: { required },
+        iban: { required, iban },
+        bic: { required, bic },
       },
       tmpBillingRepresentative: { _id: required },
     };
@@ -167,6 +181,24 @@ export default {
 
       if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
       if (get(validation, 'frAddress.$response') === false) return 'Adresse non valide';
+
+      return '';
+    });
+
+    const ibanErrorMessage = computed(() => {
+      const validation = get(validations, 'value.vendorCompany.iban');
+
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'iban.$response') === false) return 'IBAN non valide';
+
+      return '';
+    });
+
+    const bicErrorMessage = computed(() => {
+      const validation = get(validations, 'value.vendorCompany.bic');
+
+      if (get(validation, 'required.$response') === false) return REQUIRED_LABEL;
+      if (get(validation, 'bic.$response') === false) return 'BIC non valide';
 
       return '';
     });
@@ -369,6 +401,8 @@ export default {
       validations,
       siretErrorMessage,
       addressErrorMessage,
+      ibanErrorMessage,
+      bicErrorMessage,
       // Methods
       refreshCourseFundingOrganisations,
       resetOrganisationAdditionForm,
