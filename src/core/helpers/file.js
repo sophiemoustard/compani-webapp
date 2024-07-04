@@ -1,5 +1,4 @@
 import { Platform } from 'quasar';
-import GoogleDrive from '@api/GoogleDrive';
 
 export const downloadFile = (file, fileName, type = '') => {
   const link = document.createElement('a');
@@ -8,11 +7,6 @@ export const downloadFile = (file, fileName, type = '') => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-};
-
-export const downloadDriveDocx = async (params, data, fileName) => {
-  const file = await GoogleDrive.generateDocx(params, data);
-  downloadFile(file, fileName);
 };
 
 export const downloadZip = (zip, fileName) => {

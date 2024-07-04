@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredCustomers" :columns="columns" v-model:pagination="pagination" :path="path"
+    <ni-table-list :data="filteredCustomers" :columns="columns" v-model:pagination="pagination"
       :loading="tableLoading">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
@@ -138,7 +138,6 @@ export default {
           style: 'width: 30px',
         },
       ],
-      path: { name: 'ni customers info', params: 'customerId' },
     };
   },
   validations () {

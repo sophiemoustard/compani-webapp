@@ -92,16 +92,6 @@ const routes = [
           parent: 'customers',
         },
       },
-      { // must be last of ni/customers/... routes
-        path: 'ni/customers/:customerId',
-        name: 'ni customers info',
-        props: route => ({ ...route.params, ...route.query }),
-        component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'customers',
-        },
-      },
       {
         path: 'ni/courses',
         name: 'ni courses',

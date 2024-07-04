@@ -56,9 +56,6 @@ export default {
   async addQuote (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/quotes`, data);
   },
-  async deleteCertificates (id, payload) {
-    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}/certificates`, payload);
-  },
   async addFunding (id, payload) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/fundings`, payload);
   },
