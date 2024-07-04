@@ -34,7 +34,6 @@ const clientAdminRoutes = [
   { name: 'ni config coach' },
   { name: 'ni billing to bill', subscription: ERP },
   { name: 'ni billing clients balances', subscription: ERP },
-  { name: 'ni billing automatic bills', subscription: ERP },
   { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [
