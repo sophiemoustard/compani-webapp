@@ -66,15 +66,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/billing/manual-bills',
-        name: 'ni billing manual bills',
-        component: () => import('src/modules/client/pages/ni/billing/ManualBills'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
         path: 'ni/billing/clients-balances',
         name: 'ni billing clients balances',
         component: () => import('src/modules/client/pages/ni/billing/ClientsBalances'),
