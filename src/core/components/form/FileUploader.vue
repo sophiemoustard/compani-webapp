@@ -27,11 +27,10 @@
 <script>
 import { openURL } from 'quasar';
 import get from 'lodash/get';
-import GoogleDrive from '@api/GoogleDrive';
 import Button from '@components/Button';
 import CustomImg from '@components/form/CustomImg';
 import { NotifyNegative } from '@components/popup/notify';
-import { removeDiacritics, formatDownloadName } from '@helpers/utils';
+import { removeDiacritics } from '@helpers/utils';
 
 export default {
   props: {
@@ -51,7 +50,6 @@ export default {
     requiredField: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
     label: { type: String, default: 'Pas de document' },
-    driveStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
     docName: { type: String, default: 'download' },
     customFields: { type: Array, default: () => ([]) },
@@ -75,7 +73,6 @@ export default {
       if (this.customFields.length) fields.push(this.customFields);
 
       if (this.additionalValue) fields.push({ name: 'fileName', value: removeDiacritics(this.additionalValue) });
-      if (this.driveStorage) fields.push({ name: 'type', value: this.name });
 
       return fields.flat();
     },
@@ -83,10 +80,10 @@ export default {
       return get(this.entity, this.path);
     },
     imageSource () {
-      return this.driveStorage ? this.document.driveId : this.document.link;
+      return this.document.link;
     },
     hiddenImage () {
-      return this.hideImage || this.driveStorage;
+      return this.hideImage;
     },
   },
   methods: {
@@ -103,22 +100,10 @@ export default {
       this.$emit('uploaded', { file, xhr });
     },
     getDocument (doc) {
-      if (!this.driveStorage) return get(doc, 'link') || '';
-
-      return get(doc, 'driveId') || '';
+      return get(doc, 'link') || '';
     },
     async downloadDoc (doc) {
-      if (!this.driveStorage) return openURL(this.getDocument(doc));
-
-      try {
-        this.loading = true;
-
-        await GoogleDrive.downloadFileById(this.getDocument(doc), formatDownloadName(this.docName));
-      } catch (e) {
-        console.error(e);
-      } finally {
-        this.loading = false;
-      }
+      return openURL(this.getDocument(doc));
     },
     failMsg () {
       return NotifyNegative('Echec de l\'envoi du document.');

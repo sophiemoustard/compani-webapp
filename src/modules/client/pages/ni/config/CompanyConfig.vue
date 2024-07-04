@@ -47,7 +47,6 @@ import { formatAndSortUserOptions } from '@helpers/utils';
 import { companyMixin } from '@mixins/companyMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'CompanyConfig',
@@ -108,7 +107,7 @@ export default {
       resetBillingRepresentative,
     };
   },
-  mixins: [configMixin, validationMixin, tableMixin, companyMixin],
+  mixins: [configMixin, validationMixin, companyMixin],
   validations () {
     return {
       company: {
