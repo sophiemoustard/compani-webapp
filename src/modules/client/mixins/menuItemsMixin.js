@@ -92,7 +92,6 @@ export const menuItemsMixin = {
           label: 'Configuration',
           children: [
             { name: 'ni config company', icon: 'settings', label: 'Configuration générale' },
-            { name: 'ni config customers', icon: 'house', label: 'Configuration bénéficiaires' },
             { name: 'ni config coach', icon: 'people', label: 'Coachs' },
           ],
         },

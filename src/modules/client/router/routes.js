@@ -39,15 +39,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/customers',
-        name: 'ni config customers',
-        component: () => import('src/modules/client/pages/ni/config/CustomersConfig'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
-        },
-      },
-      {
         path: 'ni/config/coachs',
         name: 'ni config coach',
         component: () => import('src/modules/client/pages/ni/config/CoachConfig'),

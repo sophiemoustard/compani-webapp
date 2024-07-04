@@ -8,7 +8,6 @@ export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
 export const VIDEO_EXTENSIONS = 'video/*';
 export const AUDIO_EXTENSIONS = 'audio/*';
-export const HTML_EXTENSIONS = '.html';
 
 // CIVILITY
 export const MR = 'mr';
@@ -19,26 +18,6 @@ export const CIVILITY_OPTIONS = [
   { label: 'Monsieur / Madame', value: 'couple' },
 ];
 
-// CUSTOMER FUNDING
-export const FIXED = 'fixed';
-export const HOURLY = 'hourly';
-
-export const NATURE_OPTIONS = [
-  { label: 'Horaire', value: HOURLY },
-  { label: 'Forfaitaire', value: FIXED },
-];
-
-export const SURCHARGES = {
-  saturday: 'Samedi',
-  sunday: 'Dimanche',
-  publicHoliday: 'Jours fériés',
-  twentyFifthOfDecember: '25 décembre',
-  firstOfMay: '1er mai',
-  firstOfJanuary: '1er janvier',
-  evening: 'Soirée',
-  custom: 'Personnalisée',
-};
-
 // CONTRACTS
 export const CONTRACT = 'contract';
 
@@ -48,18 +27,6 @@ export const ABSENCE = 'absence';
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
 export const CREATION = 'creation';
-
-// THIRD PARTY PAYERS
-export const BILLING_INDIRECT = 'indirect';
-export const BILLING_DIRECT = 'direct';
-export const APA = 'APA';
-export const PCH = 'PCH';
-export const AM = 'AM';
-export const TPP_TYPE_OPTIONS = [
-  { label: 'APA', value: APA },
-  { label: 'Aide ménagère', value: AM },
-  { label: 'PCH', value: PCH },
-];
 
 // AVATAR
 export const DEFAULT_AVATAR = 'https://storage.googleapis.com/compani-main/default_avatar.png';
@@ -118,9 +85,7 @@ export const REQUIRED_LABEL = 'Champ requis';
 export const INVALID_NUMBER = 'Nombre invalide';
 
 // BILLING
-export const TWO_WEEKS = 'two_weeks';
 export const BILL = 'bill';
-export const CREDIT_NOTE = 'creditNote';
 
 // PAYMENTS
 export const DIRECT_DEBIT = 'direct_debit';
@@ -369,32 +334,6 @@ export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
 ];
 
-// TIMESTAMPING
-export const MANUAL_TIME_STAMPING = 'manual_time_stamping';
-export const QR_CODE_TIME_STAMPING = 'qr_code_time_stamping';
-export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING, QR_CODE_TIME_STAMPING];
-export const QRCODE_MISSING = 'qrcode_missing';
-export const QRCODE_ERROR = 'qrcode_error';
-export const CAMERA_ERROR = 'camera_error';
-export const MANUAL_TIME_STAMPING_REASONS = {
-  [QRCODE_MISSING]: 'Je n\'ai pas accès au code barre',
-  [QRCODE_ERROR]: 'Le code barre ne fonctionne pas',
-  [CAMERA_ERROR]: 'Mon appareil photo ne fonctionne pas',
-};
-
-// NOTE
-export const NOTE_CREATION = 'note_creation';
-export const NOTE_UPDATE = 'note_update';
-
-// BILLING ITEMS
-export const MANUAL = 'manual';
-export const AUTOMATIC = 'automatic';
-export const PER_INTERVENTION = 'per_intervention';
-export const BILLING_ITEMS_TYPE_OPTIONS = [
-  { label: 'Manuel', value: MANUAL },
-  { label: 'Par intervention', value: PER_INTERVENTION },
-];
-
 // COURSE_BILLS
 export const LIST = 'list';
 export const BALANCE = 'balance';
@@ -409,17 +348,6 @@ export const WITHOUT_SALES_REPRESENTATIVE = 'without_sales_representative';
 // END_TO_END TESTS
 export const BILLING = 'billing';
 export const AUTHENTICATION = 'authentication';
-
-// DAYS
-export const DAYS = {
-  0: 'Lundi',
-  1: 'Mardi',
-  2: 'Mercredi',
-  3: 'Jeudi',
-  4: 'Vendredi',
-  5: 'Samedi',
-  6: 'Dimanche',
-};
 
 // DATE AND DURATION UNITS
 export const YEAR = 'year';
