@@ -100,10 +100,6 @@ export default {
       return `${formatDate(date)} (${formatDateDiff(dateDiff(new Date(), date))})`;
     },
     goToPlanning () {
-      if (this.customer.subscriptions.length) {
-        return this.$router.push({ name: 'ni planning customers', query: { targetedCustomerId: this.customer._id } });
-      }
-
       return NotifyWarning('Le/la bénéficiaire n\'a pas de souscription.');
     },
     async deleteCustomer () {

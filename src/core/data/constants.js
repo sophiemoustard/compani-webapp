@@ -50,70 +50,17 @@ export const NURSING_HOME = 'nursing_home';
 export const HOSPITALIZED = 'hospitalized';
 export const DECEASED = 'deceased';
 
-// CUSTOMER ABSENCE
-export const CUSTOMER_ABSENCE = 'customer_absence';
-export const LEAVE = 'leave';
-export const HOSPITALIZATION = 'hospitalization';
 export const OTHER = 'other';
-export const CUSTOMER_ABSENCE_TYPES = [
-  { label: 'Congés', value: LEAVE },
-  { label: 'Hospitalisation', value: HOSPITALIZATION },
-  { label: 'Autre', value: OTHER },
-];
 
 // CONTRACTS
 export const CONTRACT = 'contract';
 
 // EVENTS
-export const INTERVENTION = 'intervention';
 export const ABSENCE = 'absence';
-export const UNAVAILABILITY = 'unavailability';
-export const INTERNAL_HOUR = 'internal_hour';
-export const PAID_LEAVE = 'leave';
-export const UNPAID_LEAVE = 'unpaid_leave';
-export const MATERNITY_LEAVE = 'maternity_leave';
-export const PATERNITY_LEAVE = 'paternity_leave';
-export const PARENTAL_LEAVE = 'parental_leave';
-export const WORK_ACCIDENT = 'work_accident';
-export const TRANSPORT_ACCIDENT = 'transport_accident';
-export const ILLNESS = 'illness';
-export const UNJUSTIFIED = 'unjustified_absence';
-export const CESSATION_OF_WORK_CHILD = 'cessation_of_work_child';
-export const CESSATION_OF_WORK_RISK = 'cessation_of_work_risk';
-export const ABSENCE_TYPES = [
-  { label: 'Congé', value: PAID_LEAVE },
-  { label: 'Congé sans solde', value: UNPAID_LEAVE },
-  { label: 'Congé maternité', value: MATERNITY_LEAVE },
-  { label: 'Congé paternité', value: PATERNITY_LEAVE },
-  { label: 'Congé parental', value: PARENTAL_LEAVE },
-  { label: 'Accident du travail', value: WORK_ACCIDENT },
-  { label: 'Accident de trajet', value: TRANSPORT_ACCIDENT },
-  { label: 'Maladie', value: ILLNESS },
-  { label: 'Absence injustifiée', value: UNJUSTIFIED },
-  { label: 'Arrêt de travail - garde d’enfant', value: CESSATION_OF_WORK_CHILD },
-  { label: 'Arrêt de travail - salarié(e) à risque', value: CESSATION_OF_WORK_RISK },
-  { label: 'Autre', value: OTHER },
-];
+
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
-export const CANCELLATION = 'cancellation';
 export const CREATION = 'creation';
-export const DAILY = 'daily';
-export const HALF_DAILY = 'half_daily';
-export const ABSENCE_NATURES = [
-  { label: 'Journalière', value: DAILY },
-  { label: 'Demi-journalière', value: HALF_DAILY },
-  { label: 'Horaire', value: HOURLY },
-];
-export const EVENT_TYPES = [
-  { label: 'Intervention', value: INTERVENTION },
-  { label: 'Interne', value: INTERNAL_HOUR },
-  { label: 'Absence', value: ABSENCE },
-  { label: 'Indispo', value: UNAVAILABILITY },
-];
-
-export const CANCEL_EVENT = 'cancel_event';
-export const RESTORE_EVENT = 'restore_event';
 
 // THIRD PARTY PAYERS
 export const BILLING_INDIRECT = 'indirect';
@@ -130,37 +77,6 @@ export const TPP_TYPE_OPTIONS = [
 // AVATAR
 export const DEFAULT_AVATAR = 'https://storage.googleapis.com/compani-main/default_avatar.png';
 export const UNKNOWN_AVATAR = 'https://storage.googleapis.com/compani-main/unknown_avatar.png';
-
-// REPETITION FREQUENCY
-export const NEVER = 'never';
-export const EVERY_DAY = 'every_day';
-export const EVERY_WEEK_DAY = 'every_week_day';
-export const EVERY_WEEK = 'every_week';
-export const EVERY_TWO_WEEKS = 'every_two_weeks';
-
-export const REPETITION_FREQUENCIES = [
-  { label: 'Jamais', value: NEVER },
-  { label: 'Tous les jours', value: EVERY_DAY },
-  { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
-];
-
-// CANCELLATION OPTIONS
-export const INVOICED_AND_PAID = 'invoiced_and_paid';
-export const INVOICED_AND_NOT_PAID = 'invoiced_and_not_paid';
-export const NOT_INVOICED_AND_NOT_PAID = 'not_invoiced_and_not_paid';
-export const CANCELLATION_OPTIONS = [
-  { label: 'Facturée au client & payée à l\'auxiliaire', value: INVOICED_AND_PAID },
-  { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAID },
-  { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAID },
-];
-
-// CANCELLATION REASONS
-export const CUSTOMER_INITIATIVE = 'customer_initiative';
-export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
-export const CANCELLATION_REASONS = [
-  { label: 'Client', value: CUSTOMER_INITIATIVE },
-  { label: 'Intervenant(e)', value: AUXILIARY_INITIATIVE },
-];
 
 // INTERFACE
 export const VENDOR = 'vendor';
@@ -207,48 +123,9 @@ export const ROLES_TRANSLATION = {
 export const ERP = 'erp';
 
 // PLANNING
-export const THREE_DAYS_VIEW = '3days';
-export const WEEK_VIEW = 'week';
-export const PLANNING = 'planning';
-export const AGENDA = 'agenda';
 export const PLANNING_VIEW_START_HOUR = 7;
 export const PLANNING_VIEW_END_HOUR = 22;
-export const PLANNING_PERCENTAGE_BY_MINUTES = 100 / ((PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60);
-export const STAFFING_VIEW_START_HOUR = 8;
-export const STAFFING_VIEW_END_HOUR = 20;
-export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60);
 export const SECTOR = 'sector';
-export const PERSON = 'person';
-export const MAX_WEEKLY_OCCUPATION_LEVEL = 48;
-export const LOW = 'low';
-export const HIGH = 'high';
-export const EXTREME = 'extreme';
-
-// EVENT HISTORY
-export const EVENT_CREATION = 'event_creation';
-export const EVENT_DELETION = 'event_deletion';
-export const EVENT_UPDATE = 'event_update';
-export const TIME_STAMP_CANCELLATION = 'time_stamp_cancellation';
-
-// INDICATORS
-export const PREV_MONTH_STATS = 'prev_month_stat';
-export const MONTH_STATS = 'month_stat';
-
-// TRANSORT
-export const PUBLIC_TRANSPORT = 'public';
-export const PRIVATE_TRANSPORT = 'private';
-export const COMPANY_TRANSPORT = 'company_transport';
-export const TRANSPORT_OPTIONS = [
-  { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT },
-  { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT },
-  { label: 'Aucun', value: 'none' },
-];
-export const EVENT_TRANSPORT_OPTIONS = [
-  { label: 'Pas de mode de transport spécifique', value: '' },
-  { label: 'Transports en commun / À pied', value: PUBLIC_TRANSPORT },
-  { label: 'Véhicule personnel', value: PRIVATE_TRANSPORT },
-  { label: 'Véhicule d\'entreprise', value: COMPANY_TRANSPORT },
-];
 
 export const REQUIRED_LABEL = 'Champ requis';
 export const INVALID_NUMBER = 'Nombre invalide';

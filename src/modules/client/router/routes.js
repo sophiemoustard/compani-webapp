@@ -157,26 +157,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/planning/auxiliaries',
-        name: 'ni planning auxiliaries',
-        component: () => import('src/modules/client/pages/ni/planning/AuxiliaryPlanning'),
-        props: route => ({ ...route.query }),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'planning',
-        },
-      },
-      {
-        path: 'ni/planning/customers',
-        name: 'ni planning customers',
-        component: () => import('src/modules/client/pages/ni/planning/CustomerPlanning'),
-        props: route => ({ ...route.query }),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'planning',
-        },
-      },
-      {
         path: 'ni/courses',
         name: 'ni courses',
         component: () => import('src/modules/client/pages/ni/courses/BlendedCoursesDirectory'),

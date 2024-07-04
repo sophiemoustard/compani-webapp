@@ -15,7 +15,6 @@ export const menuItemsMixin = {
     return {
       coachActiveRoutes: {
         courses: { open: false },
-        planning: { open: false },
         customers: { open: false },
         teams: { open: false },
         billing: { open: false },
@@ -62,13 +61,6 @@ export const menuItemsMixin = {
     coachRoutes () {
       return [
         {
-          ref: 'planning',
-          label: 'Planning',
-          children: [
-            { name: 'ni planning auxiliaries', icon: 'date_range', label: 'Auxiliaires' },
-            { name: 'ni planning customers', icon: 'date_range', label: 'Bénéficiaires' },
-          ],
-        }, {
           ref: 'customers',
           label: 'Bénéficiaires',
           children: [
