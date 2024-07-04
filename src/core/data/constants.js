@@ -1,5 +1,7 @@
 export const TOKEN_EXPIRE_DAY = 1; // in days
 
+export const OTHER = 'other';
+
 // MEDIA
 export const BLUE_TEXT_LOGO = 'https://storage.googleapis.com/compani-main/icons/compani_texte_bleu.png';
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
@@ -8,7 +10,7 @@ export const VIDEO_EXTENSIONS = 'video/*';
 export const AUDIO_EXTENSIONS = 'audio/*';
 export const HTML_EXTENSIONS = '.html';
 
-// CUSTOMER
+// CIVILITY
 export const MR = 'mr';
 export const MRS = 'mrs';
 export const CIVILITY_OPTIONS = [
@@ -18,15 +20,9 @@ export const CIVILITY_OPTIONS = [
 ];
 
 // CUSTOMER FUNDING
-export const MONTHLY = 'monthly';
-export const ONCE = 'once';
 export const FIXED = 'fixed';
 export const HOURLY = 'hourly';
 
-export const FUNDING_FREQ_OPTIONS = [
-  { label: 'Mensuelle', value: MONTHLY },
-  { label: 'Une seule fois', value: ONCE },
-];
 export const NATURE_OPTIONS = [
   { label: 'Horaire', value: HOURLY },
   { label: 'Forfaitaire', value: FIXED },
@@ -42,15 +38,6 @@ export const SURCHARGES = {
   evening: 'Soirée',
   custom: 'Personnalisée',
 };
-
-// CUSTOMERS SITUATION
-export const UNKNOWN = 'unknown';
-export const HOME = 'home';
-export const NURSING_HOME = 'nursing_home';
-export const HOSPITALIZED = 'hospitalized';
-export const DECEASED = 'deceased';
-
-export const OTHER = 'other';
 
 // CONTRACTS
 export const CONTRACT = 'contract';
@@ -381,12 +368,6 @@ export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Factures et avoirs', value: COURSE_BILL },
   { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
 ];
-
-// CUSTOMER STATUS
-export const ACTIVATED = 'activated';
-export const STOPPED = 'stopped';
-export const ARCHIVED = 'archived';
-export const STATUS_TYPES = { [ACTIVATED]: 'Actif', [STOPPED]: 'Arrêté', [ARCHIVED]: 'Archivé' };
 
 // TIMESTAMPING
 export const MANUAL_TIME_STAMPING = 'manual_time_stamping';

@@ -15,7 +15,6 @@ import {
 const coachRoutes = [
   { name: 'ni exports data', subscription: ERP },
   { name: 'ni exports history', subscription: ERP },
-  { name: 'ni customers', subscription: ERP },
   { name: 'account client' },
   { name: 'ni courses' },
   { name: 'ni courses dashboard' },

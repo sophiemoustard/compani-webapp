@@ -61,13 +61,6 @@ export const menuItemsMixin = {
     coachRoutes () {
       return [
         {
-          ref: 'customers',
-          label: 'Bénéficiaires',
-          children: [
-            { name: 'ni customers', icon: 'contacts', label: 'Répertoire bénéficiaires' },
-          ],
-        },
-        {
           ref: 'courses',
           label: 'Formations',
           children: [

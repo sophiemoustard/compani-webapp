@@ -84,15 +84,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/customers',
-        name: 'ni customers',
-        component: () => import('src/modules/client/pages/ni/customers/CustomersDirectory'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'customers',
-        },
-      },
-      {
         path: 'ni/courses',
         name: 'ni courses',
         component: () => import('src/modules/client/pages/ni/courses/BlendedCoursesDirectory'),
