@@ -88,7 +88,6 @@ export const menuItemsMixin = {
             { name: 'ni billing automatic bills', icon: 'picture_as_pdf', label: 'Liste des factures' },
             { name: 'ni billing clients balances', icon: 'mdi-scale-balance', label: 'Balances clients' },
             { name: 'ni billing tpp bill slips', icon: 'view_headline', label: 'Bordereaux tiers payeurs' },
-            { name: 'ni billing debits archive', icon: 'mdi-archive', label: 'Archive prélèvements' },
           ],
         },
         {

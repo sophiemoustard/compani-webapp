@@ -93,15 +93,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/billing/debits-archive',
-        name: 'ni billing debits archive',
-        component: () => import('src/modules/client/pages/ni/billing/DebitsArchive'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
         path: 'ni/billing/bills',
         name: 'ni billing automatic bills',
         component: () => import('src/modules/client/pages/ni/billing/Bills'),
