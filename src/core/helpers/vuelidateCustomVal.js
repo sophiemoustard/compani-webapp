@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { helpers } from '@vuelidate/validators';
 import { isValidIBAN, isValidBIC } from 'ibantools';
-import { workHealthServices } from '@data/workHealthServices';
-import { urssafCodes } from '@data/urssafCodes';
 import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 import { isGreaterThan, isGreaterThanOrEqual } from '@helpers/numbers';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -82,19 +80,11 @@ export const maxDate = max => helpers.withParams(
   value => !value || CompaniDate(max).isSameOrAfter(CompaniDate(value), 'day')
 );
 
-export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
-
-export const validWorkHealthService = value => !value || workHealthServices.map(whs => whs.value).includes(value);
-
-export const validUrssafCode = value => !value || urssafCodes.map(code => code.value).includes(value);
-
 export const validSiret = value => !value || /^\d{14}$/.test(value);
 
 export const rcs = value => !value || /^[0-9]*[1-9][0-9]*$/.test(value);
 
 export const validYear = value => !value || /^[2]{1}[0]{1}[0-9]{2}$/.test(value);
-
-export const validTradeName = value => !value || /^[0-9a-zA-Z]{0,11}$/.test(value);
 
 // Quiz fill-the-gap
 const parseTagCode = (str) => {

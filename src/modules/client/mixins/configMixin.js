@@ -11,9 +11,6 @@ export const configMixin = {
   data () {
     const companyModel = {
       address: { fullAddress: '' },
-      legalRepresentative: { firstname: '', lastname: '', position: '' },
-      customersConfig: { templates: {}, billFooter: '' },
-      rhConfig: { templates: {} },
       billingRepresentative: {},
     };
 

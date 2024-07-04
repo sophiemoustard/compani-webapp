@@ -33,8 +33,7 @@
     <coach-creation-modal v-model="coachCreationModal" v-model:new-coach="newCoach" :validations="v$.newCoach"
       :first-step="firstStep" :loading="loading" :phone-nbr-error="phoneNbrError(v$.newCoach)"
       :role-options="roleOptions" @hide="resetCoachCreationForm" @show="openCoachCreationModal" @submit="createCoach"
-      @go-to-next-step="nextStep" :email-error="emailError(v$.newCoach)"
-      :can-send-email="!get(company, 'subscriptions.erp')" />
+      @go-to-next-step="nextStep" :email-error="emailError(v$.newCoach)" />
 
     <coach-edition-modal v-model="coachEditionModal" :phone-nbr-error="phoneNbrError(v$.selectedCoach)"
       :validations="v$.selectedCoach" :email-error="emailError(v$.selectedCoach)" v-model:selected-coach="selectedCoach"

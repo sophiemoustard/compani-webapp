@@ -20,9 +20,8 @@ const routes = [
         if (!userClientRole) return next({ path: '/ad' });
 
         if ([...AUXILIARY_ROLES, HELPER].includes(userClientRole)) return next({ name: 'account client' });
-        if (COACH_ROLES.includes(userClientRole)) {
-          return next({ name: 'ni courses' });
-        }
+        if (COACH_ROLES.includes(userClientRole)) return next({ name: 'ni courses' });
+
         return next({ name: '404' });
       } catch (e) {
         console.error(e);

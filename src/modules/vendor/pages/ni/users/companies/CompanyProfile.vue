@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="vendor-background">
-    <ni-profile-header :title="companyName" :header-info="headerInfo" />
+    <ni-profile-header :title="companyName" />
     <profile-tabs :profile-id="companyId" :tabs-content="tabsContent" @refresh="refreshCompany" />
   </q-page>
 </template>
@@ -10,7 +10,6 @@ import { useMeta } from 'quasar';
 import { computed, ref, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
-import { COMPANY_TYPES } from '@data/constants';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
@@ -39,11 +38,6 @@ export default {
     const companyName = ref('');
 
     const company = computed(() => $store.state.company.company);
-    const companyTypeLabel = computed(() => {
-      const companyType = COMPANY_TYPES.find(type => type.value === get(company.value, 'type'));
-      return companyType ? companyType.label : '';
-    });
-    const headerInfo = computed(() => [{ icon: 'bookmark_border', label: companyTypeLabel.value }]);
 
     const refreshCompany = async () => {
       try {
@@ -70,8 +64,6 @@ export default {
       // Data
       tabsContent,
       companyName,
-      // Computed
-      headerInfo,
       // Methods
       refreshCompany,
     };

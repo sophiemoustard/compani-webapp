@@ -29,9 +29,6 @@ export const menuItemsMixin = {
     clientRole () {
       return get(this.loggedUser, 'role.client.name');
     },
-    hasBillingAssistance () {
-      return get(this.loggedUser, 'company.billingAssistance');
-    },
     isAdmin () {
       return CLIENT_ADMIN === this.clientRole;
     },

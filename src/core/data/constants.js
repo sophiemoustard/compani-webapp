@@ -109,26 +109,11 @@ export const PAYMENT_NATURE_OPTIONS = [
   { label: 'Remboursement', value: REFUND },
 ];
 
-// FUNDINGS
-export const THIRD_PARTY_PAYER = 'thirdPartyPayer';
-
 // PAY
 export const PAY = 'pay';
 
-// ORIGINS
-export const COMPANI = 'compani';
-export const THIRD_PARTY = 'third_party';
-export const OGUST = 'ogust';
-
-export const WEEKS_PER_MONTH = (52 / 12);
-
 // COMPANY
 export const COMPANY = 'company';
-export const ASSOCIATION = 'association';
-export const COMPANY_TYPES = [
-  { label: 'Association', value: ASSOCIATION },
-  { label: 'Entreprise', value: COMPANY },
-];
 
 // SMS
 export const CONVOCATION = 'convocation';
@@ -346,7 +331,6 @@ export const WITHOUT_TRAINER = 'without_trainer';
 export const WITHOUT_SALES_REPRESENTATIVE = 'without_sales_representative';
 
 // END_TO_END TESTS
-export const BILLING = 'billing';
 export const AUTHENTICATION = 'authentication';
 
 // DATE AND DURATION UNITS
