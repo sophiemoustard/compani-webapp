@@ -35,7 +35,6 @@ const clientAdminRoutes = [
   { name: 'ni billing to bill', subscription: ERP },
   { name: 'ni billing manual bills', subscription: ERP },
   { name: 'ni billing clients balances', subscription: ERP },
-  { name: 'ni billing tpp bill slips', subscription: ERP },
   { name: 'ni billing automatic bills', subscription: ERP },
   { name: 'ni courses bills' },
 ];

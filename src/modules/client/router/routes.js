@@ -84,15 +84,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/billing/tpp-bill-slips',
-        name: 'ni billing tpp bill slips',
-        component: () => import('src/modules/client/pages/ni/billing/TppBillSlips'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
         path: 'ni/billing/bills',
         name: 'ni billing automatic bills',
         component: () => import('src/modules/client/pages/ni/billing/Bills'),
