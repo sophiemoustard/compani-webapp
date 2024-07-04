@@ -75,15 +75,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/billing/credit-notes',
-        name: 'ni billing credit note',
-        component: () => import('src/modules/client/pages/ni/billing/CreditNotes'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
         path: 'ni/billing/clients-balances',
         name: 'ni billing clients balances',
         component: () => import('src/modules/client/pages/ni/billing/ClientsBalances'),

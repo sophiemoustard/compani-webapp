@@ -9,10 +9,6 @@ export default {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/first-intervention`, { params });
     return customersRaw.data.data.customers;
   },
-  async listWithBilledEvents (params) {
-    const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/billed-events`, { params });
-    return customersRaw.data.data.customers;
-  },
   async getById (id) {
     const customerRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}`);
     return customerRaw.data.data.customer;
