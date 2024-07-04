@@ -47,7 +47,6 @@ const auxiliaryRoutes = [
   { name: 'account client' },
 ];
 const helperRoutes = [
-  { name: 'customers documents', subscription: ERP },
   { name: 'account client' },
 ];
 const trainingOrganisationManagerRoutes = [

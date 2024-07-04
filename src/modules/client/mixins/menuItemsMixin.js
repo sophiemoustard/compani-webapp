@@ -7,7 +7,6 @@ import {
   PLANNING_REFERENT,
   AUXILIARY_ROLES,
   COACH_ROLES,
-  HELPER,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 
@@ -31,9 +30,6 @@ export const menuItemsMixin = {
     clientRole () {
       return get(this.loggedUser, 'role.client.name');
     },
-    customer () {
-      return this.isHelper ? this.$store.getters['customer/getCustomer'] : null;
-    },
     hasBillingAssistance () {
       return get(this.loggedUser, 'company.billingAssistance');
     },
@@ -42,9 +38,6 @@ export const menuItemsMixin = {
     },
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
-    },
-    isHelper () {
-      return this.clientRole === HELPER;
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.clientRole);
@@ -56,22 +49,15 @@ export const menuItemsMixin = {
       let routes = [];
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
 
-      if (this.isHelper) routes = this.customerRoutes;
-      else if (this.isCoach) routes = this.coachRoutes;
+      if (this.isCoach) routes = this.coachRoutes;
 
       return routes
-        .map(r => (this.isHelper ? r : { ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
+        .map(r => ({ ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
         .filter(r => (r.children ? r.children.length : ability.can('read', r.name)));
     },
     activeRoutes () {
-      if (this.isHelper) return null;
       if (this.isCoach) return this.coachActiveRoutes;
       return {};
-    },
-    customerRoutes () {
-      return [
-        { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
-      ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs);
     },
     coachRoutes () {
       return [

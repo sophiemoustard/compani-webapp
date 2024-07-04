@@ -1,10 +1,5 @@
 import { canNavigate } from '@helpers/alenvi';
-import {
-  HELPER,
-  AUXILIARY_ROLES,
-  COACH_ROLES,
-  AUXILIARY_WITHOUT_COMPANY,
-} from 'src/core/data/constants';
+import { HELPER, AUXILIARY_ROLES, COACH_ROLES } from 'src/core/data/constants';
 import store from 'src/store/index';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
@@ -24,11 +19,7 @@ const routes = [
         if (!userClientRole && !userVendorRole) return next({ name: 'account client' });
         if (!userClientRole) return next({ path: '/ad' });
 
-        if (userClientRole === HELPER) return next({ name: 'customers documents' });
-        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
-          return next({ name: 'account client' });
-        }
-        if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'account client' });
+        if ([...AUXILIARY_ROLES, HELPER].includes(userClientRole)) return next({ name: 'account client' });
         if (COACH_ROLES.includes(userClientRole)) {
           return next({ name: 'ni courses' });
         }
@@ -287,15 +278,6 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'courses',
-        },
-      },
-      // Customers view routes
-      {
-        path: 'customers/documents',
-        name: 'customers documents',
-        component: () => import('src/modules/client/pages/customers/Billing'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
         },
       },
       // All profiles
