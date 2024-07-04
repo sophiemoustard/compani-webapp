@@ -83,7 +83,6 @@ export const menuItemsMixin = {
           ref: 'billing',
           label: 'Facturation',
           children: [
-            { name: 'ni billing to bill', icon: 'credit_card', label: 'À facturer' },
             { name: 'ni billing clients balances', icon: 'mdi-scale-balance', label: 'Balances clients' },
           ],
         },

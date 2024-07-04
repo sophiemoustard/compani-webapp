@@ -32,7 +32,6 @@ const clientAdminRoutes = [
   { name: 'ni config company' },
   { name: 'ni config customers', subscription: ERP },
   { name: 'ni config coach' },
-  { name: 'ni billing to bill', subscription: ERP },
   { name: 'ni billing clients balances', subscription: ERP },
   { name: 'ni courses bills' },
 ];
