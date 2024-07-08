@@ -194,7 +194,7 @@ export default {
 
 <style lang="sass" scoped>
 .filters-container
-    grid-template-columns: repeat(4, 22%) 16%
+    grid-template-columns: repeat(4, 22%) 12%
     @media screen and (max-width: 767px)
       width: 95%
 </style>
