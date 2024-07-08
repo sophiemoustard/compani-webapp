@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="filters-container">
-      <ni-select :options="trainerList" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer" />
-      <ni-select :options="companyList" :model-value="selectedCompany" @update:model-value="updateSelectedCompany" />
-      <ni-select :options="programList" :model-value="selectedProgram" @update:model-value="updateSelectedProgram" />
+      <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer" />
+      <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany" />
+      <ni-select :options="programOptions" :model-value="selectedProgram" @update:model-value="updateSelectedProgram" />
       <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
@@ -42,11 +42,11 @@ export default {
     const { profileId } = toRefs(props);
     const questionnaireAnswers = ref({});
     const selectedTrainer = ref('');
-    const trainerList = ref([]);
+    const trainerOptions = ref([]);
     const selectedCompany = ref('');
-    const companyList = ref([]);
+    const companyOptions = ref([]);
     const selectedProgram = ref('');
-    const programList = ref([]);
+    const programOptions = ref([]);
     const selectedHolding = ref('');
     const holdingOptions = ref([]);
     const holdingCompanies = ref([]);
@@ -67,34 +67,40 @@ export default {
       }
     };
 
-    const getTrainerList = async () => {
+    const getTrainerOptions = async () => {
       try {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        trainerList.value = [{ label: 'Tous les intervenants', value: '' }, ...formatAndSortIdentityOptions(trainers)];
+        trainerOptions.value = [
+          { label: 'Tous les intervenants', value: '' },
+          ...formatAndSortIdentityOptions(trainers),
+        ];
       } catch (e) {
-        trainerList.value = [];
+        trainerOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formateurs.');
       }
     };
 
-    const getCompanyList = async () => {
+    const getCompanyOptions = async () => {
       try {
         const companies = await Companies.list();
-        companyList.value = [{ label: 'Toutes les structures', value: '' }, ...formatAndSortOptions(companies, 'name')];
+        companyOptions.value = [
+          { label: 'Toutes les structures', value: '' },
+          ...formatAndSortOptions(companies, 'name'),
+        ];
       } catch (e) {
-        companyList.value = [];
+        companyOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des structures.');
       }
     };
 
-    const getProgramList = async () => {
+    const getProgramOptions = async () => {
       try {
         const programs = await Programs.list();
-        programList.value = [{ label: 'Tous les programmes', value: '' }, ...formatAndSortOptions(programs, 'name')];
+        programOptions.value = [{ label: 'Tous les programmes', value: '' }, ...formatAndSortOptions(programs, 'name')];
       } catch (e) {
-        programList.value = [];
+        programOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
@@ -110,7 +116,7 @@ export default {
 
         holdingCompanies.value = mapValues(keyBy(holdings, '_id'), 'companies');
       } catch (e) {
-        programList.value = [];
+        programOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
@@ -145,9 +151,9 @@ export default {
     const created = async () => {
       await Promise.all([
         getQuestionnaireAnswers(),
-        getTrainerList(),
-        getCompanyList(),
-        getProgramList(),
+        getTrainerOptions(),
+        getCompanyOptions(),
+        getProgramOptions(),
         getHoldingOptions(),
       ]);
     };
@@ -158,20 +164,20 @@ export default {
       // Data
       questionnaireAnswers,
       selectedTrainer,
-      trainerList,
+      trainerOptions,
       selectedCompany,
-      companyList,
+      companyOptions,
       selectedProgram,
-      programList,
+      programOptions,
       selectedHolding,
       holdingOptions,
       // Computed
       filteredAnswers,
       // Methods
       getQuestionnaireAnswers,
-      getTrainerList,
-      getCompanyList,
-      getProgramList,
+      getTrainerOptions,
+      getCompanyOptions,
+      getProgramOptions,
       updateSelectedTrainer,
       updateSelectedCompany,
       updateSelectedProgram,
