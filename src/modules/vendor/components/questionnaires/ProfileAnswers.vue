@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import { computed, toRefs, ref } from 'vue';
 import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
 import Users from '@api/Users';
@@ -33,103 +34,118 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  data () {
-    return {
-      questionnaireAnswers: {},
-      selectedTrainer: '',
-      trainerList: [],
-      selectedCompany: '',
-      companyList: [],
-      selectedProgram: '',
-      programList: [],
-    };
-  },
-  async created () {
-    await Promise.all([
-      this.getQuestionnaireAnswers(),
-      this.getTrainerList(),
-      this.getCompanyList(),
-      this.getProgramList(),
-    ]);
-  },
-  computed: {
-    filteredAnswers () {
-      if (!get(this.questionnaireAnswers, 'followUp')) return {};
+  setup (props) {
+    const { profileId } = toRefs(props);
+    const questionnaireAnswers = ref({});
+    const selectedTrainer = ref('');
+    const trainerList = ref([]);
+    const selectedCompany = ref('');
+    const companyList = ref([]);
+    const selectedProgram = ref('');
+    const programList = ref([]);
 
-      return { ...this.questionnaireAnswers, followUp: this.questionnaireAnswers.followUp.map(this.formatFollowUp) };
-    },
-  },
-  methods: {
-    async getQuestionnaireAnswers () {
+    const filteredAnswers = computed(() => {
+      if (!get(questionnaireAnswers.value, 'followUp')) return {};
+
+      return { ...questionnaireAnswers.value, followUp: questionnaireAnswers.value.followUp.map(formatFollowUp) };
+    });
+
+    const getQuestionnaireAnswers = async () => {
       try {
-        this.questionnaireAnswers = await Questionnaires.getQuestionnaireAnswers(this.profileId);
+        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value);
       } catch (e) {
-        this.questionnaireAnswers = [];
+        questionnaireAnswers.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des réponses au questionnaire.');
       }
-    },
-    async getTrainerList () {
+    };
+
+    const getTrainerList = async () => {
       try {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerList = [
-          { label: 'Tous les intervenants', value: '' },
-          ...formatAndSortIdentityOptions(trainers),
-        ];
+        trainerList.value = [{ label: 'Tous les intervenants', value: '' }, ...formatAndSortIdentityOptions(trainers)];
       } catch (e) {
-        this.trainerList = [];
+        trainerList.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formateurs.');
       }
-    },
-    async getCompanyList () {
+    };
+
+    const getCompanyList = async () => {
       try {
         const companies = await Companies.list();
-        this.companyList = [
-          { label: 'Toutes les structures', value: '' },
-          ...formatAndSortOptions(companies, 'name'),
-        ];
+        companyList.value = [{ label: 'Toutes les structures', value: '' }, ...formatAndSortOptions(companies, 'name')];
       } catch (e) {
-        this.companyList = [];
+        companyList.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des structures.');
       }
-    },
-    async getProgramList () {
+    };
+
+    const getProgramList = async () => {
       try {
         const programs = await Programs.list();
-        this.programList = [
-          { label: 'Tous les programmes', value: '' },
-          ...formatAndSortOptions(programs, 'name'),
-        ];
+        programList.value = [{ label: 'Tous les programmes', value: '' }, ...formatAndSortOptions(programs, 'name')];
       } catch (e) {
-        this.programList = [];
+        programList.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
-    },
-    updateSelectedTrainer (trainerId) {
-      this.selectedTrainer = trainerId;
-    },
-    updateSelectedCompany (companyId) {
-      this.selectedCompany = companyId;
-    },
-    updateSelectedProgram (programId) {
-      this.selectedProgram = programId;
-    },
-    formatFollowUp (fu) {
+    };
+
+    const updateSelectedTrainer = (trainerId) => { selectedTrainer.value = trainerId; };
+
+    const updateSelectedCompany = (companyId) => { selectedCompany.value = companyId; };
+
+    const updateSelectedProgram = (programId) => { selectedProgram.value = programId; };
+
+    const formatFollowUp = (fu) => {
       const answers = fu.answers
-        .filter(a => !this.selectedTrainer || (get(a, 'course.trainer') === this.selectedTrainer))
-        .filter(a => !this.selectedCompany || (a.traineeCompany === this.selectedCompany))
-        .filter(a => !this.selectedProgram || (get(a, 'course.subProgram.program._id') === this.selectedProgram));
+        .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
+        .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
+        .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value));
 
       return { ...fu, answers: answers.map(a => a.answer) };
-    },
-    resetFilters () {
-      this.selectedTrainer = '';
-      this.selectedCompany = '';
-      this.selectedProgram = '';
-    },
+    };
+
+    const resetFilters = () => {
+      selectedTrainer.value = '';
+      selectedCompany.value = '';
+      selectedProgram.value = '';
+    };
+
+    const created = async () => {
+      await Promise.all([
+        getQuestionnaireAnswers(),
+        getTrainerList(),
+        getCompanyList(),
+        getProgramList(),
+      ]);
+    };
+
+    created();
+
+    return {
+      // Data
+      questionnaireAnswers,
+      selectedTrainer,
+      trainerList,
+      selectedCompany,
+      companyList,
+      selectedProgram,
+      programList,
+      // Computed
+      filteredAnswers,
+      // Methods
+      getQuestionnaireAnswers,
+      getTrainerList,
+      getCompanyList,
+      getProgramList,
+      updateSelectedTrainer,
+      updateSelectedCompany,
+      updateSelectedProgram,
+      resetFilters,
+    };
   },
 };
 </script>
