@@ -1,10 +1,14 @@
 <template>
   <div>
     <div class="filters-container">
-      <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer" />
-      <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany" />
-      <ni-select :options="programOptions" :model-value="selectedProgram" @update:model-value="updateSelectedProgram" />
-      <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding" />
+      <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
+        clearable />
+      <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
+        clearable />
+      <ni-select :options="programOptions" :model-value="selectedProgram" @update:model-value="updateSelectedProgram"
+        clearable />
+      <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
+        clearable />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
