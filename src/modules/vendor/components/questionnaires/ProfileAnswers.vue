@@ -4,6 +4,7 @@
       <ni-select :options="trainerList" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer" />
       <ni-select :options="companyList" :model-value="selectedCompany" @update:model-value="updateSelectedCompany" />
       <ni-select :options="programList" :model-value="selectedProgram" @update:model-value="updateSelectedProgram" />
+      <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
@@ -15,7 +16,10 @@
 <script>
 import { computed, toRefs, ref } from 'vue';
 import get from 'lodash/get';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 import Questionnaires from '@api/Questionnaires';
+import Holdings from '@api/Holdings';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -43,6 +47,9 @@ export default {
     const companyList = ref([]);
     const selectedProgram = ref('');
     const programList = ref([]);
+    const selectedHolding = ref('');
+    const holdingOptions = ref([]);
+    const holdingCompanies = ref([]);
 
     const filteredAnswers = computed(() => {
       if (!get(questionnaireAnswers.value, 'followUp')) return {};
@@ -93,17 +100,37 @@ export default {
       }
     };
 
+    const getHoldingOptions = async () => {
+      try {
+        const holdings = await Holdings.list();
+        holdingOptions.value = [
+          { label: 'Toutes les sociétés mères', value: '' },
+          ...formatAndSortOptions(holdings, 'name'),
+        ];
+
+        holdingCompanies.value = mapValues(keyBy(holdings, '_id'), 'companies');
+      } catch (e) {
+        programList.value = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des programmes.');
+      }
+    };
+
     const updateSelectedTrainer = (trainerId) => { selectedTrainer.value = trainerId; };
 
     const updateSelectedCompany = (companyId) => { selectedCompany.value = companyId; };
 
     const updateSelectedProgram = (programId) => { selectedProgram.value = programId; };
 
+    const updateSelectedHolding = (holdingId) => { selectedHolding.value = holdingId; };
+
     const formatFollowUp = (fu) => {
       const answers = fu.answers
         .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
         .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
-        .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value));
+        .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value))
+        .filter(a => !selectedHolding.value ||
+          ((holdingCompanies.value[selectedHolding.value]).includes(a.traineeCompany)));
 
       return { ...fu, answers: answers.map(a => a.answer) };
     };
@@ -112,6 +139,7 @@ export default {
       selectedTrainer.value = '';
       selectedCompany.value = '';
       selectedProgram.value = '';
+      selectedHolding.value = '';
     };
 
     const created = async () => {
@@ -120,6 +148,7 @@ export default {
         getTrainerList(),
         getCompanyList(),
         getProgramList(),
+        getHoldingOptions(),
       ]);
     };
 
@@ -134,6 +163,8 @@ export default {
       companyList,
       selectedProgram,
       programList,
+      selectedHolding,
+      holdingOptions,
       // Computed
       filteredAnswers,
       // Methods
@@ -144,6 +175,7 @@ export default {
       updateSelectedTrainer,
       updateSelectedCompany,
       updateSelectedProgram,
+      updateSelectedHolding,
       resetFilters,
     };
   },
@@ -152,7 +184,7 @@ export default {
 
 <style lang="sass" scoped>
 .filters-container
-    grid-template-columns: repeat(3, 28%) 16%
+    grid-template-columns: repeat(4, 22%) 16%
     @media screen and (max-width: 767px)
       width: 95%
 </style>
