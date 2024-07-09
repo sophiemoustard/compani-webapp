@@ -1,9 +1,14 @@
 <template>
   <div>
     <div class="filters-container">
-      <ni-select :options="trainerList" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer" />
-      <ni-select :options="companyList" :model-value="selectedCompany" @update:model-value="updateSelectedCompany" />
-      <ni-select :options="programList" :model-value="selectedProgram" @update:model-value="updateSelectedProgram" />
+      <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
+        clearable />
+      <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
+        clearable />
+      <ni-select :options="programOptions" :model-value="selectedProgram" @update:model-value="updateSelectedProgram"
+        clearable />
+      <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
+        clearable />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
@@ -13,8 +18,12 @@
 </template>
 
 <script>
+import { computed, toRefs, ref } from 'vue';
 import get from 'lodash/get';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 import Questionnaires from '@api/Questionnaires';
+import Holdings from '@api/Holdings';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -33,110 +42,159 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  data () {
-    return {
-      questionnaireAnswers: {},
-      selectedTrainer: '',
-      trainerList: [],
-      selectedCompany: '',
-      companyList: [],
-      selectedProgram: '',
-      programList: [],
-    };
-  },
-  async created () {
-    await Promise.all([
-      this.getQuestionnaireAnswers(),
-      this.getTrainerList(),
-      this.getCompanyList(),
-      this.getProgramList(),
-    ]);
-  },
-  computed: {
-    filteredAnswers () {
-      if (!get(this.questionnaireAnswers, 'followUp')) return {};
+  setup (props) {
+    const { profileId } = toRefs(props);
+    const questionnaireAnswers = ref({});
+    const selectedTrainer = ref('');
+    const trainerOptions = ref([]);
+    const selectedCompany = ref('');
+    const companyOptions = ref([]);
+    const selectedProgram = ref('');
+    const programOptions = ref([]);
+    const selectedHolding = ref('');
+    const holdingOptions = ref([]);
+    const holdingCompanies = ref([]);
 
-      return { ...this.questionnaireAnswers, followUp: this.questionnaireAnswers.followUp.map(this.formatFollowUp) };
-    },
-  },
-  methods: {
-    async getQuestionnaireAnswers () {
+    const filteredAnswers = computed(() => {
+      if (!get(questionnaireAnswers.value, 'followUp')) return {};
+
+      return { ...questionnaireAnswers.value, followUp: questionnaireAnswers.value.followUp.map(formatFollowUp) };
+    });
+
+    const getQuestionnaireAnswers = async () => {
       try {
-        this.questionnaireAnswers = await Questionnaires.getQuestionnaireAnswers(this.profileId);
+        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value);
       } catch (e) {
-        this.questionnaireAnswers = [];
+        questionnaireAnswers.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des réponses au questionnaire.');
       }
-    },
-    async getTrainerList () {
+    };
+
+    const getTrainerOptions = async () => {
       try {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerList = [
+        trainerOptions.value = [
           { label: 'Tous les intervenants', value: '' },
           ...formatAndSortIdentityOptions(trainers),
         ];
       } catch (e) {
-        this.trainerList = [];
+        trainerOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formateurs.');
       }
-    },
-    async getCompanyList () {
+    };
+
+    const getCompanyOptions = async () => {
       try {
         const companies = await Companies.list();
-        this.companyList = [
+        companyOptions.value = [
           { label: 'Toutes les structures', value: '' },
           ...formatAndSortOptions(companies, 'name'),
         ];
       } catch (e) {
-        this.companyList = [];
+        companyOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des structures.');
       }
-    },
-    async getProgramList () {
+    };
+
+    const getProgramOptions = async () => {
       try {
         const programs = await Programs.list();
-        this.programList = [
-          { label: 'Tous les programmes', value: '' },
-          ...formatAndSortOptions(programs, 'name'),
-        ];
+        programOptions.value = [{ label: 'Tous les programmes', value: '' }, ...formatAndSortOptions(programs, 'name')];
       } catch (e) {
-        this.programList = [];
+        programOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
-    },
-    updateSelectedTrainer (trainerId) {
-      this.selectedTrainer = trainerId;
-    },
-    updateSelectedCompany (companyId) {
-      this.selectedCompany = companyId;
-    },
-    updateSelectedProgram (programId) {
-      this.selectedProgram = programId;
-    },
-    formatFollowUp (fu) {
+    };
+
+    const getHoldingOptions = async () => {
+      try {
+        const holdings = await Holdings.list();
+        holdingOptions.value = [
+          { label: 'Toutes les sociétés mères', value: '' },
+          ...formatAndSortOptions(holdings, 'name'),
+        ];
+
+        holdingCompanies.value = mapValues(keyBy(holdings, '_id'), 'companies');
+      } catch (e) {
+        holdingOptions.value = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des programmes.');
+      }
+    };
+
+    const updateSelectedTrainer = (trainerId) => { selectedTrainer.value = trainerId; };
+
+    const updateSelectedCompany = (companyId) => { selectedCompany.value = companyId; };
+
+    const updateSelectedProgram = (programId) => { selectedProgram.value = programId; };
+
+    const updateSelectedHolding = (holdingId) => { selectedHolding.value = holdingId; };
+
+    const formatFollowUp = (fu) => {
       const answers = fu.answers
-        .filter(a => !this.selectedTrainer || (get(a, 'course.trainer') === this.selectedTrainer))
-        .filter(a => !this.selectedCompany || (a.traineeCompany === this.selectedCompany))
-        .filter(a => !this.selectedProgram || (get(a, 'course.subProgram.program._id') === this.selectedProgram));
+        .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
+        .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
+        .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value))
+        .filter(a => !selectedHolding.value ||
+          ((holdingCompanies.value[selectedHolding.value]).includes(a.traineeCompany)));
 
       return { ...fu, answers: answers.map(a => a.answer) };
-    },
-    resetFilters () {
-      this.selectedTrainer = '';
-      this.selectedCompany = '';
-      this.selectedProgram = '';
-    },
+    };
+
+    const resetFilters = () => {
+      selectedTrainer.value = '';
+      selectedCompany.value = '';
+      selectedProgram.value = '';
+      selectedHolding.value = '';
+    };
+
+    const created = async () => {
+      await Promise.all([
+        getQuestionnaireAnswers(),
+        getTrainerOptions(),
+        getCompanyOptions(),
+        getProgramOptions(),
+        getHoldingOptions(),
+      ]);
+    };
+
+    created();
+
+    return {
+      // Data
+      questionnaireAnswers,
+      selectedTrainer,
+      trainerOptions,
+      selectedCompany,
+      companyOptions,
+      selectedProgram,
+      programOptions,
+      selectedHolding,
+      holdingOptions,
+      // Computed
+      filteredAnswers,
+      // Methods
+      getQuestionnaireAnswers,
+      getTrainerOptions,
+      getCompanyOptions,
+      getProgramOptions,
+      updateSelectedTrainer,
+      updateSelectedCompany,
+      updateSelectedProgram,
+      updateSelectedHolding,
+      resetFilters,
+    };
   },
 };
 </script>
 
 <style lang="sass" scoped>
 .filters-container
-    grid-template-columns: repeat(3, 28%) 16%
-    @media screen and (max-width: 767px)
-      width: 95%
+  grid-template-columns: repeat(4, 22%) 12%
+  @media screen and (max-width: 767px)
+    width: 95%
 </style>
