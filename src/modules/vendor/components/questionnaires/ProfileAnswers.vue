@@ -120,7 +120,7 @@ export default {
 
         holdingCompanies.value = mapValues(keyBy(holdings, '_id'), 'companies');
       } catch (e) {
-        programOptions.value = [];
+        holdingOptions.value = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
@@ -194,7 +194,7 @@ export default {
 
 <style lang="sass" scoped>
 .filters-container
-    grid-template-columns: repeat(4, 22%) 12%
-    @media screen and (max-width: 767px)
-      width: 95%
+  grid-template-columns: repeat(4, 22%) 12%
+  @media screen and (max-width: 767px)
+    width: 95%
 </style>
