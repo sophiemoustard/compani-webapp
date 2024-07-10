@@ -9,11 +9,13 @@
 </template>
 
 <script>
+import { useStore } from 'vuex';
+import { computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength } from '@vuelidate/validators';
 import Input from '@components/form/Input';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import { QUESTION_MAX_LENGTH } from '@data/constants';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'TitleText',
@@ -23,13 +25,28 @@ export default {
   components: {
     'ni-input': Input,
   },
-  mixins: [templateMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
+  emits: ['refresh'],
+  setup (_, { emit }) {
+    const $store = useStore();
+
+    const refreshCard = () => { emit('refresh'); };
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = { card: { question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) } } };
+    const v$ = useVuelidate(rules, { card });
+
+    const { questionErrorMsg, saveTmp, updateCard } = useCardTemplate(card, v$, refreshCard);
+
     return {
-      card: { question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) } },
+      // Validations
+      v$,
+      // Computed
+      card,
+      // Methods
+      questionErrorMsg,
+      saveTmp,
+      updateCard,
     };
   },
 };

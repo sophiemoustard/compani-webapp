@@ -2,7 +2,7 @@
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
-    <div class="chart">
+    <div class="container">
       <div class="bar-container">
         <div v-for="(line, index) in lines" :key="index">
           <div class="bar bg-peach-100">
@@ -12,9 +12,8 @@
           <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
         </div>
       </div>
-      <div class="chart-footer">
-        <div class="first-label">{{ this.card.labels['1'] }}</div>
-        <div class="last-label">{{ this.card.labels['5'] }}</div>
+      <div class="labels-container">
+        <ni-labels-details are-details-visible :labels="card.labels" />
       </div>
     </div>
   </q-card>
@@ -22,11 +21,15 @@
 
 <script>
 import { formatQuantity, roundFrenchPercentage } from '@helpers/utils';
+import LabelsDetails from '@components/LabelsDetails';
 
 export default {
   name: 'SurveyChart',
   props: {
     card: { type: Object, default: () => ({}) },
+  },
+  components: {
+    'ni-labels-details': LabelsDetails,
   },
   computed: {
     subtitle () {
@@ -67,10 +70,7 @@ export default {
   width: 312px
   @media screen and (max-width: 420px)
     width: 100%
-
-.chart
-  display: flex
-  flex-direction: column
+  align-items: center
 
 .bar
   position: relative
@@ -79,13 +79,6 @@ export default {
   height: 160px
   @media screen and (max-width: 420px)
     width: 32px
-
-.chart-footer
-  display: flex
-  justify-content: space-between
-  width: 312px
-  @media screen and (max-width: 420px)
-    width: 100%
 
 .first-label
   width: 30%
@@ -105,4 +98,16 @@ export default {
   font-size: 16px
   text-align: center
   width: 100%
+
+.container
+  display: flex
+  justify-content: space-around
+  align-items: center
+  @media screen and (max-width: 767px)
+    flex-direction: column
+
+.labels-container
+  width: 40vw
+  @media screen and (max-width: 767px)
+    width: 75vw
 </style>
