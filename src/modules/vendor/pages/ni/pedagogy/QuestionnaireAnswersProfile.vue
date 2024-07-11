@@ -4,7 +4,7 @@
       <template #title>
         <ni-select class="selector" :model-value="selectedQuestionnaireType"
           @update:model-value="updateSelectedQuestionnaireType" caption="Type de questionnaire"
-          :options="questionnaireOptions" clearable />
+          :options="questionnaireOptions" clearable required-field />
       </template>
     </ni-profile-header>
     <profile-answers v-if="selectedQuestionnaireId" :profile-id="selectedQuestionnaireId" />
