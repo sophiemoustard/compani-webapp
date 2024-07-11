@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { computed, toRefs, ref } from 'vue';
+import { computed, toRefs, ref, watch } from 'vue';
 import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
@@ -163,6 +163,11 @@ export default {
     };
 
     created();
+
+    watch(profileId, async () => {
+      await created();
+      resetFilters();
+    });
 
     return {
       // Data

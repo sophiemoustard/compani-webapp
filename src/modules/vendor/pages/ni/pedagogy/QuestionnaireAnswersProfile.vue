@@ -4,7 +4,7 @@
       <template #title>
         <ni-select class="selector" :model-value="selectedQuestionnaireType"
           @update:model-value="updateSelectedQuestionnaireType" caption="Type de questionnaire"
-          :options="questionnaireOptions" clearable required-field />
+          :options="questionnaireOptions" clearable />
       </template>
     </ni-profile-header>
     <profile-answers v-if="selectedQuestionnaireId" :profile-id="selectedQuestionnaireId" />
@@ -30,10 +30,16 @@ export default {
   setup () {
     const selectedQuestionnaireType = ref('');
     const publishedQuestionnaires = ref([]);
-
     const questionnaireOptions = Object.keys(QUESTIONNAIRE_TYPES)
       .filter(type => type !== SELF_POSITIONNING)
       .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type }));
+
+    const selectedQuestionnaireId = computed(() => {
+      const selectedQuestionnaire = publishedQuestionnaires.value
+        .find(q => q.type === selectedQuestionnaireType.value);
+
+      return get(selectedQuestionnaire, '_id');
+    });
 
     const updateSelectedQuestionnaireType = (value) => { selectedQuestionnaireType.value = value; };
 
@@ -47,22 +53,15 @@ export default {
 
     created();
 
-    const selectedQuestionnaireId = computed(() => {
-      const selectedQuestionnaire = publishedQuestionnaires.value
-        .find(q => q.type === selectedQuestionnaireType.value);
-
-      return get(selectedQuestionnaire, '_id');
-    });
-
     return {
       // Data
       selectedQuestionnaireType,
       questionnaireOptions,
       publishedQuestionnaires,
-      // Methods
-      updateSelectedQuestionnaireType,
       // Computed
       selectedQuestionnaireId,
+      // Methods
+      updateSelectedQuestionnaireType,
     };
   },
 };
