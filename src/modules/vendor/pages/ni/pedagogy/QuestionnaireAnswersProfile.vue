@@ -2,44 +2,67 @@
   <q-page class="vendor-background" padding>
     <ni-profile-header title="Réponses aux questionnaires">
       <template #title>
-        <ni-select class="selector" :model-value="questionnaireType" @update:model-value="updateQuestionnaireType"
-          caption="Type de questionnaire"
+        <ni-select class="selector" :model-value="selectedQuestionnaireType"
+          @update:model-value="updateSelectedQuestionnaireType" caption="Type de questionnaire"
           :options="questionnaireOptions" clearable />
       </template>
     </ni-profile-header>
+    <profile-answers v-if="selectedQuestionnaireId" :profile-id="selectedQuestionnaireId" />
   </q-page>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
-import { QUESTIONNAIRE_TYPES, SELF_POSITIONNING } from '@data/constants';
+import ProfileAnswers from 'src/modules/vendor/components/questionnaires/ProfileAnswers';
+import Questionnaires from '@api/Questionnaires';
+import { QUESTIONNAIRE_TYPES, SELF_POSITIONNING, PUBLISHED } from '@data/constants';
 
 export default {
   name: 'QuestionnaireAnswersProfile',
   components: {
     'ni-profile-header': ProfileHeader,
     'ni-select': Select,
-  },
-  props: {
+    'profile-answers': ProfileAnswers,
   },
   setup () {
-    const questionnaireType = ref('');
+    const selectedQuestionnaireType = ref('');
+    const publishedQuestionnaires = ref([]);
 
     const questionnaireOptions = Object.keys(QUESTIONNAIRE_TYPES)
       .filter(type => type !== SELF_POSITIONNING)
       .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type }));
 
-    const updateQuestionnaireType = (value) => { questionnaireType.value = value; };
+    const updateSelectedQuestionnaireType = (value) => { selectedQuestionnaireType.value = value; };
+
+    const getPublishedQuestionnaires = async () => {
+      const questionnaires = await Questionnaires.list();
+
+      publishedQuestionnaires.value = questionnaires.filter(q => q.status === PUBLISHED);
+    };
+
+    const created = async () => getPublishedQuestionnaires();
+
+    created();
+
+    const selectedQuestionnaireId = computed(() => {
+      const selectedQuestionnaire = publishedQuestionnaires.value
+        .find(q => q.type === selectedQuestionnaireType.value);
+
+      return get(selectedQuestionnaire, '_id');
+    });
 
     return {
       // Data
-      questionnaireType,
-      // Computed
+      selectedQuestionnaireType,
       questionnaireOptions,
+      publishedQuestionnaires,
       // Methods
-      updateQuestionnaireType,
+      updateSelectedQuestionnaireType,
+      // Computed
+      selectedQuestionnaireId,
     };
   },
 };
