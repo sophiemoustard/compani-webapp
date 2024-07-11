@@ -1,3 +1,4 @@
+<!-- [TEMPORARY] - this component will be removed at the end of the project -->
 <template>
   <q-page class="vendor-background" padding>
     <ni-profile-header :title="questionnaireName" :header-info="headerInfo" />
@@ -16,7 +17,7 @@ import { QUESTIONNAIRE_TYPES } from '@data/constants';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
 
 export default {
-  name: 'QuestionnaireAnswersProfile',
+  name: 'OldQuestionnaireAnswersProfile',
   mixins: [questionnaireAnswersMixin],
   components: {
     'ni-profile-header': ProfileHeader,
