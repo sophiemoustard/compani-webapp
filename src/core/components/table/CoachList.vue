@@ -218,7 +218,7 @@ export default {
         this.loading = false;
       }
 
-      if (!get(this.company, 'subscriptions.erp') && this.newCoach.sendEmail) await this.sendEmail();
+      if (this.newCoach.sendEmail) await this.sendEmail();
 
       await this.getUsers();
       this.coachCreationModal = false;

@@ -111,7 +111,6 @@ export default {
   validations () {
     return {
       company: {
-        ics: { required },
         name: { required },
         address: {
           zipCode: { required },

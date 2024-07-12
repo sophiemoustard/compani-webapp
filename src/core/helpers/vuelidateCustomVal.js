@@ -82,8 +82,6 @@ export const maxDate = max => helpers.withParams(
 
 export const validSiret = value => !value || /^\d{14}$/.test(value);
 
-export const rcs = value => !value || /^[0-9]*[1-9][0-9]*$/.test(value);
-
 export const validYear = value => !value || /^[2]{1}[0]{1}[0-9]{2}$/.test(value);
 
 // Quiz fill-the-gap
