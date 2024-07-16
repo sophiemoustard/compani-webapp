@@ -1,10 +1,14 @@
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { sortStrings } from '@helpers/utils';
 import { formatISODurationWithBestUnit } from '@helpers/dates/utils';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import { DEFAULT_AVATAR } from '@data/constants';
 
 export const useLearnerDirectory = () => {
+  const $router = useRouter();
+  const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
+
   const pagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
   const columns = ref([
     {
@@ -14,8 +18,17 @@ export const useLearnerDirectory = () => {
       align: 'left',
       sortable: true,
       sort: (a, b) => sortStrings(a.lastname, b.lastname),
-      style: 'width: 50%',
+      style: `width: ${isVendorInterface ? '30%' : '50%'}`,
     },
+    ...isVendorInterface
+      ? [{
+        name: 'company',
+        label: 'Structure',
+        align: 'center',
+        field: 'company',
+        sortable: true,
+      }]
+      : [],
     {
       name: 'blendedCoursesCount',
       label: 'Formations mixtes',
