@@ -27,7 +27,7 @@ describe('Login page tests', () => {
       url: 'account',
     },
     { person: 'planning referent', email: 'planning-referent@alenvi.io', password: '123456!eR', url: 'account' },
-    { person: 'helper', email: 'helper@alenvi.io', password: '123456!eR', url: 'customers/documents' },
+    { person: 'helper', email: 'helper@alenvi.io', password: '123456!eR', url: 'account' },
     {
       person: 'vendor admin',
       email: 'vendor-admin@alenvi.io',

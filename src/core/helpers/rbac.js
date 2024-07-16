@@ -15,10 +15,6 @@ import {
 const coachRoutes = [
   { name: 'ni exports data', subscription: ERP },
   { name: 'ni exports history', subscription: ERP },
-  { name: 'ni customers', subscription: ERP },
-  { name: 'ni customers info', subscription: ERP },
-  { name: 'ni planning auxiliaries', subscription: ERP },
-  { name: 'ni planning customers', subscription: ERP },
   { name: 'account client' },
   { name: 'ni courses' },
   { name: 'ni courses dashboard' },
@@ -32,22 +28,14 @@ const coachRoutes = [
 const clientAdminRoutes = [
   ...coachRoutes,
   { name: 'ni config company' },
-  { name: 'ni config customers', subscription: ERP },
   { name: 'ni config coach' },
-  { name: 'ni billing to bill', subscription: ERP },
-  { name: 'ni billing manual bills', subscription: ERP },
-  { name: 'ni billing credit note', subscription: ERP },
   { name: 'ni billing clients balances', subscription: ERP },
-  { name: 'ni billing tpp bill slips', subscription: ERP },
-  { name: 'ni billing debits archive', subscription: ERP },
-  { name: 'ni billing automatic bills', subscription: ERP },
   { name: 'ni courses bills' },
 ];
 const auxiliaryRoutes = [
   { name: 'account client' },
 ];
 const helperRoutes = [
-  { name: 'customers documents', subscription: ERP },
   { name: 'account client' },
 ];
 const trainingOrganisationManagerRoutes = [

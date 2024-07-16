@@ -1,10 +1,5 @@
 import { canNavigate } from '@helpers/alenvi';
-import {
-  HELPER,
-  AUXILIARY_ROLES,
-  COACH_ROLES,
-  AUXILIARY_WITHOUT_COMPANY,
-} from 'src/core/data/constants';
+import { HELPER, AUXILIARY_ROLES, COACH_ROLES } from 'src/core/data/constants';
 import store from 'src/store/index';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
@@ -24,14 +19,9 @@ const routes = [
         if (!userClientRole && !userVendorRole) return next({ name: 'account client' });
         if (!userClientRole) return next({ path: '/ad' });
 
-        if (userClientRole === HELPER) return next({ name: 'customers documents' });
-        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
-          return next({ name: 'account client' });
-        }
-        if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'account client' });
-        if (COACH_ROLES.includes(userClientRole)) {
-          return next({ name: 'ni courses' });
-        }
+        if ([...AUXILIARY_ROLES, HELPER].includes(userClientRole)) return next({ name: 'account client' });
+        if (COACH_ROLES.includes(userClientRole)) return next({ name: 'ni courses' });
+
         return next({ name: '404' });
       } catch (e) {
         console.error(e);
@@ -48,15 +38,6 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/customers',
-        name: 'ni config customers',
-        component: () => import('src/modules/client/pages/ni/config/CustomersConfig'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
-        },
-      },
-      {
         path: 'ni/config/coachs',
         name: 'ni config coach',
         component: () => import('src/modules/client/pages/ni/config/CoachConfig'),
@@ -66,63 +47,9 @@ const routes = [
         },
       },
       {
-        path: 'ni/billing/to-bill',
-        name: 'ni billing to bill',
-        component: () => import('src/modules/client/pages/ni/billing/ToBill'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
-        path: 'ni/billing/manual-bills',
-        name: 'ni billing manual bills',
-        component: () => import('src/modules/client/pages/ni/billing/ManualBills'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
-        path: 'ni/billing/credit-notes',
-        name: 'ni billing credit note',
-        component: () => import('src/modules/client/pages/ni/billing/CreditNotes'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
         path: 'ni/billing/clients-balances',
         name: 'ni billing clients balances',
         component: () => import('src/modules/client/pages/ni/billing/ClientsBalances'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
-        path: 'ni/billing/tpp-bill-slips',
-        name: 'ni billing tpp bill slips',
-        component: () => import('src/modules/client/pages/ni/billing/TppBillSlips'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
-        path: 'ni/billing/debits-archive',
-        name: 'ni billing debits archive',
-        component: () => import('src/modules/client/pages/ni/billing/DebitsArchive'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'billing',
-        },
-      },
-      {
-        path: 'ni/billing/bills',
-        name: 'ni billing automatic bills',
-        component: () => import('src/modules/client/pages/ni/billing/Bills'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'billing',
@@ -144,45 +71,6 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'exports',
-        },
-      },
-      {
-        path: 'ni/customers',
-        name: 'ni customers',
-        component: () => import('src/modules/client/pages/ni/customers/CustomersDirectory'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'customers',
-        },
-      },
-      { // must be last of ni/customers/... routes
-        path: 'ni/customers/:customerId',
-        name: 'ni customers info',
-        props: route => ({ ...route.params, ...route.query }),
-        component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'customers',
-        },
-      },
-      {
-        path: 'ni/planning/auxiliaries',
-        name: 'ni planning auxiliaries',
-        component: () => import('src/modules/client/pages/ni/planning/AuxiliaryPlanning'),
-        props: route => ({ ...route.query }),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'planning',
-        },
-      },
-      {
-        path: 'ni/planning/customers',
-        name: 'ni planning customers',
-        component: () => import('src/modules/client/pages/ni/planning/CustomerPlanning'),
-        props: route => ({ ...route.query }),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'planning',
         },
       },
       {
@@ -287,15 +175,6 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'courses',
-        },
-      },
-      // Customers view routes
-      {
-        path: 'customers/documents',
-        name: 'customers documents',
-        component: () => import('src/modules/client/pages/customers/Billing'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
         },
       },
       // All profiles
