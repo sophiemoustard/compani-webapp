@@ -41,7 +41,18 @@ export default {
 
     const holdings = ref([]);
     const tableLoading = ref(false);
-    const columns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }];
+    const columns = [
+      { name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true },
+      {
+        name: 'companiesCount',
+        label: 'Nombre de structures',
+        align: 'right',
+        field: 'companies',
+        format: value => value.length || '0',
+        sortable: true,
+        sort: (a, b) => a.length - b.length,
+      },
+    ];
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
     const searchStr = ref('');
     const holdingCreationModal = ref(false);
