@@ -34,8 +34,7 @@ import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { NotifyNegative } from '@components/popup/notify';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
-import { userMixin } from '@mixins/userMixin';
-import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
+import { useLearnerDirectory } from '@composables/learnerDirectory';
 import { useLearnersCreation } from '@composables/learnersCreation';
 import { formatAndSortOptions } from '@helpers/utils';
 
@@ -82,6 +81,8 @@ export default {
       resetLearnerCreationModal,
     } = useLearnersCreation(refresh, true, true, companies);
 
+    const { pagination, columns, getAvatar } = useLearnerDirectory();
+
     const getHoldingCompanies = async () => {
       try {
         const companyList = await Companies.list({ holding: loggedUser.value.holding._id });
@@ -110,6 +111,8 @@ export default {
       learnerCreationModal,
       disableUserInfoEdition,
       path,
+      pagination,
+      columns,
       // Computed
       filteredLearners,
       company,
@@ -122,8 +125,8 @@ export default {
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
+      getAvatar,
     };
   },
-  mixins: [learnerDirectoryMixin, userMixin],
 };
 </script>
