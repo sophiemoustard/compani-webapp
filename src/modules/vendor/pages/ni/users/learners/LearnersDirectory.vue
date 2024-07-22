@@ -81,7 +81,7 @@ export default {
     };
 
     const created = async () => {
-      await Promise.all([refreshCompanies()]);
+      await refreshCompanies();
     };
 
     onMounted(async () => { await refresh(); });

@@ -1,8 +1,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { sortStrings } from '@helpers/utils';
-import { formatISODurationWithBestUnit } from '@helpers/dates/utils';
-import CompaniDuration from '@helpers/dates/companiDurations';
+import { formatISODurationWithBestUnit, durationAscendingSort } from '@helpers/dates/utils';
 import { DEFAULT_AVATAR } from '@data/constants';
 
 export const useLearnerDirectory = () => {
@@ -57,7 +56,7 @@ export const useLearnerDirectory = () => {
       align: 'center',
       sortable: true,
       format: value => (value !== null ? formatISODurationWithBestUnit(value) : '-'),
-      sort: (a, b) => (CompaniDuration(b).isLongerThan(a) ? 1 : -1),
+      sort: (a, b) => durationAscendingSort(a, b),
     },
   ]);
 
