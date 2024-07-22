@@ -150,6 +150,15 @@ export const formatAndSortUserOptions = (array, displayCompany) => array
   }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
+export const formatAndSortCompanyOptions = array => array
+  .map(el => ({
+    value: el._id,
+    label: el.name,
+    holding: get(el, 'holding.name') || '',
+    additionalFilters: [get(el, 'holding.name') || ''],
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
 
 export const readAPIResponseWithTypeArrayBuffer = (response) => {

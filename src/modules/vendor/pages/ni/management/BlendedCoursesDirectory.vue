@@ -70,6 +70,7 @@ import {
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
   OPERATIONS,
+  DIRECTORY,
 } from '@data/constants';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -126,7 +127,7 @@ export default {
 
     const refreshCompanies = async () => {
       try {
-        companies.value = await Companies.list();
+        companies.value = await Companies.list({ action: DIRECTORY });
       } catch (e) {
         console.error(e);
         companies.value = [];
