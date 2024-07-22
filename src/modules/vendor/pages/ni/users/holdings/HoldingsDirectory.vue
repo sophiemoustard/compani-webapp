@@ -46,7 +46,8 @@ export default {
       {
         name: 'companiesCount',
         label: 'Nombre de structures',
-        align: 'right',
+        align: 'center',
+        style: 'width: 20%',
         field: 'companies',
         format: value => value.length || '0',
         sortable: true,
