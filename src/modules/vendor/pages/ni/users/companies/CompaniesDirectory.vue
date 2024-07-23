@@ -44,7 +44,8 @@ export default {
       {
         name: 'holding',
         label: 'Société mère',
-        align: 'right',
+        align: 'center',
+        style: 'width: 20%',
         field: 'holding',
         format: value => (value ? value.name : 'N/A'),
         sortable: true,
