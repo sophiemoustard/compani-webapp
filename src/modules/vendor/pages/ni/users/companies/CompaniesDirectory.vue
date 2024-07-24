@@ -15,6 +15,7 @@
 <script>
 import { computed, ref } from 'vue';
 import { useMeta } from 'quasar';
+import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -47,7 +48,7 @@ export default {
         align: 'center',
         style: 'width: 20%',
         field: 'holding',
-        format: value => (value ? value.name : ''),
+        format: value => get(value, 'name') || '',
         sortable: true,
         sort: (a, b) => sortStrings(a.name, b.name),
       },
