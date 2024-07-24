@@ -103,7 +103,7 @@ export const useLearnersCreation = (
         picture: user.picture ? user.picture.link : null,
         noDiacriticsName: removeDiacritics(formattedName),
       },
-      company: user.company ? user.company.name : 'N/A',
+      company: user.company ? user.company.name : '',
       blendedCoursesCount: user.blendedCoursesCount,
       eLearningCoursesCount: user.eLearningCoursesCount,
       activityHistoryCount: user.activityHistoryCount,

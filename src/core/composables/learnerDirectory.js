@@ -26,6 +26,7 @@ export const useLearnerDirectory = () => {
         align: 'center',
         field: 'company',
         sortable: true,
+        sort: sortStrings,
       }]
       : [],
     {

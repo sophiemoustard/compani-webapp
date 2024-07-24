@@ -47,7 +47,7 @@ export default {
         align: 'center',
         style: 'width: 20%',
         field: 'holding',
-        format: value => (value ? value.name : 'N/A'),
+        format: value => (value ? value.name : ''),
         sortable: true,
         sort: (a, b) => sortStrings(a.name, b.name),
       },
