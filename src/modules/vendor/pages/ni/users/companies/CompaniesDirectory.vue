@@ -15,6 +15,7 @@
 <script>
 import { computed, ref } from 'vue';
 import { useMeta } from 'quasar';
+import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -24,7 +25,8 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import CompanyCreationModal from 'src/modules/vendor/components/companies/CompanyCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { removeDiacritics } from '@helpers/utils';
+import { removeDiacritics, sortStrings } from '@helpers/utils';
+import { DIRECTORY } from '@data/constants';
 
 export default {
   name: 'CompaniesDirectory',
@@ -38,7 +40,19 @@ export default {
     useMeta(metaInfo);
 
     const visibleColumns = ['name'];
-    const columns = [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }];
+    const columns = [
+      { name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true },
+      {
+        name: 'holding',
+        label: 'Société mère',
+        align: 'center',
+        style: 'width: 20%',
+        field: 'holding',
+        format: value => get(value, 'name') || '',
+        sortable: true,
+        sort: (a, b) => sortStrings(a.name, b.name),
+      },
+    ];
     const path = { name: 'ni users companies info', params: 'companyId' };
     const companies = ref([]);
     const tableLoading = ref(false);
@@ -61,7 +75,7 @@ export default {
     const refreshCompanies = async () => {
       try {
         tableLoading.value = true;
-        const companyList = await Companies.list();
+        const companyList = await Companies.list({ action: DIRECTORY });
 
         companies.value = companyList.map(c => ({ ...c, noDiacriticsName: removeDiacritics(c.name) }));
       } catch (e) {
