@@ -9,7 +9,7 @@
       :class="{ 'no-border': noBorder, 'borders': inModal && !noBorder , 'no-bottom': noError }" :error="error"
       :display-value="displayedValue" :hide-selected="!multiple" fill-input :input-debounce="0" emit-value
       ref="selectInput" :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon"
-      :error-message="errorMessage" :multiple="multiple">
+      :error-message="errorMessage" :multiple="multiple" :use-chips="useChips" :map-options="useChips">
       <template #append>
         <ni-button v-if="modelValue && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
@@ -54,6 +54,7 @@ export default {
     optionSlot: { type: Boolean, default: false },
     noBorder: { type: Boolean, default: false },
     blurOnSelection: { type: Boolean, default: true },
+    useChips: { type: Boolean, default: false },
   },
   emits: ['focus', 'blur', 'update:model-value'],
   components: {
@@ -143,6 +144,15 @@ export default {
 .select-icon
   margin: 0
 
-:deep(.q-field__native), :deep(.q-field__prefix), :deep(.q-field__suffix), :deep(.q-field__input)
-  color: $copper-grey-900
+:deep(.q-field__inner)
+  height: auto
+:deep(.q-chip)
+  background-color: $peach-200
+  padding: 0 8px
+  min-height: 26px
+  color: white
+:deep(.q-chip__icon)
+  color: white
+  opacity: 1
+  padding-left: 8px
 </style>

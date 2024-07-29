@@ -10,10 +10,10 @@
       <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
         clearable />
     </div>
-    <div class="row">
+    <div class="group-filter-container">
       <ni-select v-if="displayCourseSelect" caption="Groupe de formation" :options="courseOptions"
         :model-value="selectedCourses" @update:model-value="updateSelectedCourses" clearable multiple
-        :blur-on-selection="false" />
+        :blur-on-selection="false" use-chips />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
@@ -178,7 +178,8 @@ export default {
         .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
         .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value))
         .filter(a => !selectedHolding.value ||
-          ((holdingCompanies.value[selectedHolding.value]).includes(a.traineeCompany)));
+          ((holdingCompanies.value[selectedHolding.value]).includes(a.traineeCompany)))
+        .filter(a => !selectedCourses.value.length || (selectedCourses.value.includes(get(a, 'course._id'))));
 
       return { ...fu, answers: answers.map(a => a.answer) };
     };
@@ -242,7 +243,12 @@ export default {
 
 <style lang="sass" scoped>
 .filters-container
-  grid-template-columns: repeat(4, 22%) 12%
+  grid-template-columns: repeat(4, 24%)
+  @media screen and (max-width: 767px)
+    width: 95%
+
+.group-filter-container
+  flex-direction: column
   @media screen and (max-width: 767px)
     width: 95%
 </style>
