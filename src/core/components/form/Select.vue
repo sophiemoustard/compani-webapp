@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { ref, computed, toRefs } from 'vue';
 import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -58,61 +59,72 @@ export default {
   components: {
     'ni-button': Button,
   },
-  data () {
-    return {
-      selectableOptions: [],
-    };
-  },
-  computed: {
-    displayedValue () {
-      const option = this.options.find(opt => opt.value === this.modelValue);
+  setup (props, { emit }) {
+    const { options, modelValue, blurOnSelection } = toRefs(props);
+    const selectableOptions = ref([]);
+    const selectInput = ref(null);
+
+    const displayedValue = computed(() => {
+      const option = options.value.find(opt => opt.value === modelValue.value);
       return option ? option.label : '';
-    },
-    model () {
-      return this.options.find(opt => opt.value === this.modelValue) || null;
-    },
-    formattedOptions () {
-      return this.options.map(opt => ({
-        ...opt,
-        filters: [
-          this.formatStringForFiltering(opt.label),
-          ...(opt.additionalFilters
-            ? opt.additionalFilters.map(additionalFilter => this.formatStringForFiltering(additionalFilter))
-            : []
-          ),
-        ],
-      }));
-    },
-  },
-  methods: {
-    onFocus () {
-      this.$emit('focus');
-    },
-    onBlur () {
-      this.$emit('blur');
-    },
-    onInput (val) {
-      this.$emit('update:model-value', val);
-      if (this.blurOnSelection) this.$refs.selectInput.blur();
-    },
-    formatStringForFiltering (str) {
-      return escapeRegExp(removeDiacritics(str.toLowerCase()));
-    },
-    onFilter (val, update) {
+    });
+
+    const model = computed(() => options.value.find(opt => opt.value === modelValue.value) || null);
+
+    const formattedOptions = computed(() => options.value.map(opt => ({
+      ...opt,
+      filters: [
+        formatStringForFiltering(opt.label),
+        ...(opt.additionalFilters
+          ? opt.additionalFilters.map(additionalFilter => formatStringForFiltering(additionalFilter))
+          : []
+        ),
+      ],
+    })));
+
+    const onFocus = () => { emit('focus'); };
+
+    const onBlur = () => { emit('blur'); };
+
+    const onInput = (val) => {
+      emit('update:model-value', val);
+      if (blurOnSelection.value) selectInput.value.blur();
+    };
+
+    const formatStringForFiltering = str => escapeRegExp(removeDiacritics(str.toLowerCase()));
+
+    const onFilter = (val, update) => {
       update(() => {
         if (val) {
-          const formattedValue = this.formatStringForFiltering(val);
-          this.selectableOptions = this.formattedOptions
+          const formattedValue = formatStringForFiltering(val);
+          selectableOptions.value = formattedOptions.value
             .filter(opt => opt.filters.some(word => word.includes(formattedValue)));
         } else {
-          this.selectableOptions = this.options;
+          selectableOptions.value = options.value;
         }
       });
-    },
-    resetValue ($event) {
-      this.onInput('');
+    };
+
+    const resetValue = ($event) => {
+      onInput('');
       $event.preventDefault();
-    },
+    };
+
+    return {
+      // Data
+      selectableOptions,
+      selectInput,
+      // Computed
+      displayedValue,
+      model,
+      formattedOptions,
+      // Methods
+      onFocus,
+      onBlur,
+      onInput,
+      onFilter,
+      resetValue,
+    };
   },
 };
 </script>
