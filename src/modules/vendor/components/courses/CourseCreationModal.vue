@@ -15,9 +15,8 @@
       <ni-select in-modal :model-value="newCourse.subProgram" @update:model-value="update($event, 'subProgram')"
         @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions"
         :disable="disableSubProgram" :error="validations.subProgram.$error" />
-      <ni-select v-if="isIntraCourse" in-modal :model-value="newCourse.company"
-        @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions"
-        :error="validations.company.$error" @update:model-value="update($event, 'company')" />
+      <company-select v-if="isIntraCourse" in-modal :company="newCourse.company" :validation="validations.company"
+        required-field :company-options="companyOptions" @update:model-value="update($event, 'company')" />
       <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Chargé(e) d'accompagnement"
         @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable />
       <ni-select v-if="isIntraHoldingCourse" in-modal :model-value="newCourse.holding"
@@ -50,11 +49,12 @@ import get from 'lodash/get';
 import omit from 'lodash/omit';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import { COURSE_TYPES, REQUIRED_LABEL, INTRA, INTRA_HOLDING, PUBLISHED } from '@data/constants';
-import { formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortOptions, formatAndSortCompanyOptions } from '@helpers/utils';
 
 export default {
   name: 'CourseCreationModal',
@@ -72,6 +72,7 @@ export default {
     'ni-option-group': OptionGroup,
     'ni-modal': Modal,
     'ni-select': Select,
+    'company-select': CompanySelect,
     'ni-input': Input,
     'ni-date-input': DateInput,
   },
@@ -115,7 +116,7 @@ export default {
 
     const isIntraHoldingCourse = computed(() => newCourse.value.type === INTRA_HOLDING);
 
-    const companyOptions = computed(() => formatAndSortOptions(companies.value, 'name'));
+    const companyOptions = computed(() => formatAndSortCompanyOptions(companies.value));
 
     const hide = () => emit('hide');
 

@@ -41,7 +41,14 @@ export default {
 
     const visibleColumns = ['name'];
     const columns = [
-      { name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true },
+      {
+        name: 'name',
+        label: 'Nom',
+        align: 'left',
+        field: 'name',
+        sortable: true,
+        sort: sortStrings,
+      },
       {
         name: 'holding',
         label: 'Société mère',
