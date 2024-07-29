@@ -9,6 +9,11 @@
         clearable />
       <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
         clearable />
+    </div>
+    <div class="row">
+      <ni-select v-if="displayCourseSelect" caption="Groupe de formation" :options="courseOptions"
+        :model-value="selectedCourses" @update:model-value="updateSelectedCourses" clearable multiple
+        :blur-on-selection="false" />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
@@ -21,6 +26,7 @@
 import { computed, toRefs, ref, watch } from 'vue';
 import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
+import uniqBy from 'lodash/uniqBy';
 import mapValues from 'lodash/mapValues';
 import Questionnaires from '@api/Questionnaires';
 import Holdings from '@api/Holdings';
@@ -29,6 +35,7 @@ import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Select from '@components/form/Select';
 import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
+import { composeCourseName } from '@helpers/courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
 import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
@@ -54,11 +61,40 @@ export default {
     const selectedHolding = ref('');
     const holdingOptions = ref([]);
     const holdingCompanies = ref([]);
+    const selectedCourses = ref([]);
 
     const filteredAnswers = computed(() => {
       if (!get(questionnaireAnswers.value, 'followUp')) return {};
 
       return { ...questionnaireAnswers.value, followUp: questionnaireAnswers.value.followUp.map(formatFollowUp) };
+    });
+
+    const displayCourseSelect = computed(() => {
+      if (selectedTrainer.value || selectedCompany.value || selectedHolding.value || selectedProgram.value) {
+        return true;
+      }
+      return false;
+    });
+
+    const courseOptions = computed(() => {
+      const options = [];
+
+      if (displayCourseSelect.value) {
+        const answers = questionnaireAnswers.value.followUp.map(fu => fu.answers
+          .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
+          .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
+          .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value))
+          .filter(a => !selectedHolding.value ||
+            ((holdingCompanies.value[selectedHolding.value]).includes(a.traineeCompany))))
+          .flat();
+
+        options.push(...uniqBy(
+          answers.map(a => ({ _id: a.course._id, name: composeCourseName(a.course, true) })),
+          'name'
+        ));
+      }
+
+      return formatAndSortOptions(options, 'name');
     });
 
     const getQuestionnaireAnswers = async () => {
@@ -134,6 +170,8 @@ export default {
 
     const updateSelectedHolding = (holdingId) => { selectedHolding.value = holdingId; };
 
+    const updateSelectedCourses = (courseIds) => { selectedCourses.value = courseIds; };
+
     const formatFollowUp = (fu) => {
       const answers = fu.answers
         .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
@@ -150,6 +188,7 @@ export default {
       selectedCompany.value = '';
       selectedProgram.value = '';
       selectedHolding.value = '';
+      selectedCourses.value = [];
     };
 
     const created = async () => {
@@ -180,8 +219,11 @@ export default {
       programOptions,
       selectedHolding,
       holdingOptions,
+      selectedCourses,
       // Computed
       filteredAnswers,
+      displayCourseSelect,
+      courseOptions,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
@@ -192,6 +234,7 @@ export default {
       updateSelectedProgram,
       updateSelectedHolding,
       resetFilters,
+      updateSelectedCourses,
     };
   },
 };

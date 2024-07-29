@@ -7,9 +7,9 @@
     <q-select dense borderless :model-value="model" :bg-color="bgColor" :options="selectableOptions" @filter="onFilter"
       :disable="disable" @focus="onFocus" @blur="onBlur" @update:model-value="onInput" behavior="menu" use-input
       :class="{ 'no-border': noBorder, 'borders': inModal && !noBorder , 'no-bottom': noError }" :error="error"
-      :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" :error-message="errorMessage"
-      :multiple="multiple">
+      :display-value="displayedValue" :hide-selected="!multiple" fill-input :input-debounce="0" emit-value
+      ref="selectInput" :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon"
+      :error-message="errorMessage" :multiple="multiple">
       <template #append>
         <ni-button v-if="modelValue && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
@@ -60,16 +60,22 @@ export default {
     'ni-button': Button,
   },
   setup (props, { emit }) {
-    const { options, modelValue, blurOnSelection } = toRefs(props);
+    const { options, modelValue, blurOnSelection, multiple } = toRefs(props);
     const selectableOptions = ref([]);
     const selectInput = ref(null);
 
     const displayedValue = computed(() => {
+      if (multiple.value) {
+        const multipleOptions = selectableOptions.value.filter(opt => modelValue.value.includes(opt.value));
+        return multipleOptions.map(opt => opt.label).join(', ');
+      }
       const option = options.value.find(opt => opt.value === modelValue.value);
       return option ? option.label : '';
     });
 
-    const model = computed(() => options.value.find(opt => opt.value === modelValue.value) || null);
+    const model = computed(() => (multiple.value
+      ? modelValue.value
+      : options.value.find(opt => opt.value === modelValue.value) || null));
 
     const formattedOptions = computed(() => options.value.map(opt => ({
       ...opt,
@@ -87,7 +93,7 @@ export default {
     const onBlur = () => { emit('blur'); };
 
     const onInput = (val) => {
-      emit('update:model-value', val);
+      emit('update:model-value', multiple.value ? val.flat() : val);
       if (blurOnSelection.value) selectInput.value.blur();
     };
 
@@ -106,7 +112,7 @@ export default {
     };
 
     const resetValue = ($event) => {
-      onInput('');
+      onInput(multiple.value ? [] : '');
       $event.preventDefault();
     };
 
