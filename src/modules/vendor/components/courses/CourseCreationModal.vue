@@ -15,7 +15,7 @@
       <ni-select in-modal :model-value="newCourse.subProgram" @update:model-value="update($event, 'subProgram')"
         @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions"
         :disable="disableSubProgram" :error="validations.subProgram.$error" />
-      <ni-company-select v-if="isIntraCourse" in-modal :company="newCourse.company" :validation="validations.company"
+      <company-select v-if="isIntraCourse" in-modal :company="newCourse.company" :validation="validations.company"
         required-field :company-options="companyOptions" @update:model-value="update($event, 'company')" />
       <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Chargé(e) d'accompagnement"
         @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable />
@@ -72,7 +72,7 @@ export default {
     'ni-option-group': OptionGroup,
     'ni-modal': Modal,
     'ni-select': Select,
-    'ni-company-select': CompanySelect,
+    'company-select': CompanySelect,
     'ni-input': Input,
     'ni-date-input': DateInput,
   },

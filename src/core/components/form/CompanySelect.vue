@@ -6,7 +6,7 @@
         <q-item-section>
           <q-item-label>{{ scope.opt.label }}</q-item-label>
           <q-item-label class="details">
-            <div class="q-mb-xs">{{ scope.opt.holding }}</div>
+            <span class="q-mb-xs">{{ scope.opt.holding }}</span>
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -18,9 +18,9 @@
 import Select from '@components/form/Select';
 
 export default {
-  name: 'CourseCreationModal',
+  name: 'CompanySelect',
   props: {
-    company: { type: String, default: () => '' },
+    company: { type: String, default: '' },
     companyOptions: { type: Array, default: () => [] },
     validation: { type: Object, default: () => ({}) },
     requiredField: { type: Boolean, default: false },
