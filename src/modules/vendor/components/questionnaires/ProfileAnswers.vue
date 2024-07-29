@@ -209,6 +209,11 @@ export default {
       resetFilters();
     });
 
+    watch(selectedCompany, () => updateSelectedCourses([]));
+    watch(selectedHolding, () => updateSelectedCourses([]));
+    watch(selectedProgram, () => updateSelectedCourses([]));
+    watch(selectedTrainer, () => updateSelectedCourses([]));
+
     return {
       // Data
       questionnaireAnswers,
