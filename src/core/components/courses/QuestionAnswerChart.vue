@@ -36,7 +36,7 @@ export default {
       return { title: pa.text, total, percentage: total / card.value.answers.length || 0 };
     }));
 
-    const formatPercentage = (number) => { roundFrenchPercentage(number * 100, 0); };
+    const formatPercentage = number => roundFrenchPercentage(number * 100, 0);
 
     return {
       // Computed
