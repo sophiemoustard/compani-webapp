@@ -1,6 +1,4 @@
 <template>
-  {{ card.historyCount }}
-  {{ card.traineeCount }}
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
@@ -28,8 +26,9 @@ export default {
   setup (props) {
     const { card } = toRefs(props);
 
-    const subtitle = computed(() => `${card.value.answers.length} réponses à cette question à choix
-      ${card.value.isQuestionAnswerMultipleChoiced ? 'multiple' : 'simple'}`);
+    const subtitle = computed(() => `Question à choix
+      ${card.value.isQuestionAnswerMultipleChoiced ? 'multiple' : 'simple'} : ${card.value.traineeCount} répondants
+      pour ${card.value.historyCount} réponses`);
 
     const lines = computed(() => card.value.qcAnswers.map((pa) => {
       const total = card.value.answers.filter(a => a === pa._id).length;
