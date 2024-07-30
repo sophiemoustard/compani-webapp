@@ -69,12 +69,8 @@ export default {
       return { ...questionnaireAnswers.value, followUp: questionnaireAnswers.value.followUp.map(formatFollowUp) };
     });
 
-    const displayCourseSelect = computed(() => {
-      if (selectedTrainer.value || selectedCompany.value || selectedHolding.value || selectedProgram.value) {
-        return true;
-      }
-      return false;
-    });
+    const displayCourseSelect = computed(() => selectedTrainer.value || selectedCompany.value ||
+      selectedHolding.value || selectedProgram.value || false);
 
     const courseOptions = computed(() => {
       const options = [];

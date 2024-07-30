@@ -94,7 +94,7 @@ export default {
     const onBlur = () => { emit('blur'); };
 
     const onInput = (val) => {
-      emit('update:model-value', multiple.value ? val.flat() : val);
+      emit('update:model-value', val);
       if (blurOnSelection.value) selectInput.value.blur();
     };
 
