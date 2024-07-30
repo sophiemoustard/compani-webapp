@@ -20,6 +20,7 @@
 <script>
 import { computed, toRefs, ref, watch } from 'vue';
 import get from 'lodash/get';
+import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import Questionnaires from '@api/Questionnaires';
@@ -142,7 +143,12 @@ export default {
         .filter(a => !selectedHolding.value ||
           ((holdingCompanies.value[selectedHolding.value]).includes(a.traineeCompany)));
 
-      return { ...fu, answers: answers.map(a => a.answer) };
+      return {
+        ...fu,
+        answers: answers.map(a => a.answer),
+        traineeCount: uniq(answers.map(a => a.trainee)).length,
+        historyCount: uniq(answers.map(a => a.history)).length,
+      };
     };
 
     const resetFilters = () => {

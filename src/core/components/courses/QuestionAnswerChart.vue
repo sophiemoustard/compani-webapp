@@ -1,4 +1,6 @@
 <template>
+  {{ card.historyCount }}
+  {{ card.traineeCount }}
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
