@@ -25,6 +25,7 @@
 <script>
 import { computed, toRefs, ref, watch } from 'vue';
 import get from 'lodash/get';
+import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
 import uniqBy from 'lodash/uniqBy';
 import mapValues from 'lodash/mapValues';
@@ -177,7 +178,12 @@ export default {
           ((holdingCompanies.value[selectedHolding.value]).includes(a.traineeCompany)))
         .filter(a => !selectedCourses.value.length || (selectedCourses.value.includes(get(a, 'course._id'))));
 
-      return { ...fu, answers: answers.map(a => a.answer) };
+      return {
+        ...fu,
+        answers: answers.map(a => a.answer),
+        traineeCount: uniq(answers.map(a => a.trainee)).length,
+        historyCount: uniq(answers.map(a => a.history)).length,
+      };
     };
 
     const resetFilters = () => {
