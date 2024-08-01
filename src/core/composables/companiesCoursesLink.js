@@ -4,7 +4,8 @@ import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
-import { INTRA_HOLDING } from '@data/constants';
+import { INTRA_HOLDING, DIRECTORY } from '@data/constants';
+import { formatAndSortCompanyOptions } from '@helpers/utils';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
 export const useCompaniesCoursesLink = (course, emit) => {
@@ -29,11 +30,10 @@ export const useCompaniesCoursesLink = (course, emit) => {
   const getPotentialCompanies = async () => {
     try {
       const potentialCompanies = Object.freeze(
-        await Companies.list(course.value.type === INTRA_HOLDING ? { holding: course.value.holding } : {})
+        await Companies
+          .list(course.value.type === INTRA_HOLDING ? { holding: course.value.holding } : { action: DIRECTORY })
       );
-      selectCompanyOptions.value = potentialCompanies
-        .map(company => ({ value: company._id, label: company.name }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      selectCompanyOptions.value = formatAndSortCompanyOptions(potentialCompanies);
     } catch (error) {
       selectCompanyOptions.value = [];
       console.error(error);

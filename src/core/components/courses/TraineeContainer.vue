@@ -89,7 +89,12 @@ import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import { TRAINER, INTRA } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
-import { formatAndSortUserOptions, formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
+import {
+  formatAndSortUserOptions,
+  formatAndSortOptions,
+  formatAndSortIdentityOptions,
+  formatAndSortCompanyOptions,
+} from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -194,9 +199,9 @@ export default {
       const options = {};
       for (let i = 0; i < potentialTrainees.value.length; i++) {
         const currentAndFutureCompanyList = getCurrentAndFutureCompanies(potentialTrainees.value[i].userCompanyList);
-        options[potentialTrainees.value[i]._id] = currentAndFutureCompanyList
-          .filter(company => courseCompanyIds.value.includes(company._id))
-          .map(company => ({ label: company.name, value: company._id }));
+        options[potentialTrainees.value[i]._id] = formatAndSortCompanyOptions(
+          currentAndFutureCompanyList.filter(company => courseCompanyIds.value.includes(company._id))
+        );
       }
       return options;
     });
