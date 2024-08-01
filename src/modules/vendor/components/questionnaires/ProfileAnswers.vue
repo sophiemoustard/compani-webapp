@@ -257,7 +257,6 @@ export default {
   @media screen and (max-width: 767px)
     grid-auto-flow: row
     grid-template-rows: auto
-    width: 95%
 
 .group-filter-container
   flex-direction: column

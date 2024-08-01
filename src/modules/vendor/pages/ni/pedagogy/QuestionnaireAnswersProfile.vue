@@ -89,7 +89,13 @@ export default {
 
 <style lang="sass" scoped>
 .selector-container
-  display: flex
-  flex-direction: column
-  width: 40%
+  display: grid
+  grid-auto-flow: column
+  grid-template-columns: auto
+  justify-content: center
+  grid-gap: 24px
+  @media screen and (max-width: 767px)
+    grid-auto-flow: row
+    grid-template-rows: auto
+    grid-gap: 0px
 </style>
