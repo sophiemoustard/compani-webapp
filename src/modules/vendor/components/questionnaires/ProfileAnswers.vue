@@ -5,8 +5,8 @@
         clearable />
       <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
         clearable />
-      <ni-select :options="programOptions" :model-value="selectedProgram" @update:model-value="updateSelectedProgram"
-        clearable />
+      <ni-select v-if="!hideProgramFilter" :options="programOptions" :model-value="selectedProgram"
+        @update:model-value="updateSelectedProgram" clearable />
       <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
         clearable />
     </div>
@@ -48,10 +48,11 @@ export default {
   },
   mixins: [questionnaireAnswersMixin],
   props: {
-    profileId: { type: String, required: true },
+    questionnaireId: { type: String, required: true },
+    hideProgramFilter: { type: Boolean, default: false },
   },
   setup (props) {
-    const { profileId } = toRefs(props);
+    const { questionnaireId } = toRefs(props);
     const questionnaireAnswers = ref({});
     const selectedTrainer = ref('');
     const trainerOptions = ref([]);
@@ -96,7 +97,7 @@ export default {
 
     const getQuestionnaireAnswers = async () => {
       try {
-        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value);
+        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(questionnaireId.value);
       } catch (e) {
         questionnaireAnswers.value = [];
         console.error(e);
@@ -206,7 +207,7 @@ export default {
 
     created();
 
-    watch(profileId, async () => {
+    watch(questionnaireId, async () => {
       await created();
       resetFilters();
     });
@@ -250,9 +251,12 @@ export default {
 
 <style lang="sass" scoped>
 .filters-container
-  grid-template-columns: repeat(4, 24%)
+  display: grid
+  grid-auto-flow: column
+  grid-template-columns: auto
   @media screen and (max-width: 767px)
-    width: 95%
+    grid-auto-flow: row
+    grid-template-rows: auto
 
 .group-filter-container
   flex-direction: column
