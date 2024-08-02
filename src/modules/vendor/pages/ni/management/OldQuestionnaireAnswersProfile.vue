@@ -10,6 +10,7 @@
 
 <script>
 import get from 'lodash/get';
+import uniq from 'lodash/uniq';
 import Questionnaires from '@api/Questionnaires';
 import ProfileHeader from '@components/ProfileHeader';
 import { NotifyNegative } from '@components/popup/notify';
@@ -61,7 +62,12 @@ export default {
 
         this.questionnaireAnswers = {
           ...qa,
-          followUp: qa.followUp.map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })),
+          followUp: qa.followUp.map(fu => ({
+            ...fu,
+            answers: fu.answers.map(a => a.answer),
+            traineeCount: uniq(fu.answers.map(a => a.trainee)).length,
+            historyCount: uniq(fu.answers.map(a => a.history)).length,
+          })),
         };
       } catch (e) {
         this.questionnaireAnswers = {};
