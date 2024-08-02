@@ -48,11 +48,11 @@ export default {
   },
   mixins: [questionnaireAnswersMixin],
   props: {
-    questionnaireId: { type: String, required: true },
+    profileId: { type: String, required: true },
     hideProgramFilter: { type: Boolean, default: false },
   },
   setup (props) {
-    const { questionnaireId } = toRefs(props);
+    const { profileId } = toRefs(props);
     const questionnaireAnswers = ref({});
     const selectedTrainer = ref('');
     const trainerOptions = ref([]);
@@ -97,7 +97,7 @@ export default {
 
     const getQuestionnaireAnswers = async () => {
       try {
-        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(questionnaireId.value);
+        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value);
       } catch (e) {
         questionnaireAnswers.value = [];
         console.error(e);
@@ -207,7 +207,7 @@ export default {
 
     created();
 
-    watch(questionnaireId, async () => {
+    watch(profileId, async () => {
       await created();
       resetFilters();
     });
