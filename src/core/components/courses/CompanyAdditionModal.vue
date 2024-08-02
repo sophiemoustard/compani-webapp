@@ -3,8 +3,8 @@
     <template #title>
         Ajouter une <span class="text-weight-bold">structure</span>
       </template>
-      <ni-select in-modal :model-value="selectedCompany" @update:model-value="update" caption="Structure"
-        :options="companyOptions" required-field :error="validations.$error" />
+      <company-select in-modal :company="selectedCompany" @update:model-value="update" :company-options="companyOptions"
+        required-field :validation="validations" />
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" label="Ajouter la structure" icon-right="add" color="white"
           :loading="loading" @click="submit" />
@@ -14,7 +14,7 @@
 
 <script>
 import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 import Button from '@components/Button';
 
 export default {
@@ -28,7 +28,7 @@ export default {
   },
   components: {
     'ni-modal': Modal,
-    'ni-select': Select,
+    'company-select': CompanySelect,
     'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:selected-company'],
