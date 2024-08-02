@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
 import CompaniDate from '@helpers/dates/companiDates';
-import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatAndSortCompanyOptions } from '@helpers/utils';
 import {
   WITHOUT_TRAINER,
   ARCHIVED_COURSES,
@@ -67,8 +67,7 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
   const companyFilterOptions = computed(() => {
     const companies = courses.value
       .flatMap((course) => {
-        if (isVendorInterface) return course.companies.map(company => ({ label: company.name, value: company._id }));
-
+        if (isVendorInterface) return formatAndSortCompanyOptions(course.companies);
         if (loggedUser.value.role.holding) {
           return course.companies
             .filter(company => loggedUser.value.holding.companies.includes(company._id))
