@@ -29,10 +29,8 @@ export const useCompaniesCoursesLink = (course, emit) => {
 
   const getPotentialCompanies = async () => {
     try {
-      const potentialCompanies = Object.freeze(
-        await Companies
-          .list(course.value.type === INTRA_HOLDING ? { holding: course.value.holding } : { action: DIRECTORY })
-      );
+      const query = course.value.type === INTRA_HOLDING ? { holding: course.value.holding } : { action: DIRECTORY };
+      const potentialCompanies = Object.freeze(await Companies.list(query));
       selectCompanyOptions.value = formatAndSortCompanyOptions(potentialCompanies);
     } catch (error) {
       selectCompanyOptions.value = [];
