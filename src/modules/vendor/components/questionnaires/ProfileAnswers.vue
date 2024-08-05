@@ -39,7 +39,7 @@ import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/uti
 import { composeCourseName } from '@helpers/courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
-import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, INTRA, INTRA_HOLDING } from '@data/constants';
 
 export default {
   name: 'ProfileAnswers',
@@ -50,20 +50,21 @@ export default {
   props: {
     profileId: { type: String, required: true },
     hideProgramFilter: { type: Boolean, default: false },
+    course: { type: Object, default: () => ({}) },
   },
   setup (props) {
-    const { profileId } = toRefs(props);
+    const { profileId, course } = toRefs(props);
     const questionnaireAnswers = ref({});
-    const selectedTrainer = ref('');
+    const selectedTrainer = ref(get(course.value, 'trainer._id') || '');
     const trainerOptions = ref([]);
-    const selectedCompany = ref('');
+    const selectedCompany = ref(get(course.value, 'type') === INTRA ? get(course.value, 'companies[0]._id') : '');
     const companyOptions = ref([]);
-    const selectedProgram = ref('');
+    const selectedProgram = ref(get(course.value, 'subProgram.program._id') || '');
     const programOptions = ref([]);
-    const selectedHolding = ref('');
+    const selectedHolding = ref(get(course.value, 'type') === INTRA_HOLDING ? get(course.value, 'holding') : '');
     const holdingOptions = ref([]);
     const holdingCompanies = ref([]);
-    const selectedCourses = ref([]);
+    const selectedCourses = ref(get(course.value, '_id') ? [course.value._id] : []);
 
     const filteredAnswers = computed(() => {
       if (!get(questionnaireAnswers.value, 'followUp')) return {};
@@ -209,7 +210,7 @@ export default {
 
     watch(profileId, async () => {
       await created();
-      resetFilters();
+      if (!course.value) resetFilters();
     });
 
     watch(selectedCompany, () => updateSelectedCourses([]));

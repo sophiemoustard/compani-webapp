@@ -10,13 +10,14 @@
         </div>
       </template>
     </ni-profile-header>
-    <profile-answers v-if="selectedQuestionnaireId" :profile-id="selectedQuestionnaireId"
-      :hide-program-filter="!!selectedProgram" />
+    <profile-answers v-if="selectedQuestionnaireId && course" :profile-id="selectedQuestionnaireId"
+      :course="course" :hide-program-filter="!!selectedProgram" />
   </q-page>
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, toRefs } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
@@ -32,13 +33,21 @@ export default {
     'ni-select': Select,
     'profile-answers': ProfileAnswers,
   },
-  setup () {
-    const selectedQuestionnaireType = ref('');
+  props: {
+    questionnaireType: { type: String, enum: QUESTIONNAIRE_TYPES, default: '' },
+    courseId: { type: String, default: '' },
+  },
+  setup (props) {
+    const { courseId, questionnaireType } = toRefs(props);
+    const selectedQuestionnaireType = ref(questionnaireType.value, '');
     const publishedQuestionnaires = ref([]);
     const selectedProgram = ref('');
 
     const questionnaireOptions = Object.keys(QUESTIONNAIRE_TYPES)
       .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type }));
+
+    const $store = useStore();
+    const course = computed(() => $store.state.course.course);
 
     const selectedQuestionnaireId = computed(() => {
       const selectedQuestionnaire = selectedQuestionnaireType.value === SELF_POSITIONNING
@@ -63,11 +72,31 @@ export default {
       publishedQuestionnaires.value = questionnaires.filter(q => q.status === PUBLISHED);
     };
 
-    const created = async () => getPublishedQuestionnaires();
+    const refreshCourse = async () => {
+      try {
+        await $store.dispatch('course/fetchCourse', { courseId: courseId.value });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const created = async () => {
+      await getPublishedQuestionnaires();
+      if (courseId.value) {
+        await refreshCourse();
+        selectedProgram.value = selectedQuestionnaireType.value === SELF_POSITIONNING
+          ? course.value.subProgram.program._id
+          : '';
+      }
+    };
 
     created();
 
-    watch(selectedQuestionnaireType, () => updateSelectedProgram(''));
+    watch(selectedQuestionnaireType, () => updateSelectedProgram(
+      selectedQuestionnaireType.value === SELF_POSITIONNING
+        ? course.value.subProgram.program._id
+        : ''
+    ));
 
     return {
       // Data
@@ -79,6 +108,7 @@ export default {
       // Computed
       selectedQuestionnaireId,
       programOptions,
+      course,
       // Methods
       updateSelectedQuestionnaireType,
       updateSelectedProgram,

@@ -352,6 +352,7 @@ const routes = [
       {
         path: 'ni/pedagogy/questionnaire-answers',
         name: 'ni pedagogy questionnaire answers',
+        props: route => ({ ...route.query }),
         component: () => import('src/modules/vendor/pages/ni/pedagogy/QuestionnaireAnswersProfile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
