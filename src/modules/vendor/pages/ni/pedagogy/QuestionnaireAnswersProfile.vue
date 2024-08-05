@@ -10,8 +10,12 @@
         </div>
       </template>
     </ni-profile-header>
-    <profile-answers v-if="selectedQuestionnaireId && course" :profile-id="selectedQuestionnaireId"
-      :course="course" :hide-program-filter="!!selectedProgram" />
+    <template v-if="selectedQuestionnaireId">
+      <profile-answers v-if="courseId && course" :profile-id="selectedQuestionnaireId" :course="courseInfos"
+        :hide-program-filter="!!selectedProgram" />
+      <profile-answers v-else-if="!courseId" :profile-id="selectedQuestionnaireId"
+        :hide-program-filter="!!selectedProgram" />
+    </template>
   </q-page>
 </template>
 
@@ -19,6 +23,7 @@
 import { ref, computed, watch, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
 import ProfileAnswers from 'src/modules/vendor/components/questionnaires/ProfileAnswers';
@@ -62,6 +67,10 @@ export default {
       'name'
     ));
 
+    const courseInfos = computed(() => (courseId.value
+      ? pick(course.value, ['_id', 'trainer', 'companies', 'subProgram', 'type', 'holding'])
+      : {}));
+
     const updateSelectedQuestionnaireType = (value) => { selectedQuestionnaireType.value = value; };
 
     const updateSelectedProgram = (value) => { selectedProgram.value = value; };
@@ -82,21 +91,20 @@ export default {
 
     const created = async () => {
       await getPublishedQuestionnaires();
-      if (courseId.value) {
-        await refreshCourse();
-        selectedProgram.value = selectedQuestionnaireType.value === SELF_POSITIONNING
-          ? course.value.subProgram.program._id
-          : '';
-      }
+      if (courseId.value) await refreshCourse();
+
+      selectedProgram.value = courseId.value && selectedQuestionnaireType.value === SELF_POSITIONNING
+        ? course.value.subProgram.program._id
+        : '';
     };
 
     created();
 
-    watch(selectedQuestionnaireType, () => updateSelectedProgram(
-      selectedQuestionnaireType.value === SELF_POSITIONNING
-        ? course.value.subProgram.program._id
-        : ''
-    ));
+    watch(selectedQuestionnaireType, () => {
+      selectedProgram.value = courseId.value && selectedQuestionnaireType.value === SELF_POSITIONNING
+        ? get(course.value, 'subProgram.program._id')
+        : '';
+    });
 
     return {
       // Data
@@ -108,6 +116,7 @@ export default {
       // Computed
       selectedQuestionnaireId,
       programOptions,
+      courseInfos,
       course,
       // Methods
       updateSelectedQuestionnaireType,
