@@ -1,4 +1,3 @@
-<!-- [TEMPORARY] - this component will be removed at the end of the project -->
 <template>
   <q-page class="vendor-background" padding>
     <ni-profile-header :title="questionnaireName" :header-info="headerInfo" />

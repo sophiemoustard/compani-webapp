@@ -235,10 +235,10 @@ const routes = [
           parent: 'management',
         },
       },
-      { // [TEMPORARY] - to be removed at the end of the project
-        path: 'ni/management/questionnaires/:questionnaireId/courses/:courseId',
-        name: 'ni management questionnaire answers',
-        component: () => import('src/modules/vendor/pages/ni/management/OldQuestionnaireAnswersProfile'),
+      {
+        path: 'trainers/management/questionnaires/:questionnaireId/courses/:courseId',
+        name: 'trainers management questionnaire answers',
+        component: () => import('src/modules/vendor/pages/trainers/management/QuestionnaireAnswersProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
