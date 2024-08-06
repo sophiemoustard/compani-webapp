@@ -1,5 +1,9 @@
 <template>
   <template v-if="isRofOrVendorAdmin">
+    <div class="flex justify-end">
+      <ni-primary-button class="q-mb-md" label="Exporter les réponses" unelevated icon="import_export"
+        @click="exportAnswers" />
+    </div>
     <div class="filters-container">
       <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
         clearable />
@@ -43,14 +47,30 @@ import Programs from '@api/Programs';
 import Select from '@components/form/Select';
 import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
+import CompaniDate from '@helpers/dates/companiDates';
+import { downloadCsv } from '@helpers/file';
 import { NotifyNegative } from '@components/popup/notify';
+import PrimaryButton from '@components/PrimaryButton';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
-import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, INTRA, INTRA_HOLDING } from '@data/constants';
+import {
+  TRAINER,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
+  INTRA,
+  INTRA_HOLDING,
+  YES,
+  NO,
+  SURVEY,
+  OPEN_QUESTION,
+  DD_MM_YYYY,
+  NO_DATA,
+} from '@data/constants';
 
 export default {
   name: 'ProfileAnswers',
   components: {
     'ni-select': Select,
+    'ni-primary-button': PrimaryButton,
   },
   mixins: [questionnaireAnswersMixin],
   props: {
@@ -200,7 +220,7 @@ export default {
 
       return {
         ...fu,
-        answers: answers.map(a => a.answer),
+        answers,
         traineeCount: uniq(answers.map(a => a.trainee)).length,
         historyCount: uniq(answers.map(a => a.history)).length,
       };
@@ -212,6 +232,36 @@ export default {
       selectedProgram.value = '';
       selectedHolding.value = '';
       selectedCourses.value = [];
+    };
+
+    const getTraineeAnswer = (followUp, answer) => {
+      if ([SURVEY, OPEN_QUESTION].includes(followUp.template)) return answer;
+      return get(followUp.qcAnswers.find(a => a._id === answer), 'text');
+    };
+
+    const exportAnswers = () => {
+      const answersRowsToExport = [];
+      if (filteredAnswers.value.followUp.length) {
+        for (const fu of filteredAnswers.value.followUp) {
+          for (const a of fu.answers) {
+            answersRowsToExport.push({
+              Question: fu.question,
+              'Question à choix multiples': fu.isQuestionAnswerMultipleChoiced ? YES : NO,
+              'Réponse de l\'apprenant': getTraineeAnswer(fu, a.answer),
+              'Id de la formation': get(a, 'course._id'),
+              'Date de réponse': CompaniDate(a.createdAt).format(DD_MM_YYYY),
+            });
+          }
+        }
+      }
+
+      console.log([Object.keys(answersRowsToExport[0]), ...answersRowsToExport.map(a => Object.values(a))]);
+      return downloadCsv(
+        answersRowsToExport.length
+          ? [Object.keys(answersRowsToExport[0]), ...answersRowsToExport.map(a => Object.values(a))]
+          : [[NO_DATA]],
+        'rep.csv'
+      );
     };
 
     const created = async () => {
@@ -252,6 +302,7 @@ export default {
       selectedHolding,
       holdingOptions,
       selectedCourses,
+      exportAnswers,
       // Computed
       filteredAnswers,
       displayCourseSelect,
@@ -287,4 +338,5 @@ export default {
   flex-direction: column
   @media screen and (max-width: 767px)
     width: 95%
+
 </style>
