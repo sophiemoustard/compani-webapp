@@ -10,7 +10,7 @@
         </div>
       </template>
     </ni-profile-header>
-    <profile-answers v-if="selectedQuestionnaireId" :questionnaire-id="selectedQuestionnaireId"
+    <profile-answers v-if="selectedQuestionnaireId" :profile-id="selectedQuestionnaireId"
       :hide-program-filter="!!selectedProgram" />
   </q-page>
 </template>
