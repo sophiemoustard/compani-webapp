@@ -1,7 +1,7 @@
 <template>
-  <ni-select in-modal :model-value="company" @blur="validation.$touch" :required-field="requiredField"
-    :disable="disable" caption="Structure" :options="companyOptions" :error="validation.$error"
-    @update:model-value="update" option-slot>
+  <ni-select :in-modal="inModal" :model-value="company" @blur="validation.$touch" :required-field="requiredField"
+    :disable="disable" :caption="caption" :options="companyOptions" :error="validation.$error"
+    @update:model-value="update" option-slot :clearable="clearable">
     <template #option="{ scope }">
       <q-item v-bind="scope.itemProps">
         <q-item-section>
@@ -26,6 +26,9 @@ export default {
     validation: { type: Object, default: () => ({}) },
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
+    clearable: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: true },
+    caption: { type: String, default: 'Structure' },
   },
   components: {
     'ni-select': Select,
