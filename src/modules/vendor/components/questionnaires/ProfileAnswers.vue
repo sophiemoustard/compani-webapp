@@ -22,7 +22,7 @@
     </div>
   </template>
   <template v-if="hasFilteredAnswers">
-    <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
+    <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
     </q-card>
   </template>
@@ -64,6 +64,7 @@ import {
   OPEN_QUESTION,
   DD_MM_YYYY,
   NO_DATA,
+  QUESTION_ANSWER,
 } from '@data/constants';
 
 export default {
@@ -132,6 +133,9 @@ export default {
 
       return formatAndSortOptions(options, 'name');
     });
+
+    const cards = computed(() => get(filteredAnswers.value, 'followUp', [])
+      .map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })));
 
     const getQuestionnaireAnswers = async () => {
       try {
@@ -235,8 +239,41 @@ export default {
     };
 
     const getTraineeAnswer = (followUp, answer) => {
-      if ([SURVEY, OPEN_QUESTION].includes(followUp.template)) return answer;
-      return get(followUp.qcAnswers.find(a => a._id === answer), 'text');
+      if ([SURVEY, OPEN_QUESTION].includes(followUp.template)) return answer.replace('\n', ' ').replace('\r', ' ');
+      if (followUp.template === QUESTION_ANSWER) return get(followUp.qcAnswers.find(a => a._id === answer), 'text');
+
+      return '';
+    };
+
+    const getCsvName = () => {
+      let fileName = `Réponses_questionnaire_${CompaniDate().format(DD_MM_YYYY)}`;
+      if (selectedCourses.value.length) {
+        const courses = courseOptions.value
+          .filter(c => selectedCourses.value.includes(c.value))
+          .map(c => c.label)
+          .join('_');
+
+        return `${fileName}_formation_${courses}`;
+      }
+
+      if (selectedTrainer.value) {
+        const trainer = trainerOptions.value.find(t => t.value === selectedTrainer.value).label;
+        fileName += `_intervenant_${trainer}`;
+      }
+      if (selectedCompany.value) {
+        const company = companyOptions.value.find(c => c.value === selectedCompany.value).label;
+        fileName += `_structure_${company}`;
+      }
+      if (selectedProgram.value) {
+        const program = programOptions.value.find(p => p.value === selectedProgram.value).label;
+        fileName += `_programme_${program}`;
+      }
+      if (selectedHolding.value) {
+        const holding = holdingOptions.value.find(h => h.value === selectedHolding.value).label;
+        fileName += `_société_mère_${holding}`;
+      }
+
+      return fileName;
     };
 
     const exportAnswers = () => {
@@ -247,20 +284,20 @@ export default {
             answersRowsToExport.push({
               Question: fu.question,
               'Question à choix multiples': fu.isQuestionAnswerMultipleChoiced ? YES : NO,
+              'Date de réponse': CompaniDate(a.createdAt).format(DD_MM_YYYY),
               'Réponse de l\'apprenant': getTraineeAnswer(fu, a.answer),
               'Id de la formation': get(a, 'course._id'),
-              'Date de réponse': CompaniDate(a.createdAt).format(DD_MM_YYYY),
             });
           }
         }
       }
+      const fileName = getCsvName();
 
-      console.log([Object.keys(answersRowsToExport[0]), ...answersRowsToExport.map(a => Object.values(a))]);
       return downloadCsv(
         answersRowsToExport.length
           ? [Object.keys(answersRowsToExport[0]), ...answersRowsToExport.map(a => Object.values(a))]
           : [[NO_DATA]],
-        'rep.csv'
+        `${fileName}.csv`
       );
     };
 
@@ -309,6 +346,7 @@ export default {
       courseOptions,
       isRofOrVendorAdmin,
       hasFilteredAnswers,
+      cards,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
