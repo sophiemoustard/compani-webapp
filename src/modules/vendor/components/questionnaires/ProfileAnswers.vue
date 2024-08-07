@@ -73,7 +73,7 @@ export default {
     const selectedHolding = ref(get(course.value, 'type') === INTRA_HOLDING ? get(course.value, 'holding') : '');
     const holdingOptions = ref([]);
     const holdingCompanies = ref([]);
-    const selectedCourses = ref([]);
+    const selectedCourses = ref(get(course.value, '_id') ? [course.value._id] : []);
 
     const filteredAnswers = computed(() => {
       if (!get(questionnaireAnswers.value, 'followUp')) return {};
@@ -215,11 +215,6 @@ export default {
           getProgramOptions(),
           getHoldingOptions(),
         ]);
-
-        if (course.value) {
-          const correspondingCourseOption = courseOptions.value.find(opt => opt.value === get(course.value, '_id'));
-          selectedCourses.value = correspondingCourseOption ? [correspondingCourseOption] : [];
-        }
       } else {
         await getQuestionnaireAnswers();
       }
