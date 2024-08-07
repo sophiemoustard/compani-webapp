@@ -6,7 +6,8 @@
           <ni-select :model-value="selectedQuestionnaireType" @update:model-value="updateSelectedQuestionnaireType"
             caption="Type de questionnaire" :options="questionnaireOptions" clearable />
           <ni-select v-if="selectedQuestionnaireType === SELF_POSITIONNING" :model-value="selectedProgram"
-            @update:model-value="updateSelectedProgram" caption="Programme" :options="programOptions" clearable />
+            @update:model-value="updateSelectedProgram" caption="Programme" :options="programOptions" clearable
+            :disable="!isRofOrVendorAdmin" />
         </div>
       </template>
     </ni-profile-header>
@@ -29,7 +30,13 @@ import Select from '@components/form/Select';
 import ProfileAnswers from 'src/modules/vendor/components/questionnaires/ProfileAnswers';
 import Questionnaires from '@api/Questionnaires';
 import { formatAndSortOptions } from '@helpers/utils';
-import { QUESTIONNAIRE_TYPES, SELF_POSITIONNING, PUBLISHED } from '@data/constants';
+import {
+  QUESTIONNAIRE_TYPES,
+  SELF_POSITIONNING,
+  PUBLISHED,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
+} from '@data/constants';
 
 export default {
   name: 'QuestionnaireAnswersProfile',
@@ -48,11 +55,18 @@ export default {
     const publishedQuestionnaires = ref([]);
     const selectedProgram = ref('');
 
-    const questionnaireOptions = Object.keys(QUESTIONNAIRE_TYPES)
-      .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type }));
-
     const $store = useStore();
+
     const course = computed(() => $store.state.course.course);
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER]
+      .includes(loggedUser.value.role.vendor.name));
+
+    const questionnaireOptions = Object.keys(QUESTIONNAIRE_TYPES)
+      .filter(type => (!isRofOrVendorAdmin.value ? type !== SELF_POSITIONNING : true))
+      .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type }));
 
     const selectedQuestionnaireId = computed(() => {
       const selectedQuestionnaire = selectedQuestionnaireType.value === SELF_POSITIONNING
@@ -118,6 +132,7 @@ export default {
       programOptions,
       courseInfos,
       course,
+      isRofOrVendorAdmin,
       // Methods
       updateSelectedQuestionnaireType,
       updateSelectedProgram,

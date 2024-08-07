@@ -236,16 +236,6 @@ const routes = [
         },
       },
       {
-        path: 'trainers/management/questionnaires/:questionnaireId/courses/:courseId',
-        name: 'trainers management questionnaire answers',
-        component: () => import('src/modules/vendor/pages/trainers/management/QuestionnaireAnswersProfile'),
-        props: true,
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'management',
-        },
-      },
-      {
         path: 'trainers/management/courses',
         name: 'trainers courses',
         component: () => import('src/modules/vendor/pages/trainers/management/BlendedCoursesDirectory'),

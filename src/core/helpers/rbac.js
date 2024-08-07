@@ -70,8 +70,8 @@ const trainerRoutes = [
   { name: 'trainers info' },
   { name: 'trainers contracts' },
   { name: 'account vendor' },
-  { name: 'trainers management questionnaire answers' },
   { name: 'trainers questionnaire answers' },
+  { name: 'ni pedagogy questionnaire answers' },
 ];
 
 export const roleBasedAccessControl = {

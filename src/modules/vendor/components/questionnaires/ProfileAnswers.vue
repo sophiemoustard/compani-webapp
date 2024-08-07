@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <template v-if="isRofOrVendorAdmin">
     <div class="filters-container">
       <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
         clearable />
@@ -16,14 +16,15 @@
         :blur-on-selection="false" use-chips />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
-    <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
-      <component :is="getChartComponent(card.template)" :card="card" />
-    </q-card>
-  </div>
+  </template>
+  <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
+    <component :is="getChartComponent(card.template)" :card="card" />
+  </q-card>
 </template>
 
 <script>
 import { computed, toRefs, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
@@ -54,6 +55,14 @@ export default {
   },
   setup (props) {
     const { profileId, course } = toRefs(props);
+
+    const $store = useStore();
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER]
+      .includes(loggedUser.value.role.vendor.name));
+
     const questionnaireAnswers = ref({});
     const selectedTrainer = ref(get(course.value, 'trainer._id') || '');
     const trainerOptions = ref([]);
@@ -98,7 +107,8 @@ export default {
 
     const getQuestionnaireAnswers = async () => {
       try {
-        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value);
+        const query = isRofOrVendorAdmin.value ? {} : { course: course.value._id };
+        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value, query);
       } catch (e) {
         questionnaireAnswers.value = [];
         console.error(e);
@@ -197,16 +207,20 @@ export default {
     };
 
     const created = async () => {
-      await Promise.all([
-        getQuestionnaireAnswers(),
-        getTrainerOptions(),
-        getCompanyOptions(),
-        getProgramOptions(),
-        getHoldingOptions(),
-      ]);
+      if (isRofOrVendorAdmin.value) {
+        await Promise.all([
+          getQuestionnaireAnswers(),
+          getTrainerOptions(),
+          getCompanyOptions(),
+          getProgramOptions(),
+          getHoldingOptions(),
+        ]);
 
-      if (course.value) {
-        selectedCourses.value = courseOptions.value.find(opt => opt.value === get(course.value, '_id')) || [];
+        if (course.value) {
+          selectedCourses.value = courseOptions.value.find(opt => opt.value === get(course.value, '_id')) || [];
+        }
+      } else {
+        await getQuestionnaireAnswers();
       }
     };
 
@@ -238,6 +252,7 @@ export default {
       filteredAnswers,
       displayCourseSelect,
       courseOptions,
+      isRofOrVendorAdmin,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
