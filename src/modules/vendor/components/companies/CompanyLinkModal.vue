@@ -3,8 +3,8 @@
     <template #title>
       Rattacher à une <span class="text-weight-bold">structure</span>
     </template>
-    <ni-select in-modal :model-value="newCompanyLink.company" @update:model-value="update($event, 'company')"
-      :error="validations.company.$error" caption="Structure" :options="companyOptions" required-field />
+    <company-select :company="newCompanyLink.company" @update:model-value="update($event, 'company')"
+      :validation="validations.company" :company-options="companyOptions" required-field />
     <ni-date-input caption="Date de rattachement" :model-value="newCompanyLink.startDate" in-modal last
       @update:model-value="update($event, 'startDate')" />
     <template #footer>
@@ -16,7 +16,7 @@
 
 <script>
 import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 import DateInput from '@components/form/DateInput';
 
 export default {
@@ -29,7 +29,7 @@ export default {
     newCompanyLink: { type: Object, default: () => ({}) },
   },
   components: {
-    'ni-select': Select,
+    'company-select': CompanySelect,
     'ni-modal': Modal,
     'ni-date-input': DateInput,
   },
