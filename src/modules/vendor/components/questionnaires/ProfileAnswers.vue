@@ -217,7 +217,8 @@ export default {
         ]);
 
         if (course.value) {
-          selectedCourses.value = courseOptions.value.find(opt => opt.value === get(course.value, '_id')) || [];
+          const correspondingCourseOption = courseOptions.value.find(opt => opt.value === get(course.value, '_id'));
+          selectedCourses.value = correspondingCourseOption ? [correspondingCourseOption] : [];
         }
       } else {
         await getQuestionnaireAnswers();

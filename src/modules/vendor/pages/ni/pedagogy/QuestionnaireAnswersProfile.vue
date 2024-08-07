@@ -12,8 +12,8 @@
       </template>
     </ni-profile-header>
     <template v-if="selectedQuestionnaireId">
-      <profile-answers v-if="courseId && course" :profile-id="selectedQuestionnaireId" :course="courseInfos"
-        :hide-program-filter="!!selectedProgram" />
+      <profile-answers v-if="courseId && Object.keys(course).length" :profile-id="selectedQuestionnaireId"
+        :course="course" :hide-program-filter="!!selectedProgram" />
       <profile-answers v-else-if="!courseId" :profile-id="selectedQuestionnaireId"
         :hide-program-filter="!!selectedProgram" />
     </template>
@@ -57,7 +57,10 @@ export default {
 
     const $store = useStore();
 
-    const course = computed(() => $store.state.course.course);
+    const course = computed(() => pick(
+      $store.state.course.course,
+      ['_id', 'companies', 'subProgram.program._id', 'trainer._id', 'type', 'holding']
+    ));
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -80,10 +83,6 @@ export default {
       publishedQuestionnaires.value.filter(q => q.program).map(q => q.program),
       'name'
     ));
-
-    const courseInfos = computed(() => (courseId.value
-      ? pick(course.value, ['_id', 'trainer', 'companies', 'subProgram', 'type', 'holding'])
-      : {}));
 
     const updateSelectedQuestionnaireType = (value) => { selectedQuestionnaireType.value = value; };
 
@@ -130,7 +129,6 @@ export default {
       // Computed
       selectedQuestionnaireId,
       programOptions,
-      courseInfos,
       course,
       isRofOrVendorAdmin,
       // Methods
