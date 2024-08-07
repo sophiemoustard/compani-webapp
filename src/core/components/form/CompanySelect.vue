@@ -27,7 +27,7 @@ export default {
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false },
-    inModal: { type: Boolean, default: true },
+    inModal: { type: Boolean, default: false },
     caption: { type: String, default: 'Structure' },
   },
   components: {
