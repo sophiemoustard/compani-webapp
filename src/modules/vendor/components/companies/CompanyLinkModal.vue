@@ -3,7 +3,7 @@
     <template #title>
       Rattacher à une <span class="text-weight-bold">structure</span>
     </template>
-    <company-select :company="newCompanyLink.company" @update:model-value="update($event, 'company')"
+    <company-select :company="newCompanyLink.company" @update="update($event, 'company')"
       :validation="validations.company" :company-options="companyOptions" required-field />
     <ni-date-input caption="Date de rattachement" :model-value="newCompanyLink.startDate" in-modal last
       @update:model-value="update($event, 'startDate')" />

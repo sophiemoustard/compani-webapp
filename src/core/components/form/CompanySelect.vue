@@ -33,9 +33,9 @@ export default {
   components: {
     'ni-select': Select,
   },
-  emits: ['update:model-value'],
+  emits: ['update'],
   setup (_, { emit }) {
-    const update = event => emit('update:model-value', event);
+    const update = event => emit('update', event);
 
     return {
       // Methods

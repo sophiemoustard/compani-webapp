@@ -6,7 +6,7 @@
       <ni-select :options="holdingFilterOptions" :model-value="selectedHolding" clearable
         @update:model-value="updateSelectedHolding" />
       <company-select :options="companyFilterOptions" :company="selectedCompany" clearable
-        @update:model-value="updateSelectedCompany" :in-modal="false" caption="" />
+        @update="updateSelectedCompany" :in-modal="false" caption="" />
       <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
