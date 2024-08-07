@@ -1,6 +1,6 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-profile-header title="Réponses aux questionnaires">
+    <ni-profile-header title="Réponses aux questionnaires" :header-info="headerInfo">
       <template #title>
         <div class="selector-container">
           <ni-select :model-value="selectedQuestionnaireType" @update:model-value="updateSelectedQuestionnaireType"
@@ -28,6 +28,7 @@ import pick from 'lodash/pick';
 import ProfileHeader from '@components/ProfileHeader';
 import Select from '@components/form/Select';
 import ProfileAnswers from 'src/modules/vendor/components/questionnaires/ProfileAnswers';
+import { composeCourseName } from '@helpers/courses';
 import Questionnaires from '@api/Questionnaires';
 import { formatAndSortOptions } from '@helpers/utils';
 import {
@@ -59,7 +60,7 @@ export default {
 
     const course = computed(() => pick(
       $store.state.course.course,
-      ['_id', 'companies', 'subProgram.program._id', 'trainer._id', 'type', 'holding']
+      ['_id', 'companies', 'subProgram.program', 'trainer._id', 'type', 'holding', 'misc']
     ));
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
@@ -83,6 +84,12 @@ export default {
       publishedQuestionnaires.value.filter(q => q.program).map(q => q.program),
       'name'
     ));
+
+    const headerInfo = computed(() => (isRofOrVendorAdmin.value
+      ? []
+      : [
+        { icon: 'bookmark_border', label: get(course.value, 'subProgram') && composeCourseName(course.value, true) },
+      ]));
 
     const updateSelectedQuestionnaireType = (value) => { selectedQuestionnaireType.value = value; };
 
@@ -131,6 +138,7 @@ export default {
       programOptions,
       course,
       isRofOrVendorAdmin,
+      headerInfo,
       // Methods
       updateSelectedQuestionnaireType,
       updateSelectedProgram,
