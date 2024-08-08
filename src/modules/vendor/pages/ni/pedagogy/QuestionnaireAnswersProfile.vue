@@ -70,10 +70,10 @@ export default {
 
     const questionnaireOptions = computed(() => Object.keys(QUESTIONNAIRE_TYPES)
       .filter((type) => {
-        const courseHasSelfPositionningQ = courseId.value && !publishedQuestionnaires.value
+        const courseHasSelfPositionningQ = !courseId.value || publishedQuestionnaires.value
           .find(q => get(q, 'program._id') === get(course.value, 'subProgram.program._id'));
 
-        return (!isRofOrVendorAdmin.value || courseHasSelfPositionningQ)
+        return (!isRofOrVendorAdmin.value || !courseHasSelfPositionningQ)
           ? type !== SELF_POSITIONNING
           : true;
       })
