@@ -188,3 +188,14 @@ export const toCents = value => parseFloat(value).toFixed(2) * 100;
 export const toEuros = value => value / 100;
 
 export const formatName = list => list.map(item => item.name).join(', ');
+
+export const formatStringForExport = (str) => {
+  const formattedStr = str
+    .replace(/\r\n/g, ' ')
+    .replace(/\n/g, ' ')
+    .replace(/\r/g, ' ')
+    .replace(/\n\n/g, ' ')
+    .replace(/"/g, '""');
+
+  return `"${formattedStr}"`;
+};

@@ -45,7 +45,7 @@ import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Select from '@components/form/Select';
-import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatAndSortOptions, formatStringForExport } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import { downloadCsv } from '@helpers/file';
@@ -239,7 +239,7 @@ export default {
     };
 
     const getTraineeAnswer = (followUp, answer) => {
-      if ([SURVEY, OPEN_QUESTION].includes(followUp.template)) return answer.replace('\n', ' ').replace('\r', ' ');
+      if ([SURVEY, OPEN_QUESTION].includes(followUp.template)) return formatStringForExport(answer);
       if (followUp.template === QUESTION_ANSWER) return get(followUp.qcAnswers.find(a => a._id === answer), 'text');
 
       return '';
@@ -282,7 +282,7 @@ export default {
         for (const fu of filteredAnswers.value.followUp) {
           for (const a of fu.answers) {
             answersRowsToExport.push({
-              Question: fu.question,
+              Question: formatStringForExport(fu.question),
               'Question à choix multiples': fu.isQuestionAnswerMultipleChoiced ? YES : NO,
               'Date de réponse': CompaniDate(a.createdAt).format(DD_MM_YYYY),
               'Réponse de l\'apprenant': getTraineeAnswer(fu, a.answer),
@@ -291,8 +291,8 @@ export default {
           }
         }
       }
-      const fileName = getCsvName();
 
+      const fileName = getCsvName();
       return downloadCsv(
         answersRowsToExport.length
           ? [Object.keys(answersRowsToExport[0]), ...answersRowsToExport.map(a => Object.values(a))]
@@ -376,5 +376,4 @@ export default {
   flex-direction: column
   @media screen and (max-width: 767px)
     width: 95%
-
 </style>
