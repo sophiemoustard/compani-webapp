@@ -68,9 +68,16 @@ export default {
     const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER]
       .includes(loggedUser.value.role.vendor.name));
 
-    const questionnaireOptions = Object.keys(QUESTIONNAIRE_TYPES)
-      .filter(type => (!isRofOrVendorAdmin.value ? type !== SELF_POSITIONNING : true))
-      .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type }));
+    const questionnaireOptions = computed(() => Object.keys(QUESTIONNAIRE_TYPES)
+      .filter((type) => {
+        const courseHasSelfPositionningQ = courseId.value && !publishedQuestionnaires.value
+          .find(q => get(q, 'program._id') === get(course.value, 'subProgram.program._id'));
+
+        return (!isRofOrVendorAdmin.value || courseHasSelfPositionningQ)
+          ? type !== SELF_POSITIONNING
+          : true;
+      })
+      .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type })));
 
     const selectedQuestionnaireId = computed(() => {
       const selectedQuestionnaire = selectedQuestionnaireType.value === SELF_POSITIONNING
