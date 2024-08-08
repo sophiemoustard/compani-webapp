@@ -25,7 +25,7 @@
         </template>
       </ni-select>
       <company-select v-if="displayCompanySelect" in-modal :company="newUserRegistration.company"
-        @update:model-value="update($event, 'company')" :company-options="companyOptionsForUser"
+        @update="update($event, 'company')" :company-options="companyOptionsForUser"
         required-field :validation="validations.company" :disable="companyOptionsForUser.length < 2" />
       <q-checkbox v-if="displayIsCertified" in-modal :model-value="newUserRegistration.isCertified" class="q-mb-lg"
         label="Le stagiaire passe la certification" @update:model-value="update($event, 'isCertified')" dense />

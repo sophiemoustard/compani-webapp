@@ -16,7 +16,7 @@
         @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions"
         :disable="disableSubProgram" :error="validations.subProgram.$error" />
       <company-select v-if="isIntraCourse" in-modal :company="newCourse.company" :validation="validations.company"
-        required-field :company-options="companyOptions" @update:model-value="update($event, 'company')" />
+        required-field :company-options="companyOptions" @update="update($event, 'company')" />
       <ni-select in-modal :model-value="newCourse.salesRepresentative" caption="Chargé(e) d'accompagnement"
         @update:model-value="update($event, 'salesRepresentative')" :options="adminUserOptions" clearable />
       <ni-select v-if="isIntraHoldingCourse" in-modal :model-value="newCourse.holding"

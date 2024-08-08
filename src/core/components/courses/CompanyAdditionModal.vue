@@ -3,7 +3,7 @@
     <template #title>
         Ajouter une <span class="text-weight-bold">structure</span>
       </template>
-      <company-select in-modal :company="selectedCompany" @update:model-value="update" :company-options="companyOptions"
+      <company-select in-modal :company="selectedCompany" @update="update" :company-options="companyOptions"
         required-field :validation="validations" />
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" label="Ajouter la structure" icon-right="add" color="white"
