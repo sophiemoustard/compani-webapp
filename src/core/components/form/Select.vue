@@ -27,6 +27,7 @@
 
 <script>
 import { ref, computed, toRefs } from 'vue';
+import get from 'lodash/get';
 import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -65,17 +66,12 @@ export default {
     const selectableOptions = ref([]);
     const selectInput = ref(null);
 
-    const displayedValue = computed(() => {
-      if (multiple.value) {
-        const multipleOptions = selectableOptions.value.filter(opt => modelValue.value.includes(opt.value));
-        return multipleOptions.map(opt => opt.label).join(', ');
-      }
-      const option = options.value.find(opt => opt.value === modelValue.value);
-      return option ? option.label : '';
-    });
+    const displayedValue = computed(() => (multiple.value
+      ? model.value.map(opt => opt.label).join(', ')
+      : get(model.value, 'label') || ''));
 
     const model = computed(() => (multiple.value
-      ? modelValue.value
+      ? options.value.filter(opt => modelValue.value.includes(opt.value))
       : options.value.find(opt => opt.value === modelValue.value) || null));
 
     const formattedOptions = computed(() => options.value.map(opt => ({
@@ -94,7 +90,8 @@ export default {
     const onBlur = () => { emit('blur'); };
 
     const onInput = (val) => {
-      emit('update:model-value', val);
+      if (multiple.value) emit('update:model-value', val.map(v => get(v, 'value') || v));
+      else emit('update:model-value', val);
       if (blurOnSelection.value) selectInput.value.blur();
     };
 

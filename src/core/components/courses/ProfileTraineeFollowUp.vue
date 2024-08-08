@@ -30,7 +30,7 @@
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
-          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
+          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire.type)" />
       </div>
     </div>
     <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="learnersLoading"
@@ -205,9 +205,10 @@ export default {
       return get(selfPositionningQ, '_id') || '';
     });
 
-    const goToQuestionnaireAnswers = questionnaireId => $router.push(
-      { name: 'ni management questionnaire answers', params: { courseId: course.value._id, questionnaireId } }
-    );
+    const goToQuestionnaireAnswers = questionnaireType => $router.push({
+      name: 'ni pedagogy questionnaire answers',
+      query: { courseId: course.value._id, questionnaireType },
+    });
 
     const formatTraineeAttendances = (attendancesGroupedByTrainee, traineeId) => ({
       _id: traineeId,

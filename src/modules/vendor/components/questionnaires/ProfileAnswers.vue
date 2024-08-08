@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <template v-if="isRofOrVendorAdmin">
     <div class="filters-container">
       <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
         clearable />
@@ -16,14 +16,20 @@
         :blur-on-selection="false" use-chips />
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
+  </template>
+  <template v-if="hasFilteredAnswers">
     <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
     </q-card>
-  </div>
+  </template>
+  <template v-else>
+    <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
+  </template>
 </template>
 
 <script>
 import { computed, toRefs, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
@@ -39,7 +45,7 @@ import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/uti
 import { composeCourseName } from '@helpers/courses';
 import { NotifyNegative } from '@components/popup/notify';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
-import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, INTRA, INTRA_HOLDING } from '@data/constants';
 
 export default {
   name: 'ProfileAnswers',
@@ -50,20 +56,29 @@ export default {
   props: {
     profileId: { type: String, required: true },
     hideProgramFilter: { type: Boolean, default: false },
+    course: { type: Object, default: () => ({}) },
   },
   setup (props) {
-    const { profileId } = toRefs(props);
+    const { profileId, course } = toRefs(props);
+
+    const $store = useStore();
+
+    const loggedUser = computed(() => $store.state.main.loggedUser);
+
+    const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER]
+      .includes(loggedUser.value.role.vendor.name));
+
     const questionnaireAnswers = ref({});
-    const selectedTrainer = ref('');
+    const selectedTrainer = ref(get(course.value, 'trainer._id') || '');
     const trainerOptions = ref([]);
-    const selectedCompany = ref('');
+    const selectedCompany = ref(get(course.value, 'type') === INTRA ? get(course.value, 'companies[0]._id') : '');
     const companyOptions = ref([]);
-    const selectedProgram = ref('');
+    const selectedProgram = ref(get(course.value, 'subProgram.program._id') || '');
     const programOptions = ref([]);
-    const selectedHolding = ref('');
+    const selectedHolding = ref(get(course.value, 'type') === INTRA_HOLDING ? get(course.value, 'holding') : '');
     const holdingOptions = ref([]);
     const holdingCompanies = ref([]);
-    const selectedCourses = ref([]);
+    const selectedCourses = ref(get(course.value, '_id') ? [course.value._id] : []);
 
     const filteredAnswers = computed(() => {
       if (!get(questionnaireAnswers.value, 'followUp')) return {};
@@ -71,13 +86,16 @@ export default {
       return { ...questionnaireAnswers.value, followUp: questionnaireAnswers.value.followUp.map(formatFollowUp) };
     });
 
-    const displayCourseSelect = computed(() => selectedTrainer.value || selectedCompany.value ||
-      selectedHolding.value || selectedProgram.value || false);
+    const hasFilteredAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
+      .flatMap(a => a.answers).length > 0);
+
+    const displayCourseSelect = computed(() => (selectedTrainer.value || selectedCompany.value ||
+      selectedHolding.value || selectedProgram.value) && !!hasFilteredAnswers.value);
 
     const courseOptions = computed(() => {
       const options = [];
 
-      if (displayCourseSelect.value) {
+      if (displayCourseSelect.value && get(filteredAnswers.value, 'followUp')) {
         const answers = questionnaireAnswers.value.followUp.map(fu => fu.answers
           .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
           .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
@@ -97,7 +115,8 @@ export default {
 
     const getQuestionnaireAnswers = async () => {
       try {
-        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value);
+        const query = isRofOrVendorAdmin.value ? {} : { course: course.value._id };
+        questionnaireAnswers.value = await Questionnaires.getQuestionnaireAnswers(profileId.value, query);
       } catch (e) {
         questionnaireAnswers.value = [];
         console.error(e);
@@ -196,20 +215,24 @@ export default {
     };
 
     const created = async () => {
-      await Promise.all([
-        getQuestionnaireAnswers(),
-        getTrainerOptions(),
-        getCompanyOptions(),
-        getProgramOptions(),
-        getHoldingOptions(),
-      ]);
+      if (isRofOrVendorAdmin.value) {
+        await Promise.all([
+          getQuestionnaireAnswers(),
+          getTrainerOptions(),
+          getCompanyOptions(),
+          getProgramOptions(),
+          getHoldingOptions(),
+        ]);
+      } else {
+        await getQuestionnaireAnswers();
+      }
     };
 
     created();
 
     watch(profileId, async () => {
       await created();
-      resetFilters();
+      if (!course.value) resetFilters();
     });
 
     watch(selectedCompany, () => updateSelectedCourses([]));
@@ -233,6 +256,8 @@ export default {
       filteredAnswers,
       displayCourseSelect,
       courseOptions,
+      isRofOrVendorAdmin,
+      hasFilteredAnswers,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,

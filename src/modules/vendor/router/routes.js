@@ -235,16 +235,6 @@ const routes = [
           parent: 'management',
         },
       },
-      { // [TEMPORARY] - to be removed at the end of the project
-        path: 'ni/management/questionnaires/:questionnaireId/courses/:courseId',
-        name: 'ni management questionnaire answers',
-        component: () => import('src/modules/vendor/pages/ni/management/OldQuestionnaireAnswersProfile'),
-        props: true,
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'management',
-        },
-      },
       {
         path: 'trainers/management/courses',
         name: 'trainers courses',
@@ -352,6 +342,7 @@ const routes = [
       {
         path: 'ni/pedagogy/questionnaire-answers',
         name: 'ni pedagogy questionnaire answers',
+        props: route => ({ ...route.query }),
         component: () => import('src/modules/vendor/pages/ni/pedagogy/QuestionnaireAnswersProfile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
