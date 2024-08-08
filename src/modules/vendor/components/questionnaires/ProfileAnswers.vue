@@ -17,9 +17,14 @@
       <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
   </template>
-  <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
-    <component :is="getChartComponent(card.template)" :card="card" />
-  </q-card>
+  <template v-if="hasFilteredAnswers">
+    <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
+      <component :is="getChartComponent(card.template)" :card="card" />
+    </q-card>
+  </template>
+  <template v-else>
+    <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
+  </template>
 </template>
 
 <script>
@@ -81,13 +86,16 @@ export default {
       return { ...questionnaireAnswers.value, followUp: questionnaireAnswers.value.followUp.map(formatFollowUp) };
     });
 
-    const displayCourseSelect = computed(() => selectedTrainer.value || selectedCompany.value ||
-      selectedHolding.value || selectedProgram.value || false);
+    const hasFilteredAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
+      .flatMap(a => a.answers).length > 0);
+
+    const displayCourseSelect = computed(() => (selectedTrainer.value || selectedCompany.value ||
+      selectedHolding.value || selectedProgram.value) && !!hasFilteredAnswers.value);
 
     const courseOptions = computed(() => {
       const options = [];
 
-      if (displayCourseSelect.value && get(questionnaireAnswers.value, 'followUp')) {
+      if (displayCourseSelect.value && get(filteredAnswers.value, 'followUp')) {
         const answers = questionnaireAnswers.value.followUp.map(fu => fu.answers
           .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
           .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
@@ -249,6 +257,7 @@ export default {
       displayCourseSelect,
       courseOptions,
       isRofOrVendorAdmin,
+      hasFilteredAnswers,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
