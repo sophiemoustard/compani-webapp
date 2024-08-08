@@ -1,34 +1,36 @@
 <template>
-  <template v-if="isRofOrVendorAdmin">
-    <div class="flex justify-end">
-      <ni-primary-button class="q-mb-md" label="Exporter les réponses" unelevated icon="import_export"
-        @click="exportAnswers" />
-    </div>
-    <div class="filters-container">
-      <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
-        clearable />
-      <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
-        clearable />
-      <ni-select v-if="!hideProgramFilter" :options="programOptions" :model-value="selectedProgram"
-        @update:model-value="updateSelectedProgram" clearable />
-      <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
-        clearable />
-    </div>
-    <div class="group-filter-container">
-      <ni-select v-if="displayCourseSelect" caption="Groupe de formation" :options="courseOptions"
-        :model-value="selectedCourses" @update:model-value="updateSelectedCourses" clearable multiple
-        :blur-on-selection="false" use-chips />
-      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
-    </div>
-  </template>
-  <template v-if="hasFilteredAnswers">
-    <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
-      <component :is="getChartComponent(card.template)" :card="card" />
-    </q-card>
-  </template>
-  <template v-else>
-    <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
-  </template>
+  <div>
+    <template v-if="isRofOrVendorAdmin">
+      <div class="flex justify-end">
+        <ni-primary-button class="q-mb-md" label="Exporter les réponses" unelevated icon="import_export"
+          @click="exportAnswers" />
+      </div>
+      <div class="filters-container">
+        <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
+          clearable />
+        <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
+          clearable />
+        <ni-select v-if="!hideProgramFilter" :options="programOptions" :model-value="selectedProgram"
+          @update:model-value="updateSelectedProgram" clearable />
+        <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
+          clearable />
+      </div>
+      <div class="group-filter-container">
+        <ni-select v-if="displayCourseSelect" caption="Groupe de formation" :options="courseOptions"
+          :model-value="selectedCourses" @update:model-value="updateSelectedCourses" clearable multiple
+          :blur-on-selection="false" use-chips />
+        <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
+      </div>
+    </template>
+    <template v-if="hasFilteredAnswers">
+      <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
+        <component :is="getChartComponent(card.template)" :card="card" />
+      </q-card>
+    </template>
+    <template v-else>
+      <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
+    </template>
+  </div>
 </template>
 
 <script>
