@@ -49,12 +49,13 @@ export default {
   props: {
     questionnaireType: { type: String, enum: QUESTIONNAIRE_TYPES, default: '' },
     courseId: { type: String, default: '' },
+    programId: { type: String, default: '' },
   },
   setup (props) {
-    const { courseId, questionnaireType } = toRefs(props);
+    const { courseId, questionnaireType, programId } = toRefs(props);
     const selectedQuestionnaireType = ref(questionnaireType.value, '');
     const publishedQuestionnaires = ref([]);
-    const selectedProgram = ref('');
+    const selectedProgram = ref(get(programId, 'value') || get(course, 'value.subProgram.program._id') || '');
 
     const $store = useStore();
 
@@ -121,17 +122,13 @@ export default {
     const created = async () => {
       await getPublishedQuestionnaires();
       if (courseId.value) await refreshCourse();
-
-      selectedProgram.value = courseId.value && selectedQuestionnaireType.value === SELF_POSITIONNING
-        ? course.value.subProgram.program._id
-        : '';
     };
 
     created();
 
     watch(selectedQuestionnaireType, () => {
-      selectedProgram.value = courseId.value && selectedQuestionnaireType.value === SELF_POSITIONNING
-        ? get(course.value, 'subProgram.program._id')
+      selectedProgram.value = selectedQuestionnaireType.value === SELF_POSITIONNING
+        ? get(programId, 'value') || get(course, 'value.subProgram.program._id') || ''
         : '';
     });
 
