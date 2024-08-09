@@ -249,14 +249,6 @@ export default {
 
     const getCsvName = () => {
       let fileName = `Réponses_questionnaire_${CompaniDate().format(DD_MM_YYYY)}`;
-      if (selectedCourses.value.length) {
-        const courses = courseOptions.value
-          .filter(c => selectedCourses.value.includes(c.value))
-          .map(c => c.label)
-          .join('_');
-
-        return `${fileName}_formation_${courses}`;
-      }
 
       if (selectedTrainer.value) {
         const trainer = trainerOptions.value.find(t => t.value === selectedTrainer.value).label;
