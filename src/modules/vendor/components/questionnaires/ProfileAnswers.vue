@@ -252,19 +252,19 @@ export default {
 
       if (selectedTrainer.value) {
         const trainer = trainerOptions.value.find(t => t.value === selectedTrainer.value).label;
-        fileName += `_intervenant_${trainer}`;
+        fileName += `_${trainer}`;
       }
       if (selectedCompany.value) {
         const company = companyOptions.value.find(c => c.value === selectedCompany.value).label;
-        fileName += `_structure_${company}`;
+        fileName += `_${company}`;
       }
       if (selectedProgram.value) {
         const program = programOptions.value.find(p => p.value === selectedProgram.value).label;
-        fileName += `_programme_${program}`;
+        fileName += `_${program}`;
       }
       if (selectedHolding.value) {
         const holding = holdingOptions.value.find(h => h.value === selectedHolding.value).label;
-        fileName += `_société_mère_${holding}`;
+        fileName += `_${holding}`;
       }
 
       return fileName;
