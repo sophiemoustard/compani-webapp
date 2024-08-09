@@ -1,30 +1,36 @@
 <template>
-  <template v-if="isRofOrVendorAdmin">
-    <div class="filters-container">
-      <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
-        clearable />
-      <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
-        clearable />
-      <ni-select v-if="!hideProgramFilter" :options="programOptions" :model-value="selectedProgram"
-        @update:model-value="updateSelectedProgram" clearable />
-      <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
-        clearable />
-    </div>
-    <div class="group-filter-container">
-      <ni-select v-if="displayCourseSelect" caption="Groupe de formation" :options="courseOptions"
-        :model-value="selectedCourses" @update:model-value="updateSelectedCourses" clearable multiple
-        :blur-on-selection="false" use-chips />
-      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
-    </div>
-  </template>
-  <template v-if="hasFilteredAnswers">
-    <q-card v-for="(card, cardIndex) of filteredAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
-      <component :is="getChartComponent(card.template)" :card="card" />
-    </q-card>
-  </template>
-  <template v-else>
-    <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
-  </template>
+  <div>
+    <template v-if="isRofOrVendorAdmin">
+      <div class="flex justify-end">
+        <ni-primary-button class="q-mb-md" label="Exporter les réponses" unelevated icon="import_export"
+          @click="exportAnswers" />
+      </div>
+      <div class="filters-container">
+        <ni-select :options="trainerOptions" :model-value="selectedTrainer" @update:model-value="updateSelectedTrainer"
+          clearable />
+        <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
+          clearable />
+        <ni-select v-if="!hideProgramFilter" :options="programOptions" :model-value="selectedProgram"
+          @update:model-value="updateSelectedProgram" clearable />
+        <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
+          clearable />
+      </div>
+      <div class="group-filter-container">
+        <ni-select v-if="displayCourseSelect" caption="Groupe de formation" :options="courseOptions"
+          :model-value="selectedCourses" @update:model-value="updateSelectedCourses" clearable multiple
+          :blur-on-selection="false" use-chips />
+        <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
+      </div>
+    </template>
+    <template v-if="hasFilteredAnswers">
+      <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
+        <component :is="getChartComponent(card.template)" :card="card" />
+      </q-card>
+    </template>
+    <template v-else>
+      <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
+    </template>
+  </div>
 </template>
 
 <script>
@@ -41,16 +47,33 @@ import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Select from '@components/form/Select';
-import { formatAndSortIdentityOptions, formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatAndSortOptions, formatStringForExport } from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
+import CompaniDate from '@helpers/dates/companiDates';
+import { downloadCsv } from '@helpers/file';
 import { NotifyNegative } from '@components/popup/notify';
+import PrimaryButton from '@components/PrimaryButton';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
-import { TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, INTRA, INTRA_HOLDING } from '@data/constants';
+import {
+  TRAINER,
+  TRAINING_ORGANISATION_MANAGER,
+  VENDOR_ADMIN,
+  INTRA,
+  INTRA_HOLDING,
+  YES,
+  NO,
+  SURVEY,
+  OPEN_QUESTION,
+  DD_MM_YYYY,
+  NO_DATA,
+  QUESTION_ANSWER,
+} from '@data/constants';
 
 export default {
   name: 'ProfileAnswers',
   components: {
     'ni-select': Select,
+    'ni-primary-button': PrimaryButton,
   },
   mixins: [questionnaireAnswersMixin],
   props: {
@@ -112,6 +135,9 @@ export default {
 
       return formatAndSortOptions(options, 'name');
     });
+
+    const cards = computed(() => get(filteredAnswers.value, 'followUp', [])
+      .map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })));
 
     const getQuestionnaireAnswers = async () => {
       try {
@@ -200,7 +226,7 @@ export default {
 
       return {
         ...fu,
-        answers: answers.map(a => a.answer),
+        answers,
         traineeCount: uniq(answers.map(a => a.trainee)).length,
         historyCount: uniq(answers.map(a => a.history)).length,
       };
@@ -212,6 +238,62 @@ export default {
       selectedProgram.value = '';
       selectedHolding.value = '';
       selectedCourses.value = [];
+    };
+
+    const getTraineeAnswer = (followUp, answer) => {
+      if ([SURVEY, OPEN_QUESTION].includes(followUp.template)) return formatStringForExport(answer);
+      if (followUp.template === QUESTION_ANSWER) return get(followUp.qcAnswers.find(a => a._id === answer), 'text');
+
+      return '';
+    };
+
+    const getCsvName = () => {
+      let fileName = `Réponses_questionnaire_${CompaniDate().format(DD_MM_YYYY)}`;
+
+      if (selectedTrainer.value) {
+        const trainer = trainerOptions.value.find(t => t.value === selectedTrainer.value).label;
+        fileName += `_${trainer}`;
+      }
+      if (selectedCompany.value) {
+        const company = companyOptions.value.find(c => c.value === selectedCompany.value).label;
+        fileName += `_${company}`;
+      }
+      if (selectedProgram.value) {
+        const program = programOptions.value.find(p => p.value === selectedProgram.value).label;
+        fileName += `_${program}`;
+      }
+      if (selectedHolding.value) {
+        const holding = holdingOptions.value.find(h => h.value === selectedHolding.value).label;
+        fileName += `_${holding}`;
+      }
+
+      return fileName;
+    };
+
+    const exportAnswers = () => {
+      const answersRowsToExport = [];
+      if (filteredAnswers.value.followUp.length) {
+        for (const fu of filteredAnswers.value.followUp) {
+          for (const a of fu.answers) {
+            answersRowsToExport.push({
+              Question: formatStringForExport(fu.question),
+              'Question à choix multiples': fu.isQuestionAnswerMultipleChoiced ? YES : NO,
+              'Date de réponse': CompaniDate(a.createdAt).format(DD_MM_YYYY),
+              'Réponse de l\'apprenant': getTraineeAnswer(fu, a.answer),
+              'Id de la formation': get(a, 'course._id'),
+            });
+          }
+        }
+      }
+
+      const fileName = getCsvName();
+
+      return downloadCsv(
+        answersRowsToExport.length
+          ? [Object.keys(answersRowsToExport[0]), ...answersRowsToExport.map(a => Object.values(a))]
+          : [[NO_DATA]],
+        `${fileName}.csv`
+      );
     };
 
     const created = async () => {
@@ -252,12 +334,14 @@ export default {
       selectedHolding,
       holdingOptions,
       selectedCourses,
+      exportAnswers,
       // Computed
       filteredAnswers,
       displayCourseSelect,
       courseOptions,
       isRofOrVendorAdmin,
       hasFilteredAnswers,
+      cards,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,

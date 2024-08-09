@@ -387,3 +387,8 @@ export const CREATION_METHOD_OPTIONS = [
   { label: 'Téléverser', value: UPLOAD },
   { label: 'Générer', value: GENERATION },
 ];
+
+// Exports
+export const YES = 'Oui';
+export const NO = 'Non';
+export const NO_DATA = 'Aucune donnée';
