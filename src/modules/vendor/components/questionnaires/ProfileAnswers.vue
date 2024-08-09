@@ -295,6 +295,7 @@ export default {
       }
 
       const fileName = getCsvName();
+
       return downloadCsv(
         answersRowsToExport.length
           ? [Object.keys(answersRowsToExport[0]), ...answersRowsToExport.map(a => Object.values(a))]
