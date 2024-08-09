@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background column no-wrap">
     <template v-if="questionnaire">
       <ni-profile-header :title="questionnaireName" :header-info="headerInfo" />
-      <profile-tabs :profile-id="questionnaireId" :tabs-content="tabsContent" class="tabs" />
+      <profile-edition :profile-id="questionnaireId" class="edition" />
     </template>
   </q-page>
 </template>
@@ -13,10 +13,8 @@ import { ref, computed, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
-import ProfileTabs from '@components/ProfileTabs';
 import { DRAFT, QUESTIONNAIRE_TYPES } from '@data/constants';
 import ProfileEdition from 'src/modules/vendor/components/questionnaires/ProfileEdition';
-import ProfileAnswers from 'src/modules/vendor/components/questionnaires/ProfileAnswers';
 
 const metaInfo = { title: 'Fiche questionnaire' };
 
@@ -24,20 +22,14 @@ export default {
   name: 'QuestionnaireProfile',
   props: {
     questionnaireId: { type: String, required: true },
-    defaultTab: { type: String, default: 'edition' },
   },
   components: {
     'ni-profile-header': ProfileHeader,
-    'profile-tabs': ProfileTabs,
+    'profile-edition': ProfileEdition,
   },
   mixins: [createMetaMixin(metaInfo)],
   setup (props) {
-    const { defaultTab, questionnaireId } = toRefs(props);
-
-    const tabsContent = [
-      { label: 'Édition', name: 'edition', default: defaultTab.value === 'edition', component: ProfileEdition },
-      { label: 'Réponses', name: 'answers', default: defaultTab.value === 'answers', component: ProfileAnswers },
-    ];
+    const { questionnaireId } = toRefs(props);
     const questionnaireName = ref('');
 
     const $store = useStore();
@@ -70,7 +62,6 @@ export default {
 
     return {
       // Data
-      tabsContent,
       questionnaireName,
       // Computed
       questionnaire,
@@ -81,6 +72,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.tabs
+.edition
   flex: 1
 </style>
