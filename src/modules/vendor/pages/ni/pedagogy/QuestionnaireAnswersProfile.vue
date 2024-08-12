@@ -92,11 +92,13 @@ export default {
       'name'
     ));
 
-    const headerInfo = computed(() => (isRofOrVendorAdmin.value
-      ? []
-      : [
-        { icon: 'bookmark_border', label: get(course.value, 'subProgram') && composeCourseName(course.value, true) },
-      ]));
+    const headerInfo = computed(() => {
+      const courseName = isRofOrVendorAdmin.value
+        ? ''
+        : get(course.value, 'subProgram') && composeCourseName(course.value, true);
+
+      return courseName ? [{ icon: 'bookmark_border', label: courseName }] : [];
+    });
 
     const updateSelectedQuestionnaireType = (value) => { selectedQuestionnaireType.value = value; };
 
