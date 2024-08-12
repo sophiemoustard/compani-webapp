@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!isLoading">
     <template v-if="isRofOrVendorAdmin">
       <div class="flex justify-end">
         <ni-primary-button class="q-mb-md" label="Exporter les réponses" unelevated icon="import_export"
@@ -31,6 +31,9 @@
       <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
     </template>
   </div>
+  <q-inner-loading :showing="isLoading">
+    <q-spinner-facebook size="30px" color="primary" />
+  </q-inner-loading>
 </template>
 
 <script>
@@ -102,6 +105,7 @@ export default {
     const holdingOptions = ref([]);
     const holdingCompanies = ref([]);
     const selectedCourses = ref(get(course.value, '_id') ? [course.value._id] : []);
+    const isLoading = ref(false);
 
     const filteredAnswers = computed(() => {
       if (!get(questionnaireAnswers.value, 'followUp')) return {};
@@ -297,27 +301,35 @@ export default {
     };
 
     const created = async () => {
-      if (isRofOrVendorAdmin.value) {
-        await Promise.all([
-          getQuestionnaireAnswers(),
-          getTrainerOptions(),
-          getCompanyOptions(),
-          getProgramOptions(),
-          getHoldingOptions(),
-        ]);
+      try {
+        isLoading.value = true;
 
-        if (get(course.value, '_id')) {
-          selectedTrainer.value = course.value.trainer._id;
-          selectedCompany.value = course.value.type === INTRA ? course.value.companies[0]._id : '';
-          selectedProgram.value = course.value.subProgram.program._id;
-          selectedHolding.value = course.value.type === INTRA_HOLDING ? course.value.holding : '';
-          await nextTick();
-          selectedCourses.value = [course.value._id];
+        if (isRofOrVendorAdmin.value) {
+          await Promise.all([
+            getQuestionnaireAnswers(),
+            getTrainerOptions(),
+            getCompanyOptions(),
+            getProgramOptions(),
+            getHoldingOptions(),
+          ]);
+
+          if (get(course.value, '_id')) {
+            selectedTrainer.value = course.value.trainer._id;
+            selectedCompany.value = course.value.type === INTRA ? course.value.companies[0]._id : '';
+            selectedProgram.value = course.value.subProgram.program._id;
+            selectedHolding.value = course.value.type === INTRA_HOLDING ? course.value.holding : '';
+            await nextTick();
+            selectedCourses.value = [course.value._id];
+          }
+        } else {
+          await getQuestionnaireAnswers();
+
+          if (get(course.value, '_id')) selectedCourses.value = [course.value._id];
         }
-      } else {
-        await getQuestionnaireAnswers();
-
-        if (get(course.value, '_id')) selectedCourses.value = [course.value._id];
+      } catch (e) {
+        console.error(e);
+      } finally {
+        isLoading.value = false;
       }
     };
 
@@ -345,7 +357,7 @@ export default {
       selectedHolding,
       holdingOptions,
       selectedCourses,
-      exportAnswers,
+      isLoading,
       // Computed
       filteredAnswers,
       displayCourseSelect,
@@ -364,6 +376,7 @@ export default {
       updateSelectedHolding,
       resetFilters,
       updateSelectedCourses,
+      exportAnswers,
     };
   },
 };
