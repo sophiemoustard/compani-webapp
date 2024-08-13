@@ -7,6 +7,8 @@
       @blur="validations.name.$touch" required-field caption="Raison sociale" :error="validations.name.$error" />
     <ni-select in-modal caption="Chargé(e) d'accompagnement" :model-value="newCompany.salesRepresentative"
       @update:model-value="update($event, 'salesRepresentative')" :options="salesRepresentativeOptions" clearable />
+    <ni-select in-modal caption="Société mère" :model-value="newCompany.holding" :options="holdingOptions" clearable
+      @update:model-value="update($event, 'holding')" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -16,11 +18,12 @@
 
 <script>
 import { toRefs, ref } from 'vue';
+import Holdings from '@api/Holdings';
 import Users from '@api/Users';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import { formatAndSortUserOptions } from '@helpers/utils';
+import { formatAndSortUserOptions, formatAndSortOptions } from '@helpers/utils';
 import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 
 export default {
@@ -40,6 +43,7 @@ export default {
   setup (props, { emit }) {
     const { newCompany } = toRefs(props);
     const salesRepresentativeOptions = ref([]);
+    const holdingOptions = ref([]);
 
     const hide = () => emit('hide');
 
@@ -57,15 +61,24 @@ export default {
       salesRepresentativeOptions.value = formatAndSortUserOptions(rofAndAdminUsers, false);
     };
 
-    const created = async () => {
-      await refreshSalesRepresentativeOptions();
+    const refreshHoldings = async () => {
+      try {
+        const holdings = await Holdings.list();
+        holdingOptions.value = formatAndSortOptions(holdings, 'name');
+      } catch (e) {
+        console.error(e);
+        holdingOptions.value = [];
+      }
     };
+
+    const created = async () => Promise.all([refreshSalesRepresentativeOptions(), refreshHoldings()]);
 
     created();
 
     return {
       // Data
       salesRepresentativeOptions,
+      holdingOptions,
       // Methods
       hide,
       input,
