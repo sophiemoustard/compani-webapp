@@ -66,7 +66,7 @@ export default {
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
     const searchStr = ref('');
     const companyCreationModal = ref(false);
-    const newCompany = ref({ name: '', salesRepresentative: '' });
+    const newCompany = ref({ name: '', salesRepresentative: '', holding: '' });
     const modalLoading = ref(false);
 
     const rules = computed(() => ({ newCompany: { name: { required } } }));
@@ -95,7 +95,7 @@ export default {
     };
 
     const resetCreationModal = () => {
-      newCompany.value = { name: '' };
+      newCompany.value = { name: '', salesRepresentative: '', holding: '' };
       v$.value.newCompany.$reset();
     };
 
