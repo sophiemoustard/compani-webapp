@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background column no-wrap">
     <template v-if="questionnaire">
       <ni-profile-header :title="questionnaireName" :header-info="headerInfo">
-        <template #title v-if="questionnaire.status !== DRAFT">
+        <template #title v-if="questionnaire.status === PUBLISHED">
           <ni-primary-button label="Voir les réponses" @click="goToQuestionnaireProfileAnswers" />
         </template>
       </ni-profile-header>
@@ -17,7 +17,7 @@ import { ref, computed, watch, onBeforeUnmount, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
-import { DRAFT, QUESTIONNAIRE_TYPES, SELF_POSITIONNING } from '@data/constants';
+import { DRAFT, QUESTIONNAIRE_TYPES, SELF_POSITIONNING, PUBLISHED } from '@data/constants';
 import PrimaryButton from '@components/PrimaryButton';
 import ProfileEdition from 'src/modules/vendor/components/questionnaires/ProfileEdition';
 import { useRouter } from 'vue-router';
@@ -81,7 +81,7 @@ export default {
     return {
       // Data
       questionnaireName,
-      DRAFT,
+      PUBLISHED,
       // Computed
       questionnaire,
       headerInfo,
