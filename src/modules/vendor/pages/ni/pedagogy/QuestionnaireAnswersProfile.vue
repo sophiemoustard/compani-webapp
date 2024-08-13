@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { ref, computed, watch, toRefs } from 'vue';
+import { ref, computed, watch, toRefs, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
@@ -53,9 +53,9 @@ export default {
   },
   setup (props) {
     const { courseId, questionnaireType, programId } = toRefs(props);
-    const selectedQuestionnaireType = ref(questionnaireType.value, '');
+    const selectedQuestionnaireType = ref(questionnaireType.value || '');
     const publishedQuestionnaires = ref([]);
-    const selectedProgram = ref(get(programId, 'value') || get(course, 'value.subProgram.program._id') || '');
+    const selectedProgram = ref('');
 
     const $store = useStore();
 
@@ -74,9 +74,7 @@ export default {
         const courseHasSelfPositionningQ = !courseId.value || publishedQuestionnaires.value
           .find(q => get(q, 'program._id') === get(course.value, 'subProgram.program._id'));
 
-        return (!isRofOrVendorAdmin.value || !courseHasSelfPositionningQ)
-          ? type !== SELF_POSITIONNING
-          : true;
+        return (!isRofOrVendorAdmin.value || !courseHasSelfPositionningQ) ? type !== SELF_POSITIONNING : true;
       })
       .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type })));
 
@@ -121,7 +119,13 @@ export default {
 
     const created = async () => {
       await getPublishedQuestionnaires();
-      if (courseId.value) await refreshCourse();
+      if (courseId.value) {
+        await refreshCourse();
+
+        selectedProgram.value = get(course, 'value.subProgram.program._id');
+      }
+
+      if (programId.value) selectedProgram.value = programId.value;
     };
 
     created();
@@ -131,6 +135,8 @@ export default {
         ? get(programId, 'value') || get(course, 'value.subProgram.program._id') || ''
         : '';
     });
+
+    onBeforeUnmount(() => { $store.dispatch('course/resetCourse'); });
 
     return {
       // Data
