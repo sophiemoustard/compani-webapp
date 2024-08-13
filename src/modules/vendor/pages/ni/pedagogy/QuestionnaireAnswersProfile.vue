@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { ref, computed, watch, toRefs } from 'vue';
+import { ref, computed, watch, toRefs, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
@@ -49,10 +49,11 @@ export default {
   props: {
     questionnaireType: { type: String, enum: QUESTIONNAIRE_TYPES, default: '' },
     courseId: { type: String, default: '' },
+    programId: { type: String, default: '' },
   },
   setup (props) {
-    const { courseId, questionnaireType } = toRefs(props);
-    const selectedQuestionnaireType = ref(questionnaireType.value, '');
+    const { courseId, questionnaireType, programId } = toRefs(props);
+    const selectedQuestionnaireType = ref(questionnaireType.value || '');
     const publishedQuestionnaires = ref([]);
     const selectedProgram = ref('');
 
@@ -73,9 +74,7 @@ export default {
         const courseHasSelfPositionningQ = !courseId.value || publishedQuestionnaires.value
           .find(q => get(q, 'program._id') === get(course.value, 'subProgram.program._id'));
 
-        return (!isRofOrVendorAdmin.value || !courseHasSelfPositionningQ)
-          ? type !== SELF_POSITIONNING
-          : true;
+        return (!isRofOrVendorAdmin.value || !courseHasSelfPositionningQ) ? type !== SELF_POSITIONNING : true;
       })
       .map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type })));
 
@@ -120,20 +119,24 @@ export default {
 
     const created = async () => {
       await getPublishedQuestionnaires();
-      if (courseId.value) await refreshCourse();
+      if (courseId.value) {
+        await refreshCourse();
 
-      selectedProgram.value = courseId.value && selectedQuestionnaireType.value === SELF_POSITIONNING
-        ? course.value.subProgram.program._id
-        : '';
+        selectedProgram.value = get(course, 'value.subProgram.program._id');
+      }
+
+      if (programId.value) selectedProgram.value = programId.value;
     };
 
     created();
 
     watch(selectedQuestionnaireType, () => {
-      selectedProgram.value = courseId.value && selectedQuestionnaireType.value === SELF_POSITIONNING
-        ? get(course.value, 'subProgram.program._id')
+      selectedProgram.value = selectedQuestionnaireType.value === SELF_POSITIONNING
+        ? get(programId, 'value') || get(course, 'value.subProgram.program._id') || ''
         : '';
     });
+
+    onBeforeUnmount(() => { $store.dispatch('course/resetCourse'); });
 
     return {
       // Data
