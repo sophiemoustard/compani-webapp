@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background column no-wrap">
     <template v-if="questionnaire">
       <ni-profile-header :title="questionnaireName" :header-info="headerInfo">
-        <template #title>
+        <template #title v-if="questionnaire.status !== DRAFT">
           <ni-primary-button label="Voir les réponses" @click="goToQuestionnaireProfileAnswers" />
         </template>
       </ni-profile-header>
@@ -81,6 +81,7 @@ export default {
     return {
       // Data
       questionnaireName,
+      DRAFT,
       // Computed
       questionnaire,
       headerInfo,
