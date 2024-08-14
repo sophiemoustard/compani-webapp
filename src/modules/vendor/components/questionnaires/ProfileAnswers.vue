@@ -26,13 +26,13 @@
       <div v-if="isSelfPositionningAnswers" class="sp-answers-container">
         <div>
           <span class="section-title">Début de formation</span>
-          <q-card v-for="(card, cardIndex) of startAnswers" :key="cardIndex" flat>
+          <q-card v-for="(card, cardIndex) of startAnswers" :key="cardIndex" flat class="q-mb-sm">
             <component :is="getChartComponent(card.template)" :card="card" />
           </q-card>
         </div>
         <div>
           <span class="section-title">Fin de formation</span>
-          <q-card v-for="(card, cardIndex) of endAnswers" :key="cardIndex" flat>
+          <q-card v-for="(card, cardIndex) of endAnswers" :key="cardIndex" flat class="q-mb-sm">
             <component :is="getChartComponent(card.template)" :card="card" />
           </q-card>
         </div>
