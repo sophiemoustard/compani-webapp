@@ -2,6 +2,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
+import get from 'lodash/get';
 import CompaniDate from '@helpers/dates/companiDates';
 import { formatAndSortIdentityOptions, formatAndSortCompanyOptions } from '@helpers/utils';
 import {
@@ -10,6 +11,7 @@ import {
   COURSE_TYPES,
   UNARCHIVED_COURSES,
   WITHOUT_SALES_REPRESENTATIVE,
+  TRAINER,
 } from '@data/constants';
 
 export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions = []) => {
@@ -19,6 +21,8 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
   const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
 
   const loggedUser = computed(() => $store.state.main.loggedUser);
+
+  const loggedUserIsTrainer = ref(get(loggedUser.value, 'role.vendor.name') === TRAINER);
 
   const courses = computed(() => [...activeCourses.value, ...archivedCourses.value]);
 
@@ -145,7 +149,8 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
   };
 
   const resetFilters = () => {
-    $store.dispatch('course/resetFilters', { isClientInterface: !isVendorInterface });
+    const isClientInterfaceOrTrainer = !isVendorInterface || loggedUserIsTrainer.value;
+    $store.dispatch('course/resetFilters', { isClientInterfaceOrTrainer });
   };
 
   /* SALES REPRESENTATIVE */

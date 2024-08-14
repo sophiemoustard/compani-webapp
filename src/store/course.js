@@ -94,7 +94,7 @@ export default {
       commit('SET_SELECTED_TYPE', '');
       commit('SET_SELECTED_NO_ADDRESS_IN_SLOTS', false);
       commit('SET_SELECTED_MISSING_TRAINEES', false);
-      commit('SET_SELECTED_ARCHIVE_STATUS', params.isClientInterface ? '' : UNARCHIVED_COURSES);
+      commit('SET_SELECTED_ARCHIVE_STATUS', params.isClientInterfaceOrTrainer ? '' : UNARCHIVED_COURSES);
       commit('SET_SELECTED_SALES_REPRESENTATIVE', '');
     },
   },
