@@ -26,13 +26,13 @@
       <div v-if="isSelfPositionningAnswers" class="sp-answers-container">
         <div>
           <span class="section-title">Début de formation</span>
-          <q-card v-for="(card, cardIndex) of startAnswers" :key="cardIndex" flat class="q-ma-sm">
+          <q-card v-for="(card, cardIndex) of startAnswers" :key="cardIndex" flat>
             <component :is="getChartComponent(card.template)" :card="card" />
           </q-card>
         </div>
         <div>
           <span class="section-title">Fin de formation</span>
-          <q-card v-for="(card, cardIndex) of endAnswers" :key="cardIndex" flat class="q-ma-sm">
+          <q-card v-for="(card, cardIndex) of endAnswers" :key="cardIndex" flat>
             <component :is="getChartComponent(card.template)" :card="card" />
           </q-card>
         </div>
@@ -447,13 +447,17 @@ export default {
 .sp-answers-container
   display: flex
   flex: 1
-  justify-content: space-between
+  gap: 20px
   @media screen and (max-width: 767px)
+    flex-direction: column
+  & > div
+    flex: 1
+    display: flex
     flex-direction: column
 
 .section-title
   font-size: 24px
   font-weight: bold
   color: $copper-grey-700
-  margin: 0px 12px
+  margin: 12px
 </style>
