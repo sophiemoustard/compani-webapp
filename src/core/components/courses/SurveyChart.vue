@@ -3,17 +3,19 @@
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
     <div class="container">
-      <div class="bar-container">
-        <div v-for="(line, index) in lines" :key="index">
-          <div class="bar bg-peach-100">
-            <div class="bar-fill bg-peach-200" :style="`height: ${line.percentage * 100}%`" />
-            <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
+      <div class="info-container">
+        <div class="bar-container">
+          <div v-for="(line, index) in lines" :key="index">
+            <div class="bar bg-peach-100">
+              <div class="bar-fill bg-peach-200" :style="`height: ${line.percentage * 100}%`" />
+              <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
+            </div>
+            <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
           </div>
-          <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
         </div>
-      </div>
-      <div class="labels-container">
-        <ni-labels-details are-details-visible :labels="card.labels" />
+        <div class="labels-container">
+          <ni-labels-details are-details-visible :labels="card.labels" />
+        </div>
       </div>
     </div>
   </q-card>
@@ -100,14 +102,20 @@ export default {
   width: 100%
 
 .container
+  container-type: inline-size
+
+.info-container
   display: flex
+  flex: 1
   justify-content: space-around
   align-items: center
-  @media screen and (max-width: 767px)
+  @container (max-width: 767px)
     flex-direction: column
 
 .labels-container
-  width: 40vw
-  @media screen and (max-width: 767px)
-    width: 75vw
+  width: 30vw
+  @container (min-width: 767px )
+    width: 40vw
+  @container (max-width: 250px)
+    width: 60vw
 </style>
