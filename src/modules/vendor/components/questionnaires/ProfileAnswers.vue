@@ -103,7 +103,7 @@ export default {
     course: { type: Object, default: () => ({}) },
   },
   setup (props) {
-    const { profileId, course } = toRefs(props);
+    const { profileId, course, isSelfPositionningAnswers } = toRefs(props);
 
     const $store = useStore();
 
@@ -308,6 +308,17 @@ export default {
       return fileName;
     };
 
+    const formatAnswerTimeline = (timeline) => {
+      switch (timeline) {
+        case START_COURSE:
+          return 'Début de formation';
+        case END_COURSE:
+          return 'Fin de formation';
+        default:
+          return '';
+      }
+    };
+
     const exportAnswers = () => {
       const answersRowsToExport = [];
       if (filteredAnswers.value.followUp.length) {
@@ -319,6 +330,7 @@ export default {
               'Date de réponse': CompaniDate(a.createdAt).format(DD_MM_YYYY),
               'Réponse de l\'apprenant': getTraineeAnswer(fu, a.answer),
               'Id de la formation': get(a, 'course._id'),
+              ...(isSelfPositionningAnswers.value && { 'Période de la formation': formatAnswerTimeline(a.timeline) }),
             });
           }
         }
@@ -435,6 +447,7 @@ export default {
 .sp-answers-container
   display: flex
   flex: 1
+  justify-content: space-between
   @media screen and (max-width: 767px)
     flex-direction: column
 
