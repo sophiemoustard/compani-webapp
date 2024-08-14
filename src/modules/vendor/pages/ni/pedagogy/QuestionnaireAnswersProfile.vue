@@ -13,9 +13,9 @@
     </ni-profile-header>
     <template v-if="selectedQuestionnaireId">
       <profile-answers v-if="courseId && Object.keys(course).length" :profile-id="selectedQuestionnaireId"
-        :course="course" :hide-program-filter="!!selectedProgram" />
+        :course="course" :is-self-positionning-answers="selectedQuestionnaireType === SELF_POSITIONNING" />
       <profile-answers v-else-if="!courseId" :profile-id="selectedQuestionnaireId"
-        :hide-program-filter="!!selectedProgram" />
+        :is-self-positionning-answers="selectedQuestionnaireType === SELF_POSITIONNING" />
     </template>
   </q-page>
 </template>

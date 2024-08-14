@@ -10,7 +10,7 @@
           clearable />
         <ni-select :options="companyOptions" :model-value="selectedCompany" @update:model-value="updateSelectedCompany"
           clearable />
-        <ni-select v-if="!hideProgramFilter" :options="programOptions" :model-value="selectedProgram"
+        <ni-select v-if="!isSelfPositionningAnswers" :options="programOptions" :model-value="selectedProgram"
           @update:model-value="updateSelectedProgram" clearable />
         <ni-select :options="holdingOptions" :model-value="selectedHolding" @update:model-value="updateSelectedHolding"
           clearable />
@@ -23,9 +23,25 @@
       </div>
     </template>
     <template v-if="hasFilteredAnswers">
-      <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
-        <component :is="getChartComponent(card.template)" :card="card" />
-      </q-card>
+      <div v-if="isSelfPositionningAnswers" class="sp-answers-container">
+        <div>
+          <span class="section-title">Début de formation</span>
+          <q-card v-for="(card, cardIndex) of startAnswers" :key="cardIndex" flat class="q-mb-sm">
+            <component :is="getChartComponent(card.template)" :card="card" />
+          </q-card>
+        </div>
+        <div>
+          <span class="section-title">Fin de formation</span>
+          <q-card v-for="(card, cardIndex) of endAnswers" :key="cardIndex" flat class="q-mb-sm">
+            <component :is="getChartComponent(card.template)" :card="card" />
+          </q-card>
+        </div>
+      </div>
+      <template v-else>
+        <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
+          <component :is="getChartComponent(card.template)" :card="card" />
+        </q-card>
+      </template>
     </template>
     <template v-else>
       <span class="text-italic">Aucune réponse ne correspond aux filtres sélectionnés</span>
@@ -70,6 +86,8 @@ import {
   DD_MM_YYYY,
   NO_DATA,
   QUESTION_ANSWER,
+  START_COURSE,
+  END_COURSE,
 } from '@data/constants';
 
 export default {
@@ -81,11 +99,11 @@ export default {
   mixins: [questionnaireAnswersMixin],
   props: {
     profileId: { type: String, required: true },
-    hideProgramFilter: { type: Boolean, default: false },
+    isSelfPositionningAnswers: { type: Boolean, default: false },
     course: { type: Object, default: () => ({}) },
   },
   setup (props) {
-    const { profileId, course } = toRefs(props);
+    const { profileId, course, isSelfPositionningAnswers } = toRefs(props);
 
     const $store = useStore();
 
@@ -142,6 +160,22 @@ export default {
 
     const cards = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })));
+
+    const startAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
+      .map(fu => ({
+        ...fu,
+        answers: fu.answers
+          .filter(a => a.timeline === START_COURSE)
+          .map(a => a.answer),
+      })));
+
+    const endAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
+      .map(fu => ({
+        ...fu,
+        answers: fu.answers
+          .filter(a => a.timeline === END_COURSE)
+          .map(a => a.answer),
+      })));
 
     const getQuestionnaireAnswers = async () => {
       try {
@@ -274,6 +308,17 @@ export default {
       return fileName;
     };
 
+    const formatAnswerTimeline = (timeline) => {
+      switch (timeline) {
+        case START_COURSE:
+          return 'Début de formation';
+        case END_COURSE:
+          return 'Fin de formation';
+        default:
+          return '';
+      }
+    };
+
     const exportAnswers = () => {
       const answersRowsToExport = [];
       if (filteredAnswers.value.followUp.length) {
@@ -285,6 +330,7 @@ export default {
               'Date de réponse': CompaniDate(a.createdAt).format(DD_MM_YYYY),
               'Réponse de l\'apprenant': getTraineeAnswer(fu, a.answer),
               'Id de la formation': get(a, 'course._id'),
+              ...(isSelfPositionningAnswers.value && { 'Période de la formation': formatAnswerTimeline(a.timeline) }),
             });
           }
         }
@@ -365,6 +411,8 @@ export default {
       isRofOrVendorAdmin,
       hasFilteredAnswers,
       cards,
+      startAnswers,
+      endAnswers,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
@@ -395,4 +443,21 @@ export default {
   flex-direction: column
   @media screen and (max-width: 767px)
     width: 95%
+
+.sp-answers-container
+  display: flex
+  flex: 1
+  gap: 20px
+  @media screen and (max-width: 767px)
+    flex-direction: column
+  & > div
+    flex: 1
+    display: flex
+    flex-direction: column
+
+.section-title
+  font-size: 24px
+  font-weight: bold
+  color: $copper-grey-700
+  margin: 12px
 </style>
