@@ -1,7 +1,11 @@
 <template>
   <q-card class="card" flat>
-    <div class="text-weight-bold">{{ card.question }}</div>
-    <div class="subtitle">{{ subtitle }}</div>
+    <div class="row justify-between">
+      <span class="text-weight-bold">{{ card.question }}</span>
+      <ni-bi-color-button class="q-my-sm" icon="content_copy" label="Copier les réponses" @click="copyAnswers"
+        size="14px" :disable="!card.answers.length" />
+    </div>
+    <span class="subtitle">{{ subtitle }}</span>
     <ni-table-list :data="card.answers.map(a => ({ answer: a }))" :columns="columns"
       v-model:pagination="pagination" :rows-per-page-options="rowsPerPageOptions" :hide-header="true" :disabled="true">
       <template #body="{ col }">
@@ -13,8 +17,11 @@
 
 <script>
 import { computed, toRefs, ref } from 'vue';
+import { copyToClipboard } from 'quasar';
 import { formatQuantity } from '@helpers/utils';
 import TableList from '@components/table/TableList';
+import BiColorButton from '@components/BiColorButton';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'OpenQuestionChart',
@@ -23,6 +30,7 @@ export default {
   },
   components: {
     'ni-table-list': TableList,
+    'ni-bi-color-button': BiColorButton,
   },
   setup (props) {
     const { card } = toRefs(props);
@@ -33,6 +41,12 @@ export default {
 
     const subtitle = computed(() => `${formatQuantity('réponse', card.value.answers.length)} à cette question ouverte`);
 
+    const copyAnswers = () => {
+      copyToClipboard(card.value.answers.join(' \n'))
+        .then(() => NotifyPositive('Réponses copiées !'))
+        .catch(() => NotifyNegative('Erreur lors de la copie des réponses.'));
+    };
+
     return {
       // Data
       columns,
@@ -40,6 +54,8 @@ export default {
       rowsPerPageOptions,
       // Computed
       subtitle,
+      // Methods
+      copyAnswers,
     };
   },
 };
