@@ -22,7 +22,7 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
 
   const loggedUser = computed(() => $store.state.main.loggedUser);
 
-  const loggedUserIsTrainer = ref(get(loggedUser.value, 'role.vendor.name') === TRAINER);
+  const loggedUserIsTrainer = computed(() => get(loggedUser.value, 'role.vendor.name') === TRAINER);
 
   const courses = computed(() => [...activeCourses.value, ...archivedCourses.value]);
 
