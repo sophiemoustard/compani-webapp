@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { computed, toRefs } from 'vue';
 import { formatQuantity } from '@helpers/utils';
 
 export default {
@@ -16,10 +17,14 @@ export default {
   props: {
     card: { type: Object, default: () => ({}) },
   },
-  computed: {
-    subtitle () {
-      return `${formatQuantity('réponse', this.card.answers.length)} à cette question ouverte`;
-    },
+  setup (props) {
+    const { card } = toRefs(props);
+    const subtitle = computed(() => `${formatQuantity('réponse', card.value.answers.length)} à cette question ouverte`);
+
+    return {
+      // Computed
+      subtitle,
+    };
   },
 };
 </script>
