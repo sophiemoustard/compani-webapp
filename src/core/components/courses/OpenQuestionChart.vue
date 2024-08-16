@@ -1,8 +1,8 @@
 <template>
   <q-card class="card" flat>
-    <div class="row justify-between">
-      <span class="text-weight-bold">{{ card.question }}</span>
-      <ni-bi-color-button class="q-my-sm" icon="content_copy" label="Copier les réponses" @click="copyAnswers"
+    <div class="row justify-between q-my-sm">
+      <span class="text-weight-bold col-xs-10">{{ card.question }}</span>
+      <ni-bi-color-button class="col-xs-2" icon="content_copy" label="Copier les réponses" @click="copyAnswers"
         size="14px" :disable="!card.answers.length" />
     </div>
     <span class="subtitle">{{ subtitle }}</span>
@@ -36,8 +36,8 @@ export default {
     const { card } = toRefs(props);
 
     const columns = ref([{ name: 'answer', field: 'answer', align: 'left' }]);
-    const pagination = ref({ page: 1, rowsPerPage: 5 });
-    const rowsPerPageOptions = ref([5, 10, 20, 50, 100]);
+    const pagination = ref({ page: 1, rowsPerPage: 10 });
+    const rowsPerPageOptions = ref([10, 20, 50, 100]);
 
     const subtitle = computed(() => `${formatQuantity('réponse', card.value.answers.length)} à cette question ouverte`);
 
@@ -64,13 +64,19 @@ export default {
 <style lang="sass" scoped>
 .card
   padding: 16px 32px
+
 .subtitle
   color: $copper-grey-800
   font-size: 14px
+
 .answer-container
   border-radius: 3px !important
   font-size: 14px
   display: flex
+
+.answer
+  padding: 12px
+  margin: 2px 0px
 
 :deep(.table-list)
   .q-table
@@ -78,10 +84,8 @@ export default {
   & tbody
     & td
       padding: 0px
+      .q-item__section--main
+        font-size: 12px
   & .q-btn-toggle
-    background-color: $peach-100
-    opacity: 0.8
-
-.answer
-  padding: 8px 16px
+    background-color: $copper-grey-100
 </style>
