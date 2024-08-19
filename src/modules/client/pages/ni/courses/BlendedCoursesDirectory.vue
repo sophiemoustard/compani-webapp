@@ -175,7 +175,7 @@ export default {
   },
   beforeRouteEnter (_, from, next) {
     if (from.name !== 'ni courses info') {
-      store.dispatch('course/resetFilters', { isClientInterface: true });
+      store.dispatch('course/resetFilters', { isClientInterfaceOrTrainer: true });
     }
 
     next();

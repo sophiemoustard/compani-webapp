@@ -167,7 +167,7 @@ export default {
   },
   beforeRouteEnter (_, from, next) {
     if (from.name !== 'trainers courses info') {
-      store.dispatch('course/resetFilters', { isClientInterface: false });
+      store.dispatch('course/resetFilters', { isClientInterfaceOrTrainer: true });
     }
 
     next();
