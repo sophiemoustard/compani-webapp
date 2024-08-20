@@ -1,13 +1,13 @@
 <template>
   <q-card class="card" flat>
-    <div class="row justify-between q-my-sm">
-      <span class="text-weight-bold col-xs-10">{{ card.question }}</span>
-      <ni-bi-color-button class="col-xs-2" icon="content_copy" label="Copier les réponses" @click="copyAnswers"
+    <div class="header">
+      <span class="text-weight-bold flex-1">{{ card.question }}</span>
+      <ni-bi-color-button class="q-ml-sm" icon="content_copy" label="Copier les réponses" @click="copyAnswers"
         size="14px" :disable="!card.answers.length" />
     </div>
     <span class="subtitle">{{ subtitle }}</span>
-    <ni-table-list :data="card.answers.map(a => ({ answer: a }))" :columns="columns"
-      v-model:pagination="pagination" :rows-per-page-options="rowsPerPageOptions" :hide-header="true" :disabled="true">
+    <ni-table-list :data="formattedAnswers" :columns="columns" v-model:pagination="pagination"
+      :rows-per-page-options="rowsPerPageOptions" hide-header disabled>
       <template #body="{ col }">
         <q-item-section class="bg-peach-100 answer">{{ col.value }}</q-item-section>
       </template>
@@ -38,6 +38,7 @@ export default {
     const columns = ref([{ name: 'answer', field: 'answer', align: 'left' }]);
     const pagination = ref({ page: 1, rowsPerPage: 10 });
     const rowsPerPageOptions = ref([10, 20, 50, 100]);
+    const formattedAnswers = ref(card.value.answers.map(a => ({ answer: a })));
 
     const subtitle = computed(() => `${formatQuantity('réponse', card.value.answers.length)} à cette question ouverte`);
 
@@ -52,6 +53,7 @@ export default {
       columns,
       pagination,
       rowsPerPageOptions,
+      formattedAnswers,
       // Computed
       subtitle,
       // Methods
@@ -65,9 +67,18 @@ export default {
 .card
   padding: 16px 32px
 
+.header
+  display: flex
+  flex: 1
+  flex-direction: row
+  align-items: start
+  margin: 8px 0px 0px 0px
+
 .subtitle
   color: $copper-grey-800
   font-size: 14px
+  display: inline-block
+  margin: 0px 0px 16px 0px
 
 .answer-container
   border-radius: 3px !important
