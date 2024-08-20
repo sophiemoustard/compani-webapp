@@ -69,7 +69,6 @@ export default {
 
 .header
   display: flex
-  flex: 1
   flex-direction: row
   align-items: start
   margin: 8px 0px 0px 0px
