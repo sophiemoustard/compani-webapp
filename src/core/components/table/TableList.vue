@@ -2,7 +2,7 @@
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :rows="data" :columns="columns" flat :row-key="rowKey" binary-state-sort
       :pagination="pagination" class="table-list" :rows-per-page-options="rowsPerPageOptions"
-      @update:pagination="update($event)" :visible-columns="formattedVisibleColumns">
+      @update:pagination="update($event)" :visible-columns="formattedVisibleColumns" :hide-header="hideHeader">
       <template #body="props">
         <q-tr :no-hover="disabled" :props="props" @click="click(props.row)">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
@@ -48,6 +48,7 @@ export default {
     disabled: { type: Boolean, default: false },
     rowsPerPageOptions: { type: Array, default: () => [15, 50, 100, 200] },
     path: { type: Object, default: () => ({}) },
+    hideHeader: { type: Boolean, default: false },
   },
   components: {
     'ni-pagination': Pagination,
