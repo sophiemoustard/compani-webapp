@@ -29,7 +29,7 @@
 <script>
 import { toRefs, computed } from 'vue';
 import { useStore } from 'vuex';
-import { formatQuantity, roundFrenchPercentage } from '@helpers/utils';
+import { formatQuantity, formatPercentage } from '@helpers/utils';
 import LabelsDetails from '@components/LabelsDetails';
 import Banner from '@components/Banner';
 import { add, multiply, toFixedToFloat } from '@helpers/numbers';
@@ -66,8 +66,6 @@ export default {
 
       return toFixedToFloat(total);
     });
-
-    const formatPercentage = number => roundFrenchPercentage(number * 100, 0);
 
     return {
       // Computed
