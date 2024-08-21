@@ -2,6 +2,11 @@
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
+    <ni-banner v-if="isRofOrVendorAdmin" icon="info_outline" class="bg-peach-100">
+      <template #message>
+        Moyenne des réponses : <a class="text-weight-bold text-copper-grey-700">{{ average }} / 5</a>
+      </template>
+    </ni-banner>
     <div class="container">
       <div class="info-container">
         <div class="bar-container">
@@ -14,7 +19,7 @@
           </div>
         </div>
         <div class="labels-container">
-          <ni-labels-details are-details-visible :labels="card.labels" />
+          <ni-labels-details :are-details-visible="!isRofOrVendorAdmin" :labels="card.labels" />
         </div>
       </div>
     </div>
@@ -22,8 +27,13 @@
 </template>
 
 <script>
-import { formatQuantity, roundFrenchPercentage } from '@helpers/utils';
+import { toRefs, computed } from 'vue';
+import { useStore } from 'vuex';
+import { formatQuantity, formatPercentage } from '@helpers/utils';
 import LabelsDetails from '@components/LabelsDetails';
+import Banner from '@components/Banner';
+import { add, multiply, toFixedToFloat } from '@helpers/numbers';
+import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 
 export default {
   name: 'SurveyChart',
@@ -32,23 +42,40 @@ export default {
   },
   components: {
     'ni-labels-details': LabelsDetails,
+    'ni-banner': Banner,
   },
-  computed: {
-    subtitle () {
-      return `${formatQuantity('réponse', this.card.answers.length)} à ce sondage`;
-    },
-    lines () {
-      return ['1', '2', '3', '4', '5'].map((pa) => {
-        const total = this.card.answers.filter(a => a === pa).length;
+  setup (props) {
+    const { card } = toRefs(props);
 
-        return { title: pa, total, percentage: total / this.card.answers.length || 0 };
-      });
-    },
-  },
-  methods: {
-    formatPercentage (number) {
-      return roundFrenchPercentage(number * 100, 0);
-    },
+    const $store = useStore();
+
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+
+    const isRofOrVendorAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
+
+    const subtitle = computed(() => `${formatQuantity('réponse', card.value.answers.length)} à ce sondage`);
+
+    const lines = computed(() => ['1', '2', '3', '4', '5'].map((pa) => {
+      const total = card.value.answers.filter(a => a === pa).length;
+
+      return { title: pa, total, percentage: total / card.value.answers.length || 0 };
+    }));
+
+    const average = computed(() => {
+      const total = lines.value.reduce((acc, val) => add(acc, multiply(val.title, val.percentage)), 0);
+
+      return toFixedToFloat(total);
+    });
+
+    return {
+      // Computed
+      subtitle,
+      lines,
+      average,
+      isRofOrVendorAdmin,
+      // Methods
+      formatPercentage,
+    };
   },
 };
 </script>

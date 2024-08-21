@@ -194,3 +194,5 @@ export const formatStringForExport = (str) => {
 
   return `"${formattedStr}"`;
 };
+
+export const formatPercentage = number => roundFrenchPercentage(number * 100, 0);
