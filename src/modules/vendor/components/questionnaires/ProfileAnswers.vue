@@ -18,7 +18,7 @@
       <div class="group-filter-container">
         <ni-select v-if="displayCourseSelect" caption="Groupe de formation" :options="courseOptions"
           :model-value="selectedCourses" @update:model-value="updateSelectedCourses" clearable multiple
-          :blur-on-selection="false" use-chips />
+          :blur-on-selection="false" />
         <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
       </div>
     </template>
