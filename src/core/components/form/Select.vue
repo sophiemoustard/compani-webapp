@@ -7,9 +7,9 @@
     <q-select dense borderless :model-value="model" :bg-color="bgColor" :options="selectableOptions" @filter="onFilter"
       :disable="disable" @focus="onFocus" @blur="onBlur" @update:model-value="onInput" behavior="menu" use-input
       :class="{ 'no-border': noBorder, 'borders': inModal && !noBorder , 'no-bottom': noError }" :error="error"
-      :display-value="displayedValue" :hide-selected="!multiple" fill-input :input-debounce="0" emit-value
+      :display-value="displayedValue" :hide-selected="!multiple" fill-input :input-debounce="0" :emit-value="!multiple"
       ref="selectInput" :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon"
-      :error-message="errorMessage" :multiple="multiple" :use-chips="useChips" :map-options="useChips">
+      :error-message="errorMessage" :multiple="multiple" :use-chips="multiple">
       <template #append>
         <ni-button v-if="modelValue && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
@@ -55,7 +55,6 @@ export default {
     optionSlot: { type: Boolean, default: false },
     noBorder: { type: Boolean, default: false },
     blurOnSelection: { type: Boolean, default: true },
-    useChips: { type: Boolean, default: false },
   },
   emits: ['focus', 'blur', 'update:model-value'],
   components: {
@@ -90,8 +89,9 @@ export default {
     const onBlur = () => { emit('blur'); };
 
     const onInput = (val) => {
-      if (multiple.value) emit('update:model-value', val.map(v => get(v, 'value') || v));
-      else emit('update:model-value', val);
+      const value = multiple.value ? val.map(v => v.value) : val;
+      emit('update:model-value', value);
+
       if (blurOnSelection.value) selectInput.value.blur();
     };
 
