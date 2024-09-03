@@ -32,8 +32,8 @@ import {
   QUESTION_MAX_LENGTH,
   QC_ANSWER_MAX_LENGTH,
   PUBLISHED,
-  MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
-  MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT,
+  CHOICE_QUESTION_MAX_ANSWERS_COUNT,
+  CHOICE_QUESTION_MIN_ANSWERS_COUNT,
 } from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
@@ -88,10 +88,10 @@ export default {
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
-      card.value.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT);
+      card.value.qcAnswers.length >= CHOICE_QUESTION_MAX_ANSWERS_COUNT);
 
     const disableAnswerDeletion = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
-      card.value.qcAnswers.length <= MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT);
+      card.value.qcAnswers.length <= CHOICE_QUESTION_MIN_ANSWERS_COUNT);
 
     const requiredOneCorrectAnswer = index => !get(v$.value, 'card.qcAnswers.minOneCorrectAnswer.$response') &&
       !!card.value.qcAnswers[index].text;
@@ -123,7 +123,7 @@ export default {
       return '';
     };
 
-    const answerIsRequired = index => index < MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT;
+    const answerIsRequired = index => index < CHOICE_QUESTION_MIN_ANSWERS_COUNT;
 
     return {
       // Validations
