@@ -16,7 +16,6 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="learnerCreationModal = true" :disable="tableLoading" />
 
-    <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
       @next-step="nextStepLearnerCreationModal" @hide="resetLearnerCreationModal" :company-options="companyOptions"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
@@ -30,10 +29,11 @@ import { onMounted, ref } from 'vue';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Companies from '@api/Companies';
-import { formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortCompanyOptions } from '@helpers/utils';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { useLearnersCreation } from '@composables/learnersCreation';
 import { useLearnerDirectory } from '@composables/learnerDirectory';
+import { DIRECTORY } from '@data/constants';
 
 export default {
   name: 'LearnersDirectory',
@@ -72,8 +72,8 @@ export default {
 
     const refreshCompanies = async () => {
       try {
-        const companies = await Companies.list();
-        companyOptions.value = formatAndSortOptions(companies, 'name');
+        const companies = await Companies.list({ action: DIRECTORY });
+        companyOptions.value = formatAndSortCompanyOptions(companies, 'name');
       } catch (e) {
         console.error(e);
         companyOptions.value = [];
