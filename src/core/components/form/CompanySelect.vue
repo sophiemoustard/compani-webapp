@@ -12,11 +12,16 @@
         </q-item-section>
       </q-item>
     </template>
+    <template #no-option>
+      <ni-button v-if="displayNoOptionsSlot" color="primary" icon="add" label="Créer une nouvelle structure"
+        @click="openCompanyCreationModal" />
+    </template>
   </ni-select>
 </template>
 
 <script>
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 
 export default {
   name: 'CompanySelect',
@@ -29,17 +34,21 @@ export default {
     clearable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     caption: { type: String, default: 'Structure' },
+    displayNoOptionsSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-select': Select,
+    'ni-button': Button,
   },
-  emits: ['update'],
+  emits: ['update', 'open-company-creation-modal'],
   setup (_, { emit }) {
     const update = event => emit('update', event);
+    const openCompanyCreationModal = () => emit('open-company-creation-modal');
 
     return {
       // Methods
       update,
+      openCompanyCreationModal,
     };
   },
 };

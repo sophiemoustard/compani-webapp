@@ -32,11 +32,15 @@
 
     <company-addition-modal v-model="companyLinkModal" :loading="modalLoading" @submit="linkCompanyToHolding"
       :validations="v$.newCompanyLink" @hide="resetCompanyLinkModal" v-model:selected-company="newCompanyLink"
-      :company-options="companyOptions" />
+      :company-options="companyOptions" display-no-options-slot
+      @open-company-creation-modal="openCompanyCreationModal" />
 
     <user-addition-modal v-model="userAdditionModal" v-model:new-user-registration="newUserRegistration"
       @submit="addUser" :validations="v$.newUserRegistration" :loading="userModalLoading" @hide="resetUserAdditionForm"
       :users-options="usersOptions" label="Utilisateur" />
+
+    <company-creation-modal v-model="companyCreationModal" v-model:new-company="newCompany" :validations="v$.newCompany"
+      :loading="modalLoading" @hide="resetCompanyCreationModal" @submit="createCompany" disable-holding />
   </div>
 </template>
 
@@ -45,6 +49,7 @@ import { computed, toRefs, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import get from 'lodash/get';
+import pickBy from 'lodash/pickBy';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Companies from '@api/Companies';
@@ -52,6 +57,7 @@ import Holdings from '@api/Holdings';
 import Users from '@api/Users';
 import Button from '@components/Button';
 import CompanyAdditionModal from '@components/courses/CompanyAdditionModal';
+import CompanyCreationModal from 'src/modules/vendor/components/companies/CompanyCreationModal';
 import UserAdditionModal from '@components/courses/UserAdditionModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -66,6 +72,7 @@ export default {
   components: {
     'ni-responsive-table': ResponsiveTable,
     'company-addition-modal': CompanyAdditionModal,
+    'company-creation-modal': CompanyCreationModal,
     'ni-button': Button,
     'user-addition-modal': UserAdditionModal,
   },
@@ -74,6 +81,8 @@ export default {
     const $store = useStore();
     const $router = useRouter();
 
+    const companyCreationModal = ref(false);
+    const newCompany = ref({ name: '', salesRepresentative: '', holding: profileId.value });
     const companyColumns = ref([{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }]);
     const userColumns = ref([
       {
@@ -110,8 +119,12 @@ export default {
     const newUserRegistration = ref({ user: '' });
     const userModalLoading = ref(false);
 
-    const rules = { newCompanyLink: { required }, newUserRegistration: { user: { required } } };
-    const v$ = useVuelidate(rules, { newCompanyLink, newUserRegistration });
+    const rules = {
+      newCompanyLink: { required },
+      newUserRegistration: { user: { required } },
+      newCompany: { name: { required }, holding: { required } },
+    };
+    const v$ = useVuelidate(rules, { newCompanyLink, newUserRegistration, newCompany });
 
     const holding = computed(() => $store.state.holding.holding);
 
@@ -206,6 +219,36 @@ export default {
       }
     };
 
+    const resetCompanyCreationModal = () => {
+      newCompany.value = { name: '', salesRepresentative: '', holding: profileId.value };
+      v$.value.newCompany.$reset();
+    };
+
+    const createCompany = async () => {
+      try {
+        v$.value.newCompany.$touch();
+        if (v$.value.newCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
+        modalLoading.value = true;
+
+        await Companies.create(pickBy(newCompany.value));
+
+        companyCreationModal.value = false;
+        NotifyPositive('Structure créée.');
+        await refreshHolding();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative('Structure déjà existante.');
+        NotifyNegative('Erreur lors de la création de la structure.');
+      } finally {
+        modalLoading.value = false;
+      }
+    };
+
+    const openCompanyCreationModal = () => {
+      companyCreationModal.value = true;
+      companyLinkModal.value = false;
+    };
+
     return {
       // Data
       companyColumns,
@@ -220,6 +263,8 @@ export default {
       userAdditionModal,
       newUserRegistration,
       usersOptions,
+      companyCreationModal,
+      newCompany,
       // Computed
       holding,
       v$,
@@ -230,6 +275,9 @@ export default {
       resetUserAdditionForm,
       addUser,
       openUserAdditionModal,
+      resetCompanyCreationModal,
+      createCompany,
+      openCompanyCreationModal,
     };
   },
 };
