@@ -27,6 +27,7 @@ import Button from '@components/Button';
 import { INTER_B2B, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
+import { toRefs, computed } from 'vue';
 
 export default {
   name: 'AttendanceSheetAdditionModal',
@@ -44,36 +45,48 @@ export default {
     loading: { type: Boolean, default: false },
   },
   emits: ['hide', 'update:model-value', 'update:new-attendance-sheet', 'submit'],
-  data () {
+  setup (props, { emit }) {
+    const { newAttendanceSheet, course } = toRefs(props);
+
+    const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
+
+    const dateOptions = computed(() => {
+      const dateOptionsSet =
+      new Set(course.value.slots.map(date => CompaniDate(date.startDate).startOf('day').toISO()));
+
+      return [...dateOptionsSet].map(date => ({ value: date, label: CompaniDate(date).format(DD_MM_YYYY) }));
+    });
+
+    const hide = () => {
+      emit('hide');
+    };
+
+    const input = (event) => {
+      emit('update:model-value', event);
+    };
+
+    const submit = () => {
+      emit('submit');
+    };
+
+    const update = (event, prop) => {
+      emit('update:new-attendance-sheet', { ...newAttendanceSheet.value, [prop]: event });
+    };
+
     return {
+      // Data
       INTER_B2B,
       DOC_EXTENSIONS,
       IMAGE_EXTENSIONS,
+      // Computed
+      traineeOptions,
+      dateOptions,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
     };
-  },
-  computed: {
-    traineeOptions () {
-      return formatAndSortIdentityOptions(this.course.trainees);
-    },
-    dateOptions () {
-      const dateOptionsSet = new Set(this.course.slots.map(date => CompaniDate(date.startDate).startOf('day').toISO()));
-
-      return [...dateOptionsSet].map(date => ({ value: date, label: CompaniDate(date).format(DD_MM_YYYY) }));
-    },
-  },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, prop) {
-      this.$emit('update:new-attendance-sheet', { ...this.newAttendanceSheet, [prop]: event });
-    },
   },
 };
 </script>
