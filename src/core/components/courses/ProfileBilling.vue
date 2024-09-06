@@ -35,7 +35,7 @@
 <script>
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
@@ -335,7 +335,6 @@ export default {
     };
 
     const openBillCreationModal = () => {
-      newBill.value.mainFee.description = defaultDescription.value;
       if (course.value.type === INTRA) {
         if (v$.value.course.expectedBillsCount.$error) return NotifyWarning('Champ(s) invalide(s).');
 
@@ -363,6 +362,10 @@ export default {
         v$.value.companiesToBill.$reset();
       }
     };
+
+    watch(billCreationModal, () => {
+      if (billCreationModal.value) newBill.value.mainFee.description = defaultDescription.value;
+    });
 
     const created = async () => {
       await Promise.all([refreshCourseBills(), refreshPayers(), refreshBillingItems()]);
