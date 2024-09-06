@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Button from '@components/Button';
@@ -27,7 +28,6 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { REQUIRED_LABEL, HH_MM, DD_MM_YYYY } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
-import { toRefs, computed } from 'vue';
 
 export default {
   name: 'TraineeAttendanceCreationModal',
@@ -55,21 +55,15 @@ export default {
       value: s._id,
     })));
 
-    const hide = () => {
-      emit('hide');
-    };
+    const hide = () => emit('hide');
 
-    const input = (event) => {
-      emit('update:model-value', event);
-    };
+    const input = event => emit('update:model-value', event);
 
     const update = (event, path) => {
       emit('update:new-trainee-attendance', set({ ...newTraineeAttendance.value }, path, event));
     };
 
-    const submit = () => {
-      emit('submit');
-    };
+    const submit = () => emit('submit');
 
     return {
       // Data

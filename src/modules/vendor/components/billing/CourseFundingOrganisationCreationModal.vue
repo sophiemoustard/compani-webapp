@@ -16,13 +16,13 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
+import set from 'lodash/set';
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import set from 'lodash/set';
-import get from 'lodash/get';
 import { REQUIRED_LABEL } from '@data/constants';
-import { toRefs, computed } from 'vue';
 
 export default {
   name: 'CourseFundingOrganisationCreationModal',
@@ -46,21 +46,13 @@ export default {
         ? 'Adresse non valide'
         : REQUIRED_LABEL));
 
-    const hide = () => {
-      emit('hide');
-    };
+    const hide = () => emit('hide');
 
-    const input = (event) => {
-      emit('update:model-value', event);
-    };
+    const input = event => emit('update:model-value', event);
 
-    const submit = () => {
-      emit('submit');
-    };
+    const submit = () => emit('submit');
 
-    const update = (event, path) => {
-      emit('update:new-organisation', set({ ...newOrganisation.value }, path, event));
-    };
+    const update = (event, path) => emit('update:new-organisation', set({ ...newOrganisation.value }, path, event));
 
     return {
       // Computed

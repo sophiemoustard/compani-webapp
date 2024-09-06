@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
@@ -27,7 +28,6 @@ import Button from '@components/Button';
 import { INTER_B2B, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
-import { toRefs, computed } from 'vue';
 
 export default {
   name: 'AttendanceSheetAdditionModal',
@@ -51,27 +51,20 @@ export default {
     const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
 
     const dateOptions = computed(() => {
-      const dateOptionsSet =
-      new Set(course.value.slots.map(date => CompaniDate(date.startDate).startOf('day').toISO()));
+      const dateOptionsSet = new Set(
+        course.value.slots.map(date => CompaniDate(date.startDate).startOf('day').toISO())
+      );
 
       return [...dateOptionsSet].map(date => ({ value: date, label: CompaniDate(date).format(DD_MM_YYYY) }));
     });
 
-    const hide = () => {
-      emit('hide');
-    };
+    const hide = () => emit('hide');
 
-    const input = (event) => {
-      emit('update:model-value', event);
-    };
+    const input = event => emit('update:model-value', event);
 
-    const submit = () => {
-      emit('submit');
-    };
+    const submit = () => emit('submit');
 
-    const update = (event, prop) => {
-      emit('update:new-attendance-sheet', { ...newAttendanceSheet.value, [prop]: event });
-    };
+    const update = (event, prop) => emit('update:new-attendance-sheet', { ...newAttendanceSheet.value, [prop]: event });
 
     return {
       // Data

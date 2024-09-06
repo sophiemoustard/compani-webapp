@@ -13,8 +13,8 @@
 
 <script>
 import { defineAsyncComponent, computed, ref, watch } from 'vue';
-import { useStore } from 'vuex';
 import get from 'lodash/get';
+import { useStore } from 'vuex';
 import {
   TRANSITION,
   TITLE_TEXT_MEDIA,
@@ -90,13 +90,9 @@ export default {
       }
     });
 
-    const refreshCard = () => {
-      emit('refresh');
-    };
+    const refreshCard = () => emit('refresh');
 
-    watch(() => get(card.value, 'template'), (newValue) => {
-      currentTemplate.value = newValue;
-    });
+    watch(() => get(card.value, 'template'), (newValue) => { currentTemplate.value = newValue; });
 
     return {
       // Computed
