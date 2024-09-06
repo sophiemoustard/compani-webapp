@@ -27,6 +27,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { REQUIRED_LABEL, HH_MM, DD_MM_YYYY } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
+import { toRefs, computed } from 'vue';
 
 export default {
   name: 'TraineeAttendanceCreationModal',
@@ -46,32 +47,41 @@ export default {
     'ni-modal': Modal,
   },
   emits: ['hide', 'update:model-value', 'update:new-trainee-attendance', 'submit'],
-  data () {
-    return {
-      REQUIRED_LABEL,
+  setup (props, { emit }) {
+    const { course, newTraineeAttendance } = toRefs(props);
+
+    const slotsOptions = computed(() => course.value.slots.map(s => ({
+      label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)} - ${CompaniDate(s.endDate).format(HH_MM)}`,
+      value: s._id,
+    })));
+
+    const hide = () => {
+      emit('hide');
     };
-  },
-  computed: {
-    slotsOptions () {
-      return this.course.slots.map(s => ({
-        label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)} - ${CompaniDate(s.endDate).format(HH_MM)}`,
-        value: s._id,
-      }));
-    },
-  },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    update (event, path) {
-      this.$emit('update:new-trainee-attendance', set({ ...this.newTraineeAttendance }, path, event));
-    },
-    submit () {
-      this.$emit('submit');
-    },
+
+    const input = (event) => {
+      emit('update:model-value', event);
+    };
+
+    const update = (event, path) => {
+      emit('update:new-trainee-attendance', set({ ...newTraineeAttendance.value }, path, event));
+    };
+
+    const submit = () => {
+      emit('submit');
+    };
+
+    return {
+      // Data
+      REQUIRED_LABEL,
+      // Computed
+      slotsOptions,
+      // Methods
+      hide,
+      input,
+      update,
+      submit,
+    };
   },
 };
 </script>
