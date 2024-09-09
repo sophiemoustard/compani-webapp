@@ -17,9 +17,9 @@
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" @update:model-value="update($event.trim(), 'contact.phone')"
           :disable="disableUserInfo" />
-        <ni-select in-modal :options="companyOptions" :model-value="newUser.company"
-          @update:model-value="update($event.trim(), 'company')" caption="Structure" required-field
-          @blur="validations.company.$touch" :error="validations.company.$error" :disable="disableCompany" />
+        <company-select in-modal :company-options="companyOptions" :company="newUser.company"
+          @update="update($event.trim(), 'company')" required-field :validation="validations.company"
+          :disable="disableCompany" />
         <ni-date-input caption="Date de rattachement" :model-value="newUser.userCompanyStartDate" in-modal last
           @update:model-value="update($event, 'userCompanyStartDate')" required
           :error="validations.userCompanyStartDate.$error" />
@@ -35,7 +35,7 @@
 
 <script>
 import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 import Input from '@components/form/Input';
 import DateInput from '@components/form/DateInput';
 import Button from '@components/Button';
@@ -59,7 +59,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
-    'ni-select': Select,
+    'company-select': CompanySelect,
     'ni-button': Button,
     'ni-date-input': DateInput,
   },
