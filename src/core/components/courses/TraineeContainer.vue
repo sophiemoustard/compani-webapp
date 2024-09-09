@@ -185,7 +185,8 @@ export default {
       return '';
     });
 
-    const companyOptions = computed(() => uniqBy(Object.values(traineesCompanyOptions.value).flat(), 'value'));
+    const companyOptions = computed(() => uniqBy(Object.values(traineesCompanyOptions.value).flat(), 'value')
+      .sort((a, b) => a.label.localeCompare(b.label)));
 
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
