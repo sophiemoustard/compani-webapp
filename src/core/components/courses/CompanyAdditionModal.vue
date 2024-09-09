@@ -4,7 +4,8 @@
         Ajouter une <span class="text-weight-bold">structure</span>
       </template>
       <company-select in-modal :company="selectedCompany" @update="update" :company-options="companyOptions"
-        required-field :validation="validations" />
+        required-field :validation="validations" :display-no-options-slot="displayNoOptionsSlot"
+        @open-company-creation-modal="openCompanyCreationModal" />
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" label="Ajouter la structure" icon-right="add" color="white"
           :loading="loading" @click="submit" />
@@ -25,18 +26,20 @@ export default {
     selectedCompany: { type: String, default: '' },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    displayNoOptionsSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
     'company-select': CompanySelect,
     'ni-button': Button,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:selected-company'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:selected-company', 'open-company-creation-modal'],
   setup (_, { emit }) {
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
     const update = event => emit('update:selected-company', event);
+    const openCompanyCreationModal = () => emit('open-company-creation-modal');
 
     return {
       // Methods
@@ -44,6 +47,7 @@ export default {
       input,
       submit,
       update,
+      openCompanyCreationModal,
     };
   },
 };

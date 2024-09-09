@@ -8,7 +8,7 @@
     <ni-select in-modal caption="Chargé(e) d'accompagnement" :model-value="newCompany.salesRepresentative"
       @update:model-value="update($event, 'salesRepresentative')" :options="salesRepresentativeOptions" clearable />
     <ni-select in-modal caption="Société mère" :model-value="newCompany.holding" :options="holdingOptions" clearable
-      @update:model-value="update($event, 'holding')" />
+      @update:model-value="update($event, 'holding')" :disable="disableHolding" />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -33,6 +33,7 @@ export default {
     newCompany: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    disableHolding: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
