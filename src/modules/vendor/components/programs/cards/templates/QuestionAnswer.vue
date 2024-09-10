@@ -51,7 +51,7 @@ export default {
   emits: ['refresh'],
   mixins: [templateMixin, validationMixin],
   setup (props, { emit }) {
-    const { disableEdition, cardParent } = toRefs(props)
+    const { disableEdition, cardParent } = toRefs(props);
     const $store = useStore();
 
     const card = computed(() => $store.state.card.card);
@@ -71,20 +71,20 @@ export default {
 
     const refreshCard = () => { emit('refresh'); };
 
-    const { updateCard, saveTmp } = useCardTemplate(card, v$, refreshCard);
+    const { updateCard,
+      saveTmp,
+      updateTextAnswer,
+      getError,
+      validateAnswerDeletion,
+      addAnswer } = useCardTemplate(card, v$, refreshCard);
 
-    const disableAnswerCreation = computed(() => {
-      return card.value.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
-        disableEdition.value || cardParent.value.status === PUBLISHED;
-    });
+    const disableAnswerCreation = computed(() => card.value.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
+        disableEdition.value || cardParent.value.status === PUBLISHED);
 
+    const disableAnswerDeletion = computed(() => card.value.qcAnswers.length <= QUESTION_ANSWER_MIN_ANSWERS_COUNT ||
+        disableEdition.value || cardParent.value.status === PUBLISHED);
 
-    const disableAnswerDeletion = computed(() => {
-      return card.value.qcAnswers.length <= QUESTION_ANSWER_MIN_ANSWERS_COUNT ||
-        disableEdition.value || cardParent.value.status === PUBLISHED;
-    });
-
-    const answerIsRequired = (index) => index < QUESTION_ANSWER_MIN_ANSWERS_COUNT;
+    const answerIsRequired = index => index < QUESTION_ANSWER_MIN_ANSWERS_COUNT;
 
     const questionAnswerErrorMsg = (index) => {
       const validation = v$.value.card.qcAnswers.$each.$response.$errors[index].text;
@@ -106,6 +106,10 @@ export default {
       questionAnswerErrorMsg,
       updateCard,
       saveTmp,
+      updateTextAnswer,
+      getError,
+      validateAnswerDeletion,
+      addAnswer,
     };
   },
 };
