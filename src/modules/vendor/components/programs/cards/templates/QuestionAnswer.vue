@@ -36,6 +36,7 @@ import {
 } from '@data/constants';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'QuestionAnswer',
@@ -47,8 +48,9 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
   },
+  emits: ['refresh'],
   mixins: [templateMixin, validationMixin],
-  setup (props) {
+  setup (props, { emit }) {
     const { disableEdition, cardParent } = toRefs(props)
     const $store = useStore();
 
@@ -66,6 +68,10 @@ export default {
     }));
 
     const v$ = useVuelidate(rules, { card });
+
+    const refreshCard = () => { emit('refresh'); };
+
+    const { updateCard, saveTmp } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => {
       return card.value.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
@@ -98,6 +104,8 @@ export default {
       // Methods
       answerIsRequired,
       questionAnswerErrorMsg,
+      updateCard,
+      saveTmp,
     };
   },
 };
