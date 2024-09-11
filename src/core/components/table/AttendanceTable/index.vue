@@ -7,6 +7,10 @@
           <ni-indicator :indicator="traineesRegistered" />
           <div class="text-center">{{ formatQuantity('apprenant.e inscrit.e', traineesRegistered, 's', false) }}</div>
         </div>
+        <div class="column items-center">
+          <ni-indicator :indicator="presentTrainees" />
+          <div class="text-center">{{ formatQuantity('apprenant.e', presentTrainees, 's', false) }} ont émargé au moins une fois</div>
+        </div>
       </div>
     </q-card>
     <q-card flat>
@@ -178,6 +182,7 @@ export default {
       traineeAdditionModal,
       loading,
       newTraineeAttendance,
+      attendances,
       // Computed
       attendanceColumns,
       traineesWithAttendance,
@@ -201,6 +206,12 @@ export default {
       // Validations
       attendanceValidations,
     } = useAttendances(course, isClientInterface, canUpdate, loggedUser, modalLoading);
+
+    const presentTrainees = computed(() => {
+      const traineesWithAttendance = course.value.trainees.filter(trainee => attendances.value.some(a => a.trainee === trainee._id));
+
+      return traineesWithAttendance.length;
+    });
 
     const {
       // Data
@@ -265,6 +276,7 @@ export default {
       isLastSlotStarted,
       displayMetaInfos,
       traineesRegistered,
+      presentTrainees,
       // Methods
       get,
       attendanceCheckboxValue,
