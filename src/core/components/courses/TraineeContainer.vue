@@ -84,7 +84,6 @@ import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import get from 'lodash/get';
-import uniqBy from 'lodash/uniqBy';
 import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
@@ -185,8 +184,7 @@ export default {
       return '';
     });
 
-    const companyOptions = computed(() => uniqBy(Object.values(traineesCompanyOptions.value).flat(), 'value')
-      .sort((a, b) => a.label.localeCompare(b.label)));
+    const companyOptions = computed(() => formatAndSortCompanyOptions(course.value.companies));
 
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
