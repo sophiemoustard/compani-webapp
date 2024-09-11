@@ -38,7 +38,8 @@ export default {
     const columns = ref([{ name: 'answer', field: 'answer', align: 'left' }]);
     const pagination = ref({ page: 1, rowsPerPage: 10 });
     const rowsPerPageOptions = ref([10, 20, 50, 100]);
-    const formattedAnswers = ref(card.value.answers.map(a => ({ answer: a })));
+
+    const formattedAnswers = computed(() => card.value.answers.map(a => ({ answer: a })));
 
     const subtitle = computed(() => `${formatQuantity('réponse', card.value.answers.length)} à cette question ouverte`);
 
