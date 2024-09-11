@@ -4,12 +4,15 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
+
   name: 'Transition',
   props: {
     disableEdition: { type: Boolean, default: false },
@@ -19,12 +22,23 @@ export default {
   },
   mixins: [templateMixin],
   setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: { title: { required } },
+    }));
+
+    const v$ = useVuelidate(rules, { card });
+
+    return {
+      // Validations
+      v$,
+      // Data
+      card,
     };
   },
+
 };
 </script>
