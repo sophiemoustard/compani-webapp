@@ -34,8 +34,6 @@ import {
   QC_ANSWER_MAX_LENGTH,
   REQUIRED_LABEL,
 } from '@data/constants';
-import { validationMixin } from '@mixins/validationMixin';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
@@ -49,9 +47,9 @@ export default {
     'ni-button': Button,
   },
   emits: ['refresh'],
-  mixins: [templateMixin, validationMixin],
   setup (props, { emit }) {
     const { disableEdition, cardParent } = toRefs(props);
+
     const $store = useStore();
 
     const card = computed(() => $store.state.card.card);
@@ -71,12 +69,15 @@ export default {
 
     const refreshCard = () => { emit('refresh'); };
 
-    const { updateCard,
+    const {
+      updateCard,
       saveTmp,
       updateTextAnswer,
       getError,
       validateAnswerDeletion,
-      addAnswer } = useCardTemplate(card, v$, refreshCard);
+      addAnswer,
+      questionErrorMsg,
+    } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => card.value.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
         disableEdition.value || cardParent.value.status === PUBLISHED);
@@ -98,9 +99,12 @@ export default {
     return {
       // Validations
       v$,
+      // Data
+      card,
       // Computed
       disableAnswerCreation,
       disableAnswerDeletion,
+      questionErrorMsg,
       // Methods
       answerIsRequired,
       questionAnswerErrorMsg,
