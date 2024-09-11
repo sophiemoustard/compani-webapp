@@ -1,6 +1,14 @@
 <template>
   <div>
-    <span v-if="displayMetaInfos">displayMetaInfos</span>
+    <q-card v-if="displayMetaInfos" class="q-my-md" flat>
+      <p class="q-pa-md section-title text-weight-bold ">Données générales</p>
+      <div class="row justify-around">
+        <div class="column items-center">
+          <ni-e-learning-indicator :indicator="traineesRegistered" />
+          <div class="text-center">{{ formatQuantity('apprenant.e inscrit.e', traineesRegistered, 's', false) }}</div>
+        </div>
+      </div>
+    </q-card>
     <q-card flat>
       <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
         separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="attendancePagination">
@@ -104,10 +112,12 @@ import get from 'lodash/get';
 import { DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
 import { descendingSortBy } from '@helpers/dates/utils';
+import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
+import ELearningIndicator from '@components/courses/ELearningIndicator';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
@@ -122,6 +132,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
+    'ni-e-learning-indicator': ELearningIndicator,
   },
   setup (props) {
     const { course } = toRefs(props);
@@ -159,6 +170,8 @@ export default {
     const isRofOrVendorAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
 
     const displayMetaInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value && isLastSlotStarted);
+
+    const traineesRegistered = computed(() => course.value.trainees.length);
 
     const {
       // Data
@@ -251,6 +264,7 @@ export default {
       disableCheckbox,
       isLastSlotStarted,
       displayMetaInfos,
+      traineesRegistered,
       // Methods
       get,
       attendanceCheckboxValue,
@@ -268,6 +282,7 @@ export default {
       updateSlotCheckbox,
       getDelimiterClass,
       goToLearnerProfile,
+      formatQuantity,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,
