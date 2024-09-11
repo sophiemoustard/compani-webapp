@@ -82,7 +82,7 @@ import CompanyLinkRequests from '@api/CompanyLinkRequests';
 import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import ELearningIndicator from '@components/courses/ELearningIndicator';
+import Indicator from '@components/courses/Indicator';
 import LineChart from '@components/charts/LineChart';
 import CompanyLinkRequestCell from '@components/CompanyLinkRequestCell';
 import { DEFAULT_AVATAR, DAY, MONTH } from '@data/constants';
@@ -95,7 +95,7 @@ export default {
   components: {
     'ni-title-header': TitleHeader,
     'ni-date-range': DateRange,
-    'ni-e-learning-indicator': ELearningIndicator,
+    'ni-indicator': Indicator,
     'ni-line-chart': LineChart,
     'company-link-request-cell': CompanyLinkRequestCell,
   },

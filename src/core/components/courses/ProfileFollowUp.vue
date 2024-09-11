@@ -7,11 +7,11 @@
           <div class="text-weight-bold">Vue globale</div>
           <div class="self-center justify-center column learners-data">
             <div class="row items-center">
-              <ni-e-learning-indicator :indicator="traineesOnGoingCount" class="q-pr-sm" />
+              <ni-indicator :indicator="traineesOnGoingCount" class="q-pr-sm" />
               <div>{{ formatQuantity('apprenant',traineesOnGoingCount, 's', false) }} en cours</div>
             </div>
             <div class="row items-center">
-              <ni-e-learning-indicator :indicator="traineesFinishedCount" class="q-pr-sm" />
+              <ni-indicator :indicator="traineesFinishedCount" class="q-pr-sm" />
               <div>{{ formatQuantity('apprenant', traineesFinishedCount, 's', false) }} ayant terminé</div>
             </div>
           </div>
@@ -26,7 +26,7 @@
 
 <script>
 import { computed, ref, toRefs } from 'vue';
-import ELearningIndicator from '@components/courses/ELearningIndicator';
+import Indicator from '@components/courses/Indicator';
 import ElearningFollowUpTable from '@components/courses/ElearningFollowUpTable';
 import LineChart from '@components/charts/LineChart';
 import { useTraineeFollowUp } from '@composables/traineeFollowUp';
@@ -38,7 +38,7 @@ import { formatQuantity } from '@helpers/utils';
 export default {
   name: 'ProfileFollowUp',
   components: {
-    'ni-e-learning-indicator': ELearningIndicator,
+    'ni-indicator': Indicator,
     'elearning-follow-up-table': ElearningFollowUpTable,
     'ni-line-chart': LineChart,
   },

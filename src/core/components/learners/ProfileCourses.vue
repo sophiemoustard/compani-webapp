@@ -8,15 +8,15 @@
             <div class="text-weight-bold">Vue globale</div>
             <div class="self-center justify-center column learners-data">
               <div class="row items-center">
-                <ni-e-learning-indicator :indicator="eLearningCoursesOnGoing.length" class="q-pr-sm" />
+                <ni-indicator :indicator="eLearningCoursesOnGoing.length" class="q-pr-sm" />
                 <div>{{ eLearningCoursesOnGoingText }}</div>
               </div>
               <div class="row items-center">
-                <ni-e-learning-indicator :indicator="eLearningCoursesCompleted.length" class="q-pr-sm" />
+                <ni-indicator :indicator="eLearningCoursesCompleted.length" class="q-pr-sm" />
                 <div>{{ eLearningCoursesCompletedText }}</div>
               </div>
               <div class="row items-center">
-                <ni-e-learning-indicator :indicator="eLearningActivitiesCompleted.length" class="q-pr-sm" />
+                <ni-indicator :indicator="eLearningActivitiesCompleted.length" class="q-pr-sm" />
                 <div>{{ eLearningActivitesCompletedText }}</div>
               </div>
             </div>
@@ -140,7 +140,7 @@ import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
-import ELearningIndicator from '@components/courses/ELearningIndicator';
+import Indicator from '@components/courses/Indicator';
 import { useCourses } from '@composables/courses';
 import { useCharts } from '@composables/charts';
 
@@ -149,7 +149,7 @@ export default {
   components: {
     'ni-progress': Progress,
     'ni-expanding-table': ExpandingTable,
-    'ni-e-learning-indicator': ELearningIndicator,
+    'ni-indicator': Indicator,
     'ni-line-chart': LineChart,
   },
   setup () {

@@ -1,10 +1,10 @@
 <template>
-  <div class="elearning-indicator text-weight-bold text-copper-500">{{ indicator }}</div>
+  <div class="indicator text-weight-bold text-copper-500">{{ indicator }}</div>
 </template>
 
 <script>
 export default {
-  name: 'ELearningIndicator',
+  name: 'Indicator',
   props: {
     indicator: { type: Number, default: 0 },
   },
@@ -12,6 +12,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.elearning-indicator
+.indicator
   font-size: 36px
 </style>

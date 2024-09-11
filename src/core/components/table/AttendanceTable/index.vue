@@ -4,7 +4,7 @@
       <p class="q-pa-md section-title text-weight-bold ">Données générales</p>
       <div class="row justify-around">
         <div class="column items-center">
-          <ni-e-learning-indicator :indicator="traineesRegistered" />
+          <ni-indicator :indicator="traineesRegistered" />
           <div class="text-center">{{ formatQuantity('apprenant.e inscrit.e', traineesRegistered, 's', false) }}</div>
         </div>
       </div>
@@ -117,7 +117,7 @@ import CompaniDate from '@helpers/dates/companiDates';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
-import ELearningIndicator from '@components/courses/ELearningIndicator';
+import Indicator from '@components/courses/Indicator';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
@@ -132,7 +132,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
-    'ni-e-learning-indicator': ELearningIndicator,
+    'ni-indicator': Indicator,
   },
   setup (props) {
     const { course } = toRefs(props);
