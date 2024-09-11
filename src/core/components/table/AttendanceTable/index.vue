@@ -1,5 +1,6 @@
 <template>
   <div>
+    <span v-if="displayMetaInfos">displayMetaInfos</span>
     <q-card flat>
       <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
         separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="attendancePagination">
@@ -100,8 +101,10 @@ import { computed, toRefs, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
+import { descendingSortBy } from '@helpers/dates/utils';
+import CompaniDate from '@helpers/dates/companiDates';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
@@ -143,6 +146,19 @@ export default {
 
       return ability.can('access', 'trainee');
     });
+
+    const isLastSlotStarted = computed(() => {
+      if (course.value.slotsToPlan.length) return false;
+
+      const sortedSlots = [...course.value.slots].sort(descendingSortBy('startDate'));
+      return CompaniDate().isSameOrAfter(sortedSlots[0].startDate);
+    });
+
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+
+    const isRofOrVendorAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
+
+    const displayMetaInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value && isLastSlotStarted);
 
     const {
       // Data
@@ -233,6 +249,8 @@ export default {
       canUpdate,
       canAccessTrainee,
       disableCheckbox,
+      isLastSlotStarted,
+      displayMetaInfos,
       // Methods
       get,
       attendanceCheckboxValue,
