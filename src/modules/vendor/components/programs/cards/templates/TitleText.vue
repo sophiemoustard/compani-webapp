@@ -13,7 +13,7 @@ import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Input from '@components/form/Input';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'TitleText',
@@ -23,8 +23,8 @@ export default {
   components: {
     'ni-input': Input,
   },
-  mixins: [templateMixin],
-  setup () {
+  emits: ['refresh'],
+  setup (_, { emit }) {
     const $store = useStore();
 
     const card = computed(() => $store.state.card.card);
@@ -35,11 +35,18 @@ export default {
 
     const v$ = useVuelidate(rules, { card });
 
+    const refreshCard = () => { emit('refresh'); };
+
+    const { saveTmp, updateCard } = useCardTemplate(card, v$, refreshCard);
+
     return {
       // Validation
       v$,
       // Computed
       card,
+      // Methods
+      saveTmp,
+      updateCard,
     };
   },
 };
