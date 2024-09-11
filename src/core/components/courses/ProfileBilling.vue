@@ -35,17 +35,20 @@
 <script>
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import groupBy from 'lodash/groupBy';
+import uniq from 'lodash/uniq';
 import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import { minArrayLength, integerNumber, positiveNumber, strictPositiveNumber } from '@helpers/vuelidateCustomVal';
-import { composeCourseName } from '@helpers/courses';
-import { formatAndSortOptions, formatPrice, formatName, sortStrings } from '@helpers/utils';
-import { descendingSortBy } from '@helpers/dates/utils';
+import { composeCourseName, computeDuration } from '@helpers/courses';
+import { formatAndSortOptions, formatPrice, formatName, sortStrings, formatIdentity } from '@helpers/utils';
+import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
+import CompaniDate from '@helpers/dates/companiDates';
+import CompaniDuration from '@helpers/dates/companiDurations';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
 import CourseFundingOrganisations from '@api/CourseFundingOrganisations';
@@ -53,7 +56,17 @@ import CourseBills from '@api/CourseBills';
 import CourseBillingItems from '@api/CourseBillingItems';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { useCourseBilling } from '@composables/courseBills';
-import { LIST, COMPANY, REQUIRED_LABEL, INTRA, FUNDING_ORGANISATION, GROUP } from '@data/constants';
+import {
+  LIST,
+  COMPANY,
+  REQUIRED_LABEL,
+  INTRA,
+  FUNDING_ORGANISATION,
+  GROUP,
+  LONG_DURATION_H_MM,
+  E_LEARNING,
+  DD_MM_YYYY,
+} from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
 import CompaniesSelectionModal from 'src/modules/vendor/components/billing/CompaniesSelectionModal';
@@ -82,7 +95,7 @@ export default {
     const billCreationModal = ref(false);
     const companiesSelectionModal = ref(false);
     const billCreationLoading = ref(false);
-    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP } });
+    const newBill = ref({ payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP, description: '' } });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const removeNewBillDatas = ref(true);
     const course = computed(() => $store.state.course.course);
@@ -108,6 +121,28 @@ export default {
       },
       companiesToBill: { minArrayLength: minArrayLength(1) },
     }));
+
+    const defaultDescription = computed(() => {
+      const slots = [...course.value.slots].sort(ascendingSortBy('startDate'));
+
+      const liveSteps = course.value.subProgram.steps.filter(s => s.type !== E_LEARNING);
+      const liveDuration = CompaniDuration(computeDuration(liveSteps)).format(LONG_DURATION_H_MM);
+      const eLearningSteps = course.value.subProgram.steps.filter(s => s.type === E_LEARNING);
+      const eLearningDuration = CompaniDuration(computeDuration(eLearningSteps)).format(LONG_DURATION_H_MM);
+      const startDate = slots.length ? CompaniDate(slots[0].startDate).format(DD_MM_YYYY) : '(date à planifier)';
+      const endDate = course.value.slotsToPlan.length
+        ? '(date à planifier)'
+        : CompaniDate(slots[slots.length - 1].startDate).format(DD_MM_YYYY);
+      const location = uniq(slots.map(s => get(s, 'address.city'))).join(', ');
+      const trainer = formatIdentity(get(course.value, 'trainer.identity'), 'FL');
+
+      return 'Actions pour le développement des compétences \r\n'
+        + `Formation pour ${traineesQuantity.value} salarié-es\r\n`
+        + `Durée : ${liveDuration} présentiel${eLearningSteps.length ? `, ${eLearningDuration} eLearning` : ''}\r\n`
+        + `Dates : du ${startDate} au ${endDate} \r\n`
+        + `Lieu : ${location} \r\n`
+        + `Nom du formateur : ${trainer}`;
+    });
 
     const v$ = useVuelidate(rules, { course, newBill, companiesToBill });
 
@@ -293,7 +328,7 @@ export default {
 
     const resetBillCreationModal = () => {
       if (removeNewBillDatas.value) {
-        newBill.value = { payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP } };
+        newBill.value = { payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP, description: '' } };
         v$.value.newBill.$reset();
         resetCompaniesSelectionModal();
       }
@@ -327,6 +362,10 @@ export default {
         v$.value.companiesToBill.$reset();
       }
     };
+
+    watch(billCreationModal, () => {
+      if (billCreationModal.value) newBill.value.mainFee.description = defaultDescription.value;
+    });
 
     const created = async () => {
       await Promise.all([refreshCourseBills(), refreshPayers(), refreshBillingItems()]);
