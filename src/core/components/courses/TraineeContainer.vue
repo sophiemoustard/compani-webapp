@@ -84,12 +84,17 @@ import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import get from 'lodash/get';
+import uniqBy from 'lodash/uniqBy';
 import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import { TRAINER, INTRA } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
-import { formatAndSortUserOptions, formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
+import {
+  formatAndSortUserOptions,
+  formatAndSortIdentityOptions,
+  formatAndSortCompanyOptions,
+} from '@helpers/utils';
 import { getCurrentAndFutureCompanies } from '@helpers/userCompanies';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -180,7 +185,8 @@ export default {
       return '';
     });
 
-    const companyOptions = computed(() => formatAndSortOptions(course.value.companies, 'name'));
+    const companyOptions = computed(() => uniqBy(Object.values(traineesCompanyOptions.value).flat(), 'value')
+      .sort((a, b) => a.label.localeCompare(b.label)));
 
     const traineesGroupedByCompanies = computed(() => groupBy(course.value.trainees, t => t.registrationCompany));
 
@@ -194,9 +200,9 @@ export default {
       const options = {};
       for (let i = 0; i < potentialTrainees.value.length; i++) {
         const currentAndFutureCompanyList = getCurrentAndFutureCompanies(potentialTrainees.value[i].userCompanyList);
-        options[potentialTrainees.value[i]._id] = currentAndFutureCompanyList
-          .filter(company => courseCompanyIds.value.includes(company._id))
-          .map(company => ({ label: company.name, value: company._id }));
+        options[potentialTrainees.value[i]._id] = formatAndSortCompanyOptions(
+          currentAndFutureCompanyList.filter(company => courseCompanyIds.value.includes(company._id))
+        );
       }
       return options;
     });

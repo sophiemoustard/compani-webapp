@@ -12,8 +12,9 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
-import { mapState } from 'vuex';
+import { defineAsyncComponent, computed, ref, watch } from 'vue';
+import get from 'lodash/get';
+import { useStore } from 'vuex';
 import {
   TRANSITION,
   TITLE_TEXT_MEDIA,
@@ -36,27 +37,14 @@ export default {
     cardParent: { type: Object, default: () => ({}) },
   },
   emits: ['refresh'],
-  data () {
-    return {
-      TRANSITION,
-      TITLE_TEXT_MEDIA,
-      TITLE_TEXT,
-      TEXT_MEDIA,
-      FLASHCARD,
-      FILL_THE_GAPS,
-      ORDER_THE_SEQUENCE,
-      SINGLE_CHOICE_QUESTION,
-      MULTIPLE_CHOICE_QUESTION,
-      SURVEY,
-      OPEN_QUESTION,
-      QUESTION_ANSWER,
-      currentTemplate: '',
-    };
-  },
-  computed: {
-    ...mapState('card', ['card']),
-    templateInstance () {
-      switch (this.currentTemplate) {
+  setup (_, { emit }) {
+    const $store = useStore();
+    const currentTemplate = ref('');
+
+    const card = computed(() => $store.state.card.card);
+
+    const templateInstance = computed(() => {
+      switch (currentTemplate.value) {
         case TRANSITION:
           return defineAsyncComponent(
             () => import('src/modules/vendor/components/programs/cards/templates/Transition')
@@ -100,17 +88,19 @@ export default {
         default:
           return null;
       }
-    },
-  },
-  watch: {
-    'card.template': function (value) {
-      this.currentTemplate = value;
-    },
-  },
-  methods: {
-    refreshCard () {
-      this.$emit('refresh');
-    },
+    });
+
+    const refreshCard = () => emit('refresh');
+
+    watch(() => get(card.value, 'template'), (newValue) => { currentTemplate.value = newValue; });
+
+    return {
+      // Computed
+      card,
+      templateInstance,
+      // Methods
+      refreshCard,
+    };
   },
 };
 </script>

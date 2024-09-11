@@ -16,11 +16,12 @@
 </template>
 
 <script>
+import { toRefs, computed } from 'vue';
+import set from 'lodash/set';
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import set from 'lodash/set';
-import get from 'lodash/get';
 import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
@@ -37,26 +38,31 @@ export default {
     'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-organisation'],
-  computed: {
-    addressErrorMessage () {
-      return get(this.validations, 'address.fullAddress.frAddress.$response') === false
+  setup (props, { emit }) {
+    const { newOrganisation, validations } = toRefs(props);
+
+    const addressErrorMessage = computed(() => (
+      get(validations.value, 'address.fullAddress.frAddress.$response') === false
         ? 'Adresse non valide'
-        : REQUIRED_LABEL;
-    },
-  },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (event, path) {
-      this.$emit('update:new-organisation', set({ ...this.newOrganisation }, path, event));
-    },
+        : REQUIRED_LABEL));
+
+    const hide = () => emit('hide');
+
+    const input = event => emit('update:model-value', event);
+
+    const submit = () => emit('submit');
+
+    const update = (event, path) => emit('update:new-organisation', set({ ...newOrganisation.value }, path, event));
+
+    return {
+      // Computed
+      addressErrorMessage,
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

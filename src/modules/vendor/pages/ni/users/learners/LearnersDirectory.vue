@@ -16,7 +16,6 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="learnerCreationModal = true" :disable="tableLoading" />
 
-    <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
       @next-step="nextStepLearnerCreationModal" @hide="resetLearnerCreationModal" :company-options="companyOptions"
       :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
@@ -26,15 +25,15 @@
 
 <script>
 import { useMeta } from 'quasar';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Companies from '@api/Companies';
-import { formatAndSortOptions } from '@helpers/utils';
-import { userMixin } from '@mixins/userMixin';
-import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
+import { formatAndSortCompanyOptions } from '@helpers/utils';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { useLearnersCreation } from '@composables/learnersCreation';
+import { useLearnerDirectory } from '@composables/learnerDirectory';
+import { DIRECTORY } from '@data/constants';
 
 export default {
   name: 'LearnersDirectory',
@@ -46,6 +45,7 @@ export default {
   setup () {
     const metaInfo = { title: 'Répertoire apprenants' };
     useMeta(metaInfo);
+    const companyOptions = ref([]);
 
     const path = { name: 'ni users learners info', params: 'learnerId' };
 
@@ -68,7 +68,25 @@ export default {
       resetLearnerCreationModal,
     } = useLearnersCreation(refresh, false, true);
 
+    const { pagination, columns, getAvatar } = useLearnerDirectory();
+
+    const refreshCompanies = async () => {
+      try {
+        const companies = await Companies.list({ action: DIRECTORY });
+        companyOptions.value = formatAndSortCompanyOptions(companies, 'name');
+      } catch (e) {
+        console.error(e);
+        companyOptions.value = [];
+      }
+    };
+
+    const created = async () => {
+      await refreshCompanies();
+    };
+
     onMounted(async () => { await refresh(); });
+
+    created();
 
     return {
       // Data
@@ -80,6 +98,9 @@ export default {
       learnerCreationModalLoading,
       learnerCreationModal,
       path,
+      pagination,
+      columns,
+      companyOptions,
       // Computed
       filteredLearners,
       // Validations
@@ -89,27 +110,8 @@ export default {
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
       resetLearnerCreationModal,
+      getAvatar,
     };
-  },
-  mixins: [userMixin, learnerDirectoryMixin],
-  data () {
-    return {
-      companyOptions: [],
-    };
-  },
-  async created () {
-    await Promise.all([this.refreshCompanies()]);
-  },
-  methods: {
-    async refreshCompanies () {
-      try {
-        const companies = await Companies.list();
-        this.companyOptions = formatAndSortOptions(companies, 'name');
-      } catch (e) {
-        console.error(e);
-        this.companyOptions = [];
-      }
-    },
   },
 };
 </script>

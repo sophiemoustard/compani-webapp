@@ -5,8 +5,8 @@
     <div class="filters-container">
       <ni-select :options="holdingFilterOptions" :model-value="selectedHolding" clearable
         @update:model-value="updateSelectedHolding" />
-      <ni-select :options="companyFilterOptions" :model-value="selectedCompany" clearable
-        @update:model-value="updateSelectedCompany" />
+      <company-select :options="companyFilterOptions" :company="selectedCompany" clearable
+        @update="updateSelectedCompany" caption="" />
       <ni-select :options="trainerFilterOptions" :model-value="selectedTrainer" clearable
         @update:model-value="updateSelectedTrainer" />
       <ni-select :options="programFilterOptions" :model-value="selectedProgram" clearable
@@ -59,6 +59,7 @@ import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
 import DateInput from '@components/form/DateInput';
 import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -70,6 +71,7 @@ import {
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
   OPERATIONS,
+  DIRECTORY,
 } from '@data/constants';
 import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 import { minDate, maxDate, strictPositiveNumber, integerNumber, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -80,6 +82,7 @@ export default {
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-select': Select,
+    'company-select': CompanySelect,
     'course-creation-modal': CourseCreationModal,
     'ni-trello': Trello,
     'ni-date-input': DateInput,
@@ -126,7 +129,7 @@ export default {
 
     const refreshCompanies = async () => {
       try {
-        companies.value = await Companies.list();
+        companies.value = await Companies.list({ action: DIRECTORY });
       } catch (e) {
         console.error(e);
         companies.value = [];
@@ -358,7 +361,7 @@ export default {
   },
   beforeRouteEnter (_, from, next) {
     if (!['ni management blended courses info', 'ni users trainers info'].includes(from.name)) {
-      store.dispatch('course/resetFilters', { isClientInterface: false });
+      store.dispatch('course/resetFilters', { isClientInterfaceOrTrainer: false });
     }
 
     next();

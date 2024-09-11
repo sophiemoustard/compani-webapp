@@ -7,9 +7,9 @@
     <q-select dense borderless :model-value="model" :bg-color="bgColor" :options="selectableOptions" @filter="onFilter"
       :disable="disable" @focus="onFocus" @blur="onBlur" @update:model-value="onInput" behavior="menu" use-input
       :class="{ 'no-border': noBorder, 'borders': inModal && !noBorder , 'no-bottom': noError }" :error="error"
-      :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" :error-message="errorMessage"
-      :multiple="multiple">
+      :display-value="displayedValue" :hide-selected="!multiple" fill-input :input-debounce="0" :emit-value="!multiple"
+      ref="selectInput" :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon"
+      :error-message="errorMessage" :multiple="multiple" :use-chips="multiple">
       <template #append>
         <ni-button v-if="modelValue && !disable && clearable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import { ref, computed, toRefs } from 'vue';
+import get from 'lodash/get';
 import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
 import escapeRegExp from 'lodash/escapeRegExp';
@@ -58,61 +60,75 @@ export default {
   components: {
     'ni-button': Button,
   },
-  data () {
-    return {
-      selectableOptions: [],
+  setup (props, { emit }) {
+    const { options, modelValue, blurOnSelection, multiple } = toRefs(props);
+    const selectableOptions = ref([]);
+    const selectInput = ref(null);
+
+    const displayedValue = computed(() => (multiple.value
+      ? model.value.map(opt => opt.label).join(', ')
+      : get(model.value, 'label') || ''));
+
+    const model = computed(() => (multiple.value
+      ? options.value.filter(opt => modelValue.value.includes(opt.value))
+      : options.value.find(opt => opt.value === modelValue.value) || null));
+
+    const formattedOptions = computed(() => options.value.map(opt => ({
+      ...opt,
+      filters: [
+        formatStringForFiltering(opt.label),
+        ...(opt.additionalFilters
+          ? opt.additionalFilters.map(additionalFilter => formatStringForFiltering(additionalFilter))
+          : []
+        ),
+      ],
+    })));
+
+    const onFocus = () => { emit('focus'); };
+
+    const onBlur = () => { emit('blur'); };
+
+    const onInput = (val) => {
+      const value = multiple.value ? val.map(v => v.value) : val;
+      emit('update:model-value', value);
+
+      if (blurOnSelection.value) selectInput.value.blur();
     };
-  },
-  computed: {
-    displayedValue () {
-      const option = this.options.find(opt => opt.value === this.modelValue);
-      return option ? option.label : '';
-    },
-    model () {
-      return this.options.find(opt => opt.value === this.modelValue) || null;
-    },
-    formattedOptions () {
-      return this.options.map(opt => ({
-        ...opt,
-        filters: [
-          this.formatStringForFiltering(opt.label),
-          ...(opt.additionalFilters
-            ? opt.additionalFilters.map(additionalFilter => this.formatStringForFiltering(additionalFilter))
-            : []
-          ),
-        ],
-      }));
-    },
-  },
-  methods: {
-    onFocus () {
-      this.$emit('focus');
-    },
-    onBlur () {
-      this.$emit('blur');
-    },
-    onInput (val) {
-      this.$emit('update:model-value', val);
-      if (this.blurOnSelection) this.$refs.selectInput.blur();
-    },
-    formatStringForFiltering (str) {
-      return escapeRegExp(removeDiacritics(str.toLowerCase()));
-    },
-    onFilter (val, update) {
+
+    const formatStringForFiltering = str => escapeRegExp(removeDiacritics(str.toLowerCase()));
+
+    const onFilter = (val, update) => {
       update(() => {
         if (val) {
-          const formattedValue = this.formatStringForFiltering(val);
-          this.selectableOptions = this.formattedOptions
+          const formattedValue = formatStringForFiltering(val);
+          selectableOptions.value = formattedOptions.value
             .filter(opt => opt.filters.some(word => word.includes(formattedValue)));
         } else {
-          this.selectableOptions = this.options;
+          selectableOptions.value = options.value;
         }
       });
-    },
-    resetValue ($event) {
-      this.onInput('');
+    };
+
+    const resetValue = ($event) => {
+      onInput(multiple.value ? [] : '');
       $event.preventDefault();
-    },
+    };
+
+    return {
+      // Data
+      selectableOptions,
+      selectInput,
+      // Computed
+      displayedValue,
+      model,
+      formattedOptions,
+      // Methods
+      onFocus,
+      onBlur,
+      onInput,
+      onFilter,
+      resetValue,
+    };
   },
 };
 </script>
@@ -125,6 +141,15 @@ export default {
 .select-icon
   margin: 0
 
-:deep(.q-field__native), :deep(.q-field__prefix), :deep(.q-field__suffix), :deep(.q-field__input)
-  color: $copper-grey-900
+:deep(.q-field__inner)
+  height: auto
+:deep(.q-chip)
+  background-color: $peach-200
+  padding: 0 8px
+  min-height: 26px
+  color: white
+:deep(.q-chip__icon)
+  color: white
+  opacity: 1
+  padding-left: 8px
 </style>

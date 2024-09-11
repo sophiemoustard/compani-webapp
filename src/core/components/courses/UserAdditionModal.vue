@@ -24,9 +24,9 @@
             @click="openUserCreationModal" />
         </template>
       </ni-select>
-      <ni-select v-if="displayCompanySelect" in-modal :model-value="newUserRegistration.company"
-        @update:model-value="update($event, 'company')" caption="Structure" :options="companyOptionsForUser"
-        required-field :error="validations.company.$error" :disable="companyOptionsForUser.length < 2" />
+      <company-select v-if="displayCompanySelect" in-modal :company="newUserRegistration.company"
+        @update="update($event, 'company')" :company-options="companyOptionsForUser"
+        required-field :validation="validations.company" :disable="companyOptionsForUser.length < 2" />
       <q-checkbox v-if="displayIsCertified" in-modal :model-value="newUserRegistration.isCertified" class="q-mb-lg"
         label="Le stagiaire passe la certification" @update:model-value="update($event, 'isCertified')" dense />
       <template #footer>
@@ -42,6 +42,7 @@ import set from 'lodash/set';
 import { computed, toRefs } from 'vue';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 import Button from '@components/Button';
 
 export default {
@@ -61,6 +62,7 @@ export default {
   components: {
     'ni-modal': Modal,
     'ni-select': Select,
+    'company-select': CompanySelect,
     'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-user-registration', 'open-user-creation-modal'],

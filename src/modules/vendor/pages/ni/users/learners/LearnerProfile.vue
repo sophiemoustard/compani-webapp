@@ -38,8 +38,8 @@ import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompanyDetachModal from '@components/learners/CompanyDetachModal';
-import { formatIdentity, formatAndSortOptions } from '@helpers/utils';
-import { ROLE_TRANSLATION, DAY } from '@data/constants';
+import { formatIdentity, formatAndSortCompanyOptions } from '@helpers/utils';
+import { ROLE_TRANSLATION, DAY, DIRECTORY } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CompanyLinkModal from 'src/modules/vendor/components/companies/CompanyLinkModal';
 import { useCompanyDetachment } from '@composables/companyDetachment';
@@ -113,9 +113,9 @@ export default {
 
     const openCompanyLinkModal = async () => {
       try {
-        const companies = await Companies.list();
+        const companies = await Companies.list({ action: DIRECTORY });
 
-        companyOptions.value = formatAndSortOptions(companies, 'name');
+        companyOptions.value = formatAndSortCompanyOptions(companies);
         companyLinkModal.value = true;
       } catch (e) {
         console.error(e);

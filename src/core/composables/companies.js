@@ -10,18 +10,8 @@ export const useCompanies = (v$) => {
     return '';
   });
 
-  const tradeNameError = (validation) => {
-    if (get(validation.tradeName, 'validTradeName.$response') === false) {
-      return 'Doit contenir maximum 11 caractères, uniquement alphanumériques.';
-    }
-
-    return '';
-  };
-
   return {
     // Computed
     addressError,
-    // Methods
-    tradeNameError,
   };
 };

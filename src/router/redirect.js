@@ -10,9 +10,7 @@ export const logOutAndRedirectToLogin = async (params) => {
   store.dispatch('course/resetCourse');
   store.dispatch('program/resetProgram');
   store.dispatch('company/resetCompany');
-  store.dispatch('customer/resetCustomer');
   store.dispatch('userProfile/resetUserProfile');
-  store.dispatch('planning/resetPlanning');
 
   if (router.currentRoute.value.path === '/login') return;
   if (params && params.to) return router.replace({ path: '/login', query: { from: params.to.fullPath } });

@@ -10,14 +10,6 @@ export default {
       console.error(e.response);
     }
   },
-  async listWithSectorHistories (params = null) {
-    try {
-      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/sector-histories`, { params });
-      return usersRaw.data.data.users;
-    } catch (e) {
-      console.error(e.response);
-    }
-  },
   async learnerList (params = null) {
     const learners = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/learners`, { params });
     return learners.data.data.users;

@@ -9,20 +9,12 @@
           </q-item-label>
         </div>
         <q-separator />
-        <template v-for="route of routes">
-          <template v-if="isHelper">
-            <ni-menu-item class="customer-menu-size" :name="route.name" :icon="route.icon" :label="route.label"
-              :key="route.name" />
-            <q-separator :key="`separator-${route.name}`" />
-          </template>
-          <template v-else>
-            <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label"
-              :key="route.ref">
+        <template v-for="route of routes" :key="route.ref">
+            <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label">
               <ni-menu-item v-for="item of route.children" :name="item.name" :icon="item.icon" :label="item.label"
                 :key="item.name" :params="item.params" />
             </q-expansion-item>
-          <q-separator :key="`separator-${route.ref}`" />
-          </template>
+          <q-separator />
         </template>
         <ni-side-menu-footer :label="footerLabel" :user-id="loggedUser._id" :interface-type="interfaceType" />
       </q-list>

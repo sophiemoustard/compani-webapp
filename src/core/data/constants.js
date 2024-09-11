@@ -1,14 +1,15 @@
 export const TOKEN_EXPIRE_DAY = 1; // in days
 
+export const OTHER = 'other';
+
 // MEDIA
 export const BLUE_TEXT_LOGO = 'https://storage.googleapis.com/compani-main/icons/compani_texte_bleu.png';
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
 export const VIDEO_EXTENSIONS = 'video/*';
 export const AUDIO_EXTENSIONS = 'audio/*';
-export const HTML_EXTENSIONS = '.html';
 
-// CUSTOMER
+// CIVILITY
 export const MR = 'mr';
 export const MRS = 'mrs';
 export const CIVILITY_OPTIONS = [
@@ -17,150 +18,19 @@ export const CIVILITY_OPTIONS = [
   { label: 'Monsieur / Madame', value: 'couple' },
 ];
 
-// CUSTOMER FUNDING
-export const MONTHLY = 'monthly';
-export const ONCE = 'once';
-export const FIXED = 'fixed';
-export const HOURLY = 'hourly';
-
-export const FUNDING_FREQ_OPTIONS = [
-  { label: 'Mensuelle', value: MONTHLY },
-  { label: 'Une seule fois', value: ONCE },
-];
-export const NATURE_OPTIONS = [
-  { label: 'Horaire', value: HOURLY },
-  { label: 'Forfaitaire', value: FIXED },
-];
-
-export const SURCHARGES = {
-  saturday: 'Samedi',
-  sunday: 'Dimanche',
-  publicHoliday: 'Jours fériés',
-  twentyFifthOfDecember: '25 décembre',
-  firstOfMay: '1er mai',
-  firstOfJanuary: '1er janvier',
-  evening: 'Soirée',
-  custom: 'Personnalisée',
-};
-
-// CUSTOMERS SITUATION
-export const UNKNOWN = 'unknown';
-export const HOME = 'home';
-export const NURSING_HOME = 'nursing_home';
-export const HOSPITALIZED = 'hospitalized';
-export const DECEASED = 'deceased';
-
-// CUSTOMER ABSENCE
-export const CUSTOMER_ABSENCE = 'customer_absence';
-export const LEAVE = 'leave';
-export const HOSPITALIZATION = 'hospitalization';
-export const OTHER = 'other';
-export const CUSTOMER_ABSENCE_TYPES = [
-  { label: 'Congés', value: LEAVE },
-  { label: 'Hospitalisation', value: HOSPITALIZATION },
-  { label: 'Autre', value: OTHER },
-];
-
 // CONTRACTS
 export const CONTRACT = 'contract';
 
 // EVENTS
-export const INTERVENTION = 'intervention';
 export const ABSENCE = 'absence';
-export const UNAVAILABILITY = 'unavailability';
-export const INTERNAL_HOUR = 'internal_hour';
-export const PAID_LEAVE = 'leave';
-export const UNPAID_LEAVE = 'unpaid_leave';
-export const MATERNITY_LEAVE = 'maternity_leave';
-export const PATERNITY_LEAVE = 'paternity_leave';
-export const PARENTAL_LEAVE = 'parental_leave';
-export const WORK_ACCIDENT = 'work_accident';
-export const TRANSPORT_ACCIDENT = 'transport_accident';
-export const ILLNESS = 'illness';
-export const UNJUSTIFIED = 'unjustified_absence';
-export const CESSATION_OF_WORK_CHILD = 'cessation_of_work_child';
-export const CESSATION_OF_WORK_RISK = 'cessation_of_work_risk';
-export const ABSENCE_TYPES = [
-  { label: 'Congé', value: PAID_LEAVE },
-  { label: 'Congé sans solde', value: UNPAID_LEAVE },
-  { label: 'Congé maternité', value: MATERNITY_LEAVE },
-  { label: 'Congé paternité', value: PATERNITY_LEAVE },
-  { label: 'Congé parental', value: PARENTAL_LEAVE },
-  { label: 'Accident du travail', value: WORK_ACCIDENT },
-  { label: 'Accident de trajet', value: TRANSPORT_ACCIDENT },
-  { label: 'Maladie', value: ILLNESS },
-  { label: 'Absence injustifiée', value: UNJUSTIFIED },
-  { label: 'Arrêt de travail - garde d’enfant', value: CESSATION_OF_WORK_CHILD },
-  { label: 'Arrêt de travail - salarié(e) à risque', value: CESSATION_OF_WORK_RISK },
-  { label: 'Autre', value: OTHER },
-];
+
 export const EDITION = 'edition';
 export const DELETION = 'deletion';
-export const CANCELLATION = 'cancellation';
 export const CREATION = 'creation';
-export const DAILY = 'daily';
-export const HALF_DAILY = 'half_daily';
-export const ABSENCE_NATURES = [
-  { label: 'Journalière', value: DAILY },
-  { label: 'Demi-journalière', value: HALF_DAILY },
-  { label: 'Horaire', value: HOURLY },
-];
-export const EVENT_TYPES = [
-  { label: 'Intervention', value: INTERVENTION },
-  { label: 'Interne', value: INTERNAL_HOUR },
-  { label: 'Absence', value: ABSENCE },
-  { label: 'Indispo', value: UNAVAILABILITY },
-];
-
-export const CANCEL_EVENT = 'cancel_event';
-export const RESTORE_EVENT = 'restore_event';
-
-// THIRD PARTY PAYERS
-export const BILLING_INDIRECT = 'indirect';
-export const BILLING_DIRECT = 'direct';
-export const APA = 'APA';
-export const PCH = 'PCH';
-export const AM = 'AM';
-export const TPP_TYPE_OPTIONS = [
-  { label: 'APA', value: APA },
-  { label: 'Aide ménagère', value: AM },
-  { label: 'PCH', value: PCH },
-];
 
 // AVATAR
 export const DEFAULT_AVATAR = 'https://storage.googleapis.com/compani-main/default_avatar.png';
 export const UNKNOWN_AVATAR = 'https://storage.googleapis.com/compani-main/unknown_avatar.png';
-
-// REPETITION FREQUENCY
-export const NEVER = 'never';
-export const EVERY_DAY = 'every_day';
-export const EVERY_WEEK_DAY = 'every_week_day';
-export const EVERY_WEEK = 'every_week';
-export const EVERY_TWO_WEEKS = 'every_two_weeks';
-
-export const REPETITION_FREQUENCIES = [
-  { label: 'Jamais', value: NEVER },
-  { label: 'Tous les jours', value: EVERY_DAY },
-  { label: 'Tous les jours de la semaine (lundi au vendredi)', value: EVERY_WEEK_DAY },
-];
-
-// CANCELLATION OPTIONS
-export const INVOICED_AND_PAID = 'invoiced_and_paid';
-export const INVOICED_AND_NOT_PAID = 'invoiced_and_not_paid';
-export const NOT_INVOICED_AND_NOT_PAID = 'not_invoiced_and_not_paid';
-export const CANCELLATION_OPTIONS = [
-  { label: 'Facturée au client & payée à l\'auxiliaire', value: INVOICED_AND_PAID },
-  { label: 'Facturée & non payée', value: INVOICED_AND_NOT_PAID },
-  { label: 'Non facturée & non payée', value: NOT_INVOICED_AND_NOT_PAID },
-];
-
-// CANCELLATION REASONS
-export const CUSTOMER_INITIATIVE = 'customer_initiative';
-export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
-export const CANCELLATION_REASONS = [
-  { label: 'Client', value: CUSTOMER_INITIATIVE },
-  { label: 'Intervenant(e)', value: AUXILIARY_INITIATIVE },
-];
 
 // INTERFACE
 export const VENDOR = 'vendor';
@@ -207,56 +77,15 @@ export const ROLES_TRANSLATION = {
 export const ERP = 'erp';
 
 // PLANNING
-export const THREE_DAYS_VIEW = '3days';
-export const WEEK_VIEW = 'week';
-export const PLANNING = 'planning';
-export const AGENDA = 'agenda';
 export const PLANNING_VIEW_START_HOUR = 7;
 export const PLANNING_VIEW_END_HOUR = 22;
-export const PLANNING_PERCENTAGE_BY_MINUTES = 100 / ((PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60);
-export const STAFFING_VIEW_START_HOUR = 8;
-export const STAFFING_VIEW_END_HOUR = 20;
-export const STAFFING_PERCENTAGE_BY_MINUTES = 100 / ((STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60);
 export const SECTOR = 'sector';
-export const PERSON = 'person';
-export const MAX_WEEKLY_OCCUPATION_LEVEL = 48;
-export const LOW = 'low';
-export const HIGH = 'high';
-export const EXTREME = 'extreme';
-
-// EVENT HISTORY
-export const EVENT_CREATION = 'event_creation';
-export const EVENT_DELETION = 'event_deletion';
-export const EVENT_UPDATE = 'event_update';
-export const TIME_STAMP_CANCELLATION = 'time_stamp_cancellation';
-
-// INDICATORS
-export const PREV_MONTH_STATS = 'prev_month_stat';
-export const MONTH_STATS = 'month_stat';
-
-// TRANSORT
-export const PUBLIC_TRANSPORT = 'public';
-export const PRIVATE_TRANSPORT = 'private';
-export const COMPANY_TRANSPORT = 'company_transport';
-export const TRANSPORT_OPTIONS = [
-  { label: 'Abonnement transports en commun', value: PUBLIC_TRANSPORT },
-  { label: 'Voiture personnelle', value: PRIVATE_TRANSPORT },
-  { label: 'Aucun', value: 'none' },
-];
-export const EVENT_TRANSPORT_OPTIONS = [
-  { label: 'Pas de mode de transport spécifique', value: '' },
-  { label: 'Transports en commun / À pied', value: PUBLIC_TRANSPORT },
-  { label: 'Véhicule personnel', value: PRIVATE_TRANSPORT },
-  { label: 'Véhicule d\'entreprise', value: COMPANY_TRANSPORT },
-];
 
 export const REQUIRED_LABEL = 'Champ requis';
 export const INVALID_NUMBER = 'Nombre invalide';
 
 // BILLING
-export const TWO_WEEKS = 'two_weeks';
 export const BILL = 'bill';
-export const CREDIT_NOTE = 'creditNote';
 
 // PAYMENTS
 export const DIRECT_DEBIT = 'direct_debit';
@@ -280,26 +109,11 @@ export const PAYMENT_NATURE_OPTIONS = [
   { label: 'Remboursement', value: REFUND },
 ];
 
-// FUNDINGS
-export const THIRD_PARTY_PAYER = 'thirdPartyPayer';
-
 // PAY
 export const PAY = 'pay';
 
-// ORIGINS
-export const COMPANI = 'compani';
-export const THIRD_PARTY = 'third_party';
-export const OGUST = 'ogust';
-
-export const WEEKS_PER_MONTH = (52 / 12);
-
 // COMPANY
 export const COMPANY = 'company';
-export const ASSOCIATION = 'association';
-export const COMPANY_TYPES = [
-  { label: 'Association', value: ASSOCIATION },
-  { label: 'Entreprise', value: COMPANY },
-];
 
 // SMS
 export const CONVOCATION = 'convocation';
@@ -391,10 +205,8 @@ export const CARD_TEMPLATES = [
   { label: 'Question\t&\tRéponse', value: QUESTION_ANSWER, type: QUESTIONNAIRE },
 ];
 
-export const SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT = 3;
-export const SINGLE_CHOICE_QUESTION_MIN_FALSY_ANSWERS_COUNT = 1;
-export const MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT = 4;
-export const MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT = 2;
+export const CHOICE_QUESTION_MAX_ANSWERS_COUNT = 4;
+export const CHOICE_QUESTION_MIN_ANSWERS_COUNT = 2;
 export const FILL_THE_GAPS_MIN_ANSWERS_COUNT = 2;
 export const FILL_THE_GAPS_MAX_ANSWERS_COUNT = 6;
 export const ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT = 2;
@@ -505,57 +317,6 @@ export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
 ];
 
-// CUSTOMER STATUS
-export const ACTIVATED = 'activated';
-export const STOPPED = 'stopped';
-export const ARCHIVED = 'archived';
-export const STATUS_TYPES = { [ACTIVATED]: 'Actif', [STOPPED]: 'Arrêté', [ARCHIVED]: 'Archivé' };
-
-// CUSTOMER STOP REASONS
-export const SUPPORT_STOPPING_REASONS_OPTIONS = [
-  { label: 'Qualité', value: 'quality' },
-  { label: 'Hospitalisation', value: 'hospitalization' },
-  { label: 'Décès', value: 'death' },
-  { label: 'Départ en EPHAD', value: 'ephad_departure' },
-  { label: 'Amélioration de l\'état', value: 'condition_improvement' },
-  { label: 'Autre', value: 'other' },
-];
-
-// TIMESTAMPING
-export const MANUAL_TIME_STAMPING = 'manual_time_stamping';
-export const QR_CODE_TIME_STAMPING = 'qr_code_time_stamping';
-export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING, QR_CODE_TIME_STAMPING];
-export const QRCODE_MISSING = 'qrcode_missing';
-export const QRCODE_ERROR = 'qrcode_error';
-export const CAMERA_ERROR = 'camera_error';
-export const MANUAL_TIME_STAMPING_REASONS = {
-  [QRCODE_MISSING]: 'Je n\'ai pas accès au code barre',
-  [QRCODE_ERROR]: 'Le code barre ne fonctionne pas',
-  [CAMERA_ERROR]: 'Mon appareil photo ne fonctionne pas',
-};
-
-// NOTE
-export const NOTE_CREATION = 'note_creation';
-export const NOTE_UPDATE = 'note_update';
-
-// BILLING ITEMS
-export const MANUAL = 'manual';
-export const AUTOMATIC = 'automatic';
-export const PER_INTERVENTION = 'per_intervention';
-export const BILLING_ITEMS_TYPE_OPTIONS = [
-  { label: 'Manuel', value: MANUAL },
-  { label: 'Par intervention', value: PER_INTERVENTION },
-];
-
-// CREDIT_NOTES
-export const EVENTS = 'events';
-export const BILLING_ITEMS = 'billing_items';
-export const CREDIT_NOTE_TYPE_OPTIONS = [
-  { label: 'Souscription', value: SUBSCRIPTION },
-  { label: 'Intervention', value: EVENTS },
-  { label: 'Article manuel', value: BILLING_ITEMS },
-];
-
 // COURSE_BILLS
 export const LIST = 'list';
 export const BALANCE = 'balance';
@@ -568,19 +329,7 @@ export const WITHOUT_TRAINER = 'without_trainer';
 export const WITHOUT_SALES_REPRESENTATIVE = 'without_sales_representative';
 
 // END_TO_END TESTS
-export const BILLING = 'billing';
 export const AUTHENTICATION = 'authentication';
-
-// DAYS
-export const DAYS = {
-  0: 'Lundi',
-  1: 'Mardi',
-  2: 'Mercredi',
-  3: 'Jeudi',
-  4: 'Vendredi',
-  5: 'Samedi',
-  6: 'Dimanche',
-};
 
 // DATE AND DURATION UNITS
 export const YEAR = 'year';
@@ -636,3 +385,8 @@ export const CREATION_METHOD_OPTIONS = [
   { label: 'Téléverser', value: UPLOAD },
   { label: 'Générer', value: GENERATION },
 ];
+
+// Exports
+export const YES = 'Oui';
+export const NO = 'Non';
+export const NO_DATA = 'Aucune donnée';

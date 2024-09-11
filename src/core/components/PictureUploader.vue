@@ -39,6 +39,8 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import CustomImg from '@components/form/CustomImg';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
+import { computed, toRefs, ref } from 'vue';
+import { useQuasar } from 'quasar';
 
 export default {
   name: 'PictureUploader',
@@ -51,92 +53,83 @@ export default {
     'ni-custom-img': CustomImg,
     'ni-button': Button,
   },
-  data () {
-    return {
-      image: '',
-      displayCropper: false,
-      loadingImage: false,
-      fileChosen: false,
-      DEFAULT_AVATAR,
-    };
-  },
-  computed: {
-    hasPicture () {
-      return !!this.pictureLink;
-    },
-    pictureLink () {
-      return get(this.user, 'picture.link') || null;
-    },
-    noDiacriticLastname () {
-      return removeDiacritics(get(this.user, 'identity.lastname') || '');
-    },
-    noDiacriticFirstname () {
-      return removeDiacritics(get(this.user, 'identity.firstname') || '');
-    },
-  },
-  created () {
-    this.image = get(this.user, 'picture.link') || '';
-  },
-  methods: {
-    openFileSelection () {
-      this.$refs.file.click();
-    },
-    loadImage (event) {
+  setup (props) {
+    const { user, refreshPicture } = toRefs(props);
+    const $q = useQuasar();
+    const file = ref(null);
+    const cropper = ref(null);
+    const image = ref('');
+    const displayCropper = ref(false);
+    const loadingImage = ref(false);
+
+    const hasPicture = computed(() => !!pictureLink.value);
+
+    const pictureLink = computed(() => get(user.value, 'picture.link') || null);
+
+    const noDiacriticLastname = computed(() => removeDiacritics(get(user.value, 'identity.lastname') || ''));
+
+    const noDiacriticFirstname = computed(() => removeDiacritics(get(user.value, 'identity.firstname') || ''));
+
+    const openFileSelection = () => { if (file.value) file.value.click(); };
+
+    const loadImage = (event) => {
       const { files } = event.target;
 
       if (files && files[0]) {
-        if (this.image) URL.revokeObjectURL(this.image);
+        if (image.value) URL.revokeObjectURL(image.value);
 
         const blob = URL.createObjectURL(files[0]);
 
         const reader = new FileReader();
-        reader.onload = (e) => { this.image = blob; };
+        reader.onload = (e) => { image.value = blob; };
         reader.readAsArrayBuffer(files[0]);
-        this.displayCropper = true;
+        displayCropper.value = true;
       }
-    },
-    rotate (angle) {
-      this.$refs.cropper.rotate(angle);
-    },
-    async uploadImage () {
-      const { canvas } = this.$refs.cropper.getResult();
+    };
+
+    const rotate = angle => cropper.value.rotate(angle);
+
+    const uploadImage = async () => {
+      const { canvas } = cropper.value.getResult();
       if (canvas) {
-        await canvas.toBlob(
-          async (blob) => {
-            this.loadingImage = true;
+        await canvas.toBlob(async (blob) => {
+          loadingImage.value = true;
 
-            const data = new FormData();
-            data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
-            data.append('file', blob);
+          const data = new FormData();
+          data.append(
+            'fileName',
+            `photo_${noDiacriticFirstname.value}_${noDiacriticLastname.value}`
+          );
+          data.append('file', blob);
 
-            await Users.uploadImage(this.user._id, data);
-            await this.refreshPicture();
+          await Users.uploadImage(user.value._id, data);
+          await refreshPicture.value();
 
-            this.displayCropper = false;
-            this.loadingImage = false;
-          },
-          'image/jpeg'
-        );
+          displayCropper.value = false;
+          loadingImage.value = false;
+        }, 'image/jpeg');
       }
-    },
-    validateImageDeletion () {
-      this.$q.dialog({
+    };
+
+    const validateImageDeletion = () => {
+      $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir supprimer votre photo&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',
       })
-        .onOk(this.deleteImage)
+        .onOk(deleteImage)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async deleteImage () {
-      try {
-        if (get(this.user, 'picture.publicId')) {
-          await Users.deleteImage(this.user._id);
-          this.image = '';
+    };
 
-          await this.refreshPicture();
+    const deleteImage = async () => {
+      try {
+        if (get(user.value, 'picture.publicId')) {
+          await Users.deleteImage(user.value._id);
+          image.value = '';
+
+          await refreshPicture.value();
 
           NotifyPositive('Photo supprimée');
         } else NotifyNegative('Erreur lors de la suppression de la photo.');
@@ -144,12 +137,34 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la photo.');
       }
-    },
-    pictureDlLink (link) {
-      return link
-        ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`)
-        : '';
-    },
+    };
+
+    const pictureDlLink = link => (link
+      ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${noDiacriticFirstname.value}_${noDiacriticLastname.value}`)
+      : '');
+
+    const created = () => {
+      image.value = get(user.value, 'picture.link') || '';
+    };
+
+    created();
+
+    return {
+      DEFAULT_AVATAR,
+      pictureLink,
+      hasPicture,
+      openFileSelection,
+      loadImage,
+      rotate,
+      uploadImage,
+      validateImageDeletion,
+      pictureDlLink,
+      image,
+      file,
+      cropper,
+      displayCropper,
+      loadingImage,
+    };
   },
 };
 </script>

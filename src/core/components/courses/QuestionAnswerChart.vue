@@ -15,30 +15,34 @@
 </template>
 
 <script>
-import { roundFrenchPercentage } from '@helpers/utils';
+import { toRefs, computed } from 'vue';
+import { formatPercentage } from '@helpers/utils';
 
 export default {
   name: 'QuestionAnswerChart',
   props: {
     card: { type: Object, default: () => ({}) },
   },
-  computed: {
-    subtitle () {
-      return `${this.card.answers.length} réponses à cette question à choix
-        ${this.card.isQuestionAnswerMultipleChoiced ? 'multiple' : 'simple'}`;
-    },
-    lines () {
-      return this.card.qcAnswers.map((pa) => {
-        const total = this.card.answers.filter(a => a === pa._id).length;
+  setup (props) {
+    const { card } = toRefs(props);
 
-        return { title: pa.text, total, percentage: total / this.card.answers.length || 0 };
-      });
-    },
-  },
-  methods: {
-    formatPercentage (number) {
-      return roundFrenchPercentage(number * 100, 0);
-    },
+    const subtitle = computed(() => `Question à choix
+      ${card.value.isQuestionAnswerMultipleChoiced ? 'multiple' : 'simple'} : ${card.value.traineeCount} répondants
+      pour ${card.value.historyCount} réponses`);
+
+    const lines = computed(() => card.value.qcAnswers.map((pa) => {
+      const total = card.value.answers.filter(a => a === pa._id).length;
+
+      return { title: pa.text, total, percentage: total / card.value.answers.length || 0 };
+    }));
+
+    return {
+      // Computed
+      subtitle,
+      lines,
+      // Methods
+      formatPercentage,
+    };
   },
 };
 </script>

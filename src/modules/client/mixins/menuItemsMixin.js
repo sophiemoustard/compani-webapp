@@ -7,7 +7,6 @@ import {
   PLANNING_REFERENT,
   AUXILIARY_ROLES,
   COACH_ROLES,
-  HELPER,
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 
@@ -16,7 +15,6 @@ export const menuItemsMixin = {
     return {
       coachActiveRoutes: {
         courses: { open: false },
-        planning: { open: false },
         customers: { open: false },
         teams: { open: false },
         billing: { open: false },
@@ -31,20 +29,11 @@ export const menuItemsMixin = {
     clientRole () {
       return get(this.loggedUser, 'role.client.name');
     },
-    customer () {
-      return this.isHelper ? this.$store.getters['customer/getCustomer'] : null;
-    },
-    hasBillingAssistance () {
-      return get(this.loggedUser, 'company.billingAssistance');
-    },
     isAdmin () {
       return CLIENT_ADMIN === this.clientRole;
     },
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
-    },
-    isHelper () {
-      return this.clientRole === HELPER;
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.clientRole);
@@ -56,39 +45,18 @@ export const menuItemsMixin = {
       let routes = [];
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
 
-      if (this.isHelper) routes = this.customerRoutes;
-      else if (this.isCoach) routes = this.coachRoutes;
+      if (this.isCoach) routes = this.coachRoutes;
 
       return routes
-        .map(r => (this.isHelper ? r : { ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
+        .map(r => ({ ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
         .filter(r => (r.children ? r.children.length : ability.can('read', r.name)));
     },
     activeRoutes () {
-      if (this.isHelper) return null;
       if (this.isCoach) return this.coachActiveRoutes;
       return {};
     },
-    customerRoutes () {
-      return [
-        { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
-      ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs);
-    },
     coachRoutes () {
       return [
-        {
-          ref: 'planning',
-          label: 'Planning',
-          children: [
-            { name: 'ni planning auxiliaries', icon: 'date_range', label: 'Auxiliaires' },
-            { name: 'ni planning customers', icon: 'date_range', label: 'Bénéficiaires' },
-          ],
-        }, {
-          ref: 'customers',
-          label: 'Bénéficiaires',
-          children: [
-            { name: 'ni customers', icon: 'contacts', label: 'Répertoire bénéficiaires' },
-          ],
-        },
         {
           ref: 'courses',
           label: 'Formations',
@@ -105,13 +73,7 @@ export const menuItemsMixin = {
           ref: 'billing',
           label: 'Facturation',
           children: [
-            { name: 'ni billing to bill', icon: 'credit_card', label: 'À facturer' },
-            { name: 'ni billing manual bills', icon: 'receipt', label: 'Factures manuelles' },
-            { name: 'ni billing automatic bills', icon: 'picture_as_pdf', label: 'Liste des factures' },
-            { name: 'ni billing credit note', icon: 'mdi-credit-card-refund', label: 'Avoirs' },
             { name: 'ni billing clients balances', icon: 'mdi-scale-balance', label: 'Balances clients' },
-            { name: 'ni billing tpp bill slips', icon: 'view_headline', label: 'Bordereaux tiers payeurs' },
-            { name: 'ni billing debits archive', icon: 'mdi-archive', label: 'Archive prélèvements' },
           ],
         },
         {
@@ -127,7 +89,6 @@ export const menuItemsMixin = {
           label: 'Configuration',
           children: [
             { name: 'ni config company', icon: 'settings', label: 'Configuration générale' },
-            { name: 'ni config customers', icon: 'house', label: 'Configuration bénéficiaires' },
             { name: 'ni config coach', icon: 'people', label: 'Coachs' },
           ],
         },

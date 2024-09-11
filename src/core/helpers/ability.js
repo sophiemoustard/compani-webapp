@@ -6,9 +6,6 @@ import {
   VENDOR_ADMIN,
   TRAINING_ORGANISATION_MANAGER,
   COACH,
-  AUXILIARY,
-  PLANNING_REFERENT,
-  ERP,
   TRAINER,
   INTRA,
   INTRA_HOLDING,
@@ -25,7 +22,7 @@ const getRoleAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 
 export const defineAbilitiesFor = (user) => {
   const isVendorInterface = /\/ad\//.test(router.currentRoute.value.path);
-  const { role, company, _id, sector } = user;
+  const { role, company } = user;
   const clientRole = get(role, 'client.name');
   const vendorRole = get(role, 'vendor.name');
   const holdingRole = get(role, 'holding.name');
@@ -46,15 +43,6 @@ export const defineAbilitiesFor = (user) => {
     can('update', 'course_trainee_follow_up');
   }
 
-  if (companySubscriptions.includes(ERP)) {
-    if (clientRole === CLIENT_ADMIN) can('update', 'erp_config');
-
-    if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('update', 'Events');
-    if (clientRole === AUXILIARY) {
-      can('update', 'Events', { auxiliaryId: { $eq: _id } });
-      can('update', 'Events', { sectorId: { $eq: sector } });
-    }
-  }
   return createMongoAbility(rules);
 };
 

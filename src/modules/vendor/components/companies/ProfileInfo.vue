@@ -10,19 +10,9 @@
       <div class="row gutter-profile">
         <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
           @blur="trimAndUpdateCompany('name')" :error="v$.company.name.$error" />
-        <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
-          @blur="trimAndUpdateCompany('tradeName')" :error="v$.company.tradeName.$error"
-          :error-message="tradeNameError(v$.company)" />
         <ni-search-address v-model="company.address" :error-message="addressError" @blur="updateCompany('address')"
             @focus="saveTmp('address.fullAddress')" :error="v$.company.address.$error" />
-        <ni-select v-model="company.type" caption="Type" :options="companyTypeOptions" @focus="saveTmp('type')"
-          @blur="trimAndUpdateCompany('type')" />
       </div>
-    </div>
-    <div class="q-mb-xl">
-      <p class="text-weight-bold">Abonnements</p>
-      <q-checkbox dense v-model="company.subscriptions.erp" color="primary" label="ERP"
-        @update:model-value="updateCompany('subscriptions.erp')" />
     </div>
     <ni-coach-list :company="company" />
   </div>
@@ -44,16 +34,15 @@ import Companies from '@api/Companies';
 import Users from '@api/Users';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
-import Select from '@components/form/Select';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import InterlocutorCell from '@components/courses/InterlocutorCell';
 import InterlocutorModal from '@components/courses/InterlocutorModal';
-import { validTradeName, frAddress } from '@helpers/vuelidateCustomVal';
+import { frAddress } from '@helpers/vuelidateCustomVal';
 import { formatAndSortUserOptions } from '@helpers/utils';
 import { useValidations } from '@composables/validations';
 import { useCompanies } from '@composables/companies';
-import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, EDITION, COMPANY_TYPES } from '@data/constants';
+import { TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, EDITION } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -64,13 +53,11 @@ export default {
     'ni-input': Input,
     'ni-coach-list': CoachList,
     'ni-search-address': SearchAddress,
-    'ni-select': Select,
     'ni-interlocutor-cell': InterlocutorCell,
     'ni-interlocutor-modal': InterlocutorModal,
   },
   setup (props) {
     const { profileId } = toRefs(props);
-    const companyTypeOptions = COMPANY_TYPES;
     const tmpInput = ref('');
     const salesRepresentativeOptions = ref([]);
     const tmpSalesRepresentative = ref({});
@@ -84,8 +71,6 @@ export default {
     const companyRules = computed(() => ({
       company: {
         name: { required },
-        type: { required },
-        tradeName: { validTradeName },
         address: {
           zipCode: { required },
           street: { required },
@@ -100,7 +85,7 @@ export default {
 
     const { waitForValidation } = useValidations();
 
-    const { tradeNameError, addressError } = useCompanies(v$.value);
+    const { addressError } = useCompanies(v$.value);
 
     const saveTmp = (path) => { tmpInput.value = get(company.value, path); };
 
@@ -186,7 +171,6 @@ export default {
     return {
       // Data
       tmpInput,
-      companyTypeOptions,
       salesRepresentativeOptions,
       salesRepresentativeModal,
       salesRepresentativeModalLabel,
@@ -201,7 +185,6 @@ export default {
       saveTmp,
       trimAndUpdateCompany,
       updateCompany,
-      tradeNameError,
       refreshSalesRepresentativeOptions,
       openSalesRepresentativeModal,
       resetSalesRepresentative,

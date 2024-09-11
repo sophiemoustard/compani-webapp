@@ -2,14 +2,16 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import sortedUniqBy from 'lodash/sortedUniqBy';
+import get from 'lodash/get';
 import CompaniDate from '@helpers/dates/companiDates';
-import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { formatAndSortIdentityOptions, formatAndSortCompanyOptions } from '@helpers/utils';
 import {
   WITHOUT_TRAINER,
   ARCHIVED_COURSES,
   COURSE_TYPES,
   UNARCHIVED_COURSES,
   WITHOUT_SALES_REPRESENTATIVE,
+  TRAINER,
 } from '@data/constants';
 
 export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions = []) => {
@@ -19,6 +21,8 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
   const isVendorInterface = /\/ad\//.test($router.currentRoute.value.path);
 
   const loggedUser = computed(() => $store.state.main.loggedUser);
+
+  const loggedUserIsTrainer = computed(() => get(loggedUser.value, 'role.vendor.name') === TRAINER);
 
   const courses = computed(() => [...activeCourses.value, ...archivedCourses.value]);
 
@@ -67,8 +71,7 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
   const companyFilterOptions = computed(() => {
     const companies = courses.value
       .flatMap((course) => {
-        if (isVendorInterface) return course.companies.map(company => ({ label: company.name, value: company._id }));
-
+        if (isVendorInterface) return formatAndSortCompanyOptions(course.companies);
         if (loggedUser.value.role.holding) {
           return course.companies
             .filter(company => loggedUser.value.holding.companies.includes(company._id))
@@ -146,7 +149,8 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
   };
 
   const resetFilters = () => {
-    $store.dispatch('course/resetFilters', { isClientInterface: !isVendorInterface });
+    const isClientInterfaceOrTrainer = !isVendorInterface || loggedUserIsTrainer.value;
+    $store.dispatch('course/resetFilters', { isClientInterfaceOrTrainer });
   };
 
   /* SALES REPRESENTATIVE */

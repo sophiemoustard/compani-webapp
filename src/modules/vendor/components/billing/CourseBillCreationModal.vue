@@ -21,6 +21,8 @@
     <ni-input in-modal caption="Quantité" :error="validations.mainFee.count.$error" type="number"
       :model-value="newBill.mainFee.count" @blur="validations.mainFee.count.$touch" required-field
       :error-message="errorMessages.count" @update:model-value="update($event, 'mainFee.count')" />
+    <ni-input in-modal caption="Description" type="textarea" :model-value="newBill.mainFee.description"
+      @update:model-value="update($event, 'mainFee.description')" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Créer la facture" icon-right="add" color="white"
         :loading="loading" @click="submit" />

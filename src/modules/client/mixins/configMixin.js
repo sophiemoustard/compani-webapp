@@ -3,17 +3,12 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import { extend } from '@helpers/utils';
 import Companies from '@api/Companies';
-import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { REQUIRED_LABEL } from '@data/constants';
 
 export const configMixin = {
   data () {
     const companyModel = {
       address: { fullAddress: '' },
-      legalRepresentative: { firstname: '', lastname: '', position: '' },
-      customersConfig: { templates: {}, billFooter: '' },
-      rhConfig: { templates: {} },
       billingRepresentative: {},
     };
 
@@ -69,44 +64,6 @@ export const configMixin = {
         this.tmpBillingRepresentative = {};
         this.billingRepresentativeModalLoading = false;
       }
-    },
-    nbrError (path, validations = this.v$) {
-      const val = get(validations, path);
-      if (get(val, 'required.$response') === false) return REQUIRED_LABEL;
-      if (get(val, 'positiveNumber.$response') === false || get(val, 'numeric.$response') === false ||
-        get(val, 'maxValue.$response') === false) return 'Nombre non valide';
-      if (get(val, 'fractionDigits.$response') === false) return 'Décimales non valides';
-
-      return '';
-    },
-    // Documents
-    async deleteDocument (driveId, type, key) {
-      try {
-        await GoogleDrive.removeFileById({ id: driveId });
-
-        const payload = { [key]: { templates: { [type]: { driveId: null, link: null } } } };
-        await Companies.updateById(this.company._id, payload);
-
-        await this.refreshCompany();
-        NotifyPositive('Document supprimé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document.');
-      }
-    },
-    validateDocumentDeletion (driveId, type, key) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document&nbsp;?',
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.deleteDocument(driveId, type, key))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async documentUploaded () {
-      NotifyPositive('Document envoyé');
-      await this.refreshCompany();
     },
   },
 };
