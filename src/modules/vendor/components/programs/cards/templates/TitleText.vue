@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Input from '@components/form/Input';
@@ -18,16 +20,26 @@ export default {
   props: {
     disableEdition: { type: Boolean, default: false },
   },
-  setup () {
-    return { v$: useVuelidate() };
-  },
   components: {
     'ni-input': Input,
   },
   mixins: [templateMixin],
-  validations () {
-    return {
+  setup () {
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: { title: { required }, text: { required } },
+    }));
+
+    const v$ = useVuelidate(rules, { card });
+
+    return {
+      // Validation
+      v$,
+      // Computed
+      card,
     };
   },
 };
