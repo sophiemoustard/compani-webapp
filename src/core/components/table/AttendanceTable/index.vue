@@ -9,7 +9,9 @@
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="presentTrainees" />
-          <span class="text-center">{{ formatQuantity('apprenant.e inscrit.e', presentTrainees, 's', false) }} ont émargé<br />au moins une fois</span>
+          <span class="text-center">
+            {{ formatQuantity('apprenant.e inscrit.e', presentTrainees, 's', false) }} ont émargé<br>au moins une fois
+          </span>
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="absenceRate" />
@@ -17,10 +19,14 @@
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="realAbsenceRate" />
-          <span class="text-center">de taux d'absence réel <br />(sans compter les apprenant.es <br />toujours absent.es)</span>
+          <span class="text-center">
+            de taux d'absence réel <br>(sans compter les apprenant.es <br>toujours absent.es)
+          </span>
         </div>
       </div>
-      <span class="meta-infos-footer">* Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits</span>
+      <span class="meta-infos-footer">
+        * Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits
+      </span>
     </q-card>
     <q-card flat>
       <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
@@ -127,7 +133,7 @@ import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
 import { descendingSortBy } from '@helpers/dates/utils';
 import { formatQuantity, formatPercentage } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
-import { add, multiply, subtract, divide } from '@helpers/numbers';
+import { multiply, subtract, divide } from '@helpers/numbers';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
@@ -217,13 +223,12 @@ export default {
       attendanceValidations,
     } = useAttendances(course, isClientInterface, canUpdate, loggedUser, modalLoading);
 
-    const attendancesForRegisteredTrainees = computed(() => attendances.value.filter(a => course.value.trainees.some(t => t._id === a.trainee)));
+    const attendancesForRegisteredTrainees = computed(() => attendances.value
+      .filter(a => course.value.trainees.some(t => t._id === a.trainee)));
 
-    const presentTrainees = computed(() => {
-      const traineesWithAttendance = course.value.trainees.filter(trainee => attendancesForRegisteredTrainees.value.some(a => a.trainee === trainee._id));
-
-      return traineesWithAttendance.length;
-    });
+    const presentTrainees = computed(() => course.value.trainees
+      .filter(trainee => attendancesForRegisteredTrainees.value.some(a => a.trainee === trainee._id))
+      .length);
 
     const absenceRate = computed(() => {
       const numerator = attendancesForRegisteredTrainees.value.length;
@@ -235,7 +240,7 @@ export default {
     const realAbsenceRate = computed(() => {
       const numerator = attendancesForRegisteredTrainees.value.length;
       const denominator = multiply(course.value.slots.length, presentTrainees.value);
-    
+
       return formatPercentage(subtract(1, divide(numerator, denominator)));
     });
 
