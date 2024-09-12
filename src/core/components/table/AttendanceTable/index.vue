@@ -6,12 +6,15 @@
         <div class="meta-infos">
           <div class="column items-center">
             <ni-indicator :indicator="registeredTrainees" />
-            <span class="text-center">{{ formatQuantity('apprenant.e inscrit.e', registeredTrainees, 's', false) }}</span>
+            <span class="text-center">
+              {{ formatQuantity('apprenant.e inscrit.e', registeredTrainees, 's', false) }}
+            </span>
           </div>
           <div class="column items-center">
             <ni-indicator :indicator="presentTrainees" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', presentTrainees, 's', false) }} ont émargé<br>au moins une fois
+              {{ formatQuantity('apprenant.e inscrit.e', presentTrainees, 's', false) }}
+              ayant émargé<br>au moins une fois
             </span>
           </div>
           <div class="column items-center">
@@ -20,14 +23,17 @@
           </div>
           <div class="column items-center">
             <ni-indicator :indicator="realAbsenceRate" is-percentage />
-            <span class="text-center">
-              de taux d'absence réel <br>(sans compter les apprenant.es <br>toujours absent.es)
-            </span>
+            <span class="text-center">de taux d'absence réel **</span>
           </div>
         </div>
-        <span class="meta-infos-footer">
-          * Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits
-        </span>
+        <div class="column q-my-md">
+          <span class="meta-infos-footer">
+            * Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits<br>
+          </span>
+          <span class="meta-infos-footer">
+            ** Taux d'absence réel : ne prend en compte que les apprenant.es inscrit.es ayant émargé au moins une fois
+          </span>
+        </div>
       </q-card>
     </div>
     <q-card flat>
@@ -135,7 +141,7 @@ import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
 import { descendingSortBy } from '@helpers/dates/utils';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
-import { multiply, subtract, divide, toFixedToFloat } from '@helpers/numbers';
+import { multiply, subtract, divide } from '@helpers/numbers';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
@@ -403,5 +409,5 @@ export default {
 .meta-infos-footer
   font-size: 12px
   font-style: italic
-  padding: 16px
+  padding: 4px 16px
 </style>
