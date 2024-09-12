@@ -5,15 +5,15 @@
         <p class="q-pa-md section-title text-weight-bold ">Données générales *</p>
         <div class="meta-infos">
           <div class="column items-center">
-            <ni-indicator :indicator="registeredTrainees" />
+            <ni-indicator :indicator="registeredTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', registeredTrainees, 's', false) }}
+              {{ formatQuantity('apprenant.e inscrit.e', registeredTraineesCount, 's', false) }}
             </span>
           </div>
           <div class="column items-center">
-            <ni-indicator :indicator="presentTrainees" />
+            <ni-indicator :indicator="presentTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', presentTrainees, 's', false) }}
+              {{ formatQuantity('apprenant.e inscrit.e', presentTraineesCount, 's', false) }}
               ayant émargé<br>au moins une fois
             </span>
           </div>
@@ -197,9 +197,10 @@ export default {
 
     const isRofOrVendorAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
 
-    const displayMetaInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value && isLastSlotStarted.value);
+    const registeredTraineesCount = computed(() => course.value.trainees.length);
 
-    const registeredTrainees = computed(() => course.value.trainees.length);
+    const displayMetaInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value && isLastSlotStarted.value &&
+      registeredTraineesCount.value);
 
     const {
       // Data
@@ -234,22 +235,22 @@ export default {
     const attendancesForRegisteredTrainees = computed(() => attendances.value
       .filter(a => course.value.trainees.some(t => t._id === a.trainee)));
 
-    const presentTrainees = computed(() => course.value.trainees
+    const presentTraineesCount = computed(() => course.value.trainees
       .filter(trainee => attendancesForRegisteredTrainees.value.some(a => a.trainee === trainee._id))
       .length);
 
     const absenceRate = computed(() => {
       const numerator = attendancesForRegisteredTrainees.value.length;
-      const denominator = multiply(course.value.slots.length, registeredTrainees.value);
-      const res = multiply(subtract(1, divide(numerator, denominator)), 100);
+      const denominator = multiply(course.value.slots.length, registeredTraineesCount.value);
+      const res = denominator > 0 ? multiply(subtract(1, divide(numerator, denominator)), 100) : 100;
 
       return Math.round(res);
     });
 
     const realAbsenceRate = computed(() => {
       const numerator = attendancesForRegisteredTrainees.value.length;
-      const denominator = multiply(course.value.slots.length, presentTrainees.value);
-      const res = multiply(subtract(1, divide(numerator, denominator)), 100);
+      const denominator = multiply(course.value.slots.length, presentTraineesCount.value);
+      const res = denominator > 0 ? multiply(subtract(1, divide(numerator, denominator)), 100) : 100;
 
       return Math.round(res);
     });
@@ -314,13 +315,11 @@ export default {
       canUpdate,
       canAccessTrainee,
       disableCheckbox,
-      isLastSlotStarted,
       displayMetaInfos,
-      registeredTrainees,
-      presentTrainees,
+      registeredTraineesCount,
+      presentTraineesCount,
       absenceRate,
       realAbsenceRate,
-      attendances,
       // Methods
       get,
       attendanceCheckboxValue,
