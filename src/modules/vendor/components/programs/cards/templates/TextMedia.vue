@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Input from '@components/form/Input';
@@ -26,7 +28,25 @@ export default {
     cardParent: { type: Object, default: () => ({}) },
   },
   setup () {
-    return { v$: useVuelidate() };
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
+      card: {
+        text: { required },
+        media: { publicId: { required }, link: { required }, type: { required } },
+      },
+    }));
+
+    const v$ = useVuelidate(rules, { card });
+
+    return {
+      // Validation
+      v$,
+      // Computed
+      card,
+    };
   },
   components: {
     'ni-input': Input,
@@ -34,14 +54,6 @@ export default {
     'ni-option-group': OptionGroup,
   },
   mixins: [templateMixin],
-  validations () {
-    return {
-      card: {
-        text: { required },
-        media: { publicId: { required }, link: { required }, type: { required } },
-      },
-    };
-  },
 };
 </script>
 
