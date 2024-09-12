@@ -4,8 +4,8 @@
       <p class="q-pa-md section-title text-weight-bold ">Données générales *</p>
       <div class="row justify-around">
         <div class="column items-center">
-          <ni-indicator :indicator="traineesRegistered" />
-          <span class="text-center">{{ formatQuantity('apprenant.e inscrit.e', traineesRegistered, 's', false) }}</span>
+          <ni-indicator :indicator="registeredTrainees" />
+          <span class="text-center">{{ formatQuantity('apprenant.e inscrit.e', registeredTrainees, 's', false) }}</span>
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="presentTrainees" />
@@ -185,7 +185,7 @@ export default {
 
     const displayMetaInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value && isLastSlotStarted);
 
-    const traineesRegistered = computed(() => course.value.trainees.length);
+    const registeredTrainees = computed(() => course.value.trainees.length);
 
     const {
       // Data
@@ -217,21 +217,23 @@ export default {
       attendanceValidations,
     } = useAttendances(course, isClientInterface, canUpdate, loggedUser, modalLoading);
 
+    const attendancesForRegisteredTrainees = computed(() => attendances.value.filter(a => course.value.trainees.some(t => t._id === a.trainee)));
+
     const presentTrainees = computed(() => {
-      const traineesWithAttendance = course.value.trainees.filter(trainee => attendances.value.some(a => a.trainee === trainee._id));
+      const traineesWithAttendance = course.value.trainees.filter(trainee => attendancesForRegisteredTrainees.value.some(a => a.trainee === trainee._id));
 
       return traineesWithAttendance.length;
     });
 
     const absenceRate = computed(() => {
-      const numerator = attendances.value.length;
-      const denominator = multiply(course.value.slots.length, traineesRegistered.value);
+      const numerator = attendancesForRegisteredTrainees.value.length;
+      const denominator = multiply(course.value.slots.length, registeredTrainees.value);
 
       return formatPercentage(subtract(1, divide(numerator, denominator)));
     });
 
     const realAbsenceRate = computed(() => {
-      const numerator = attendances.value.length;
+      const numerator = attendancesForRegisteredTrainees.value.length;
       const denominator = multiply(course.value.slots.length, presentTrainees.value);
     
       return formatPercentage(subtract(1, divide(numerator, denominator)));
@@ -299,10 +301,11 @@ export default {
       disableCheckbox,
       isLastSlotStarted,
       displayMetaInfos,
-      traineesRegistered,
+      registeredTrainees,
       presentTrainees,
       absenceRate,
       realAbsenceRate,
+      attendances,
       // Methods
       get,
       attendanceCheckboxValue,
