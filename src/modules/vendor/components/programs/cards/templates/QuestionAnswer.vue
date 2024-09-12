@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { computed, toRefs } from 'vue';
+import { useStore } from 'vuex';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
@@ -32,8 +34,7 @@ import {
   QC_ANSWER_MAX_LENGTH,
   REQUIRED_LABEL,
 } from '@data/constants';
-import { validationMixin } from '@mixins/validationMixin';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'QuestionAnswer',
@@ -45,42 +46,75 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
   },
-  mixins: [templateMixin, validationMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+  emits: ['refresh'],
+  setup (props, { emit }) {
+    const { disableEdition, cardParent } = toRefs(props);
+
+    const $store = useStore();
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcAnswers: {
-          $each: helpers.forEach({ text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) } }),
+          $each: helpers.forEach({
+            text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
+          }),
         },
       },
-    };
-  },
-  computed: {
-    disableAnswerCreation () {
-      return this.card.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-    disableAnswerDeletion () {
-      return this.card.qcAnswers.length <= QUESTION_ANSWER_MIN_ANSWERS_COUNT ||
-        this.disableEdition || this.cardParent.status === PUBLISHED;
-    },
-  },
-  methods: {
-    questionAnswerErrorMsg (index) {
-      const validation = this.v$.card.qcAnswers.$each.$response.$errors[index].text;
+    }));
+
+    const v$ = useVuelidate(rules, { card });
+
+    const refreshCard = () => { emit('refresh'); };
+
+    const {
+      updateCard,
+      saveTmp,
+      updateTextAnswer,
+      getError,
+      validateAnswerDeletion,
+      addAnswer,
+      questionErrorMsg,
+    } = useCardTemplate(card, v$, refreshCard);
+
+    const disableAnswerCreation = computed(() => card.value.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
+        disableEdition.value || cardParent.value.status === PUBLISHED);
+
+    const disableAnswerDeletion = computed(() => card.value.qcAnswers.length <= QUESTION_ANSWER_MIN_ANSWERS_COUNT ||
+        disableEdition.value || cardParent.value.status === PUBLISHED);
+
+    const answerIsRequired = index => index < QUESTION_ANSWER_MIN_ANSWERS_COUNT;
+
+    const questionAnswerErrorMsg = (index) => {
+      const validation = v$.value.card.qcAnswers.$each.$response.$errors[index].text;
 
       if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
       if (get(validation, '0.$validator') === 'maxLength') return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
-    },
-    answerIsRequired (index) {
-      return index < QUESTION_ANSWER_MIN_ANSWERS_COUNT;
-    },
+    };
+
+    return {
+      // Validations
+      v$,
+      // Data
+      card,
+      // Computed
+      disableAnswerCreation,
+      disableAnswerDeletion,
+      questionErrorMsg,
+      // Methods
+      answerIsRequired,
+      questionAnswerErrorMsg,
+      updateCard,
+      saveTmp,
+      updateTextAnswer,
+      getError,
+      validateAnswerDeletion,
+      addAnswer,
+    };
   },
 };
 </script>
