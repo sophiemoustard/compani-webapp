@@ -11,6 +11,10 @@
           <ni-indicator :indicator="presentTrainees" />
           <div class="text-center">{{ formatQuantity('apprenant.e', presentTrainees, 's', false) }} ont émargé au moins une fois</div>
         </div>
+        <div class="column items-center">
+          <ni-indicator :indicator="absenceRate" />
+          <div class="text-center">de taux d'absence</div>
+        </div>
       </div>
     </q-card>
     <q-card flat>
@@ -116,8 +120,9 @@ import get from 'lodash/get';
 import { DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
 import { descendingSortBy } from '@helpers/dates/utils';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatPercentage } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
+import { add, multiply, subtract, divide } from '@helpers/numbers';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
@@ -213,6 +218,13 @@ export default {
       return traineesWithAttendance.length;
     });
 
+    const absenceRate = computed(() => {
+      const numerator = attendances.value.length;
+      const denominator = multiply(course.value.slots.length, traineesRegistered.value);
+    
+      return formatPercentage(subtract(1, divide(numerator, denominator)));
+    });
+
     const {
       // Data
       attendanceSheetTableLoading,
@@ -277,6 +289,7 @@ export default {
       displayMetaInfos,
       traineesRegistered,
       presentTrainees,
+      absenceRate,
       // Methods
       get,
       attendanceCheckboxValue,
