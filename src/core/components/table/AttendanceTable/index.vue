@@ -1,25 +1,26 @@
 <template>
   <div>
     <q-card v-if="displayMetaInfos" class="q-my-md" flat>
-      <p class="q-pa-md section-title text-weight-bold ">Données générales</p>
+      <p class="q-pa-md section-title text-weight-bold ">Données générales *</p>
       <div class="row justify-around">
         <div class="column items-center">
           <ni-indicator :indicator="traineesRegistered" />
-          <div class="text-center">{{ formatQuantity('apprenant.e inscrit.e', traineesRegistered, 's', false) }}</div>
+          <span class="text-center">{{ formatQuantity('apprenant.e inscrit.e', traineesRegistered, 's', false) }}</span>
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="presentTrainees" />
-          <div class="text-center">{{ formatQuantity('apprenant.e', presentTrainees, 's', false) }} ont émargé<br />au moins une fois</div>
+          <span class="text-center">{{ formatQuantity('apprenant.e inscrit.e', presentTrainees, 's', false) }} ont émargé<br />au moins une fois</span>
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="absenceRate" />
-          <div class="text-center">de taux d'absence</div>
+          <span class="text-center">de taux d'absence</span>
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="realAbsenceRate" />
-          <div class="text-center">de taux d'absence réel <br />(sans compter les apprenant.es <br />toujours absent.es)</div>
+          <span class="text-center">de taux d'absence réel <br />(sans compter les apprenant.es <br />toujours absent.es)</span>
         </div>
       </div>
+      <span class="meta-infos-footer">* Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits</span>
     </q-card>
     <q-card flat>
       <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
@@ -379,4 +380,9 @@ export default {
 
 .last-subscribed-interline
   padding-bottom: 16px
+
+.meta-infos-footer
+  font-size: 12px
+  font-style: italic
+  padding: 16px
 </style>
