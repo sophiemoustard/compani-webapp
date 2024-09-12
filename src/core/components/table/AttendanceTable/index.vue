@@ -2,7 +2,7 @@
   <div>
     <q-card v-if="displayMetaInfos" class="q-my-md" flat>
       <p class="q-pa-md section-title text-weight-bold ">Données générales *</p>
-      <div class="row justify-around">
+      <div class="meta-infos">
         <div class="column items-center">
           <ni-indicator :indicator="registeredTrainees" />
           <span class="text-center">{{ formatQuantity('apprenant.e inscrit.e', registeredTrainees, 's', false) }}</span>
@@ -388,6 +388,13 @@ export default {
 
 .last-subscribed-interline
   padding-bottom: 16px
+
+.meta-infos
+  display: flex
+  flex-direction: row
+  justify-content: space-around
+  @media screen and (max-width: 767px)
+    flex-direction: column
 
 .meta-infos-footer
   font-size: 12px
