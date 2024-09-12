@@ -9,11 +9,15 @@
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="presentTrainees" />
-          <div class="text-center">{{ formatQuantity('apprenant.e', presentTrainees, 's', false) }} ont émargé au moins une fois</div>
+          <div class="text-center">{{ formatQuantity('apprenant.e', presentTrainees, 's', false) }} ont émargé<br />au moins une fois</div>
         </div>
         <div class="column items-center">
           <ni-indicator :indicator="absenceRate" />
           <div class="text-center">de taux d'absence</div>
+        </div>
+        <div class="column items-center">
+          <ni-indicator :indicator="realAbsenceRate" />
+          <div class="text-center">de taux d'absence réel <br />(sans compter les apprenant.es <br />toujours absent.es)</div>
         </div>
       </div>
     </q-card>
@@ -221,6 +225,13 @@ export default {
     const absenceRate = computed(() => {
       const numerator = attendances.value.length;
       const denominator = multiply(course.value.slots.length, traineesRegistered.value);
+
+      return formatPercentage(subtract(1, divide(numerator, denominator)));
+    });
+
+    const realAbsenceRate = computed(() => {
+      const numerator = attendances.value.length;
+      const denominator = multiply(course.value.slots.length, presentTrainees.value);
     
       return formatPercentage(subtract(1, divide(numerator, denominator)));
     });
@@ -290,6 +301,7 @@ export default {
       traineesRegistered,
       presentTrainees,
       absenceRate,
+      realAbsenceRate,
       // Methods
       get,
       attendanceCheckboxValue,
