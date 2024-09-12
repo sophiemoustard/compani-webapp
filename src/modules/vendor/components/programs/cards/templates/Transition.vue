@@ -12,7 +12,6 @@ import Input from '@components/form/Input';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
-
   name: 'Transition',
   props: {
     disableEdition: { type: Boolean, default: false },
@@ -39,7 +38,7 @@ export default {
     return {
       // Validations
       v$,
-      // Data
+      // Computed
       card,
       // Methods
       saveTmp,
