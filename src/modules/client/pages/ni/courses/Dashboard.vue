@@ -16,11 +16,11 @@
       <div class="text-weight-bold q-mb-sm col-md-4 col-xs-12 text-copper-grey-700">Le eLearning dans ma structure</div>
       <div class="row justify-around col-md-8 col-xs-12">
         <div class="column items-center">
-          <ni-e-learning-indicator :indicator="activeLearners" />
+          <ni-indicator :indicator="activeLearners" />
           <div class="text-center">apprenants actifs</div>
         </div>
         <div class="column items-center">
-          <ni-e-learning-indicator :indicator="activityHistoriesBetweenDates.length" />
+          <ni-indicator :indicator="activityHistoriesBetweenDates.length" />
           <div class="text-center">activités de eLearning réalisées</div>
         </div>
       </div>
@@ -35,7 +35,7 @@
           <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
             class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
-              <ni-e-learning-indicator :indicator="index + 1" />
+              <ni-indicator :indicator="index + 1" />
               <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
               <div class="text-copper-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
             </div>
@@ -52,7 +52,7 @@
           <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
             class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
-              <ni-e-learning-indicator :indicator="index + 1" />
+              <ni-indicator :indicator="index + 1" />
               <div class="q-mx-md text-copper-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
             </div>
             <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
@@ -82,7 +82,7 @@ import CompanyLinkRequests from '@api/CompanyLinkRequests';
 import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import ELearningIndicator from '@components/courses/ELearningIndicator';
+import Indicator from '@components/courses/Indicator';
 import LineChart from '@components/charts/LineChart';
 import CompanyLinkRequestCell from '@components/CompanyLinkRequestCell';
 import { DEFAULT_AVATAR, DAY, MONTH } from '@data/constants';
@@ -95,7 +95,7 @@ export default {
   components: {
     'ni-title-header': TitleHeader,
     'ni-date-range': DateRange,
-    'ni-e-learning-indicator': ELearningIndicator,
+    'ni-indicator': Indicator,
     'ni-line-chart': LineChart,
     'company-link-request-cell': CompanyLinkRequestCell,
   },
