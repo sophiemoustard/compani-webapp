@@ -24,23 +24,11 @@
     </template>
     <template v-if="hasFilteredAnswers">
       <div v-if="isSelfPositionningAnswers" class="sp-answers-container">
-        <div>
-          <span class="section-title">Début de formation</span>
-          <q-card v-for="(card, cardIndex) of startAnswers" :key="cardIndex" flat class="q-mb-sm">
-            <component :is="getChartComponent(card.template)" :card="card" />
-          </q-card>
-        </div>
-        <div>
-          <span class="section-title">Fin de formation</span>
-          <q-card v-for="(card, cardIndex) of endAnswers" :key="cardIndex" flat class="q-mb-sm">
-            <component :is="getChartComponent(card.template)" :card="card" />
-          </q-card>
-        </div>
+        <questionnaire-answers-container title="Début de formation" :cards="startAnswers" />
+        <questionnaire-answers-container title="Fin de formation" :cards="endAnswers" />
       </div>
       <template v-else>
-        <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
-          <component :is="getChartComponent(card.template)" :card="card" />
-        </q-card>
+        <questionnaire-answers-container :cards="cards" />
       </template>
     </template>
     <template v-else>
@@ -72,6 +60,7 @@ import CompaniDate from '@helpers/dates/companiDates';
 import { downloadCsv } from '@helpers/file';
 import { NotifyNegative } from '@components/popup/notify';
 import PrimaryButton from '@components/PrimaryButton';
+import QuestionnaireAnswersContainer from 'src/modules/vendor/components/questionnaires/QuestionnaireAnswersContainer';
 import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
 import {
   TRAINER,
@@ -95,6 +84,7 @@ export default {
   components: {
     'ni-select': Select,
     'ni-primary-button': PrimaryButton,
+    'questionnaire-answers-container': QuestionnaireAnswersContainer,
   },
   mixins: [questionnaireAnswersMixin],
   props: {
@@ -454,10 +444,4 @@ export default {
     flex: 1
     display: flex
     flex-direction: column
-
-.section-title
-  font-size: 24px
-  font-weight: bold
-  color: $copper-grey-700
-  margin: 12px
 </style>
