@@ -30,7 +30,12 @@ export default {
     cardParent: { type: Object, default: () => ({}) },
     isUploading: { type: Boolean, default: false },
   },
-  emits: ['refresh', 'card-parent'],
+  components: {
+    'ni-input': Input,
+    'ni-file-uploader': FileUploader,
+    'ni-option-group': OptionGroup,
+  },
+  emits: ['refresh'],
   setup (props, { emit }) {
     const { cardParent } = toRefs(props);
 
@@ -81,11 +86,6 @@ export default {
       start,
       finish,
     };
-  },
-  components: {
-    'ni-input': Input,
-    'ni-file-uploader': FileUploader,
-    'ni-option-group': OptionGroup,
   },
 };
 </script>

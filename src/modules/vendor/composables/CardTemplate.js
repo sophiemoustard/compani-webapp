@@ -22,8 +22,8 @@ import {
 
 export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
   const tmpInput = ref('');
-  const $q = useQuasar();
   const isUploading = ref(false);
+  const $q = useQuasar();
 
   const questionErrorMsg = computed(() => {
     if (get(v$.value, 'card.question.required.$response') === false) return REQUIRED_LABEL;
@@ -32,6 +32,40 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     }
 
     return '';
+  });
+
+  const mediaFileName = computed(() => {
+    if (card.value && card.value.title) return card.value.title.replace(/ /g, '_');
+
+    return cardParent.value.name.replace(/ /g, '_');
+  });
+
+  const mediaUploadUrl = computed(() => `${process.env.API_HOSTNAME}/cards/${card.value._id}/upload`);
+
+  const extensions = computed(() => {
+    switch (card.value.media.type) {
+      case UPLOAD_VIDEO:
+        return VIDEO_EXTENSIONS;
+      case UPLOAD_AUDIO:
+        return AUDIO_EXTENSIONS;
+      case UPLOAD_IMAGE:
+        return IMAGE_EXTENSIONS;
+      default:
+        return '';
+    }
+  });
+
+  const maxFileSize = computed(() => {
+    switch (card.value.media.type) {
+      case UPLOAD_IMAGE:
+        return 300 * 1000;
+      case UPLOAD_AUDIO:
+        return 5 * 1000 * 1000;
+      case UPLOAD_VIDEO:
+        return 25 * 1000 * 1000;
+      default:
+        return 0;
+    }
   });
 
   const saveTmp = (path) => {
@@ -163,51 +197,13 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
       html: true,
       ok: true,
       cancel: 'Annuler',
-    }).onOk(() => deleteMedia(path))
+    }).onOk(() => deleteMedia())
       .onCancel(() => NotifyPositive('Suppression annulée.'));
   };
 
-  const mediaFileName = computed(() => {
-    if (card.value && card.value.title) return card.value.title.replace(/ /g, '_');
+  const start = () => { isUploading.value = true; };
 
-    return cardParent.value.name.replace(/ /g, '_');
-  });
-
-  const mediaUploadUrl = computed(() => `${process.env.API_HOSTNAME}/cards/${card.value._id}/upload`);
-
-  const extensions = computed(() => {
-    switch (card.value.media.type) {
-      case UPLOAD_VIDEO:
-        return VIDEO_EXTENSIONS;
-      case UPLOAD_AUDIO:
-        return AUDIO_EXTENSIONS;
-      case UPLOAD_IMAGE:
-        return IMAGE_EXTENSIONS;
-      default:
-        return '';
-    }
-  });
-
-  const maxFileSize = computed(() => {
-    switch (card.value.media.type) {
-      case UPLOAD_IMAGE:
-        return 300 * 1000;
-      case UPLOAD_AUDIO:
-        return 5 * 1000 * 1000;
-      case UPLOAD_VIDEO:
-        return 25 * 1000 * 1000;
-      default:
-        return 0;
-    }
-  });
-
-  const start = () => {
-    isUploading.value = true;
-  };
-
-  const finish = () => {
-    isUploading.value = false;
-  };
+  const finish = () => { isUploading.value = false; };
 
   return {
     // Data
