@@ -61,7 +61,6 @@ import { downloadCsv } from '@helpers/file';
 import { NotifyNegative } from '@components/popup/notify';
 import PrimaryButton from '@components/PrimaryButton';
 import QuestionnaireAnswersContainer from 'src/modules/vendor/components/questionnaires/QuestionnaireAnswersContainer';
-import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
 import {
   TRAINER,
   TRAINING_ORGANISATION_MANAGER,
@@ -86,7 +85,6 @@ export default {
     'ni-primary-button': PrimaryButton,
     'questionnaire-answers-container': QuestionnaireAnswersContainer,
   },
-  mixins: [questionnaireAnswersMixin],
   props: {
     profileId: { type: String, required: true },
     isSelfPositionningAnswers: { type: Boolean, default: false },

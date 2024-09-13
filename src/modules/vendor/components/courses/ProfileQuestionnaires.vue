@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <q-card v-for="(card, cardIndex) of questionnaireAnswers" :key="cardIndex" flat class="q-mb-sm">
-      <component :is="getChartComponent(card.template)" :card="card" />
-    </q-card>
-  </div>
+  <questionnaire-answers-container :cards="questionnaireAnswers" />
 </template>
 
 <script>
@@ -12,11 +8,13 @@ import { useStore } from 'vuex';
 import uniq from 'lodash/uniq';
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
-import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
+import QuestionnaireAnswersContainer from 'src/modules/vendor/components/questionnaires/QuestionnaireAnswersContainer';
 
 export default {
   name: 'ProfileQuestionnaires',
-  mixins: [questionnaireAnswersMixin],
+  components: {
+    'questionnaire-answers-container': QuestionnaireAnswersContainer,
+  },
   setup () {
     const questionnaireAnswers = ref([]);
 
