@@ -26,12 +26,14 @@
       <span class="q-pb-md text-weight-bold">Chiffres généraux</span>
       <div class="indicator-container">
         <div class="indicator-cell">
-          <ni-indicator :indicator="globalInfo.historyCount" />
-          <span>{{ formatQuantity('réponse', globalInfo.historyCount, 's', false) }}</span>
-        </div>
-        <div class="indicator-cell">
           <ni-indicator :indicator="globalInfo.traineeCount" />
           <span>{{ formatQuantity('apprenant.e', globalInfo.traineeCount, 's', false ) }} ayant répondu *</span>
+        </div>
+        <div class="indicator-cell">
+          <ni-indicator :indicator="globalInfo.historyCount" />
+          <span>{{ formatQuantity('réponse', globalInfo.historyCount, 's', false) }}
+          <span v-if="isSelfPositionningAnswers">**</span>
+          </span>
         </div>
         <div v-if="isSelfPositionningAnswers" class="indicator-cell">
           <ni-indicator :indicator="startAnswersAverage" />
@@ -43,7 +45,14 @@
         </div>
       </div>
       <div class="q-pt-lg global-info-description">
-        * apprenant.es ayant répondu : prend en compte les apprenant.es ayant répondu au moins une fois au questionnaire
+        <span>
+          * apprenant.es ayant répondu : prend en compte les apprenant.es ayant répondu au moins une fois au
+          questionnaire
+        </span>
+        <span v-if="isSelfPositionningAnswers">
+          ** réponses : {{ formatQuantity('réponse', startAnswersCount) }} au questionnaire de début et
+          {{ formatQuantity('réponse', endAnswersCount) }} au questionniare de fin
+        </span>
       </div>
     </q-card>
     <template v-if="hasFilteredAnswers">
@@ -190,17 +199,17 @@ export default {
           .map(a => a.answer),
       })));
 
-    const startAnswersAverage = computed(() => {
-      const answers = startAnswers.value.flatMap(startAnswer => startAnswer.answers);
-      const average = answers.length
-        ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
-        : 0;
+    const startAnswersCount = computed(() => {
+      const maxTraineeCountAnswer = startAnswers.value.reduce(
+        (accumulator, answer) => (answer.answers.length >= accumulator.answers.length ? answer : accumulator),
+        startAnswers.value[0]
+      );
 
-      return toFixedToFloat(average, 2);
+      return get(maxTraineeCountAnswer, 'answers', []).length;
     });
 
-    const endAnswersAverage = computed(() => {
-      const answers = endAnswers.value.flatMap(endAnswer => endAnswer.answers);
+    const startAnswersAverage = computed(() => {
+      const answers = startAnswers.value.flatMap(startAnswer => startAnswer.answers);
       const average = answers.length
         ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
         : 0;
@@ -215,6 +224,24 @@ export default {
           .filter(a => a.timeline === END_COURSE)
           .map(a => a.answer),
       })));
+
+    const endAnswersAverage = computed(() => {
+      const answers = endAnswers.value.flatMap(endAnswer => endAnswer.answers);
+      const average = answers.length
+        ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
+        : 0;
+
+      return toFixedToFloat(average, 2);
+    });
+
+    const endAnswersCount = computed(() => {
+      const maxTraineeCountAnswer = endAnswers.value.reduce(
+        (accumulator, answer) => (answer.answers.length >= accumulator.answers.length ? answer : accumulator),
+        endAnswers.value[0]
+      );
+
+      return get(maxTraineeCountAnswer, 'answers', []).length;
+    });
 
     const globalInfo = computed(() => {
       const maxHistoryCountCard = cards.value
@@ -465,6 +492,8 @@ export default {
       globalInfo,
       startAnswersAverage,
       endAnswersAverage,
+      startAnswersCount,
+      endAnswersCount,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
@@ -511,6 +540,8 @@ export default {
 .global-info-description
   font-size: 12px
   font-style: italic
+  display: flex
+  flex-direction: column
 
 .indicator-container
   display: flex
