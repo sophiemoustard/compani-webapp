@@ -12,10 +12,17 @@ import {
   SINGLE_CHOICE_QUESTION,
   QUESTION_MAX_LENGTH,
   REQUIRED_LABEL,
+  UPLOAD_IMAGE,
+  UPLOAD_VIDEO,
+  UPLOAD_AUDIO,
+  AUDIO_EXTENSIONS,
+  IMAGE_EXTENSIONS,
+  VIDEO_EXTENSIONS,
 } from '@data/constants';
 
-export const useCardTemplate = (card, v$, refreshCard) => {
+export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
   const tmpInput = ref('');
+  const isUploading = ref(false);
   const $q = useQuasar();
 
   const questionErrorMsg = computed(() => {
@@ -25,6 +32,40 @@ export const useCardTemplate = (card, v$, refreshCard) => {
     }
 
     return '';
+  });
+
+  const mediaFileName = computed(() => {
+    if (card.value && card.value.title) return card.value.title.replace(/ /g, '_');
+
+    return cardParent.value.name.replace(/ /g, '_');
+  });
+
+  const mediaUploadUrl = computed(() => `${process.env.API_HOSTNAME}/cards/${card.value._id}/upload`);
+
+  const extensions = computed(() => {
+    switch (card.value.media.type) {
+      case UPLOAD_VIDEO:
+        return VIDEO_EXTENSIONS;
+      case UPLOAD_AUDIO:
+        return AUDIO_EXTENSIONS;
+      case UPLOAD_IMAGE:
+        return IMAGE_EXTENSIONS;
+      default:
+        return '';
+    }
+  });
+
+  const maxFileSize = computed(() => {
+    switch (card.value.media.type) {
+      case UPLOAD_IMAGE:
+        return 300 * 1000;
+      case UPLOAD_AUDIO:
+        return 5 * 1000 * 1000;
+      case UPLOAD_VIDEO:
+        return 25 * 1000 * 1000;
+      default:
+        return 0;
+    }
   });
 
   const saveTmp = (path) => {
@@ -126,11 +167,54 @@ export const useCardTemplate = (card, v$, refreshCard) => {
     }
   };
 
+  const mediaUploaded = async () => {
+    try {
+      await refreshCard();
+      NotifyPositive('Média envoyé');
+    } catch (e) {
+      NotifyNegative('Erreur lors de l\'envoi du média');
+    }
+  };
+
+  const deleteMedia = async () => {
+    try {
+      if (get(card.value, 'media')) {
+        await Cards.deleteMedia(card.value._id);
+
+        await refreshCard();
+        NotifyPositive('Média supprimé');
+      } else NotifyNegative('Erreur lors de la suppression du média.');
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la suppression du média.');
+    }
+  };
+
+  const validateMediaDeletion = (path) => {
+    $q.dialog({
+      title: 'Confirmation',
+      message: 'Êtes-vous sûr(e) de vouloir supprimer ce média&nbsp;?',
+      html: true,
+      ok: true,
+      cancel: 'Annuler',
+    }).onOk(() => deleteMedia())
+      .onCancel(() => NotifyPositive('Suppression annulée.'));
+  };
+
+  const start = () => { isUploading.value = true; };
+
+  const finish = () => { isUploading.value = false; };
+
   return {
     // Data
     tmpInput,
+    isUploading,
     // Computed
     questionErrorMsg,
+    mediaFileName,
+    mediaUploadUrl,
+    extensions,
+    maxFileSize,
     // Methods
     saveTmp,
     updateCard,
@@ -138,5 +222,10 @@ export const useCardTemplate = (card, v$, refreshCard) => {
     updateTextAnswer,
     addAnswer,
     validateAnswerDeletion,
+    mediaUploaded,
+    deleteMedia,
+    validateMediaDeletion,
+    start,
+    finish,
   };
 };
