@@ -22,7 +22,7 @@
         <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
       </div>
     </template>
-    <q-card flat class="q-pa-md">
+    <q-card v-if="displayGlobalInfos" flat class="q-pa-md">
       <span class="q-pb-md text-weight-bold">Chiffres généraux</span>
       <div class="indicator-container">
         <div class="indicator-cell">
@@ -76,6 +76,7 @@
 <script>
 import { computed, toRefs, ref, watch, nextTick } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
@@ -137,6 +138,8 @@ export default {
 
     const $store = useStore();
 
+    const $router = useRouter();
+
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER]
@@ -190,6 +193,11 @@ export default {
 
     const cards = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })));
+
+    const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
+
+    const displayGlobalInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value &&
+      hasFilteredAnswers.value);
 
     const startAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({
@@ -486,6 +494,7 @@ export default {
       courseOptions,
       isRofOrVendorAdmin,
       hasFilteredAnswers,
+      displayGlobalInfos,
       cards,
       startAnswers,
       endAnswers,
