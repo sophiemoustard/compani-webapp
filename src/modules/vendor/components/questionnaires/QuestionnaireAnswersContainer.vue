@@ -1,8 +1,7 @@
 <template>
   <div>
     <span class="section-title">{{ title }}</span>
-    <q-card
-      v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
+    <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
     </q-card>
   </div>
