@@ -22,6 +22,22 @@
         <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
       </div>
     </template>
+    <q-card flat class="q-pa-md">
+      <span class="q-pb-md text-weight-bold">Chiffres généraux</span>
+      <div class="row justify-evenly">
+        <div class="column items-center">
+          <ni-indicator :indicator="globalInfo.historyCount" />
+          <span>{{ formatQuantity('réponse globale', globalInfo.historyCount, 's', false) }}</span>
+        </div>
+        <div class="column items-center">
+          <ni-indicator :indicator="globalInfo.traineeCount" />
+          <span>{{ formatQuantity('apprenant.e', globalInfo.traineeCount, 's', false ) }} ayant répondu *</span>
+        </div>
+      </div>
+      <div class="q-pt-lg global-info-description">
+        * apprenant.es ayant répondu : prend en compte les apprenant.es ayant répondu au moins une fois au questionnaire
+      </div>
+    </q-card>
     <template v-if="hasFilteredAnswers">
       <div v-if="isSelfPositionningAnswers" class="sp-answers-container">
         <questionnaire-answers-container title="Début de formation" :cards="startAnswers" />
@@ -48,18 +64,25 @@ import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
 import uniqBy from 'lodash/uniqBy';
 import mapValues from 'lodash/mapValues';
+import pick from 'lodash/pick';
 import Questionnaires from '@api/Questionnaires';
 import Holdings from '@api/Holdings';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Select from '@components/form/Select';
-import { formatAndSortIdentityOptions, formatAndSortOptions, formatStringForExport } from '@helpers/utils';
+import {
+  formatAndSortIdentityOptions,
+  formatAndSortOptions,
+  formatStringForExport,
+  formatQuantity,
+} from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import { downloadCsv } from '@helpers/file';
 import { NotifyNegative } from '@components/popup/notify';
 import PrimaryButton from '@components/PrimaryButton';
+import Indicator from '@components/courses/Indicator';
 import QuestionnaireAnswersContainer from 'src/modules/vendor/components/questionnaires/QuestionnaireAnswersContainer';
 import {
   TRAINER,
@@ -81,6 +104,7 @@ import {
 export default {
   name: 'ProfileAnswers',
   components: {
+    'ni-indicator': Indicator,
     'ni-select': Select,
     'ni-primary-button': PrimaryButton,
     'questionnaire-answers-container': QuestionnaireAnswersContainer,
@@ -164,6 +188,16 @@ export default {
           .filter(a => a.timeline === END_COURSE)
           .map(a => a.answer),
       })));
+
+    const globalInfo = computed(() => {
+      const maxHistoryCountCard = cards.value
+        .reduce(
+          (accumulator, card) => (card.historyCount >= accumulator.historyCount ? card : accumulator),
+          cards.value[0]
+        );
+
+      return pick(maxHistoryCountCard, ['historyCount', 'traineeCount']);
+    });
 
     const getQuestionnaireAnswers = async () => {
       try {
@@ -401,6 +435,7 @@ export default {
       cards,
       startAnswers,
       endAnswers,
+      globalInfo,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
@@ -413,6 +448,7 @@ export default {
       resetFilters,
       updateSelectedCourses,
       exportAnswers,
+      formatQuantity,
     };
   },
 };
@@ -442,4 +478,8 @@ export default {
     flex: 1
     display: flex
     flex-direction: column
+
+.global-info-description
+  font-size: 12px
+  font-style: italic
 </style>
