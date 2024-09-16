@@ -24,14 +24,22 @@
     </template>
     <q-card flat class="q-pa-md">
       <span class="q-pb-md text-weight-bold">Chiffres généraux</span>
-      <div class="row justify-evenly">
-        <div class="column items-center">
+      <div class="indicator-container">
+        <div class="indicator-cell">
           <ni-indicator :indicator="globalInfo.historyCount" />
           <span>{{ formatQuantity('réponse globale', globalInfo.historyCount, 's', false) }}</span>
         </div>
-        <div class="column items-center">
+        <div class="indicator-cell">
           <ni-indicator :indicator="globalInfo.traineeCount" />
           <span>{{ formatQuantity('apprenant.e', globalInfo.traineeCount, 's', false ) }} ayant répondu *</span>
+        </div>
+        <div v-if="isSelfPositionningAnswers" class="indicator-cell">
+          <ni-indicator :indicator="startAnswersAverage" />
+          <span class="text-center">de moyenne pour les réponses au questionnaire de début</span>
+        </div>
+        <div v-if="isSelfPositionningAnswers" class="indicator-cell">
+          <ni-indicator :indicator="endAnswersAverage" />
+          <span class="text-center">de moyenne pour les réponses au questionnaire de fin</span>
         </div>
       </div>
       <div class="q-pt-lg global-info-description">
@@ -80,6 +88,7 @@ import {
 import { composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import { downloadCsv } from '@helpers/file';
+import { add, divide, toFixedToFloat } from '@helpers/numbers';
 import { NotifyNegative } from '@components/popup/notify';
 import PrimaryButton from '@components/PrimaryButton';
 import Indicator from '@components/courses/Indicator';
@@ -180,6 +189,24 @@ export default {
           .filter(a => a.timeline === START_COURSE)
           .map(a => a.answer),
       })));
+
+    const startAnswersAverage = computed(() => {
+      const answers = startAnswers.value.flatMap(startAnswer => startAnswer.answers);
+      const average = answers.length
+        ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
+        : 0;
+
+      return toFixedToFloat(average, 2);
+    });
+
+    const endAnswersAverage = computed(() => {
+      const answers = endAnswers.value.flatMap(endAnswer => endAnswer.answers);
+      const average = answers.length
+        ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
+        : 0;
+
+      return toFixedToFloat(average, 2);
+    });
 
     const endAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({
@@ -436,6 +463,8 @@ export default {
       startAnswers,
       endAnswers,
       globalInfo,
+      startAnswersAverage,
+      endAnswersAverage,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
@@ -482,4 +511,20 @@ export default {
 .global-info-description
   font-size: 12px
   font-style: italic
+
+.indicator-container
+  display: flex
+  flex-direction: row
+  justify-content: space-evenly
+  @media screen and (max-width: 767px)
+    flex-direction: column
+    align-items: center
+
+.indicator-cell
+  display: flex
+  flex-direction: column
+  align-items: center
+  max-width: 15vw
+  @media screen and (max-width: 767px)
+    max-width: 50vw
 </style>
