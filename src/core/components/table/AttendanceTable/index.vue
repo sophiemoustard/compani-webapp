@@ -1,5 +1,41 @@
 <template>
   <div>
+    <div v-if="displayMetaInfos">
+      <q-card class="q-my-md" flat>
+        <p class="q-pa-md section-title text-weight-bold ">Données générales *</p>
+        <div class="meta-infos">
+          <div class="column items-center">
+            <ni-indicator :indicator="registeredTraineesCount" />
+            <span class="text-center">
+              {{ formatQuantity('apprenant.e inscrit.e', registeredTraineesCount, 's', false) }}
+            </span>
+          </div>
+          <div class="column items-center">
+            <ni-indicator :indicator="presentTraineesCount" />
+            <span class="text-center">
+              {{ formatQuantity('apprenant.e inscrit.e', presentTraineesCount, 's', false) }}
+              ayant émargé<br>au moins une fois
+            </span>
+          </div>
+          <div class="column items-center">
+            <ni-indicator :indicator="absenceRate" is-percentage />
+            <span class="text-center">de taux d'absence</span>
+          </div>
+          <div class="column items-center">
+            <ni-indicator :indicator="realAbsenceRate" is-percentage />
+            <span class="text-center">de taux d'absence réel **</span>
+          </div>
+        </div>
+        <div class="column q-my-md">
+          <span class="meta-infos-footer">
+            * Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits<br>
+          </span>
+          <span class="meta-infos-footer">
+            ** Taux d'absence réel : ne prend en compte que les apprenant.es inscrit.es ayant émargé au moins une fois
+          </span>
+        </div>
+      </q-card>
+    </div>
     <q-card flat>
       <q-table v-if="courseHasSlot" :rows="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
         separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="attendancePagination">
@@ -100,11 +136,16 @@ import { computed, toRefs, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
+import { descendingSortBy } from '@helpers/dates/utils';
+import { formatQuantity } from '@helpers/utils';
+import CompaniDate from '@helpers/dates/companiDates';
+import { multiply, subtract, divide } from '@helpers/numbers';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
+import Indicator from '@components/courses/Indicator';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
@@ -119,6 +160,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
+    'ni-indicator': Indicator,
   },
   setup (props) {
     const { course } = toRefs(props);
@@ -144,11 +186,28 @@ export default {
       return ability.can('access', 'trainee');
     });
 
+    const isLastSlotStarted = computed(() => {
+      if (course.value.slotsToPlan.length) return false;
+
+      const sortedSlots = [...course.value.slots].sort(descendingSortBy('startDate'));
+      return CompaniDate().isSameOrAfter(sortedSlots[0].startDate);
+    });
+
+    const vendorRole = computed(() => $store.getters['main/getVendorRole']);
+
+    const isRofOrVendorAdmin = computed(() => [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN].includes(vendorRole.value));
+
+    const registeredTraineesCount = computed(() => course.value.trainees.length);
+
+    const displayMetaInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value && isLastSlotStarted.value &&
+      registeredTraineesCount.value);
+
     const {
       // Data
       traineeAdditionModal,
       loading,
       newTraineeAttendance,
+      attendances,
       // Computed
       attendanceColumns,
       traineesWithAttendance,
@@ -172,6 +231,29 @@ export default {
       // Validations
       attendanceValidations,
     } = useAttendances(course, isClientInterface, canUpdate, loggedUser, modalLoading);
+
+    const attendancesForRegisteredTrainees = computed(() => attendances.value
+      .filter(a => course.value.trainees.some(t => t._id === a.trainee)));
+
+    const presentTraineesCount = computed(() => course.value.trainees
+      .filter(trainee => attendancesForRegisteredTrainees.value.some(a => a.trainee === trainee._id))
+      .length);
+
+    const absenceRate = computed(() => {
+      const numerator = attendancesForRegisteredTrainees.value.length;
+      const denominator = multiply(course.value.slots.length, registeredTraineesCount.value);
+      const res = denominator > 0 ? multiply(subtract(1, divide(numerator, denominator)), 100) : 100;
+
+      return Math.round(res);
+    });
+
+    const realAbsenceRate = computed(() => {
+      const numerator = attendancesForRegisteredTrainees.value.length;
+      const denominator = multiply(course.value.slots.length, presentTraineesCount.value);
+      const res = denominator > 0 ? multiply(subtract(1, divide(numerator, denominator)), 100) : 100;
+
+      return Math.round(res);
+    });
 
     const {
       // Data
@@ -233,6 +315,11 @@ export default {
       canUpdate,
       canAccessTrainee,
       disableCheckbox,
+      displayMetaInfos,
+      registeredTraineesCount,
+      presentTraineesCount,
+      absenceRate,
+      realAbsenceRate,
       // Methods
       get,
       attendanceCheckboxValue,
@@ -250,6 +337,7 @@ export default {
       updateSlotCheckbox,
       getDelimiterClass,
       goToLearnerProfile,
+      formatQuantity,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,
@@ -309,4 +397,16 @@ export default {
 
 .last-subscribed-interline
   padding-bottom: 16px
+
+.meta-infos
+  display: flex
+  flex-direction: row
+  justify-content: space-around
+  @media screen and (max-width: 767px)
+    flex-direction: column
+
+.meta-infos-footer
+  font-size: 12px
+  font-style: italic
+  padding: 4px 16px
 </style>
