@@ -8,7 +8,7 @@
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
         :error="getError('qcAnswers', i) || requiredOneCorrectAnswer(i)" :disable="disableEdition"
         :required-field="answerIsRequired(i)" />
-      <q-checkbox v-model="card.qcAnswers[i].correct" @update:model-value="updateCorrectAnswer(i)"
+      <q-checkbox v-model="card.qcAnswers[i].correct" @update:model-value="updateCorrectAnswer(i, 'qcAnswers')"
         :disable="!card.qcAnswers[i].text || disableEdition" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
@@ -26,7 +26,6 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   REQUIRED_LABEL,
   QUESTION_OR_TITLE_MAX_LENGTH,
@@ -36,7 +35,6 @@ import {
   CHOICE_QUESTION_MIN_ANSWERS_COUNT,
 } from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
-import Cards from '@api/Cards';
 import Button from '@components/Button';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
@@ -85,6 +83,7 @@ export default {
       updateTextAnswer,
       validateAnswerDeletion,
       errorMsg,
+      updateCorrectAnswer,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
@@ -95,23 +94,6 @@ export default {
 
     const requiredOneCorrectAnswer = index => !get(v$.value, 'card.qcAnswers.minOneCorrectAnswer.$response') &&
       !!card.value.qcAnswers[index].text;
-
-    const updateCorrectAnswer = async (index) => {
-      try {
-        const editedAnswer = get(card.value, `qcAnswers[${index}]`);
-
-        await Cards.updateAnswer(
-          { cardId: card.value._id, answerId: editedAnswer._id },
-          { correct: editedAnswer.correct }
-        );
-
-        await refreshCard();
-        NotifyPositive('Carte mise à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour de la carte.');
-      }
-    };
 
     const answersErrorMsg = (index) => {
       const validation = v$.value.card.qcAnswers.$each.$response.$errors[index].text;

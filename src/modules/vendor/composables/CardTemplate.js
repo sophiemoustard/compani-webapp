@@ -90,7 +90,7 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
   const getAnswerKeyToUpdate = (template) => {
     if ([MULTIPLE_CHOICE_QUESTION, SINGLE_CHOICE_QUESTION, QUESTION_ANSWER].includes(template)) return 'qcAnswers';
     if (template === ORDER_THE_SEQUENCE) return 'orderedAnswers';
-    if (template === FILL_THE_GAPS) return 'falsyGapAnswers';
+    if (template === FILL_THE_GAPS) return 'gapAnswers';
 
     return '';
   };
@@ -109,6 +109,23 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
       await Cards.updateAnswer(
         { cardId: card.value._id, answerId: editedAnswer._id },
         { text: editedAnswer.text.trim() }
+      );
+
+      await refreshCard();
+      NotifyPositive('Carte mise à jour.');
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la mise à jour de la carte.');
+    }
+  };
+
+  const updateCorrectAnswer = async (index, key) => {
+    try {
+      const editedAnswer = get(card.value, `${key}[${index}]`);
+
+      await Cards.updateAnswer(
+        { cardId: card.value._id, answerId: editedAnswer._id },
+        { correct: editedAnswer.correct }
       );
 
       await refreshCard();
@@ -220,6 +237,7 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     updateCard,
     getError,
     updateTextAnswer,
+    updateCorrectAnswer,
     addAnswer,
     validateAnswerDeletion,
     mediaUploaded,

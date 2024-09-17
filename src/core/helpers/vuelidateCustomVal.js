@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { helpers } from '@vuelidate/validators';
 import { isValidIBAN, isValidBIC } from 'ibantools';
-import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 import { isGreaterThan, isGreaterThanOrEqual } from '@helpers/numbers';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -85,60 +84,19 @@ export const validSiret = value => !value || /^\d{14}$/.test(value);
 export const validYear = value => !value || /^[2]{1}[0]{1}[0-9]{2}$/.test(value);
 
 // Quiz fill-the-gap
-const parseTagCode = (str) => {
-  const outerAcc = '';
-  const gapAcc = [];
-
-  return parseTagCodeRecursively(outerAcc, gapAcc, str);
-};
-
-const parseTagCodeRecursively = (outerAcc, gapAcc, str) => {
-  const splitedStr = str.match(/(.*?)<trou>(.*?)<\/trou>(.*)/s);
-
-  if (!splitedStr) return { outerAcc: outerAcc.concat(' ', str), gapAcc };
-
-  gapAcc.push(splitedStr[2]);
-  return parseTagCodeRecursively(outerAcc.concat(' ', splitedStr[1]), gapAcc, splitedStr[3]);
-};
-
-const containLonelyTag = value => /<trou>|<\/trou>/g.test(value);
-
-export const validTagging = (value) => {
-  if (!value) return true;
-  const { outerAcc, gapAcc } = parseTagCode(value);
-
-  return !containLonelyTag(outerAcc) && !gapAcc.some(v => containLonelyTag(v));
-};
-
-export const validAnswerInTag = (value) => {
-  if (!value) return true;
-  const { gapAcc } = parseTagCode(value);
-
-  return !gapAcc.some(v => v.trim() !== v);
-};
-
 export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\040'-]*$/.test(value);
-
-export const validCaractersTags = (value) => {
-  if (!value) return true;
-  const { gapAcc } = parseTagCode(value);
-
-  return gapAcc.every(v => validCaracters(v));
-};
-
-export const validTagLength = (value) => {
-  if (!value) return true;
-  const { gapAcc } = parseTagCode(value);
-
-  return gapAcc.every(v => v.length > 0 && v.length <= GAP_ANSWER_MAX_LENGTH);
-};
 
 export const validTagsCount = (value) => {
   if (!value) return true;
-  const { gapAcc } = parseTagCode(value);
+  const splitedStr = value.match(/<trou>/g);
 
-  return (gapAcc.length === 0 && !validTagging(value)) || gapAcc.length === 1 ||
-    (gapAcc.length === 2 && validTagging(value));
+  return !!(splitedStr && splitedStr.length > 0 && splitedStr.length < 3);
+};
+
+export const matchingTagsCount = (card, value) => {
+  const splitedStr = value.match(/<trou>/g);
+
+  return !!(splitedStr && splitedStr.length === card.value.gapAnswers.filter(a => a.correct).length);
 };
 
 export const minArrayLength = minLength => value => value.filter(a => !!a).length >= minLength;
