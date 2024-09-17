@@ -23,7 +23,9 @@
               <div class="company-name-container">
                 <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="[col.class, 'company']">
                   <template v-if="col.name === 'company'">
-                    <div v-if="canAccessCompany" @click="goToCompany(col.value)">{{ col.value }}</div>
+                    <div v-if="canAccessCompany" @click="$event.stopPropagation()">
+                      <router-link :to="goToCompany(props.row)"> {{ col.value }} </router-link>
+                    </div>
                     <div v-else>{{ col.value }}</div>
                   </template>
                   <template v-else-if="col.name === 'actions'">
@@ -82,7 +84,6 @@
 import { subject } from '@casl/ability';
 import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
@@ -131,7 +132,6 @@ export default {
     const { validations, potentialTrainees } = toRefs(props);
 
     const $store = useStore();
-    const $router = useRouter();
 
     const editedCertifications = ref([]);
     const certificationsUpdateModal = ref(false);
@@ -334,10 +334,9 @@ export default {
 
     const inputTmpMaxTrainees = event => emit('update:maxTrainees', event);
 
-    const goToCompany = async (companyName) => {
-      const companyId = course.value.companies.find(c => c.name === companyName)._id;
-      $router.push({ name: 'ni users companies info', params: { companyId }, query: { defaultTab: 'infos' } });
-    };
+    const goToCompany = row => ({
+      name: 'ni users companies info', params: { companyId: row._id }, query: { defaultTab: 'infos' },
+    });
 
     const created = async () => {
       defineCourseAbilities();
