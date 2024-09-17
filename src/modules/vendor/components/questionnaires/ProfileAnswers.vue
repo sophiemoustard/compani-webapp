@@ -76,7 +76,6 @@
 <script>
 import { computed, toRefs, ref, watch, nextTick } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
 import get from 'lodash/get';
 import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
@@ -138,8 +137,6 @@ export default {
 
     const $store = useStore();
 
-    const $router = useRouter();
-
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
     const isRofOrVendorAdmin = computed(() => [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER]
@@ -194,10 +191,7 @@ export default {
     const cards = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })));
 
-    const isClientInterface = !/\/ad\//.test($router.currentRoute.value.path);
-
-    const displayGlobalInfos = computed(() => !isClientInterface && isRofOrVendorAdmin.value &&
-      hasFilteredAnswers.value);
+    const displayGlobalInfos = computed(() => isRofOrVendorAdmin.value && hasFilteredAnswers.value);
 
     const startAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({

@@ -32,5 +32,5 @@ export default {
   font-size: 24px
   font-weight: bold
   color: $copper-grey-700
-  margin: 12px
+  margin: 24px 16px
 </style>
