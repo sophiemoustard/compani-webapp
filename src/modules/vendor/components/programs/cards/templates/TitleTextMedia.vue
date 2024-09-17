@@ -9,7 +9,7 @@
       :options="UPLOAD_EXTENSION_OPTIONS" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="v$.card.media.$error"
-      :extensions="extensions" :additional-value="mediaFileName" required-field
+      :extensions="extensions" :additional-value="mediaFileName" required-field @start="start" @finish="finish"
       :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" :disable="disableEdition" />
   </div>
 </template>
@@ -30,7 +30,6 @@ export default {
   props: {
     disableEdition: { type: Boolean, default: false },
     cardParent: { type: Object, default: () => ({}) },
-    isUploading: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
@@ -66,6 +65,9 @@ export default {
       mediaFileName,
       mediaUploadUrl,
       maxFileSize,
+      isUploading,
+      start,
+      finish,
     } = useCardTemplate(card, v$, refreshCard, cardParent);
 
     return {
@@ -73,6 +75,7 @@ export default {
       v$,
       // Data
       UPLOAD_EXTENSION_OPTIONS,
+      isUploading,
       // Computed
       card,
       extensions,
@@ -84,6 +87,8 @@ export default {
       updateCard,
       mediaUploaded,
       validateMediaDeletion,
+      start,
+      finish,
     };
   },
 };
