@@ -28,7 +28,6 @@ export default {
   props: {
     disableEdition: { type: Boolean, default: false },
     cardParent: { type: Object, default: () => ({}) },
-    isUploading: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
@@ -65,6 +64,7 @@ export default {
       maxFileSize,
       start,
       finish,
+      isUploading,
     } = useCardTemplate(card, v$, refreshCard, cardParent);
 
     return {
@@ -72,6 +72,7 @@ export default {
       v$,
       // Data
       UPLOAD_EXTENSION_OPTIONS,
+      isUploading,
       // Computed
       card,
       mediaFileName,
