@@ -35,11 +35,11 @@
           <span v-if="isSelfPositionningAnswers">**</span>
           </span>
         </div>
-        <div v-if="isSelfPositionningAnswers" class="indicator-cell">
+        <div v-if="isSelfPositionningAnswers && startAnswersCount" class="indicator-cell">
           <ni-indicator :indicator="startAnswersAverage" />
           <span class="text-center">de moyenne pour les réponses au questionnaire de début</span>
         </div>
-        <div v-if="isSelfPositionningAnswers" class="indicator-cell">
+        <div v-if="isSelfPositionningAnswers && endAnswersCount" class="indicator-cell">
           <ni-indicator :indicator="endAnswersAverage" />
           <span class="text-center">de moyenne pour les réponses au questionnaire de fin</span>
         </div>
