@@ -1,7 +1,8 @@
 <template>
   <div>
     <ni-input caption="Titre" v-model="card.title" required-field @focus="saveTmp('title')"
-      @blur="updateCard('title')" :error="v$.card.title.$error" :disable="disableEdition" />
+      @blur="updateCard('title')" :error="v$.card.title.$error" :error-message="titleErrorMsg"
+      :disable="disableEdition" />
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="v$.card.text.$error" type="textarea" :disable="disableEdition" />
     <ni-option-group v-model="card.media.type" inline @update:model-value="updateCard('media.type')"
@@ -18,11 +19,11 @@
 import { computed, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
-import { required } from '@vuelidate/validators';
+import { required, maxLength } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import OptionGroup from '@components/form/OptionGroup';
-import { UPLOAD_EXTENSION_OPTIONS } from '@data/constants';
+import { UPLOAD_EXTENSION_OPTIONS, QUESTION_OR_TITLE_MAX_LENGTH } from '@data/constants';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
@@ -46,7 +47,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        title: { required },
+        title: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         text: { required },
         media: { publicId: { required }, link: { required }, type: { required } },
       },
@@ -68,6 +69,7 @@ export default {
       isUploading,
       start,
       finish,
+      titleErrorMsg,
     } = useCardTemplate(card, v$, refreshCard, cardParent);
 
     return {
@@ -82,6 +84,7 @@ export default {
       mediaFileName,
       mediaUploadUrl,
       maxFileSize,
+      titleErrorMsg,
       // Methods
       saveTmp,
       updateCard,

@@ -34,6 +34,15 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     return '';
   });
 
+  const titleErrorMsg = computed(() => {
+    if (get(v$.value, 'card.title.required.$response') === false) return REQUIRED_LABEL;
+    if (get(v$.value, 'card.title.maxLength.$response') === false) {
+      return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;
+    }
+
+    return '';
+  });
+
   const mediaFileName = computed(() => {
     if (card.value && card.value.title) return card.value.title.replace(/ /g, '_');
 
@@ -215,6 +224,7 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     mediaUploadUrl,
     extensions,
     maxFileSize,
+    titleErrorMsg,
     // Methods
     saveTmp,
     updateCard,
