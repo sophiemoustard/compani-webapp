@@ -24,7 +24,7 @@
                 <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="[col.class, 'company']">
                   <template v-if="col.name === 'company'">
                     <div v-if="canAccessCompany" @click="$event.stopPropagation()">
-                      <router-link :to="goToCompany(props.row)"> {{ col.value }} </router-link>
+                      <router-link :to="goToCompany(props.row)">{{ col.value }}</router-link>
                     </div>
                     <div v-else>{{ col.value }}</div>
                   </template>
