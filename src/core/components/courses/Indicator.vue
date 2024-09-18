@@ -1,5 +1,6 @@
 <template>
-  <div class="indicator text-weight-bold text-copper-500">{{ isPercentage ? `${indicator} %` : indicator }}</div>
+  <div v-if="!indicator && displayDefaultIndicator" class="indicator text-weight-bold text-copper-500">-</div>
+  <div v-else class="indicator text-weight-bold text-copper-500">{{ isPercentage ? `${indicator} %` : indicator }}</div>
 </template>
 
 <script>
@@ -8,6 +9,7 @@ export default {
   props: {
     indicator: { type: Number, default: 0 },
     isPercentage: { type: Boolean, default: false },
+    displayDefaultIndicator: { type: Boolean, default: false },
   },
 };
 </script>
