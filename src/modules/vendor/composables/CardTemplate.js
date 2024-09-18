@@ -10,7 +10,7 @@ import {
   ORDER_THE_SEQUENCE,
   QUESTION_ANSWER,
   SINGLE_CHOICE_QUESTION,
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   REQUIRED_LABEL,
   UPLOAD_IMAGE,
   UPLOAD_VIDEO,
@@ -28,7 +28,7 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
   const questionErrorMsg = computed(() => {
     if (get(v$.value, 'card.question.required.$response') === false) return REQUIRED_LABEL;
     if (get(v$.value, 'card.question.maxLength.$response') === false) {
-      return `${QUESTION_MAX_LENGTH} caractères maximum.`;
+      return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;
     }
 
     return '';

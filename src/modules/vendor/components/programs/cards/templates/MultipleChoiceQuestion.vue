@@ -29,7 +29,7 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   REQUIRED_LABEL,
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   QC_ANSWER_MAX_LENGTH,
   PUBLISHED,
   CHOICE_QUESTION_MAX_ANSWERS_COUNT,
@@ -60,7 +60,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         qcAnswers: {
           minOneCorrectAnswer,
           $each: helpers.forEach({

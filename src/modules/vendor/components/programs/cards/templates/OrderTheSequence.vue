@@ -23,7 +23,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import {
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT,
   ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT,
   PUBLISHED,
@@ -58,7 +58,7 @@ export default {
 
     const rules = {
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         orderedAnswers: { $each: helpers.forEach({ text: { required } }) },
         explanation: { required },
       },

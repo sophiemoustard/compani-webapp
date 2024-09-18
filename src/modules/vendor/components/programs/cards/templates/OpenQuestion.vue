@@ -14,7 +14,7 @@ import { computed } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength } from '@vuelidate/validators';
 import Input from '@components/form/Input';
-import { QUESTION_MAX_LENGTH } from '@data/constants';
+import { QUESTION_OR_TITLE_MAX_LENGTH } from '@data/constants';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
@@ -33,7 +33,7 @@ export default {
 
     const card = computed(() => $store.state.card.card);
 
-    const rules = { card: { question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) } } };
+    const rules = { card: { question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) } } };
     const v$ = useVuelidate(rules, { card });
 
     const { questionErrorMsg, saveTmp, updateCard } = useCardTemplate(card, v$, refreshCard);

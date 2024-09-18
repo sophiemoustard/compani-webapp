@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { QUESTION_MAX_LENGTH, REQUIRED_LABEL, UPLOAD_EXTENSION_OPTIONS } from '@data/constants';
+import { QUESTION_OR_TITLE_MAX_LENGTH, REQUIRED_LABEL, UPLOAD_EXTENSION_OPTIONS } from '@data/constants';
 import {
   AUDIO_EXTENSIONS,
   IMAGE_EXTENSIONS,
@@ -40,7 +40,7 @@ export const templateMixin = {
     questionErrorMsg () {
       if (get(this.v$, 'card.question.required.$response') === false) return REQUIRED_LABEL;
       if (get(this.v$, 'card.question.maxLength.$response') === false) {
-        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
+        return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;
       }
 
       return '';

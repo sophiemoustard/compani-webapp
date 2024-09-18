@@ -27,7 +27,7 @@ import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import {
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   QUESTION_ANSWER_MAX_ANSWERS_COUNT,
   QUESTION_ANSWER_MIN_ANSWERS_COUNT,
   PUBLISHED,
@@ -56,7 +56,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         qcAnswers: {
           $each: helpers.forEach({
             text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },

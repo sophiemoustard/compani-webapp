@@ -27,7 +27,7 @@ import { required, maxLength, requiredIf } from '@vuelidate/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import { QUESTION_MAX_LENGTH } from '@data/constants';
+import { QUESTION_OR_TITLE_MAX_LENGTH } from '@data/constants';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
@@ -48,7 +48,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         labels: {
           1: { required },
           2: { required: requiredIf(displayAllLabels.value) },
