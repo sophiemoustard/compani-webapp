@@ -25,18 +25,14 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
   const isUploading = ref(false);
   const $q = useQuasar();
 
-  const errorMsg = computed((path) => {
-    if (get(v$.value, 'card.question.required.$response') === false) return REQUIRED_LABEL;
-    if (get(v$.value, 'card.question.maxLength.$response') === false) {
-      return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;
-    }
-    if (get(v$.value, 'card.title.required.$response', path) === false) return REQUIRED_LABEL;
-    if (get(v$.value, 'card.title.maxLength.$response', path) === false) {
+  const errorMsg = (path) => {
+    if (get(v$.value, `card.${path}.required.$response`) === false) return REQUIRED_LABEL;
+    if (get(v$.value, `card.${path}.maxLength.$response`) === false) {
       return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;
     }
 
     return '';
-  });
+  };
 
   const mediaFileName = computed(() => {
     if (card.value && card.value.title) return card.value.title.replace(/ /g, '_');

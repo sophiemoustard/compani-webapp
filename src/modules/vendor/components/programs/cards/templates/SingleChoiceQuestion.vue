@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="answer.correct ? 'Bonne réponse' : `Mauvaise réponse ${i}`" :disable="disableEdition"

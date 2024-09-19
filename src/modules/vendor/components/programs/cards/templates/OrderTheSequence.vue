@@ -2,7 +2,7 @@
   <div class="container">
     <ni-input class="q-mb-lg" caption="Question" v-model="card.question" required-field :disable="disableEdition"
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="v$.card.question.$error" type="textarea"
-      :error-message="errorMsg" />
+      :error-message="errorMsg('question')" />
     <div v-for="(orderedAnswers, i) in card.orderedAnswers" :key="i" class="answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="orderedAnswers.text"
         @focus="saveTmp(`orderedAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :disable="disableEdition"
