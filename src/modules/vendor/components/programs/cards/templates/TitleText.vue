@@ -1,7 +1,7 @@
 <template>
   <div>
     <ni-input caption="Titre" v-model="card.title" required-field @focus="saveTmp('title')"
-      @blur="updateCard('title')" :error="v$.card.title.$error" :error-message="titleErrorMsg"
+      @blur="updateCard('title')" :error="v$.card.title.$error" :error-message="errorMsg"
       :disable="disableEdition" />
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="v$.card.text.$error" type="textarea" :disable="disableEdition" />
@@ -32,22 +32,24 @@ export default {
     const card = computed(() => $store.state.card.card);
 
     const rules = computed(() => ({
-      card: { title: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
-        text: { required } },
+      card: {
+        title: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
+        text: { required },
+      },
     }));
 
     const v$ = useVuelidate(rules, { card });
 
     const refreshCard = () => { emit('refresh'); };
 
-    const { saveTmp, updateCard, titleErrorMsg } = useCardTemplate(card, v$, refreshCard);
+    const { saveTmp, updateCard, errorMsg } = useCardTemplate(card, v$, refreshCard);
 
     return {
       // Validation
       v$,
       // Computed
       card,
-      titleErrorMsg,
+      errorMsg,
       // Methods
       saveTmp,
       updateCard,

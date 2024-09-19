@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg"
       :disable="disableEdition" class="q-mb-lg" />
     <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
       class="q-mb-lg" dense :disable="disableEdition" />
@@ -76,7 +76,7 @@ export default {
       getError,
       validateAnswerDeletion,
       addAnswer,
-      questionErrorMsg,
+      errorMsg,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => card.value.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
@@ -104,7 +104,7 @@ export default {
       // Computed
       disableAnswerCreation,
       disableAnswerDeletion,
-      questionErrorMsg,
+      errorMsg,
       // Methods
       answerIsRequired,
       questionAnswerErrorMsg,

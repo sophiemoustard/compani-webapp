@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg"
       :disable="disableEdition" />
     <div class="checkbox-container">
       <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
@@ -64,7 +64,7 @@ export default {
       emit('refresh');
     };
 
-    const { tmpInput, saveTmp, updateCard, questionErrorMsg } = useCardTemplate(card, v$, refreshCard);
+    const { tmpInput, saveTmp, updateCard, errorMsg } = useCardTemplate(card, v$, refreshCard);
 
     const labelErrorMessage = (labelKey) => {
       if (get(v$.value, `card.labels[${labelKey}].required.$response`) === false) {
@@ -131,7 +131,7 @@ export default {
       // Methods
       labelErrorMessage,
       updateCardLabels,
-      questionErrorMsg,
+      errorMsg,
       saveTmp,
       updateCard,
       get,

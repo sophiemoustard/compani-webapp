@@ -37,7 +37,7 @@ export const templateMixin = {
     mediaUploadUrl () {
       return `${process.env.API_HOSTNAME}/cards/${this.card._id}/upload`;
     },
-    questionErrorMsg () {
+    errorMsg () {
       if (get(this.v$, 'card.question.required.$response') === false) return REQUIRED_LABEL;
       if (get(this.v$, 'card.question.maxLength.$response') === false) {
         return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;

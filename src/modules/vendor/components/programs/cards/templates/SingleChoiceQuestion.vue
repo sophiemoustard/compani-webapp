@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="answer.correct ? 'Bonne réponse' : `Mauvaise réponse ${i}`" :disable="disableEdition"
@@ -79,7 +79,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
-      questionErrorMsg,
+      errorMsg,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => card.value.qcAnswers.length >= CHOICE_QUESTION_MAX_ANSWERS_COUNT ||
@@ -105,7 +105,7 @@ export default {
       v$,
       disableAnswerCreation,
       disableAnswerDeletion,
-      questionErrorMsg,
+      errorMsg,
       // Methods
       qcAnswerErrorMsg,
       answerIsRequired,
