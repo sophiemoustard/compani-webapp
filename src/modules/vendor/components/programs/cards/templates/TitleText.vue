@@ -1,8 +1,7 @@
 <template>
   <div>
-    <ni-input caption="Titre" v-model="card.title" required-field @focus="saveTmp('title')"
-      @blur="updateCard('title')" :error="v$.card.title.$error" :error-message="errorMsg('title')"
-      :disable="disableEdition" />
+    <ni-input caption="Titre" v-model="card.title" required-field @focus="saveTmp('title')" @blur="updateCard('title')"
+    :error="v$.card.title.$error" :error-message="errorMsg('title')" :disable="disableEdition" />
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="v$.card.text.$error" type="textarea" :disable="disableEdition" />
   </div>
