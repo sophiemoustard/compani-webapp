@@ -27,7 +27,9 @@
       <div class="indicator-container">
         <div class="indicator-cell">
           <ni-indicator :indicator="globalInfo.traineeCount" />
-          <span>{{ formatQuantity('apprenant.e', globalInfo.traineeCount, 's', false ) }} ayant répondu *</span>
+          <span class="text-center">
+            {{ formatQuantity('apprenant.e', globalInfo.traineeCount, 's', false ) }} ayant répondu *
+          </span>
         </div>
         <div class="indicator-cell">
           <ni-indicator :indicator="globalInfo.historyCount" />
