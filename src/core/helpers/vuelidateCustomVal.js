@@ -1,4 +1,5 @@
 import axios from 'axios';
+import get from 'lodash/get';
 import { helpers } from '@vuelidate/validators';
 import { isValidIBAN, isValidBIC } from 'ibantools';
 import { isGreaterThan, isGreaterThanOrEqual } from '@helpers/numbers';
@@ -88,15 +89,15 @@ export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\04
 
 export const validTagsCount = (value) => {
   if (!value) return true;
-  const splitedStr = value.match(/<trou>/g);
+  const tagsCount = get(value.match(/<trou>/g), 'length') || 0;
 
-  return !!(splitedStr && splitedStr.length > 0 && splitedStr.length < 3);
+  return !!(tagsCount && tagsCount < 3);
 };
 
 export const matchingTagsCount = (card, value) => {
-  const splitedStr = value.match(/<trou>/g);
+  const tagsCount = get(value.match(/<trou>/g), 'length') || 0;
 
-  return !!(splitedStr && splitedStr.length === card.value.gapAnswers.filter(a => a.correct).length);
+  return !!(tagsCount === card.value.gapAnswers.filter(a => a.correct).length);
 };
 
 export const minArrayLength = minLength => value => value.filter(a => !!a).length >= minLength;

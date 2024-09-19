@@ -119,11 +119,10 @@ export default {
         correctAnswers.value.some(a => !a.text)) {
         color = 'red-800';
       }
-      let index = 0;
-      const text = card.value.gappedText
-        .replace(/<trou>/g, () => (
-          index < correctAnswers.value.length ? ` ${correctAnswers.value[index++].text} ` : ''
-        ));
+      const correctAnswersText = correctAnswers.value.map(a => a.text);
+      const text = card.value.gappedText.replace(/<trou>/g, () => (
+        correctAnswersText.length ? ` ${correctAnswersText.shift()} ` : ''
+      ));
       return { text, color };
     });
 
