@@ -4,12 +4,12 @@
       @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
-      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" class="input"
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="qcAnswer.text" class="input"
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
         :error="getError('qcAnswers', i) || requiredOneCorrectAnswer(i)" :disable="disableEdition"
         :required-field="answerIsRequired(i)" />
-      <q-checkbox v-model="card.qcAnswers[i].correct" @update:model-value="updateCorrectAnswer(i, 'qcAnswers')"
-        :disable="!card.qcAnswers[i].text || disableEdition" />
+      <q-checkbox v-model="qcAnswer.correct" @update:model-value="updateCorrectAnswer(qcAnswer)"
+        :disable="!qcAnswer.text || disableEdition" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"

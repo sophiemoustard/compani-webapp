@@ -119,10 +119,8 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     }
   };
 
-  const updateCorrectAnswer = async (index, key) => {
+  const updateCorrectAnswer = async (editedAnswer) => {
     try {
-      const editedAnswer = get(card.value, `${key}[${index}]`);
-
       await Cards.updateAnswer(
         { cardId: card.value._id, answerId: editedAnswer._id },
         { correct: editedAnswer.correct }

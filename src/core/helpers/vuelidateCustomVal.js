@@ -91,13 +91,13 @@ export const validTagsCount = (value) => {
   if (!value) return true;
   const tagsCount = get(value.match(/<trou>/g), 'length') || 0;
 
-  return !!(tagsCount && tagsCount < 3);
+  return !!tagsCount && tagsCount < 3;
 };
 
 export const matchingTagsCount = (card, value) => {
   const tagsCount = get(value.match(/<trou>/g), 'length') || 0;
 
-  return !!(tagsCount === card.value.gapAnswers.filter(a => a.correct).length);
+  return tagsCount === card.value.gapAnswers.filter(a => a.correct).length;
 };
 
 export const minArrayLength = minLength => value => value.filter(a => !!a).length >= minLength;

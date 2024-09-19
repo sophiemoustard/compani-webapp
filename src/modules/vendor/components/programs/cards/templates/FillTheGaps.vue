@@ -16,12 +16,12 @@
     <q-checkbox v-model="card.canSwitchAnswers" @update:model-value="updateCard('canSwitchAnswers')"
       label="Réponses interchangeables" class="q-mb-lg switch-answers" dense :disable="disableEdition" />
     <div class="row gutter-profile-x">
-      <div v-for="(_, i) in card.gapAnswers" :key="i" class="answers">
-        <ni-input :caption="`Mot ${i + 1}`" v-model="card.gapAnswers[i].text" class="input"
+      <div v-for="(answer, i) in card.gapAnswers" :key="i" class="answers">
+        <ni-input :caption="`Mot ${i + 1}`" v-model="answer.text" class="input"
           @focus="saveTmp(`gapAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="gapAnswersErrorMsg(i)"
           :error="getError('gapAnswers', i) || requiredOneCorrectAnswer(i)" :disable="disableEdition"
           :required-field="answerIsRequired(i)" />
-        <q-checkbox v-model="card.gapAnswers[i].correct" @update:model-value="updateCorrectAnswer(i, 'gapAnswers')"
+        <q-checkbox v-model="answer.correct" @update:model-value="updateCorrectAnswer(answer)"
           :disable="disableAnswerCheckbox(i)" />
         <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
       </div>
