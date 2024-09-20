@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
-      :disable="disableEdition" class="q-mb-lg" />
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
+      :disable="disableEdition" class="q-mb-lg" type="textarea" />
     <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
       class="q-mb-lg" dense :disable="disableEdition" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" dense :disable="disableEdition" class="q-mb-lg"
@@ -27,7 +27,7 @@ import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import {
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   QUESTION_ANSWER_MAX_ANSWERS_COUNT,
   QUESTION_ANSWER_MIN_ANSWERS_COUNT,
   PUBLISHED,
@@ -56,7 +56,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         qcAnswers: {
           $each: helpers.forEach({
             text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
@@ -76,7 +76,7 @@ export default {
       getError,
       validateAnswerDeletion,
       addAnswer,
-      questionErrorMsg,
+      errorMsg,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => card.value.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
@@ -104,7 +104,6 @@ export default {
       // Computed
       disableAnswerCreation,
       disableAnswerDeletion,
-      questionErrorMsg,
       // Methods
       answerIsRequired,
       questionAnswerErrorMsg,
@@ -114,6 +113,7 @@ export default {
       getError,
       validateAnswerDeletion,
       addAnswer,
+      errorMsg,
     };
   },
 };

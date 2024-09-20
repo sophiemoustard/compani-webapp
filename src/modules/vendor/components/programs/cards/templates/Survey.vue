@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
-      :disable="disableEdition" />
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
+      :disable="disableEdition" type="textarea" />
     <div class="checkbox-container">
       <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
         class="q-mb-lg" dense :disable="disableEdition" />
@@ -27,7 +27,7 @@ import { required, maxLength, requiredIf } from '@vuelidate/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import { QUESTION_MAX_LENGTH } from '@data/constants';
+import { QUESTION_OR_TITLE_MAX_LENGTH } from '@data/constants';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
@@ -48,7 +48,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         labels: {
           1: { required },
           2: { required: requiredIf(displayAllLabels.value) },
@@ -64,7 +64,7 @@ export default {
       emit('refresh');
     };
 
-    const { tmpInput, saveTmp, updateCard, questionErrorMsg } = useCardTemplate(card, v$, refreshCard);
+    const { tmpInput, saveTmp, updateCard, errorMsg } = useCardTemplate(card, v$, refreshCard);
 
     const labelErrorMessage = (labelKey) => {
       if (get(v$.value, `card.labels[${labelKey}].required.$response`) === false) {
@@ -131,7 +131,7 @@ export default {
       // Methods
       labelErrorMessage,
       updateCardLabels,
-      questionErrorMsg,
+      errorMsg,
       saveTmp,
       updateCard,
       get,

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" class="input"
@@ -29,7 +29,7 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   REQUIRED_LABEL,
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   QC_ANSWER_MAX_LENGTH,
   PUBLISHED,
   CHOICE_QUESTION_MAX_ANSWERS_COUNT,
@@ -60,7 +60,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         qcAnswers: {
           minOneCorrectAnswer,
           $each: helpers.forEach({
@@ -84,7 +84,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
-      questionErrorMsg,
+      errorMsg,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
@@ -132,7 +132,6 @@ export default {
       card,
       disableAnswerCreation,
       disableAnswerDeletion,
-      questionErrorMsg,
       // Methods
       requiredOneCorrectAnswer,
       updateCorrectAnswer,
@@ -144,6 +143,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
+      errorMsg,
     };
   },
 };

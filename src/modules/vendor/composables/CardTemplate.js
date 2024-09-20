@@ -10,7 +10,7 @@ import {
   ORDER_THE_SEQUENCE,
   QUESTION_ANSWER,
   SINGLE_CHOICE_QUESTION,
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   REQUIRED_LABEL,
   UPLOAD_IMAGE,
   UPLOAD_VIDEO,
@@ -24,15 +24,6 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
   const tmpInput = ref('');
   const isUploading = ref(false);
   const $q = useQuasar();
-
-  const questionErrorMsg = computed(() => {
-    if (get(v$.value, 'card.question.required.$response') === false) return REQUIRED_LABEL;
-    if (get(v$.value, 'card.question.maxLength.$response') === false) {
-      return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-    }
-
-    return '';
-  });
 
   const mediaFileName = computed(() => {
     if (card.value && card.value.title) return card.value.title.replace(/ /g, '_');
@@ -205,16 +196,25 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
 
   const finish = () => { isUploading.value = false; };
 
+  const errorMsg = (path) => {
+    if (get(v$.value, `card.${path}.required.$response`) === false) return REQUIRED_LABEL;
+    if (get(v$.value, `card.${path}.maxLength.$response`) === false) {
+      return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;
+    }
+
+    return '';
+  };
+
   return {
     // Data
     tmpInput,
     isUploading,
     // Computed
-    questionErrorMsg,
     mediaFileName,
     mediaUploadUrl,
     extensions,
     maxFileSize,
+    errorMsg,
     // Methods
     saveTmp,
     updateCard,

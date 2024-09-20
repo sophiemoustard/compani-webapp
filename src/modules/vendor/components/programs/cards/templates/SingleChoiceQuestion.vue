@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="answer.correct ? 'Bonne réponse' : `Mauvaise réponse ${i}`" :disable="disableEdition"
@@ -27,7 +27,7 @@ import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
 import {
   REQUIRED_LABEL,
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   QC_ANSWER_MAX_LENGTH,
   PUBLISHED,
   CHOICE_QUESTION_MAX_ANSWERS_COUNT,
@@ -56,7 +56,7 @@ export default {
 
     const rules = {
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         qcAnswers: {
           $each: helpers.forEach({
             text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
@@ -79,7 +79,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
-      questionErrorMsg,
+      errorMsg,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => card.value.qcAnswers.length >= CHOICE_QUESTION_MAX_ANSWERS_COUNT ||
@@ -105,7 +105,6 @@ export default {
       v$,
       disableAnswerCreation,
       disableAnswerDeletion,
-      questionErrorMsg,
       // Methods
       qcAnswerErrorMsg,
       answerIsRequired,
@@ -115,6 +114,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
+      errorMsg,
     };
   },
 };
