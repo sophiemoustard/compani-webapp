@@ -105,7 +105,6 @@ export default {
       v$,
       disableAnswerCreation,
       disableAnswerDeletion,
-      errorMsg,
       // Methods
       qcAnswerErrorMsg,
       answerIsRequired,
@@ -115,6 +114,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
+      errorMsg,
     };
   },
 };

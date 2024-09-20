@@ -2,7 +2,7 @@
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
-      :disable="disableEdition" class="q-mb-lg" />
+      :disable="disableEdition" class="q-mb-lg" type="textarea" />
     <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
       class="q-mb-lg" dense :disable="disableEdition" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" dense :disable="disableEdition" class="q-mb-lg"
@@ -104,7 +104,6 @@ export default {
       // Computed
       disableAnswerCreation,
       disableAnswerDeletion,
-      errorMsg,
       // Methods
       answerIsRequired,
       questionAnswerErrorMsg,
@@ -114,6 +113,7 @@ export default {
       getError,
       validateAnswerDeletion,
       addAnswer,
+      errorMsg,
     };
   },
 };

@@ -132,7 +132,6 @@ export default {
       card,
       disableAnswerCreation,
       disableAnswerDeletion,
-      errorMsg,
       // Methods
       requiredOneCorrectAnswer,
       updateCorrectAnswer,
@@ -144,6 +143,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
+      errorMsg,
     };
   },
 };

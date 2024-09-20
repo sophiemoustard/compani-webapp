@@ -82,7 +82,6 @@ export default {
       v$,
       // Computed
       card,
-      errorMsg,
       disableAnswerCreation,
       disableAnswerDeletion,
       // Methods
@@ -94,6 +93,7 @@ export default {
       validateAnswerDeletion,
       addAnswer,
       answerIsRequired,
+      errorMsg,
     };
   },
 };

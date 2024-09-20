@@ -2,7 +2,7 @@
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
-      :disable="disableEdition" />
+      :disable="disableEdition" type="textarea" />
     <div class="checkbox-container">
       <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
         class="q-mb-lg" dense :disable="disableEdition" />
