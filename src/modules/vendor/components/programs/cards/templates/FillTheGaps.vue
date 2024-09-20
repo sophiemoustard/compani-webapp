@@ -2,7 +2,9 @@
   <div class="container">
     <ni-banner icon-color="copper-500" class="bg-copper-grey-100 text-copper-grey-800" icon="info_outline">
       <template #message>
-        Remplacer chaque bonne réponse par une balise &lt;trou&gt; et cocher les bonnes réponses dans la liste des mots
+        - Renseigner les éléments de réponses possibles dans les champs "Mot" <br>
+        - Cocher les bonnes réponses <br>
+        - Dans le champ Texte, remplacer chaque bonne réponse par une balise &lt;trou&gt;
       </template>
     </ni-banner>
     <div class="q-mb-lg ">
