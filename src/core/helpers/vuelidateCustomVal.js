@@ -1,7 +1,7 @@
 import axios from 'axios';
-import get from 'lodash/get';
 import { helpers } from '@vuelidate/validators';
 import { isValidIBAN, isValidBIC } from 'ibantools';
+import { FILL_THE_GAPS_MAX_GAPS_COUNT } from '@data/constants';
 import { isGreaterThan, isGreaterThanOrEqual } from '@helpers/numbers';
 import CompaniDate from '@helpers/dates/companiDates';
 
@@ -89,13 +89,13 @@ export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\04
 
 export const validTagsCount = (value) => {
   if (!value) return true;
-  const tagsCount = get(value.match(/<trou>/g), 'length') || 0;
+  const tagsCount = (value.match(/<trou>/g) || []).length;
 
-  return !!tagsCount && tagsCount < 3;
+  return !!tagsCount && tagsCount <= FILL_THE_GAPS_MAX_GAPS_COUNT;
 };
 
 export const matchingTagsCount = (card, value) => {
-  const tagsCount = get(value.match(/<trou>/g), 'length') || 0;
+  const tagsCount = (value.match(/<trou>/g) || []).length;
 
   return tagsCount === card.value.gapAnswers.filter(a => a.correct).length;
 };

@@ -6,7 +6,7 @@
     <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="qcAnswer.text" class="input"
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
-        :error="getError('qcAnswers', i) || requiredOneCorrectAnswer(i)" :disable="disableEdition"
+        :error="getError('qcAnswers', i) || requiredOneCorrectAnswer('qcAnswers', i)" :disable="disableEdition"
         :required-field="answerIsRequired(i)" />
       <q-checkbox v-model="qcAnswer.correct" @update:model-value="updateCorrectAnswer(qcAnswer)"
         :disable="!qcAnswer.text || disableEdition" />
@@ -84,6 +84,7 @@ export default {
       validateAnswerDeletion,
       errorMsg,
       updateCorrectAnswer,
+      requiredOneCorrectAnswer,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
@@ -92,14 +93,11 @@ export default {
     const disableAnswerDeletion = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
       card.value.qcAnswers.length <= CHOICE_QUESTION_MIN_ANSWERS_COUNT);
 
-    const requiredOneCorrectAnswer = index => !get(v$.value, 'card.qcAnswers.minOneCorrectAnswer.$response') &&
-      !!card.value.qcAnswers[index].text;
-
     const answersErrorMsg = (index) => {
       const validation = v$.value.card.qcAnswers.$each.$response.$errors[index].text;
 
       if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
-      if (requiredOneCorrectAnswer(index)) return 'Une bonne réponse est nécessaire.';
+      if (requiredOneCorrectAnswer('qcAnswers', index)) return 'Une bonne réponse est nécessaire.';
       if (get(validation, '0.$validator') === 'maxLength') return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';

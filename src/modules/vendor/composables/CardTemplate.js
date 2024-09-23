@@ -18,6 +18,7 @@ import {
   AUDIO_EXTENSIONS,
   IMAGE_EXTENSIONS,
   VIDEO_EXTENSIONS,
+  PUBLISHED,
 } from '@data/constants';
 
 export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
@@ -84,6 +85,9 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     }
   };
 
+  const requiredOneCorrectAnswer = (path, index) => !get(v$.value, `card.${path}.minOneCorrectAnswer.$response`) &&
+    !!`card.value.${path}[${index}].text`;
+
   const getError = (path, index) => !!get(v$.value, `card.${path}.$dirty`) &&
     get(v$.value, `card.${path}.$each.$response.$errors[${index}].text.0.$response`) === false;
 
@@ -125,6 +129,29 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
         { cardId: card.value._id, answerId: editedAnswer._id },
         { correct: editedAnswer.correct }
       );
+
+      await refreshCard();
+      NotifyPositive('Carte mise à jour.');
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la mise à jour de la carte.');
+    }
+  };
+
+  const updateGappedTextCard = async () => {
+    try {
+      const value = get(card.value, 'gappedText');
+      if (tmpInput.value === value) return;
+
+      const validation = get(v$.value.card, 'gappedText');
+      if (validation) {
+        validation.$touch();
+        const error = !validation.required.$response || !validation.validTagsCount.$response ||
+          (cardParent.value.status === PUBLISHED && !validation.matchingTagsCount.$response);
+        if (error) return NotifyWarning('Champ(s) invalide(s)');
+      }
+
+      await Cards.updateById(card.value._id, { gappedText: value.trim() });
 
       await refreshCard();
       NotifyPositive('Carte mise à jour.');
@@ -233,6 +260,8 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     // Methods
     saveTmp,
     updateCard,
+    updateGappedTextCard,
+    requiredOneCorrectAnswer,
     getError,
     updateTextAnswer,
     updateCorrectAnswer,

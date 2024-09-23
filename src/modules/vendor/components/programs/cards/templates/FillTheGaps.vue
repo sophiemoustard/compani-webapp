@@ -1,16 +1,14 @@
 <template>
   <div class="container">
-    <ni-banner icon-color="copper-500" class="bg-copper-grey-100 text-copper-grey-800" icon="info_outline">
+    <ni-banner class="bg-peach-100" icon="info_outline">
       <template #message>
-        - Renseigner les éléments de réponses possibles dans les champs "Mot" <br>
-        - Cocher les bonnes réponses <br>
-        - Dans le champ Texte, remplacer chaque bonne réponse par une balise &lt;trou&gt;
+        Remplacer chaque bonne réponse par une balise &lt;trou&gt; et cocher les bonnes réponses dans la liste des mots
       </template>
     </ni-banner>
     <div class="q-mb-lg ">
       <ni-input caption="Texte" v-model="card.gappedText" required-field @focus="saveTmp('gappedText')"
-        @blur="updateCard('gappedText')" :error="v$.card.gappedText.$error" type="textarea" :disable="disableEdition"
-        :error-message="gappedTextTagCodeErrorMsg" />
+      :error="v$.card.gappedText.$error || v$.card.gappedText.matchingTagsCount.$response === false" type="textarea"
+      :disable="disableEdition" :error-message="gappedTextTagCodeErrorMsg" @blur="updateGappedTextCard" />
       <p :class="`text-italic text-14 text-${filledText.color}`" v-if="filledText.text">
         Texte final : {{ filledText.text }}
       </p>
@@ -19,10 +17,9 @@
       label="Réponses interchangeables" class="q-mb-lg switch-answers" dense :disable="disableEdition" />
     <div class="row gutter-profile-x">
       <div v-for="(answer, i) in card.gapAnswers" :key="i" class="answers">
-        <ni-input :caption="`Mot ${i + 1}`" v-model="answer.text" class="input"
+        <ni-input :caption="`Mot ${i + 1}`" v-model="answer.text" class="input" :required-field="answerIsRequired(i)"
           @focus="saveTmp(`gapAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="gapAnswersErrorMsg(i)"
-          :error="getError('gapAnswers', i) || requiredOneCorrectAnswer(i)" :disable="disableEdition"
-          :required-field="answerIsRequired(i)" />
+          :error="getError('gapAnswers', i) || requiredOneCorrectAnswer('gapAnswers', i)" :disable="disableEdition" />
         <q-checkbox v-model="answer.correct" @update:model-value="updateCorrectAnswer(answer)"
           :disable="disableAnswerCheckbox(i)" />
         <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
@@ -49,6 +46,7 @@ import {
   PUBLISHED,
   FILL_THE_GAPS_MAX_ANSWERS_COUNT,
   FILL_THE_GAPS_MIN_ANSWERS_COUNT,
+  FILL_THE_GAPS_MAX_GAPS_COUNT,
 } from '@data/constants';
 import { minOneCorrectAnswer, matchingTagsCount, validTagsCount, validCaracters } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
@@ -93,18 +91,20 @@ export default {
 
     const {
       updateCard,
+      updateGappedTextCard,
       getError,
       saveTmp,
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
       updateCorrectAnswer,
-    } = useCardTemplate(card, v$, refreshCard);
+      requiredOneCorrectAnswer,
+    } = useCardTemplate(card, v$, refreshCard, cardParent);
 
     const gappedTextTagCodeErrorMsg = computed(() => {
       const modifiedText = v$.value.card.gappedText;
       if (get(modifiedText, 'required.$response') === false) return REQUIRED_LABEL;
-      if (get(modifiedText, 'validTagsCount.$response') === false) return 'Le nombre de trous doit être de 1 ou 2';
+      if (get(modifiedText, 'validTagsCount.$response') === false) return 'Le nombre de \'<trou>\' doit être de 1 ou 2';
       if (get(modifiedText, 'matchingTagsCount.$response') === false) {
         return 'Le nombre de \'<trou>\' ne correspond pas au nombre de bonnes réponses renseignées';
       }
@@ -135,16 +135,13 @@ export default {
         disableEdition.value || cardParent.value.status === PUBLISHED);
 
     const disableAnswerCheckbox = index => !card.value.gapAnswers[index].text || disableEdition.value ||
-      (correctAnswers.value.length === 2 && !card.value.gapAnswers[index].correct) ||
+      (correctAnswers.value.length === FILL_THE_GAPS_MAX_GAPS_COUNT && !card.value.gapAnswers[index].correct) ||
       cardParent.value.status === PUBLISHED;
-
-    const requiredOneCorrectAnswer = index => !!card.value.gapAnswers[index].text &&
-      !get(v$.value, 'card.gapAnswers.minOneCorrectAnswer.$response');
 
     const gapAnswersErrorMsg = (index) => {
       const validation = v$.value.card.gapAnswers.$each.$response.$errors[index].text;
 
-      if (requiredOneCorrectAnswer(index)) return 'Une bonne réponse est nécessaire.';
+      if (requiredOneCorrectAnswer('gapAnswers', index)) return 'Une bonne réponse est nécessaire.';
 
       switch (get(validation, '0.$validator')) {
         case 'required':
@@ -177,6 +174,7 @@ export default {
       answerIsRequired,
       disableAnswerCheckbox,
       updateCard,
+      updateGappedTextCard,
       getError,
       saveTmp,
       addAnswer,
