@@ -29,6 +29,8 @@ export default {
     courseCompanies: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     courseName: { type: String, default: '' },
+    isInterCourse: { type: Boolean, default: false },
+
   },
   components: {
     'ni-modal': Modal,
@@ -37,9 +39,13 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:companies-to-bill'],
   setup (props, { emit }) {
-    const { courseCompanies } = toRefs(props);
+    const { courseCompanies, isInterCourse } = toRefs(props);
 
-    const companiesOptions = computed(() => courseCompanies.value.map(c => ({ label: c.name, value: c._id })));
+    const companiesOptions = computed(() => courseCompanies.value
+      .map((c) => {
+        const label = isInterCourse.value ? `${c.name}${c.holding ? ` (${c.holding.name})` : ''}` : c.name;
+        return { label, value: c._id };
+      }));
 
     const hide = () => emit('hide');
 
