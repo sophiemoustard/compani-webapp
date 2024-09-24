@@ -106,6 +106,7 @@ export default {
       if (get(modifiedText, 'required.$response') === false) return REQUIRED_LABEL;
       if (get(modifiedText, 'validTagsCount.$response') === false) return 'Le nombre de \'<trou>\' doit être de 1 ou 2';
       if (get(modifiedText, 'matchingTagsCount.$response') === false) {
+        if (cardParent.value.status === PUBLISHED) return 'Le nombre de \'<trou>\' ne peut pas être modifié';
         return 'Le nombre de \'<trou>\' ne correspond pas au nombre de bonnes réponses renseignées';
       }
 
