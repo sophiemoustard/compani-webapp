@@ -30,7 +30,6 @@ export default {
     validations: { type: Object, default: () => ({}) },
     courseName: { type: String, default: '' },
     isInterCourse: { type: Boolean, default: false },
-
   },
   components: {
     'ni-modal': Modal,
@@ -43,7 +42,7 @@ export default {
 
     const companiesOptions = computed(() => courseCompanies.value
       .map((c) => {
-        const label = isInterCourse.value ? `${c.name}${c.holding ? ` (${c.holding.name})` : ''}` : c.name;
+        const label = `${c.name}${isInterCourse.value && c.holding ? ` (${c.holding.name})` : ''}`;
         return { label, value: c._id };
       }));
 
