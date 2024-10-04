@@ -31,10 +31,10 @@
       <div v-if="isRofOrVendorAdmin && endSelfPositionningHistoryCount">
         <ni-banner icon="info_outline">
           <template #message>
-            <a class="text-weight-bold">
-              {{ selfPositionningHistoryValidatedCount }} / {{ endSelfPositionningHistoryCount }}
-            </a>
-            réponses au questionnaire d'auto-positionnement de fin ont été validées.
+            {{ formatQuantity('réponse', selfPositionningHistoryValidatedCount) }} au questionnaire
+            d'auto-positionnement de fin
+            {{ formatQuantity('validée', selfPositionningHistoryValidatedCount, 's', false) }} sur
+            {{ endSelfPositionningHistoryCount }}.
           </template>
         </ni-banner>
       </div>
