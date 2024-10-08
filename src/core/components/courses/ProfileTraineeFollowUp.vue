@@ -40,8 +40,8 @@
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
         <router-link v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
-        :to="goToQuestionnaireAnswers(questionnaire.type)">
-        <questionnaire-answers-cell :questionnaire="questionnaire" />
+          :to="goToQuestionnaireAnswers(questionnaire.type)">
+            <questionnaire-answers-cell :questionnaire="questionnaire" />
         </router-link>
       </div>
     </div>
