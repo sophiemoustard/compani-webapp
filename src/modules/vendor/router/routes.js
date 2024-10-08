@@ -255,7 +255,9 @@ const routes = [
             const { course } = store.state.course;
             const { loggedUser } = store.state.main;
 
-            return loggedUser._id === get(course, 'trainer._id') ? next() : next('/404');
+            const trainerIds = get(course, 'trainers', []).map(t => t._id);
+
+            return trainerIds.includes(loggedUser._id) ? next() : next('/404');
           } catch (e) {
             console.error(e);
           }
