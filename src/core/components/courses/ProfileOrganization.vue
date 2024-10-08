@@ -19,9 +19,6 @@
         <interlocutor-cell :interlocutor="course.operationsRepresentative" caption="Chargé des opérations"
           :can-update="canUpdateInterlocutor" :contact="course.contact" :disable="isArchived"
           @open-modal="openOperationsRepresentativeModal" />
-        <interlocutor-cell :interlocutor="course.trainer" caption="Intervenant" :contact="course.contact"
-          :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
-          @open-modal="openTrainerModal" clearable />
         <interlocutor-cell :interlocutor="course.companyRepresentative" caption="Chargé de formation structure"
           :contact="course.contact" :can-update="canUpdateCompanyRepresentative" :disable="isArchived"
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
@@ -30,6 +27,12 @@
           @open-modal="openSalesRepresentativeModal" clearable />
         <ni-secondary-button v-if="!course.contact._id && canUpdateInterlocutor" :disable="isArchived"
           label="Définir un contact pour la formation" @click="openContactAdditionModal" />
+      </div>
+      <p class="text-weight-bold table-title q-mt-xl">Intervenants</p>
+      <div class="interlocutor-container">
+        <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
+          caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
+          label="Ajouter un intervenant" :disable="isArchived" clearable is-trainer />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
@@ -359,7 +362,7 @@ export default {
     const contactOptions = computed(() => {
       const interlocutors = [
         { interlocutor: course.value.operationsRepresentative, role: 'Chargé(e) des opérations' },
-        ...(course.value.trainer._id ? [{ interlocutor: course.value.trainer, role: 'Intervenant(e)' }] : []),
+        // ...(course.value.trainer._id ? [{ interlocutor: course.value.trainer, role: 'Intervenant(e)' }] : []),
         ...(course.value.companyRepresentative._id
           ? [{ interlocutor: course.value.companyRepresentative, role: 'Chargé(e) de formation structure' }]
           : []),
@@ -694,7 +697,8 @@ export default {
     };
 
     const validateTrainerUpdate = async () => {
-      if (course.value.trainerMission && tmpInterlocutor.value._id !== course.value.trainer._id) {
+      // if (course.value.trainerMission && tmpInterlocutor.value._id !== course.value.trainer._id) {
+      if (course.value.trainerMission) {
         const message = 'Un ordre de mission est associé au formateur actuel et sera annulé.'
           + ' Êtes-vous sûr(e) de vouloir continuer&nbsp;?';
         $q.dialog({
@@ -757,8 +761,8 @@ export default {
         const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un ';
 
         tmpInterlocutor.value = {
-          _id: course.value.trainer._id,
-          isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
+          // _id: course.value.trainer._id,
+          // isContact: !!course.value.trainer._id && course.value.trainer._id === course.value.contact._id,
         };
         interlocutorLabel.value = { action, interlocutor: 'intervenant' };
         trainerModal.value = true;
