@@ -125,7 +125,7 @@ export default {
       const onSiteSteps = course.value.subProgram.steps.filter(step => step.type === ON_SITE).map(step => step._id);
       const onSiteSlots = [...course.value.slots, ...course.value.slotsToPlan]
         .filter(slot => onSiteSteps.includes(slot.step));
-      if (!course.value.trainer._id) infos.push('l\'intervenant(e)');
+      if (!get(course.value, 'trainers', []).length) infos.push('l\'intervenant(e)');
       if (!course.value.slots || !course.value.slots.length) infos.push('minimum 1 créneau');
       else if (onSiteSlots.length && !onSiteSlots.some(slot => slot.address)) infos.push('mininum 1 adresse');
       if (course.value.slotsToPlan.length) {
