@@ -39,8 +39,10 @@
         </ni-banner>
       </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
-        <questionnaire-answers-cell v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
-          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire.type)" />
+        <router-link v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
+        :to="goToQuestionnaireAnswers(questionnaire.type)">
+        <questionnaire-answers-cell :questionnaire="questionnaire" />
+        </router-link>
       </div>
     </div>
     <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="learnersLoading"
@@ -224,7 +226,7 @@ export default {
       .flatMap(q => q.histories.filter(h => !!h.isValidated))
       .length);
 
-    const goToQuestionnaireAnswers = questionnaireType => $router.push({
+    const goToQuestionnaireAnswers = questionnaireType => ({
       name: 'ni pedagogy questionnaire answers',
       query: { courseId: course.value._id, questionnaireType },
     });
