@@ -34,7 +34,7 @@ export const useCourses = (course) => {
 
   const followUpMissingInfo = computed(() => {
     const missingInfo = [];
-    if (!course.value.trainer._id) missingInfo.push('l\'intervenant(e)');
+    if (!get(course.value, 'trainers', []).length) missingInfo.push('l\'intervenant(e)');
     if (!course.value.slots || !course.value.slots.length) missingInfo.push('minimum 1 créneau');
 
     if (!get(course.value, 'contact._id')) missingInfo.push('le contact pour la formation');
