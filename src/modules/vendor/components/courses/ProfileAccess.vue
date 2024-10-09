@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { ref, computed, toRef } from 'vue';
+import { ref, computed, toRefs } from 'vue';
 import { useQuasar } from 'quasar';
 import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
@@ -66,9 +66,14 @@ export default {
     const companyOptions = ref([]);
     const accessRuleCreationModal = ref(false);
     const modalLoading = ref(false);
-    const { profileId } = toRef(props);
+    const { profileId } = toRefs(props);
     const $q = useQuasar();
-    const v$ = useVuelidate();
+
+    const rules = computed(() => ({
+      newAccessRule: { required },
+    }));
+
+    const v$ = useVuelidate(rules, { newAccessRule });
 
     const $store = useStore();
 
@@ -78,7 +83,7 @@ export default {
 
     const refreshCourse = async () => {
       try {
-        await $store.dispatch('course/fetchCourse', { courseId: profileId });
+        await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
       } catch (e) {
         console.error(e);
       }
@@ -86,7 +91,7 @@ export default {
 
     const openAddAccessRuleModal = async () => {
       try {
-        const companies = await Companies.list({ DIRECTORY });
+        const companies = await Companies.list({ action: DIRECTORY });
         const companiesWithoutAccessRules = companies.filter(
           c => !accessRules.value.map(ar => ar.name).includes(c.name)
         );
@@ -103,16 +108,16 @@ export default {
     const resetAccessRuleCreationModal = () => {
       companyOptions.value = [];
       newAccessRule.value = '';
-      v$.newAccessRule.value.$reset();
+      v$.value.newAccessRule.$reset();
     };
 
     const addAccessRule = async () => {
       try {
-        v$.newAccessRule.$touch();
-        if (v$.newAccessRule.$error) return NotifyWarning('Une règle d\'accès est requise');
+        v$.value.newAccessRule.$touch();
+        if (v$.value.newAccessRule.$error) return NotifyWarning('Une règle d\'accès est requise');
 
         modalLoading.value = true;
-        await Courses.addAccessRule(profileId, { company: newAccessRule.value });
+        await Courses.addAccessRule(profileId.value, { company: newAccessRule.value });
 
         accessRuleCreationModal.value = false;
         NotifyPositive('Règle d\'accès créée.');
@@ -139,7 +144,7 @@ export default {
 
     const deleteAccessRule = async (accessRuleId) => {
       try {
-        await Courses.deleteAccessRule(profileId, accessRuleId);
+        await Courses.deleteAccessRule(profileId.value, accessRuleId);
 
         NotifyPositive('Règle d\'accès suprimée.');
 
@@ -168,11 +173,6 @@ export default {
       validateAccessRuleDeletion,
       // Computed
       accessRules,
-    };
-  },
-  validations () {
-    return {
-      newAccessRule: { required },
     };
   },
 };

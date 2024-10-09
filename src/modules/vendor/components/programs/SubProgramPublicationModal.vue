@@ -42,7 +42,7 @@ export default {
     'ni-option-group': OptionGroup,
     'company-select': CompanySelect,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:selected-company'],
+  emits: ['hide', 'update:model-value', 'submit'],
   setup (_, { emit }) {
     const access = ref(FREE_ACCESS);
     const accessCompany = ref('');
@@ -62,15 +62,15 @@ export default {
     const input = event => emit('update:model-value', event);
 
     const submit = () => {
-      v$.accessCompany.$touch();
-      if (v$.accessCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
+      v$.value.accessCompany.$touch();
+      if (v$.value.accessCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
 
       emit('submit', accessCompany.value);
     };
 
     const resetAccess = () => { accessCompany.value = ''; };
 
-    const update = event => emit('update:selected-company', event);
+    const update = (event) => { accessCompany.value = event; };
 
     return {
       // Validations
