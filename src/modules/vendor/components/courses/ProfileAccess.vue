@@ -31,16 +31,19 @@
 </template>
 
 <script>
+import { ref, computed, toRef } from 'vue';
+import { useQuasar } from 'quasar';
+import { useStore } from 'vuex';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
-import { mapState } from 'vuex';
+import { DIRECTORY } from '@data/constants';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Button from '@components/Button';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
-import { formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortCompanyOptions } from '@helpers/utils';
 import AccessRuleCreationModal from 'src/modules/vendor/components/courses/AccessRuleCreationModal';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 export default {
   name: 'ProfileAccess',
@@ -52,103 +55,125 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  data () {
-    return {
-      tableLoading: false,
-      columns: [
-        { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 92%' },
-        { name: 'actions', label: '', field: '_id' },
-      ],
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
-      newAccessRule: '',
-      companyOptions: [],
-      accessRuleCreationModal: false,
-      modalLoading: false,
-    };
-  },
-  computed: {
-    ...mapState('course', ['course']),
-    accessRules () {
-      return this.course.accessRules || [];
-    },
-  },
-  validations () {
-    return {
-      newAccessRule: { required },
-    };
-  },
-  methods: {
-    async refreshCourse () {
+  setup (props) {
+    const tableLoading = ref(false);
+    const columns = ref([
+      { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 92%' },
+      { name: 'actions', label: '', field: '_id' },
+    ]);
+    const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
+    const newAccessRule = ref('');
+    const companyOptions = ref([]);
+    const accessRuleCreationModal = ref(false);
+    const modalLoading = ref(false);
+    const { profileId } = toRef(props);
+    const $q = useQuasar();
+    const v$ = useVuelidate();
+
+    const $store = useStore();
+
+    const course = computed(() => $store.state.course.course);
+
+    const accessRules = computed(() => course.value.accessRules || []);
+
+    const refreshCourse = async () => {
       try {
-        await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
+        await $store.dispatch('course/fetchCourse', { courseId: profileId });
       } catch (e) {
         console.error(e);
       }
-    },
-    async openAddAccessRuleModal () {
+    };
+
+    const openAddAccessRuleModal = async () => {
       try {
-        const companies = await Companies.list();
+        const companies = await Companies.list({ DIRECTORY });
         const companiesWithoutAccessRules = companies.filter(
-          c => !this.accessRules.map(ar => ar.name).includes(c.name)
+          c => !accessRules.value.map(ar => ar.name).includes(c.name)
         );
 
-        this.companyOptions = formatAndSortOptions(companiesWithoutAccessRules, 'name');
-        this.accessRuleCreationModal = true;
+        companyOptions.value = formatAndSortCompanyOptions(companiesWithoutAccessRules, 'name');
+        accessRuleCreationModal.value = true;
       } catch (e) {
         console.error(e);
-        this.accessRuleCreationModal = false;
-        this.companyOptions = [];
+        accessRuleCreationModal.value = false;
+        companyOptions.value = [];
       }
-    },
-    resetAccessRuleCreationModal () {
-      this.companyOptions = [];
-      this.newAccessRule = '';
-      this.v$.newAccessRule.$reset();
-    },
-    async addAccessRule () {
+    };
+
+    const resetAccessRuleCreationModal = () => {
+      companyOptions.value = [];
+      newAccessRule.value = '';
+      v$.newAccessRule.value.$reset();
+    };
+
+    const addAccessRule = async () => {
       try {
-        this.v$.newAccessRule.$touch();
-        if (this.v$.newAccessRule.$error) return NotifyWarning('Une règle d\'accès est requise');
+        v$.newAccessRule.$touch();
+        if (v$.newAccessRule.$error) return NotifyWarning('Une règle d\'accès est requise');
 
-        this.modalLoading = true;
-        await Courses.addAccessRule(this.profileId, { company: this.newAccessRule });
+        modalLoading.value = true;
+        await Courses.addAccessRule(profileId, { company: newAccessRule.value });
 
-        this.accessRuleCreationModal = false;
+        accessRuleCreationModal.value = false;
         NotifyPositive('Règle d\'accès créée.');
 
-        await this.refreshCourse();
+        await refreshCourse();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la règle d\'accès.');
       } finally {
-        this.modalLoading = false;
+        modalLoading.value = false;
       }
-    },
-    validateAccessRuleDeletion (accessRuleId) {
-      this.$q.dialog({
+    };
+
+    const validateAccessRuleDeletion = (accessRuleId) => {
+      $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir supprimer cette règle d\'accès&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteAccessRule(accessRuleId))
+      }).onOk(() => deleteAccessRule(accessRuleId))
         .onCancel(() => NotifyPositive('Suppression annulé.'));
-    },
-    async deleteAccessRule (accessRuleId) {
+    };
+
+    const deleteAccessRule = async (accessRuleId) => {
       try {
-        await Courses.deleteAccessRule(this.profileId, accessRuleId);
+        await Courses.deleteAccessRule(profileId, accessRuleId);
 
         NotifyPositive('Règle d\'accès suprimée.');
 
-        await this.refreshCourse();
+        await refreshCourse();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la règle d\'accès.');
       }
-    },
+    };
+
+    return {
+      // Validations
+      v$,
+      // Data
+      tableLoading,
+      columns,
+      pagination,
+      newAccessRule,
+      companyOptions,
+      accessRuleCreationModal,
+      modalLoading,
+      // Methods
+      openAddAccessRuleModal,
+      addAccessRule,
+      resetAccessRuleCreationModal,
+      validateAccessRuleDeletion,
+      // Computed
+      accessRules,
+    };
+  },
+  validations () {
+    return {
+      newAccessRule: { required },
+    };
   },
 };
 </script>
