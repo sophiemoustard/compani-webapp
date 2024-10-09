@@ -10,7 +10,11 @@
           label="La formation est certifiante" @update:model-value="updateCourse('hasCertifyingTest')"
           :disable="!!get(course, 'certifiedTrainees.length')" />
       </div>
-      <p class="text-weight-bold table-title">Interlocuteurs</p>
+      <div class="row justify-between align-center q-mt-md">
+        <p class="text-weight-bold">Interlocuteurs</p>
+        <ni-secondary-button v-if="canUpdateInterlocutor" icon="edit" :disable="isArchived" class="q-mb-lg"
+          label="Modifier le contact pour la formation" @click="openContactAdditionModal" />
+      </div>
       <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">
         Des questions sur votre parcours de formation ou sur la facturation ? Retrouvez vos contacts Compani sur
         <a class="clickable-name cursor-pointer" @click="goToContactProfile">la page dédiée</a> .
@@ -28,13 +32,15 @@
       </div>
       <p class="text-weight-bold table-title q-mt-xl">Intervenants</p>
       <div class="interlocutor-container">
-        <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
-          caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
-          label="Ajouter un intervenant" :disable="isArchived" clearable is-trainer />
+        <div v-for="trainer in course.trainers" :key="trainer._id">
+          <interlocutor-cell :interlocutor="trainer" caption="Intervenant" :contact="course.contact"
+            :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
+            clearable is-trainer />
+        </div>
       </div>
+      <ni-secondary-button v-if="canUpdateInterlocutor" class="q-my-lg" label="Ajouter un intervenant"
+        @click="openTrainerModal" />
     </div>
-    <ni-secondary-button v-if="canUpdateInterlocutor" icon="edit" :disable="isArchived" class="q-mb-lg"
-        label="Modifier le contact pour la formation" @click="openContactAdditionModal" />
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
       v-model:estimated-start-date="tmpCourse.estimatedStartDate" />
@@ -103,7 +109,7 @@
       :label="interlocutorLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutorId" @hide="resetInterlocutor"
-      @submit="validateTrainerUpdate(TRAINER)" :loading="interlocutorModalLoading" :label="interlocutorLabel"
+      @submit="addTrainer()" :loading="interlocutorModalLoading" :label="interlocutorLabel"
       :interlocutors-options="trainerOptions" clearable />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutorId"
@@ -697,8 +703,22 @@ export default {
       await updateInterlocutor(TRAINER);
     };
 
+    const addTrainer = async () => {
+      try {
+        await Courses.addTrainer(course.value._id, { trainer: tmpInterlocutorId.value });
+
+        trainerModal.value = false;
+        await refreshCourse();
+        NotifyPositive('Intervenant ajouté.');
+      } catch (e) {
+        console.error(e);
+        if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
+
+        NotifyNegative('Erreur lors de l\'ajout de l\'intervenant.');
+      }
+    };
+
     const validateTrainerUpdate = async () => {
-      // if (course.value.trainerMission && tmpInterlocutor.value._id !== course.value.trainer._id) {
       if (course.value.trainerMission) {
         const message = 'Un ordre de mission est associé au formateur actuel et sera annulé.'
           + ' Êtes-vous sûr(e) de vouloir continuer&nbsp;?';
@@ -752,14 +772,12 @@ export default {
       operationsRepresentativeEditionModal.value = true;
     };
 
-    const openTrainerModal = (value, trainerId) => {
+    const openTrainerModal = (value, trainerId = '') => {
       if (value === DELETION) {
         openInterlocutorDeletionValidationModal(get(course.value, 'trainer.identity'), TRAINER);
       } else {
-        const action = value === EDITION ? 'Modifier l\'' : 'Ajouter un ';
-
         tmpInterlocutorId.value = trainerId;
-        interlocutorLabel.value = { action, interlocutor: 'intervenant' };
+        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'intervenant' };
         trainerModal.value = true;
       }
     };
@@ -978,6 +996,7 @@ export default {
       refreshTraineeTable,
       refreshTrainingContracts,
       goToContactProfile,
+      addTrainer,
     };
   },
 };
