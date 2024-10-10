@@ -37,7 +37,8 @@
       <div class="interlocutor-container">
         <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
           caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
-          label="Ajouter un intervenant" :disable="isArchived" clearable interlocutor-is-trainer />
+          label="Ajouter un intervenant" :disable="isArchived" clearable interlocutor-is-trainer
+          @open-modal="(event) => openTrainerModal(event.action, event.interlocutorId)" />
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un intervenant"
           @click="openTrainerModal" />
       </div>
@@ -144,7 +145,6 @@ import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Roles from '@api/Roles';
 import Courses from '@api/Courses';
-import TrainerMissions from '@api/TrainerMissions';
 import TrainingContracts from '@api/TrainingContracts';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
@@ -180,7 +180,6 @@ import {
   EDITION,
   HOLDING_ADMIN,
   INTRA_HOLDING,
-  DAY,
   DELETION,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
@@ -700,12 +699,6 @@ export default {
       }
     };
 
-    const updateMissionAndTrainer = async () => {
-      await TrainerMissions
-        .update(course.value.trainerMission._id, { cancelledAt: CompaniDate().startOf(DAY).toISO() });
-      await updateInterlocutor(TRAINER);
-    };
-
     const addTrainer = async () => {
       try {
         v$.value.trainer.$touch();
@@ -724,8 +717,22 @@ export default {
       }
     };
 
-    const validateTrainerUpdate = async () => {
-      if (course.value.trainerMission) {
+    const removeTrainer = async (interlocutorId) => {
+      try {
+        await Courses.removeTrainer(course.value._id, interlocutorId);
+
+        await refreshCourse();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du détachement de l\'intervenant.');
+      }
+    };
+
+    const validateTrainerDeletion = async (interlocutorId) => {
+      const hasTrainerMission = !!course.value.trainerMissions
+        .find(trainerMission => trainerMission.trainer === interlocutorId);
+
+      if (hasTrainerMission) {
         const message = 'Un ordre de mission est associé au formateur actuel et sera annulé.'
           + ' Êtes-vous sûr(e) de vouloir continuer&nbsp;?';
         $q.dialog({
@@ -734,10 +741,10 @@ export default {
           html: true,
           ok: true,
           cancel: 'Annuler',
-        }).onOk(() => updateMissionAndTrainer())
+        }).onOk(() => removeTrainer(interlocutorId))
           .onCancel(() => NotifyPositive('Mise à jour annulée.'));
       } else {
-        await updateInterlocutor(TRAINER);
+        await removeTrainer(interlocutorId);
       }
     };
 
@@ -780,7 +787,8 @@ export default {
 
     const openTrainerModal = (value, trainerId = '') => {
       if (value === DELETION) {
-        openInterlocutorDeletionValidationModal(get(course.value, 'trainer.identity'), TRAINER);
+        const trainerToRemove = course.value.trainers.find(t => t._id === trainerId);
+        openInterlocutorDeletionValidationModal(get(trainerToRemove, 'identity'), TRAINER, trainerId);
       } else {
         tmpInterlocutorId.value = trainerId;
         interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'intervenant' };
@@ -801,14 +809,14 @@ export default {
       contactAdditionModal.value = true;
     };
 
-    const removeInterlocutor = (interlocutorType) => {
+    const removeInterlocutor = (interlocutorType, interlocutorId) => {
       tmpInterlocutorId.value = '';
 
-      if (interlocutorType === TRAINER) validateTrainerUpdate();
+      if (interlocutorType === TRAINER) validateTrainerDeletion(interlocutorId);
       else updateInterlocutor(interlocutorType);
     };
 
-    const openInterlocutorDeletionValidationModal = (identity, interlocutorType) => {
+    const openInterlocutorDeletionValidationModal = (identity, interlocutorType, interlocutorId = '') => {
       const message = `Êtes-vous sûr(e) de vouloir détacher ${formatIdentity(identity, 'FL')} de la formation&nbsp;?`;
       $q.dialog({
         title: 'Confirmation',
@@ -816,7 +824,7 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => removeInterlocutor(interlocutorType))
+      }).onOk(() => removeInterlocutor(interlocutorType, interlocutorId))
         .onCancel(() => NotifyPositive('Détachement annulé.'));
     };
 
@@ -987,7 +995,7 @@ export default {
       sendMessage,
       downloadConvocation,
       updateInterlocutor,
-      validateTrainerUpdate,
+      validateTrainerDeletion,
       updateContact,
       resetContactAddition,
       openOperationsRepresentativeModal,
