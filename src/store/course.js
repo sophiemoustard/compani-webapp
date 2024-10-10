@@ -43,7 +43,7 @@ export default {
     fetchCourse: async ({ commit }, params) => {
       try {
         const course = await Courses.getById(params.courseId);
-        if (!get(course, 'trainer._id')) course.trainer = { _id: '' };
+        if (!get(course, 'trainers', []).length) course.trainers = [{ _id: '' }];
         if (!get(course, 'operationsRepresentative._id')) course.operationsRepresentative = { _id: '' };
         if (!get(course, 'contact._id')) course.contact = { _id: '' };
         if (!get(course, 'companyRepresentative._id')) course.companyRepresentative = { _id: '' };

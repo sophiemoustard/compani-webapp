@@ -94,4 +94,7 @@ export default {
 
     return course.data.data.course;
   },
+  async addTrainer (courseId, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/courses/${courseId}/trainers`, payload);
+  },
 };
