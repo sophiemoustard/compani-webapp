@@ -4,9 +4,8 @@
         {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor }}</span>
     </template>
       <ni-select in-modal :model-value="interlocutor" @update:model-value="updateInterlocutor"
-        :caption="upperCaseFirstLetter(label.interlocutor)"
-        :options="interlocutorsOptions" option-slot :error="validations.$error" @blur="validations.$touch"
-        :clearable="clearable" :required-field="!clearable">
+        :caption="upperCaseFirstLetter(label.interlocutor)" :options="interlocutorsOptions" option-slot
+        :error="validations.$error" @blur="validations.$touch" :clearable="clearable" :required-field="!clearable">
         <template #option="{ scope }">
           <q-item v-bind="scope.itemProps">
             <q-item-section avatar>
