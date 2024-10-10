@@ -188,7 +188,6 @@ const routes = [
           try {
             if ([
               'ni users learners info',
-              'trainers questionnaire answers',
               'ni pedagogy questionnaire answers',
             ].includes(from.name)) {
               to.query.defaultTab = 'traineeFollowUp';
