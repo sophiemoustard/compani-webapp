@@ -4,7 +4,7 @@
       Ajouter une <span class="text-weight-bold">règle d'accès</span>
     </template>
       <company-select in-modal :company-options="companyOptions" :company="newAccessRule" required-field
-      @update="update" :validation="validations" last />
+        @update="update" :validation="validations" last />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la règle d'accès" color="primary" :loading="loading"
         icon-right="add" @click="submit" />

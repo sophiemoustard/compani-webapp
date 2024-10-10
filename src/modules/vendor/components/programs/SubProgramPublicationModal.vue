@@ -9,8 +9,8 @@
         Seuls les apprenants de la structure choisie auront accès à la formation.
         Vous pourrez modifier et rajouter des règles d’accès par la suite.
       </span>
-        <company-select classes="select" in-modal :company-options="companyOptions" :company="accessCompany"
-          required-field @update="update" :validation="v$.accessCompany" />
+      <company-select class="select" in-modal :company-options="companyOptions" :company="accessCompany"
+        required-field @update="update" :validation="v$.accessCompany" />
     </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Publier avec cette règle d'accès" color="primary"
@@ -66,7 +66,10 @@ export default {
       emit('submit', accessCompany.value);
     };
 
-    const resetAccess = () => { accessCompany.value = ''; };
+    const resetAccess = () => {
+      accessCompany.value = '';
+      v$.value.accessCompany.$reset();
+    };
 
     const update = (event) => { accessCompany.value = event; };
 

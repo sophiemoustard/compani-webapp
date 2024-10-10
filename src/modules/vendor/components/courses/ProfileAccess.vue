@@ -56,6 +56,10 @@ export default {
     profileId: { type: String, required: true },
   },
   setup (props) {
+    const { profileId } = toRefs(props);
+    const $q = useQuasar();
+    const $store = useStore();
+
     const tableLoading = ref(false);
     const columns = ref([
       { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 92%' },
@@ -66,16 +70,12 @@ export default {
     const companyOptions = ref([]);
     const accessRuleCreationModal = ref(false);
     const modalLoading = ref(false);
-    const { profileId } = toRefs(props);
-    const $q = useQuasar();
 
     const rules = computed(() => ({
       newAccessRule: { required },
     }));
 
     const v$ = useVuelidate(rules, { newAccessRule });
-
-    const $store = useStore();
 
     const course = computed(() => $store.state.course.course);
 
