@@ -9,9 +9,8 @@
         Seuls les apprenants de la structure choisie auront accès à la formation.
         Vous pourrez modifier et rajouter des règles d’accès par la suite.
       </span>
-        <company-select class="select" in-modal :company-options="companyOptions" :company="accessCompany"
-          required-field @update="update" :validation="v$.accessCompany" :display-no-options-slot="displayNoOptionsSlot"
-            caption="Structure" />
+        <company-select classes="select" in-modal :company-options="companyOptions" :company="accessCompany"
+          required-field @update="update" :validation="v$.accessCompany" />
     </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Publier avec cette règle d'accès" color="primary"
@@ -35,7 +34,6 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     companyOptions: { type: Array, default: () => [] },
-    displayNoOptionsSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
