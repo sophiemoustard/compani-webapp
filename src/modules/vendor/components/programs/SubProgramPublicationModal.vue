@@ -9,8 +9,8 @@
         Seuls les apprenants de la structure choisie auront accès à la formation.
         Vous pourrez modifier et rajouter des règles d’accès par la suite.
       </span>
-      <ni-select class="select" in-modal v-model="accessCompany" required-field caption="Structure"
-        :options="companyOptions" :error="v$.accessCompany.$error" />
+      <company-select class="select" in-modal :company-options="companyOptions" :company="accessCompany"
+        required-field @update="update" :validation="v$.accessCompany" />
     </template>
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Publier avec cette règle d'accès" color="primary"
@@ -20,13 +20,14 @@
 </template>
 
 <script>
+import { computed, ref } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { requiredIf } from '@vuelidate/validators';
+import { FREE_ACCESS, RESTRICTED_ACCESS, ACCESS_OPTIONS } from '@data/constants';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
-import Select from '@components/form/Select';
 import { NotifyWarning } from '@components/popup/notify';
-import { FREE_ACCESS, RESTRICTED_ACCESS, ACCESS_OPTIONS } from '@data/constants';
+import CompanySelect from '@components/form/CompanySelect';
 
 export default {
   name: 'SubProgramPublicationModal',
@@ -37,41 +38,56 @@ export default {
   components: {
     'ni-modal': Modal,
     'ni-option-group': OptionGroup,
-    'ni-select': Select,
+    'company-select': CompanySelect,
   },
   emits: ['hide', 'update:model-value', 'submit'],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  data () {
+  setup (_, { emit }) {
+    const access = ref(FREE_ACCESS);
+    const accessCompany = ref('');
+
+    const rules = computed(() => ({
+      accessCompany: { required: requiredIf(access.value === RESTRICTED_ACCESS) },
+    }));
+
+    const v$ = useVuelidate(rules, { accessCompany });
+
+    const hide = () => {
+      access.value = FREE_ACCESS;
+      accessCompany.value = '';
+      emit('hide');
+    };
+
+    const input = event => emit('update:model-value', event);
+
+    const submit = () => {
+      v$.value.accessCompany.$touch();
+      if (v$.value.accessCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      emit('submit', accessCompany.value);
+    };
+
+    const resetAccess = () => {
+      accessCompany.value = '';
+      v$.value.accessCompany.$reset();
+    };
+
+    const update = (event) => { accessCompany.value = event; };
+
     return {
-      access: FREE_ACCESS,
+      // Validations
+      v$,
+      // Data
       RESTRICTED_ACCESS,
       ACCESS_OPTIONS,
-      accessCompany: '',
+      access,
+      accessCompany,
+      // Methods
+      hide,
+      input,
+      submit,
+      resetAccess,
+      update,
     };
-  },
-  validations () {
-    return { accessCompany: { required: requiredIf(this.access === RESTRICTED_ACCESS) } };
-  },
-  methods: {
-    hide () {
-      this.access = FREE_ACCESS;
-      this.accessCompany = '';
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.v$.accessCompany.$touch();
-      if (this.v$.accessCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-      this.$emit('submit', this.accessCompany);
-    },
-    resetAccess () {
-      this.accessCompany = '';
-    },
   },
 };
 </script>

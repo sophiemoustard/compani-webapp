@@ -3,8 +3,8 @@ import { useQuasar } from 'quasar';
 import SubPrograms from '@api/SubPrograms';
 import Companies from '@api/Companies';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { PUBLISHED } from '@data/constants';
-import { formatAndSortOptions } from '@helpers/utils';
+import { PUBLISHED, DIRECTORY } from '@data/constants';
+import { formatAndSortCompanyOptions } from '@helpers/utils';
 
 export const useSubProgramPublicationModal = (program, refreshProgram) => {
   const $q = useQuasar();
@@ -32,8 +32,8 @@ export const useSubProgramPublicationModal = (program, refreshProgram) => {
 
   const openSubProgramPublicationModal = async () => {
     try {
-      const companies = await Companies.list();
-      companyOptions.value = formatAndSortOptions(companies, 'name');
+      const companies = await Companies.list({ action: DIRECTORY });
+      companyOptions.value = formatAndSortCompanyOptions(companies, 'name');
       subProgramPublicationModal.value = true;
     } catch (e) {
       console.error(e);
