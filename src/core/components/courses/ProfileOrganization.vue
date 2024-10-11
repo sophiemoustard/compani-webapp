@@ -110,8 +110,8 @@
       :label="interlocutorLabel" />
 
     <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutorId" @hide="resetInterlocutor"
-      @submit="addTrainer()" :loading="interlocutorModalLoading" :label="interlocutorLabel"
-      :interlocutors-options="trainerOptions" clearable />
+      @submit="addTrainer()" :loading="interlocutorModalLoading" :label="interlocutorLabel" :validations="v$.trainer"
+      :interlocutors-options="trainerOptions" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutorId"
       @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.companyRepresentative"
@@ -293,6 +293,7 @@ export default {
       newSms: { content: { required }, type: { required } },
       companyRepresentative: { required },
       operationsRepresentative: { required },
+      trainer: { required },
     }));
 
     const v$ = useVuelidate(
@@ -303,6 +304,7 @@ export default {
         newSms,
         companyRepresentative: tmpInterlocutorId,
         operationsRepresentative: tmpInterlocutorId,
+        trainer: tmpInterlocutorId,
       }
     );
 
@@ -706,6 +708,9 @@ export default {
 
     const addTrainer = async () => {
       try {
+        v$.value.trainer.$touch();
+        if (v$.value.trainer.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         await Courses.addTrainer(course.value._id, { trainer: tmpInterlocutorId.value });
 
         trainerModal.value = false;
