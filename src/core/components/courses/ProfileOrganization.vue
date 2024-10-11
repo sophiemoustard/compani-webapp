@@ -662,9 +662,9 @@ export default {
           if (v$.value[interlocutorType].$error) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const isContact = interlocutorType === TRAINER
-          ? get(course.value, 'trainers').map(t => t._id).includes(get(course.value, 'contact._id'))
-          : get(course.value, 'contact._id') === get(course.value, `${interlocutorType}._id`);
+        const isContact = get(course.value, 'contact._id')
+          ? course.value.contact._id === get(course.value, `${interlocutorType}._id`)
+          : false;
 
         const payload = {
           [interlocutorType]: tmpInterlocutorId.value,
