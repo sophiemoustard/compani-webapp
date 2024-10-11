@@ -31,12 +31,10 @@
           @open-modal="openSalesRepresentativeModal" clearable />
       </div>
       <p class="text-weight-bold table-title q-mt-xl">Intervenants</p>
-      <div class="interlocutor-container" v-if="get(course, 'trainers', []).some(t => t._id)">
-        <div v-for="trainer in course.trainers" :key="trainer._id">
-          <interlocutor-cell :interlocutor="trainer" caption="Intervenant" :contact="course.contact"
-            :can-update="canUpdateInterlocutor" label="Ajouter un intervenant" :disable="isArchived"
-            clearable is-trainer />
-        </div>
+      <div v-if="get(course, 'trainers', []).some(t => t._id)" class="interlocutor-container">
+        <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
+          caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
+          label="Ajouter un intervenant" :disable="isArchived" clearable is-trainer />
       </div>
       <p v-else class="text-italic q-mb-md ">Aucun intervenant n'est défini pour cette formation.</p>
       <ni-secondary-button v-if="canUpdateInterlocutor" class="q-my-lg" label="Ajouter un intervenant"
