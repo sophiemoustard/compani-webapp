@@ -369,7 +369,7 @@ export default {
     const contactOptions = computed(() => {
       const interlocutors = [
         { interlocutor: course.value.operationsRepresentative, role: 'Chargé(e) des opérations' },
-        ...(get(course.value, 'trainers', []).length
+        ...(get(course.value, 'trainers', []).some(t => t._id)
           ? course.value.trainers.map(trainer => ({ interlocutor: trainer, role: 'Intervenant(e)' }))
           : []),
         ...(course.value.companyRepresentative._id
