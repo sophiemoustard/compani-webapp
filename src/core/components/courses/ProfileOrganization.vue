@@ -722,6 +722,7 @@ export default {
         await Courses.removeTrainer(course.value._id, interlocutorId);
 
         await refreshCourse();
+        NotifyPositive('Intervenant détaché.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du détachement de l\'intervenant.');
@@ -742,7 +743,7 @@ export default {
           ok: true,
           cancel: 'Annuler',
         }).onOk(() => removeTrainer(interlocutorId))
-          .onCancel(() => NotifyPositive('Mise à jour annulée.'));
+          .onCancel(() => NotifyPositive('Détachement annulé.'));
       } else {
         await removeTrainer(interlocutorId);
       }
