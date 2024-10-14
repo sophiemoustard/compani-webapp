@@ -35,10 +35,10 @@
         <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
           caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
           label="Ajouter un intervenant" :disable="isArchived" clearable is-trainer />
+        <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un intervenant"
+          @click="openTrainerModal" />
       </div>
       <p v-else class="text-italic q-mb-md ">Aucun intervenant n'est défini pour cette formation.</p>
-      <ni-secondary-button v-if="canUpdateInterlocutor" class="q-my-lg" label="Ajouter un intervenant"
-        @click="openTrainerModal" />
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
       :is-rof-or-vendor-admin="isRofOrVendorAdmin" @update="updateCourse('estimatedStartDate')"
@@ -104,16 +104,16 @@
 
     <interlocutor-modal v-model="operationsRepresentativeEditionModal" v-model:interlocutor="tmpInterlocutorId"
       @submit="updateInterlocutor(OPERATIONS_REPRESENTATIVE)" :validations="v$.operationsRepresentative"
-      :loading="interlocutorModalLoading" @hide="resetInterlocutor" :interlocutors-options="adminUserOptions"
-      :label="interlocutorLabel" />
+      :loading="interlocutorModalLoading" @hide="resetInterlocutor(OPERATIONS_REPRESENTATIVE)"
+      :interlocutors-options="adminUserOptions" :label="interlocutorLabel" />
 
-    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutorId" @hide="resetInterlocutor"
-      @submit="addTrainer()" :loading="interlocutorModalLoading" :label="interlocutorLabel" :validations="v$.trainer"
-      :interlocutors-options="trainerOptions" />
+    <interlocutor-modal v-model="trainerModal" v-model:interlocutor="tmpInterlocutorId"
+      @hide="resetInterlocutor(TRAINER)" @submit="addTrainer()" :loading="interlocutorModalLoading"
+      :label="interlocutorLabel" :validations="v$.trainer" :interlocutors-options="trainerOptions" />
 
     <interlocutor-modal v-model="companyRepresentativeModal" v-model:interlocutor="tmpInterlocutorId"
       @submit="updateInterlocutor(COMPANY_REPRESENTATIVE)" :validations="v$.companyRepresentative"
-      :loading="interlocutorModalLoading" @hide="resetInterlocutor" :label="interlocutorLabel"
+      :loading="interlocutorModalLoading" @hide="resetInterlocutor(COMPANY_REPRESENTATIVE)" :label="interlocutorLabel"
       :interlocutors-options="companyRepresentativeOptions" />
 
     <interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpInterlocutorId"
@@ -1015,4 +1015,6 @@ export default {
 .certifying-checkbox
   @media screen and (max-width: 767px)
     padding: 0px 0px 16px 16px
+.button-trainer
+  justify-self: start
 </style>
