@@ -30,7 +30,7 @@ export default {
     'ni-input': Input,
   },
   emits: ['refresh'],
-  setup (props, { emit }) {
+  setup (_, { emit }) {
     const $store = useStore();
 
     const refreshCard = () => { emit('refresh'); };
@@ -83,6 +83,4 @@ export default {
   justify-content: space-between
 .input
   flex: 1
-.add-button
-  align-self: flex-end
 </style>
