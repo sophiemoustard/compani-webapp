@@ -37,10 +37,9 @@
       <div class="interlocutor-container">
         <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
           caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
-          label="Ajouter un intervenant" :disable="isArchived" clearable interlocutor-is-trainer
-          @open-modal="(event) => openTrainerModal(event.action, event.interlocutorId)" />
+          :disable="isArchived" clearable interlocutor-is-trainer @open-modal="openTrainerModal" />
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un intervenant"
-          @click="openTrainerModal" />
+          @click="() => openTrainerModal({ action: CREATION })" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
@@ -181,6 +180,7 @@ import {
   HOLDING_ADMIN,
   INTRA_HOLDING,
   DELETION,
+  CREATION,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
@@ -719,7 +719,7 @@ export default {
 
     const removeTrainer = async (interlocutorId) => {
       try {
-        await Courses.removeTrainer(course.value._id, interlocutorId);
+        await Courses.deleteTrainer(course.value._id, interlocutorId);
 
         await refreshCourse();
         NotifyPositive('Intervenant détaché.');
@@ -786,8 +786,10 @@ export default {
       operationsRepresentativeEditionModal.value = true;
     };
 
-    const openTrainerModal = (value, trainerId = '') => {
-      if (value === DELETION) {
+    const openTrainerModal = (event) => {
+      const { action, interlocutorId: trainerId } = event;
+
+      if (action === DELETION) {
         const trainerToRemove = course.value.trainers.find(t => t._id === trainerId);
         openInterlocutorDeletionValidationModal(get(trainerToRemove, 'identity'), TRAINER, trainerId);
       } else {
@@ -797,8 +799,9 @@ export default {
       }
     };
 
-    const openCompanyRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const openCompanyRepresentativeModal = (event) => {
+      const { action: eventAction } = event;
+      const action = eventAction === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
       tmpInterlocutorId.value = course.value.companyRepresentative._id;
       interlocutorLabel.value = { action, interlocutor: 'chargé de formation structure' };
@@ -829,14 +832,15 @@ export default {
         .onCancel(() => NotifyPositive('Détachement annulé.'));
     };
 
-    const openSalesRepresentativeModal = (value) => {
-      if (value === DELETION) {
+    const openSalesRepresentativeModal = (event) => {
+      const { action: eventAction } = event;
+      if (eventAction === DELETION) {
         openInterlocutorDeletionValidationModal(
           get(course.value, 'salesRepresentative.identity'),
           SALES_REPRESENTATIVE
         );
       } else {
-        const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+        const action = eventAction === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
         tmpInterlocutorId.value = get(course.value, 'salesRepresentative._id') || '';
         interlocutorLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
@@ -961,6 +965,7 @@ export default {
       OPERATIONS_REPRESENTATIVE,
       TRAINER,
       SALES_REPRESENTATIVE,
+      CREATION,
       // Computed
       course,
       v$,

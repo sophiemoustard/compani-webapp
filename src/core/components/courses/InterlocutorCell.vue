@@ -57,7 +57,9 @@ export default {
   setup (_, { emit }) {
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
 
-    const openModal = (action, interlocutorId) => emit('open-modal', { action, interlocutorId });
+    const openModal = (action, interlocutorId = '') => {
+      emit('open-modal', { action, ...(interlocutorId && { interlocutorId }) });
+    };
 
     return {
       // Data
