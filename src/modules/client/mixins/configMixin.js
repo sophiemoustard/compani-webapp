@@ -44,10 +44,10 @@ export const configMixin = {
         let payload;
         if (path === 'billingRepresentative') {
           this.billingRepresentativeModalLoading = true;
-          this.v$.tmpBillingRepresentative.$touch();
-          if (this.v$.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+          this.v$.tmpBillingRepresentativeId.$touch();
+          if (this.v$.tmpBillingRepresentativeId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-          payload = { billingRepresentative: this.tmpBillingRepresentative._id };
+          payload = { billingRepresentative: this.tmpBillingRepresentativeId };
         } else {
           payload = set({}, path, get(this.company, path));
         }
@@ -61,7 +61,7 @@ export const configMixin = {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
-        this.tmpBillingRepresentative = {};
+        this.tmpBillingRepresentativeId = '';
         this.billingRepresentativeModalLoading = false;
       }
     },
