@@ -31,7 +31,8 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
 
   const trainerFilterOptions = computed(() => {
     const filteredCourses = courses.value.filter(course => get(course, 'trainers', []).length);
-    const trainers = filteredCourses.flatMap(course => formatAndSortIdentityOptions(course.trainers))
+    const trainers = filteredCourses
+      .flatMap(course => formatAndSortIdentityOptions(course.trainers))
       .sort((a, b) => a.label.localeCompare(b.label));
 
     return [
