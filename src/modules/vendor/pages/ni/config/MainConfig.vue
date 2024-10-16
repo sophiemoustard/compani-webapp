@@ -70,10 +70,10 @@
       @submit="addItem" :validations="validations.newItem" @hide="resetItemAdditionForm"
       :loading="itemsLoading" />
 
-    <interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
+    <interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentativeId"
       @submit="updateVendorCompany('billingRepresentative')" :label="billingRepresentativeModalLabel"
       :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
-      :validations="validations.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
+      :validations="validations.tmpBillingRepresentativeId" @hide="resetBillingRepresentative" />
   </div>
 </template>
 
@@ -149,7 +149,7 @@ export default {
     const billingRepresentativeModal = ref(false);
     const billingRepresentativeModalLoading = ref(false);
     const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
-    const tmpBillingRepresentative = ref({});
+    const tmpBillingRepresentativeId = ref('');
 
     const rules = {
       newOrganisation: { address: { required }, name: { required } },
@@ -162,9 +162,9 @@ export default {
         iban: { required, iban },
         bic: { required, bic },
       },
-      tmpBillingRepresentative: { _id: required },
+      tmpBillingRepresentativeId: { required },
     };
-    const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany, tmpBillingRepresentative });
+    const validations = useVuelidate(rules, { newOrganisation, newItem, vendorCompany, tmpBillingRepresentativeId });
     const { waitForValidation } = useValidations();
 
     const siretErrorMessage = computed(() => {
@@ -231,10 +231,10 @@ export default {
         let payload;
         if (path === 'billingRepresentative') {
           billingRepresentativeModalLoading.value = true;
-          validations.value.tmpBillingRepresentative.$touch();
-          if (validations.value.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+          validations.value.tmpBillingRepresentativeId.$touch();
+          if (validations.value.tmpBillingRepresentativeId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-          payload = { billingRepresentative: tmpBillingRepresentative.value._id };
+          payload = { billingRepresentative: tmpBillingRepresentativeId.value };
         } else {
           payload = set({}, path, get(vendorCompany.value, path));
         }
@@ -248,7 +248,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        tmpBillingRepresentative.value = {};
+        tmpBillingRepresentativeId.value = '';
         billingRepresentativeModalLoading.value = false;
       }
     };
@@ -352,7 +352,7 @@ export default {
     const openBillingRepresentativeModal = (value) => {
       const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
-      tmpBillingRepresentative.value = get(vendorCompany.value, 'billingRepresentative');
+      tmpBillingRepresentativeId.value = get(vendorCompany.value, 'billingRepresentative._id');
       billingRepresentativeModalLabel.value = { action, interlocutor: 'chargé de facturation' };
       billingRepresentativeModal.value = true;
     };
@@ -364,9 +364,9 @@ export default {
     };
 
     const resetBillingRepresentative = () => {
-      tmpBillingRepresentative.value = { _id: '' };
+      tmpBillingRepresentativeId.value = '';
       billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
-      validations.value.tmpBillingRepresentative.$reset();
+      validations.value.tmpBillingRepresentativeId.$reset();
     };
 
     const created = async () => {
@@ -396,7 +396,7 @@ export default {
       billingRepresentativeModalLabel,
       billingRepresentativeModal,
       billingRepresentativeModalLoading,
-      tmpBillingRepresentative,
+      tmpBillingRepresentativeId,
       // Computed
       validations,
       siretErrorMessage,
