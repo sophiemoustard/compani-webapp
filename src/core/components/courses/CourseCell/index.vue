@@ -128,9 +128,11 @@ export default {
 
       if (selectedTrainer.value) {
         const courseTrainerIds = course.value.trainers ? course.value.trainers.map(trainer => trainer._id) : [];
+
         if (selectedTrainer.value === WITHOUT_TRAINER && courseTrainerIds.length) return false;
-        if (selectedTrainer.value !== WITHOUT_TRAINER &&
-        !courseTrainerIds.includes(selectedTrainer.value)) return false;
+        if (selectedTrainer.value !== WITHOUT_TRAINER && !courseTrainerIds.includes(selectedTrainer.value)) {
+          return false;
+        }
       }
 
       if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
