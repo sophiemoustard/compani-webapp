@@ -20,9 +20,9 @@
           </div>
         </div>
       </div>
-      <div v-if="canUpdate && !interlocutorIsTrainer">
-        <ni-button icon="edit" :disable="disable" @click="openModal(EDITION)" />
-        <ni-button v-if="clearable" icon="delete" :disable="disable" @click="openModal(DELETION)" />
+      <div v-if="canUpdate">
+        <ni-button v-if="!interlocutorIsTrainer" icon="edit" :disable="disable" @click="openModal(EDITION)" />
+        <ni-button v-if="clearable" icon="delete" :disable="disable" @click="openModal(DELETION, interlocutor._id)" />
       </div>
     </q-card>
   </div>
@@ -57,7 +57,9 @@ export default {
   setup (_, { emit }) {
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
 
-    const openModal = value => emit('open-modal', value);
+    const openModal = (action, interlocutorId = '') => {
+      emit('open-modal', { action, ...(interlocutorId && { interlocutorId }) });
+    };
 
     return {
       // Data
