@@ -268,8 +268,10 @@ export default {
   font-size: 14px
 .label
   display: inline
-  max-width: 12em
+  max-width: 15em
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
+  @media screen and (max-width: 768px)
+    max-width: 12em
 </style>
