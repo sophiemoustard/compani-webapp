@@ -127,9 +127,12 @@ export default {
       if (selectedProgram.value && course.value.subProgram.program._id !== selectedProgram.value) return false;
 
       if (selectedTrainer.value) {
-        const courseTrainer = get(course.value, 'trainer._id');
-        if (selectedTrainer.value === WITHOUT_TRAINER && courseTrainer) return false;
-        if (selectedTrainer.value !== WITHOUT_TRAINER && courseTrainer !== selectedTrainer.value) return false;
+        const courseTrainerIds = course.value.trainers ? course.value.trainers.map(trainer => trainer._id) : [];
+
+        if (selectedTrainer.value === WITHOUT_TRAINER && courseTrainerIds.length) return false;
+        if (selectedTrainer.value !== WITHOUT_TRAINER && !courseTrainerIds.includes(selectedTrainer.value)) {
+          return false;
+        }
       }
 
       if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
