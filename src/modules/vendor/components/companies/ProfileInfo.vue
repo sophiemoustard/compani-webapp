@@ -146,8 +146,9 @@ export default {
       salesRepresentativeOptions.value = formatAndSortUserOptions(rofAndAdminUsers, false);
     };
 
-    const openSalesRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const openSalesRepresentativeModal = (event) => {
+      const { action: eventAction } = event;
+      const action = eventAction === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
       tmpSalesRepresentativeId.value = get(company.value, 'salesRepresentative._id');
       salesRepresentativeModalLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
