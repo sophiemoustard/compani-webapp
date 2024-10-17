@@ -349,8 +349,9 @@ export default {
       }
     };
 
-    const openBillingRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const openBillingRepresentativeModal = (event) => {
+      const { action: eventAction } = event;
+      const action = eventAction === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
       tmpBillingRepresentativeId.value = get(vendorCompany.value, 'billingRepresentative._id');
       billingRepresentativeModalLabel.value = { action, interlocutor: 'chargé de facturation' };
