@@ -22,7 +22,7 @@
     "@vuelidate/validators": "~2.0.4",
     "axios": "~1.7.7",
     "bignumber.js": "~9.1.2",
-    "chart.js": "~4.4.3",
+    "chart.js": "~4.4.5",
     "connect-history-api-fallback": "~2.0.0",
     "date-holidays": "~3.23.12",
     "dotenv": "~16.4.1",
