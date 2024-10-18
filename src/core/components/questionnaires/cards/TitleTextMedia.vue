@@ -46,7 +46,7 @@ export default {
   text-align: center
 .img
   width: 30vw
+  height: auto
   @media screen and (max-width: $breakpoint-md)
     width: 50vw
-  height: auto
 </style>

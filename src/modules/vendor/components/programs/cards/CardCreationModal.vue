@@ -172,13 +172,13 @@ h6
   font-size: 14px
   height: 120px
   width: 100px
-  @media screen and (max-width: 767px)
-    width: 65px
-    height: 90px
   display: flex
   align-items: center
   justify-content: center
   margin: 10px 7px
+  @media screen and (max-width: 767px)
+    width: 65px
+    height: 90px
   &-content
     text-align: center
     flex-wrap: wrap

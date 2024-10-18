@@ -97,9 +97,9 @@ export default {
   display: flex
   justify-content: space-between
   width: 312px
+  align-items: center
   @media screen and (max-width: 420px)
     width: 100%
-  align-items: center
 
 .bar
   position: relative
