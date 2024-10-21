@@ -262,13 +262,13 @@ export default {
   font-size: 12px
   color: $copper-grey-600
 .item-section-container
-  display: flex
+  min-width: 0
 .infos-course-nearest-date
   color: $copper-grey-900 !important
   font-size: 14px
 .label
-  display: inline
-  max-width: 15em
+  display: inline-block
+  max-width: 20em
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
