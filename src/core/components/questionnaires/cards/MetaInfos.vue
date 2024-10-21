@@ -55,10 +55,10 @@ export default {
   flex-direction: column
   padding: 0 0 16px 0
 .title
-  @media screen and (max-width: $breakpoint-md)
-    font-size: 20px
   text-align: center
   color: $copper-grey-700
+  @media screen and (max-width: $breakpoint-md)
+    font-size: 20px
 .items-container
   color: $copper-grey-600
   display: flex

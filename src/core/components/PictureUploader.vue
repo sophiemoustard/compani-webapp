@@ -39,7 +39,7 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import CustomImg from '@components/form/CustomImg';
 import { DEFAULT_AVATAR } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
-import { computed, toRefs, ref } from 'vue';
+import { computed, toRefs, ref, useTemplateRef } from 'vue';
 import { useQuasar } from 'quasar';
 
 export default {
@@ -56,8 +56,8 @@ export default {
   setup (props) {
     const { user, refreshPicture } = toRefs(props);
     const $q = useQuasar();
-    const file = ref(null);
-    const cropper = ref(null);
+    const file = useTemplateRef('file');
+    const cropper = useTemplateRef('cropper');
     const image = ref('');
     const displayCropper = ref(false);
     const loadingImage = ref(false);

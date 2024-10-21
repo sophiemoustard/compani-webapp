@@ -182,12 +182,12 @@ export default {
   background-color: $copper-100
   border-radius: 4px
   height: fit-content
+  width: 85%
+  padding: 7px
   @media screen and (min-width: 768px)
     min-height: 90px
   @media screen and (max-width: 767px)
     min-height: 80px
-  width: 85%
-  padding: 7px
   &-title
     display: flex
     justify-content: space-between

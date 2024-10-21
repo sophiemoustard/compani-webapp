@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { useTemplateRef, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { CLIENT, VENDOR } from '@data/constants';
 import CourseCell from '@components/courses/CourseCell';
@@ -24,12 +24,14 @@ export default {
     const $router = useRouter();
     const interfaceType = /\/ad\//.test($router.currentRoute.value.path) ? VENDOR : CLIENT;
 
-    const cellRefs = ref([]);
+    const cellRefs = useTemplateRef('cellRefs');
 
-    const courseCounter = computed(() => cellRefs.value
-      .flat()
-      .map(t => t.isDisplayed)
-      .reduce((acc, value) => (value ? acc + 1 : acc), 0));
+    const courseCounter = computed(() => (cellRefs.value
+      ? cellRefs.value
+        .flat()
+        .map(t => t.isDisplayed)
+        .reduce((acc, value) => (value ? acc + 1 : acc), 0)
+      : 0));
 
     return {
       // Data

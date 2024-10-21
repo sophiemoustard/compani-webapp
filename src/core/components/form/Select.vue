@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { ref, computed, toRefs } from 'vue';
+import { ref, computed, toRefs, useTemplateRef } from 'vue';
 import get from 'lodash/get';
 import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
@@ -63,7 +63,7 @@ export default {
   setup (props, { emit }) {
     const { options, modelValue, blurOnSelection, multiple } = toRefs(props);
     const selectableOptions = ref([]);
-    const selectInput = ref(null);
+    const selectInput = useTemplateRef('selectInput');
 
     const displayedValue = computed(() => (multiple.value
       ? model.value.map(opt => opt.label).join(', ')
