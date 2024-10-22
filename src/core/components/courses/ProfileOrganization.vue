@@ -788,6 +788,9 @@ export default {
 
     const openTrainerModal = (event) => {
       const { action, interlocutorId: trainerId } = event;
+      if (isArchived.value) {
+        return NotifyWarning('Vous ne pouvez pas ajouter d’intervenant(e) à une formation archivée.');
+      }
 
       if (action === DELETION) {
         const trainerToRemove = course.value.trainers.find(t => t._id === trainerId);
