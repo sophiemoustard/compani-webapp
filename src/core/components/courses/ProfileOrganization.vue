@@ -12,7 +12,7 @@
       </div>
       <div class="row justify-between align-center q-mt-md">
         <p class="text-weight-bold">Interlocuteurs</p>
-        <ni-secondary-button v-if="canUpdateInterlocutor" icon="edit" :disable="isArchived" class="q-mb-lg"
+        <ni-secondary-button v-if="canUpdateInterlocutor" icon="edit" class="q-mb-lg"
           label="Modifier le contact pour la formation" @click="openContactAdditionModal" />
       </div>
       <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">
@@ -28,7 +28,7 @@
           label="Ajouter un chargé de formation structure" @open-modal="openCompanyRepresentativeModal" />
         <interlocutor-cell v-if="canReadAndUpdateSalesRepresentative" :interlocutor="course.salesRepresentative"
           caption="Chargé d'accompagnement" can-update label="Ajouter un chargé d'accompagnement"
-          @open-modal="openSalesRepresentativeModal" clearable />
+          @open-modal="openSalesRepresentativeModal" clearable :disable="isArchived" />
       </div>
       <p class="text-weight-bold table-title q-mt-xl">Intervenants</p>
       <p v-if="!get(course, 'trainers', []).some(t => t._id)" class="text-italic q-mb-lg">
@@ -812,6 +812,9 @@ export default {
     };
 
     const openContactAdditionModal = () => {
+      if (isArchived.value) {
+        return NotifyWarning('Vous ne pouvez pas modifier le contact d’une formation archivée.');
+      }
       tmpContactId.value = course.value.contact._id;
       contactAdditionModal.value = true;
     };
