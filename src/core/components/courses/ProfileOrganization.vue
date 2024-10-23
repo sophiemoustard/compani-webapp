@@ -787,10 +787,11 @@ export default {
     };
 
     const openTrainerModal = (event) => {
-      const { action, interlocutorId: trainerId } = event;
       if (isArchived.value) {
         return NotifyWarning('Vous ne pouvez pas ajouter d’intervenant(e) à une formation archivée.');
       }
+
+      const { action, interlocutorId: trainerId } = event;
 
       if (action === DELETION) {
         const trainerToRemove = course.value.trainers.find(t => t._id === trainerId);
@@ -815,6 +816,7 @@ export default {
       if (isArchived.value) {
         return NotifyWarning('Vous ne pouvez pas modifier le contact d’une formation archivée.');
       }
+
       tmpContactId.value = course.value.contact._id;
       contactAdditionModal.value = true;
     };
