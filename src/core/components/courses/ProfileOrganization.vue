@@ -122,7 +122,7 @@
 import { subject } from '@casl/ability';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { computed, ref, toRefs, watch } from 'vue';
+import { computed, ref, toRefs, watch, useTemplateRef } from 'vue';
 import { useQuasar, copyToClipboard } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
@@ -241,7 +241,6 @@ export default {
     const contactAdditionModal = ref(false);
     const salesRepresentativeModal = ref(false);
     const tmpContactId = ref('');
-    const courseHistoryFeed = ref(null);
     const potentialTrainees = ref([]);
     const trainingContracts = ref([]);
     const trainingContractTableLoading = ref(false);
@@ -254,6 +253,7 @@ export default {
     const canReadHistory = ref(false);
     const canUpdateCertifyingTest = ref(false);
     const canReadAndUpdateSalesRepresentative = ref(false);
+    const courseHistoryFeed = useTemplateRef('courseHistoryFeed');
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
     const SALES_REPRESENTATIVE = 'salesRepresentative';

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs, useTemplateRef } from 'vue';
 import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR, HH_MM } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniInterval from '@helpers/dates/companiIntervals';
@@ -48,7 +48,7 @@ export default {
   },
   setup (props, { emit }) {
     const { min } = toRefs(props);
-    const qTimeMenu = ref(null);
+    const qTimeMenu = useTemplateRef('qTimeMenu');
     const selectTime = ref(false);
 
     const hoursOptions = computed(() => {
