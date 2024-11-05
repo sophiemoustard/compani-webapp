@@ -25,7 +25,9 @@
 
 <script>
 import get from 'lodash/get';
-import { mapState } from 'vuex';
+import { ref, computed, toRefs, useTemplateRef, onBeforeUnmount } from 'vue';
+import { useStore } from 'vuex';
+import { useQuasar } from 'quasar';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import Questionnaires from '@api/Questionnaires';
@@ -36,7 +38,7 @@ import { PUBLISHED } from '@data/constants';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
-import { cardMixin } from '@mixins/cardMixin';
+import { useCards } from '../../../../core/composables/cards';
 
 export default {
   name: 'ProfileEdition',
@@ -50,121 +52,117 @@ export default {
     'card-creation-modal': CardCreationModal,
     'ni-button': Button,
   },
-  mixins: [cardMixin],
-  setup () {
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
+  setup ({ props }) {
+    const { profileId } = toRefs(props);
+    const $q = useQuasar();
+    const tmpInput = ref('');
+    const cardCreationModal = ref(false);
+    const nameLock = ref(false);
+    const isEditionLocked = ref(false);
+    const cardContainer = useTemplateRef('cardContainer');
+
+    const $store = useStore();
+
+    const questionnaire = computed(() => $store.state.questionnaire.questionnaire);
+
+    const card = computed(() => $store.state.card.card);
+
+    const rules = computed(() => ({
       questionnaire: { name: { required } },
-    };
-  },
-  data () {
-    return {
-      tmpInput: '',
-      PUBLISHED,
-      cardCreationModal: false,
-      nameLock: false,
-      isEditionLocked: false,
-    };
-  },
-  computed: {
-    ...mapState({
-      questionnaire: state => state.questionnaire.questionnaire,
-      card: state => state.card.card,
-    }),
-    isQuestionnairePublished () {
-      return this.questionnaire.status === PUBLISHED;
-    },
-    isQuestionnaireValid () {
-      return this.questionnaire.areCardsValid && this.questionnaire.cards.length > 0;
-    },
-    lockIcon () {
-      return this.nameLock ? 'lock' : 'lock_open';
-    },
-  },
-  async created () {
-    await this.refreshQuestionnaire();
-    this.nameLock = this.isQuestionnairePublished;
-    this.isEditionLocked = this.isQuestionnairePublished;
-  },
-  methods: {
-    async refreshQuestionnaire () {
-      try {
-        await this.$store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: this.profileId });
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    async refreshCard () {
-      try {
-        await this.$store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: this.questionnaire._id });
-        const card = this.questionnaire.cards.find(c => c._id === this.card._id);
-        this.$store.dispatch('card/fetchCard', card);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    validateUnlockEdition () {
-      const isPublishedMessage = this.isQuestionnairePublished
-        ? 'Ce questionnaire est publié, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes.'
-          + '<br /><br />'
-        : '';
+    }));
 
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: `${isPublishedMessage} Êtes-vous sûr(e) de vouloir déverrouiller ce questionnaire&nbsp;?`,
-        html: true,
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Questionnaire déverrouillé.'); })
-        .onCancel(() => NotifyPositive('Déverrouillage annulé.'));
-    },
-    saveTmpName () {
-      this.tmpInput = get(this.questionnaire, 'name') || '';
-    },
-    async createCard (template) {
-      this.$q.loading.show();
-      try {
-        await Questionnaires.addCard(this.questionnaire._id, { template });
+    const v$ = useVuelidate(rules, { questionnaire });
 
-        NotifyPositive('Carte créée.');
-        this.cardCreationModal = false;
-
-        this.$refs.cardContainer.scrollDown();
-
-        await this.refreshQuestionnaire();
-        const cardCreated = this.questionnaire.cards[this.questionnaire.cards.length - 1];
-        await this.$store.dispatch('card/fetchCard', cardCreated);
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création de la carte.');
-      } finally {
-        this.$q.loading.hide();
-      }
-    },
-    async deleteCard (cardId) {
+    const deleteCard = async (cardId) => {
       try {
         await Questionnaires.deleteCard(cardId);
-        await this.refreshQuestionnaire();
-        this.$store.dispatch('card/resetCard');
+        await refreshQuestionnaire();
+        $store.dispatch('card/resetCard');
         NotifyPositive('Carte supprimée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
-    },
-    async updateQuestionnaire (event) {
+    };
+
+    const { validateCardDeletion } = useCards(cardCreationModal, deleteCard);
+
+    const isQuestionnairePublished = computed(() => questionnaire.value.status === PUBLISHED);
+
+    const isQuestionnaireValid = computed(() => questionnaire.value.areCardsValid && !!questionnaire.value.cards.length);
+
+    const lockIcon = computed(() => (nameLock.value ? 'lock' : 'lock_open'));
+
+    const refreshQuestionnaire = async () => {
       try {
-        if (event) await Questionnaires.update(this.questionnaire._id, { cards: event });
+        await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: profileId });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const refreshCard = async () => {
+      try {
+        await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: questionnaire.value._id });
+        const cardFounded = questionnaire.value.cards.find(c => c._id === card.value._id);
+        $store.dispatch('card/fetchCard', cardFounded);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const validateUnlockEdition = () => {
+      const isPublishedMessage = isQuestionnairePublished.value
+        ? 'Ce questionnaire est publié, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes.'
+          + '<br /><br />'
+        : '';
+
+      $q.dialog({
+        title: 'Confirmation',
+        message: `${isPublishedMessage} Êtes-vous sûr(e) de vouloir déverrouiller ce questionnaire&nbsp;?`,
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => { isEditionLocked.value = false; NotifyPositive('Questionnaire déverrouillé.'); })
+        .onCancel(() => NotifyPositive('Déverrouillage annulé.'));
+    };
+
+    const saveTmpName = () => {
+      tmpInput.value = get(questionnaire.value, 'name') || '';
+    };
+
+    const createCard = async (template) => {
+      $q.loading.show();
+      try {
+        await Questionnaires.addCard(questionnaire.value._id, { template });
+
+        NotifyPositive('Carte créée.');
+        cardCreationModal.value = false;
+
+        cardContainer.value.scrollDown();
+
+        await refreshQuestionnaire();
+        const cardCreated = questionnaire.value.cards[questionnaire.value.cards.length - 1];
+        await $store.dispatch('card/fetchCard', cardCreated);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la carte.');
+      } finally {
+        $q.loading.hide();
+      }
+    };
+
+    const updateQuestionnaire = async (event) => {
+      try {
+        if (event) await Questionnaires.update(questionnaire.value._id, { cards: event });
         else {
-          const name = get(this.questionnaire, 'name');
-          if (this.tmpInput === name) return;
-          this.v$.questionnaire.$touch();
+          const name = get(questionnaire.value, 'name');
+          if (tmpInput.value === name) return;
+          v$.questionnaire.$touch();
 
-          if (this.v$.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
+          if (v$.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-          await Questionnaires.update(this.questionnaire._id, { name });
+          await Questionnaires.update(questionnaire.value._id, { name });
         }
 
         NotifyPositive('Modification enregistrée.');
@@ -173,28 +171,30 @@ export default {
         if (event) NotifyNegative('Erreur lors de la modification des cartes.');
         else NotifyNegative('Erreur lors de la modification du questionnaire.');
       } finally {
-        this.refreshQuestionnaire();
+        refreshQuestionnaire();
       }
-    },
-    async validateQuestionnairePublication () {
-      if (!this.questionnaire.cards.length) return NotifyWarning('Il n\'y a aucune carte dans ce questionnaire.');
-      if (!this.questionnaire.areCardsValid) return NotifyWarning('Carte(s) invalide(s).');
+    };
 
-      this.$q.dialog({
+    const validateQuestionnairePublication = async () => {
+      if (!questionnaire.value.cards.length) return NotifyWarning('Il n\'y a aucune carte dans ce questionnaire.');
+      if (!questionnaire.value.areCardsValid) return NotifyWarning('Carte(s) invalide(s).');
+
+      $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir publier ce questionnaire&nbsp;?',
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.publishQuestionnaire())
+      }).onOk(() => publishQuestionnaire())
         .onCancel(() => NotifyPositive('Publication annulée.'));
-    },
-    async publishQuestionnaire () {
+    };
+
+    const publishQuestionnaire = async () => {
       try {
-        if (this.isQuestionnaireValid) {
-          await Questionnaires.update(this.questionnaire._id, { status: PUBLISHED });
-          this.nameLock = true;
-          this.isEditionLocked = true;
+        if (isQuestionnaireValid.value) {
+          await Questionnaires.update(questionnaire.value._id, { status: PUBLISHED });
+          nameLock.value = true;
+          isEditionLocked.value = true;
           NotifyPositive('Questionnaire publié.');
         }
       } catch (e) {
@@ -202,12 +202,40 @@ export default {
         if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la publication du questionnaire.');
       } finally {
-        this.refreshQuestionnaire();
+        refreshQuestionnaire();
       }
-    },
-  },
-  async beforeUnmount () {
-    this.$store.dispatch('card/resetCard');
+    };
+
+    const created = async () => {
+      await refreshQuestionnaire();
+      nameLock.value = isQuestionnairePublished.value;
+      isEditionLocked.value = isQuestionnairePublished.value;
+    };
+
+    created();
+
+    onBeforeUnmount(() => $store.dispatch('card/resetCard'));
+
+    return {
+      // Validation
+      v$,
+      // Data
+      cardCreationModal,
+      nameLock,
+      isEditionLocked,
+      // Computed
+      questionnaire,
+      isQuestionnairePublished,
+      lockIcon,
+      // Methods
+      refreshCard,
+      validateUnlockEdition,
+      saveTmpName,
+      createCard,
+      updateQuestionnaire,
+      validateQuestionnairePublication,
+      validateCardDeletion,
+    };
   },
 };
 </script>
