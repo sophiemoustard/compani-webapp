@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { toRefs, computed, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
@@ -32,13 +32,14 @@ import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'Survey',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     'ni-input': Input,
   },
   emits: ['refresh'],
-  setup (props, { emit }) {
-    const { disableEdition } = toRefs(props);
-
+  setup (_, { emit }) {
     const $store = useStore();
     const $q = useQuasar();
 
@@ -122,8 +123,7 @@ export default {
     };
 
     return {
-      // Data
-      disableEdition,
+      // Validation
       v$,
       // Computed
       card,

@@ -1,5 +1,9 @@
 <template>
   <div class="column">
+    <div class="q-mb-lg">
+      <ni-button v-if="isEditionLocked" label="Déverrouiller" color="primary" icon="mdi-lock"
+        @click="validateUnlockEdition" />
+    </div>
     <div class="row justify-between">
       <div class="row body">
         <ni-input v-model.trim="questionnaire.name" required-field caption="Nom" @blur="updateQuestionnaire"
@@ -15,7 +19,7 @@
     <div class="row body">
       <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
         @delete-card="validateCardDeletion" :card-parent="questionnaire" @update="updateQuestionnaire"
-        :disable-edition="isEditionLocked" @unlock-edition="validateUnlockEdition" />
+        :disable-edition="isEditionLocked" />
       <card-edition :card-parent="questionnaire" @refresh="refreshCard" :disable-edition="isEditionLocked" />
     </div>
 
@@ -89,7 +93,8 @@ export default {
 
     const isQuestionnairePublished = computed(() => questionnaire.value.status === PUBLISHED);
 
-    const isQuestionnaireValid = computed(() => questionnaire.value.areCardsValid && !!questionnaire.value.cards.length);
+    const isQuestionnaireValid = computed(() => questionnaire.value.areCardsValid &&
+      !!questionnaire.value.cards.length);
 
     const lockIcon = computed(() => (nameLock.value ? 'lock' : 'lock_open'));
 
