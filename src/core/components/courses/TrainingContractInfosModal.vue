@@ -22,8 +22,8 @@
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
     <div>
-      <span class="text-weight-bold">Intervenant(e) :</span>
-      {{ formatIdentity(course.trainer.identity, 'FL') }}
+      <span class="text-weight-bold">{{ formatQuantity('Intervenant·e', trainersName.length, 's', false) }} : </span>
+      {{ trainersName.join(', ') }}
     </div>
     <div v-if="!isInterCourse" class="q-mb-md">
       <span class="text-weight-bold">Prix du programme :</span>
@@ -101,6 +101,8 @@ export default {
     const companyName = computed(() => course.value.companies
       .find(c => c._id === newGeneratedTrainingContractInfos.value.company).name);
 
+    const trainersName = computed(() => course.value.trainers.map(trainer => formatIdentity(trainer.identity, 'FL')));
+
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
@@ -112,6 +114,7 @@ export default {
       addressList,
       learnersCount,
       companyName,
+      trainersName,
       // Methods
       hide,
       input,
