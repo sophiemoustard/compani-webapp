@@ -38,11 +38,11 @@ import Questionnaires from '@api/Questionnaires';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
+import { useCards } from '@composables/cards';
 import { PUBLISHED } from '@data/constants';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
-import { useCards } from '@composables/cards';
 
 export default {
   name: 'ProfileEdition',
@@ -66,20 +66,6 @@ export default {
     const isEditionLocked = ref(false);
     const cardContainer = useTemplateRef('cardContainer');
 
-    const deleteCard = async (cardId) => {
-      try {
-        await Questionnaires.deleteCard(cardId);
-        await refreshQuestionnaire();
-        $store.dispatch('card/resetCard');
-        NotifyPositive('Carte supprimée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la carte.');
-      }
-    };
-
-    const { validateCardDeletion, openCardCreationModal } = useCards(cardCreationModal, deleteCard);
-
     const questionnaire = computed(() => $store.state.questionnaire.questionnaire);
 
     const card = computed(() => $store.state.card.card);
@@ -93,9 +79,23 @@ export default {
     const isQuestionnairePublished = computed(() => questionnaire.value.status === PUBLISHED);
 
     const isQuestionnaireValid = computed(() => questionnaire.value.areCardsValid &&
-      !!questionnaire.value.cards.length);
+  !!questionnaire.value.cards.length);
 
     const lockIcon = computed(() => (nameLock.value ? 'lock' : 'lock_open'));
+
+    const deleteCard = async (cardId) => {
+      try {
+        await Questionnaires.deleteCard(cardId);
+        await refreshQuestionnaire();
+        $store.dispatch('card/resetCard');
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la carte.');
+      }
+    };
+
+    const { validateCardDeletion, openCardCreationModal } = useCards(cardCreationModal, deleteCard);
 
     const refreshQuestionnaire = async () => {
       try {
