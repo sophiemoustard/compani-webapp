@@ -58,14 +58,13 @@ export default {
   },
   setup (props) {
     const { profileId } = toRefs(props);
+    const $store = useStore();
     const $q = useQuasar();
     const tmpInput = ref('');
     const cardCreationModal = ref(false);
     const nameLock = ref(false);
     const isEditionLocked = ref(false);
     const cardContainer = useTemplateRef('cardContainer');
-
-    const $store = useStore();
 
     const deleteCard = async (cardId) => {
       try {
@@ -79,10 +78,7 @@ export default {
       }
     };
 
-    const {
-      validateCardDeletion,
-      openCardCreationModal,
-    } = useCards(cardCreationModal, deleteCard);
+    const { validateCardDeletion, openCardCreationModal } = useCards(cardCreationModal, deleteCard);
 
     const questionnaire = computed(() => $store.state.questionnaire.questionnaire);
 
