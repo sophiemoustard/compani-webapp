@@ -67,6 +67,18 @@ export default {
 
     const $store = useStore();
 
+    const deleteCard = async (cardId) => {
+      try {
+        await Questionnaires.deleteCard(cardId);
+        await refreshQuestionnaire();
+        $store.dispatch('card/resetCard');
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la carte.');
+      }
+    };
+
     const {
       validateCardDeletion,
       openCardCreationModal,
@@ -145,18 +157,6 @@ export default {
         NotifyNegative('Erreur lors de la création de la carte.');
       } finally {
         $q.loading.hide();
-      }
-    };
-
-    const deleteCard = async (cardId) => {
-      try {
-        await Questionnaires.deleteCard(cardId);
-        await refreshQuestionnaire();
-        $store.dispatch('card/resetCard');
-        NotifyPositive('Carte supprimée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     };
 
