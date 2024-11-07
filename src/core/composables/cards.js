@@ -5,7 +5,7 @@ export const useCards = (cardCreationModal, deleteCard) => {
   const $q = useQuasar();
 
   const openCardCreationModal = () => {
-    cardCreationModal = true;
+    cardCreationModal.value = true;
   };
 
   const validateCardDeletion = (cardId) => {

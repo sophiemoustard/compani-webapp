@@ -42,7 +42,7 @@ import { PUBLISHED } from '@data/constants';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
-import { useCards } from '../../../../core/composables/cards';
+import { useCards } from '@composables/cards';
 
 export default {
   name: 'ProfileEdition',
@@ -56,7 +56,7 @@ export default {
     'card-creation-modal': CardCreationModal,
     'ni-button': Button,
   },
-  setup ({ props }) {
+  setup (props) {
     const { profileId } = toRefs(props);
     const $q = useQuasar();
     const tmpInput = ref('');
@@ -66,6 +66,11 @@ export default {
     const cardContainer = useTemplateRef('cardContainer');
 
     const $store = useStore();
+
+    const {
+      validateCardDeletion,
+      openCardCreationModal,
+    } = useCards(cardCreationModal, deleteCard);
 
     const questionnaire = computed(() => $store.state.questionnaire.questionnaire);
 
@@ -77,20 +82,6 @@ export default {
 
     const v$ = useVuelidate(rules, { questionnaire });
 
-    const deleteCard = async (cardId) => {
-      try {
-        await Questionnaires.deleteCard(cardId);
-        await refreshQuestionnaire();
-        $store.dispatch('card/resetCard');
-        NotifyPositive('Carte supprimée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la carte.');
-      }
-    };
-
-    const { validateCardDeletion } = useCards(cardCreationModal, deleteCard);
-
     const isQuestionnairePublished = computed(() => questionnaire.value.status === PUBLISHED);
 
     const isQuestionnaireValid = computed(() => questionnaire.value.areCardsValid &&
@@ -100,7 +91,7 @@ export default {
 
     const refreshQuestionnaire = async () => {
       try {
-        await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: profileId });
+        await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: profileId.value });
       } catch (e) {
         console.error(e);
       }
@@ -109,8 +100,8 @@ export default {
     const refreshCard = async () => {
       try {
         await $store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: questionnaire.value._id });
-        const cardFounded = questionnaire.value.cards.find(c => c._id === card.value._id);
-        $store.dispatch('card/fetchCard', cardFounded);
+        const focusedCard = questionnaire.value.cards.find(c => c._id === card.value._id);
+        $store.dispatch('card/fetchCard', focusedCard);
       } catch (e) {
         console.error(e);
       }
@@ -157,15 +148,27 @@ export default {
       }
     };
 
+    const deleteCard = async (cardId) => {
+      try {
+        await Questionnaires.deleteCard(cardId);
+        await refreshQuestionnaire();
+        $store.dispatch('card/resetCard');
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la carte.');
+      }
+    };
+
     const updateQuestionnaire = async (event) => {
       try {
         if (event) await Questionnaires.update(questionnaire.value._id, { cards: event });
         else {
           const name = get(questionnaire.value, 'name');
           if (tmpInput.value === name) return;
-          v$.questionnaire.$touch();
+          v$.value.questionnaire.$touch();
 
-          if (v$.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
+          if (v$.value.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           await Questionnaires.update(questionnaire.value._id, { name });
         }
@@ -176,7 +179,7 @@ export default {
         if (event) NotifyNegative('Erreur lors de la modification des cartes.');
         else NotifyNegative('Erreur lors de la modification du questionnaire.');
       } finally {
-        refreshQuestionnaire();
+        await refreshQuestionnaire();
       }
     };
 
@@ -207,7 +210,7 @@ export default {
         if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la publication du questionnaire.');
       } finally {
-        refreshQuestionnaire();
+        await refreshQuestionnaire();
       }
     };
 
@@ -240,6 +243,7 @@ export default {
       updateQuestionnaire,
       validateQuestionnairePublication,
       validateCardDeletion,
+      openCardCreationModal,
     };
   },
 };
