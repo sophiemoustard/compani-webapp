@@ -79,7 +79,7 @@ export default {
     const isQuestionnairePublished = computed(() => questionnaire.value.status === PUBLISHED);
 
     const isQuestionnaireValid = computed(() => questionnaire.value.areCardsValid &&
-  !!questionnaire.value.cards.length);
+      !!questionnaire.value.cards.length);
 
     const lockIcon = computed(() => (nameLock.value ? 'lock' : 'lock_open'));
 
