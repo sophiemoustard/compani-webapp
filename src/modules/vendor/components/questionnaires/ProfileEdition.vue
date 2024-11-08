@@ -116,10 +116,9 @@ export default {
     };
 
     const validateUnlockEdition = () => {
-      const isPublishedMessage = isQuestionnairePublished.value
-        ? 'Ce questionnaire est publié, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes.'
-          + '<br /><br />'
-        : '';
+      const isPublishedMessage =
+        'Ce questionnaire est publié, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes.'
+        + '<br /><br />';
 
       $q.dialog({
         title: 'Confirmation',
