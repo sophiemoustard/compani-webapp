@@ -58,8 +58,10 @@ export default {
   },
   setup (props) {
     const { profileId } = toRefs(props);
+
     const $store = useStore();
     const $q = useQuasar();
+
     const tmpInput = ref('');
     const cardCreationModal = ref(false);
     const nameLock = ref(false);
@@ -70,9 +72,7 @@ export default {
 
     const card = computed(() => $store.state.card.card);
 
-    const rules = computed(() => ({
-      questionnaire: { name: { required } },
-    }));
+    const rules = computed(() => ({ questionnaire: { name: { required } } }));
 
     const v$ = useVuelidate(rules, { questionnaire });
 
@@ -131,13 +131,11 @@ export default {
         .onCancel(() => NotifyPositive('Déverrouillage annulé.'));
     };
 
-    const saveTmpName = () => {
-      tmpInput.value = get(questionnaire.value, 'name') || '';
-    };
+    const saveTmpName = () => { tmpInput.value = get(questionnaire.value, 'name') || ''; };
 
     const createCard = async (template) => {
-      $q.loading.show();
       try {
+        $q.loading.show();
         await Questionnaires.addCard(questionnaire.value._id, { template });
 
         NotifyPositive('Carte créée.');
@@ -162,8 +160,8 @@ export default {
         else {
           const name = get(questionnaire.value, 'name');
           if (tmpInput.value === name) return;
-          v$.value.questionnaire.$touch();
 
+          v$.value.questionnaire.$touch();
           if (v$.value.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
           await Questionnaires.update(questionnaire.value._id, { name });

@@ -1,12 +1,10 @@
-import { NotifyPositive } from '@components/popup/notify';
 import { useQuasar } from 'quasar';
+import { NotifyPositive } from '@components/popup/notify';
 
 export const useCards = (cardCreationModal, deleteCard) => {
   const $q = useQuasar();
 
-  const openCardCreationModal = () => {
-    cardCreationModal.value = true;
-  };
+  const openCardCreationModal = () => { cardCreationModal.value = true; };
 
   const validateCardDeletion = (cardId) => {
     $q.dialog({
