@@ -7,7 +7,8 @@
       <q-checkbox v-model="card.isMandatory" @update:model-value="updateCard('isMandatory')" label="Réponse obligatoire"
         class="q-mb-lg" dense :disable="disableEdition" />
       <q-checkbox :model-value="displayAllLabels" @update:model-value="validateInitialization"
-        label="Définir les légendes de chaque niveau" class="q-mb-lg" dense :disable="disableEdition" />
+        label="Définir les légendes de chaque niveau" class="q-mb-lg" dense
+        :disable="disableEdition || isCardParentPublished" />
     </div>
     <div class="input-container" v-for="label in Object.keys(card.labels)" :key="label">
       <ni-input :caption="`Légende niveau ${label}`" v-model="card.labels[label]"
@@ -18,30 +19,33 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, requiredIf } from '@vuelidate/validators';
 import Cards from '@api/Cards';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import { QUESTION_OR_TITLE_MAX_LENGTH } from '@data/constants';
+import { QUESTION_OR_TITLE_MAX_LENGTH, PUBLISHED } from '@data/constants';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
 export default {
   name: 'Survey',
   props: {
     disableEdition: { type: Boolean, default: false },
+    cardParent: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-input': Input,
   },
   emits: ['refresh'],
-  setup (_, { emit }) {
+  setup (props, { emit }) {
     const $store = useStore();
     const $q = useQuasar();
+
+    const { cardParent } = toRefs(props);
 
     const card = computed(() => $store.state.card.card);
 
@@ -60,6 +64,8 @@ export default {
       },
     }));
     const v$ = useVuelidate(rules, { card });
+
+    const isCardParentPublished = computed(() => get(cardParent.value, 'status') === PUBLISHED);
 
     const refreshCard = () => {
       emit('refresh');
@@ -80,6 +86,8 @@ export default {
         if (tmpInput.value === get(card.value, `labels.${labelKey}`)) return;
 
         v$.value.card.labels.$touch();
+        if (get(v$.value, `card.labels.${labelKey}.$error`)) return NotifyWarning('Champ(s) invalide(s).');
+
         await Cards.updateById(card.value._id, { labels: card.value.labels });
 
         await refreshCard();
@@ -93,6 +101,8 @@ export default {
     const initializeLabels = async (labels, displayAllLabelsValue) => {
       try {
         await Cards.updateById(card.value._id, { labels });
+
+        v$.value.card.labels.$touch();
 
         await refreshCard();
         displayAllLabels.value = displayAllLabelsValue;
@@ -123,11 +133,13 @@ export default {
     };
 
     return {
+      // Data
+      displayAllLabels,
       // Validation
       v$,
       // Computed
       card,
-      displayAllLabels,
+      isCardParentPublished,
       // Methods
       labelErrorMessage,
       updateCardLabels,

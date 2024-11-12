@@ -116,14 +116,12 @@ export default {
     };
 
     const validateUnlockEdition = () => {
-      const message =
-        'Ce questionnaire est publié, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes.'
-        + '<br /><br />'
-        + 'Êtes-vous sûr(e) de vouloir déverrouiller ce questionnaire&nbsp;?';
+      const message = 'Ce questionnaire est publié, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des '
+        + 'cartes.<br /><br /> Êtes-vous sûr(e) de vouloir déverrouiller ce questionnaire&nbsp;?';
 
       $q.dialog({
         title: 'Confirmation',
-        message: `${message}`,
+        message,
         html: true,
         ok: true,
         cancel: 'Annuler',
