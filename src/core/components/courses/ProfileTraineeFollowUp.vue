@@ -74,7 +74,7 @@
               <div class="dates">{{ attendance.date }}</div>
               <div class="hours">{{ attendance.hours }}</div>
               <div class="misc">{{ attendance.misc }}</div>
-              <div class="trainer">{{ attendance.trainer }}</div>
+              <div class="trainer">{{ attendance.trainers }}</div>
             </div>
           </q-td>
         </template>
@@ -206,7 +206,9 @@ export default {
       }
     };
 
-    const loggedUserIsCourseTrainer = computed(() => loggedUser.value._id === course.value.trainer._id);
+    const loggedUserIsCourseTrainer = computed(() => course.value.trainers
+      .map(t => t._id)
+      .includes(loggedUser.value._id));
 
     const filteredQuestionnaires = computed(() => (loggedUserIsCourseTrainer.value
       ? questionnaires.value.filter(q => q.type !== SELF_POSITIONNING)
@@ -243,7 +245,7 @@ export default {
           _id: a._id,
           date: CompaniDate(a.courseSlot.startDate).format(DD_MM_YYYY),
           hours: formatSlotSchedule(a.courseSlot),
-          trainer: formatIdentity(get(a, 'trainer.identity'), 'FL'),
+          trainers: a.trainers.map(t => formatIdentity(t.identity, 'FL')).join(', '),
           misc: a.misc,
         })),
     });
@@ -418,7 +420,11 @@ export default {
   width: 15%
 
 .trainer
-  width: 50%
+  display: inline-block
+  max-width: 25%
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
 
 .misc
   width: 15%
@@ -427,7 +433,6 @@ export default {
   justify-content: flex-start
   div
     justify-content: center
-    display: flex
     align-items: center
     justify-content: flex-start
     margin-right: 2%
