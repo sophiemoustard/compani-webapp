@@ -74,7 +74,7 @@
               <div class="dates">{{ attendance.date }}</div>
               <div class="hours">{{ attendance.hours }}</div>
               <div class="misc">{{ attendance.misc }}</div>
-              <div class="trainer">{{ attendance.trainers }}</div>
+              <div class="trainers">{{ attendance.trainers }}</div>
             </div>
           </q-td>
         </template>
@@ -419,7 +419,7 @@ export default {
 .hours
   width: 15%
 
-.trainer
+.trainers
   display: inline-block
   max-width: 25%
   white-space: nowrap
