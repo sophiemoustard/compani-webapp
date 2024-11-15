@@ -421,7 +421,6 @@ export default {
 
 .trainers
   display: inline-block
-  max-width: 25%
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
