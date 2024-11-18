@@ -28,9 +28,21 @@
           </template>
         </ni-banner>
       </div>
+      <div v-if="isRofOrVendorAdmin && endSelfPositionningHistoryCount">
+        <ni-banner icon="info_outline">
+          <template #message>
+            {{ formatQuantity('réponse', selfPositionningHistoryValidatedCount) }} au questionnaire
+            d'auto-positionnement de fin
+            {{ formatQuantity('validée', selfPositionningHistoryValidatedCount, 's', false) }} sur
+            {{ endSelfPositionningHistoryCount }}.
+          </template>
+        </ni-banner>
+      </div>
       <div v-if="areQuestionnaireAnswersVisible" class="questionnaires-container">
-        <questionnaire-answers-cell v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
-          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire.type)" />
+        <router-link v-for="questionnaire in filteredQuestionnaires" :key="questionnaire._id"
+          :to="goToQuestionnaireAnswers(questionnaire.type)">
+            <questionnaire-answers-cell :questionnaire="questionnaire" />
+        </router-link>
       </div>
     </div>
     <elearning-follow-up-table v-if="courseHasElearningStep" :learners="learners" :loading="learnersLoading"
@@ -103,6 +115,7 @@ import {
   SELF_POSITIONNING,
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
+  END_COURSE,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
 import CompaniDate from '@helpers/dates/companiDates';
@@ -205,7 +218,15 @@ export default {
       return get(selfPositionningQ, '_id') || '';
     });
 
-    const goToQuestionnaireAnswers = questionnaireType => $router.push({
+    const endSelfPositionningHistoryCount = computed(() => questionnaires.value
+      .flatMap(q => q.histories.filter(h => h.timeline === END_COURSE))
+      .length);
+
+    const selfPositionningHistoryValidatedCount = computed(() => questionnaires.value
+      .flatMap(q => q.histories.filter(h => !!h.isValidated))
+      .length);
+
+    const goToQuestionnaireAnswers = questionnaireType => ({
       name: 'ni pedagogy questionnaire answers',
       query: { courseId: course.value._id, questionnaireType },
     });
@@ -367,6 +388,8 @@ export default {
       filteredQuestionnaires,
       endSelfPositionningQuestionnaireId,
       loggedUserIsCourseTrainer,
+      endSelfPositionningHistoryCount,
+      selfPositionningHistoryValidatedCount,
       // Methods
       get,
       formatQuantity,

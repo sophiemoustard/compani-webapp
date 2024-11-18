@@ -3,8 +3,8 @@
     <template #title>
       Ajouter une <span class="text-weight-bold">règle d'accès</span>
     </template>
-    <ni-select in-modal :model-value="newAccessRule" @update:model-value="update" :error="validations.$error"
-      caption="Structure" :options="companyOptions" last required-field />
+      <company-select in-modal :company-options="companyOptions" :company="newAccessRule" required-field
+        @update="update" :validation="validations" last />
     <template #footer>
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la règle d'accès" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -14,7 +14,7 @@
 
 <script>
 import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 
 export default {
   name: 'AccessRuleCreationModal',
@@ -27,22 +27,25 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:new-access-rule'],
   components: {
-    'ni-select': Select,
+    'company-select': CompanySelect,
     'ni-modal': Modal,
   },
-  methods: {
-    hide () {
-      this.$emit('hide');
-    },
-    input (event) {
-      this.$emit('update:model-value', event);
-    },
-    submit () {
-      this.$emit('submit');
-    },
-    update (value) {
-      this.$emit('update:new-access-rule', value);
-    },
+  setup (_, { emit }) {
+    const hide = () => emit('hide');
+
+    const input = event => emit('update:model-value', event);
+
+    const submit = () => emit('submit');
+
+    const update = value => emit('update:new-access-rule', value);
+
+    return {
+      // Methods
+      hide,
+      input,
+      submit,
+      update,
+    };
   },
 };
 </script>

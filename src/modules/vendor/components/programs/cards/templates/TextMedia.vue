@@ -3,7 +3,7 @@
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="v$.card.text.$error" type="textarea" :disable="disableEdition" />
     <ni-option-group v-model="card.media.type" :options="UPLOAD_EXTENSION_OPTIONS" inline
-      :error="v$.card.media.type.$error" type="radio" :disable="isUploading || !!card.media.publicId"
+      :error="v$.card.media.type.$error" type="radio" :disable="isUploading || !!card.media.publicId || disableEdition"
       @update:model-value="updateCard('media.type')" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="v$.card.media.$error"

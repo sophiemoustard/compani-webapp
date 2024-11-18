@@ -10,8 +10,8 @@
       </ni-banner>
       <div v-if="course.type === INTRA">{{ traineesQuantityInfos }} </div>
     </div>
-    <ni-select in-modal caption="Payeur" :options="payerOptions" :model-value="newBill.payer" required-field
-      @update:model-value="update($event, 'payer')" :error="validations.payer.$error" />
+    <company-select in-modal caption="Payeur" :company-options="payerOptions" :company="newBill.payer" required-field
+      @update="update($event, 'payer')" :validation="validations.payer" />
     <ni-option-group v-if="course.type !== INTRA" in-modal :model-value="newBill.mainFee.countUnit"
       :options="countUnitOptions" type="radio" @update:model-value="update($event, 'mainFee.countUnit')"
       :error="validations.mainFee.countUnit.$error" caption="Unité" inline required-field />
@@ -37,7 +37,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import OptionGroup from '@components/form/OptionGroup';
 import Button from '@components/Button';
-import Select from '@components/form/Select';
+import CompanySelect from '@components/form/CompanySelect';
 import Banner from '@components/Banner';
 import { INTRA, TRAINEE, GROUP } from '@data/constants';
 import { formatQuantity, formatName } from '@helpers/utils';
@@ -60,7 +60,7 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
     'ni-button': Button,
-    'ni-select': Select,
+    'company-select': CompanySelect,
     'ni-banner': Banner,
     'ni-option-group': OptionGroup,
   },

@@ -28,7 +28,7 @@
 
     <ni-companies-selection-modal v-model="companiesSelectionModal" v-model:companies-to-bill="companiesToBill"
       :course-companies="course.companies" @submit="openNextModal" :validations="v$.companiesToBill"
-      @hide="resetCompaniesSelectionModal" :course-name="courseName" />
+      @hide="resetCompaniesSelectionModal" :course-name="courseName" :is-inter-course="course.type === INTER_B2B" />
   </div>
 </template>
 
@@ -45,7 +45,14 @@ import useVuelidate from '@vuelidate/core';
 import { required, minValue } from '@vuelidate/validators';
 import { minArrayLength, integerNumber, positiveNumber, strictPositiveNumber } from '@helpers/vuelidateCustomVal';
 import { composeCourseName, computeDuration } from '@helpers/courses';
-import { formatAndSortOptions, formatPrice, formatName, sortStrings, formatIdentity } from '@helpers/utils';
+import {
+  formatAndSortOptions,
+  formatPrice,
+  formatName,
+  sortStrings,
+  formatIdentity,
+  formatAndSortCompanyOptions,
+} from '@helpers/utils';
 import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -66,6 +73,8 @@ import {
   LONG_DURATION_H_MM,
   E_LEARNING,
   DD_MM_YYYY,
+  DIRECTORY,
+  INTER_B2B,
 } from '@data/constants';
 import CourseBillingCard from 'src/modules/vendor/components/billing/CourseBillingCard';
 import BillCreationModal from 'src/modules/vendor/components/billing/CourseBillCreationModal';
@@ -206,9 +215,9 @@ export default {
     const refreshPayers = async () => {
       try {
         const organisations = await CourseFundingOrganisations.list();
-        const companyList = await Companies.list();
+        const companyList = await Companies.list({ action: DIRECTORY });
         const formattedOrganisationList = formatAndSortOptions(organisations, 'name');
-        const formattedCompanyList = formatAndSortOptions(companyList, 'name');
+        const formattedCompanyList = formatAndSortCompanyOptions(companyList, 'name');
         payerList.value =
           [
             ...formattedOrganisationList.map(payer => ({ ...payer, type: FUNDING_ORGANISATION })),
@@ -374,6 +383,8 @@ export default {
     created();
 
     return {
+      // Data
+      INTER_B2B,
       // Validation
       v$,
       // Data

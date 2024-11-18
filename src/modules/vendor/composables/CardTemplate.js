@@ -10,7 +10,7 @@ import {
   ORDER_THE_SEQUENCE,
   QUESTION_ANSWER,
   SINGLE_CHOICE_QUESTION,
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   REQUIRED_LABEL,
   UPLOAD_IMAGE,
   UPLOAD_VIDEO,
@@ -18,21 +18,13 @@ import {
   AUDIO_EXTENSIONS,
   IMAGE_EXTENSIONS,
   VIDEO_EXTENSIONS,
+  PUBLISHED,
 } from '@data/constants';
 
 export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
   const tmpInput = ref('');
   const isUploading = ref(false);
   const $q = useQuasar();
-
-  const questionErrorMsg = computed(() => {
-    if (get(v$.value, 'card.question.required.$response') === false) return REQUIRED_LABEL;
-    if (get(v$.value, 'card.question.maxLength.$response') === false) {
-      return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-    }
-
-    return '';
-  });
 
   const mediaFileName = computed(() => {
     if (card.value && card.value.title) return card.value.title.replace(/ /g, '_');
@@ -93,13 +85,16 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     }
   };
 
+  const requiredOneCorrectAnswer = (path, index) => !get(v$.value, `card.${path}.minOneCorrectAnswer.$response`) &&
+    !!`card.value.${path}[${index}].text`;
+
   const getError = (path, index) => !!get(v$.value, `card.${path}.$dirty`) &&
     get(v$.value, `card.${path}.$each.$response.$errors[${index}].text.0.$response`) === false;
 
   const getAnswerKeyToUpdate = (template) => {
     if ([MULTIPLE_CHOICE_QUESTION, SINGLE_CHOICE_QUESTION, QUESTION_ANSWER].includes(template)) return 'qcAnswers';
     if (template === ORDER_THE_SEQUENCE) return 'orderedAnswers';
-    if (template === FILL_THE_GAPS) return 'falsyGapAnswers';
+    if (template === FILL_THE_GAPS) return 'gapAnswers';
 
     return '';
   };
@@ -119,6 +114,44 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
         { cardId: card.value._id, answerId: editedAnswer._id },
         { text: editedAnswer.text.trim() }
       );
+
+      await refreshCard();
+      NotifyPositive('Carte mise à jour.');
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la mise à jour de la carte.');
+    }
+  };
+
+  const updateCorrectAnswer = async (editedAnswer) => {
+    try {
+      await Cards.updateAnswer(
+        { cardId: card.value._id, answerId: editedAnswer._id },
+        { correct: editedAnswer.correct }
+      );
+
+      await refreshCard();
+      NotifyPositive('Carte mise à jour.');
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la mise à jour de la carte.');
+    }
+  };
+
+  const updateGappedTextCard = async () => {
+    try {
+      const value = get(card.value, 'gappedText');
+      if (tmpInput.value === value) return;
+
+      const validation = get(v$.value.card, 'gappedText');
+      if (validation) {
+        validation.$touch();
+        const error = !validation.required.$response || !validation.validTagsCount.$response ||
+          (cardParent.value.status === PUBLISHED && !validation.matchingTagsCount.$response);
+        if (error) return NotifyWarning('Champ(s) invalide(s)');
+      }
+
+      await Cards.updateById(card.value._id, { gappedText: value.trim() });
 
       await refreshCard();
       NotifyPositive('Carte mise à jour.');
@@ -205,21 +238,33 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
 
   const finish = () => { isUploading.value = false; };
 
+  const errorMsg = (path) => {
+    if (get(v$.value, `card.${path}.required.$response`) === false) return REQUIRED_LABEL;
+    if (get(v$.value, `card.${path}.maxLength.$response`) === false) {
+      return `${QUESTION_OR_TITLE_MAX_LENGTH} caractères maximum.`;
+    }
+
+    return '';
+  };
+
   return {
     // Data
     tmpInput,
     isUploading,
     // Computed
-    questionErrorMsg,
     mediaFileName,
     mediaUploadUrl,
     extensions,
     maxFileSize,
+    errorMsg,
     // Methods
     saveTmp,
     updateCard,
+    updateGappedTextCard,
+    requiredOneCorrectAnswer,
     getError,
     updateTextAnswer,
+    updateCorrectAnswer,
     addAnswer,
     validateAnswerDeletion,
     mediaUploaded,

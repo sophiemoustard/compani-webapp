@@ -22,25 +22,48 @@
         <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
       </div>
     </template>
-    <template v-if="hasFilteredAnswers">
-      <div v-if="isSelfPositionningAnswers" class="sp-answers-container">
-        <div>
-          <span class="section-title">Début de formation</span>
-          <q-card v-for="(card, cardIndex) of startAnswers" :key="cardIndex" flat class="q-mb-sm">
-            <component :is="getChartComponent(card.template)" :card="card" />
-          </q-card>
+    <q-card v-if="displayGlobalInfos" flat class="q-pa-md">
+      <span class="q-pb-md text-weight-bold">Chiffres généraux</span>
+      <div class="indicator-container">
+        <div class="indicator-cell">
+          <ni-indicator :indicator="globalInfo.traineeCount" />
+          <span class="text-center">
+            {{ formatQuantity('apprenant.e', globalInfo.traineeCount, 's', false ) }} ayant répondu *
+          </span>
         </div>
-        <div>
-          <span class="section-title">Fin de formation</span>
-          <q-card v-for="(card, cardIndex) of endAnswers" :key="cardIndex" flat class="q-mb-sm">
-            <component :is="getChartComponent(card.template)" :card="card" />
-          </q-card>
+        <div class="indicator-cell">
+          <ni-indicator :indicator="globalInfo.historyCount" />
+          <span>{{ formatQuantity('réponse', globalInfo.historyCount, 's', false) }}
+          <span v-if="isSelfPositionningAnswers">**</span>
+          </span>
+        </div>
+        <div v-if="isSelfPositionningAnswers" class="indicator-cell">
+          <ni-indicator :indicator="startAnswersAverage" display-default-indicator />
+          <span class="text-center">de moyenne pour les réponses au questionnaire de début</span>
+        </div>
+        <div v-if="isSelfPositionningAnswers" class="indicator-cell">
+          <ni-indicator :indicator="endAnswersAverage" display-default-indicator />
+          <span class="text-center">de moyenne pour les réponses au questionnaire de fin</span>
         </div>
       </div>
+      <div class="q-pt-lg global-info-description">
+        <span>
+          * apprenant.es ayant répondu : prend en compte les apprenant.es ayant répondu au moins une fois au
+          questionnaire
+        </span>
+        <span v-if="isSelfPositionningAnswers">
+          ** réponses : {{ formatQuantity('réponse', startAnswersCount) }} au questionnaire de début et
+          {{ formatQuantity('réponse', endAnswersCount) }} au questionniare de fin
+        </span>
+      </div>
+    </q-card>
+    <template v-if="hasFilteredAnswers">
+      <div v-if="isSelfPositionningAnswers" class="sp-answers-container">
+        <questionnaire-answers-container title="Début de formation" :cards="startAnswers" />
+        <questionnaire-answers-container title="Fin de formation" :cards="endAnswers" />
+      </div>
       <template v-else>
-        <q-card v-for="(card, cardIndex) of cards" :key="cardIndex" flat class="q-mb-sm">
-          <component :is="getChartComponent(card.template)" :card="card" />
-        </q-card>
+        <questionnaire-answers-container :cards="cards" />
       </template>
     </template>
     <template v-else>
@@ -60,19 +83,27 @@ import uniq from 'lodash/uniq';
 import keyBy from 'lodash/keyBy';
 import uniqBy from 'lodash/uniqBy';
 import mapValues from 'lodash/mapValues';
+import pick from 'lodash/pick';
 import Questionnaires from '@api/Questionnaires';
 import Holdings from '@api/Holdings';
 import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import Select from '@components/form/Select';
-import { formatAndSortIdentityOptions, formatAndSortOptions, formatStringForExport } from '@helpers/utils';
+import {
+  formatAndSortIdentityOptions,
+  formatAndSortOptions,
+  formatStringForExport,
+  formatQuantity,
+} from '@helpers/utils';
 import { composeCourseName } from '@helpers/courses';
 import CompaniDate from '@helpers/dates/companiDates';
 import { downloadCsv } from '@helpers/file';
+import { add, divide, toFixedToFloat } from '@helpers/numbers';
 import { NotifyNegative } from '@components/popup/notify';
 import PrimaryButton from '@components/PrimaryButton';
-import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
+import Indicator from '@components/courses/Indicator';
+import QuestionnaireAnswersContainer from 'src/modules/vendor/components/questionnaires/QuestionnaireAnswersContainer';
 import {
   TRAINER,
   TRAINING_ORGANISATION_MANAGER,
@@ -93,10 +124,11 @@ import {
 export default {
   name: 'ProfileAnswers',
   components: {
+    'ni-indicator': Indicator,
     'ni-select': Select,
     'ni-primary-button': PrimaryButton,
+    'questionnaire-answers-container': QuestionnaireAnswersContainer,
   },
-  mixins: [questionnaireAnswersMixin],
   props: {
     profileId: { type: String, required: true },
     isSelfPositionningAnswers: { type: Boolean, default: false },
@@ -161,6 +193,8 @@ export default {
     const cards = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({ ...fu, answers: fu.answers.map(a => a.answer) })));
 
+    const displayGlobalInfos = computed(() => isRofOrVendorAdmin.value && hasFilteredAnswers.value);
+
     const startAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({
         ...fu,
@@ -169,6 +203,24 @@ export default {
           .map(a => a.answer),
       })));
 
+    const startAnswersCount = computed(() => {
+      const maxTraineeCountAnswer = startAnswers.value.reduce(
+        (accumulator, answer) => (answer.answers.length >= accumulator.answers.length ? answer : accumulator),
+        startAnswers.value[0]
+      );
+
+      return get(maxTraineeCountAnswer, 'answers', []).length;
+    });
+
+    const startAnswersAverage = computed(() => {
+      const answers = startAnswers.value.flatMap(startAnswer => startAnswer.answers);
+      const average = answers.length
+        ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
+        : 0;
+
+      return toFixedToFloat(average, 2);
+    });
+
     const endAnswers = computed(() => get(filteredAnswers.value, 'followUp', [])
       .map(fu => ({
         ...fu,
@@ -176,6 +228,34 @@ export default {
           .filter(a => a.timeline === END_COURSE)
           .map(a => a.answer),
       })));
+
+    const endAnswersAverage = computed(() => {
+      const answers = endAnswers.value.flatMap(endAnswer => endAnswer.answers);
+      const average = answers.length
+        ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
+        : 0;
+
+      return toFixedToFloat(average, 2);
+    });
+
+    const endAnswersCount = computed(() => {
+      const maxTraineeCountAnswer = endAnswers.value.reduce(
+        (accumulator, answer) => (answer.answers.length >= accumulator.answers.length ? answer : accumulator),
+        endAnswers.value[0]
+      );
+
+      return get(maxTraineeCountAnswer, 'answers', []).length;
+    });
+
+    const globalInfo = computed(() => {
+      const maxHistoryCountCard = cards.value
+        .reduce(
+          (accumulator, card) => (card.historyCount >= accumulator.historyCount ? card : accumulator),
+          cards.value[0]
+        );
+
+      return pick(maxHistoryCountCard, ['historyCount', 'traineeCount']);
+    });
 
     const getQuestionnaireAnswers = async () => {
       try {
@@ -410,9 +490,15 @@ export default {
       courseOptions,
       isRofOrVendorAdmin,
       hasFilteredAnswers,
+      displayGlobalInfos,
       cards,
       startAnswers,
       endAnswers,
+      globalInfo,
+      startAnswersAverage,
+      endAnswersAverage,
+      startAnswersCount,
+      endAnswersCount,
       // Methods
       getQuestionnaireAnswers,
       getTrainerOptions,
@@ -425,6 +511,7 @@ export default {
       resetFilters,
       updateSelectedCourses,
       exportAnswers,
+      formatQuantity,
     };
   },
 };
@@ -455,9 +542,25 @@ export default {
     display: flex
     flex-direction: column
 
-.section-title
-  font-size: 24px
-  font-weight: bold
-  color: $copper-grey-700
-  margin: 12px
+.global-info-description
+  font-size: 12px
+  font-style: italic
+  display: flex
+  flex-direction: column
+
+.indicator-container
+  display: flex
+  flex-direction: row
+  justify-content: space-evenly
+  @media screen and (max-width: 767px)
+    flex-direction: column
+    align-items: center
+
+.indicator-cell
+  display: flex
+  flex-direction: column
+  align-items: center
+  max-width: 15vw
+  @media screen and (max-width: 767px)
+    max-width: 50vw
 </style>

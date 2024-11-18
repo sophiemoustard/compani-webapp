@@ -1,15 +1,15 @@
 <template>
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="questionErrorMsg"
+      @blur="updateCard('question')" :error="v$.card.question.$error" :error-message="errorMsg('question')"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
-      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" class="input"
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="qcAnswer.text" class="input"
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
-        :error="getError('qcAnswers', i) || requiredOneCorrectAnswer(i)" :disable="disableEdition"
+        :error="getError('qcAnswers', i) || requiredOneCorrectAnswer('qcAnswers', i)" :disable="disableEdition"
         :required-field="answerIsRequired(i)" />
-      <q-checkbox v-model="card.qcAnswers[i].correct" @update:model-value="updateCorrectAnswer(i)"
-        :disable="!card.qcAnswers[i].text || disableEdition" />
+      <q-checkbox v-model="qcAnswer.correct" @update:model-value="updateCorrectAnswer(qcAnswer)"
+        :disable="!qcAnswer.text || disableEdition" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
@@ -26,17 +26,15 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength, helpers } from '@vuelidate/validators';
 import Input from '@components/form/Input';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   REQUIRED_LABEL,
-  QUESTION_MAX_LENGTH,
+  QUESTION_OR_TITLE_MAX_LENGTH,
   QC_ANSWER_MAX_LENGTH,
   PUBLISHED,
   CHOICE_QUESTION_MAX_ANSWERS_COUNT,
   CHOICE_QUESTION_MIN_ANSWERS_COUNT,
 } from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
-import Cards from '@api/Cards';
 import Button from '@components/Button';
 import { useCardTemplate } from 'src/modules/vendor/composables/CardTemplate';
 
@@ -60,7 +58,7 @@ export default {
 
     const rules = computed(() => ({
       card: {
-        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
+        question: { required, maxLength: maxLength(QUESTION_OR_TITLE_MAX_LENGTH) },
         qcAnswers: {
           minOneCorrectAnswer,
           $each: helpers.forEach({
@@ -84,7 +82,9 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
-      questionErrorMsg,
+      errorMsg,
+      updateCorrectAnswer,
+      requiredOneCorrectAnswer,
     } = useCardTemplate(card, v$, refreshCard);
 
     const disableAnswerCreation = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
@@ -93,31 +93,11 @@ export default {
     const disableAnswerDeletion = computed(() => disableEdition.value || cardParent.value.status === PUBLISHED ||
       card.value.qcAnswers.length <= CHOICE_QUESTION_MIN_ANSWERS_COUNT);
 
-    const requiredOneCorrectAnswer = index => !get(v$.value, 'card.qcAnswers.minOneCorrectAnswer.$response') &&
-      !!card.value.qcAnswers[index].text;
-
-    const updateCorrectAnswer = async (index) => {
-      try {
-        const editedAnswer = get(card.value, `qcAnswers[${index}]`);
-
-        await Cards.updateAnswer(
-          { cardId: card.value._id, answerId: editedAnswer._id },
-          { correct: editedAnswer.correct }
-        );
-
-        await refreshCard();
-        NotifyPositive('Carte mise à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour de la carte.');
-      }
-    };
-
     const answersErrorMsg = (index) => {
       const validation = v$.value.card.qcAnswers.$each.$response.$errors[index].text;
 
       if (get(validation, '0.$validator') === 'required') return REQUIRED_LABEL;
-      if (requiredOneCorrectAnswer(index)) return 'Une bonne réponse est nécessaire.';
+      if (requiredOneCorrectAnswer('qcAnswers', index)) return 'Une bonne réponse est nécessaire.';
       if (get(validation, '0.$validator') === 'maxLength') return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
@@ -132,7 +112,6 @@ export default {
       card,
       disableAnswerCreation,
       disableAnswerDeletion,
-      questionErrorMsg,
       // Methods
       requiredOneCorrectAnswer,
       updateCorrectAnswer,
@@ -144,6 +123,7 @@ export default {
       addAnswer,
       updateTextAnswer,
       validateAnswerDeletion,
+      errorMsg,
     };
   },
 };
