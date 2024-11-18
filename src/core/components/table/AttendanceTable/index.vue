@@ -7,13 +7,13 @@
           <div class="column items-center">
             <ni-indicator :indicator="registeredTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', registeredTraineesCount, 's', false) }}
+              {{ formatQuantity('apprenant·e inscrit·e', registeredTraineesCount, '·s', false) }}
             </span>
           </div>
           <div class="column items-center">
             <ni-indicator :indicator="presentTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', presentTraineesCount, 's', false) }}
+              {{ formatQuantity('apprenant·e inscrit·e', presentTraineesCount, '·s', false) }}
               ayant émargé<br>au moins une fois
             </span>
           </div>
@@ -31,7 +31,7 @@
             * Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits<br>
           </span>
           <span class="meta-infos-footer">
-            ** Taux d'absence réel : ne prend en compte que les apprenant.es inscrit.es ayant émargé au moins une fois
+            ** Taux d'absence réel : ne prend en compte que les apprenant·e·s inscrit·e·s ayant émargé au moins une fois
           </span>
         </div>
       </q-card>
