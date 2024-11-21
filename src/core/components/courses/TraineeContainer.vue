@@ -305,6 +305,9 @@ export default {
     };
 
     const openCertificationsUpdateModal = () => {
+      if (course.value.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas modifier les certifications d’une formation archivée.');
+      }
       editedCertifications.value = course.value.certifiedTrainees;
       certificationsUpdateModal.value = true;
     };
