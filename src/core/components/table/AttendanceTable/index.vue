@@ -7,13 +7,13 @@
           <div class="column items-center">
             <ni-indicator :indicator="registeredTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', registeredTraineesCount, 's', false) }}
+              {{ formatQuantity('apprenant·e inscrit·e', registeredTraineesCount, 's', false) }}
             </span>
           </div>
           <div class="column items-center">
             <ni-indicator :indicator="presentTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', presentTraineesCount, 's', false) }}
+              {{ formatQuantity('apprenant·e inscrit·e', presentTraineesCount, 's', false) }}
               ayant émargé<br>au moins une fois
             </span>
           </div>
@@ -31,7 +31,7 @@
             * Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits<br>
           </span>
           <span class="meta-infos-footer">
-            ** Taux d'absence réel : ne prend en compte que les apprenant.es inscrit.es ayant émargé au moins une fois
+            ** Taux d'absence réel : ne prend en compte que les apprenant·es inscrit·es ayant émargé au moins une fois
           </span>
         </div>
       </q-card>
@@ -81,14 +81,14 @@
           </q-tr>
         </template>
         <template #no-data>
-          <div class="text-center text-italic">Aucun(e) stagiaire n'a été ajouté(e) à cette formation</div>
+          <div class="text-center text-italic">Aucun·e stagiaire n'a été ajouté·e à cette formation</div>
         </template>
       </q-table>
       <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
         Aucun créneau n'a été ajouté à cette formation
       </div>
       <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm" :disable="loading"
-        label="Ajouter un(e) participant(e) non inscrit(e)" @click="openTraineeAttendanceAdditionModal" />
+        label="Ajouter un·e participant·e non inscrit·e" @click="openTraineeAttendanceAdditionModal" />
     </q-card>
 
     <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns"

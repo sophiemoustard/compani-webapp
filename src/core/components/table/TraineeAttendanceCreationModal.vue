@@ -4,12 +4,12 @@
       Ajouter une <span class="text-weight-bold">personne</span>
     </template>
     <ni-select :options="traineeFilterOptions" :model-value="newTraineeAttendance.trainee"
-      @update:model-value="update($event, 'trainee')" caption="Participant(e)" in-modal
+      @update:model-value="update($event, 'trainee')" caption="Participant·e" in-modal
       :error="validation.trainee.$error" :error-message="REQUIRED_LABEL" required-field />
     <div class="row q-pb-md">
       <ni-option-group :model-value="newTraineeAttendance.attendances" :error-message="REQUIRED_LABEL" required-field
         :options="slotsOptions" :error="validation.attendances.$error" type="checkbox" inline
-        caption="Selectionner les créneaux auxquels a été présent(e) le/la participant(e)"
+        caption="Selectionner les créneaux auxquels a été présent·e le/la participant·e"
         @update:model-value="update($event, 'attendances')" />
     </div>
     <template #footer>

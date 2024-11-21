@@ -31,7 +31,7 @@ export const useAttendanceSheets = (
     },
     {
       name: 'trainee',
-      label: 'Participant(e)',
+      label: 'Participant·e',
       align: 'left',
       field: row => formatIdentity(get(row, 'trainee.identity'), 'FL'),
     },
@@ -153,7 +153,7 @@ export const useAttendanceSheets = (
 
     $q.dialog({
       title: 'Confirmation',
-      message: 'Êtes-vous sûr(e) de vouloir supprimer cette feuille d\'émargement&nbsp;?',
+      message: 'Êtes-vous sûr·e de vouloir supprimer cette feuille d\'émargement&nbsp;?',
       html: true,
       ok: true,
       cancel: 'Annuler',
