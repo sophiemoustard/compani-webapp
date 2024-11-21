@@ -5,7 +5,7 @@
     </template>
     <ni-select v-if="course.type === INTER_B2B" :model-value="newAttendanceSheet.trainee"
       :error="validations.trainee.$error" @update:model-value="update($event, 'trainee')" in-modal required-field
-      caption="Participant(e)" :options="traineeOptions" @blur="validations.trainee.$touch" />
+      caption="Participant·e" :options="traineeOptions" @blur="validations.trainee.$touch" />
     <ni-select v-else :model-value="newAttendanceSheet.date" @blur="validations.date.$touch"
       :error="validations.date.$error" @update:model-value="update($event, 'date')" :options="dateOptions"
       required-field in-modal caption="Date" />

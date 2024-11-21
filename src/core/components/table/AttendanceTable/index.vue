@@ -81,14 +81,14 @@
           </q-tr>
         </template>
         <template #no-data>
-          <div class="text-center text-italic">Aucun(e) stagiaire n'a été ajouté(e) à cette formation</div>
+          <div class="text-center text-italic">Aucun·e stagiaire n'a été ajouté·e à cette formation</div>
         </template>
       </q-table>
       <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
         Aucun créneau n'a été ajouté à cette formation
       </div>
       <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm" :disable="loading"
-        label="Ajouter un(e) participant(e) non inscrit(e)" @click="openTraineeAttendanceAdditionModal" />
+        label="Ajouter un·e participant·e non inscrit·e" @click="openTraineeAttendanceAdditionModal" />
     </q-card>
 
     <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns"
