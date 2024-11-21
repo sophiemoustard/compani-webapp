@@ -28,7 +28,7 @@
         <div class="indicator-cell">
           <ni-indicator :indicator="globalInfo.traineeCount" />
           <span class="text-center">
-            {{ formatQuantity('apprenant·e', globalInfo.traineeCount, '·s', false ) }} ayant répondu *
+            {{ formatQuantity('apprenant·e', globalInfo.traineeCount, 's', false ) }} ayant répondu *
           </span>
         </div>
         <div class="indicator-cell">
@@ -48,7 +48,7 @@
       </div>
       <div class="q-pt-lg global-info-description">
         <span>
-          * apprenant·e·s ayant répondu : prend en compte les apprenant·e·s ayant répondu au moins une fois au
+          * apprenant·es ayant répondu : prend en compte les apprenant·es ayant répondu au moins une fois au
           questionnaire
         </span>
         <span v-if="isSelfPositionningAnswers">
