@@ -38,11 +38,18 @@ export const useAttendanceSheets = (
     { name: 'actions', label: '', align: 'left' },
   ]);
 
+  const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
+
+  const isSingleCourse = computed(() => (
+    SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id)
+  ));
+
   const attendanceSheetRules = computed(() => ({
     newAttendanceSheet: {
       file: { required },
       trainee: { required: requiredIf(course.value.type === INTER_B2B) },
       date: { required: requiredIf(course.value.type !== INTER_B2B) },
+      slots: { required: requiredIf(isSingleCourse) },
     },
   }));
 
@@ -78,6 +85,12 @@ export const useAttendanceSheets = (
     return attendanceSheets.value;
   });
 
+  const notLinkedSlotOptions = computed(() => {
+    if (!isSingleCourse.value) return [];
+
+    return course.value.slots.filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).includes(s._id)));
+  });
+
   const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
 
   const refreshAttendanceSheets = async () => {
@@ -110,6 +123,7 @@ export const useAttendanceSheets = (
     }
 
     attendanceSheetAdditionModal.value = true;
+    if (isSingleCourse.value) newAttendanceSheet.value.slots = [];
   };
 
   const resetAttendanceSheetAdditionModal = () => {
@@ -118,11 +132,14 @@ export const useAttendanceSheets = (
   };
 
   const formatPayload = () => {
-    const { course: newAttendanceSheetCourse, file, trainee, date } = newAttendanceSheet.value;
+    const { course: newAttendanceSheetCourse, file, trainee, date, slots } = newAttendanceSheet.value;
     const form = new FormData();
     course.value.type === INTER_B2B ? form.append('trainee', trainee) : form.append('date', date);
     form.append('course', newAttendanceSheetCourse);
     form.append('file', file);
+    if (isSingleCourse.value) {
+      slots.forEach(slot => form.append('slots', slot));
+    }
 
     return form;
   };
@@ -186,6 +203,7 @@ export const useAttendanceSheets = (
     // Computed
     attendanceSheetVisibleColumns,
     formattedAttendanceSheets,
+    notLinkedSlotOptions,
     // Methods
     disableSheetDeletion,
     refreshAttendanceSheets,

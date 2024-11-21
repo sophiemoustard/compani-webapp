@@ -126,7 +126,7 @@
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
         @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
-        :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" />
+        :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" :slots="notLinkedSlotOptions" />
   </div>
 </template>
 
@@ -264,6 +264,7 @@ export default {
       // Computed
       attendanceSheetVisibleColumns,
       formattedAttendanceSheets,
+      notLinkedSlotOptions,
       // Methods
       disableSheetDeletion,
       refreshAttendanceSheets,
@@ -320,6 +321,7 @@ export default {
       presentTraineesCount,
       absenceRate,
       realAbsenceRate,
+      notLinkedSlotOptions,
       // Methods
       get,
       attendanceCheckboxValue,
