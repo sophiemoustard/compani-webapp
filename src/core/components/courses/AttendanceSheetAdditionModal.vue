@@ -12,8 +12,8 @@
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
       :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
-    <ni-option-group v-if="course.type === INTER_B2B && slotOptions.length > 0" :model-value="newAttendanceSheet.slots"
-      in-modal required-field :options="slotOptions" :error="validations.slots.$error" type="checkbox" inline
+    <ni-option-group v-if="slotOptions.length > 0" :model-value="newAttendanceSheet.slots" in-modal required-field
+      :options="slotOptions" :error="validations.slots.$error" type="checkbox" inline
       @update:model-value="update($event, 'slots')"
       caption="Sélectionner les créneaux auxquels a été présent·e le/la participant·e" />
     <template #footer>
