@@ -9,6 +9,8 @@ import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
+const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
+
 export const useAttendanceSheets = (
   course,
   isClientInterface,
@@ -38,18 +40,14 @@ export const useAttendanceSheets = (
     { name: 'actions', label: '', align: 'left' },
   ]);
 
-  const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
-
-  const isSingleCourse = computed(() => (
-    SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id)
-  ));
+  const isSingleCourse = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
 
   const attendanceSheetRules = computed(() => ({
     newAttendanceSheet: {
       file: { required },
       trainee: { required: requiredIf(course.value.type === INTER_B2B) },
       date: { required: requiredIf(course.value.type !== INTER_B2B) },
-      slots: { required: requiredIf(isSingleCourse) },
+      slots: { required: requiredIf(isSingleCourse.value) },
     },
   }));
 
@@ -122,8 +120,9 @@ export const useAttendanceSheets = (
       return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
     }
 
-    attendanceSheetAdditionModal.value = true;
     if (isSingleCourse.value) newAttendanceSheet.value.slots = [];
+
+    attendanceSheetAdditionModal.value = true;
   };
 
   const resetAttendanceSheetAdditionModal = () => {
@@ -137,9 +136,8 @@ export const useAttendanceSheets = (
     course.value.type === INTER_B2B ? form.append('trainee', trainee) : form.append('date', date);
     form.append('course', newAttendanceSheetCourse);
     form.append('file', file);
-    if (isSingleCourse.value) {
-      slots.forEach(slot => form.append('slots', slot));
-    }
+
+    if (isSingleCourse.value) slots.forEach(slot => form.append('slots', slot));
 
     return form;
   };

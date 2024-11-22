@@ -12,8 +12,9 @@
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
       :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
-    <ni-option-group :model-value="newAttendanceSheet.slots" in-modal required-field :options="slotOptions"
-      :error="validations.slots.$error" type="checkbox" inline @update:model-value="update($event, 'slots')"
+    <ni-option-group v-if="course.type === INTER_B2B && slotOptions.length > 0" :model-value="newAttendanceSheet.slots"
+      in-modal required-field :options="slotOptions" :error="validations.slots.$error" type="checkbox" inline
+      @update:model-value="update($event, 'slots')"
       caption="Sélectionner les créneaux auxquels a été présent·e le/la participant·e" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter la feuille d'émargement" :loading="loading"
@@ -49,7 +50,7 @@ export default {
     course: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    slots: { type: Array, default: () => ([]) },
+    slots: { type: Array, default: () => [] },
   },
   emits: ['hide', 'update:model-value', 'update:new-attendance-sheet', 'submit'],
   setup (props, { emit }) {
@@ -69,8 +70,8 @@ export default {
       [...slots.value]
         .sort(ascendingSortBy('startDate'))
         .map(s => ({
-          label:
-          `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)} - ${CompaniDate(s.endDate).format(HH_MM)}`,
+          label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
+          - ${CompaniDate(s.endDate).format(HH_MM)}`,
           value: s._id,
         }))
     ));
