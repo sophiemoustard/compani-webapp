@@ -116,11 +116,11 @@ export const useAttendanceSheets = (
     if (course.value.archivedAt) {
       return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
     }
-    if (isSingleCourse.value && !notLinkedSlotOptions.value.length) {
-      return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
-    }
     if (!course.value.companies.length) {
       return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
+    }
+    if (isSingleCourse.value && !notLinkedSlotOptions.value.length) {
+      return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
     }
 
     if (isSingleCourse.value) newAttendanceSheet.value.slots = [];
