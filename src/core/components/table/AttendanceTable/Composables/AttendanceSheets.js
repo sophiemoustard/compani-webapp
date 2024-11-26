@@ -119,11 +119,12 @@ export const useAttendanceSheets = (
     if (!course.value.companies.length) {
       return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
     }
-    if (isSingleCourse.value && !notLinkedSlotOptions.value.length) {
-      return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
+    if (isSingleCourse.value) {
+      if (!notLinkedSlotOptions.value.length) {
+        return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
+      }
+      newAttendanceSheet.value.slots = [];
     }
-
-    if (isSingleCourse.value) newAttendanceSheet.value.slots = [];
 
     attendanceSheetAdditionModal.value = true;
   };
