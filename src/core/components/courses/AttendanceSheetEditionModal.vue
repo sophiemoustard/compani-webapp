@@ -5,21 +5,22 @@
     </template>
     <ni-select :model-value="editedAttendanceSheet.trainee"
     :options="traineeIdentity" />
-    <ni-option-group :model-value="selectedSlots" in-modal required-field
-      @update:model-value="update($event, 'slots')" type="checkbox" inline :options="formattedSlotOptions" />
+    <ni-option-group :model-value="editedAttendanceSheet.slots" in-modal required-field
+      @update:model-value="update($event, 'slots')" type="checkbox" inline :options="editionSlotOptions" />
+    <template #footer>
+    <ni-button class="full-width modal-btn bg-primary" label="Modifier la feuille d'émargement" :loading="loading"
+      icon-right="add" @click="submit" color="white" />
+    </template>
   </ni-modal>
 </template>
 
 <script>
-import { toRefs, computed, ref } from 'vue';
-import keyBy from 'lodash/keyBy';
+import { toRefs, computed } from 'vue';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
-import { DD_MM_YYYY, HH_MM } from '@data/constants';
+import Button from '@components/Button';
 import { formatIdentity } from '@helpers/utils';
-import { ascendingSortBy } from '@helpers/dates/utils';
-import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
   name: 'AttendanceSheetEditionModal',
@@ -27,29 +28,18 @@ export default {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-option-group': OptionGroup,
+    'ni-button': Button,
   },
   props: {
     modelValue: { type: Boolean, default: false },
     editedAttendanceSheet: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    notLinkedSlotOptions: { type: Array, default: () => [] },
+    editionSlotOptions: { type: Array, default: () => [] },
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:edited-attendance-sheet'],
   setup (props, { emit }) {
-    const { notLinkedSlotOptions, editedAttendanceSheet } = toRefs(props);
-
-    const slotsOptions = ref([...notLinkedSlotOptions.value, ...editedAttendanceSheet.value.slots]);
-
-    const formattedSlotOptions = computed(() => (
-      [...slotsOptions.value]
-        .sort(ascendingSortBy('startDate'))
-        .map(s => ({
-          label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
-          - ${CompaniDate(s.endDate).format(HH_MM)}`,
-          value: s._id,
-        }))
-    ));
+    const { editedAttendanceSheet } = toRefs(props);
 
     const traineeIdentity = computed(() => [
       { label: formatIdentity(editedAttendanceSheet.value.trainee.identity, 'FL'),
@@ -65,18 +55,14 @@ export default {
     const submit = () => emit('submit');
 
     const update = (slotsValue, prop) => {
-      const slotsKeyById = keyBy(slotsOptions.value, '_id');
-      const editedSlots = slotsValue.map(slotId => slotsKeyById[slotId]);
-
       emit(
         'update:edited-attendance-sheet',
-        { ...editedAttendanceSheet.value, [prop]: editedSlots }
+        { ...editedAttendanceSheet.value, [prop]: slotsValue }
       );
     };
 
     return {
       // Computed
-      formattedSlotOptions,
       traineeIdentity,
       selectedSlots,
       // Methods

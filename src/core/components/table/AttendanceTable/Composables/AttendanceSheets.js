@@ -4,9 +4,10 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
-import { INTER_B2B, DD_MM_YYYY } from '@data/constants';
+import { INTER_B2B, DD_MM_YYYY, HH_MM } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
+import { ascendingSortBy } from '@helpers/dates/utils';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
@@ -25,6 +26,7 @@ export const useAttendanceSheets = (
   const attendanceSheets = ref([]);
   const newAttendanceSheet = ref({ course: course.value._id });
   const editedAttendanceSheet = ref({ _id: '', slots: [], trainee: {} });
+  const editionSlotOptions = ref([]);
   const attendanceSheetColumns = ref([
     {
       name: 'date',
@@ -89,7 +91,8 @@ export const useAttendanceSheets = (
   const notLinkedSlotOptions = computed(() => {
     if (!isSingleCourse.value) return [];
 
-    return course.value.slots.filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).includes(s._id)));
+    return course.value.slots
+      .filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).map(slot => slot._id).includes(s._id)));
   });
 
   const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
@@ -206,9 +209,16 @@ export const useAttendanceSheets = (
     }
     editedAttendanceSheet.value = {
       _id: attendanceSheet._id,
-      slots: attendanceSheet.slots || [],
+      slots: get(attendanceSheet, 'slots', []).map(slot => slot._id),
       trainee: attendanceSheet.trainee,
     };
+    editionSlotOptions.value = [...attendanceSheet.slots || [], ...notLinkedSlotOptions.value]
+      .sort(ascendingSortBy('startDate'))
+      .map(s => ({
+        label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
+      - ${CompaniDate(s.endDate).format(HH_MM)}`,
+        value: s._id,
+      }));
     attendanceSheetEditionModal.value = true;
   };
 
@@ -236,6 +246,7 @@ export const useAttendanceSheets = (
   const resetAttendanceSheetEditionModal = () => {
     v$.value.editedAttendanceSheet.$reset();
     editedAttendanceSheet.value = { _id: '', slots: [], trainee: {} };
+    editionSlotOptions.value = [];
   };
 
   return {
@@ -251,6 +262,7 @@ export const useAttendanceSheets = (
     attendanceSheetVisibleColumns,
     formattedAttendanceSheets,
     notLinkedSlotOptions,
+    editionSlotOptions,
     isSingleCourse,
     // Methods
     disableSheetDeletion,
