@@ -4,7 +4,7 @@
       Modifier la <span class="text-weight-bold">feuille d'émargement</span>
     </template>
     <ni-select :model-value="editedAttendanceSheet.trainee"
-    :options="traineeIdentity" />
+    :options="traineeIdentity" disable />
     <ni-option-group :model-value="editedAttendanceSheet.slots" in-modal required-field
       @update:model-value="update($event, 'slots')" type="checkbox" inline :options="editionSlotOptions" />
     <template #footer>

@@ -207,6 +207,9 @@ export const useAttendanceSheets = (
     if (course.value.isArchived) {
       return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
     }
+    if (![...attendanceSheet.slots || [], ...notLinkedSlotOptions.value].length) {
+      return NotifyWarning('Aucun créneau modifiable pour cette feuille d\'émargement.');
+    }
     editedAttendanceSheet.value = {
       _id: attendanceSheet._id,
       slots: get(attendanceSheet, 'slots', []).map(slot => slot._id),
