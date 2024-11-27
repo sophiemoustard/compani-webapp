@@ -9,6 +9,8 @@ import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
+const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
+
 export const useAttendanceSheets = (
   course,
   isClientInterface,
@@ -38,11 +40,14 @@ export const useAttendanceSheets = (
     { name: 'actions', label: '', align: 'left' },
   ]);
 
+  const isSingleCourse = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
+
   const attendanceSheetRules = computed(() => ({
     newAttendanceSheet: {
       file: { required },
       trainee: { required: requiredIf(course.value.type === INTER_B2B) },
       date: { required: requiredIf(course.value.type !== INTER_B2B) },
+      slots: { required: requiredIf(isSingleCourse.value) },
     },
   }));
 
@@ -78,6 +83,12 @@ export const useAttendanceSheets = (
     return attendanceSheets.value;
   });
 
+  const notLinkedSlotOptions = computed(() => {
+    if (!isSingleCourse.value) return [];
+
+    return course.value.slots.filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).includes(s._id)));
+  });
+
   const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
 
   const refreshAttendanceSheets = async () => {
@@ -108,6 +119,12 @@ export const useAttendanceSheets = (
     if (!course.value.companies.length) {
       return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
     }
+    if (isSingleCourse.value) {
+      if (!notLinkedSlotOptions.value.length) {
+        return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
+      }
+      newAttendanceSheet.value.slots = [];
+    }
 
     attendanceSheetAdditionModal.value = true;
   };
@@ -118,11 +135,13 @@ export const useAttendanceSheets = (
   };
 
   const formatPayload = () => {
-    const { course: newAttendanceSheetCourse, file, trainee, date } = newAttendanceSheet.value;
+    const { course: newAttendanceSheetCourse, file, trainee, date, slots } = newAttendanceSheet.value;
     const form = new FormData();
     course.value.type === INTER_B2B ? form.append('trainee', trainee) : form.append('date', date);
     form.append('course', newAttendanceSheetCourse);
     form.append('file', file);
+
+    if (isSingleCourse.value) slots.forEach(slot => form.append('slots', slot));
 
     return form;
   };
@@ -186,6 +205,7 @@ export const useAttendanceSheets = (
     // Computed
     attendanceSheetVisibleColumns,
     formattedAttendanceSheets,
+    notLinkedSlotOptions,
     // Methods
     disableSheetDeletion,
     refreshAttendanceSheets,

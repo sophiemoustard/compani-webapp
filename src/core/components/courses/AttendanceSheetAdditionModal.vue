@@ -12,6 +12,10 @@
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
       :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
+    <ni-option-group v-if="slotOptions.length" :model-value="newAttendanceSheet.slots" in-modal required-field
+      :options="slotOptions" :error="validations.slots.$error" type="checkbox" inline
+      @update:model-value="update($event, 'slots')"
+      caption="Sélectionner les créneaux auxquels a été présent·e le/la participant·e" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter la feuille d'émargement" :loading="loading"
         icon-right="add" @click="submit" color="white" />
@@ -25,8 +29,10 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import { INTER_B2B, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY } from '@data/constants';
+import OptionGroup from '@components/form/OptionGroup';
+import { INTER_B2B, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY, HH_MM } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { ascendingSortBy } from '@helpers/dates/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
@@ -36,6 +42,7 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
     'ni-button': Button,
+    'ni-option-group': OptionGroup,
   },
   props: {
     modelValue: { type: Boolean, default: false },
@@ -43,10 +50,11 @@ export default {
     course: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    slots: { type: Array, default: () => [] },
   },
   emits: ['hide', 'update:model-value', 'update:new-attendance-sheet', 'submit'],
   setup (props, { emit }) {
-    const { newAttendanceSheet, course } = toRefs(props);
+    const { newAttendanceSheet, course, slots } = toRefs(props);
 
     const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
 
@@ -57,6 +65,16 @@ export default {
 
       return [...dateOptionsSet].map(date => ({ value: date, label: CompaniDate(date).format(DD_MM_YYYY) }));
     });
+
+    const slotOptions = computed(() => (
+      [...slots.value]
+        .sort(ascendingSortBy('startDate'))
+        .map(s => ({
+          label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
+          - ${CompaniDate(s.endDate).format(HH_MM)}`,
+          value: s._id,
+        }))
+    ));
 
     const hide = () => emit('hide');
 
@@ -74,6 +92,7 @@ export default {
       // Computed
       traineeOptions,
       dateOptions,
+      slotOptions,
       // Methods
       hide,
       input,
