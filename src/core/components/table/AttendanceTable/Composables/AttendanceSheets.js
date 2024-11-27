@@ -21,8 +21,10 @@ export const useAttendanceSheets = (
   const $q = useQuasar();
   const attendanceSheetTableLoading = ref(false);
   const attendanceSheetAdditionModal = ref(false);
+  const attendanceSheetEditionModal = ref(false);
   const attendanceSheets = ref([]);
   const newAttendanceSheet = ref({ course: course.value._id });
+  const editedAttendanceSheet = ref({ _id: '', slots: [], trainee: {} });
   const attendanceSheetColumns = ref([
     {
       name: 'date',
@@ -49,9 +51,10 @@ export const useAttendanceSheets = (
       date: { required: requiredIf(course.value.type !== INTER_B2B) },
       slots: { required: requiredIf(isSingleCourse.value) },
     },
+    editedAttendanceSheet: { slots: { required: requiredIf(isSingleCourse.value) } },
   }));
 
-  const v$ = useVuelidate(attendanceSheetRules, { newAttendanceSheet });
+  const v$ = useVuelidate(attendanceSheetRules, { newAttendanceSheet, editedAttendanceSheet });
 
   const attendanceSheetVisibleColumns = computed(() => (course.value.type === INTER_B2B
     ? ['trainee', 'actions']
@@ -90,6 +93,8 @@ export const useAttendanceSheets = (
   });
 
   const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
+
+  const disableSheetEdition = () => !!course.value.archivedAt;
 
   const refreshAttendanceSheets = async () => {
     try {
@@ -195,6 +200,44 @@ export const useAttendanceSheets = (
     }
   };
 
+  const openAttendanceSheetEditionModal = (attendanceSheet) => {
+    if (course.value.isArchived) {
+      return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
+    }
+    editedAttendanceSheet.value = {
+      _id: attendanceSheet._id,
+      slots: attendanceSheet.slots || [],
+      trainee: attendanceSheet.trainee,
+    };
+    attendanceSheetEditionModal.value = true;
+  };
+
+  const updateAttendanceSheet = async () => {
+    try {
+      if (!canUpdate.value) return NotifyNegative('Impossible d\'éditer la feuille d\'émargement.');
+
+      v$.value.editedAttendanceSheet.$touch();
+      if (v$.value.editedAttendanceSheet.$error) return NotifyNegative('Champs(s) invalide(s)');
+      modalLoading.value = true;
+
+      await AttendanceSheets.update(editedAttendanceSheet.value._id, { slots: editedAttendanceSheet.value.slots });
+
+      attendanceSheetEditionModal.value = false;
+      NotifyPositive('Feuille d\'émargement ajoutée.');
+      await refreshAttendanceSheets();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de l\'édition de la feuille d\'émargement.');
+    } finally {
+      modalLoading.value = false;
+    }
+  };
+
+  const resetAttendanceSheetEditionModal = () => {
+    v$.value.editedAttendanceSheet.$reset();
+    editedAttendanceSheet.value = { _id: '', slots: [], trainee: {} };
+  };
+
   return {
     // Data
     attendanceSheetTableLoading,
@@ -202,18 +245,25 @@ export const useAttendanceSheets = (
     attendanceSheets,
     newAttendanceSheet,
     attendanceSheetColumns,
+    attendanceSheetEditionModal,
+    editedAttendanceSheet,
     // Computed
     attendanceSheetVisibleColumns,
     formattedAttendanceSheets,
     notLinkedSlotOptions,
+    isSingleCourse,
     // Methods
     disableSheetDeletion,
+    disableSheetEdition,
     refreshAttendanceSheets,
     openAttendanceSheetAdditionModal,
     resetAttendanceSheetAdditionModal,
     addAttendanceSheet,
     validateAttendanceSheetDeletion,
     deleteAttendanceSheet,
+    openAttendanceSheetEditionModal,
+    updateAttendanceSheet,
+    resetAttendanceSheetEditionModal,
     // Validations
     attendanceSheetValidations: v$,
   };
