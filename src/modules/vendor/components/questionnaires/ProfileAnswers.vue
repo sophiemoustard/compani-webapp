@@ -174,7 +174,7 @@ export default {
 
       if (displayCourseSelect.value && get(filteredAnswers.value, 'followUp')) {
         const answers = questionnaireAnswers.value.followUp.map(fu => fu.answers
-          .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
+          .filter(a => !selectedTrainer.value || (get(a, 'course.trainers').includes(selectedTrainer.value)))
           .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
           .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value))
           .filter(a => !selectedHolding.value ||
@@ -335,7 +335,7 @@ export default {
 
     const formatFollowUp = (fu) => {
       const answers = fu.answers
-        .filter(a => !selectedTrainer.value || (get(a, 'course.trainer') === selectedTrainer.value))
+        .filter(a => !selectedTrainer.value || (get(a, 'course.trainers').includes(selectedTrainer.value)))
         .filter(a => !selectedCompany.value || (a.traineeCompany === selectedCompany.value))
         .filter(a => !selectedProgram.value || (get(a, 'course.subProgram.program._id') === selectedProgram.value))
         .filter(a => !selectedHolding.value ||
@@ -440,7 +440,7 @@ export default {
           ]);
 
           if (get(course.value, '_id')) {
-            selectedTrainer.value = course.value.trainer._id;
+            selectedTrainer.value = course.value.trainers.length === 1 ? course.value.trainers[0] : '';
             selectedCompany.value = course.value.type === INTRA ? course.value.companies[0]._id : '';
             selectedProgram.value = course.value.subProgram.program._id;
             selectedHolding.value = course.value.type === INTRA_HOLDING ? course.value.holding : '';
