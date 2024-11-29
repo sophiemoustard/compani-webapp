@@ -204,18 +204,16 @@ export const useAttendanceSheets = (
   };
 
   const openAttendanceSheetEditionModal = (attendanceSheet) => {
-    if (course.value.isArchived) {
-      return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
-    }
-    if (![...attendanceSheet.slots || [], ...notLinkedSlotOptions.value].length) {
-      return NotifyWarning('Aucun créneau modifiable pour cette feuille d\'émargement.');
+    const linkedSlots = attendanceSheet.slots || [];
+    if (![...linkedSlots, ...notLinkedSlotOptions.value].length) {
+      return NotifyWarning('Tous les créneaux sont déjà rattachés á une feuille d\'émargement.');
     }
     editedAttendanceSheet.value = {
       _id: attendanceSheet._id,
-      slots: get(attendanceSheet, 'slots', []).map(slot => slot._id),
+      slots: linkedSlots.map(slot => slot._id),
       trainee: attendanceSheet.trainee,
     };
-    editionSlotOptions.value = [...attendanceSheet.slots || [], ...notLinkedSlotOptions.value]
+    editionSlotOptions.value = [...linkedSlots, ...notLinkedSlotOptions.value]
       .sort(ascendingSortBy('startDate'))
       .map(s => ({
         label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
@@ -230,13 +228,13 @@ export const useAttendanceSheets = (
       if (!canUpdate.value) return NotifyNegative('Impossible d\'éditer la feuille d\'émargement.');
 
       v$.value.editedAttendanceSheet.$touch();
-      if (v$.value.editedAttendanceSheet.$error) return NotifyNegative('Champs(s) invalide(s)');
+      if (v$.value.editedAttendanceSheet.$error) return NotifyWarning('Champs(s) invalide(s)');
       modalLoading.value = true;
 
       await AttendanceSheets.update(editedAttendanceSheet.value._id, { slots: editedAttendanceSheet.value.slots });
 
       attendanceSheetEditionModal.value = false;
-      NotifyPositive('Feuille d\'émargement ajoutée.');
+      NotifyPositive('Feuille d\'émargement modifiée.');
       await refreshAttendanceSheets();
     } catch (e) {
       console.error(e);

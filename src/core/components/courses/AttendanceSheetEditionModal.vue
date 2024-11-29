@@ -4,9 +4,10 @@
       Modifier la <span class="text-weight-bold">feuille d'émargement</span>
     </template>
     <ni-select :model-value="editedAttendanceSheet.trainee"
-    :options="traineeIdentity" disable />
+      :options="traineeIdentity" disable />
     <ni-option-group :model-value="editedAttendanceSheet.slots" in-modal required-field
-      @update:model-value="update($event, 'slots')" type="checkbox" inline :options="editionSlotOptions" />
+      @update:model-value="update($event, 'slots')" type="checkbox" inline :options="editionSlotOptions"
+      caption="Modifier les créneaux auxquels a été présent·e le/la participant·e" />
     <template #footer>
     <ni-button class="full-width modal-btn bg-primary" label="Modifier la feuille d'émargement" :loading="loading"
       icon-right="add" @click="submit" color="white" />
@@ -46,8 +47,6 @@ export default {
         value: editedAttendanceSheet.value.trainee },
     ]);
 
-    const selectedSlots = computed(() => editedAttendanceSheet.value.slots.map(slot => slot._id));
-
     const hide = () => emit('hide');
 
     const input = event => emit('update:model-value', event);
@@ -64,13 +63,11 @@ export default {
     return {
       // Computed
       traineeIdentity,
-      selectedSlots,
       // Methods
       hide,
       input,
       submit,
       update,
-      // formatIdentity,
     };
   },
 };
