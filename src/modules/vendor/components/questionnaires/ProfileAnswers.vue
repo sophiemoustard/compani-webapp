@@ -440,7 +440,7 @@ export default {
           ]);
 
           if (get(course.value, '_id')) {
-            selectedTrainer.value = course.value.trainers.length === 1 ? course.value.trainers[0] : '';
+            selectedTrainer.value = course.value.trainers.length === 1 ? course.value.trainers[0]._id : '';
             selectedCompany.value = course.value.type === INTRA ? course.value.companies[0]._id : '';
             selectedProgram.value = course.value.subProgram.program._id;
             selectedHolding.value = course.value.type === INTRA_HOLDING ? course.value.holding : '';
