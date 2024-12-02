@@ -3,11 +3,11 @@
     <template #title>
       Modifier la <span class="text-weight-bold">feuille d'émargement</span>
     </template>
-    <ni-select :model-value="editedAttendanceSheet.trainee"
-      :options="traineeIdentity" disable />
+    <ni-select :model-value="editedAttendanceSheet.trainee" :options="traineeIdentity" disable />
     <ni-option-group :model-value="editedAttendanceSheet.slots" in-modal required-field
       @update:model-value="update($event, 'slots')" type="checkbox" inline :options="editionSlotOptions"
-      caption="Sélectionner les créneaux auxquels a été présent·e le/la participant·e" />
+      caption="Sélectionner les créneaux auxquels a été présent·e le/la participant·e"
+      :error="validations.slots.$error" />
     <template #footer>
     <ni-button class="full-width modal-btn bg-primary" label="Modifier la feuille d'émargement" :loading="loading"
       icon-right="add" @click="submit" color="white" />
