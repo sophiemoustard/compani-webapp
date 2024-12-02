@@ -7,7 +7,7 @@
       :options="traineeIdentity" disable />
     <ni-option-group :model-value="editedAttendanceSheet.slots" in-modal required-field
       @update:model-value="update($event, 'slots')" type="checkbox" inline :options="editionSlotOptions"
-      caption="Modifier les créneaux auxquels a été présent·e le/la participant·e" />
+      caption="Sélectionner les créneaux auxquels a été présent·e le/la participant·e" />
     <template #footer>
     <ni-button class="full-width modal-btn bg-primary" label="Modifier la feuille d'émargement" :loading="loading"
       icon-right="add" @click="submit" color="white" />
@@ -42,10 +42,10 @@ export default {
   setup (props, { emit }) {
     const { editedAttendanceSheet } = toRefs(props);
 
-    const traineeIdentity = computed(() => [
-      { label: formatIdentity(editedAttendanceSheet.value.trainee.identity, 'FL'),
-        value: editedAttendanceSheet.value.trainee },
-    ]);
+    const traineeIdentity = computed(() => [{
+      label: formatIdentity(editedAttendanceSheet.value.trainee.identity, 'FL'),
+      value: editedAttendanceSheet.value.trainee,
+    }]);
 
     const hide = () => emit('hide');
 
@@ -53,12 +53,10 @@ export default {
 
     const submit = () => emit('submit');
 
-    const update = (slotsValue, prop) => {
-      emit(
-        'update:edited-attendance-sheet',
-        { ...editedAttendanceSheet.value, [prop]: slotsValue }
-      );
-    };
+    const update = (slotsValue, prop) => emit(
+      'update:edited-attendance-sheet',
+      { ...editedAttendanceSheet.value, [prop]: slotsValue }
+    );
 
     return {
       // Computed

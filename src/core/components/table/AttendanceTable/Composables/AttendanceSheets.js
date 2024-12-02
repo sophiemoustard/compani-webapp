@@ -206,8 +206,9 @@ export const useAttendanceSheets = (
   const openAttendanceSheetEditionModal = (attendanceSheet) => {
     const linkedSlots = attendanceSheet.slots || [];
     if (![...linkedSlots, ...notLinkedSlotOptions.value].length) {
-      return NotifyWarning('Tous les créneaux sont déjà rattachés á une feuille d\'émargement.');
+      return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
     }
+
     editedAttendanceSheet.value = {
       _id: attendanceSheet._id,
       slots: linkedSlots.map(slot => slot._id),

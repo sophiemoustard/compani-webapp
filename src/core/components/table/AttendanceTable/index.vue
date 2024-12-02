@@ -130,8 +130,8 @@
         @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
         :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" :slots="notLinkedSlotOptions" />
     <attendance-sheet-edition-modal v-model="attendanceSheetEditionModal" @hide="resetAttendanceSheetEditionModal"
-        @submit="updateAttendanceSheet" v-model:edited-attendance-sheet="editedAttendanceSheet" :loading="modalLoading"
-        :validations="attendanceSheetValidations.editedAttendanceSheet" :edition-slot-options="editionSlotOptions" />
+      @submit="updateAttendanceSheet" v-model:edited-attendance-sheet="editedAttendanceSheet" :loading="modalLoading"
+      :validations="attendanceSheetValidations.editedAttendanceSheet" :edition-slot-options="editionSlotOptions" />
   </div>
 </template>
 
