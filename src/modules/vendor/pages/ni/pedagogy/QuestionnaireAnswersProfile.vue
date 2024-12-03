@@ -61,7 +61,7 @@ export default {
 
     const course = computed(() => pick(
       $store.state.course.course,
-      ['_id', 'companies', 'subProgram.program', 'trainer._id', 'type', 'holding', 'misc']
+      ['_id', 'companies', 'subProgram.program', 'trainers', 'type', 'holding', 'misc']
     ));
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
