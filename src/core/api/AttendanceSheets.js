@@ -10,6 +10,9 @@ export default {
     formData.append('origin', WEBAPP);
     await alenviAxios.post(`${process.env.API_HOSTNAME}/attendancesheets`, formData);
   },
+  async update (attendanceSheetId, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/attendancesheets/${attendanceSheetId}`, payload);
+  },
   async delete (attendanceSheetId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/attendancesheets/${attendanceSheetId}`);
   },

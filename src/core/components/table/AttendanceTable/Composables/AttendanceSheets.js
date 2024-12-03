@@ -4,9 +4,10 @@ import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
-import { INTER_B2B, DD_MM_YYYY } from '@data/constants';
+import { INTER_B2B, DD_MM_YYYY, HH_MM } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
+import { ascendingSortBy } from '@helpers/dates/utils';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
@@ -21,8 +22,11 @@ export const useAttendanceSheets = (
   const $q = useQuasar();
   const attendanceSheetTableLoading = ref(false);
   const attendanceSheetAdditionModal = ref(false);
+  const attendanceSheetEditionModal = ref(false);
   const attendanceSheets = ref([]);
   const newAttendanceSheet = ref({ course: course.value._id });
+  const editedAttendanceSheet = ref({ _id: '', slots: [], trainee: {} });
+  const editionSlotOptions = ref([]);
   const attendanceSheetColumns = ref([
     {
       name: 'date',
@@ -49,9 +53,10 @@ export const useAttendanceSheets = (
       date: { required: requiredIf(course.value.type !== INTER_B2B) },
       slots: { required: requiredIf(isSingleCourse.value) },
     },
+    editedAttendanceSheet: { slots: { required: requiredIf(isSingleCourse.value) } },
   }));
 
-  const v$ = useVuelidate(attendanceSheetRules, { newAttendanceSheet });
+  const v$ = useVuelidate(attendanceSheetRules, { newAttendanceSheet, editedAttendanceSheet });
 
   const attendanceSheetVisibleColumns = computed(() => (course.value.type === INTER_B2B
     ? ['trainee', 'actions']
@@ -86,10 +91,13 @@ export const useAttendanceSheets = (
   const notLinkedSlotOptions = computed(() => {
     if (!isSingleCourse.value) return [];
 
-    return course.value.slots.filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).includes(s._id)));
+    return course.value.slots
+      .filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).map(slot => slot._id).includes(s._id)));
   });
 
   const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
+
+  const disableSheetEdition = () => !!course.value.archivedAt;
 
   const refreshAttendanceSheets = async () => {
     try {
@@ -195,6 +203,54 @@ export const useAttendanceSheets = (
     }
   };
 
+  const openAttendanceSheetEditionModal = (attendanceSheet) => {
+    const linkedSlots = attendanceSheet.slots || [];
+    if (![...linkedSlots, ...notLinkedSlotOptions.value].length) {
+      return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
+    }
+
+    editedAttendanceSheet.value = {
+      _id: attendanceSheet._id,
+      slots: linkedSlots.map(slot => slot._id),
+      trainee: attendanceSheet.trainee,
+    };
+    editionSlotOptions.value = [...linkedSlots, ...notLinkedSlotOptions.value]
+      .sort(ascendingSortBy('startDate'))
+      .map(s => ({
+        label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
+      - ${CompaniDate(s.endDate).format(HH_MM)}`,
+        value: s._id,
+      }));
+    attendanceSheetEditionModal.value = true;
+  };
+
+  const updateAttendanceSheet = async () => {
+    try {
+      if (!canUpdate.value) return NotifyNegative('Impossible d\'éditer la feuille d\'émargement.');
+
+      v$.value.editedAttendanceSheet.$touch();
+      if (v$.value.editedAttendanceSheet.$error) return NotifyWarning('Champs(s) invalide(s)');
+      modalLoading.value = true;
+
+      await AttendanceSheets.update(editedAttendanceSheet.value._id, { slots: editedAttendanceSheet.value.slots });
+
+      attendanceSheetEditionModal.value = false;
+      NotifyPositive('Feuille d\'émargement modifiée.');
+      await refreshAttendanceSheets();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de l\'édition de la feuille d\'émargement.');
+    } finally {
+      modalLoading.value = false;
+    }
+  };
+
+  const resetAttendanceSheetEditionModal = () => {
+    v$.value.editedAttendanceSheet.$reset();
+    editedAttendanceSheet.value = { _id: '', slots: [], trainee: {} };
+    editionSlotOptions.value = [];
+  };
+
   return {
     // Data
     attendanceSheetTableLoading,
@@ -202,18 +258,26 @@ export const useAttendanceSheets = (
     attendanceSheets,
     newAttendanceSheet,
     attendanceSheetColumns,
+    attendanceSheetEditionModal,
+    editedAttendanceSheet,
     // Computed
     attendanceSheetVisibleColumns,
     formattedAttendanceSheets,
     notLinkedSlotOptions,
+    editionSlotOptions,
+    isSingleCourse,
     // Methods
     disableSheetDeletion,
+    disableSheetEdition,
     refreshAttendanceSheets,
     openAttendanceSheetAdditionModal,
     resetAttendanceSheetAdditionModal,
     addAttendanceSheet,
     validateAttendanceSheetDeletion,
     deleteAttendanceSheet,
+    openAttendanceSheetEditionModal,
+    updateAttendanceSheet,
+    resetAttendanceSheetEditionModal,
     // Validations
     attendanceSheetValidations: v$,
   };

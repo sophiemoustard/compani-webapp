@@ -100,6 +100,8 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions justify-end">
+                <ni-button v-if="canUpdate && isSingleCourse" icon="edit" color="primary"
+                  @click="openAttendanceSheetEditionModal(props.row)" :disable="disableSheetEdition(props.row)" />
                 <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
                   :disable="!props.row.file.link" />
                 <ni-button v-if="canUpdate" icon="delete" color="primary"
@@ -125,8 +127,11 @@
       :trainees="traineesWithAttendance" @submit="addTrainee" />
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
-        @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
-        :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" :slots="notLinkedSlotOptions" />
+      @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
+      :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" :slots="notLinkedSlotOptions" />
+    <attendance-sheet-edition-modal v-model="attendanceSheetEditionModal" @hide="resetAttendanceSheetEditionModal"
+      @submit="updateAttendanceSheet" v-model:edited-attendance-sheet="editedAttendanceSheet" :loading="modalLoading"
+      :validations="attendanceSheetValidations.editedAttendanceSheet" :edition-slot-options="editionSlotOptions" />
   </div>
 </template>
 
@@ -147,6 +152,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import Indicator from '@components/courses/Indicator';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
+import AttendanceSheetEditionModal from '../../courses/AttendanceSheetEditionModal.vue';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
 
@@ -160,6 +166,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
+    'attendance-sheet-edition-modal': AttendanceSheetEditionModal,
     'ni-indicator': Indicator,
   },
   setup (props) {
@@ -261,17 +268,25 @@ export default {
       attendanceSheetAdditionModal,
       newAttendanceSheet,
       attendanceSheetColumns,
+      attendanceSheetEditionModal,
+      editedAttendanceSheet,
       // Computed
       attendanceSheetVisibleColumns,
       formattedAttendanceSheets,
       notLinkedSlotOptions,
+      editionSlotOptions,
+      isSingleCourse,
       // Methods
       disableSheetDeletion,
+      disableSheetEdition,
       refreshAttendanceSheets,
       openAttendanceSheetAdditionModal,
       resetAttendanceSheetAdditionModal,
       addAttendanceSheet,
       validateAttendanceSheetDeletion,
+      resetAttendanceSheetEditionModal,
+      updateAttendanceSheet,
+      openAttendanceSheetEditionModal,
       // Validations
       attendanceSheetValidations,
     } = useAttendanceSheets(course, isClientInterface, canUpdate, loggedUser, modalLoading);
@@ -304,6 +319,8 @@ export default {
       attendanceSheetColumns,
       attendanceSheetPagination,
       attendancePagination,
+      attendanceSheetEditionModal,
+      editedAttendanceSheet,
       // Computed
       canAccessLearnerProfile,
       attendanceColumns,
@@ -322,10 +339,13 @@ export default {
       absenceRate,
       realAbsenceRate,
       notLinkedSlotOptions,
+      editionSlotOptions,
+      isSingleCourse,
       // Methods
       get,
       attendanceCheckboxValue,
       disableSheetDeletion,
+      disableSheetEdition,
       traineesCount,
       openAttendanceSheetAdditionModal,
       resetAttendanceSheetAdditionModal,
@@ -339,7 +359,10 @@ export default {
       updateSlotCheckbox,
       getDelimiterClass,
       goToLearnerProfile,
+      resetAttendanceSheetEditionModal,
+      updateAttendanceSheet,
       formatQuantity,
+      openAttendanceSheetEditionModal,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,
