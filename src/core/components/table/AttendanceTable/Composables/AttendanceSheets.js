@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
+import keyBy from 'lodash/keyBy';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
@@ -43,6 +44,7 @@ export const useAttendanceSheets = (
     },
     { name: 'actions', label: '', align: 'left' },
   ]);
+  const stepsById = ref(keyBy(course.value.subProgram.steps, '_id'));
 
   const isSingleCourse = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
 
@@ -260,6 +262,7 @@ export const useAttendanceSheets = (
     attendanceSheetColumns,
     attendanceSheetEditionModal,
     editedAttendanceSheet,
+    stepsById,
     // Computed
     attendanceSheetVisibleColumns,
     formattedAttendanceSheets,
