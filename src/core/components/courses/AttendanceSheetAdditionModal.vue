@@ -72,9 +72,7 @@ export default {
       const groupedSlots = groupBy(slots.value, 'step');
 
       return Object.keys(stepsById.value).reduce((acc, step) => {
-        if (groupedSlots[step]) {
-          acc[step] = groupedSlots[step];
-        }
+        if (groupedSlots[step]) { acc[step] = groupedSlots[step]; }
 
         return acc;
       }, {});
@@ -85,7 +83,7 @@ export default {
         .map(slotGroup => slotGroup.sort(ascendingSortBy('startDate'))
           .map(s => ({
             label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
-          - ${CompaniDate(s.endDate).format(HH_MM)}`,
+                - ${CompaniDate(s.endDate).format(HH_MM)}`,
             value: s._id,
           })))
     ));

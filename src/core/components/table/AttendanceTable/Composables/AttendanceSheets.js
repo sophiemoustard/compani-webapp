@@ -27,7 +27,7 @@ export const useAttendanceSheets = (
   const attendanceSheets = ref([]);
   const newAttendanceSheet = ref({ course: course.value._id });
   const editedAttendanceSheet = ref({ _id: '', slots: [], trainee: {} });
-  const editionSlotsGroupedByStep = ref([]);
+  const editionSlotsGroupedByStep = ref({});
   const attendanceSheetColumns = ref([
     {
       name: 'date',
@@ -219,9 +219,7 @@ export const useAttendanceSheets = (
 
     const groupedSlots = groupBy([...linkedSlots, ...notLinkedSlotOptions.value], 'step');
     editionSlotsGroupedByStep.value = Object.keys(stepsById.value).reduce((acc, step) => {
-      if (groupedSlots[step]) {
-        acc[step] = groupedSlots[step];
-      }
+      if (groupedSlots[step]) { acc[step] = groupedSlots[step]; }
       return acc;
     }, {});
 
@@ -252,7 +250,7 @@ export const useAttendanceSheets = (
   const resetAttendanceSheetEditionModal = () => {
     v$.value.editedAttendanceSheet.$reset();
     editedAttendanceSheet.value = { _id: '', slots: [], trainee: {} };
-    editionSlotsGroupedByStep.value = [];
+    editionSlotsGroupedByStep.value = {};
   };
 
   return {
