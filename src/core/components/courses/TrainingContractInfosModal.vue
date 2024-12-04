@@ -22,7 +22,7 @@
     <div><span class="text-weight-bold">Dates :</span> {{ dates }}</div>
     <div><span class="text-weight-bold">Lieux :</span> {{ addressList }}</div>
     <div>
-      <span class="text-weight-bold">{{ formatQuantity('Intervenant·e', course.trainers.length, '·s', false) }} :</span>
+      <span class="text-weight-bold">{{ formatQuantity('Intervenant·e', course.trainers.length, 's', false) }} :</span>
       {{ trainersName }}
     </div>
     <div v-if="!isInterCourse" class="q-mb-md">
