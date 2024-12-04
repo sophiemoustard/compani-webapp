@@ -128,10 +128,12 @@
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
       @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
-      :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" :slots="notLinkedSlotOptions" />
+      :steps-by-id="stepsById" :validations="attendanceSheetValidations.newAttendanceSheet" :course="course"
+      :slots="notLinkedSlotOptions" />
     <attendance-sheet-edition-modal v-model="attendanceSheetEditionModal" @hide="resetAttendanceSheetEditionModal"
       @submit="updateAttendanceSheet" v-model:edited-attendance-sheet="editedAttendanceSheet" :loading="modalLoading"
-      :validations="attendanceSheetValidations.editedAttendanceSheet" :edition-slot-options="editionSlotOptions" />
+      :validations="attendanceSheetValidations.editedAttendanceSheet" :steps-by-id="stepsById"
+      :edition-slots-grouped-by-step="editionSlotsGroupedByStep" />
   </div>
 </template>
 
@@ -270,11 +272,12 @@ export default {
       attendanceSheetColumns,
       attendanceSheetEditionModal,
       editedAttendanceSheet,
+      stepsById,
       // Computed
       attendanceSheetVisibleColumns,
       formattedAttendanceSheets,
       notLinkedSlotOptions,
-      editionSlotOptions,
+      editionSlotsGroupedByStep,
       isSingleCourse,
       // Methods
       disableSheetDeletion,
@@ -321,6 +324,7 @@ export default {
       attendancePagination,
       attendanceSheetEditionModal,
       editedAttendanceSheet,
+      stepsById,
       // Computed
       canAccessLearnerProfile,
       attendanceColumns,
@@ -339,7 +343,7 @@ export default {
       absenceRate,
       realAbsenceRate,
       notLinkedSlotOptions,
-      editionSlotOptions,
+      editionSlotsGroupedByStep,
       isSingleCourse,
       // Methods
       get,

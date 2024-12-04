@@ -175,3 +175,9 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+:deep(.q-option-group)
+  display: flex
+  flex-direction: column
+</style>

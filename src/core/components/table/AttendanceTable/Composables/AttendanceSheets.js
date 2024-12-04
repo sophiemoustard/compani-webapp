@@ -1,13 +1,14 @@
 import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
+import keyBy from 'lodash/keyBy';
+import groupBy from 'lodash/groupBy';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
-import { INTER_B2B, DD_MM_YYYY, HH_MM } from '@data/constants';
+import { INTER_B2B, DD_MM_YYYY } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
-import { ascendingSortBy } from '@helpers/dates/utils';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
@@ -26,7 +27,7 @@ export const useAttendanceSheets = (
   const attendanceSheets = ref([]);
   const newAttendanceSheet = ref({ course: course.value._id });
   const editedAttendanceSheet = ref({ _id: '', slots: [], trainee: {} });
-  const editionSlotOptions = ref([]);
+  const editionSlotsGroupedByStep = ref({});
   const attendanceSheetColumns = ref([
     {
       name: 'date',
@@ -43,6 +44,7 @@ export const useAttendanceSheets = (
     },
     { name: 'actions', label: '', align: 'left' },
   ]);
+  const stepsById = ref(keyBy(course.value.subProgram.steps, '_id'));
 
   const isSingleCourse = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
 
@@ -214,13 +216,13 @@ export const useAttendanceSheets = (
       slots: linkedSlots.map(slot => slot._id),
       trainee: attendanceSheet.trainee,
     };
-    editionSlotOptions.value = [...linkedSlots, ...notLinkedSlotOptions.value]
-      .sort(ascendingSortBy('startDate'))
-      .map(s => ({
-        label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
-      - ${CompaniDate(s.endDate).format(HH_MM)}`,
-        value: s._id,
-      }));
+
+    const groupedSlots = groupBy([...linkedSlots, ...notLinkedSlotOptions.value], 'step');
+    editionSlotsGroupedByStep.value = Object.keys(stepsById.value).reduce((acc, step) => {
+      if (groupedSlots[step]) acc[step] = groupedSlots[step];
+      return acc;
+    }, {});
+
     attendanceSheetEditionModal.value = true;
   };
 
@@ -248,7 +250,7 @@ export const useAttendanceSheets = (
   const resetAttendanceSheetEditionModal = () => {
     v$.value.editedAttendanceSheet.$reset();
     editedAttendanceSheet.value = { _id: '', slots: [], trainee: {} };
-    editionSlotOptions.value = [];
+    editionSlotsGroupedByStep.value = {};
   };
 
   return {
@@ -260,11 +262,12 @@ export const useAttendanceSheets = (
     attendanceSheetColumns,
     attendanceSheetEditionModal,
     editedAttendanceSheet,
+    stepsById,
     // Computed
     attendanceSheetVisibleColumns,
     formattedAttendanceSheets,
     notLinkedSlotOptions,
-    editionSlotOptions,
+    editionSlotsGroupedByStep,
     isSingleCourse,
     // Methods
     disableSheetDeletion,
