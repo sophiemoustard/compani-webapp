@@ -219,7 +219,7 @@ export const useAttendanceSheets = (
 
     const groupedSlots = groupBy([...linkedSlots, ...notLinkedSlotOptions.value], 'step');
     editionSlotsGroupedByStep.value = Object.keys(stepsById.value).reduce((acc, step) => {
-      if (groupedSlots[step]) { acc[step] = groupedSlots[step]; }
+      if (groupedSlots[step]) acc[step] = groupedSlots[step];
       return acc;
     }, {});
 
