@@ -143,14 +143,15 @@ export default {
         ? '(date à planifier)'
         : CompaniDate(slots[slots.length - 1].startDate).format(DD_MM_YYYY);
       const location = uniq(slots.map(s => get(s, 'address.city'))).join(', ');
-      const trainers = course.value.trainers.map(trainer => formatIdentity(get(trainer, 'identity'), 'FL')).join(', ');
+      const trainersName = course.value.trainers
+        .map(trainer => formatIdentity(get(trainer, 'identity'), 'FL')).join(', ');
 
       return 'Actions pour le développement des compétences \r\n'
         + `Formation pour ${traineesQuantity.value} salarié-es\r\n`
         + `Durée : ${liveDuration} présentiel${eLearningSteps.length ? `, ${eLearningDuration} eLearning` : ''}\r\n`
         + `Dates : du ${startDate} au ${endDate} \r\n`
         + `Lieu : ${location} \r\n`
-        + `Nom du / des intervenant·es : ${trainers}`;
+        + `Nom du / des intervenant·es : ${trainersName}`;
     });
 
     const v$ = useVuelidate(rules, { course, newBill, companiesToBill });
