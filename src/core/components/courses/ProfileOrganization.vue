@@ -8,7 +8,7 @@
           @blur="updateCourse('misc')" :disable="isArchived" />
         <q-checkbox v-if="canUpdateCertifyingTest" v-model="tmpCourse.hasCertifyingTest" class="certifying-checkbox"
           label="La formation est certifiante" @update:model-value="updateCourse('hasCertifyingTest')"
-          :disable="!!get(course, 'certifiedTrainees.length')" />
+          :disable="!!get(course, 'certifiedTrainees.length') || isArchived" />
       </div>
       <p class="text-weight-bold table-title">Interlocuteurs</p>
       <div v-if="isClientInterface" class="text-italic text-copper-grey-500 q-mb-md">

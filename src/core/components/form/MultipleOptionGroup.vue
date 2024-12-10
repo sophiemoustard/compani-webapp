@@ -7,11 +7,12 @@
       </div>
       <div v-for="(options, index) in optionsGroups" :key="index">
         <div class="group-title">
-          <q-icon :name="groupTitles[index].icon" size="sm" color="copper-grey-500" class="q-mr-xs" />
+          <q-icon v-if="groupTitles[index].icon" :name="groupTitles[index].icon" size="sm" color="copper-grey-500"
+            class="q-mr-xs" />
           <div class="text-weight-bold">{{ groupTitles[index].label }}</div>
         </div>
         <q-field dense borderless class="col-12">
-          <q-option-group :model-value="modelValue" :options="options" type="radio" inline dense
+          <q-option-group :model-value="modelValue" :options="options" :type="type" inline :dense="type ==='radio'"
             @update:model-value="update" />
         </q-field>
       </div>
@@ -29,9 +30,10 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    modelValue: { type: String, default: '' },
+    modelValue: { type: [String, Array, Boolean], default: '' },
     optionsGroups: { type: Array, default: () => [] },
     groupTitles: { type: Array, default: () => [] },
+    type: { type: String, default: 'radio' },
   },
   emits: ['update:model-value'],
   methods: {
@@ -52,8 +54,6 @@ export default {
 .required::after
   content: ' *'
 :deep(.q-option-group)
-  display: flex
-  flex-direction: column
   color: $copper-grey-700 !important
   .q-radio
     padding: 10px 6px !important

@@ -173,7 +173,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const addTrainee = async () => {
     try {
-      if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
+      if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter un·e participant·e.');
 
       v$.value.newTraineeAttendance.$touch();
       if (v$.value.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
@@ -181,10 +181,10 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
       const promises = await Promise.all(newTraineeAttendance.value.attendances
         .map(s => updateAttendanceCheckbox(newTraineeAttendance.value.trainee, s)));
       traineeAdditionModal.value = false;
-      if (promises.some(p => !!p)) NotifyPositive('Participant(e) ajouté(e).');
+      if (promises.some(p => !!p)) NotifyPositive('Participant·e ajouté·e.');
     } catch (e) {
       console.error(e);
-      NotifyNegative('Erreur lors de l\'ajout du/de la participant(e).');
+      NotifyNegative('Erreur lors de l\'ajout du/de la participant·e.');
     } finally {
       modalLoading.value = false;
     }
@@ -197,7 +197,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
 
   const openTraineeAttendanceAdditionModal = () => {
     if (course.value.archivedAt) {
-      return NotifyWarning('Vous ne pouvez pas ajouter un(e) participant(e) à une formation archivée.');
+      return NotifyWarning('Vous ne pouvez pas ajouter un·e participant·e à une formation archivée.');
     }
 
     traineeAdditionModal.value = true;
@@ -213,7 +213,7 @@ export const useAttendances = (course, isClientInterface, canUpdate, loggedUser,
   const updateSlotCheckbox = async (slotId) => {
     try {
       loading.value = true;
-      if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
+      if (!canUpdate.value) return NotifyNegative('Impossible d\'ajouter un·e participant·e.');
 
       if (slotCheckboxValue(slotId)) await Attendances.delete({ courseSlot: slotId });
       else await Attendances.create({ courseSlot: slotId });

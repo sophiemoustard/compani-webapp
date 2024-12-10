@@ -7,13 +7,13 @@
           <div class="column items-center">
             <ni-indicator :indicator="registeredTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', registeredTraineesCount, 's', false) }}
+              {{ formatQuantity('apprenant·e inscrit·e', registeredTraineesCount, 's', false) }}
             </span>
           </div>
           <div class="column items-center">
             <ni-indicator :indicator="presentTraineesCount" />
             <span class="text-center">
-              {{ formatQuantity('apprenant.e inscrit.e', presentTraineesCount, 's', false) }}
+              {{ formatQuantity('apprenant·e inscrit·e', presentTraineesCount, 's', false) }}
               ayant émargé<br>au moins une fois
             </span>
           </div>
@@ -31,7 +31,7 @@
             * Ces données ne prennent pas en compte les émargements des stagiaires non-inscrits<br>
           </span>
           <span class="meta-infos-footer">
-            ** Taux d'absence réel : ne prend en compte que les apprenant.es inscrit.es ayant émargé au moins une fois
+            ** Taux d'absence réel : ne prend en compte que les apprenant·es inscrit·es ayant émargé au moins une fois
           </span>
         </div>
       </q-card>
@@ -81,14 +81,14 @@
           </q-tr>
         </template>
         <template #no-data>
-          <div class="text-center text-italic">Aucun(e) stagiaire n'a été ajouté(e) à cette formation</div>
+          <div class="text-center text-italic">Aucun·e stagiaire n'a été ajouté·e à cette formation</div>
         </template>
       </q-table>
       <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
         Aucun créneau n'a été ajouté à cette formation
       </div>
       <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm" :disable="loading"
-        label="Ajouter un(e) participant(e) non inscrit(e)" @click="openTraineeAttendanceAdditionModal" />
+        label="Ajouter un·e participant·e non inscrit·e" @click="openTraineeAttendanceAdditionModal" />
     </q-card>
 
     <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns"
@@ -100,6 +100,8 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions justify-end">
+                <ni-button v-if="canUpdate && isSingleCourse" icon="edit" color="primary"
+                  @click="openAttendanceSheetEditionModal(props.row)" :disable="disableSheetEdition(props.row)" />
                 <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
                   :disable="!props.row.file.link" />
                 <ni-button v-if="canUpdate" icon="delete" color="primary"
@@ -125,8 +127,13 @@
       :trainees="traineesWithAttendance" @submit="addTrainee" />
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
-        @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
-        :validations="attendanceSheetValidations.newAttendanceSheet" :course="course" />
+      @submit="addAttendanceSheet" v-model:new-attendance-sheet="newAttendanceSheet" :loading="modalLoading"
+      :steps-by-id="stepsById" :validations="attendanceSheetValidations.newAttendanceSheet" :course="course"
+      :slots="notLinkedSlotOptions" />
+    <attendance-sheet-edition-modal v-model="attendanceSheetEditionModal" @hide="resetAttendanceSheetEditionModal"
+      @submit="updateAttendanceSheet" v-model:edited-attendance-sheet="editedAttendanceSheet" :loading="modalLoading"
+      :validations="attendanceSheetValidations.editedAttendanceSheet" :steps-by-id="stepsById"
+      :edition-slots-grouped-by-step="editionSlotsGroupedByStep" />
   </div>
 </template>
 
@@ -147,6 +154,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import Indicator from '@components/courses/Indicator';
 import TraineeAttendanceCreationModal from '../TraineeAttendanceCreationModal';
+import AttendanceSheetEditionModal from '../../courses/AttendanceSheetEditionModal.vue';
 import { useAttendances } from './Composables/Attendances';
 import { useAttendanceSheets } from './Composables/AttendanceSheets';
 
@@ -160,6 +168,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
+    'attendance-sheet-edition-modal': AttendanceSheetEditionModal,
     'ni-indicator': Indicator,
   },
   setup (props) {
@@ -261,16 +270,26 @@ export default {
       attendanceSheetAdditionModal,
       newAttendanceSheet,
       attendanceSheetColumns,
+      attendanceSheetEditionModal,
+      editedAttendanceSheet,
+      stepsById,
       // Computed
       attendanceSheetVisibleColumns,
       formattedAttendanceSheets,
+      notLinkedSlotOptions,
+      editionSlotsGroupedByStep,
+      isSingleCourse,
       // Methods
       disableSheetDeletion,
+      disableSheetEdition,
       refreshAttendanceSheets,
       openAttendanceSheetAdditionModal,
       resetAttendanceSheetAdditionModal,
       addAttendanceSheet,
       validateAttendanceSheetDeletion,
+      resetAttendanceSheetEditionModal,
+      updateAttendanceSheet,
+      openAttendanceSheetEditionModal,
       // Validations
       attendanceSheetValidations,
     } = useAttendanceSheets(course, isClientInterface, canUpdate, loggedUser, modalLoading);
@@ -303,6 +322,9 @@ export default {
       attendanceSheetColumns,
       attendanceSheetPagination,
       attendancePagination,
+      attendanceSheetEditionModal,
+      editedAttendanceSheet,
+      stepsById,
       // Computed
       canAccessLearnerProfile,
       attendanceColumns,
@@ -320,10 +342,14 @@ export default {
       presentTraineesCount,
       absenceRate,
       realAbsenceRate,
+      notLinkedSlotOptions,
+      editionSlotsGroupedByStep,
+      isSingleCourse,
       // Methods
       get,
       attendanceCheckboxValue,
       disableSheetDeletion,
+      disableSheetEdition,
       traineesCount,
       openAttendanceSheetAdditionModal,
       resetAttendanceSheetAdditionModal,
@@ -337,7 +363,10 @@ export default {
       updateSlotCheckbox,
       getDelimiterClass,
       goToLearnerProfile,
+      resetAttendanceSheetEditionModal,
+      updateAttendanceSheet,
       formatQuantity,
+      openAttendanceSheetEditionModal,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,

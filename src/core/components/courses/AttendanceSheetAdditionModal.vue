@@ -5,13 +5,17 @@
     </template>
     <ni-select v-if="course.type === INTER_B2B" :model-value="newAttendanceSheet.trainee"
       :error="validations.trainee.$error" @update:model-value="update($event, 'trainee')" in-modal required-field
-      caption="Participant(e)" :options="traineeOptions" @blur="validations.trainee.$touch" />
+      caption="Participant·e" :options="traineeOptions" @blur="validations.trainee.$touch" />
     <ni-select v-else :model-value="newAttendanceSheet.date" @blur="validations.date.$touch"
       :error="validations.date.$error" @update:model-value="update($event, 'date')" :options="dateOptions"
       required-field in-modal caption="Date" />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :model-value="newAttendanceSheet.file" @update:model-value="update($event, 'file')"
       :extensions="[DOC_EXTENSIONS, IMAGE_EXTENSIONS]" :error="validations.file.$error" />
+    <ni-multiple-option-group v-if="slotOptions.length" :model-value="newAttendanceSheet.slots" in-modal required-field
+      :options-groups="slotOptions" :error="validations.slots.$error" type="checkbox" inline
+      @update:model-value="update($event, 'slots')" :group-titles="stepsName"
+      caption="Sélectionner les créneaux auxquels a été présent·e le/la participant·e" />
     <template #footer>
       <ni-button class="full-width modal-btn bg-primary" label="Ajouter la feuille d'émargement" :loading="loading"
         icon-right="add" @click="submit" color="white" />
@@ -21,12 +25,15 @@
 
 <script>
 import { toRefs, computed } from 'vue';
+import groupBy from 'lodash/groupBy';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import { INTER_B2B, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY } from '@data/constants';
+import MultipleOptionGroup from '@components/form/MultipleOptionGroup';
+import { INTER_B2B, DOC_EXTENSIONS, IMAGE_EXTENSIONS, DD_MM_YYYY, HH_MM } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
+import { ascendingSortBy } from '@helpers/dates/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 
 export default {
@@ -36,6 +43,7 @@ export default {
     'ni-modal': Modal,
     'ni-input': Input,
     'ni-button': Button,
+    'ni-multiple-option-group': MultipleOptionGroup,
   },
   props: {
     modelValue: { type: Boolean, default: false },
@@ -43,10 +51,12 @@ export default {
     course: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    slots: { type: Array, default: () => [] },
+    stepsById: { type: Object, default: () => ({}) },
   },
   emits: ['hide', 'update:model-value', 'update:new-attendance-sheet', 'submit'],
   setup (props, { emit }) {
-    const { newAttendanceSheet, course } = toRefs(props);
+    const { newAttendanceSheet, course, slots, stepsById } = toRefs(props);
 
     const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
 
@@ -57,6 +67,29 @@ export default {
 
       return [...dateOptionsSet].map(date => ({ value: date, label: CompaniDate(date).format(DD_MM_YYYY) }));
     });
+
+    const slotsGroupedByStep = computed(() => {
+      const groupedSlots = groupBy(slots.value, 'step');
+
+      return Object.keys(stepsById.value).reduce((acc, step) => {
+        if (groupedSlots[step]) acc[step] = groupedSlots[step];
+
+        return acc;
+      }, {});
+    });
+
+    const slotOptions = computed(() => (
+      Object.values(slotsGroupedByStep.value)
+        .map(slotGroup => slotGroup.sort(ascendingSortBy('startDate'))
+          .map(s => ({
+            label: `${CompaniDate(s.startDate).format(`${DD_MM_YYYY} ${HH_MM}`)}
+              - ${CompaniDate(s.endDate).format(HH_MM)}`,
+            value: s._id,
+          })))
+    ));
+
+    const stepsName = computed(() => Object.keys(slotsGroupedByStep.value)
+      .map(stepId => ({ label: stepsById.value[stepId].name })));
 
     const hide = () => emit('hide');
 
@@ -74,6 +107,8 @@ export default {
       // Computed
       traineeOptions,
       dateOptions,
+      slotOptions,
+      stepsName,
       // Methods
       hide,
       input,
