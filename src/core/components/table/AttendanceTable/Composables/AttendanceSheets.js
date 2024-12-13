@@ -97,7 +97,7 @@ export const useAttendanceSheets = (
       .filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).map(slot => slot._id).includes(s._id)));
   });
 
-  const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
+  const disableSheetDeletion = attendanceSheet => !get(attendanceSheet, 'file.link') || !!course.value.archivedAt;
 
   const disableSheetEdition = () => !!course.value.archivedAt;
 
