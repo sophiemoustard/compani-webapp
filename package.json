@@ -16,7 +16,7 @@
     "lint": "eslint ./src --ext .js,.vue -c .eslintrc.js"
   },
   "dependencies": {
-    "@casl/ability": "~6.7.1",
+    "@casl/ability": "~6.7.2",
     "@quasar/extras": "~1.16.12",
     "@vuelidate/core": "~2.0.3",
     "@vuelidate/validators": "~2.0.4",
