@@ -107,7 +107,8 @@ module.exports = configure(ctx => ({
 
             return false;
           },
-        })
+        }),
+        new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] }),
       );
     },
     env: {
