@@ -15,52 +15,58 @@
           :model-value="estimatedStartDate" @update:model-value="inputTmpEstimatedStartDate($event)"
           @blur="updateEstimatedStartDate" :disabled="course.archivedAt" />
       </div>
-      <q-card class="q-pa-md">
-        <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
-          <div :class="getStepClass(step)">
-            <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
-            <div class="row q-pa-md">
-              <div class="index">{{ index + 1 }}</div>
-              <div class="q-mx-md">
-                <div>{{ step.name }}</div>
-                <div class="type text-capitalize">{{ step.typeLabel }}</div>
+      <q-card class="q-pa-md" title="Afficher la liste des créneaux">
+        <q-item-section @click="showDetails()" class="slots cursor-pointer">
+          {{ showSlotList ? 'Cacher' : 'Afficher' }} la liste de tous les créneaux
+          <q-icon size="xs" :name="iconName" color="copper-grey-700" />
+        </q-item-section>
+        <template v-if="showSlotList">
+          <q-item-section v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm flex">
+            <div :class="getStepClass(step)">
+              <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
+              <div class="row q-pa-md">
+                <div class="index">{{ index + 1 }}</div>
+                <div class="q-mx-md">
+                  <div>{{ step.name }}</div>
+                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
+                </div>
               </div>
-            </div>
-            <div v-if="!isElearningStep(step)" class="slots-container">
-              <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
-                :key="day" class="row q-ml-xl q-my-sm">
-                <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
-                <div>
-                  <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
-                    :class="getSlotClass(step)">
-                    <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
-                    <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                    <div v-else class="q-mr-md ellipsis link-container">
-                      <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
-                        {{ slot.meetingLink }}
-                      </a>
-                      {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+              <div v-if="!isElearningStep(step)" class="slots-container">
+                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
+                  :key="day" class="row q-ml-xl q-my-sm">
+                  <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
+                  <div>
+                    <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
+                      :class="getSlotClass(step)">
+                      <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
+                      <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                      <div v-else class="q-mr-md ellipsis link-container">
+                        <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                          {{ slot.meetingLink }}
+                        </a>
+                        {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+                      </div>
+                      <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                     </div>
+                  </div>
+                </div>
+                <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
+                  class="to-plan-slot">
+                  <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
+                    :key="slot._id" @click="openEditionModal(slot)"
+                    :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
+                    <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
                     <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                   </div>
                 </div>
-              </div>
-              <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
-                class="to-plan-slot">
-                <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
-                  :key="slot._id" @click="openEditionModal(slot)"
-                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
-                  <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
-                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
+                  <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
+                    :disable="addDateToPlanLoading" />
                 </div>
               </div>
-              <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
-                <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
-                  :disable="addDateToPlanLoading" />
-              </div>
             </div>
-          </div>
-        </div>
+          </q-item-section>
+        </template>
       </q-card>
     </div>
 
@@ -124,6 +130,7 @@ export default {
     const SLOTS_TO_PLAN_KEY = 'toPlan';
     const isOnlySlot = ref(false);
     const isPlannedSlot = ref(false);
+    const showSlotList = ref(true);
 
     const { isVendorInterface } = useCourses();
     const { waitForFormValidation } = useValidations();
@@ -217,6 +224,8 @@ export default {
     }));
 
     const v$ = useVuelidate(rules, { editedCourseSlot });
+
+    const iconName = computed(() => (showSlotList.value ? 'expand_less' : 'expand_more'));
 
     const getSlotAddress = slot => get(slot, 'address.fullAddress') || 'Adresse non renseignée';
 
@@ -379,6 +388,8 @@ export default {
       canEdit.value && `cursor-pointer hover-${isPlannedStep(step) ? 'blue' : 'orange'}`,
     ];
 
+    const showDetails = () => { showSlotList.value = !showSlotList.value; };
+
     const created = async () => {
       if (!course.value) emit('refresh');
     };
@@ -396,6 +407,7 @@ export default {
       SLOTS_TO_PLAN_KEY,
       isOnlySlot,
       isPlannedSlot,
+      showSlotList,
       // Computed
       v$,
       course,
@@ -403,6 +415,7 @@ export default {
       stepTypes,
       courseSlotsByStepAndDate,
       stepList,
+      iconName,
       // Methods
       get,
       omit,
@@ -421,6 +434,7 @@ export default {
       getStepClass,
       getSlotClass,
       formatSlotSchedule,
+      showDetails,
     };
   },
 };
@@ -453,6 +467,13 @@ export default {
   padding: 8px 16px
   border-radius: 15px 15px 0px 0px
   color: $orange-900
+.slots
+  flex-direction: row
+  justify-content: space-between
+  background-color: $copper-grey-100
+  padding: 16px
+  margin: 4px
+  color: $copper-grey-700
 .to-plan-slot
   width: fit-content
 .index
