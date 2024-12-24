@@ -16,51 +16,72 @@
           @blur="updateEstimatedStartDate" :disabled="course.archivedAt" />
       </div>
       <q-card class="q-pa-md">
-        <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
-          <div :class="getStepClass(step)">
-            <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
-            <div class="row q-pa-md">
-              <div class="index">{{ index + 1 }}</div>
-              <div class="q-mx-md">
-                <div>{{ step.name }}</div>
-                <div class="type text-capitalize">{{ step.typeLabel }}</div>
+        <q-item-section @click="showStepDetails()" class="slots cursor-pointer bg-copper-grey-100 copper-grey-700">
+          {{ showStepList ? 'Masquer' : 'Afficher' }} la liste des étapes de la formation
+          <q-icon size="xs" :name="showStepList.value ? 'expand_less' : 'expand_more'" color="copper-grey-700" />
+        </q-item-section>
+        <template v-if="showStepList">
+          <q-item-section v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm flex">
+            <div :class="getStepClass(step)">
+              <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
+              <div class="row q-pa-md">
+                <div class="index">{{ index + 1 }}</div>
+                <div class="q-mx-md">
+                  <div>{{ step.name }}</div>
+                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
+                </div>
               </div>
-            </div>
-            <div v-if="!isElearningStep(step)" class="slots-container">
-              <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
-                :key="day" class="row q-ml-xl q-my-sm">
-                <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
-                <div>
-                  <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
-                    :class="getSlotClass(step)">
-                    <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
-                    <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                    <div v-else class="q-mr-md ellipsis link-container">
-                      <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
-                        {{ slot.meetingLink }}
-                      </a>
-                      {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+              <div v-if="!isElearningStep(step)" class="slots-container cursor-pointer">
+                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY))"
+                  :key="day" class="row q-ml-xl q-my-sm">
+                  <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
+                  <div>
+                    <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
+                      :class="getSlotClass(step)">
+                      <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
+                      <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                      <div v-else class="q-mr-md ellipsis link-container">
+                        <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                          {{ slot.meetingLink }}
+                        </a>
+                        {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+                      </div>
+                      <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                     </div>
-                    <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                   </div>
                 </div>
-              </div>
-              <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
-                class="to-plan-slot">
-                <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
-                  :key="slot._id" @click="openEditionModal(slot)"
-                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
-                  <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
-                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)"
+                  class="q-mx-lg bg-peach-100">
+                  <q-item-section @click="() => showSlotToPlanDetails(step.key)" class="slots cursor-pointer">
+                    <span class="text-orange-500">
+                      {{ showSlotToPlan[step.key] ? 'Masquer' : 'Afficher' }}
+                      {{ formatQuantity(
+                        'créneau',
+                        Object.values(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)).flat().length,
+                        'x'
+                        ) }} à planifier
+                    </span>
+                    <q-icon :name="showSlotToPlan[step.key] ? 'expand_less' : 'expand_more'" size="20px"
+                      class="q-ml-sm" />
+                  </q-item-section>
+                  <div v-if="showSlotToPlan[step.key]" class="slots-to-plan-grid">
+                    <div v-for="slot in
+                      Object.values(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)).flat()"
+                      :key="slot._id" @click="openEditionModal(slot)"
+                      :class="['row items-center q-ml-lg q-mb-sm', canEdit && 'cursor-pointer hover-orange']">
+                      <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
+                      <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                    </div>
+                  </div>
+                </div>
+                <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
+                  <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
+                    :disable="addDateToPlanLoading" />
                 </div>
               </div>
-              <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
-                <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
-                  :disable="addDateToPlanLoading" />
-              </div>
             </div>
-          </div>
-        </div>
+          </q-item-section>
+        </template>
       </q-card>
     </div>
 
@@ -121,9 +142,10 @@ export default {
     const modalLoading = ref(false);
     const editedCourseSlot = ref({});
     const editionModal = ref(false);
-    const SLOTS_TO_PLAN_KEY = 'toPlan';
+    const TO_PLAN_KEY = 'toPlan';
     const isOnlySlot = ref(false);
     const isPlannedSlot = ref(false);
+    const showStepList = ref(true);
 
     const { isVendorInterface } = useCourses();
     const { waitForFormValidation } = useValidations();
@@ -175,7 +197,7 @@ export default {
       const slotsByStepAndDateList = Object.keys(slotsByStep)
         .map(key => groupBy(
           slotsByStep[key],
-          s => (s.startDate ? CompaniDate(s.startDate).format(DD_MM_YYYY) : SLOTS_TO_PLAN_KEY)
+          s => (s.startDate ? CompaniDate(s.startDate).format(DD_MM_YYYY) : TO_PLAN_KEY)
         ));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
@@ -187,6 +209,8 @@ export default {
       type: step.type,
       typeLabel: getStepTypeLabel(step.type),
     })));
+
+    const showSlotToPlan = ref(Object.entries(stepList.value.map(s => [s.key, false])));
 
     const rules = computed(() => ({
       editedCourseSlot: {
@@ -287,6 +311,7 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       } finally {
         addDateToPlanLoading.value = false;
+        showSlotToPlan.value[stepId] = true;
       }
     };
 
@@ -357,7 +382,7 @@ export default {
     const isElearningStep = step => step.type === E_LEARNING;
 
     const isPlannedStep = step => !!courseSlotsByStepAndDate.value[step.key] &&
-      Object.keys(courseSlotsByStepAndDate.value[step.key]).every(date => date !== SLOTS_TO_PLAN_KEY);
+      Object.keys(courseSlotsByStepAndDate.value[step.key]).every(date => date !== TO_PLAN_KEY);
 
     const isStepToPlan = step => !(isElearningStep(step) || isPlannedStep(step));
 
@@ -379,6 +404,12 @@ export default {
       canEdit.value && `cursor-pointer hover-${isPlannedStep(step) ? 'blue' : 'orange'}`,
     ];
 
+    const showStepDetails = () => { showStepList.value = !showStepList.value; };
+
+    const showSlotToPlanDetails = (stepId) => {
+      showSlotToPlan.value[stepId] = !showSlotToPlan.value[stepId];
+    };
+
     const created = async () => {
       if (!course.value) emit('refresh');
     };
@@ -393,9 +424,11 @@ export default {
       modalLoading,
       editedCourseSlot,
       editionModal,
-      SLOTS_TO_PLAN_KEY,
+      TO_PLAN_KEY,
       isOnlySlot,
       isPlannedSlot,
+      showStepList,
+      showSlotToPlanDetails,
       // Computed
       v$,
       course,
@@ -421,6 +454,9 @@ export default {
       getStepClass,
       getSlotClass,
       formatSlotSchedule,
+      showStepDetails,
+      showSlotToPlan,
+      formatQuantity,
     };
   },
 };
@@ -453,8 +489,11 @@ export default {
   padding: 8px 16px
   border-radius: 15px 15px 0px 0px
   color: $orange-900
-.to-plan-slot
-  width: fit-content
+.slots
+  flex-direction: row
+  justify-content: space-between
+  padding: 16px
+  margin: 4px
 .index
   background-color: $copper-500
   border-radius: 50%
@@ -480,4 +519,12 @@ export default {
     text-decoration-color: $primary
 .link-container
   max-width: 14em
+.slots-to-plan-grid
+  display: grid
+  grid-auto-flow: row
+  grid-template-rows: auto
+  grid-gap: 16px
+  grid-template-columns: repeat(4, 15vw)
+  @media screen and (max-width: 767px)
+    grid-template-columns: repeat(1, 50vw)
 </style>
