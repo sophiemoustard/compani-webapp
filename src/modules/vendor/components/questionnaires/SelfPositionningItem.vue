@@ -6,7 +6,7 @@
       <survey-answer title="Note de début" :answer="Number(item.answers.startCourse) || 0" />
       <survey-answer title="Note de fin" :answer="Number(item.answers.endCourse) || 0" />
       <survey-answer v-if="trainerAnswer" title="Note ajustée" :answer="Number(trainerAnswer)" />
-      <q-checkbox v-else-if="isValidated" :model-value="isValidated" label="Je valide la note de fin" />
+      <q-checkbox v-else-if="isValidated" :model-value="isValidated" label="Je valide la note de fin" disabled />
       <div v-else-if="item.answers.endCourse" class="flex column justify-end q-py-md">
         <ni-button label="Ajuster la note" class="bg-primary" color="white" @click="openTrainerReviewModal" />
         <q-checkbox class="q-py-sm" :model-value="trainerValidation" label="Je valide la note de fin"
@@ -17,8 +17,6 @@
   <trainer-review-modal v-model="trainerReviewModal" :trainer-answer="Number(trainerAnswer)" :labels="item.labels"
     :question="item.question" :validations="v$.trainerAnswer" @hide="closeTrainerReviewModal"
     @submit="(answer) => updateTrainerReview(ADJUST, answer)" />
-    {{ item.answers }}
-    trainer Answer : {{ trainerAnswer }}
 </template>
 
 <script>
@@ -60,7 +58,6 @@ export default {
     watch(() => item.value.answers, () => {
       trainerValidation.value = false;
       trainerAnswer.value = 0;
-      console.log('on passe dans le watcher');
     });
 
     const openTrainerReviewModal = () => { trainerReviewModal.value = true; };
