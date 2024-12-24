@@ -12,8 +12,7 @@
           Vous avez déjà validé les réponses au questionnaire d'auto-positionnement de fin pour cet apprenant.
         </template>
       </ni-banner>
-      <template v-else>
-        <ni-banner class="bg-peach-200" icon="info_outline">
+        <ni-banner v-if="!endQuestionnaireHistory.isValidated" class="bg-peach-200" icon="info_outline">
           <template #message v-if="get(endQuestionnaireHistory, '_id')">
             Pour valider les réponses au questionnaire d’auto-positionnement de fin, veuillez : <br>
             <div class="q-pl-md">
@@ -33,21 +32,22 @@
           </template>
         </ni-banner>
         <self-positionning-item v-for="card of Object.values(filteredQuestionnaireAnswers)" :key="card._id" :item="card"
-          @update-trainer-review="updateTrainerReview" />
+          @update-trainer-review="updateTrainerReview" :is-validated="endQuestionnaireHistory.isValidated" />
         <div v-if="get(endQuestionnaireHistory, '_id')" class="q-py-md">
-          <ni-input caption="Commentaire général sur la progression de l’apprenant" v-model="trainerComment"
-            type="textarea" :rows="5" />
+          <ni-input caption="Commentaire général sur la progression de l’apprenant" type="textarea" :rows="5"
+            v-model="trainerComment" :disabled="endQuestionnaireHistory.isValidated"
+            :read-only="endQuestionnaireHistory.isValidated" />
           <div class="flex justify-end">
-            <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerReview" />
+          <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerReview"
+            v-if="!endQuestionnaireHistory.isValidated" />
           </div>
         </div>
-      </template>
     </template>
   </q-page>
 </template>
 
 <script>
-import { toRefs, ref, computed } from 'vue';
+import { toRefs, ref, computed, watch } from 'vue';
 import { useQuasar } from 'quasar';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
@@ -105,7 +105,14 @@ export default {
       const questionnaireAnswersList = history.questionnaireAnswersList
         .map((a) => {
           const { question, labels, _id } = a.card;
-          return { cardId: _id, question, labels, answer: a.answerList[0], timeline: history.timeline };
+          return {
+            cardId: _id,
+            question,
+            labels,
+            answer: a.answerList[0],
+            timeline: history.timeline,
+            ...(a.trainerAnswerList && { trainerAnswer: a.trainerAnswerList[0] }),
+          };
         });
 
       return { ...history, questionnaireAnswersList };
@@ -127,6 +134,7 @@ export default {
             question: card.question,
             labels: card.labels,
             card: card.cardId,
+            ...(card.trainerAnswer && { trainerAnswer: card.trainerAnswer }),
           };
         }
       }
@@ -139,6 +147,14 @@ export default {
       const traineeFollowUp = followUp.filter(qa => qa.user === selectedTrainee.value);
 
       return traineeFollowUp.find(qa => qa.timeline === END_COURSE) || {};
+    });
+
+    watch(() => endQuestionnaireHistory.value, () => {
+      if (get(endQuestionnaireHistory.value, 'isValidated')) {
+        trainerComment.value = get(endQuestionnaireHistory.value, 'trainerComment');
+      } else {
+        trainerComment.value = '';
+      }
     });
 
     const refreshQuestionnaireAnswers = async () => {
@@ -155,7 +171,8 @@ export default {
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const validateTraineeSelection = (traineeId) => {
-      if (trainerReview.value.some(a => a.isValidated || a.answer) || trainerComment.value) {
+      if (trainerReview.value.some(a => a.isValidated || a.answer) ||
+      (!endQuestionnaireHistory.value.isValidated && trainerComment.value)) {
         $q.dialog({
           title: 'Confirmation',
           message: `Êtes-vous sûr(e) de vouloir changer d'apprenant &nbsp;? Les informations renseignées pour
@@ -189,7 +206,7 @@ export default {
       try {
         const payload = {
           trainerAnswers: trainerReview.value.map(a => omit(a, ['isValidated'])),
-          ...(trainerComment.value && { trainerComment: trainerComment.value }),
+          trainerComment: trainerComment.value,
         };
 
         await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, payload);
@@ -198,7 +215,6 @@ export default {
 
         await refreshQuestionnaireAnswers();
         trainerReview.value = [];
-        trainerComment.value = '';
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la validation des réponses au questionnaire.');
