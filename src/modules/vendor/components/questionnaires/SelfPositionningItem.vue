@@ -21,6 +21,7 @@
 
 <script>
 import { ref, toRefs, computed, watch } from 'vue';
+import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
@@ -35,7 +36,7 @@ export default {
   name: 'SurveyItem',
   props: {
     item: { type: Object, required: true },
-    isValidated: { type: Boolean, required: false },
+    isValidated: { type: Boolean, default: false },
   },
   components: {
     'ni-labels-details': LabelsDetails,
@@ -48,16 +49,16 @@ export default {
     const { item, isValidated } = toRefs(props);
     const trainerValidation = ref(false);
     const trainerReviewModal = ref(false);
-    const trainerAnswer = ref(isValidated.value ? item.value.trainerAnswer : 0);
+    const trainerAnswer = ref(get(item.value, 'trainerAnswer', 0));
 
     const rules = computed(() => ({
       trainerAnswer: { required, strictPositiveNumber, integerNumber },
     }));
     const v$ = useVuelidate(rules, { trainerAnswer });
 
-    watch(() => item.value.answers, () => {
+    watch(() => item.value, () => {
       trainerValidation.value = false;
-      trainerAnswer.value = 0;
+      trainerAnswer.value = isValidated.value ? get(item.value, 'trainerAnswer', 0) : 0;
     });
 
     const openTrainerReviewModal = () => { trainerReviewModal.value = true; };

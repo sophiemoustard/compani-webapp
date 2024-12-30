@@ -35,11 +35,11 @@
           @update-trainer-review="updateTrainerReview" :is-validated="endQuestionnaireHistory.isValidated" />
         <div v-if="get(endQuestionnaireHistory, '_id')" class="q-py-md">
           <ni-input caption="Commentaire général sur la progression de l’apprenant" type="textarea" :rows="5"
-            v-model="trainerComment" :disabled="endQuestionnaireHistory.isValidated"
+            v-model="trainerComment" :disable="endQuestionnaireHistory.isValidated"
             :read-only="endQuestionnaireHistory.isValidated" />
           <div class="flex justify-end">
-          <ni-button class="bg-primary" color="white" label="Valider les réponses" @click="validateTrainerReview"
-            v-if="!endQuestionnaireHistory.isValidated" />
+          <ni-button v-if="!endQuestionnaireHistory.isValidated" class="bg-primary" color="white"
+            label="Valider les réponses" @click="validateTrainerReview" />
           </div>
         </div>
     </template>
@@ -150,11 +150,9 @@ export default {
     });
 
     watch(() => endQuestionnaireHistory.value, () => {
-      if (get(endQuestionnaireHistory.value, 'isValidated')) {
-        trainerComment.value = get(endQuestionnaireHistory.value, 'trainerComment');
-      } else {
-        trainerComment.value = '';
-      }
+      trainerComment.value = get(endQuestionnaireHistory.value, 'isValidated')
+        ? get(endQuestionnaireHistory.value, 'trainerComment', '')
+        : '';
     });
 
     const refreshQuestionnaireAnswers = async () => {
@@ -206,7 +204,7 @@ export default {
       try {
         const payload = {
           trainerAnswers: trainerReview.value.map(a => omit(a, ['isValidated'])),
-          trainerComment: trainerComment.value,
+          ...(trainerComment.value && { trainerComment: trainerComment.value }),
         };
 
         await QuestionnaireHistories.update(endQuestionnaireHistory.value._id, payload);
