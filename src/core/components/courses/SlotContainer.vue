@@ -75,8 +75,8 @@
                   </div>
                 </div>
                 <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
-                  <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
-                    :disable="addDateToPlanLoading" />
+                  <ni-button label="Ajouter des créneaux" color="primary" icon="add"
+                    @click="openMultipleSlotCreationModal(step.key)" :disable="addDateToPlanLoading" />
                 </div>
               </div>
             </div>
@@ -90,6 +90,8 @@
       @submit="updateCourseSlot" @update="setCourseSlot" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
       :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
       @unplan-slot="unplanSlot" />
+
+    <multiple-slot-creation-modal v-model:slots-quantity="slotsToAdd.quantity" @hide="resetCreationModal" />
   </div>
 </template>
 <script>
@@ -106,6 +108,7 @@ import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
+import MultipleSlotCreationModal from '@components/courses/MultipleSlotCreationModal';
 import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
@@ -130,6 +133,7 @@ export default {
     'slot-edition-modal': SlotEditionModal,
     'ni-button': Button,
     'ni-date-input': DateInput,
+    'multiple-slot-creation-modal': MultipleSlotCreationModal,
   },
   emits: ['refresh', 'update', 'update:estimatedStartDate'],
   setup (props, { emit }) {
@@ -146,11 +150,13 @@ export default {
     const isPlannedSlot = ref(false);
     const showStepList = ref(true);
     const showSlotToPlan = ref([]);
+    const multipleSlotCreationModal = ref(false);
 
     const { isVendorInterface } = useCourses();
     const { waitForFormValidation } = useValidations();
 
     const course = computed(() => $store.state.course.course);
+    const slotsToAdd = ref({ course: course.value._id, step: '', quantity: 1 });
 
     const slotsDurationTitle = computed(() => {
       if (!course.value || !course.value.slots) return '0h';
@@ -408,6 +414,14 @@ export default {
       showSlotToPlan.value[stepId] = !showSlotToPlan.value[stepId];
     };
 
+    const openMultipleSlotCreationModal = (stepId) => {
+      multipleSlotCreationModal.value = true;
+    };
+
+    const resetCreationModal = () => {
+      slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
+    };
+
     const created = async () => {
       if (!course.value) emit('refresh');
 
@@ -429,6 +443,7 @@ export default {
       isPlannedSlot,
       showStepList,
       showSlotToPlanDetails,
+      slotsToAdd,
       // Computed
       v$,
       course,
@@ -457,6 +472,8 @@ export default {
       showStepDetails,
       showSlotToPlan,
       formatQuantity,
+      openMultipleSlotCreationModal,
+      resetCreationModal,
     };
   },
 };
