@@ -16,11 +16,11 @@
           @blur="updateEstimatedStartDate" :disabled="course.archivedAt" />
       </div>
       <q-card class="q-pa-md">
-        <q-item-section @click="showStepDetails()" class="slots cursor-pointer bg-copper-grey-100 copper-grey-700">
+        <q-item-section @click="showStepDetails" class="slots cursor-pointer bg-copper-grey-50 copper-grey-700">
           {{ showStepList ? 'Masquer' : 'Afficher' }} la liste des étapes de la formation
-          <q-icon size="xs" :name="showStepList.value ? 'expand_less' : 'expand_more'" color="copper-grey-700" />
+          <q-icon size="xs" :name="showStepList ? 'expand_less' : 'expand_more'" color="copper-grey-700" />
         </q-item-section>
-        <template v-if="showStepList">
+        <div v-if="showStepList" class="bg-copper-grey-50 q-px-md">
           <q-item-section v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm flex">
             <div :class="getStepClass(step)">
               <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
@@ -31,7 +31,7 @@
                   <div class="type text-capitalize">{{ step.typeLabel }}</div>
                 </div>
               </div>
-              <div v-if="!isElearningStep(step)" class="slots-container cursor-pointer">
+              <div v-if="!isElearningStep(step)" class="slots-container">
                 <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY))"
                   :key="day" class="row q-ml-xl q-my-sm">
                   <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
@@ -81,7 +81,7 @@
               </div>
             </div>
           </q-item-section>
-        </template>
+        </div>
       </q-card>
     </div>
 
@@ -92,7 +92,6 @@
       @unplan-slot="unplanSlot" />
   </div>
 </template>
-
 <script>
 import { useStore } from 'vuex';
 import { computed, ref, toRefs } from 'vue';
@@ -210,7 +209,7 @@ export default {
       typeLabel: getStepTypeLabel(step.type),
     })));
 
-    const showSlotToPlan = ref(Object.entries(stepList.value.map(s => [s.key, false])));
+    const showSlotToPlan = ref(stepList.value.map(s => ({ [s.key]: false })));
 
     const rules = computed(() => ({
       editedCourseSlot: {
@@ -493,7 +492,6 @@ export default {
   flex-direction: row
   justify-content: space-between
   padding: 16px
-  margin: 4px
 .index
   background-color: $copper-500
   border-radius: 50%
@@ -527,4 +525,6 @@ export default {
   grid-template-columns: repeat(4, 15vw)
   @media screen and (max-width: 767px)
     grid-template-columns: repeat(1, 50vw)
+.q-item__section
+  margin-left: 0px
 </style>
