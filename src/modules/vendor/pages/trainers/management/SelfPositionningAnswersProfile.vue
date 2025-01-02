@@ -169,8 +169,9 @@ export default {
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const validateTraineeSelection = (traineeId) => {
-      if (trainerReview.value.some(a => a.isValidated || a.answer) ||
-      (!endQuestionnaireHistory.value.isValidated && trainerComment.value)) {
+      const displayConfirmationModal = trainerReview.value
+        .some(a => a.isValidated || a.answer) || (!endQuestionnaireHistory.value.isValidated && trainerComment.value);
+      if (displayConfirmationModal) {
         $q.dialog({
           title: 'Confirmation',
           message: `Êtes-vous sûr(e) de vouloir changer d'apprenant &nbsp;? Les informations renseignées pour
@@ -212,7 +213,6 @@ export default {
         NotifyPositive('Validation des réponses enregistrée.');
 
         await refreshQuestionnaireAnswers();
-        trainerReview.value = [];
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la validation des réponses au questionnaire.');
