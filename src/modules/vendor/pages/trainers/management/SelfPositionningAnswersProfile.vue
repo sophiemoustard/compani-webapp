@@ -169,8 +169,8 @@ export default {
     const updateSelectedTrainee = (traineeId) => { selectedTrainee.value = traineeId; };
 
     const validateTraineeSelection = (traineeId) => {
-      const displayConfirmationModal = trainerReview.value
-        .some(a => a.isValidated || a.answer) || (!endQuestionnaireHistory.value.isValidated && trainerComment.value);
+      const displayConfirmationModal = trainerReview.value.some(a => a.isValidated || a.answer) ||
+        (!endQuestionnaireHistory.value.isValidated && trainerComment.value);
       if (displayConfirmationModal) {
         $q.dialog({
           title: 'Confirmation',
