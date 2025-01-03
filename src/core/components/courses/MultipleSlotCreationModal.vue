@@ -15,6 +15,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import { toRefs } from 'vue';
 
 export default {
   name: 'MultipleSlotCreationModal',
@@ -22,18 +23,21 @@ export default {
     modelValue: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    slotsQuantity: { type: Number, required: true },
   },
   components: {
     'ni-modal': Modal,
     'ni-input': Input,
   },
   emits: ['hide', 'submit', 'update:slots-quantity'],
-  setup (_, emit) {
+  setup (props, emit) {
+    const { slotsQuantity } = toRefs(props);
+
     const hide = () => emit('hide');
 
     const submit = () => emit('submit');
 
-    const update = event => emit('update:slots-quantity', event);
+    const update = event => emit('update:slots-quantity', event, slotsQuantity);
 
     return {
       // Methods

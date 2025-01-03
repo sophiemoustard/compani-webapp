@@ -91,7 +91,8 @@
       :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
       @unplan-slot="unplanSlot" />
 
-    <multiple-slot-creation-modal v-model:slots-quantity="slotsToAdd.quantity" @hide="resetCreationModal" />
+    <multiple-slot-creation-modal v-model:slots-quantity="slotsToAdd.quantity" @hide="resetCreationModal"
+      @submit="createCourseSlots" />
   </div>
 </template>
 <script>
@@ -422,6 +423,21 @@ export default {
       slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
     };
 
+    const createCourseSlots = async () => {
+      try {
+        v$.value.editedCourseSlot.dates.touch();
+
+        await CourseSlots.create({ payload: slotsToAdd });
+        multipleSlotCreationModal.value = false;
+        NotifyPositive('Date à planifier ajoutée.');
+
+        emit('refresh');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
+      }
+    };
+
     const created = async () => {
       if (!course.value) emit('refresh');
 
@@ -474,6 +490,7 @@ export default {
       formatQuantity,
       openMultipleSlotCreationModal,
       resetCreationModal,
+      createCourseSlots,
     };
   },
 };
