@@ -13,9 +13,10 @@
 </template>
 
 <script>
-import Modal from '@components/modal/Modal';
-import Input from '@components/form/Input';
 import { toRefs } from 'vue';
+import Button from '@components/Button';
+import Input from '@components/form/Input';
+import Modal from '@components/modal/Modal';
 
 export default {
   name: 'MultipleSlotCreationModal',
@@ -28,6 +29,7 @@ export default {
   components: {
     'ni-modal': Modal,
     'ni-input': Input,
+    'ni-button': Button,
   },
   emits: ['hide', 'submit', 'update:slots-quantity'],
   setup (props, emit) {

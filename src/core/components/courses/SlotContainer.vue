@@ -419,10 +419,6 @@ export default {
       multipleSlotCreationModal.value = true;
     };
 
-    const resetCreationModal = () => {
-      slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
-    };
-
     const createCourseSlots = async () => {
       try {
         v$.value.editedCourseSlot.dates.touch();
@@ -436,6 +432,10 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       }
+    };
+
+    const resetCreationModal = () => {
+      slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
     };
 
     const created = async () => {
