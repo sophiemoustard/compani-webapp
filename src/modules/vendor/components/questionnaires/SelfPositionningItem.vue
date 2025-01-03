@@ -5,7 +5,8 @@
     <div class="answers">
       <survey-answer title="Note de début" :answer="Number(item.answers.startCourse) || 0" />
       <survey-answer title="Note de fin" :answer="Number(item.answers.endCourse) || 0" />
-      <survey-answer v-if="trainerAnswer" title="Note ajustée" :answer="trainerAnswer" />
+      <survey-answer v-if="trainerAnswer" title="Note ajustée" :answer="Number(trainerAnswer)" />
+      <q-checkbox v-else-if="isValidated" :model-value="isValidated" label="Je valide la note de fin" disabled />
       <div v-else-if="item.answers.endCourse" class="flex column justify-end q-py-md">
         <ni-button label="Ajuster la note" class="bg-primary" color="white" @click="openTrainerReviewModal" />
         <q-checkbox class="q-py-sm" :model-value="trainerValidation" label="Je valide la note de fin"
@@ -13,13 +14,14 @@
       </div>
     </div>
   </q-card>
-  <trainer-review-modal v-model="trainerReviewModal" :trainer-answer="trainerAnswer" :labels="item.labels"
+  <trainer-review-modal v-model="trainerReviewModal" :trainer-answer="Number(trainerAnswer)" :labels="item.labels"
     :question="item.question" :validations="v$.trainerAnswer" @hide="closeTrainerReviewModal"
     @submit="(answer) => updateTrainerReview(ADJUST, answer)" />
 </template>
 
 <script>
 import { ref, toRefs, computed, watch } from 'vue';
+import get from 'lodash/get';
 import useVuelidate from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
 import SurveyAnswer from 'src/modules/vendor/components/questionnaires/SurveyAnswer';
@@ -34,6 +36,7 @@ export default {
   name: 'SurveyItem',
   props: {
     item: { type: Object, required: true },
+    isValidated: { type: Boolean, default: false },
   },
   components: {
     'ni-labels-details': LabelsDetails,
@@ -43,19 +46,19 @@ export default {
   },
   emits: ['update-trainer-review'],
   setup (props, { emit }) {
-    const { item } = toRefs(props);
+    const { item, isValidated } = toRefs(props);
     const trainerValidation = ref(false);
     const trainerReviewModal = ref(false);
-    const trainerAnswer = ref(0);
+    const trainerAnswer = ref(get(item.value, 'trainerAnswer', 0));
 
     const rules = computed(() => ({
       trainerAnswer: { required, strictPositiveNumber, integerNumber },
     }));
     const v$ = useVuelidate(rules, { trainerAnswer });
 
-    watch(() => item.value.answers, () => {
+    watch(() => item.value, () => {
       trainerValidation.value = false;
-      trainerAnswer.value = 0;
+      trainerAnswer.value = isValidated.value ? get(item.value, 'trainerAnswer', 0) : 0;
     });
 
     const openTrainerReviewModal = () => { trainerReviewModal.value = true; };
