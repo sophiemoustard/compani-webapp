@@ -99,7 +99,12 @@
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">
             <template v-if="col.name === 'actions'">
-              <div class="row no-wrap table-actions justify-end">
+              <div v-if="!props.row.file" class="justify-end overflow-hidden-nowrap flex">
+                <div v-if="!props.row.signatures.trainee" class="text-italic text-primary">En attente de signature</div>
+                <ni-primary-button v-else label="Générer" icon="add" :disabled="modalLoading"
+                  @click="generateAttendanceSheet(props.row._id)" />
+              </div>
+              <div v-else class="row no-wrap table-actions justify-end">
                 <ni-button v-if="canUpdate && isSingleCourse" icon="edit" color="primary"
                   @click="openAttendanceSheetEditionModal(props.row)" :disable="disableSheetEdition(props.row)" />
                 <ni-button icon="file_download" color="primary" type="a" :href="get(props.row, 'file.link')"
@@ -107,6 +112,9 @@
                 <ni-button v-if="canUpdate" icon="delete" color="primary"
                   @click="validateAttendanceSheetDeletion(props.row)" :disable="disableSheetDeletion(props.row)" />
               </div>
+            </template>
+            <template v-else-if="col.name === 'trainee' && get(props.row, 'slots.length')">
+              {{ formatSingleAttendanceSheetName(col.value, props.row.slots) }}
             </template>
             <template v-else>
               {{ col.value }}
@@ -143,13 +151,14 @@ import { computed, toRefs, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import { DEFAULT_AVATAR, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN, DD_MM_YYYY } from '@data/constants';
 import { defineAbilitiesFor, defineAbilitiesForCourse } from '@helpers/ability';
 import { descendingSortBy } from '@helpers/dates/utils';
 import { formatQuantity } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { multiply, subtract, divide } from '@helpers/numbers';
 import Button from '@components/Button';
+import PrimaryButton from '@components/PrimaryButton';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import Indicator from '@components/courses/Indicator';
@@ -165,6 +174,7 @@ export default {
   },
   components: {
     'ni-button': Button,
+    'ni-primary-button': PrimaryButton,
     'ni-simple-table': SimpleTable,
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
@@ -290,6 +300,7 @@ export default {
       resetAttendanceSheetEditionModal,
       updateAttendanceSheet,
       openAttendanceSheetEditionModal,
+      generateAttendanceSheet,
       // Validations
       attendanceSheetValidations,
     } = useAttendanceSheets(course, isClientInterface, canUpdate, loggedUser, modalLoading);
@@ -297,6 +308,11 @@ export default {
     const getDelimiterClass = (index) => {
       if (index === course.value.trainees.length) return 'unsubscribed-delimiter';
       if (index === course.value.trainees.length - 1) return 'last-subscribed-interline';
+    };
+
+    const formatSingleAttendanceSheetName = (traineeName, slots) => {
+      const dates = [...new Set(slots.map(slot => CompaniDate(slot.startDate).format(DD_MM_YYYY)))].join(', ');
+      return `${traineeName} - ${dates}`;
     };
 
     const created = async () => {
@@ -367,6 +383,8 @@ export default {
       updateAttendanceSheet,
       formatQuantity,
       openAttendanceSheetEditionModal,
+      generateAttendanceSheet,
+      formatSingleAttendanceSheetName,
       // Validations
       attendanceSheetValidations,
       attendanceValidations,

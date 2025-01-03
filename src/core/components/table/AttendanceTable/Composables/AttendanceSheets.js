@@ -6,7 +6,7 @@ import groupBy from 'lodash/groupBy';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
-import { INTER_B2B, DD_MM_YYYY } from '@data/constants';
+import { INTER_B2B, DD_MM_YYYY, GENERATION } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -99,7 +99,7 @@ export const useAttendanceSheets = (
 
   const disableSheetDeletion = attendanceSheet => !get(attendanceSheet, 'file.link') || !!course.value.archivedAt;
 
-  const disableSheetEdition = () => !!course.value.archivedAt;
+  const disableSheetEdition = attendanceSheet => !!course.value.archivedAt || !!get(attendanceSheet, 'signatures');
 
   const refreshAttendanceSheets = async () => {
     try {
@@ -172,6 +172,22 @@ export const useAttendanceSheets = (
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
+    } finally {
+      modalLoading.value = false;
+    }
+  };
+
+  const generateAttendanceSheet = async (attendanceSheetId) => {
+    try {
+      modalLoading.value = true;
+
+      await AttendanceSheets.update(attendanceSheetId, { action: GENERATION });
+
+      NotifyPositive('Feuille d\'émargement générée.');
+      await refreshAttendanceSheets();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la génération de la feuille d\'émargement.');
     } finally {
       modalLoading.value = false;
     }
@@ -281,6 +297,7 @@ export const useAttendanceSheets = (
     openAttendanceSheetEditionModal,
     updateAttendanceSheet,
     resetAttendanceSheetEditionModal,
+    generateAttendanceSheet,
     // Validations
     attendanceSheetValidations: v$,
   };
