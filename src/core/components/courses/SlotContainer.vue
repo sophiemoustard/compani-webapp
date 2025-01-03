@@ -64,11 +64,11 @@
                     <q-icon :name="showSlotToPlan[step.key] ? 'expand_less' : 'expand_more'" size="20px"
                       class="q-ml-sm" />
                   </q-item-section>
-                  <div v-if="showSlotToPlan[step.key]" class="slots-to-plan-grid">
+                  <div v-if="showSlotToPlan[step.key]" class="to-plan-slot">
                     <div v-for="slot in
                       Object.values(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)).flat()"
                       :key="slot._id" @click="openEditionModal(slot)"
-                      :class="['row items-center q-ml-lg q-mb-sm', canEdit && 'cursor-pointer hover-orange']">
+                      :class="['row items-center q-ml-lg q-pa-sm', canEdit && 'cursor-pointer hover-orange']">
                       <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
                       <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                     </div>
@@ -145,6 +145,7 @@ export default {
     const isOnlySlot = ref(false);
     const isPlannedSlot = ref(false);
     const showStepList = ref(true);
+    const showSlotToPlan = ref([]);
 
     const { isVendorInterface } = useCourses();
     const { waitForFormValidation } = useValidations();
@@ -208,8 +209,6 @@ export default {
       type: step.type,
       typeLabel: getStepTypeLabel(step.type),
     })));
-
-    const showSlotToPlan = ref(stepList.value.map(s => ({ [s.key]: false })));
 
     const rules = computed(() => ({
       editedCourseSlot: {
@@ -411,6 +410,8 @@ export default {
 
     const created = async () => {
       if (!course.value) emit('refresh');
+
+      showSlotToPlan.value = stepList.value.map(s => ({ [s.key]: false }));
     };
 
     created();
@@ -517,14 +518,8 @@ export default {
     text-decoration-color: $primary
 .link-container
   max-width: 14em
-.slots-to-plan-grid
-  display: grid
-  grid-auto-flow: row
-  grid-template-rows: auto
-  grid-gap: 16px
-  grid-template-columns: repeat(4, 15vw)
-  @media screen and (max-width: 767px)
-    grid-template-columns: repeat(1, 50vw)
+.to-plan-slot
+  width: fit-content
 .q-item__section
   margin-left: 0px
 </style>
