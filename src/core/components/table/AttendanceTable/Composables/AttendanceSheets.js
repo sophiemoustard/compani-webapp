@@ -99,7 +99,7 @@ export const useAttendanceSheets = (
 
   const disableSheetDeletion = attendanceSheet => !get(attendanceSheet, 'file.link') || !!course.value.archivedAt;
 
-  const disableSheetEdition = () => !!course.value.archivedAt;
+  const disableSheetEdition = attendanceSheet => !!course.value.archivedAt || !!get(attendanceSheet, 'signatures');
 
   const refreshAttendanceSheets = async () => {
     try {
@@ -187,7 +187,6 @@ export const useAttendanceSheets = (
       await refreshAttendanceSheets();
     } catch (e) {
       console.error(e);
-      if (e.data.statusCode === 403) return NotifyNegative(e.data.message);
       NotifyNegative('Erreur lors de la génération de la feuille d\'émargement.');
     } finally {
       modalLoading.value = false;
