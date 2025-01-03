@@ -213,6 +213,7 @@ export default {
         NotifyPositive('Validation des réponses enregistrée.');
 
         await refreshQuestionnaireAnswers();
+        trainerReview.value = [];
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la validation des réponses au questionnaire.');
