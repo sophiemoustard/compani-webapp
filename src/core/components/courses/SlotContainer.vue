@@ -91,8 +91,8 @@
       :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
       @unplan-slot="unplanSlot" />
 
-    <multiple-slot-creation-modal v-model:slots-quantity="slotsToAdd.quantity" @hide="resetCreationModal"
-      @submit="createCourseSlots" />
+    <multiple-slot-creation-modal v-model="multipleSlotCreationModal" :slots-quantity="slotsQuantity"
+      @hide="resetCreationModal" @submit="createCourseSlots" @update:slots-quantity="updateSlotsQuantity" />
   </div>
 </template>
 <script>
@@ -158,6 +158,8 @@ export default {
 
     const course = computed(() => $store.state.course.course);
     const slotsToAdd = ref({ course: course.value._id, step: '', quantity: 1 });
+
+    const slotsQuantity = computed(() => slotsToAdd.value.quantity);
 
     const slotsDurationTitle = computed(() => {
       if (!course.value || !course.value.slots) return '0h';
@@ -416,14 +418,13 @@ export default {
     };
 
     const openMultipleSlotCreationModal = (stepId) => {
+      set(slotsToAdd.value, 'step', stepId);
       multipleSlotCreationModal.value = true;
     };
 
     const createCourseSlots = async () => {
       try {
-        v$.value.editedCourseSlot.dates.touch();
-
-        await CourseSlots.create({ payload: slotsToAdd });
+        await CourseSlots.create(slotsToAdd.value);
         multipleSlotCreationModal.value = false;
         NotifyPositive('Date à planifier ajoutée.');
 
@@ -434,9 +435,9 @@ export default {
       }
     };
 
-    const resetCreationModal = () => {
-      slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
-    };
+    const resetCreationModal = () => { slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 }; };
+
+    const updateSlotsQuantity = (value) => { set(slotsToAdd.value, 'quantity', Number(value)); };
 
     const created = async () => {
       if (!course.value) emit('refresh');
@@ -460,6 +461,7 @@ export default {
       showStepList,
       showSlotToPlanDetails,
       slotsToAdd,
+      multipleSlotCreationModal,
       // Computed
       v$,
       course,
@@ -467,6 +469,7 @@ export default {
       stepTypes,
       courseSlotsByStepAndDate,
       stepList,
+      slotsQuantity,
       // Methods
       get,
       omit,
@@ -491,6 +494,7 @@ export default {
       openMultipleSlotCreationModal,
       resetCreationModal,
       createCourseSlots,
+      updateSlotsQuantity,
     };
   },
 };
