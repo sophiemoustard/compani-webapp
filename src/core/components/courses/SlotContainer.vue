@@ -92,7 +92,8 @@
       @unplan-slot="unplanSlot" />
 
     <multiple-slot-creation-modal v-model="multipleSlotCreationModal" :slots-quantity="slotsQuantity"
-      @hide="resetCreationModal" @submit="createCourseSlots" @update:slots-quantity="updateSlotsQuantity" />
+      @hide="resetCreationModal" @submit="createCourseSlots" @update:slots-quantity="updateSlotsQuantity"
+      :validations="v$.slotsQuantity" />
   </div>
 </template>
 <script>
@@ -118,7 +119,16 @@ import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY, SHORT_D
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel, formatSlotSchedule } from '@helpers/courses';
 import { ascendingSort, getISOTotalDuration } from '@helpers/dates/utils';
-import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
+import {
+  frAddress,
+  minDate,
+  maxDate,
+  urlAddress,
+  validHour,
+  strictMinHour,
+  strictPositiveNumber,
+  integerNumber,
+} from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 
@@ -245,9 +255,10 @@ export default {
           },
         },
       },
+      slotsQuantity: { required, strictPositiveNumber, integerNumber },
     }));
 
-    const v$ = useVuelidate(rules, { editedCourseSlot });
+    const v$ = useVuelidate(rules, { editedCourseSlot, slotsQuantity });
 
     const getSlotAddress = slot => get(slot, 'address.fullAddress') || 'Adresse non renseignée';
 
@@ -424,7 +435,11 @@ export default {
 
     const createCourseSlots = async () => {
       try {
+        v$.value.slotsQuantity.$touch();
+        if (v$.value.slotsQuantity.$error) return NotifyWarning('Champ invalide');
+
         await CourseSlots.create(slotsToAdd.value);
+
         multipleSlotCreationModal.value = false;
         NotifyPositive('Date à planifier ajoutée.');
 
@@ -435,7 +450,10 @@ export default {
       }
     };
 
-    const resetCreationModal = () => { slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 }; };
+    const resetCreationModal = () => {
+      slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
+      v$.value.validations.slotsQuantity.$reset();
+    };
 
     const updateSlotsQuantity = (value) => { set(slotsToAdd.value, 'quantity', Number(value)); };
 
