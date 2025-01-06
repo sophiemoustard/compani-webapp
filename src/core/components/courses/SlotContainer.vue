@@ -76,7 +76,7 @@
                 </div>
                 <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
                   <ni-button label="Ajouter des créneaux" color="primary" icon="add"
-                    @click="openMultipleSlotCreationModal(step.key)" :disable="addDateToPlanLoading" />
+                    @click="openMultipleSlotCreationModal(step.key)" :disable="slotCreationLoading" />
                 </div>
               </div>
             </div>
@@ -93,7 +93,7 @@
 
     <multiple-slot-creation-modal v-model="multipleSlotCreationModal" :slots-quantity="slotsQuantity"
       @hide="resetCreationModal" @submit="createCourseSlots" @update:slots-quantity="updateSlotsQuantity"
-      :validations="v$.slotsQuantity" />
+      :validations="v$.slotsQuantity" :loading="slotCreationLoading" />
   </div>
 </template>
 <script>
@@ -152,7 +152,7 @@ export default {
 
     const $store = useStore();
 
-    const addDateToPlanLoading = ref(false);
+    const slotCreationLoading = ref(false);
     const modalLoading = ref(false);
     const editedCourseSlot = ref({});
     const editionModal = ref(false);
@@ -313,26 +313,6 @@ export default {
       };
     };
 
-    const addDateToPlan = async (stepId) => {
-      try {
-        if (course.value.archivedAt) {
-          return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
-        }
-
-        addDateToPlanLoading.value = true;
-        await CourseSlots.create({ course: course.value._id, step: stepId });
-        NotifyPositive('Date à planifier ajoutée.');
-
-        emit('refresh');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
-      } finally {
-        addDateToPlanLoading.value = false;
-        showSlotToPlan.value[stepId] = true;
-      }
-    };
-
     const updateCourseSlot = async () => {
       try {
         v$.value.editedCourseSlot.$touch();
@@ -435,9 +415,14 @@ export default {
 
     const createCourseSlots = async () => {
       try {
+        if (course.value.archivedAt) {
+          return NotifyWarning('Vous ne pouvez pas ajouter de créneaux à une formation archivée.');
+        }
+
         v$.value.slotsQuantity.$touch();
         if (v$.value.slotsQuantity.$error) return NotifyWarning('Champ invalide');
 
+        slotCreationLoading.value = true;
         await CourseSlots.create(slotsToAdd.value);
 
         multipleSlotCreationModal.value = false;
@@ -469,7 +454,7 @@ export default {
       // Data
       isVendorInterface,
       ON_SITE,
-      addDateToPlanLoading,
+      slotCreationLoading,
       modalLoading,
       editedCourseSlot,
       editionModal,
@@ -494,7 +479,6 @@ export default {
       getSlotAddress,
       openEditionModal,
       resetEditionModal,
-      addDateToPlan,
       updateCourseSlot,
       deleteCourseSlot,
       unplanSlot,
