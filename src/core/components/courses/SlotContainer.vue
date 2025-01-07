@@ -426,8 +426,8 @@ export default {
         multipleSlotCreationModal.value = false;
         NotifyPositive('Date à planifier ajoutée.');
 
-        slotCreationLoading.value = false;
         emit('refresh');
+        slotCreationLoading.value = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
