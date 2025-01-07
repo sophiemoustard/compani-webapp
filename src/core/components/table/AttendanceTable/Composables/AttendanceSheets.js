@@ -196,9 +196,14 @@ export const useAttendanceSheets = (
   const validateAttendanceSheetDeletion = (attendanceSheet) => {
     if (!canUpdate.value) return NotifyNegative('Impossible de supprimer la feuille d\'émargement.');
 
+    const message = attendanceSheet.signatures
+      ? 'Êtes-vous sûr·e de vouloir supprimer cette feuille d\'émargement&nbsp;? <br /> Les signatures seront '
+      + 'également supprimées.'
+      : 'Êtes-vous sûr·e de vouloir supprimer cette feuille d\'émargement&nbsp;?';
+
     $q.dialog({
       title: 'Confirmation',
-      message: 'Êtes-vous sûr·e de vouloir supprimer cette feuille d\'émargement&nbsp;?',
+      message,
       html: true,
       ok: true,
       cancel: 'Annuler',
