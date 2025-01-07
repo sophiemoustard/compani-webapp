@@ -92,7 +92,7 @@
       @unplan-slot="unplanSlot" />
 
     <multiple-slot-creation-modal v-model="multipleSlotCreationModal" v-model:slots-to-add="slotsToAdd"
-      @hide="resetCreationModal" @submit="createCourseSlots" :validations="v$.slotsToAdd.quantity"
+      @hide="resetCreationModal" @submit="createCourseSlots" :validations="v$.slotsToAdd"
       :loading="slotCreationLoading" />
   </div>
 </template>
@@ -427,10 +427,11 @@ export default {
         NotifyPositive('Date à planifier ajoutée.');
 
         emit('refresh');
-        slotCreationLoading.value = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
+      } finally {
+        slotCreationLoading.value = false;
       }
     };
 

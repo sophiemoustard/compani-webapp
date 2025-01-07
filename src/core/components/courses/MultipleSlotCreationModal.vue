@@ -2,8 +2,8 @@
   <ni-modal :model-value="modelValue" @update:model-value="input" @hide="hide">
     <template #title>Ajouter des créneaux</template>
     <ni-input in-modal caption="Nombre de créneaux à ajouter" type="number" required-field
-      :model-value="slotsToAdd.quantity" @update:model-value="update($event, 'quantity')" :error="validations.$error"
-      :error-message="quantityErrorMessage" />
+      :model-value="slotsToAdd.quantity" @update:model-value="update($event, 'quantity')"
+      :error="validations.quantity.$error" :error-message="quantityErrorMessage" />
     <template #footer>
       <ni-button class="bg-primary full-width modal-btn" label="Ajouter les créneaux" icon="add" color="white"
         :loading="loading" @click="submit" />
@@ -35,8 +35,8 @@ export default {
     const { validations, slotsToAdd } = toRefs(props);
 
     const quantityErrorMessage = computed(() => {
-      if (validations.value.strictPositiveNumber.$response === false ||
-        validations.value.integerNumber.$response === false) {
+      if (validations.value.quantity.strictPositiveNumber.$response === false ||
+        validations.value.quantity.integerNumber.$response === false) {
         return 'Nombre non valide, doit être un entier strictement positif .';
       }
 
