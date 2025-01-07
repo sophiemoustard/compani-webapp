@@ -4,11 +4,11 @@
       <span class="text-weight-bold">Informations de l'ordre de mission</span>
     </template>
     <div>
-      <span class="text-weight-bold">Prénom et NOM :</span> {{ formatIdentity(course.trainer.identity, 'FL') }}
+      <span class="text-weight-bold">Prénom et NOM :</span> {{ formatIdentity(trainer.identity, 'FL') }}
     </div>
     <div>
       <span class="text-weight-bold">Fonction : </span>
-      <span v-if="course.trainer.identity.title">{{ trainerGender }}</span>
+      <span v-if="trainer.identity.title">{{ trainerGender }}</span>
       <span v-else class="text-orange-700">Civilité manquante</span>
     </div>
     <div><span class="text-weight-bold">Nom du programme :</span> {{ courses[0].subProgram.program.name }}</div>
@@ -46,6 +46,7 @@ export default {
     courses: { type: Array, default: () => [] },
     fee: { type: Number, default: 0 },
     loading: { type: Boolean, default: false },
+    trainer: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
@@ -53,12 +54,12 @@ export default {
   },
   emits: ['hide', 'update:model-value', 'submit'],
   setup (props, { emit }) {
-    const { courses } = toRefs(props);
+    const { courses, trainer } = toRefs(props);
 
     const course = computed(() => courses.value[0]);
 
     const trainerGender = computed(() => {
-      const civility = get(CIVILITY_OPTIONS.find(opt => course.value.trainer.identity.title === opt.value), 'value');
+      const civility = get(CIVILITY_OPTIONS.find(opt => trainer.value.identity.title === opt.value), 'value');
       return civility === MR ? 'Formateur' : 'Formatrice';
     });
 
@@ -91,7 +92,7 @@ export default {
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => {
-      if (!course.value.trainer.identity.title) {
+      if (!trainer.value.identity.title) {
         NotifyWarning('Civilité manquante, veuillez l\'ajouter dans l\'onglet "Infos personnelles"');
       } else emit('submit');
     };

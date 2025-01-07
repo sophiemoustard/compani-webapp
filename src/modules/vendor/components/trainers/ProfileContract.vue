@@ -18,7 +18,7 @@
 
     <trainer-mission-infos-modal v-model="trainerMissionInfosModal" :courses="selectedCourses"
       :fee="Number(newTrainerMission.fee)" :loading="missionCreationLoading" @submit="createTrainerMission"
-      @hide="resetMissionCreationModal" />
+      @hide="resetMissionCreationModal" :trainer="trainer" />
   </div>
 </template>
 
@@ -203,6 +203,7 @@ export default {
       coursesWithoutTrainerMission,
       selectedCourses,
       canUpdateTrainerMissions,
+      trainer,
       // Methods
       openTrainerMissionCreationModal,
       createTrainerMission,
