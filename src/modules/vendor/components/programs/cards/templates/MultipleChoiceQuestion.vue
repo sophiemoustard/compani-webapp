@@ -8,7 +8,7 @@
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
         :error="getError('qcAnswers', i) || requiredOneCorrectAnswer('qcAnswers', i)" :disable="disableEdition"
         :required-field="answerIsRequired(i)" />
-      <q-checkbox v-model="qcAnswer.correct" @update:model-value="updateCorrectAnswer(qcAnswer)"
+      <q-checkbox v-model="qcAnswer.isCorrect" @update:model-value="updateCorrectAnswer(qcAnswer)"
         :disable="!qcAnswer.text || disableEdition" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
