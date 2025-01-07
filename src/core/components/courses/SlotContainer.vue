@@ -91,9 +91,9 @@
       :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
       @unplan-slot="unplanSlot" />
 
-    <multiple-slot-creation-modal v-model="multipleSlotCreationModal" :slots-quantity="slotsQuantity"
-      @hide="resetCreationModal" @submit="createCourseSlots" @update:slots-quantity="updateSlotsQuantity"
-      :validations="v$.slotsQuantity" :loading="slotCreationLoading" />
+    <multiple-slot-creation-modal v-model="multipleSlotCreationModal" v-model:slots-to-add="slotsToAdd"
+      @hide="resetCreationModal" @submit="createCourseSlots" :validations="v$.slotsToAdd.quantity"
+      :loading="slotCreationLoading" />
   </div>
 </template>
 <script>
@@ -168,8 +168,6 @@ export default {
 
     const course = computed(() => $store.state.course.course);
     const slotsToAdd = ref({ course: course.value._id, step: '', quantity: 1 });
-
-    const slotsQuantity = computed(() => slotsToAdd.value.quantity);
 
     const slotsDurationTitle = computed(() => {
       if (!course.value || !course.value.slots) return '0h';
@@ -255,10 +253,10 @@ export default {
           },
         },
       },
-      slotsQuantity: { required, strictPositiveNumber, integerNumber },
+      slotsToAdd: { quantity: { required, strictPositiveNumber, integerNumber } },
     }));
 
-    const v$ = useVuelidate(rules, { editedCourseSlot, slotsQuantity });
+    const v$ = useVuelidate(rules, { editedCourseSlot, slotsToAdd });
 
     const getSlotAddress = slot => get(slot, 'address.fullAddress') || 'Adresse non renseignée';
 
@@ -419,8 +417,8 @@ export default {
           return NotifyWarning('Vous ne pouvez pas ajouter de créneaux à une formation archivée.');
         }
 
-        v$.value.slotsQuantity.$touch();
-        if (v$.value.slotsQuantity.$error) return NotifyWarning('Champ invalide');
+        v$.value.slotsToAdd.$touch();
+        if (v$.value.slotsToAdd.$error) return NotifyWarning('Champ invalide');
 
         slotCreationLoading.value = true;
         await CourseSlots.create(slotsToAdd.value);
@@ -428,6 +426,7 @@ export default {
         multipleSlotCreationModal.value = false;
         NotifyPositive('Date à planifier ajoutée.');
 
+        slotCreationLoading.value = false;
         emit('refresh');
       } catch (e) {
         console.error(e);
@@ -437,10 +436,8 @@ export default {
 
     const resetCreationModal = () => {
       slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
-      v$.value.validations.slotsQuantity.$reset();
+      v$.value.slotsToAdd.$reset();
     };
-
-    const updateSlotsQuantity = (value) => { set(slotsToAdd.value, 'quantity', Number(value)); };
 
     const created = async () => {
       if (!course.value) emit('refresh');
@@ -472,7 +469,6 @@ export default {
       stepTypes,
       courseSlotsByStepAndDate,
       stepList,
-      slotsQuantity,
       // Methods
       get,
       omit,
@@ -496,7 +492,6 @@ export default {
       openMultipleSlotCreationModal,
       resetCreationModal,
       createCourseSlots,
-      updateSlotsQuantity,
     };
   },
 };
