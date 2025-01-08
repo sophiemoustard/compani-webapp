@@ -75,8 +75,8 @@
                   </div>
                 </div>
                 <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
-                  <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
-                    :disable="addDateToPlanLoading" />
+                  <ni-button label="Ajouter des créneaux" color="primary" icon="add"
+                    @click="openMultipleSlotCreationModal(step.key)" :disable="slotCreationLoading" />
                 </div>
               </div>
             </div>
@@ -90,6 +90,10 @@
       @submit="updateCourseSlot" @update="setCourseSlot" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
       :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
       @unplan-slot="unplanSlot" />
+
+    <multiple-slot-creation-modal v-model="multipleSlotCreationModal" v-model:slots-to-add="slotsToAdd"
+      @hide="resetCreationModal" @submit="createCourseSlots" :validations="v$.slotsToAdd"
+      :loading="slotCreationLoading" />
   </div>
 </template>
 <script>
@@ -106,6 +110,7 @@ import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
+import MultipleSlotCreationModal from '@components/courses/MultipleSlotCreationModal';
 import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
@@ -114,7 +119,16 @@ import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY, SHORT_D
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel, formatSlotSchedule } from '@helpers/courses';
 import { ascendingSort, getISOTotalDuration } from '@helpers/dates/utils';
-import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
+import {
+  frAddress,
+  minDate,
+  maxDate,
+  urlAddress,
+  validHour,
+  strictMinHour,
+  strictPositiveNumber,
+  integerNumber,
+} from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 
@@ -130,6 +144,7 @@ export default {
     'slot-edition-modal': SlotEditionModal,
     'ni-button': Button,
     'ni-date-input': DateInput,
+    'multiple-slot-creation-modal': MultipleSlotCreationModal,
   },
   emits: ['refresh', 'update', 'update:estimatedStartDate'],
   setup (props, { emit }) {
@@ -137,7 +152,7 @@ export default {
 
     const $store = useStore();
 
-    const addDateToPlanLoading = ref(false);
+    const slotCreationLoading = ref(false);
     const modalLoading = ref(false);
     const editedCourseSlot = ref({});
     const editionModal = ref(false);
@@ -146,11 +161,13 @@ export default {
     const isPlannedSlot = ref(false);
     const showStepList = ref(true);
     const showSlotToPlan = ref([]);
+    const multipleSlotCreationModal = ref(false);
 
     const { isVendorInterface } = useCourses();
     const { waitForFormValidation } = useValidations();
 
     const course = computed(() => $store.state.course.course);
+    const slotsToAdd = ref({ course: course.value._id, step: '', quantity: 1 });
 
     const slotsDurationTitle = computed(() => {
       if (!course.value || !course.value.slots) return '0h';
@@ -236,9 +253,10 @@ export default {
           },
         },
       },
+      slotsToAdd: { quantity: { required, strictPositiveNumber, integerNumber } },
     }));
 
-    const v$ = useVuelidate(rules, { editedCourseSlot });
+    const v$ = useVuelidate(rules, { editedCourseSlot, slotsToAdd });
 
     const getSlotAddress = slot => get(slot, 'address.fullAddress') || 'Adresse non renseignée';
 
@@ -291,26 +309,6 @@ export default {
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
       };
-    };
-
-    const addDateToPlan = async (stepId) => {
-      try {
-        if (course.value.archivedAt) {
-          return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
-        }
-
-        addDateToPlanLoading.value = true;
-        await CourseSlots.create({ course: course.value._id, step: stepId });
-        NotifyPositive('Date à planifier ajoutée.');
-
-        emit('refresh');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
-      } finally {
-        addDateToPlanLoading.value = false;
-        showSlotToPlan.value[stepId] = true;
-      }
     };
 
     const updateCourseSlot = async () => {
@@ -408,6 +406,45 @@ export default {
       showSlotToPlan.value[stepId] = !showSlotToPlan.value[stepId];
     };
 
+    const openMultipleSlotCreationModal = (stepId) => {
+      set(slotsToAdd.value, 'step', stepId);
+      multipleSlotCreationModal.value = true;
+    };
+
+    const createCourseSlots = async () => {
+      try {
+        if (course.value.archivedAt) {
+          return NotifyWarning('Vous ne pouvez pas ajouter de créneaux à une formation archivée.');
+        }
+
+        v$.value.slotsToAdd.$touch();
+        if (v$.value.slotsToAdd.$error) return NotifyWarning('Champ invalide');
+
+        slotCreationLoading.value = true;
+        await CourseSlots.create(slotsToAdd.value);
+
+        multipleSlotCreationModal.value = false;
+        const message = slotsToAdd.value.quantity > 1 ? 'Créneaux à planifier ajoutés.' : 'Créneau à planifier ajouté.';
+        NotifyPositive(message);
+
+        emit('refresh');
+      } catch (e) {
+        console.error(e);
+
+        const message = slotsToAdd.value.quantity > 1
+          ? 'Erreur lors de l\'ajout des créneaux à planifier.'
+          : 'Erreur lors de l\'ajout du créneau à planifier.';
+        NotifyNegative(message);
+      } finally {
+        slotCreationLoading.value = false;
+      }
+    };
+
+    const resetCreationModal = () => {
+      slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
+      v$.value.slotsToAdd.$reset();
+    };
+
     const created = async () => {
       if (!course.value) emit('refresh');
 
@@ -420,7 +457,7 @@ export default {
       // Data
       isVendorInterface,
       ON_SITE,
-      addDateToPlanLoading,
+      slotCreationLoading,
       modalLoading,
       editedCourseSlot,
       editionModal,
@@ -429,6 +466,8 @@ export default {
       isPlannedSlot,
       showStepList,
       showSlotToPlanDetails,
+      slotsToAdd,
+      multipleSlotCreationModal,
       // Computed
       v$,
       course,
@@ -442,7 +481,6 @@ export default {
       getSlotAddress,
       openEditionModal,
       resetEditionModal,
-      addDateToPlan,
       updateCourseSlot,
       deleteCourseSlot,
       unplanSlot,
@@ -457,6 +495,9 @@ export default {
       showStepDetails,
       showSlotToPlan,
       formatQuantity,
+      openMultipleSlotCreationModal,
+      resetCreationModal,
+      createCourseSlots,
     };
   },
 };
