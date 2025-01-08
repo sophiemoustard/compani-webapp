@@ -52,6 +52,7 @@ export const useAttendanceSheets = (
     newAttendanceSheet: {
       file: { required },
       trainee: { required: requiredIf(course.value.type === INTER_B2B) },
+      trainer: { required },
       date: { required: requiredIf(course.value.type !== INTER_B2B) },
       slots: { required: requiredIf(isSingleCourse.value) },
     },
@@ -126,15 +127,23 @@ export const useAttendanceSheets = (
     if (course.value.archivedAt) {
       return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
     }
+    if (!course.value.trainers.filter(t => t._id).length) {
+      return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation sans intervenant·e.');
+    }
     if (!course.value.companies.length) {
       return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
     }
+    if (course.value.type === INTER_B2B && !course.value.trainees.length) {
+      return NotifyWarning('Au moins un·e stagiaire doit être rattaché·e à la formation.');
+    }
     if (isSingleCourse.value) {
+      if (!course.value.slots.length) return NotifyWarning('Il n\'y a aucun créneau planifier pour cette formation');
       if (!notLinkedSlotOptions.value.length) {
         return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
       }
       newAttendanceSheet.value.slots = [];
     }
+    if (course.value.trainers.length === 1) newAttendanceSheet.value.trainer = course.value.trainers[0]._id;
 
     attendanceSheetAdditionModal.value = true;
   };
@@ -145,10 +154,11 @@ export const useAttendanceSheets = (
   };
 
   const formatPayload = () => {
-    const { course: newAttendanceSheetCourse, file, trainee, date, slots } = newAttendanceSheet.value;
+    const { course: newAttendanceSheetCourse, file, trainee, trainer, date, slots } = newAttendanceSheet.value;
     const form = new FormData();
     course.value.type === INTER_B2B ? form.append('trainee', trainee) : form.append('date', date);
     form.append('course', newAttendanceSheetCourse);
+    form.append('trainer', trainer);
     form.append('file', file);
 
     if (isSingleCourse.value) slots.forEach(slot => form.append('slots', slot));
