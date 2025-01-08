@@ -3,7 +3,7 @@
     <template #title>Ajouter des créneaux</template>
     <ni-input in-modal caption="Nombre de créneaux à ajouter" type="number" required-field
       :model-value="slotsToAdd.quantity" @update:model-value="update($event, 'quantity')"
-      :error="validations.quantity.$error" :error-message="quantityErrorMessage" />
+      :error="validations.quantity.$error" :error-message="quantityErrorMessage" last />
     <template #footer>
       <ni-button class="bg-primary full-width modal-btn" label="Ajouter les créneaux" icon="add" color="white"
         :loading="loading" @click="submit" />

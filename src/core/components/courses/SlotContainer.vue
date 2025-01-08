@@ -424,12 +424,17 @@ export default {
         await CourseSlots.create(slotsToAdd.value);
 
         multipleSlotCreationModal.value = false;
-        NotifyPositive('Date à planifier ajoutée.');
+        const message = slotsToAdd.value.quantity > 1 ? 'Créneaux à planifier ajoutés.' : 'Créneau à planifier ajouté.';
+        NotifyPositive(message);
 
         emit('refresh');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
+
+        const message = slotsToAdd.value.quantity > 1
+          ? 'Erreur lors de l\'ajout des créneaux à planifier.'
+          : 'Erreur lors de l\'ajout du créneau à planifier.';
+        NotifyNegative(message);
       } finally {
         slotCreationLoading.value = false;
       }
