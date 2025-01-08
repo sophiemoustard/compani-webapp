@@ -17,8 +17,8 @@
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
       <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell :img="questionnaireQRCode" :types="questionnaireTypes"
-          @click="goToQuestionnaireProfile" />
+        <ni-questionnaire-qrcode-cell v-for="qrCode in questionnaireQRCodes" :key="qrCode._id" :img="qrCode.img"
+        :types="questionnaireTypes" @click="goToQuestionnaireProfile" />
       </div>
       <div v-if="loggedUserIsCourseTrainer && endSelfPositionningQuestionnaireId">
         <ni-banner icon="edit">
@@ -115,6 +115,7 @@ import {
   SELF_POSITIONNING,
   TRAINING_ORGANISATION_MANAGER,
   VENDOR_ADMIN,
+  START_COURSE,
   END_COURSE,
 } from '@data/constants';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -156,7 +157,7 @@ export default {
       { name: 'expand', label: '', field: '' },
     ]);
     const pagination = ref({ sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 });
-    const questionnaireQRCode = ref('');
+    const questionnaireQRCodes = ref([]);
     const questionnaireTypes = ref([]);
 
     const course = computed(() => $store.state.course.course);
@@ -180,7 +181,7 @@ export default {
 
     const areQuestionnaireAnswersVisible = computed(() => questionnaires.value.length);
 
-    const areQuestionnaireQRCodeVisible = computed(() => questionnaireQRCode.value);
+    const areQuestionnaireQRCodeVisible = computed(() => questionnaireQRCodes.value);
 
     const areQuestionnaireVisible = computed(() => (!isClientInterface &&
       (areQuestionnaireAnswersVisible.value || areQuestionnaireQRCodeVisible.value)));
@@ -326,8 +327,18 @@ export default {
         const publishedQuestionnaires = await Questionnaires.list({ course: profileId.value });
         questionnaireTypes.value = publishedQuestionnaires.map(q => q.type).sort((a, b) => sortStrings(a, b));
 
-        if (publishedQuestionnaires.length) {
-          questionnaireQRCode.value = await Questionnaires.getQRCode({ course: profileId.value });
+        const getQuestionnaireTypeExpectations = await Questionnaires
+          .getQRCode({ course: profileId.value, courseTimeline: START_COURSE })
+          .find(q => q.type === EXPECTATIONS);
+        if (getQuestionnaireTypeExpectations) {
+          return questionnaireQRCodes.value.push({ img, courseTimeline: START_COURSE });
+        }
+
+        const getQuestionnaireTypeEndOfCourse = await Questionnaires
+          .getQRCode({ course: profileId.value, courseTimeline: END_COURSE })
+          .find(q => q.type === END_COURSE);
+        if (getQuestionnaireTypeEndOfCourse) {
+          return questionnaireQRCodes.value.push({ img, courseTimeline: END_COURSE });
         }
       } catch (e) {
         console.error(e);
@@ -335,8 +346,9 @@ export default {
       }
     };
 
-    const goToQuestionnaireProfile = () => {
-      const questionnaire = $router.resolve({ name: 'ni questionnaires', query: { courseId: profileId.value } });
+    const goToQuestionnaireProfile = (courseTimeline) => {
+      const questionnaire = $router.resolve({ name: 'ni questionnaires',
+        query: { courseId: profileId.value, courseTimeline } });
 
       window.open(questionnaire.href, '_blank');
     };
@@ -367,7 +379,7 @@ export default {
       isIntraOrIntraHoldingOrVendor,
       learners,
       learnersLoading,
-      questionnaireQRCode,
+      questionnaireQRCodes,
       isClientInterface,
       questionnaireTypes,
       EXPECTATIONS,
