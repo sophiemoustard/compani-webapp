@@ -38,13 +38,14 @@ import Start from '@components/questionnaires/cards/Start';
 import End from '@components/questionnaires/cards/End';
 import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { INCREMENT, START_CARD_INDEX } from '@data/constants';
+import { INCREMENT, START_CARD_INDEX, START_COURSE, EXPECTATIONS, END_OF_COURSE } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 
 export default {
   name: 'QuestionnaireForm',
   props: {
     courseId: { type: String, required: true },
+    courseTimeline: { type: String, required: true },
   },
   components: {
     'compani-header': CompaniHeader,
@@ -57,7 +58,7 @@ export default {
     const metaInfo = { title: 'Formulaire de réponse au questionnaire' };
     useMeta(metaInfo);
 
-    const { courseId } = toRefs(props);
+    const { courseId, courseTimeline } = toRefs(props);
     const course = ref({});
     const questionnaires = ref([]);
     const cards = ref([]);
@@ -85,10 +86,17 @@ export default {
 
     const getQuestionnaires = async () => {
       try {
-        const fetchedQuestionnaires = await Questionnaires.getFromNotLogged({ course: courseId.value });
+        const fetchedQuestionnaires = await Questionnaires
+          .getFromNotLogged({ course: courseId.value });
         questionnaires.value = [...fetchedQuestionnaires].sort((a, b) => sortStrings(a.type, b.type));
         cards.value = questionnaires.value.map(q => q.cards).flat();
         endCardIndex.value = cards.value.length;
+        console.log('fetchedQuestionnaires', fetchedQuestionnaires);
+        const filteredQuestionnaires = questionnaires.value.filter(q => (courseTimeline.value === START_COURSE
+          ? q.type !== END_OF_COURSE
+          : q.type !== EXPECTATIONS));
+        console.log('filteredQuestionnaires', filteredQuestionnaires);
+        return filteredQuestionnaires;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des informations de la formation.');

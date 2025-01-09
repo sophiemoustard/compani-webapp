@@ -16,9 +16,10 @@
     </div>
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
-      <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
-        <ni-questionnaire-qrcode-cell v-for="qrCode in questionnaireQRCodes" :key="qrCode._id" :img="qrCode.img"
-        :types="questionnaireTypes" @click="goToQuestionnaireProfile" />
+      <div v-if="areQuestionnaireQRCodeVisible.length" class="questionnaire-link-container">
+        <ni-questionnaire-qrcode-cell v-for="(qrCode, idx) in questionnaireQRCodes" :key="`qrCode-${idx}`"
+          :img="qrCode.img" :types="filteredQRCode(qrCode.courseTimeline)"
+          @click="goToQuestionnaireProfile(qrCode.courseTimeline)" />
       </div>
       <div v-if="loggedUserIsCourseTrainer && endSelfPositionningQuestionnaireId">
         <ni-banner icon="edit">
@@ -327,24 +328,24 @@ export default {
         const publishedQuestionnaires = await Questionnaires.list({ course: profileId.value });
         questionnaireTypes.value = publishedQuestionnaires.map(q => q.type).sort((a, b) => sortStrings(a, b));
 
-        const getQuestionnaireTypeExpectations = await Questionnaires
-          .getQRCode({ course: profileId.value, courseTimeline: START_COURSE })
-          .find(q => q.type === EXPECTATIONS);
-        if (getQuestionnaireTypeExpectations) {
-          return questionnaireQRCodes.value.push({ img, courseTimeline: START_COURSE });
-        }
-
-        const getQuestionnaireTypeEndOfCourse = await Questionnaires
-          .getQRCode({ course: profileId.value, courseTimeline: END_COURSE })
-          .find(q => q.type === END_COURSE);
-        if (getQuestionnaireTypeEndOfCourse) {
-          return questionnaireQRCodes.value.push({ img, courseTimeline: END_COURSE });
+        if (publishedQuestionnaires.length) {
+          if (questionnaireTypes.value.includes(EXPECTATIONS)) {
+            const img = await Questionnaires.getQRCode({ course: profileId.value, courseTimeline: START_COURSE });
+            questionnaireQRCodes.value.push({ img, courseTimeline: START_COURSE });
+          }
+          if (questionnaireTypes.value.includes(END_OF_COURSE)) {
+            const img = await Questionnaires.getQRCode({ course: profileId.value, courseTimeline: END_COURSE });
+            questionnaireQRCodes.value.push({ img, courseTimeline: END_COURSE });
+          }
         }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires et des QR codes associés.');
       }
     };
+
+    const filteredQRCode = courseTimeline => questionnaireTypes.value
+      .filter(qType => (courseTimeline === START_COURSE ? qType !== EXPECTATIONS : qType !== END_OF_COURSE));
 
     const goToQuestionnaireProfile = (courseTimeline) => {
       const questionnaire = $router.resolve({ name: 'ni questionnaires',
@@ -386,6 +387,7 @@ export default {
       END_OF_COURSE,
       OFFICIAL,
       CUSTOM,
+      START_COURSE,
       // Computed
       course,
       courseHasElearningStep,
@@ -412,6 +414,7 @@ export default {
       downloadAttendanceSheet,
       goToQuestionnaireProfile,
       goToSelfPositionningAnswers,
+      filteredQRCode,
     };
   },
 };
