@@ -53,10 +53,7 @@
                 <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)"
                   class="q-mx-md">
                   <div @click="openEditionModal(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)[0])"
-                    :class="[
-                      'to-plan-slot row items-center q-ml-lg q-pa-sm',
-                      canEdit && 'cursor-pointer hover-orange'
-                    ]">
+                    :class="['to-plan-slot q-mb-sm', canEdit && 'to-plan-slot-container cursor-pointer hover-orange']">
                     <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
                     <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                   </div>
@@ -64,21 +61,16 @@
                     class="q-mx-lg bg-peach-100">
                     <q-item-section @click="() => showSlotToPlanDetails(step.key)" class="slots cursor-pointer">
                       <span class="text-orange-500">
-                        {{ showSlotToPlan[step.key] ? 'Masquer' : 'Afficher' }}
-                        {{ formatQuantity(
-                          'créneau',
-                          get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY).length - 1,
-                          'x'
-                          ) }} à planifier
+                        {{ showSlotToPlan[step.key] ? 'Masquer' : 'Afficher' }} les autres créneaux à planifier
+                        ({{ get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY).length - 1 }})
                       </span>
                       <q-icon :name="showSlotToPlan[step.key] ? 'expand_less' : 'expand_more'" size="20px"
                         class="q-ml-sm" />
                     </q-item-section>
-                    <div v-if="showSlotToPlan[step.key]" class="to-plan-slot">
-                      <div v-for="slot in
-                        tail(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY))"
-                        :key="slot._id" @click="openEditionModal(slot)"
-                        :class="['row items-center q-ml-lg q-pa-sm', canEdit && 'cursor-pointer hover-orange']">
+                    <div v-if="showSlotToPlan[step.key]" class="to-plan-slot-container q-pb-sm">
+                      <div v-for="slot in tail(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY))" :key="slot._id"
+                        :class="['to-plan-slot', canEdit && 'cursor-pointer hover-orange']"
+                        @click="openEditionModal(slot)">
                         <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
                         <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                       </div>
@@ -506,7 +498,6 @@ export default {
       formatSlotSchedule,
       showStepDetails,
       showSlotToPlan,
-      formatQuantity,
       openMultipleSlotCreationModal,
       resetCreationModal,
       createCourseSlots,
@@ -571,8 +562,14 @@ export default {
     text-decoration-color: $primary
 .link-container
   max-width: 14em
-.to-plan-slot
+.to-plan-slot-container
   width: fit-content
+.to-plan-slot
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  margin-left: 24px
+  padding: 8px
 .q-item__section
   margin-left: 0px
 </style>
