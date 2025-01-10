@@ -20,7 +20,7 @@
         <ni-input :caption="`Mot ${i + 1}`" v-model="answer.text" class="input" :required-field="answerIsRequired(i)"
           @focus="saveTmp(`gapAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="gapAnswersErrorMsg(i)"
           :error="getError('gapAnswers', i) || requiredOneCorrectAnswer('gapAnswers', i)" :disable="disableEdition" />
-        <q-checkbox v-model="answer.correct" @update:model-value="updateCorrectAnswer(answer)"
+        <q-checkbox v-model="answer.isCorrect" @update:model-value="updateCorrectAnswer(answer)"
           :disable="disableAnswerCheckbox(i)" />
         <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
       </div>
@@ -113,7 +113,7 @@ export default {
       return '';
     });
 
-    const correctAnswers = computed(() => card.value.gapAnswers.filter(a => a.correct));
+    const correctAnswers = computed(() => card.value.gapAnswers.filter(a => a.isCorrect));
 
     const filledText = computed(() => {
       let color = 'primary';
@@ -136,7 +136,7 @@ export default {
         disableEdition.value || cardParent.value.status === PUBLISHED);
 
     const disableAnswerCheckbox = index => !card.value.gapAnswers[index].text || disableEdition.value ||
-      (correctAnswers.value.length === FILL_THE_GAPS_MAX_GAPS_COUNT && !card.value.gapAnswers[index].correct) ||
+      (correctAnswers.value.length === FILL_THE_GAPS_MAX_GAPS_COUNT && !card.value.gapAnswers[index].isCorrect) ||
       cardParent.value.status === PUBLISHED;
 
     const gapAnswersErrorMsg = (index) => {

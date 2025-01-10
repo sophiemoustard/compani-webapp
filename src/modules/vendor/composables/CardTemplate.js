@@ -127,7 +127,7 @@ export const useCardTemplate = (card, v$, refreshCard, cardParent) => {
     try {
       await Cards.updateAnswer(
         { cardId: card.value._id, answerId: editedAnswer._id },
-        { correct: editedAnswer.correct }
+        { isCorrect: editedAnswer.isCorrect }
       );
 
       await refreshCard();
