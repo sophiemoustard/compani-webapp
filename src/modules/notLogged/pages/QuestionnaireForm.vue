@@ -86,17 +86,12 @@ export default {
 
     const getQuestionnaires = async () => {
       try {
-        const fetchedQuestionnaires = await Questionnaires
-          .getFromNotLogged({ course: courseId.value });
-        questionnaires.value = [...fetchedQuestionnaires].sort((a, b) => sortStrings(a.type, b.type));
+        const fetchedQuestionnaires = await Questionnaires.getFromNotLogged({ course: courseId.value });
+        questionnaires.value = [...fetchedQuestionnaires]
+          .sort((a, b) => sortStrings(a.type, b.type))
+          .filter(q => (courseTimeline.value === START_COURSE ? q.type !== END_OF_COURSE : q.type !== EXPECTATIONS));
         cards.value = questionnaires.value.map(q => q.cards).flat();
         endCardIndex.value = cards.value.length;
-        console.log('fetchedQuestionnaires', fetchedQuestionnaires);
-        const filteredQuestionnaires = questionnaires.value.filter(q => (courseTimeline.value === START_COURSE
-          ? q.type !== END_OF_COURSE
-          : q.type !== EXPECTATIONS));
-        console.log('filteredQuestionnaires', filteredQuestionnaires);
-        return filteredQuestionnaires;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des informations de la formation.');

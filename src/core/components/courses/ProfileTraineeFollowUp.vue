@@ -16,7 +16,7 @@
     </div>
     <div v-if="areQuestionnaireVisible" class="q-mb-xl">
       <p class="text-weight-bold">Questionnaires</p>
-      <div v-if="areQuestionnaireQRCodeVisible.length" class="questionnaire-link-container">
+      <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
         <ni-questionnaire-qrcode-cell v-for="(qrCode, idx) in questionnaireQRCodes" :key="`qrCode-${idx}`"
           :img="qrCode.img" :types="filteredQRCode(qrCode.courseTimeline)"
           @click="goToQuestionnaireProfile(qrCode.courseTimeline)" />
@@ -182,7 +182,7 @@ export default {
 
     const areQuestionnaireAnswersVisible = computed(() => questionnaires.value.length);
 
-    const areQuestionnaireQRCodeVisible = computed(() => questionnaireQRCodes.value);
+    const areQuestionnaireQRCodeVisible = computed(() => questionnaireQRCodes.value.length);
 
     const areQuestionnaireVisible = computed(() => (!isClientInterface &&
       (areQuestionnaireAnswersVisible.value || areQuestionnaireQRCodeVisible.value)));
@@ -345,7 +345,7 @@ export default {
     };
 
     const filteredQRCode = courseTimeline => questionnaireTypes.value
-      .filter(qType => (courseTimeline === START_COURSE ? qType !== EXPECTATIONS : qType !== END_OF_COURSE));
+      .filter(qType => (courseTimeline === START_COURSE ? qType !== END_OF_COURSE : qType !== EXPECTATIONS));
 
     const goToQuestionnaireProfile = (courseTimeline) => {
       const questionnaire = $router.resolve({ name: 'ni questionnaires',
