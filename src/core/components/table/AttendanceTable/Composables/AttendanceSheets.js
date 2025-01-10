@@ -136,8 +136,8 @@ export const useAttendanceSheets = (
     if (course.value.type === INTER_B2B && !course.value.trainees.length) {
       return NotifyWarning('Au moins un·e stagiaire doit être rattaché·e à la formation.');
     }
+    if (!course.value.slots.length) return NotifyWarning('Il n\'y a aucun créneau planifié pour cette formation.');
     if (isSingleCourse.value) {
-      if (!course.value.slots.length) return NotifyWarning('Il n\'y a aucun créneau planifier pour cette formation');
       if (!notLinkedSlotOptions.value.length) {
         return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
       }
