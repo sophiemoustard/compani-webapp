@@ -17,10 +17,10 @@
     <ni-coach-list :company="company" />
   </div>
 
-  <ni-interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpSalesRepresentative"
+  <ni-interlocutor-modal v-model="salesRepresentativeModal" v-model:interlocutor="tmpSalesRepresentativeId"
     @submit="updateCompany('salesRepresentative')" :label="salesRepresentativeModalLabel"
     :interlocutors-options="salesRepresentativeOptions" :loading="salesRepresentativeModalLoading"
-    @hide="resetSalesRepresentative" :validations="v$.tmpSalesRepresentative" />
+    @hide="resetSalesRepresentative" :validations="v$.tmpSalesRepresentativeId" />
 </template>
 
 <script>
@@ -60,7 +60,7 @@ export default {
     const { profileId } = toRefs(props);
     const tmpInput = ref('');
     const salesRepresentativeOptions = ref([]);
-    const tmpSalesRepresentative = ref({});
+    const tmpSalesRepresentativeId = ref('');
     const salesRepresentativeModal = ref(false);
     const salesRepresentativeModalLoading = ref(false);
     const salesRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
@@ -79,9 +79,9 @@ export default {
           location: { required },
         },
       },
-      tmpSalesRepresentative: { _id: { required } },
+      tmpSalesRepresentativeId: { required },
     }));
-    const v$ = useVuelidate(companyRules, { company, tmpSalesRepresentative });
+    const v$ = useVuelidate(companyRules, { company, tmpSalesRepresentativeId });
 
     const { waitForValidation } = useValidations();
 
@@ -112,10 +112,10 @@ export default {
 
         let payload;
         if (path === 'salesRepresentative') {
-          v$.value.tmpSalesRepresentative.$touch();
-          if (v$.value.tmpSalesRepresentative.$error) return NotifyWarning('Champ invalide');
+          v$.value.tmpSalesRepresentativeId.$touch();
+          if (v$.value.tmpSalesRepresentativeId.$error) return NotifyWarning('Champ invalide');
 
-          payload = { salesRepresentative: tmpSalesRepresentative.value._id };
+          payload = { salesRepresentative: tmpSalesRepresentativeId.value };
         } else {
           v$.value.company.$touch();
           const isValid = await waitForValidation(v$.value.company, path);
@@ -146,19 +146,20 @@ export default {
       salesRepresentativeOptions.value = formatAndSortUserOptions(rofAndAdminUsers, false);
     };
 
-    const openSalesRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const openSalesRepresentativeModal = (event) => {
+      const { action: eventAction } = event;
+      const action = eventAction === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
-      tmpSalesRepresentative.value = get(company.value, 'salesRepresentative');
+      tmpSalesRepresentativeId.value = get(company.value, 'salesRepresentative._id');
       salesRepresentativeModalLabel.value = { action, interlocutor: 'chargé d\'accompagnement' };
       salesRepresentativeModal.value = true;
     };
 
     const resetSalesRepresentative = () => {
-      tmpSalesRepresentative.value = {};
+      tmpSalesRepresentativeId.value = '';
       salesRepresentativeModalLabel.value = { action: '', interlocutor: '' };
       salesRepresentativeModalLoading.value = false;
-      v$.value.tmpSalesRepresentative.$reset();
+      v$.value.tmpSalesRepresentativeId.$reset();
     };
 
     const created = async () => {
@@ -175,7 +176,7 @@ export default {
       salesRepresentativeModal,
       salesRepresentativeModalLabel,
       salesRepresentativeModalLoading,
-      tmpSalesRepresentative,
+      tmpSalesRepresentativeId,
       // Validations
       v$,
       // Computed

@@ -30,8 +30,10 @@ export const useCourseFilters = (activeCourses, archivedCourses, holdingsOptions
   const selectedTrainer = computed(() => $store.state.course.selectedTrainer);
 
   const trainerFilterOptions = computed(() => {
-    const filteredCourses = courses.value.filter(course => !!course.trainer);
-    const trainers = formatAndSortIdentityOptions(filteredCourses, 'trainer');
+    const filteredCourses = courses.value.filter(course => get(course, 'trainers', []).length);
+    const trainers = filteredCourses
+      .flatMap(course => formatAndSortIdentityOptions(course.trainers))
+      .sort((a, b) => a.label.localeCompare(b.label));
 
     return [
       { label: 'Tous les intervenants', value: '' },

@@ -127,9 +127,12 @@ export default {
       if (selectedProgram.value && course.value.subProgram.program._id !== selectedProgram.value) return false;
 
       if (selectedTrainer.value) {
-        const courseTrainer = get(course.value, 'trainer._id');
-        if (selectedTrainer.value === WITHOUT_TRAINER && courseTrainer) return false;
-        if (selectedTrainer.value !== WITHOUT_TRAINER && courseTrainer !== selectedTrainer.value) return false;
+        const courseTrainerIds = course.value.trainers ? course.value.trainers.map(trainer => trainer._id) : [];
+
+        if (selectedTrainer.value === WITHOUT_TRAINER && courseTrainerIds.length) return false;
+        if (selectedTrainer.value !== WITHOUT_TRAINER && !courseTrainerIds.includes(selectedTrainer.value)) {
+          return false;
+        }
       }
 
       if (selectedCompany.value && !companiesIds.includes(selectedCompany.value)) return false;
@@ -259,14 +262,16 @@ export default {
   font-size: 12px
   color: $copper-grey-600
 .item-section-container
-  display: flex
+  min-width: 0
 .infos-course-nearest-date
   color: $copper-grey-900 !important
   font-size: 14px
 .label
-  display: inline
-  max-width: 12em
+  display: inline-block
+  max-width: 20em
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
+  @media screen and (max-width: 768px)
+    max-width: 12em
 </style>

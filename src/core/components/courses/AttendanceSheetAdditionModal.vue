@@ -3,6 +3,9 @@
     <template #title>
       Ajouter une nouvelle <span class="text-weight-bold">feuille d'émargement</span>
     </template>
+    <ni-select :model-value="newAttendanceSheet.trainer" :error="validations.trainer.$error"
+      @update:model-value="update($event, 'trainer')" in-modal required-field caption="Intervenant·e"
+      :options="trainerOptions" @blur="validations.trainer.$touch" :disable="course.trainers.length < 2" />
     <ni-select v-if="course.type === INTER_B2B" :model-value="newAttendanceSheet.trainee"
       :error="validations.trainee.$error" @update:model-value="update($event, 'trainee')" in-modal required-field
       caption="Participant·e" :options="traineeOptions" @blur="validations.trainee.$touch" />
@@ -60,6 +63,8 @@ export default {
 
     const traineeOptions = computed(() => formatAndSortIdentityOptions(course.value.trainees));
 
+    const trainerOptions = computed(() => formatAndSortIdentityOptions(course.value.trainers));
+
     const dateOptions = computed(() => {
       const dateOptionsSet = new Set(
         course.value.slots.map(date => CompaniDate(date.startDate).startOf('day').toISO())
@@ -106,6 +111,7 @@ export default {
       IMAGE_EXTENSIONS,
       // Computed
       traineeOptions,
+      trainerOptions,
       dateOptions,
       slotOptions,
       stepsName,

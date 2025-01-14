@@ -3,7 +3,7 @@
     <template #title>
         {{ label.action }}<span class="text-weight-bold">{{ label.interlocutor }}</span>
     </template>
-      <ni-select in-modal :model-value="interlocutor._id" @update:model-value="update($event, '_id')"
+      <ni-select in-modal :model-value="interlocutor" @update:model-value="updateInterlocutor"
         :caption="upperCaseFirstLetter(label.interlocutor)" :options="interlocutorsOptions" option-slot
         :error="validations.$error" @blur="validations.$touch" :clearable="clearable" :required-field="!clearable">
         <template #option="{ scope }">
@@ -20,13 +20,6 @@
           </q-item>
         </template>
       </ni-select>
-      <div v-if="showContact">
-        <q-checkbox :model-value="interlocutor.isContact" label="Contact pour la formation" dense :disable="loading"
-          @update:model-value="update($event, 'isContact')" />
-        <div class="explanation">
-          C'est le contact donné aux stagiaires s'ils ont des questions pratiques concernant la formation
-        </div>
-      </div>
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor}`"
           icon-right="add" color="white" :loading="loading" @click="submit" />
@@ -35,8 +28,6 @@
 </template>
 
 <script>
-import { toRefs } from 'vue';
-import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Button from '@components/Button';
@@ -47,11 +38,10 @@ export default {
   props: {
     modelValue: { type: Boolean, default: false },
     interlocutorsOptions: { type: Array, default: () => [] },
-    interlocutor: { type: Object, default: () => ({}) },
+    interlocutor: { type: String, default: '' },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     label: { type: Object, default: () => ({}) },
-    showContact: { type: Boolean, default: false },
     clearable: { type: Boolean, default: false },
   },
   components: {
@@ -60,25 +50,18 @@ export default {
     'ni-button': Button,
   },
   emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor'],
-  setup (props, { emit }) {
-    const { interlocutor } = toRefs(props);
+  setup (_, { emit }) {
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
-    const update = (event, path) => {
-      const newInterlocutor = (path === '_id' && !event)
-        ? { _id: '', isContact: false }
-        : set({ ...interlocutor.value }, path, event);
-
-      emit('update:interlocutor', newInterlocutor);
-    };
+    const updateInterlocutor = event => emit('update:interlocutor', event);
 
     return {
       // Methods
       hide,
       input,
       submit,
-      update,
+      updateInterlocutor,
       upperCaseFirstLetter,
     };
   },
@@ -89,8 +72,4 @@ export default {
 .details
   font-size: 14px
   color: $copper-grey-500
-.explanation
-  font-size: 12px
-  color: $copper-grey-600
-  margin: 0px 0px 24px 28px
 </style>

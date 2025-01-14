@@ -21,12 +21,13 @@
         </div>
       </div>
       <div v-if="canUpdate">
-        <ni-button icon="edit" :disable="disable" @click="openModal(EDITION)" />
-        <ni-button v-if="clearable" icon="delete" :disable="disable" @click="openModal(DELETION)" />
+        <ni-button v-if="!interlocutorIsTrainer" icon="edit" :disable="disable" @click="openModal(EDITION)" />
+        <ni-button v-if="clearable" icon="delete" :disable="disable" @click="openModal(DELETION, interlocutor._id)" />
       </div>
     </q-card>
   </div>
-  <ni-secondary-button v-else-if="canUpdate" :label="label" :disable="disable" @click="openModal(CREATION)" />
+  <ni-secondary-button v-else-if="canUpdate && !interlocutorIsTrainer" :label="label" :disable="disable"
+    @click="openModal(CREATION)" />
 </template>
 
 <script>
@@ -46,6 +47,7 @@ export default {
     disable: { type: Boolean, default: false },
     label: { type: String, default: '' },
     clearable: { type: Boolean, default: false },
+    interlocutorIsTrainer: { type: Boolean, default: false },
   },
   components: {
     'ni-button': Button,
@@ -55,7 +57,9 @@ export default {
   setup (_, { emit }) {
     const getAvatar = picture => get(picture, 'link') || DEFAULT_AVATAR;
 
-    const openModal = value => emit('open-modal', value);
+    const openModal = (action, interlocutorId = '') => {
+      emit('open-modal', { action, ...(interlocutorId && { interlocutorId }) });
+    };
 
     return {
       // Data

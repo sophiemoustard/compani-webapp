@@ -34,7 +34,7 @@ export const useCourses = (course) => {
 
   const followUpMissingInfo = computed(() => {
     const missingInfo = [];
-    if (!course.value.trainer._id) missingInfo.push('l\'intervenant(e)');
+    if (!get(course.value, 'trainers', []).some(t => t._id)) missingInfo.push('l\'intervenant(e)');
     if (!course.value.slots || !course.value.slots.length) missingInfo.push('minimum 1 créneau');
 
     if (!get(course.value, 'contact._id')) missingInfo.push('le contact pour la formation');
@@ -59,7 +59,9 @@ export const useCourses = (course) => {
     return type ? type.label : '';
   });
 
-  const trainerName = computed(() => formatIdentity(get(course.value, 'trainer.identity'), 'FL'));
+  const trainersName = computed(() => get(course.value, 'trainers', [])
+    .map(trainer => formatIdentity(trainer.identity, 'FL'))
+    .join(', '));
 
   const salesRepresentativeName = computed(
     () => formatIdentity(get(course.value, 'salesRepresentative.identity'), 'FL')
@@ -76,9 +78,9 @@ export const useCourses = (course) => {
 
   const headerInfo = computed(() => [
     { icon: 'bookmark_border', label: courseType.value },
-    ...(trainerName.value ? [{ icon: 'emoji_people', label: trainerName.value }] : []),
-    ...(course.value.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
     ...(displaySalesRepresentative.value ? [{ icon: 'fa fa-handshake', label: salesRepresentativeName.value }] : []),
+    ...(course.value.archivedAt ? [{ icon: 'circle', label: 'Archivée', iconClass: 'info-archived' }] : []),
+    ...(trainersName.value ? [{ icon: 'emoji_people', label: trainersName.value }] : []),
   ]);
 
   const downloadAttendanceSheet = async () => {

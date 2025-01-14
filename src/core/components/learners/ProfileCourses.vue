@@ -102,7 +102,7 @@
               <div class="dates">{{ attendance.date }}</div>
               <div class="hours">{{ attendance.hours }}</div>
               <div class="misc">{{ attendance.misc }}</div>
-              <div class="trainer">{{ attendance.trainer }}</div>
+              <div class="trainers">{{ attendance.trainers }}</div>
             </div>
           </q-td>
         </template>
@@ -317,7 +317,7 @@ export default {
           _id: a._id,
           date: CompaniDate(a.courseSlot.startDate).format(DD_MM_YYYY),
           hours: formatSlotSchedule(a.courseSlot),
-          trainer: formatIdentity(get(a, 'course.trainer.identity'), 'FL'),
+          trainers: get(a, 'course.trainers', []).map(t => formatIdentity(t.identity, 'FL')).join(', '),
           misc: a.course.misc,
         })),
     });
@@ -425,8 +425,20 @@ export default {
   @media screen and (min-width: 767px)
     width: 15%
 
-.trainer
-  width: 50%
+.expanding-table-expanded-row
+  justify-content: flex-start
+  div
+    justify-content: center
+    align-items: center
+    justify-content: flex-start
+    margin-right: 2%
+    word-break: break-word
+
+.trainers
+  display: inline-block
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
 
 .misc
   width: 15%
