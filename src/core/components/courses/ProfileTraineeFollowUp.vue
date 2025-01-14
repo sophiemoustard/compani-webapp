@@ -18,7 +18,7 @@
       <p class="text-weight-bold">Questionnaires</p>
       <div v-if="areQuestionnaireQRCodeVisible" class="questionnaire-link-container">
         <ni-questionnaire-qrcode-cell v-for="(qrCode, idx) in questionnaireQRCodes" :key="`qrCode-${idx}`"
-          :img="qrCode.img" :types="filteredQRCode(qrCode.courseTimeline)"
+          :img="qrCode.img" :types="filterQuestionnaireTypes(qrCode.courseTimeline)"
           @click="goToQuestionnaireProfile(qrCode.courseTimeline)" />
       </div>
       <div v-if="loggedUserIsCourseTrainer && endSelfPositionningQuestionnaireId">
@@ -344,12 +344,14 @@ export default {
       }
     };
 
-    const filteredQRCode = courseTimeline => questionnaireTypes.value
+    const filterQuestionnaireTypes = courseTimeline => questionnaireTypes.value
       .filter(qType => (courseTimeline === START_COURSE ? qType !== END_OF_COURSE : qType !== EXPECTATIONS));
 
     const goToQuestionnaireProfile = (courseTimeline) => {
-      const questionnaire = $router.resolve({ name: 'ni questionnaires',
-        query: { courseId: profileId.value, courseTimeline } });
+      const questionnaire = $router.resolve({
+        name: 'ni questionnaires',
+        query: { courseId: profileId.value, courseTimeline },
+      });
 
       window.open(questionnaire.href, '_blank');
     };
@@ -414,7 +416,7 @@ export default {
       downloadAttendanceSheet,
       goToQuestionnaireProfile,
       goToSelfPositionningAnswers,
-      filteredQRCode,
+      filterQuestionnaireTypes,
     };
   },
 };
