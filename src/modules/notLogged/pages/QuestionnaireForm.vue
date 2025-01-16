@@ -15,9 +15,19 @@
         Merci d'avoir répondu au questionnaire ! Vous pouvez à présent fermer la fenêtre.
       </span>
     </template>
-    <span v-else class="end-text">
-      Oups, une erreur est survenue. Ce questionnaire n'est plus accessible, merci de fermer cette page.
-    </span>
+    <div v-else class="end-text">
+      Oups, une erreur est survenue.
+      Ce questionnaire n'est pas encore accessible ou ne l'est plus.
+      <ni-banner icon="info_outline" class="end-text-banner">
+        <template #message>
+          <li>le questionnaire de recueil des attentes est disponible jusqu'à la fin du créneau de mi-formation</li>
+          <li>
+            le questionnaire de fin de formation est disponible à partir du début de la journée du dernier créneau
+          </li>
+        </template>
+      </ni-banner>
+      Merci de fermer cette page.
+    </div>
   </div>
 </template>
 
@@ -38,13 +48,15 @@ import Start from '@components/questionnaires/cards/Start';
 import End from '@components/questionnaires/cards/End';
 import CardTemplate from '@components/questionnaires/cards/CardTemplate';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { INCREMENT, START_CARD_INDEX } from '@data/constants';
+import Banner from '@components/Banner';
+import { INCREMENT, START_CARD_INDEX, START_COURSE, EXPECTATIONS, END_OF_COURSE, END_COURSE } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 
 export default {
   name: 'QuestionnaireForm',
   props: {
     courseId: { type: String, required: true },
+    courseTimeline: { type: String, required: true },
   },
   components: {
     'compani-header': CompaniHeader,
@@ -52,12 +64,13 @@ export default {
     start: Start,
     end: End,
     'card-template': CardTemplate,
+    'ni-banner': Banner,
   },
   setup (props) {
     const metaInfo = { title: 'Formulaire de réponse au questionnaire' };
     useMeta(metaInfo);
 
-    const { courseId } = toRefs(props);
+    const { courseId, courseTimeline } = toRefs(props);
     const course = ref({});
     const questionnaires = ref([]);
     const cards = ref([]);
@@ -86,7 +99,19 @@ export default {
     const getQuestionnaires = async () => {
       try {
         const fetchedQuestionnaires = await Questionnaires.getFromNotLogged({ course: courseId.value });
-        questionnaires.value = [...fetchedQuestionnaires].sort((a, b) => sortStrings(a.type, b.type));
+        const questionnaireTypes = fetchedQuestionnaires.map(q => q.type);
+        const isAfterMiddleCourse = !questionnaireTypes.includes(EXPECTATIONS);
+        const isBeforeEndOfCourse = !questionnaireTypes.includes(END_OF_COURSE);
+
+        if ((courseTimeline.value === START_COURSE && isAfterMiddleCourse) ||
+          (courseTimeline.value === END_COURSE && isBeforeEndOfCourse)) {
+          questionnaires.value = [];
+        } else {
+          questionnaires.value = [...fetchedQuestionnaires]
+            .sort((a, b) => sortStrings(a.type, b.type))
+            .filter(q => (courseTimeline.value === START_COURSE ? q.type !== END_OF_COURSE : q.type !== EXPECTATIONS));
+        }
+
         cards.value = questionnaires.value.map(q => q.cards).flat();
         endCardIndex.value = cards.value.length;
       } catch (e) {
@@ -189,4 +214,8 @@ export default {
 .end-text
   text-align: center
   color: $primary
+  &-banner
+    margin: 12px 0px
+    text-align: start
+    background: $copper-grey-200
 </style>

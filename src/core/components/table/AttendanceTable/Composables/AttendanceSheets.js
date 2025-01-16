@@ -6,7 +6,7 @@ import groupBy from 'lodash/groupBy';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
-import { INTER_B2B, DD_MM_YYYY } from '@data/constants';
+import { INTER_B2B, DD_MM_YYYY, GENERATION } from '@data/constants';
 import { formatIdentity, sortStrings } from '@helpers/utils';
 import CompaniDate from '@helpers/dates/companiDates';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -52,6 +52,7 @@ export const useAttendanceSheets = (
     newAttendanceSheet: {
       file: { required },
       trainee: { required: requiredIf(course.value.type === INTER_B2B) },
+      trainer: { required },
       date: { required: requiredIf(course.value.type !== INTER_B2B) },
       slots: { required: requiredIf(isSingleCourse.value) },
     },
@@ -97,9 +98,9 @@ export const useAttendanceSheets = (
       .filter(s => attendanceSheets.value.every(as => !get(as, 'slots', []).map(slot => slot._id).includes(s._id)));
   });
 
-  const disableSheetDeletion = attendanceSheet => !attendanceSheet.file.link || !!course.value.archivedAt;
+  const disableSheetDeletion = attendanceSheet => !get(attendanceSheet, 'file.link') || !!course.value.archivedAt;
 
-  const disableSheetEdition = () => !!course.value.archivedAt;
+  const disableSheetEdition = attendanceSheet => !!course.value.archivedAt || !!get(attendanceSheet, 'signatures');
 
   const refreshAttendanceSheets = async () => {
     try {
@@ -126,15 +127,23 @@ export const useAttendanceSheets = (
     if (course.value.archivedAt) {
       return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation archivée.');
     }
+    if (!course.value.trainers.filter(t => t._id).length) {
+      return NotifyWarning('Vous ne pouvez pas ajouter de feuilles d\'émargement à une formation sans intervenant·e.');
+    }
     if (!course.value.companies.length) {
       return NotifyWarning('Au moins une structure doit être rattachée à la formation.');
     }
+    if (course.value.type === INTER_B2B && !course.value.trainees.length) {
+      return NotifyWarning('Au moins un·e stagiaire doit être rattaché·e à la formation.');
+    }
+    if (!course.value.slots.length) return NotifyWarning('Il n\'y a aucun créneau planifié pour cette formation.');
     if (isSingleCourse.value) {
       if (!notLinkedSlotOptions.value.length) {
         return NotifyWarning('Tous les créneaux sont déjà rattachés à une feuille d\'émargement.');
       }
       newAttendanceSheet.value.slots = [];
     }
+    if (course.value.trainers.length === 1) newAttendanceSheet.value.trainer = course.value.trainers[0]._id;
 
     attendanceSheetAdditionModal.value = true;
   };
@@ -145,10 +154,11 @@ export const useAttendanceSheets = (
   };
 
   const formatPayload = () => {
-    const { course: newAttendanceSheetCourse, file, trainee, date, slots } = newAttendanceSheet.value;
+    const { course: newAttendanceSheetCourse, file, trainee, trainer, date, slots } = newAttendanceSheet.value;
     const form = new FormData();
     course.value.type === INTER_B2B ? form.append('trainee', trainee) : form.append('date', date);
     form.append('course', newAttendanceSheetCourse);
+    form.append('trainer', trainer);
     form.append('file', file);
 
     if (isSingleCourse.value) slots.forEach(slot => form.append('slots', slot));
@@ -177,12 +187,33 @@ export const useAttendanceSheets = (
     }
   };
 
+  const generateAttendanceSheet = async (attendanceSheetId) => {
+    try {
+      modalLoading.value = true;
+
+      await AttendanceSheets.update(attendanceSheetId, { action: GENERATION });
+
+      NotifyPositive('Feuille d\'émargement générée.');
+      await refreshAttendanceSheets();
+    } catch (e) {
+      console.error(e);
+      NotifyNegative('Erreur lors de la génération de la feuille d\'émargement.');
+    } finally {
+      modalLoading.value = false;
+    }
+  };
+
   const validateAttendanceSheetDeletion = (attendanceSheet) => {
     if (!canUpdate.value) return NotifyNegative('Impossible de supprimer la feuille d\'émargement.');
 
+    const message = attendanceSheet.signatures
+      ? 'Êtes-vous sûr·e de vouloir supprimer cette feuille d\'émargement&nbsp;? <br /> Les signatures seront '
+      + 'également supprimées.'
+      : 'Êtes-vous sûr·e de vouloir supprimer cette feuille d\'émargement&nbsp;?';
+
     $q.dialog({
       title: 'Confirmation',
-      message: 'Êtes-vous sûr·e de vouloir supprimer cette feuille d\'émargement&nbsp;?',
+      message,
       html: true,
       ok: true,
       cancel: 'Annuler',
@@ -281,6 +312,7 @@ export const useAttendanceSheets = (
     openAttendanceSheetEditionModal,
     updateAttendanceSheet,
     resetAttendanceSheetEditionModal,
+    generateAttendanceSheet,
     // Validations
     attendanceSheetValidations: v$,
   };

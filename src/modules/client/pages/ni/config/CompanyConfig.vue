@@ -21,10 +21,10 @@
       </div>
     </div>
 
-    <interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
+    <interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentativeId"
       @submit="updateCompany('billingRepresentative')" :label="billingRepresentativeModalLabel"
       :interlocutors-options="billingRepresentativeOptions" :loading="billingRepresentativeModalLoading"
-      :validations="v$.tmpBillingRepresentative" @hide="resetBillingRepresentative" />
+      :validations="v$.tmpBillingRepresentativeId" @hide="resetBillingRepresentative" />
   </q-page>
 </template>
 
@@ -65,16 +65,17 @@ export default {
     const billingRepresentativeModal = ref(false);
     const billingRepresentativeModalLoading = ref(false);
     const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
-    const tmpBillingRepresentative = ref({});
+    const tmpBillingRepresentativeId = ref('');
 
     const v$ = useVuelidate();
     const $store = useStore();
     const company = computed(() => $store.getters['main/getCompany']);
 
-    const openBillingRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const openBillingRepresentativeModal = (event) => {
+      const { action: eventAction } = event;
+      const action = eventAction === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
-      tmpBillingRepresentative.value = get(company.value, 'billingRepresentative');
+      tmpBillingRepresentativeId.value = get(company.value, 'billingRepresentative._id');
       billingRepresentativeModalLabel.value = { action, interlocutor: 'chargé de facturation de ma structure' };
       billingRepresentativeModal.value = true;
     };
@@ -87,9 +88,9 @@ export default {
     };
 
     const resetBillingRepresentative = () => {
-      tmpBillingRepresentative.value = {};
+      tmpBillingRepresentativeId.value = '';
       billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
-      v$.value.tmpBillingRepresentative.$reset();
+      v$.value.tmpBillingRepresentativeId.$reset();
     };
 
     return {
@@ -97,7 +98,7 @@ export default {
       billingRepresentativeOptions,
       billingRepresentativeModal,
       billingRepresentativeModalLabel,
-      tmpBillingRepresentative,
+      tmpBillingRepresentativeId,
       billingRepresentativeModalLoading,
       // Computed
       v$,
@@ -120,7 +121,7 @@ export default {
           location: { required },
         },
       },
-      tmpBillingRepresentative: { _id: required },
+      tmpBillingRepresentativeId: { required },
     };
   },
   computed: {

@@ -82,7 +82,9 @@ module.exports = configure(ctx => ({
     preloadChunks: true,
     chainWebpack (chain) {
       const nodePolyfillWebpackPlugin = require('node-polyfill-webpack-plugin');
-      chain.plugin('node-polyfill').use(nodePolyfillWebpackPlugin);
+      chain.plugin('node-polyfill')
+        .use(nodePolyfillWebpackPlugin)
+        .use(webpack.ProvidePlugin, [{ Buffer: ['buffer', 'Buffer'] }]);
     },
     extendWebpack (cfg) {
       cfg.module.rules.push({ test: /\.html$/, use: { loader: 'html-loader' } });

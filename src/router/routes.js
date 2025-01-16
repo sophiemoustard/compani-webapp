@@ -18,7 +18,7 @@ const routes = [
     path: '/ni/questionnaires',
     name: 'ni questionnaires',
     component: () => import('src/modules/notLogged/pages/QuestionnaireForm'),
-    props: route => ({ courseId: route.query.courseId }),
+    props: route => ({ courseId: route.query.courseId, courseTimeline: route.query.courseTimeline }),
   },
   {
     // Always leave this as last one

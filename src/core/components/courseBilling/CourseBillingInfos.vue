@@ -106,10 +106,10 @@
         :validations="validations.editedCoursePayment" :course-payment-meta-info="coursePaymentMetaInfo" />
     </template>
     <div v-else class="text-italic">Pas de factures</div>
-    <ni-interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentative"
+    <ni-interlocutor-modal v-model="billingRepresentativeModal" v-model:interlocutor="tmpBillingRepresentativeId"
       @submit="updateCompany" :label="billingRepresentativeModalLabel" :loading="billingRepresentativeModalLoading"
       :interlocutors-options="billingRepresentativeGroupedByCompany[company._id]" @hide="resetBillingRepresentative"
-      :validations="validations.tmpBillingRepresentative" />
+      :validations="validations.tmpBillingRepresentativeId" />
   </div>
 </template>
 
@@ -233,7 +233,7 @@ export default {
     const billingRepresentativeModal = ref(false);
     const billingRepresentativeModalLoading = ref(false);
     const billingRepresentativeModalLabel = ref({ action: '', interlocutor: '' });
-    const tmpBillingRepresentative = ref({});
+    const tmpBillingRepresentativeId = ref('');
 
     const rules = {
       newCoursePayment: {
@@ -247,12 +247,12 @@ export default {
         type: { required },
         date: { required },
       },
-      tmpBillingRepresentative: { _id: required },
+      tmpBillingRepresentativeId: { required },
     };
 
     const { isVendorInterface } = useCourses();
 
-    const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment, tmpBillingRepresentative });
+    const validations = useVuelidate(rules, { newCoursePayment, editedCoursePayment, tmpBillingRepresentativeId });
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -453,10 +453,11 @@ export default {
       return `${programName}${misc}`;
     };
 
-    const openBillingRepresentativeModal = (value) => {
-      const action = value === EDITION ? 'Modifier le ' : 'Ajouter un ';
+    const openBillingRepresentativeModal = (event) => {
+      const { action: eventAction } = event;
+      const action = eventAction === EDITION ? 'Modifier le ' : 'Ajouter un ';
 
-      tmpBillingRepresentative.value = get(company.value, 'billingRepresentative');
+      tmpBillingRepresentativeId.value = get(company.value, 'billingRepresentative._id');
       billingRepresentativeModalLabel.value = {
         action,
         interlocutor: `chargé de facturation chez ${truncate(company.value.name, 20)}`,
@@ -474,10 +475,10 @@ export default {
     const updateCompany = async () => {
       try {
         billingRepresentativeModalLoading.value = true;
-        validations.value.tmpBillingRepresentative.$touch();
-        if (validations.value.tmpBillingRepresentative.$error) return NotifyWarning('Champ(s) invalide(s)');
+        validations.value.tmpBillingRepresentativeId.$touch();
+        if (validations.value.tmpBillingRepresentativeId.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Companies.updateById(company.value._id, { billingRepresentative: tmpBillingRepresentative.value._id });
+        await Companies.updateById(company.value._id, { billingRepresentative: tmpBillingRepresentativeId.value });
         NotifyPositive('Modification enregistrée.');
 
         emit('refresh-company');
@@ -486,15 +487,15 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
-        tmpBillingRepresentative.value = {};
+        tmpBillingRepresentativeId.value = '';
         billingRepresentativeModalLoading.value = false;
       }
     };
 
     const resetBillingRepresentative = () => {
-      tmpBillingRepresentative.value = {};
+      tmpBillingRepresentativeId.value = '';
       billingRepresentativeModalLabel.value = { action: '', interlocutor: '' };
-      validations.value.tmpBillingRepresentative.$reset();
+      validations.value.tmpBillingRepresentativeId.$reset();
     };
 
     watch(company, async () => {
@@ -531,7 +532,7 @@ export default {
       billingRepresentativeModalLabel,
       billingRepresentativeModalLoading,
       billingRepresentativeGroupedByCompany,
-      tmpBillingRepresentative,
+      tmpBillingRepresentativeId,
       // Computed
       validations,
       canUpdateBilling,

@@ -16,50 +16,74 @@
           @blur="updateEstimatedStartDate" :disabled="course.archivedAt" />
       </div>
       <q-card class="q-pa-md">
-        <div v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm">
-          <div :class="getStepClass(step)">
-            <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
-            <div class="row q-pa-md">
-              <div class="index">{{ index + 1 }}</div>
-              <div class="q-mx-md">
-                <div>{{ step.name }}</div>
-                <div class="type text-capitalize">{{ step.typeLabel }}</div>
+        <q-item-section @click="showStepDetails" class="slots cursor-pointer bg-copper-grey-50 copper-grey-700">
+          {{ showStepList ? 'Masquer' : 'Afficher' }} la liste des étapes de la formation
+          <q-icon size="xs" :name="showStepList ? 'expand_less' : 'expand_more'" color="copper-grey-700" />
+        </q-item-section>
+        <div v-if="showStepList" class="bg-copper-grey-50 q-px-md">
+          <q-item-section v-for="(step, index) in stepList" :key="step.key" class="q-pb-sm flex">
+            <div :class="getStepClass(step)">
+              <div v-if="isStepToPlan(step)" class="to-plan-header">Créneaux à programmer</div>
+              <div class="row q-pa-md">
+                <div class="index">{{ index + 1 }}</div>
+                <div class="q-mx-md">
+                  <div>{{ step.name }}</div>
+                  <div class="type text-capitalize">{{ step.typeLabel }}</div>
+                </div>
               </div>
-            </div>
-            <div v-if="!isElearningStep(step)" class="slots-container">
-              <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY))"
-                :key="day" class="row q-ml-xl q-my-sm">
-                <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
-                <div>
-                  <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
-                    :class="getSlotClass(step)">
-                    <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
-                    <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
-                    <div v-else class="q-mr-md ellipsis link-container">
-                      <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
-                        {{ slot.meetingLink }}
-                      </a>
-                      {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+              <div v-if="!isElearningStep(step)" class="slots-container">
+                <div v-for="day in Object.entries(omit(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY))"
+                  :key="day" class="row q-ml-xl q-my-sm">
+                  <div class="text-weight-bold q-mr-md">{{ day[0] }}</div>
+                  <div>
+                    <div v-for="slot in day[1]" :key="slot._id" @click="openEditionModal(slot)"
+                      :class="getSlotClass(step)">
+                      <div class="q-mr-md">{{ formatSlotSchedule(slot) }}</div>
+                      <div v-if="step.type === ON_SITE" class="q-mr-md">{{ getSlotAddress(slot) }}</div>
+                      <div v-else class="q-mr-md ellipsis link-container">
+                        <a class="link" :href="slot.meetingLink" target="_blank" @click="$event.stopPropagation()">
+                          {{ slot.meetingLink }}
+                        </a>
+                        {{ !slot.meetingLink ? 'Lien vers la visio non renseigné' : '' }}
+                      </div>
+                      <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                     </div>
-                    <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
                   </div>
                 </div>
-              </div>
-              <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)"
-                class="to-plan-slot">
-                <div v-for="slot in Object.values(get(courseSlotsByStepAndDate[step.key], SLOTS_TO_PLAN_KEY)).flat()"
-                  :key="slot._id" @click="openEditionModal(slot)"
-                  :class="['row items-center q-ml-xl q-mb-md', canEdit && 'cursor-pointer hover-orange']">
-                  <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
-                  <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                <div v-if="isStepToPlan(step) && !!get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)"
+                  class="q-mx-md">
+                  <div @click="openEditionModal(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY)[0])"
+                    :class="['to-plan-slot q-mb-sm', canEdit && 'to-plan-slot-container cursor-pointer hover-orange']">
+                    <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
+                    <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                  </div>
+                  <div v-if="get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY).length - 1"
+                    class="q-mx-lg bg-peach-100">
+                    <q-item-section @click="() => showSlotToPlanDetails(step.key)" class="slots cursor-pointer">
+                      <span class="text-orange-500">
+                        {{ showSlotToPlan[step.key] ? 'Masquer' : 'Afficher' }} les autres créneaux à planifier
+                        ({{ get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY).length - 1 }})
+                      </span>
+                      <q-icon :name="showSlotToPlan[step.key] ? 'expand_less' : 'expand_more'" size="20px"
+                        class="q-ml-sm" />
+                    </q-item-section>
+                    <div v-if="showSlotToPlan[step.key]" class="to-plan-slot-container q-pb-sm">
+                      <div v-for="slot in tail(get(courseSlotsByStepAndDate[step.key], TO_PLAN_KEY))" :key="slot._id"
+                        :class="['to-plan-slot', canEdit && 'cursor-pointer hover-orange']"
+                        @click="openEditionModal(slot)">
+                        <div class="clickable-name text-orange-500 q-mr-md">créneau à planifier</div>
+                        <q-icon v-if="canEdit" name="edit" size="12px" color="copper-grey-500" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
+                  <ni-button label="Ajouter des créneaux" color="primary" icon="add"
+                    @click="openMultipleSlotCreationModal(step.key)" :disable="slotCreationLoading" />
                 </div>
               </div>
-              <div class="q-mt-sm" v-if="canEdit && isRofOrVendorAdmin && isVendorInterface" align="right">
-                <ni-button label="Ajouter un créneau" color="primary" icon="add" @click="addDateToPlan(step.key)"
-                  :disable="addDateToPlanLoading" />
-              </div>
             </div>
-          </div>
+          </q-item-section>
         </div>
       </q-card>
     </div>
@@ -69,9 +93,12 @@
       @submit="updateCourseSlot" @update="setCourseSlot" :is-rof-or-vendor-admin="isRofOrVendorAdmin"
       :is-vendor-interface="isVendorInterface" :is-only-slot="isOnlySlot" :is-planned-slot="isPlannedSlot"
       @unplan-slot="unplanSlot" />
+
+    <multiple-slot-creation-modal v-model="multipleSlotCreationModal" v-model:slots-to-add="slotsToAdd"
+      @hide="resetCreationModal" @submit="createCourseSlots" :validations="v$.slotsToAdd"
+      :loading="slotCreationLoading" />
   </div>
 </template>
-
 <script>
 import { useStore } from 'vuex';
 import { computed, ref, toRefs } from 'vue';
@@ -80,12 +107,14 @@ import has from 'lodash/has';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
+import tail from 'lodash/tail';
 import groupBy from 'lodash/groupBy';
 import useVuelidate from '@vuelidate/core';
 import { required, requiredIf } from '@vuelidate/validators';
 import CourseSlots from '@api/CourseSlots';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
+import MultipleSlotCreationModal from '@components/courses/MultipleSlotCreationModal';
 import DateInput from '@components/form/DateInput';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { useCourses } from '@composables/courses';
@@ -94,7 +123,16 @@ import { E_LEARNING, ON_SITE, REMOTE, DAY_MONTH_YEAR, HH_MM, DD_MM_YYYY, SHORT_D
 import { formatQuantity } from '@helpers/utils';
 import { getStepTypeLabel, formatSlotSchedule } from '@helpers/courses';
 import { ascendingSort, getISOTotalDuration } from '@helpers/dates/utils';
-import { frAddress, minDate, maxDate, urlAddress, validHour, strictMinHour } from '@helpers/vuelidateCustomVal';
+import {
+  frAddress,
+  minDate,
+  maxDate,
+  urlAddress,
+  validHour,
+  strictMinHour,
+  strictPositiveNumber,
+  integerNumber,
+} from '@helpers/vuelidateCustomVal';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
 
@@ -110,6 +148,7 @@ export default {
     'slot-edition-modal': SlotEditionModal,
     'ni-button': Button,
     'ni-date-input': DateInput,
+    'multiple-slot-creation-modal': MultipleSlotCreationModal,
   },
   emits: ['refresh', 'update', 'update:estimatedStartDate'],
   setup (props, { emit }) {
@@ -117,18 +156,22 @@ export default {
 
     const $store = useStore();
 
-    const addDateToPlanLoading = ref(false);
+    const slotCreationLoading = ref(false);
     const modalLoading = ref(false);
     const editedCourseSlot = ref({});
     const editionModal = ref(false);
-    const SLOTS_TO_PLAN_KEY = 'toPlan';
+    const TO_PLAN_KEY = 'toPlan';
     const isOnlySlot = ref(false);
     const isPlannedSlot = ref(false);
+    const showStepList = ref(true);
+    const showSlotToPlan = ref([]);
+    const multipleSlotCreationModal = ref(false);
 
     const { isVendorInterface } = useCourses();
     const { waitForFormValidation } = useValidations();
 
     const course = computed(() => $store.state.course.course);
+    const slotsToAdd = ref({ course: course.value._id, step: '', quantity: 1 });
 
     const slotsDurationTitle = computed(() => {
       if (!course.value || !course.value.slots) return '0h';
@@ -175,7 +218,7 @@ export default {
       const slotsByStepAndDateList = Object.keys(slotsByStep)
         .map(key => groupBy(
           slotsByStep[key],
-          s => (s.startDate ? CompaniDate(s.startDate).format(DD_MM_YYYY) : SLOTS_TO_PLAN_KEY)
+          s => (s.startDate ? CompaniDate(s.startDate).format(DD_MM_YYYY) : TO_PLAN_KEY)
         ));
 
       return Object.fromEntries(Object.keys(slotsByStep).map((key, index) => [key, slotsByStepAndDateList[index]]));
@@ -214,9 +257,10 @@ export default {
           },
         },
       },
+      slotsToAdd: { quantity: { required, strictPositiveNumber, integerNumber } },
     }));
 
-    const v$ = useVuelidate(rules, { editedCourseSlot });
+    const v$ = useVuelidate(rules, { editedCourseSlot, slotsToAdd });
 
     const getSlotAddress = slot => get(slot, 'address.fullAddress') || 'Adresse non renseignée';
 
@@ -269,25 +313,6 @@ export default {
         ...(stepType === ON_SITE && get(courseSlot, 'address.fullAddress') && { address: courseSlot.address }),
         ...(stepType === REMOTE && courseSlot.meetingLink && { meetingLink: courseSlot.meetingLink }),
       };
-    };
-
-    const addDateToPlan = async (stepId) => {
-      try {
-        if (course.value.archivedAt) {
-          return NotifyWarning('Vous ne pouvez pas ajouter un créneau à une formation archivée.');
-        }
-
-        addDateToPlanLoading.value = true;
-        await CourseSlots.create({ course: course.value._id, step: stepId });
-        NotifyPositive('Date à planifier ajoutée.');
-
-        emit('refresh');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
-      } finally {
-        addDateToPlanLoading.value = false;
-      }
     };
 
     const updateCourseSlot = async () => {
@@ -357,7 +382,7 @@ export default {
     const isElearningStep = step => step.type === E_LEARNING;
 
     const isPlannedStep = step => !!courseSlotsByStepAndDate.value[step.key] &&
-      Object.keys(courseSlotsByStepAndDate.value[step.key]).every(date => date !== SLOTS_TO_PLAN_KEY);
+      Object.keys(courseSlotsByStepAndDate.value[step.key]).every(date => date !== TO_PLAN_KEY);
 
     const isStepToPlan = step => !(isElearningStep(step) || isPlannedStep(step));
 
@@ -379,8 +404,54 @@ export default {
       canEdit.value && `cursor-pointer hover-${isPlannedStep(step) ? 'blue' : 'orange'}`,
     ];
 
+    const showStepDetails = () => { showStepList.value = !showStepList.value; };
+
+    const showSlotToPlanDetails = (stepId) => {
+      showSlotToPlan.value[stepId] = !showSlotToPlan.value[stepId];
+    };
+
+    const openMultipleSlotCreationModal = (stepId) => {
+      if (course.value.archivedAt) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de créneaux à une formation archivée.');
+      }
+      set(slotsToAdd.value, 'step', stepId);
+      multipleSlotCreationModal.value = true;
+    };
+
+    const createCourseSlots = async () => {
+      try {
+        v$.value.slotsToAdd.$touch();
+        if (v$.value.slotsToAdd.$error) return NotifyWarning('Champ invalide');
+
+        slotCreationLoading.value = true;
+        await CourseSlots.create(slotsToAdd.value);
+
+        multipleSlotCreationModal.value = false;
+        const message = slotsToAdd.value.quantity > 1 ? 'Créneaux à planifier ajoutés.' : 'Créneau à planifier ajouté.';
+        NotifyPositive(message);
+
+        emit('refresh');
+      } catch (e) {
+        console.error(e);
+
+        const message = slotsToAdd.value.quantity > 1
+          ? 'Erreur lors de l\'ajout des créneaux à planifier.'
+          : 'Erreur lors de l\'ajout du créneau à planifier.';
+        NotifyNegative(message);
+      } finally {
+        slotCreationLoading.value = false;
+      }
+    };
+
+    const resetCreationModal = () => {
+      slotsToAdd.value = { course: course.value._id, step: '', quantity: 1 };
+      v$.value.slotsToAdd.$reset();
+    };
+
     const created = async () => {
       if (!course.value) emit('refresh');
+
+      showSlotToPlan.value = stepList.value.map(s => ({ [s.key]: false }));
     };
 
     created();
@@ -389,13 +460,17 @@ export default {
       // Data
       isVendorInterface,
       ON_SITE,
-      addDateToPlanLoading,
+      slotCreationLoading,
       modalLoading,
       editedCourseSlot,
       editionModal,
-      SLOTS_TO_PLAN_KEY,
+      TO_PLAN_KEY,
       isOnlySlot,
       isPlannedSlot,
+      showStepList,
+      showSlotToPlanDetails,
+      slotsToAdd,
+      multipleSlotCreationModal,
       // Computed
       v$,
       course,
@@ -406,10 +481,10 @@ export default {
       // Methods
       get,
       omit,
+      tail,
       getSlotAddress,
       openEditionModal,
       resetEditionModal,
-      addDateToPlan,
       updateCourseSlot,
       deleteCourseSlot,
       unplanSlot,
@@ -421,6 +496,11 @@ export default {
       getStepClass,
       getSlotClass,
       formatSlotSchedule,
+      showStepDetails,
+      showSlotToPlan,
+      openMultipleSlotCreationModal,
+      resetCreationModal,
+      createCourseSlots,
     };
   },
 };
@@ -453,8 +533,10 @@ export default {
   padding: 8px 16px
   border-radius: 15px 15px 0px 0px
   color: $orange-900
-.to-plan-slot
-  width: fit-content
+.slots
+  flex-direction: row
+  justify-content: space-between
+  padding: 16px
 .index
   background-color: $copper-500
   border-radius: 50%
@@ -480,4 +562,14 @@ export default {
     text-decoration-color: $primary
 .link-container
   max-width: 14em
+.to-plan-slot-container
+  width: fit-content
+.to-plan-slot
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  margin-left: 24px
+  padding: 8px
+.q-item__section
+  margin-left: 0px
 </style>

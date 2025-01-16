@@ -97,12 +97,12 @@ export const validTagsCount = (value) => {
 export const matchingTagsCount = (card, value) => {
   const tagsCount = (value.match(/<trou>/g) || []).length;
 
-  return tagsCount === card.value.gapAnswers.filter(a => a.correct).length;
+  return tagsCount === card.value.gapAnswers.filter(a => a.isCorrect).length;
 };
 
 export const minArrayLength = minLength => value => value.filter(a => !!a).length >= minLength;
 
-export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;
+export const minOneCorrectAnswer = value => value.filter(a => a.isCorrect).length >= 1;
 
 export const urlAddress = (value) => {
   if (!value) return true;
