@@ -37,9 +37,16 @@
       <div class="interlocutor-container">
         <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
           caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
-          :disable="isArchived" clearable interlocutor-is-trainer @open-modal="openTrainerModal" />
+          :disable="isArchived" clearable interlocutor-is-trainer-or-tutor @open-modal="openTrainerModal" />
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un intervenant"
           @click="() => openTrainerModal({ action: CREATION })" />
+      </div>
+      <div v-if="isSingle" class="interlocutor-container">
+        <interlocutor-cell v-for="tutor in course.tutors" :key="tutor._id" :interlocutor="tutor" caption="Tuteur"
+          :can-update="canUpdateInterlocutor" :disable="isArchived" clearable interlocutor-is-trainer-or-tutor
+          @open-modal="openTutorModal" />
+        <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un tuteur"
+          @click="() => openTutorModal({ action: CREATION })" />
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
@@ -125,6 +132,10 @@
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
       @hide="resetContactAddition" :contact-options="contactOptions" />
+
+    <interlocutor-modal v-model="tutorModal" v-model:interlocutor="tmpInterlocutorId" :validations="v$.tutor"
+      @submit="addTutor()" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
+      :label="interlocutorLabel" :interlocutors-options="traineesOptions" />
   </div>
 </template>
 
@@ -181,10 +192,11 @@ import {
   INTRA_HOLDING,
   DELETION,
   CREATION,
+  TUTOR,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
-import { formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
+import { formatQuantity, formatIdentity, formatDownloadName, formatAndSortUserOptions } from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
@@ -215,6 +227,8 @@ export default {
   },
   setup (props) {
     const { profileId } = toRefs(props);
+
+    const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
 
     const $store = useStore();
     const $router = useRouter();
@@ -262,6 +276,7 @@ export default {
     const canReadHistory = ref(false);
     const canUpdateCertifyingTest = ref(false);
     const canReadAndUpdateSalesRepresentative = ref(false);
+    const tutorModal = ref(false);
     const courseHistoryFeed = useTemplateRef('courseHistoryFeed');
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
@@ -282,6 +297,7 @@ export default {
       isArchived,
       followUpMissingInfo,
       downloadAttendanceSheet,
+      isIntraCourse,
     } = useCourses(course);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
@@ -293,6 +309,7 @@ export default {
       companyRepresentative: { required },
       operationsRepresentative: { required },
       trainer: { required },
+      tutor: { required },
     }));
 
     const v$ = useVuelidate(
@@ -304,6 +321,7 @@ export default {
         companyRepresentative: tmpInterlocutorId,
         operationsRepresentative: tmpInterlocutorId,
         trainer: tmpInterlocutorId,
+        tutor: tmpInterlocutorId,
       }
     );
 
@@ -380,6 +398,8 @@ export default {
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
     });
 
+    const isSingle = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
+
     watch(course, async (newValue, oldValue) => {
       tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees', 'hasCertifyingTest']);
 
@@ -391,6 +411,8 @@ export default {
         if (!newValue.companies.every(c => oldValueCompaniesIds.includes(c._id))) await refreshTrainingContracts();
       }
     }, { immediate: true });
+
+    const traineesOptions = computed(() => formatAndSortUserOptions(potentialTrainees.value, !isIntraCourse.value));
 
     const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
@@ -912,6 +934,38 @@ export default {
       }
     };
 
+    const openTutorModal = (event) => {
+      if (isArchived.value) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation archivée.');
+      }
+
+      const { action, interlocutorId: tutorId } = event;
+
+      if (action === CREATION) {
+        tmpInterlocutorId.value = tutorId;
+        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
+        tutorModal.value = true;
+      }
+    };
+
+    const addTutor = async () => {
+      try {
+        v$.value.tutor.$touch();
+        if (v$.value.tutor.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Courses.addTutor(course.value._id, { tutor: tmpInterlocutorId.value });
+
+        tutorModal.value = false;
+        await refreshCourse();
+        NotifyPositive('Tuteur ajouté.');
+      } catch (e) {
+        console.error(e);
+        if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
+
+        NotifyNegative('Erreur lors de l\'ajout du tuteur.');
+      }
+    };
+
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
 
     const created = async () => {
@@ -974,6 +1028,8 @@ export default {
       TRAINER,
       SALES_REPRESENTATIVE,
       CREATION,
+      TUTOR,
+      tutorModal,
       // Computed
       course,
       v$,
@@ -995,6 +1051,8 @@ export default {
       isCourseInter,
       isVendorInterface,
       isIntraHoldingCourse,
+      isSingle,
+      traineesOptions,
       // Methods
       get,
       formatQuantity,
@@ -1025,6 +1083,8 @@ export default {
       refreshTrainingContracts,
       goToContactProfile,
       addTrainer,
+      openTutorModal,
+      addTutor,
     };
   },
 };
