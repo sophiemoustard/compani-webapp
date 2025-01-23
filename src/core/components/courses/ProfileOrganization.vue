@@ -42,17 +42,15 @@
           @click="() => openTrainerModal({ action: CREATION })" />
       </div>
       <div v-if="isSingleCourse">
-        <div>
-          <p class="text-weight-bold table-title q-mt-xl">Tuteurs</p>
-          <p v-if="!get(course, 'tutors', []).some(t => t._id)" class="text-italic q-mb-lg">
+        <p class="text-weight-bold table-title q-mt-xl">Tuteurs</p>
+        <p v-if="!get(course, 'tutors', []).some(t => t._id)" class="text-italic q-mb-lg">
           Aucun tuteur n'est défini pour cette formation.
-          </p>
-        </div>
+        </p>
         <div class="interlocutor-container">
-        <interlocutor-cell v-for="tutor in course.tutors" :key="tutor._id" :interlocutor="tutor" caption="Tuteur"
-          :can-update="canUpdateInterlocutor" :disable="isArchived" interlocutor-is-trainer-or-tutor />
-        <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un tuteur"
-          @click="() => openTutorModal({ action: CREATION })" />
+          <interlocutor-cell v-for="tutor in course.tutors" :key="tutor._id" :interlocutor="tutor" caption="Tuteur"
+            :can-update="canUpdateInterlocutor" :disable="isArchived" interlocutor-is-trainer-or-tutor />
+          <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un tuteur"
+            @click="() => openTutorModal({ action: CREATION })" />
         </div>
       </div>
     </div>
