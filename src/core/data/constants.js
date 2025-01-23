@@ -44,6 +44,7 @@ export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planning_referent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
+export const TUTOR = 'tutor';
 
 // ROLES VENDOR
 export const VENDOR_ADMIN = 'vendor_admin';
