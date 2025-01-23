@@ -41,12 +41,19 @@
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un intervenant"
           @click="() => openTrainerModal({ action: CREATION })" />
       </div>
-      <p class="text-weight-bold table-title q-mt-xl">Tuteurs</p>
-      <div v-if="isSingleCourse" class="interlocutor-container">
+      <div v-if="isSingleCourse">
+        <div class="interlocutor-container">
+          <p class="text-weight-bold table-title q-mt-xl">Tuteurs</p>
+          <p v-if="!get(course, 'tutors', []).some(t => t._id)" class="text-italic q-mb-lg">
+          Aucun tuteur n'est défini pour cette formation.
+          </p>
+        </div>
+        <div class="interlocutor-container">
         <interlocutor-cell v-for="tutor in course.tutors" :key="tutor._id" :interlocutor="tutor" caption="Tuteur"
           :can-update="canUpdateInterlocutor" :disable="isArchived" interlocutor-is-trainer-or-tutor />
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un tuteur"
           @click="() => openTutorModal({ action: CREATION })" />
+        </div>
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
@@ -134,7 +141,7 @@
       @hide="resetContactAddition" :contact-options="contactOptions" />
 
     <interlocutor-modal v-model="tutorModal" v-model:interlocutor="tmpInterlocutorId" :validations="v$.tutor"
-      @submit="addTutor()" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
+      @submit="addTutor" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
       :label="interlocutorLabel" :interlocutors-options="traineesOptions" />
   </div>
 </template>
