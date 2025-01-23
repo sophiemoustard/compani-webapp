@@ -42,7 +42,7 @@
           @click="() => openTrainerModal({ action: CREATION })" />
       </div>
       <div v-if="isSingleCourse">
-        <div class="interlocutor-container">
+        <div>
           <p class="text-weight-bold table-title q-mt-xl">Tuteurs</p>
           <p v-if="!get(course, 'tutors', []).some(t => t._id)" class="text-italic q-mb-lg">
           Aucun tuteur n'est défini pour cette formation.
