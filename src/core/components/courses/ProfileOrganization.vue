@@ -41,10 +41,10 @@
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un intervenant"
           @click="() => openTrainerModal({ action: CREATION })" />
       </div>
-      <div v-if="isSingle" class="interlocutor-container">
+      <p class="text-weight-bold table-title q-mt-xl">Tuteurs</p>
+      <div v-if="isSingleCourse" class="interlocutor-container">
         <interlocutor-cell v-for="tutor in course.tutors" :key="tutor._id" :interlocutor="tutor" caption="Tuteur"
-          :can-update="canUpdateInterlocutor" :disable="isArchived" clearable interlocutor-is-trainer-or-tutor
-          @open-modal="openTutorModal" />
+          :can-update="canUpdateInterlocutor" :disable="isArchived" interlocutor-is-trainer-or-tutor />
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un tuteur"
           @click="() => openTutorModal({ action: CREATION })" />
       </div>
@@ -398,7 +398,7 @@ export default {
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
     });
 
-    const isSingle = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
+    const isSingleCourse = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
 
     watch(course, async (newValue, oldValue) => {
       tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees', 'hasCertifyingTest']);
@@ -939,13 +939,11 @@ export default {
         return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation archivée.');
       }
 
-      const { action, interlocutorId: tutorId } = event;
+      const { interlocutorId: tutorId } = event;
 
-      if (action === CREATION) {
-        tmpInterlocutorId.value = tutorId;
-        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
-        tutorModal.value = true;
-      }
+      tmpInterlocutorId.value = tutorId;
+      interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
+      tutorModal.value = true;
     };
 
     const addTutor = async () => {
@@ -1051,7 +1049,7 @@ export default {
       isCourseInter,
       isVendorInterface,
       isIntraHoldingCourse,
-      isSingle,
+      isSingleCourse,
       traineesOptions,
       // Methods
       get,
