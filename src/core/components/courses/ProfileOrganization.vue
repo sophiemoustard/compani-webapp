@@ -410,6 +410,11 @@ export default {
 
       if (!oldValue) return;
 
+      if (displayHistory.value) {
+        await getCourseHistories();
+        courseHistoryFeed.value.resumeScroll();
+      }
+
       if (newValue.companies.length !== oldValue.companies.length) await refreshTrainingContracts();
       else {
         const oldValueCompaniesIds = oldValue.companies.map(c => c._id);
@@ -438,15 +443,7 @@ export default {
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
-      if (displayHistory.value) await getCourseHistories();
-      else courseHistories.value = [];
-    };
-
-    const refreshCourseHistories = async () => {
-      if (displayHistory.value) {
-        await getCourseHistories();
-        courseHistoryFeed.value.resumeScroll();
-      }
+      courseHistories.value = [];
     };
 
     const getCourseHistories = async (createdAt = null) => {
@@ -469,13 +466,18 @@ export default {
       }
     };
 
-    const updateCourseHistories = async (done) => {
-      const lastCreatedAt = courseHistories.value.length
-        ? courseHistories.value[courseHistories.value.length - 1].createdAt
-        : null;
-      const olderCourseHistories = await getCourseHistories(lastCreatedAt);
+    const updateCourseHistories = async (index, done) => {
+      if (index === 1) {
+        await getCourseHistories();
+        done(courseHistories.value.length);
+      } else {
+        const lastCreatedAt = courseHistories.value.length
+          ? courseHistories.value[courseHistories.value.length - 1].createdAt
+          : null;
+        const olderCourseHistories = await getCourseHistories(lastCreatedAt);
 
-      return done(!olderCourseHistories.length);
+        return done(!olderCourseHistories.length);
+      }
     };
 
     const refreshPotentialTrainees = async () => {
@@ -496,7 +498,6 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
-        await refreshCourseHistories();
       } catch (e) {
         console.error(e);
       } finally {
