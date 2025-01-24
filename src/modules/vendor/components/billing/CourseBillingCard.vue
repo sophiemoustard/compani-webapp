@@ -26,7 +26,8 @@
                   :disable="pdfLoading">
                   {{ bill.number }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
-                <div v-else class="text-weight-bold">
+                <div v-else class="text-weight-bold" @click="openBillDeletionModal(bill._id)">
+                  <q-icon name="delete" />
                   A facturer - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
                 <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
@@ -520,6 +521,29 @@ export default {
       NotifyPositive('Validation de la facture annulée.');
     };
 
+    const deleteBill = async (billId) => {
+      try {
+        await CourseBills.deleteBill(billId);
+
+        NotifyPositive('Facture supprimée');
+        emit('refresh-course-bills');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la facture brouillon');
+      }
+    };
+
+    const openBillDeletionModal = (billId) => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette facture brouillon ?',
+        html: true,
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => deleteBill(billId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    };
+
     const isBilled = bill => !!bill.billedAt;
 
     const showDetails = (billId) => { emit('unroll', billId); };
@@ -606,6 +630,7 @@ export default {
       pickBy,
       formatPrice,
       CompaniDate,
+      openBillDeletionModal,
     };
   },
 };

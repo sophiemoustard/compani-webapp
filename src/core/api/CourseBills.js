@@ -27,4 +27,8 @@ export default {
   async deleteBillingPurchase (billId, billingPurchaseId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/coursebills/${billId}/billingpurchases/${billingPurchaseId}`);
   },
+
+  async deleteBill (billId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/coursebills/${billId}`);
+  },
 };
