@@ -29,7 +29,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="courseColumns" :loading="loading" v-model:pagination="pagination">
+        <ni-expanding-table :data="courses" :columns="courseColumns" :loading="loading"
+          v-model:pagination="coursePagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'attendances' && has(col, 'value.attendanceDuration')">
@@ -88,13 +89,26 @@
         </ni-expanding-table>
       </q-card>
     </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Formations en tant que tuteur</p>
+      <q-card>
+        <ni-expanding-table :data="tutorCourses" :columns="[courseColumns[0]]" :loading="loading"
+          v-model:pagination="tutorPagination">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <router-link :to="goToCourseProfile(props)" class="clickable-name">{{ col.value }}</router-link>
+            </q-td>
+          </template>
+        </ni-expanding-table>
+      </q-card>
+    </div>
     <div v-if="unsubscribedAttendances.length" class="q-mb-xl">
       <p class="text-weight-bold q-mb-sm">Emargements non prévus</p>
       <div class="text-italic q-my-xs">
         {{ formatIdentity(userProfile.identity, 'FL') }} a émargé dans certaines formations sans inscription.
       </div>
-      <ni-expanding-table :data="unsubscribedAttendances" :columns="attendanceColumns" :pagination="pagination"
-        :hide-bottom="false" :loading="loading">
+      <ni-expanding-table :data="unsubscribedAttendances" :columns="attendanceColumns"
+        :pagination="attendancePagination" :hide-bottom="false" :loading="loading">
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
             <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
@@ -158,9 +172,12 @@ export default {
     const { isVendorInterface, isClientInterface } = useCourses();
     const { getCountsByMonth, monthAxisLabels } = useCharts();
     const courses = ref([]);
+    const tutorCourses = ref([]);
     const activitiesByMonth = ref([]);
     const loading = ref(false);
-    const pagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const coursePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const tutorPagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const attendancePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
     const courseColumns = ref([
       {
         name: 'name',
@@ -269,14 +286,20 @@ export default {
           }),
         });
 
-        courses.value = userCourses.map(course => ({
-          ...course,
-          subProgram: {
-            ...course.subProgram,
-            elearningSteps: course.subProgram.steps.filter(step => step.type === E_LEARNING),
-            liveSteps: course.subProgram.steps.filter(step => [ON_SITE, REMOTE].includes(step.type)),
-          },
-        }));
+        userCourses.forEach((course) => {
+          if ((course.tutors || []).includes(userProfile.value._id)) {
+            tutorCourses.value.push(course);
+          } else {
+            courses.value.push({
+              ...course,
+              subProgram: {
+                ...course.subProgram,
+                elearningSteps: course.subProgram.steps.filter(step => step.type === E_LEARNING),
+                liveSteps: course.subProgram.steps.filter(step => [ON_SITE, REMOTE].includes(step.type)),
+              },
+            });
+          }
+        });
       } catch (e) {
         NotifyNegative('Erreur lors de la récupération des formations');
         console.error(e);
@@ -346,8 +369,11 @@ export default {
     return {
       // Data
       courses,
+      tutorCourses,
       loading,
-      pagination,
+      coursePagination,
+      tutorPagination,
+      attendancePagination,
       courseColumns,
       attendanceColumns,
       unsubscribedAttendances,

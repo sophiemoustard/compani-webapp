@@ -11,7 +11,7 @@
     <template v-if="Object.keys(groupedCourseBills).length">
       <div v-for="index of Object.keys(groupedCourseBills)" :key="index" class="q-mb-xl">
         <p class="text-weight-bold">{{ getTableName(index) }}</p>
-        <ni-expanding-table :data="groupedCourseBills[index]" :columns="columns" v-model:pagination="pagination"
+        <ni-expanding-table :data="groupedCourseBills[index]" :columns="columns" v-model:pagination="paginations[index]"
           :hide-bottom="false" :loading="loading">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -228,7 +228,7 @@ export default {
       { name: 'payment', align: 'center', field: val => val.coursePayments || '', classes: 'formatted-price' },
       { name: 'expand', classes: 'expand' },
     ]);
-    const pagination = ref({ page: 1, rowsPerPage: 15 });
+    const paginations = ref([{ page: 1, rowsPerPage: 15 }, { page: 1, rowsPerPage: 15 }, { page: 1, rowsPerPage: 15 }]);
     const billingRepresentativeGroupedByCompany = ref({});
     const billingRepresentativeModal = ref(false);
     const billingRepresentativeModalLoading = ref(false);
@@ -515,7 +515,7 @@ export default {
     return {
       // Data
       columns,
-      pagination,
+      paginations,
       loading,
       pdfLoading,
       coursePaymentMetaInfo,
