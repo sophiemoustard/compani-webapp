@@ -89,10 +89,10 @@
         </ni-expanding-table>
       </q-card>
     </div>
-    <div class="q-mb-xl">
+    <div v-if="tutorCourses.length" class="q-mb-xl">
       <p class="text-weight-bold">Formations en tant que tuteur</p>
       <q-card>
-        <ni-expanding-table :data="tutorCourses" :columns="[courseColumns[0]]" :loading="loading"
+        <ni-expanding-table :data="tutorCourses" :columns="[courseNameColumn]" :loading="loading"
           v-model:pagination="tutorPagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -178,17 +178,18 @@ export default {
     const coursePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
     const tutorPagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
     const attendancePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const courseNameColumn = ref({
+      name: 'name',
+      label: 'Nom',
+      field: row => row,
+      align: 'left',
+      sortable: true,
+      format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
+      sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
+      style: 'width: 30%',
+    });
     const courseColumns = ref([
-      {
-        name: 'name',
-        label: 'Nom',
-        field: row => row,
-        align: 'left',
-        sortable: true,
-        format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
-        sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
-        style: 'width: 30%',
-      },
+      courseNameColumn.value,
       {
         name: 'type',
         label: 'Type de formation',
@@ -287,7 +288,7 @@ export default {
         });
 
         userCourses.forEach((course) => {
-          if ((course.tutors || []).includes(userProfile.value._id)) {
+          if (course.tutors && course.tutors.includes(userProfile.value._id)) {
             tutorCourses.value.push(course);
           } else {
             courses.value.push({
@@ -375,6 +376,7 @@ export default {
       tutorPagination,
       attendancePagination,
       courseColumns,
+      courseNameColumn,
       attendanceColumns,
       unsubscribedAttendances,
       activitiesByMonth,
