@@ -60,7 +60,7 @@
     <ni-trainee-container :loading="courseLoading" @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')"
       :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
-    <q-page-sticky expand position="right">
+    <q-page-sticky expand position="right" style="z-index: 10">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
