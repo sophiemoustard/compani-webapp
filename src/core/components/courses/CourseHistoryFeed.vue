@@ -42,9 +42,9 @@ export default {
 
     const height = computed(() => window.innerHeight - top.value);
 
-    const close = () => { emit('toggle-history'); };
+    const close = () => emit('toggle-history');
 
-    const load = (index, done) => { emit('load', index, done); };
+    const load = (index, done) => emit('load', { index, done });
 
     const resumeScroll = () => { infiniteScroll.value.resume(); };
 

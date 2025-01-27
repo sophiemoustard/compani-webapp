@@ -443,7 +443,6 @@ export default {
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
-      courseHistories.value = [];
     };
 
     const getCourseHistories = async (createdAt = null) => {
@@ -466,7 +465,7 @@ export default {
       }
     };
 
-    const updateCourseHistories = async (index, done) => {
+    const updateCourseHistories = async ({ index, done }) => {
       if (index === 1) {
         await getCourseHistories();
         done(courseHistories.value.length);
