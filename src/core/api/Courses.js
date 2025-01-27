@@ -103,4 +103,7 @@ export default {
   async addTutor (courseId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/courses/${courseId}/tutors`, payload);
   },
+  async deleteTutor (courseId, tutorId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/tutors/${tutorId}`);
+  },
 };

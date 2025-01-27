@@ -48,7 +48,8 @@
         </p>
         <div class="interlocutor-container">
           <interlocutor-cell v-for="tutor in course.tutors" :key="tutor._id" :interlocutor="tutor" caption="Tuteur"
-            :can-update="canUpdateInterlocutor" :disable="isArchived" interlocutor-is-trainer-or-tutor />
+            :can-update="canUpdateInterlocutor" :disable="isArchived" interlocutor-is-trainer-or-tutor clearable
+            @open-modal="openTutorModal" />
           <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un tuteur"
             @click="() => openTutorModal({ action: CREATION })" />
         </div>
@@ -848,10 +849,23 @@ export default {
       contactAdditionModal.value = true;
     };
 
+    const removeTutor = async (interlocutorId) => {
+      try {
+        await Courses.deleteTutor(course.value._id, interlocutorId);
+
+        await refreshCourse();
+        NotifyPositive('Tuteur détaché.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du détachement du tuteur.');
+      }
+    };
+
     const removeInterlocutor = (interlocutorType, interlocutorId) => {
       tmpInterlocutorId.value = '';
 
       if (interlocutorType === TRAINER) validateTrainerDeletion(interlocutorId);
+      else if (interlocutorType === TUTOR) removeTutor(interlocutorId);
       else updateInterlocutor(interlocutorType);
     };
 
@@ -944,11 +958,16 @@ export default {
         return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation archivée.');
       }
 
-      const { interlocutorId: tutorId } = event;
+      const { action, interlocutorId: tutorId } = event;
 
-      tmpInterlocutorId.value = tutorId;
-      interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
-      tutorModal.value = true;
+      if (action === DELETION) {
+        const tutorToRemove = course.value.tutors.find(t => t._id === tutorId);
+        openInterlocutorDeletionValidationModal(get(tutorToRemove, 'identity'), TUTOR, tutorId);
+      } else {
+        tmpInterlocutorId.value = tutorId;
+        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
+        tutorModal.value = true;
+      }
     };
 
     const addTutor = async () => {
