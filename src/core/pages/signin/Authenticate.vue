@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue';
 import { useMeta } from 'quasar';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -43,9 +44,14 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import PrimaryButton from '@components/PrimaryButton';
 import { NotifyNegative } from '@components/popup/notify';
-import { AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY, REQUIRED_LABEL } from '@data/constants';
+import { useLogin } from '@composables/login';
+import {
+  // AUXILIARY_ROLES,
+  // AUXILIARY_WITHOUT_COMPANY,
+  REQUIRED_LABEL,
+} from '@data/constants';
 import { isUserLogged } from '@helpers/alenvi';
-import { logInMixin } from '@mixins/logInMixin';
+// import { logInMixin } from '@mixins/logInMixin';
 
 export default {
   name: 'Authentication',
@@ -55,13 +61,10 @@ export default {
     'ni-button': Button,
     'ni-primary-button': PrimaryButton,
   },
-  mixins: [logInMixin],
-  data () {
-    return {
-      credentials: { email: '', password: '' },
-    };
-  },
+  // mixins: [logInMixin],
   setup () {
+    const credentials = ref({ email: '', password: '' });
+
     const metaInfo = {
       title: 'Connexion',
       meta: [{
@@ -71,46 +74,49 @@ export default {
     };
     useMeta(metaInfo);
 
-    return { v$: useVuelidate() };
-  },
-  validations () {
-    return {
-      credentials: {
-        email: { required, email },
-        password: { required },
-      },
-    };
-  },
-  computed: {
-    isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.clientRole);
-    },
-    isAuxiliaryWithoutCompany () {
-      return this.clientRole === AUXILIARY_WITHOUT_COMPANY;
-    },
-    emailErrorMessage () {
-      if (!this.v$.credentials.email.required) return REQUIRED_LABEL;
+    const { logInUser } = useLogin();
+
+    const rules = computed(() => ({
+      credentials: { email: { required, email }, password: { required } },
+    }));
+
+    const v$ = useVuelidate(rules, { credentials });
+
+    // const isAuxiliary = computed(() => AUXILIARY_ROLES.includes(clientRole));
+
+    // const isAuxiliaryWithoutCompany = computed(() => clientRole === AUXILIARY_WITHOUT_COMPANY);
+
+    const emailErrorMessage = computed(() => {
+      if (!v$.credentials.email.required) return REQUIRED_LABEL;
       return 'Email invalide';
-    },
-  },
-  async beforeRouteEnter (to, from, next) {
-    const isLogged = await isUserLogged();
-    if (isLogged) next({ path: '/' });
-    else next();
-  },
-  methods: {
-    async submit () {
+    });
+
+    const submit = async () => {
       try {
-        this.v$.credentials.$touch();
-        if (this.v$.credentials.$error) return;
-        await this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
+        v$.value.credentials.$touch();
+        if (v$.value.credentials.$error) return;
+        await logInUser({ email: credentials.value.email.toLowerCase(), password: credentials.value.password });
       } catch (e) {
         console.error(e);
         if (get(e, 'response.status') === 401) return NotifyNegative('Identifiant ou mot de passe invalide');
-        NotifyNegative('Impossible de se connecter.');
+        NotifyNegative('Impossible de se connecter');
       }
-    },
-    set,
+    };
+
+    return {
+      // Data
+      credentials,
+      // Computed
+      emailErrorMessage,
+      // Methods
+      submit,
+      set,
+    };
+  },
+  beforeRouteEnter (to, from, next) {
+    const isLogged = isUserLogged();
+    if (isLogged) next({ path: '/' });
+    else next();
   },
 };
 </script>
