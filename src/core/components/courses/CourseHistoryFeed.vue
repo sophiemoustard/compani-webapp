@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { computed, ref } from 'vue';
 import Button from '@components/Button';
 import CourseHistory from './CourseHistory';
 
@@ -34,24 +35,30 @@ export default {
     courseHistories: { type: Array, default: () => ([]) },
   },
   emits: ['toggle-history', 'load'],
-  computed: {
-    height () {
-      return window.innerHeight - this.top;
-    },
-    top () {
-      return window.innerWidth >= 768 ? 300 : 350;
-    },
-  },
-  methods: {
-    close () {
-      this.$emit('toggle-history');
-    },
-    load (index, done) {
-      this.$emit('load', done);
-    },
-    resumeScroll () {
-      this.$refs.infiniteScroll.resume();
-    },
+  setup (_, { emit }) {
+    const infiniteScroll = ref(null);
+
+    const top = computed(() => (window.innerWidth >= 768 ? 300 : 350));
+
+    const height = computed(() => window.innerHeight - top.value);
+
+    const close = () => emit('toggle-history');
+
+    const load = (index, done) => emit('load', { index, done });
+
+    const resumeScroll = () => { infiniteScroll.value.resume(); };
+
+    return {
+      // Data
+      infiniteScroll,
+      // Computed
+      height,
+      top,
+      // Methods
+      close,
+      load,
+      resumeScroll,
+    };
   },
 };
 </script>

@@ -60,7 +60,7 @@
     <ni-trainee-container :loading="courseLoading" @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')"
       :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
-    <q-page-sticky expand position="right">
+    <q-page-sticky class="container-history" expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
@@ -410,6 +410,11 @@ export default {
 
       if (!oldValue) return;
 
+      if (displayHistory.value) {
+        await getCourseHistories();
+        courseHistoryFeed.value.resumeScroll();
+      }
+
       if (newValue.companies.length !== oldValue.companies.length) await refreshTrainingContracts();
       else {
         const oldValueCompaniesIds = oldValue.companies.map(c => c._id);
@@ -438,15 +443,6 @@ export default {
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
-      if (displayHistory.value) await getCourseHistories();
-      else courseHistories.value = [];
-    };
-
-    const refreshCourseHistories = async () => {
-      if (displayHistory.value) {
-        await getCourseHistories();
-        courseHistoryFeed.value.resumeScroll();
-      }
     };
 
     const getCourseHistories = async (createdAt = null) => {
@@ -469,13 +465,18 @@ export default {
       }
     };
 
-    const updateCourseHistories = async (done) => {
-      const lastCreatedAt = courseHistories.value.length
-        ? courseHistories.value[courseHistories.value.length - 1].createdAt
-        : null;
-      const olderCourseHistories = await getCourseHistories(lastCreatedAt);
+    const updateCourseHistories = async ({ index, done }) => {
+      if (index === 1) {
+        await getCourseHistories();
+        done(courseHistories.value.length);
+      } else {
+        const lastCreatedAt = courseHistories.value.length
+          ? courseHistories.value[courseHistories.value.length - 1].createdAt
+          : null;
+        const olderCourseHistories = await getCourseHistories(lastCreatedAt);
 
-      return done(!olderCourseHistories.length);
+        return done(!olderCourseHistories.length);
+      }
     };
 
     const refreshPotentialTrainees = async () => {
@@ -496,7 +497,6 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
-        await refreshCourseHistories();
       } catch (e) {
         console.error(e);
       } finally {
@@ -1104,4 +1104,6 @@ export default {
     padding: 0px 0px 16px 16px
 .button-trainer
   justify-self: start
+.container-history
+  z-index: 10
 </style>
