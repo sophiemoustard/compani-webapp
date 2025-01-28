@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeUnmount } from 'vue';
 import { sameAs, required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import CompaniHeader from '@components/CompaniHeader';
@@ -82,9 +82,9 @@ export default {
       }
     };
 
-    //   beforeUnmount() {
-    //   clearTimeout(timeout.value);
-    // };
+    onBeforeUnmount(() => {
+      clearTimeout(timeout.value);
+    });
 
     return {
       // Data

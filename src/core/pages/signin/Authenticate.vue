@@ -51,7 +51,6 @@ import {
   REQUIRED_LABEL,
 } from '@data/constants';
 import { isUserLogged } from '@helpers/alenvi';
-// import { logInMixin } from '@mixins/logInMixin';
 
 export default {
   name: 'Authentication',
@@ -61,7 +60,6 @@ export default {
     'ni-button': Button,
     'ni-primary-button': PrimaryButton,
   },
-  // mixins: [logInMixin],
   setup () {
     const credentials = ref({ email: '', password: '' });
 
@@ -87,7 +85,7 @@ export default {
     // const isAuxiliaryWithoutCompany = computed(() => clientRole === AUXILIARY_WITHOUT_COMPANY);
 
     const emailErrorMessage = computed(() => {
-      if (!v$.credentials.email.required) return REQUIRED_LABEL;
+      if (!v$.value.credentials.email.required) return REQUIRED_LABEL;
       return 'Email invalide';
     });
 
@@ -113,7 +111,7 @@ export default {
       set,
     };
   },
-  beforeRouteEnter (to, from, next) {
+  beforeRouteEnter (_, from, next) {
     const isLogged = isUserLogged();
     if (isLogged) next({ path: '/' });
     else next();
