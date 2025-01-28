@@ -26,9 +26,9 @@
                   :disable="pdfLoading">
                   {{ bill.number }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
-                <div v-else class="text-weight-bold" @click.stop="openBillDeletionModal(bill._id)">
+                <div v-else class="text-weight-bold">
                   A facturer - {{ formatPrice(bill.netInclTaxes) }}
-                  <q-icon name="delete" size="16px" color="copper-grey-500" />
+                  <ni-button icon="delete" @click.stop="openBillDeletionModal(bill._id)" />
                 </div>
                 <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
                   <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
