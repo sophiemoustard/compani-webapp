@@ -60,7 +60,7 @@
     <ni-trainee-container :loading="courseLoading" @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')"
       :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
-    <q-page-sticky expand position="right" style="z-index: 10">
+    <q-page-sticky class="container-history" expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
@@ -1104,4 +1104,6 @@ export default {
     padding: 0px 0px 16px 16px
 .button-trainer
   justify-self: start
+.container-history
+  z-index: 10
 </style>
