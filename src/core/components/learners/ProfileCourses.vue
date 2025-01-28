@@ -287,20 +287,15 @@ export default {
           }),
         });
 
-        userCourses.forEach((course) => {
-          if (course.tutors && course.tutors.includes(userProfile.value._id)) {
-            tutorCourses.value.push(course);
-          } else {
-            courses.value.push({
-              ...course,
-              subProgram: {
-                ...course.subProgram,
-                elearningSteps: course.subProgram.steps.filter(step => step.type === E_LEARNING),
-                liveSteps: course.subProgram.steps.filter(step => [ON_SITE, REMOTE].includes(step.type)),
-              },
-            });
-          }
-        });
+        tutorCourses.value = userCourses.tutorCourses;
+        courses.value = userCourses.traineeCourses.map(course => ({
+          ...course,
+          subProgram: {
+            ...course.subProgram,
+            elearningSteps: course.subProgram.steps.filter(step => step.type === E_LEARNING),
+            liveSteps: course.subProgram.steps.filter(step => [ON_SITE, REMOTE].includes(step.type)),
+          },
+        }));
       } catch (e) {
         NotifyNegative('Erreur lors de la récupération des formations');
         console.error(e);
