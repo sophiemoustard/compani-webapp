@@ -315,6 +315,8 @@ export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Questionnaires de satisfaction', value: END_OF_COURSE },
   { label: 'Factures et avoirs', value: COURSE_BILL },
   { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
+  { label: 'Questionnaires d\'auto-positionnement par groupe', value: SELF_POSITIONNING },
+
 ];
 
 // COURSE_BILLS
