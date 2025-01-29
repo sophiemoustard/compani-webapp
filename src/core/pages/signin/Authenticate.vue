@@ -45,11 +45,7 @@ import Button from '@components/Button';
 import PrimaryButton from '@components/PrimaryButton';
 import { NotifyNegative } from '@components/popup/notify';
 import { useLogin } from '@composables/login';
-import {
-  // AUXILIARY_ROLES,
-  // AUXILIARY_WITHOUT_COMPANY,
-  REQUIRED_LABEL,
-} from '@data/constants';
+import { REQUIRED_LABEL } from '@data/constants';
 import { isUserLogged } from '@helpers/alenvi';
 
 export default {
@@ -79,10 +75,6 @@ export default {
     }));
 
     const v$ = useVuelidate(rules, { credentials });
-
-    // const isAuxiliary = computed(() => AUXILIARY_ROLES.includes(clientRole));
-
-    // const isAuxiliaryWithoutCompany = computed(() => clientRole === AUXILIARY_WITHOUT_COMPANY);
 
     const emailErrorMessage = computed(() => {
       if (!v$.value.credentials.email.required) return REQUIRED_LABEL;

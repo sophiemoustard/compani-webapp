@@ -43,19 +43,16 @@ export default {
     const timeout = ref(null);
     const userEmail = ref('');
 
-    console.log('userID', userId);
-
     const { logInUser } = useLogin();
 
     const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
 
     const rules = computed(() => ({
-      password: { required, ...passwordValidation },
+      password: { required, ...passwordValidation.value },
       passwordConfirm: { required, sameAs: sameAs(password.value) },
     }));
 
     const v$ = useVuelidate(rules, { password, passwordConfirm });
-    console.log('log in');
 
     const setData = (checkToken) => {
       userId.value = checkToken.user._id;
