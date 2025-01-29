@@ -9,8 +9,8 @@ export const useLogin = () => {
   const $route = useRoute();
   const $router = useRouter();
 
-  const clientRole = computed(() => $store.getter['main/getClientRole']);
-  const vendorRole = computed(() => $store.getter['main/getVendorRole']);
+  const clientRole = computed(() => $store.getters['main/getClientRole']);
+  const vendorRole = computed(() => $store.getters['main/getVendorRole']);
   const loggedUser = computed(() => $store.state.main.loggedUser);
 
   const logInUser = async (authenticationPayload) => {
@@ -25,7 +25,6 @@ export const useLogin = () => {
     return $router.replace('/').catch((e) => {});
   };
 
-  console.log('logInUser composable', logInUser);
   return {
     // Computed
     clientRole,

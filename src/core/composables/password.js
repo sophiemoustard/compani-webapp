@@ -7,9 +7,7 @@ export const usePassword = () => {
   const passwordValidation = ref({ minLength: minLength(6) });
 
   const passwordError = (validationObj) => {
-    // if (validationObj.required.$response === false) return REQUIRED_LABEL;
     if (get(validationObj, 'required.$response') === false) return REQUIRED_LABEL;
-    // if (validationObj.minLength.$response === false) return 'Le mot de passe doit contenir au minimum 6 caractères.';
     if (get(validationObj, 'minLength.$response') === false) {
       return 'Le mot de passe doit contenir au minimum 6 caractères.';
     }
@@ -17,9 +15,7 @@ export const usePassword = () => {
   };
 
   const passwordConfirmError = (validationObj) => {
-    // if (validationObj.required.$response === false) return REQUIRED_LABEL;
     if (get(validationObj, 'required.$response') === false) return REQUIRED_LABEL;
-    // if (validationObj.sameAs.$response === false) return 'Le mot de passe doit être identique';
     if (get(validationObj, 'sameAs.$response') === false) return 'Le mot de passe doit être identique';
     return 'Mot de passe invalide';
   };
