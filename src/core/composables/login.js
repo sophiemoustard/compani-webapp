@@ -18,13 +18,14 @@ export const useLogin = () => {
 
     await $store.dispatch('main/fetchLoggedUser', auth.user._id);
 
-    if (loggedUser.value) throw new Error('Error on login');
+    if (!loggedUser.value) throw new Error('Error on login');
 
     if ($route.query.from) return $router.replace({ path: $route.query.from });
     if (vendorRole.value) return $router.replace('/ad').catch((e) => {});
     return $router.replace('/').catch((e) => {});
   };
 
+  console.log('logInUser composable', logInUser);
   return {
     // Computed
     clientRole,

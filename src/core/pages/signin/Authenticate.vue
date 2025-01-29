@@ -61,6 +61,7 @@ export default {
     'ni-primary-button': PrimaryButton,
   },
   setup () {
+    console.log('je suis dans authenticate');
     const credentials = ref({ email: '', password: '' });
 
     const metaInfo = {
@@ -73,6 +74,7 @@ export default {
     useMeta(metaInfo);
 
     const { logInUser } = useLogin();
+    console.log('log user', logInUser);
 
     const rules = computed(() => ({
       credentials: { email: { required, email }, password: { required } },
