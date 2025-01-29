@@ -92,7 +92,7 @@
     <div v-if="tutorCourses.length" class="q-mb-xl">
       <p class="text-weight-bold">Formations en tant que tuteur</p>
       <q-card>
-        <ni-expanding-table :data="tutorCourses" :columns="[courseNameColumn]" :loading="loading"
+        <ni-expanding-table :data="tutorCourses" :columns="courseNameColumn" :loading="loading"
           v-model:pagination="tutorPagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -178,18 +178,21 @@ export default {
     const coursePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
     const tutorPagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
     const attendancePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
-    const courseNameColumn = ref({
+    const courseNameColumn = ref([{
       name: 'name',
       label: 'Nom',
       field: row => row,
       align: 'left',
       sortable: true,
       format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
-      sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
+      sort: (a, b) => sortStrings(
+        get(a, 'subProgram.program.name') + a.misc || '',
+        get(b, 'subProgram.program.name') + b.misc || ''
+      ),
       style: 'width: 30%',
-    });
+    }]);
     const courseColumns = ref([
-      courseNameColumn.value,
+      ...courseNameColumn.value,
       {
         name: 'type',
         label: 'Type de formation',
@@ -279,7 +282,7 @@ export default {
         loading.value = true;
         const loggedUserHolding = get(loggedUser.value, 'holding._id');
 
-        const userCourses = await Courses.list({
+        const { tutorCourses: tutorCourseList, traineeCourses } = await Courses.list({
           trainee: userProfile.value._id,
           action: PEDAGOGY,
           ...(isClientInterface && {
@@ -287,8 +290,8 @@ export default {
           }),
         });
 
-        tutorCourses.value = userCourses.tutorCourses;
-        courses.value = userCourses.traineeCourses.map(course => ({
+        tutorCourses.value = tutorCourseList;
+        courses.value = traineeCourses.map(course => ({
           ...course,
           subProgram: {
             ...course.subProgram,
