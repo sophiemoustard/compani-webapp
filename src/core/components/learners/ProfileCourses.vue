@@ -29,7 +29,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="courseColumns" :loading="loading" v-model:pagination="pagination">
+        <ni-expanding-table :data="traineeCourses" :columns="courseColumns" :loading="loading"
+          v-model:pagination="traineePagination">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'attendances' && has(col, 'value.attendanceDuration')">
@@ -46,7 +47,9 @@
               </template>
               <template v-else-if="col.name === 'name'">
                 <div @click="$event.stopPropagation()">
-                  <router-link :to="goToCourseProfile(props)" class="clickable-name">{{ col.value }}</router-link>
+                  <router-link :to="goToCourseProfile(props, TRAINEE)" class="clickable-name">
+                    {{ col.value }}
+                  </router-link>
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -88,13 +91,26 @@
         </ni-expanding-table>
       </q-card>
     </div>
+    <div v-if="tutorCourses.length" class="q-mb-xl">
+      <p class="text-weight-bold">Formations en tant que tuteur</p>
+      <q-card>
+        <ni-expanding-table :data="tutorCourses" :columns="courseNameColumn" :loading="loading"
+          v-model:pagination="tutorPagination">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <router-link :to="goToCourseProfile(props)" class="clickable-name">{{ col.value }}</router-link>
+            </q-td>
+          </template>
+        </ni-expanding-table>
+      </q-card>
+    </div>
     <div v-if="unsubscribedAttendances.length" class="q-mb-xl">
       <p class="text-weight-bold q-mb-sm">Emargements non prévus</p>
       <div class="text-italic q-my-xs">
         {{ formatIdentity(userProfile.identity, 'FL') }} a émargé dans certaines formations sans inscription.
       </div>
-      <ni-expanding-table :data="unsubscribedAttendances" :columns="attendanceColumns" :pagination="pagination"
-        :hide-bottom="false" :loading="loading">
+      <ni-expanding-table :data="unsubscribedAttendances" :columns="attendanceColumns"
+        :pagination="attendancePagination" :hide-bottom="false" :loading="loading">
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
             <div v-for="attendance in props.row.attendances" :key="attendance._id" :props="props"
@@ -130,6 +146,7 @@ import {
   DD_MM_YYYY,
   MONTH,
   DAY,
+  TRAINEE,
 } from '@data/constants';
 import CompaniDate from '@helpers/dates/companiDates';
 import CompaniDuration from '@helpers/dates/companiDurations';
@@ -157,21 +174,28 @@ export default {
 
     const { isVendorInterface, isClientInterface } = useCourses();
     const { getCountsByMonth, monthAxisLabels } = useCharts();
-    const courses = ref([]);
+    const traineeCourses = ref([]);
+    const tutorCourses = ref([]);
     const activitiesByMonth = ref([]);
     const loading = ref(false);
-    const pagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const traineePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const tutorPagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const attendancePagination = ref({ sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 });
+    const courseNameColumn = ref([{
+      name: 'name',
+      label: 'Nom',
+      field: row => row,
+      align: 'left',
+      sortable: true,
+      format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
+      sort: (a, b) => sortStrings(
+        get(a, 'subProgram.program.name') + a.misc || '',
+        get(b, 'subProgram.program.name') + b.misc || ''
+      ),
+      style: 'width: 30%',
+    }]);
     const courseColumns = ref([
-      {
-        name: 'name',
-        label: 'Nom',
-        field: row => row,
-        align: 'left',
-        sortable: true,
-        format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
-        sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
-        style: 'width: 30%',
-      },
+      ...courseNameColumn.value,
       {
         name: 'type',
         label: 'Type de formation',
@@ -204,7 +228,7 @@ export default {
 
     const userProfile = computed(() => $store.state.userProfile.userProfile);
 
-    const eLearningCourses = computed(() => courses.value.filter(c => c.format === STRICTLY_E_LEARNING) || []);
+    const eLearningCourses = computed(() => traineeCourses.value.filter(c => c.format === STRICTLY_E_LEARNING) || []);
 
     const eLearningCoursesOnGoing = computed(() => eLearningCourses.value.filter(c => c.progress.eLearning < 1) || []);
 
@@ -221,7 +245,7 @@ export default {
       : 'formation eLearning terminée'));
 
     const eLearningActivitiesCompleted = computed(() => {
-      const activityHistories = courses.value
+      const activityHistories = traineeCourses.value
         .map(c => c.subProgram.steps.map(s => s.activities.map(a => a.activityHistories).flat()).flat())
         .flat();
 
@@ -232,7 +256,7 @@ export default {
       ? 'activités eLearning réalisées'
       : 'activité eLearning réalisée'));
 
-    const goToCourseProfile = (props) => {
+    const goToCourseProfile = (props, role) => {
       if (!isVendorInterface && props.row.subProgram.isStrictlyELearning) {
         return { name: 'ni elearning courses info', params: { courseId: props.row._id } };
       }
@@ -241,7 +265,7 @@ export default {
         return {
           name: 'ni courses info',
           params: { courseId: props.row._id },
-          query: { defaultTab: 'traineeFollowUp' },
+          query: { defaultTab: role === TRAINEE ? 'traineeFollowUp' : 'organization' },
         };
       }
 
@@ -252,7 +276,7 @@ export default {
       return {
         name: 'ni management blended courses info',
         params: { courseId: props.row._id },
-        query: { defaultTab: 'traineeFollowUp' },
+        query: { defaultTab: role === TRAINEE ? 'traineeFollowUp' : 'organization' },
       };
     };
 
@@ -261,7 +285,7 @@ export default {
         loading.value = true;
         const loggedUserHolding = get(loggedUser.value, 'holding._id');
 
-        const userCourses = await Courses.list({
+        const { tutorCourses: tutorCourseList, traineeCourses: traineeCourseList } = await Courses.list({
           trainee: userProfile.value._id,
           action: PEDAGOGY,
           ...(isClientInterface && {
@@ -269,7 +293,8 @@ export default {
           }),
         });
 
-        courses.value = userCourses.map(course => ({
+        tutorCourses.value = tutorCourseList;
+        traineeCourses.value = traineeCourseList.map(course => ({
           ...course,
           subProgram: {
             ...course.subProgram,
@@ -280,7 +305,8 @@ export default {
       } catch (e) {
         NotifyNegative('Erreur lors de la récupération des formations');
         console.error(e);
-        courses.value = [];
+        traineeCourses.value = [];
+        tutorCourses.value = [];
       } finally {
         loading.value = false;
       }
@@ -345,16 +371,21 @@ export default {
 
     return {
       // Data
-      courses,
+      traineeCourses,
+      tutorCourses,
       loading,
-      pagination,
+      traineePagination,
+      tutorPagination,
+      attendancePagination,
       courseColumns,
+      courseNameColumn,
       attendanceColumns,
       unsubscribedAttendances,
       activitiesByMonth,
       monthAxisLabels,
       DD_MM_YYYY,
       SHORT_DURATION_H_MM,
+      TRAINEE,
       // Computed
       userProfile,
       eLearningCoursesOnGoing,
