@@ -19,6 +19,10 @@
             </q-item-section>
           </q-item>
         </template>
+        <template #no-option>
+          <ni-button v-if="displayNoOptionsSlot" color="primary" icon="add" label="Créer un nouveau compte"
+            @click="openUserCreationModal" />
+        </template>
       </ni-select>
       <template #footer>
         <ni-button class="bg-primary full-width modal-btn" :label="`${label.action}${label.interlocutor}`"
@@ -43,18 +47,21 @@ export default {
     loading: { type: Boolean, default: false },
     label: { type: Object, default: () => ({}) },
     clearable: { type: Boolean, default: false },
+    displayNoOptionsSlot: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-button': Button,
   },
-  emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor'],
+  emits: ['hide', 'update:model-value', 'submit', 'update:interlocutor', 'open-user-creation-modal'],
   setup (_, { emit }) {
     const hide = () => emit('hide');
     const input = event => emit('update:model-value', event);
     const submit = () => emit('submit');
     const updateInterlocutor = event => emit('update:interlocutor', event);
+
+    const openUserCreationModal = event => emit('open-user-creation-modal', event);
 
     return {
       // Methods
@@ -63,6 +70,7 @@ export default {
       submit,
       updateInterlocutor,
       upperCaseFirstLetter,
+      openUserCreationModal,
     };
   },
 };

@@ -141,7 +141,14 @@
 
     <interlocutor-modal v-model="tutorModal" v-model:interlocutor="tmpInterlocutorId" :validations="v$.tutor"
       @submit="addTutor" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
-      :label="interlocutorLabel" :interlocutors-options="traineesOptions" />
+      :label="interlocutorLabel" :interlocutors-options="traineesOptions" display-no-options-slot
+      @open-user-creation-modal="openLearnerCreationModal" />
+
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" @hide="resetContactAddition"
+      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
+      :disable-company="isIntraCourse" :learner-edition="learnerAlreadyExists"
+      :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
+      @submit="submitLearnerCreationModal" :disable-user-info="disableUserInfoEdition" />
   </div>
 </template>
 
@@ -178,6 +185,7 @@ import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import BiColorButton from '@components/BiColorButton';
 import SecondaryButton from '@components/SecondaryButton';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -202,12 +210,19 @@ import {
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
-import { formatQuantity, formatIdentity, formatDownloadName, formatAndSortUserOptions } from '@helpers/utils';
+import {
+  formatQuantity,
+  formatIdentity,
+  formatDownloadName,
+  formatAndSortUserOptions,
+  formatAndSortCompanyOptions,
+} from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import { useCourses } from '@composables/courses';
+import { useLearnersCreation } from '@composables/learnersCreation';
 
 export default {
   name: 'ProfileOrganization',
@@ -230,6 +245,7 @@ export default {
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
     'training-contract-container': TrainingContractContainer,
+    'learner-creation-modal': LearnerCreationModal,
   },
   setup (props) {
     const { profileId } = toRefs(props);
@@ -282,7 +298,6 @@ export default {
     const canReadHistory = ref(false);
     const canUpdateCertifyingTest = ref(false);
     const canReadAndUpdateSalesRepresentative = ref(false);
-    const tutorModal = ref(false);
     const courseHistoryFeed = useTemplateRef('courseHistoryFeed');
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
@@ -305,6 +320,26 @@ export default {
       downloadAttendanceSheet,
       isIntraCourse,
     } = useCourses(course);
+
+    const refreshTraineeTable = async () => {
+      await refreshCourse();
+      await refreshPotentialTrainees();
+    };
+
+    const {
+      newLearner,
+      resetLearnerCreationModal,
+      firstStep,
+      nextStepLearnerCreationModal,
+      learnerAlreadyExists,
+      learnerValidation,
+      learnerCreationModal,
+      learnerCreationModalLoading,
+      submitLearnerCreationModal,
+      disableUserInfoEdition,
+      traineeAdditionModal: tutorModal,
+      newTraineeRegistration,
+    } = useLearnersCreation(refreshTraineeTable);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -425,6 +460,8 @@ export default {
 
     const traineesOptions = computed(() => formatAndSortUserOptions(potentialTrainees.value, !isIntraCourse.value));
 
+    const companyOptions = computed(() => formatAndSortCompanyOptions(course.value.companies));
+
     const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
@@ -503,11 +540,6 @@ export default {
       } finally {
         courseLoading.value = false;
       }
-    };
-
-    const refreshTraineeTable = async () => {
-      await refreshCourse();
-      await refreshPotentialTrainees();
     };
 
     const formatInterlocutorOption = interlocutor => ({
@@ -988,7 +1020,20 @@ export default {
       }
     };
 
+    const openLearnerCreationModal = async () => {
+      tutorModal.value = false;
+      learnerCreationModal.value = true;
+    };
+
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
+
+    watch(tutorModal, () => {
+      if (tutorModal.value && newTraineeRegistration.value.user) {
+        tmpInterlocutorId.value = newTraineeRegistration.value.user;
+        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
+        newTraineeRegistration.value.user = '';
+      }
+    });
 
     const created = async () => {
       const promises = [];
@@ -1052,6 +1097,13 @@ export default {
       CREATION,
       TUTOR,
       tutorModal,
+      newLearner,
+      firstStep,
+      learnerAlreadyExists,
+      learnerValidation,
+      learnerCreationModalLoading,
+      disableUserInfoEdition,
+      learnerCreationModal,
       // Computed
       course,
       v$,
@@ -1075,6 +1127,8 @@ export default {
       isIntraHoldingCourse,
       isSingleCourse,
       traineesOptions,
+      companyOptions,
+      isIntraCourse,
       // Methods
       get,
       formatQuantity,
@@ -1107,6 +1161,10 @@ export default {
       addTrainer,
       openTutorModal,
       addTutor,
+      openLearnerCreationModal,
+      resetLearnerCreationModal,
+      nextStepLearnerCreationModal,
+      submitLearnerCreationModal,
     };
   },
 };
