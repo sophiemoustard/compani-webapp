@@ -154,7 +154,9 @@ const routes = [
         component: () => import('src/modules/client/pages/ni/courses/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni courses learners info') to.query.defaultTab = 'traineeFollowUp';
+            if (from.name === 'ni courses learners info' && !to.query.defaultTab) {
+              to.query.defaultTab = 'traineeFollowUp';
+            }
 
             return next();
           } catch (e) {
