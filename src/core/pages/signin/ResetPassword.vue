@@ -19,15 +19,16 @@
 </template>
 
 <script>
+import { ref, computed, onBeforeUnmount } from 'vue';
 import { sameAs, required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
+import { useLogin } from '@composables/login';
+import { usePassword } from '@composables/password';
 import Authentication from '@api/Authentication';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { isUserLogged } from '@helpers/alenvi';
-import { passwordMixin } from '@mixins/passwordMixin';
-import { logInMixin } from '@mixins/logInMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 export default {
@@ -35,15 +36,67 @@ export default {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
-  setup () { return { v$: useVuelidate() }; },
-  mixins: [passwordMixin, logInMixin],
-  data () {
+  setup () {
+    const password = ref('');
+    const passwordConfirm = ref('');
+    const userId = ref(null);
+    const timeout = ref(null);
+    const userEmail = ref('');
+
+    const { logInUser } = useLogin();
+
+    const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
+
+    const rules = computed(() => ({
+      password: { required, ...passwordValidation.value },
+      passwordConfirm: { required, sameAs: sameAs(password.value) },
+    }));
+
+    const v$ = useVuelidate(rules, { password, passwordConfirm });
+
+    const setData = (checkToken) => {
+      userId.value = checkToken.user._id;
+      userEmail.value = checkToken.user.email;
+    };
+
+    const logIn = async () => {
+      try {
+        await logInUser({ email: userEmail.value, password: password.value });
+      } catch (e) {
+        NotifyNegative('Erreur lors de la connexion. Si le problème persiste, contactez le support technique.');
+        console.error(e);
+      }
+    };
+
+    const submit = async () => {
+      try {
+        v$.value.$touch();
+        if (v$.value.error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Authentication.updatePassword(userId.value, { local: { password: password.value }, isConfirmed: true });
+
+        NotifyPositive('Mot de passe changé. Connexion en cours ...');
+        timeout.value = setTimeout(() => logIn(), 2000);
+      } catch (e) {
+        NotifyNegative('Erreur, si le problème persiste, contactez le support technique.');
+        console.error(e.response);
+      }
+    };
+
+    onBeforeUnmount(() => {
+      clearTimeout(timeout.value);
+    });
+
     return {
-      password: '',
-      passwordConfirm: '',
-      userId: null,
-      timeout: null,
-      userEmail: '',
+      // Data
+      password,
+      passwordConfirm,
+      passwordError,
+      passwordConfirmError,
+      // Methods
+      submit,
+      setData,
+      v$,
     };
   },
   async beforeRouteEnter (to, from, next) {
@@ -62,43 +115,6 @@ export default {
       else console.error(e);
       logOutAndRedirectToLogin();
     }
-  },
-  validations () {
-    return {
-      password: { required, ...this.passwordValidation },
-      passwordConfirm: { required, sameAs: sameAs(this.password) },
-    };
-  },
-  methods: {
-    setData (checkToken) {
-      this.userId = checkToken.user._id;
-      this.userEmail = checkToken.user.email;
-    },
-    async logIn () {
-      try {
-        await this.logInUser({ email: this.userEmail, password: this.password });
-      } catch (e) {
-        NotifyNegative('Erreur lors de la connexion. Si le problème persiste, contactez le support technique.');
-        console.error(e);
-      }
-    },
-    async submit () {
-      try {
-        this.v$.$touch();
-        if (this.v$.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Authentication.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true });
-
-        NotifyPositive('Mot de passe changé. Connexion en cours...');
-        this.timeout = setTimeout(() => this.logIn(), 2000);
-      } catch (e) {
-        NotifyNegative('Erreur, si le problème persiste, contactez le support technique.');
-        console.error(e.response);
-      }
-    },
-  },
-  beforeUnmount () {
-    clearTimeout(this.timeout);
   },
 };
 </script>
