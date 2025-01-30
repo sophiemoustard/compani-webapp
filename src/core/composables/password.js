@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-// import get from 'lodash/get';
 import { minLength } from '@vuelidate/validators';
 import { REQUIRED_LABEL } from '@data/constants';
 
