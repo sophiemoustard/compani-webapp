@@ -26,10 +26,8 @@
                   :disable="pdfLoading">
                   {{ bill.number }} - {{ formatPrice(bill.netInclTaxes) }}
                 </div>
-                <div v-else class="text-weight-bold">
-                  <span class="q-py-sm">
-                    A facturer - {{ formatPrice(bill.netInclTaxes) }}
-                  </span>
+                <div v-else class="row text-weight-bold">
+                  <div class="q-pt-xs"> A facturer - {{ formatPrice(bill.netInclTaxes) }}</div>
                   <ni-button icon="delete" @click.stop="openBillDeletionModal(bill._id)" color="copper-grey-700"
                     size="12px" />
                 </div>
