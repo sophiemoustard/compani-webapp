@@ -1,4 +1,4 @@
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed, nextTick, useTemplateRef } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -11,7 +11,7 @@ import Users from '@api/Users';
 
 export const useUser = () => {
   const emailLock = ref(true);
-  const userEmail = ref({ emailInput: null });
+  const userEmail = useTemplateRef('userEmail');
   const tmpInput = ref('');
 
   const $store = useStore();
@@ -81,10 +81,12 @@ export const useUser = () => {
   };
 
   const toggleEmailLock = async () => {
+    console.log('user email', userEmail.value);
     if (emailLock.value) {
       emailLock.value = false;
       await $nextTick();
-      userEmail.value.emailInput.focus();
+      userEmail.value.focus();
+      console.log('ici');
     } else {
       await updateUser('local.email');
     }

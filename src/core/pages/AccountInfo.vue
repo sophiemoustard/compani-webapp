@@ -19,6 +19,7 @@
           @focus="saveTmp('identity.lastname')" />
         <div class="col-xs-12 col-md-6 row items-center">
           <div class="col-11">
+            {{ userEmail }}
             <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
               :error="v$.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
               :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" />
@@ -68,9 +69,7 @@ import Button from '@components/Button';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-// import { passwordMixin } from '@mixins/passwordMixin';
 import { validationMixin } from '@mixins/validationMixin';
-// import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 import { useUser } from '@composables/user';
@@ -101,7 +100,7 @@ export default {
     const backgroundClass = ref(/\/ad\//.test($route.path) ? 'vendor-background' : 'client-background');
     const isLoggingOut = ref(false);
 
-    const { toggleEmailLock, updateUser, emailError, updateAlenviUser, lockIcon } = useUser();
+    const { toggleEmailLock, updateUser, emailError, updateAlenviUser, lockIcon, userEmail } = useUser();
     const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
 
     const userProfile = computed(() => $store.state.main.loggedUser);
@@ -195,6 +194,7 @@ export default {
       emailError,
       toggleEmailLock,
       updateAlenviUser,
+      userEmail,
       lockIcon,
       passwordError,
       passwordConfirmError,
