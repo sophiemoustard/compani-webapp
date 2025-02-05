@@ -6,8 +6,7 @@ import { useValidations } from '@composables/validations';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPhoneForPayload } from '@helpers/utils';
 
-export const useUser = (updateAlenviUser, v$) => {
-  const emailLock = ref(true);
+export const useUser = (updateAlenviUser, v$, emailLock) => {
   const userEmail = useTemplateRef('userEmail');
   const tmpInput = ref('');
 
@@ -61,7 +60,7 @@ export const useUser = (updateAlenviUser, v$) => {
     if (emailLock.value) {
       emailLock.value = false;
       await nextTick();
-      userEmail.value.focus();
+      userEmail.value.$refs.emailInput.focus();
     } else {
       await updateUser('local.email');
     }

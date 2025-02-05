@@ -19,7 +19,6 @@
           @focus="saveTmp('identity.lastname')" />
         <div class="col-xs-12 col-md-6 row items-center">
           <div class="col-11">
-            {{ userEmail }}
             <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
               :error="v$.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
               :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" />
@@ -69,7 +68,6 @@ import Button from '@components/Button';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { validationMixin } from '@mixins/validationMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 import { useUser } from '@composables/user';
@@ -77,7 +75,6 @@ import { usePassword } from '@composables/password';
 
 export default {
   name: 'AccountInfo',
-  mixins: [validationMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-button': Button,
@@ -141,7 +138,7 @@ export default {
 
     const v$ = useVuelidate(rules, { userProfile, newPassword });
 
-    const { toggleEmailLock, updateUser, emailError, lockIcon, userEmail } = useUser(updateAlenviUser, v$);
+    const { toggleEmailLock, updateUser, emailError, lockIcon, userEmail } = useUser(updateAlenviUser, v$, emailLock);
 
     const saveTmp = (path) => {
       if (tmpInput.value === '') tmpInput.value = get(userProfile.value, path);
@@ -203,7 +200,6 @@ export default {
       v$,
       refreshUser,
       saveTmp,
-      // updateAlenviUser,
       resetForm,
       logout,
       submitPasswordChange,
