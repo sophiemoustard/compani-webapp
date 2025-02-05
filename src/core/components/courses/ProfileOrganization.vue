@@ -335,10 +335,9 @@ export default {
       learnerCreationModal,
       learnerCreationModalLoading,
       submitLearnerCreationModal,
-      disableUserInfoEdition,
       traineeAdditionModal: tutorModal,
-      newTraineeRegistration,
-    } = useLearnersCreation(refreshTraineeTable);
+      newTraineeRegistration: newTutorRegistration,
+    } = useLearnersCreation(refreshTraineeTable, false, false, courseCompanyIds);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -461,6 +460,8 @@ export default {
 
     const companyOptions = computed(() => formatAndSortCompanyOptions(course.value.companies));
 
+    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
+
     const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
@@ -519,7 +520,7 @@ export default {
     const refreshPotentialTrainees = async () => {
       try {
         if (isClientInterface && course.value.type === INTER_B2B) return;
-        const companies = course.value.companies.map(c => c._id);
+        const companies = courseCompanyIds.value;
 
         potentialTrainees.value = !isEmpty(companies)
           ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
@@ -562,15 +563,18 @@ export default {
         }
         const loggedUserCompany = get(loggedUser.value, 'company._id');
         const loggedUserHoldingRole = get(loggedUser.value, 'role.holding.name');
-        const courseCompanies = course.value.companies.map(c => c._id);
+        // const courseCompanies = course.value.companies.map(c => c._id);
 
-        if (loggedUserIsTrainer.value && !loggedUserHoldingRole && !courseCompanies.includes(loggedUserCompany)) {
+        if (loggedUserIsTrainer.value && !loggedUserHoldingRole &&
+        !courseCompanyIds.value.includes(loggedUserCompany)) {
           companyRepresentativeOptions.value = [];
           return;
         }
 
         const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompanies[0], includeHoldingAdmins: true })
+          ? await Users.list(
+            { role: [COACH, CLIENT_ADMIN], company: courseCompanyIds.value[0], includeHoldingAdmins: true }
+          )
           : await Users.list({ role: [HOLDING_ADMIN], holding: course.value.holding });
 
         companyRepresentativeOptions.value = Object.freeze(clientsUsersAllowedtoAccessCompany
@@ -1031,10 +1035,10 @@ export default {
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
 
     watch(tutorModal, () => {
-      if (tutorModal.value && newTraineeRegistration.value.user) {
-        tmpInterlocutorId.value = newTraineeRegistration.value.user;
+      if (tutorModal.value && newTutorRegistration.value.user) {
+        tmpInterlocutorId.value = newTutorRegistration.value.user;
         interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
-        newTraineeRegistration.value.user = '';
+        newTutorRegistration.value.user = '';
       }
     });
 
@@ -1105,7 +1109,6 @@ export default {
       learnerAlreadyExists,
       learnerValidation,
       learnerCreationModalLoading,
-      disableUserInfoEdition,
       learnerCreationModal,
       // Computed
       course,
@@ -1131,7 +1134,6 @@ export default {
       isSingleCourse,
       traineesOptions,
       companyOptions,
-      isIntraCourse,
       // Methods
       get,
       formatQuantity,

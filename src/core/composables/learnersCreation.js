@@ -178,7 +178,7 @@ export const useLearnersCreation = (
     if (companies.value.includes(lastCompany)) {
       return isDirectory
         ? NotifyWarning('Un compte rattaché à la structure existe déjà avec cette adresse mail.')
-        : NotifyWarning('L\'apprenant(e) existe déjà et peut être inscrit(e) à la formation sans modification.');
+        : NotifyWarning('La personne existe déjà et peut être ajoutée à la formation sans modification.');
     }
     return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
   };
