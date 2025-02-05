@@ -144,11 +144,10 @@
       :label="interlocutorLabel" :interlocutors-options="traineesOptions" display-no-options-slot
       @open-user-creation-modal="openLearnerCreationModal" />
 
-    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" @hide="resetContactAddition"
-      :first-step="firstStep" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
-      :disable-company="isIntraCourse" :learner-edition="learnerAlreadyExists"
-      :validations="learnerValidation.newLearner" :loading="learnerCreationModalLoading"
-      @submit="submitLearnerCreationModal" :disable-user-info="disableUserInfoEdition" />
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
+      @hide="resetLearnerCreationModal" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
+      :learner-edition="learnerAlreadyExists" :validations="learnerValidation.newLearner"
+      :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </div>
 </template>
 
@@ -988,6 +987,10 @@ export default {
     const openTutorModal = (event) => {
       if (isArchived.value) {
         return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation archivée.');
+      }
+
+      if (course.value.companies.length === 0) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation sans structure.');
       }
 
       const { action, interlocutorId: tutorId } = event;
