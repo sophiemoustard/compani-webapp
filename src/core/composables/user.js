@@ -1,15 +1,12 @@
 import { ref, computed, nextTick, useTemplateRef } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
-import set from 'lodash/set';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { useValidations } from '@composables/validations';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPhoneForPayload } from '@helpers/utils';
-import useVuelidate from '@vuelidate/core';
-import Users from '@api/Users';
 
-export const useUser = () => {
+export const useUser = (updateAlenviUser, v$) => {
   const emailLock = ref(true);
   const userEmail = useTemplateRef('userEmail');
   const tmpInput = ref('');
@@ -17,35 +14,15 @@ export const useUser = () => {
   const $store = useStore();
   const userProfile = computed(() => $store.state.main.loggedUser);
 
-  const $nextTick = nextTick;
-
   const { waitForValidation } = useValidations();
-  const v$ = useVuelidate();
 
   const lockIcon = computed(() => (emailLock.value ? 'lock' : 'lock_open'));
-
-  const refreshUser = async () => {
-    await $store.dispatch('main/fetchLoggedUser', userProfile.value._id);
-  };
-
-  const updateAlenviUser = async (path) => {
-    try {
-      const value = get(userProfile.value, path);
-      const payload = set({}, path, value);
-
-      await Users.updateById(userProfile.value._id, payload);
-      await refreshUser();
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  };
 
   const emailErrorHandler = async () => {
     try {
       NotifyNegative('Email déjà existant.');
       userProfile.value.local.email = tmpInput.value;
-      await $nextTick();
+      await nextTick();
       userEmail.value.select();
     } catch (e) {
       console.error(e);
@@ -81,12 +58,10 @@ export const useUser = () => {
   };
 
   const toggleEmailLock = async () => {
-    console.log('user email', userEmail.value);
     if (emailLock.value) {
       emailLock.value = false;
-      await $nextTick();
+      await nextTick();
       userEmail.value.focus();
-      console.log('ici');
     } else {
       await updateUser('local.email');
     }

@@ -61,7 +61,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, email, sameAs } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-// import Users from '@api/Users';
+import Users from '@api/Users';
 import Authentication from '@api/Authentication';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
@@ -100,10 +100,25 @@ export default {
     const backgroundClass = ref(/\/ad\//.test($route.path) ? 'vendor-background' : 'client-background');
     const isLoggingOut = ref(false);
 
-    const { toggleEmailLock, updateUser, emailError, updateAlenviUser, lockIcon, userEmail } = useUser();
-    const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
+    const refreshUser = async () => {
+      await $store.dispatch('main/fetchLoggedUser', userProfile.value._id);
+    };
+
+    const updateAlenviUser = async (path) => {
+      try {
+        const value = get(userProfile.value, path);
+        const payload = set({}, path, value);
+
+        await Users.updateById(userProfile.value._id, payload);
+        await refreshUser();
+      } catch (e) {
+        console.error(e);
+        throw e;
+      }
+    };
 
     const userProfile = computed(() => $store.state.main.loggedUser);
+    const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
 
     const rules = computed(() => ({
       userProfile: {
@@ -126,26 +141,11 @@ export default {
 
     const v$ = useVuelidate(rules, { userProfile, newPassword });
 
-    const refreshUser = async () => {
-      await $store.dispatch('main/fetchLoggedUser', userProfile.value._id);
-    };
+    const { toggleEmailLock, updateUser, emailError, lockIcon, userEmail } = useUser(updateAlenviUser, v$);
 
     const saveTmp = (path) => {
       if (tmpInput.value === '') tmpInput.value = get(userProfile.value, path);
     };
-
-    // const updateAlenviUser = async (path) => {
-    //   try {
-    //     const value = get(userProfile.value, path);
-    //     const payload = set({}, path, value);
-
-    //     await Users.updateById(userProfile.value._id, payload);
-    //     await refreshUser();
-    //   } catch (e) {
-    //     console.error(e);
-    //     throw e;
-    //   }
-    // };
 
     const submitPasswordChange = async () => {
       try {
@@ -193,7 +193,6 @@ export default {
       updateUser,
       emailError,
       toggleEmailLock,
-      updateAlenviUser,
       userEmail,
       lockIcon,
       passwordError,
