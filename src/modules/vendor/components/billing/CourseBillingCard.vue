@@ -28,8 +28,7 @@
                 </div>
                 <div v-else class="row text-weight-bold">
                   <div class="q-pt-xs"> A facturer - {{ formatPrice(bill.netInclTaxes) }}</div>
-                  <ni-button icon="delete" @click.stop="openBillDeletionModal(bill._id)" color="copper-grey-700"
-                    size="12px" />
+                  <ni-button icon="delete" @click.stop="openBillDeletionModal(bill._id)" size="12px" />
                 </div>
                 <div class="q-ml-lg bill-cancel" v-if="bill.courseCreditNote">
                   <q-icon size="12px" name="fas fa-times-circle" color="orange-500 attendance" />
