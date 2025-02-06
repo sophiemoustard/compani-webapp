@@ -306,6 +306,8 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
+    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
+
     const {
       vendorRole,
       disableDocDownload,
@@ -324,8 +326,6 @@ export default {
       await refreshCourse();
       await refreshPotentialTrainees();
     };
-
-    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
 
     const {
       newLearner,

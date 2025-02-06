@@ -180,7 +180,7 @@ export const useLearnersCreation = (
         ? NotifyWarning('Un compte rattaché à la structure existe déjà avec cette adresse mail.')
         : NotifyWarning('La personne existe déjà et peut être ajoutée à la formation sans modification.');
     }
-    return NotifyNegative('L\'apprenant(e) existe déjà et n\'est pas relié(e) à la bonne structure.');
+    return NotifyNegative('La personne existe déjà et n\'est pas reliée à la bonne structure.');
   };
 
   const nextStepLearnerCreationModal = async () => {
