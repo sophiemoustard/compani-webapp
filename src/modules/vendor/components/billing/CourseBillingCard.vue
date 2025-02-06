@@ -530,7 +530,7 @@ export default {
         emit('refresh-course-bills');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la facture brouillon');
+        NotifyNegative('Erreur lors de la suppression de la facture brouillon.');
       }
     };
 
@@ -542,7 +542,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => deleteBill(billId))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     };
 
     const isBilled = bill => !!bill.billedAt;
