@@ -20,7 +20,7 @@
 
 <script>
 import { ref, computed, onBeforeUnmount } from 'vue';
-import { sameAs, required } from '@vuelidate/validators';
+import { sameAs, required, minLength } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
@@ -45,10 +45,10 @@ export default {
 
     const { logInUser } = useLogin();
 
-    const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
+    const { passwordError, passwordConfirmError } = usePassword();
 
     const rules = computed(() => ({
-      password: { required, ...passwordValidation.value },
+      password: { required, minLength: minLength(6) },
       passwordConfirm: { required, sameAs: sameAs(password.value) },
     }));
 

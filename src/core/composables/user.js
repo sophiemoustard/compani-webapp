@@ -85,6 +85,5 @@ export const useUser = (updateAlenviUser, v$, emailLock) => {
     updateUser,
     emailErrorHandler,
     emailError,
-    v$,
   };
 };

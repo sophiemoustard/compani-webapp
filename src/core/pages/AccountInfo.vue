@@ -57,7 +57,7 @@ import { ref, computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
-import { required, email, sameAs } from '@vuelidate/validators';
+import { required, email, sameAs, minLength } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
@@ -67,11 +67,11 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import PictureUploader from '@components/PictureUploader';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 import { useUser } from '@composables/user';
 import { usePassword } from '@composables/password';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 export default {
   name: 'AccountInfo',
@@ -115,23 +115,15 @@ export default {
     };
 
     const userProfile = computed(() => $store.state.main.loggedUser);
-    const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
 
     const rules = computed(() => ({
       userProfile: {
-        identity: {
-          firstname: { required },
-          lastname: { required },
-        },
-        local: {
-          email: { required, email },
-        },
-        contact: {
-          phone: { frPhoneNumber },
-        },
+        identity: { firstname: { required }, lastname: { required } },
+        local: { email: { required, email } },
+        contact: { phone: { frPhoneNumber } },
       },
       newPassword: {
-        password: { required, ...passwordValidation.value },
+        password: { required, minLength: minLength(6) },
         confirm: { required, sameAs: sameAs(newPassword.value.password) },
       },
     }));
@@ -139,6 +131,8 @@ export default {
     const v$ = useVuelidate(rules, { userProfile, newPassword });
 
     const { toggleEmailLock, updateUser, emailError, lockIcon, userEmail } = useUser(updateAlenviUser, v$, emailLock);
+
+    const { passwordError, passwordConfirmError } = usePassword();
 
     const saveTmp = (path) => {
       if (tmpInput.value === '') tmpInput.value = get(userProfile.value, path);
