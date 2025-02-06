@@ -141,7 +141,13 @@
 
     <interlocutor-modal v-model="tutorModal" v-model:interlocutor="tmpInterlocutorId" :validations="v$.tutor"
       @submit="addTutor" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
-      :label="interlocutorLabel" :interlocutors-options="traineesOptions" />
+      :label="interlocutorLabel" :interlocutors-options="traineesOptions" display-no-options-slot
+      @open-user-creation-modal="openLearnerCreationModal" />
+
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
+      @hide="resetLearnerCreationModal" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
+      :learner-edition="learnerAlreadyExists" :validations="learnerValidation.newLearner"
+      :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </div>
 </template>
 
@@ -178,6 +184,7 @@ import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import BiColorButton from '@components/BiColorButton';
 import SecondaryButton from '@components/SecondaryButton';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -202,12 +209,19 @@ import {
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
-import { formatQuantity, formatIdentity, formatDownloadName, formatAndSortUserOptions } from '@helpers/utils';
+import {
+  formatQuantity,
+  formatIdentity,
+  formatDownloadName,
+  formatAndSortUserOptions,
+  formatAndSortCompanyOptions,
+} from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import { useCourses } from '@composables/courses';
+import { useLearnersCreation } from '@composables/learnersCreation';
 
 export default {
   name: 'ProfileOrganization',
@@ -230,6 +244,7 @@ export default {
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
     'training-contract-container': TrainingContractContainer,
+    'learner-creation-modal': LearnerCreationModal,
   },
   setup (props) {
     const { profileId } = toRefs(props);
@@ -282,7 +297,6 @@ export default {
     const canReadHistory = ref(false);
     const canUpdateCertifyingTest = ref(false);
     const canReadAndUpdateSalesRepresentative = ref(false);
-    const tutorModal = ref(false);
     const courseHistoryFeed = useTemplateRef('courseHistoryFeed');
     const OPERATIONS_REPRESENTATIVE = 'operationsRepresentative';
     const COMPANY_REPRESENTATIVE = 'companyRepresentative';
@@ -291,6 +305,8 @@ export default {
     const urlIos = 'https://apple.co/33kKzcU';
 
     const course = computed(() => $store.state.course.course);
+
+    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
 
     const {
       vendorRole,
@@ -305,6 +321,25 @@ export default {
       downloadAttendanceSheet,
       isIntraCourse,
     } = useCourses(course);
+
+    const refreshTraineeTable = async () => {
+      await refreshCourse();
+      await refreshPotentialTrainees();
+    };
+
+    const {
+      newLearner,
+      resetLearnerCreationModal,
+      firstStep,
+      nextStepLearnerCreationModal,
+      learnerAlreadyExists,
+      learnerValidation,
+      learnerCreationModal,
+      learnerCreationModalLoading,
+      submitLearnerCreationModal,
+      traineeAdditionModal: tutorModal,
+      newTraineeRegistration: newTutorRegistration,
+    } = useLearnersCreation(refreshTraineeTable, false, false, courseCompanyIds);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -425,6 +460,8 @@ export default {
 
     const traineesOptions = computed(() => formatAndSortUserOptions(potentialTrainees.value, !isIntraCourse.value));
 
+    const companyOptions = computed(() => formatAndSortCompanyOptions(course.value.companies));
+
     const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
@@ -483,10 +520,11 @@ export default {
     const refreshPotentialTrainees = async () => {
       try {
         if (isClientInterface && course.value.type === INTER_B2B) return;
-        const companies = course.value.companies.map(c => c._id);
 
-        potentialTrainees.value = !isEmpty(companies)
-          ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
+        potentialTrainees.value = !isEmpty(courseCompanyIds.value)
+          ? Object.freeze(await Users.learnerList(
+            { companies: courseCompanyIds.value, startDate: CompaniDate().toISO(), action: COURSE }
+          ))
           : [];
       } catch (error) {
         potentialTrainees.value = [];
@@ -503,11 +541,6 @@ export default {
       } finally {
         courseLoading.value = false;
       }
-    };
-
-    const refreshTraineeTable = async () => {
-      await refreshCourse();
-      await refreshPotentialTrainees();
     };
 
     const formatInterlocutorOption = interlocutor => ({
@@ -531,15 +564,17 @@ export default {
         }
         const loggedUserCompany = get(loggedUser.value, 'company._id');
         const loggedUserHoldingRole = get(loggedUser.value, 'role.holding.name');
-        const courseCompanies = course.value.companies.map(c => c._id);
 
-        if (loggedUserIsTrainer.value && !loggedUserHoldingRole && !courseCompanies.includes(loggedUserCompany)) {
+        if (loggedUserIsTrainer.value && !loggedUserHoldingRole &&
+        !courseCompanyIds.value.includes(loggedUserCompany)) {
           companyRepresentativeOptions.value = [];
           return;
         }
 
         const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompanies[0], includeHoldingAdmins: true })
+          ? await Users.list(
+            { role: [COACH, CLIENT_ADMIN], company: courseCompanyIds.value[0], includeHoldingAdmins: true }
+          )
           : await Users.list({ role: [HOLDING_ADMIN], holding: course.value.holding });
 
         companyRepresentativeOptions.value = Object.freeze(clientsUsersAllowedtoAccessCompany
@@ -958,6 +993,10 @@ export default {
         return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation archivée.');
       }
 
+      if (!course.value.companies.length) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation sans structure.');
+      }
+
       const { action, interlocutorId: tutorId } = event;
 
       if (action === DELETION) {
@@ -988,7 +1027,20 @@ export default {
       }
     };
 
+    const openLearnerCreationModal = async () => {
+      tutorModal.value = false;
+      learnerCreationModal.value = true;
+    };
+
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
+
+    watch(tutorModal, () => {
+      if (tutorModal.value && newTutorRegistration.value.user) {
+        tmpInterlocutorId.value = newTutorRegistration.value.user;
+        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
+        newTutorRegistration.value.user = '';
+      }
+    });
 
     const created = async () => {
       const promises = [];
@@ -1052,6 +1104,12 @@ export default {
       CREATION,
       TUTOR,
       tutorModal,
+      newLearner,
+      firstStep,
+      learnerAlreadyExists,
+      learnerValidation,
+      learnerCreationModalLoading,
+      learnerCreationModal,
       // Computed
       course,
       v$,
@@ -1075,6 +1133,7 @@ export default {
       isIntraHoldingCourse,
       isSingleCourse,
       traineesOptions,
+      companyOptions,
       // Methods
       get,
       formatQuantity,
@@ -1107,6 +1166,10 @@ export default {
       addTrainer,
       openTutorModal,
       addTutor,
+      openLearnerCreationModal,
+      resetLearnerCreationModal,
+      nextStepLearnerCreationModal,
+      submitLearnerCreationModal,
     };
   },
 };
