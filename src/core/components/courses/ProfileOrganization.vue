@@ -325,6 +325,8 @@ export default {
       await refreshPotentialTrainees();
     };
 
+    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
+
     const {
       newLearner,
       resetLearnerCreationModal,
@@ -460,8 +462,6 @@ export default {
 
     const companyOptions = computed(() => formatAndSortCompanyOptions(course.value.companies));
 
-    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
-
     const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
 
@@ -520,10 +520,11 @@ export default {
     const refreshPotentialTrainees = async () => {
       try {
         if (isClientInterface && course.value.type === INTER_B2B) return;
-        const companies = courseCompanyIds.value;
 
-        potentialTrainees.value = !isEmpty(companies)
-          ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
+        potentialTrainees.value = !isEmpty(courseCompanyIds.value)
+          ? Object.freeze(await Users.learnerList(
+            { companies: courseCompanyIds.value, startDate: CompaniDate().toISO(), action: COURSE }
+          ))
           : [];
       } catch (error) {
         potentialTrainees.value = [];
@@ -563,7 +564,6 @@ export default {
         }
         const loggedUserCompany = get(loggedUser.value, 'company._id');
         const loggedUserHoldingRole = get(loggedUser.value, 'role.holding.name');
-        // const courseCompanies = course.value.companies.map(c => c._id);
 
         if (loggedUserIsTrainer.value && !loggedUserHoldingRole &&
         !courseCompanyIds.value.includes(loggedUserCompany)) {
@@ -993,7 +993,7 @@ export default {
         return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation archivée.');
       }
 
-      if (course.value.companies.length === 0) {
+      if (!course.value.companies.length) {
         return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation sans structure.');
       }
 
