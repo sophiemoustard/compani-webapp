@@ -13,15 +13,15 @@
       <div class="row gutter-profile q-mb-xl">
         <ni-input caption="Prénom" :error="v$.userProfile.identity.firstname.$error"
           v-model.trim="userProfile.identity.firstname" @blur="updateUser('identity.firstname')"
-          @focus="saveTmp('identity.firstname')" />
+          @focus="saveTmp('identity.firstname')" required-field />
         <ni-input caption="Nom" :error="v$.userProfile.identity.lastname.$error"
           v-model.trim="userProfile.identity.lastname" @blur="updateUser('identity.lastname')"
-          @focus="saveTmp('identity.lastname')" />
+          @focus="saveTmp('identity.lastname')" required-field />
         <div class="col-xs-12 col-md-6 row items-center">
           <div class="col-11">
             <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
               :error="v$.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
-              :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" />
+              :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" required-field />
           </div>
           <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
             <ni-button :icon="lockIcon" @click="toggleEmailLock(!emailLock)" color="copper-grey-500" />
@@ -57,21 +57,20 @@ import { ref, computed, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import { useRoute } from 'vue-router';
 import useVuelidate from '@vuelidate/core';
-import { required, email, sameAs, minLength } from '@vuelidate/validators';
+import { required, email, sameAs } from '@vuelidate/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import Users from '@api/Users';
 import Authentication from '@api/Authentication';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import PictureUploader from '@components/PictureUploader';
-import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 import { useUser } from '@composables/user';
 import { usePassword } from '@composables/password';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
+import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 
 export default {
   name: 'AccountInfo',
@@ -97,24 +96,13 @@ export default {
     const backgroundClass = ref(/\/ad\//.test($route.path) ? 'vendor-background' : 'client-background');
     const isLoggingOut = ref(false);
 
+    const userProfile = computed(() => $store.state.main.loggedUser);
+
     const refreshUser = async () => {
       await $store.dispatch('main/fetchLoggedUser', userProfile.value._id);
     };
 
-    const updateAlenviUser = async (path) => {
-      try {
-        const value = get(userProfile.value, path);
-        const payload = set({}, path, value);
-
-        await Users.updateById(userProfile.value._id, payload);
-        await refreshUser();
-      } catch (e) {
-        console.error(e);
-        throw e;
-      }
-    };
-
-    const userProfile = computed(() => $store.state.main.loggedUser);
+    const { passwordError, passwordConfirmError, passwordValidation } = usePassword();
 
     const rules = computed(() => ({
       userProfile: {
@@ -123,17 +111,14 @@ export default {
         contact: { phone: { frPhoneNumber } },
       },
       newPassword: {
-        password: { required, minLength: minLength(6) },
+        password: { ...passwordValidation.value },
         confirm: { required, sameAs: sameAs(newPassword.value.password) },
       },
     }));
 
     const v$ = useVuelidate(rules, { userProfile, newPassword });
 
-    const { toggleEmailLock, updateUser, emailError, lockIcon, userEmail } = useUser(updateAlenviUser, v$, emailLock);
-
-    const { passwordError, passwordConfirmError } = usePassword();
-
+    const { toggleEmailLock, updateUser, emailError, lockIcon, userEmail } = useUser(refreshUser, v$, emailLock);
     const saveTmp = (path) => {
       if (tmpInput.value === '') tmpInput.value = get(userProfile.value, path);
     };

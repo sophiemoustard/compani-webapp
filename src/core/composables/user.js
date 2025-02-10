@@ -1,12 +1,14 @@
 import { ref, computed, nextTick, useTemplateRef } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
+import set from 'lodash/set';
+import Users from '@api/Users';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { useValidations } from '@composables/validations';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPhoneForPayload } from '@helpers/utils';
 
-export const useUser = (updateAlenviUser, v$, emailLock) => {
+export const useUser = (refreshUser, v$, emailLock) => {
   const userEmail = useTemplateRef('userEmail');
   const tmpInput = ref('');
 
@@ -28,10 +30,23 @@ export const useUser = (updateAlenviUser, v$, emailLock) => {
     }
   };
 
+  const updateAlenviUser = async (path) => {
+    try {
+      const value = get(userProfile.value, path);
+      const payload = set({}, path, value);
+
+      await Users.updateById(userProfile.value._id, payload);
+      await refreshUser();
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  };
+
   const updateUser = async (path) => {
     try {
-      if (tmpInput.value === get(userProfile.value, path)) {
-        if (path === 'local.email' && tmpInput.value !== '') emailLock.value = true;
+      if (tmpInput.value && tmpInput.value === get(userProfile.value, path)) {
+        if (path === 'local.email') emailLock.value = true;
         return;
       }
 
