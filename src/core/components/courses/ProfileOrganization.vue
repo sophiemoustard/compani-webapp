@@ -1013,9 +1013,6 @@ export default {
       try {
         interlocutorModalLoading.value = true;
 
-        v$.value.tutor.$touch();
-        if (v$.value.tutor.$error) return NotifyWarning('Champ(s) invalide(s).');
-
         await Courses.addTutor(course.value._id, { tutor: tmpInterlocutorId.value });
 
         await refreshCourse();
@@ -1033,6 +1030,9 @@ export default {
     };
 
     const validateTutorAddition = () => {
+      v$.value.tutor.$touch();
+      if (v$.value.tutor.$error) return NotifyWarning('Champ(s) invalide(s).');
+
       $q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir ajouter l\'utilisateur comme tuteur de la formation&nbsp;? <br /><br />'
