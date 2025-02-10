@@ -1021,7 +1021,7 @@ export default {
         await refreshCourse();
         tutorModal.value = false;
         NotifyPositive('Tuteur ajouté.');
-        NotifyPositive('Email envoyé');
+        NotifyPositive('Email envoyé.');
       } catch (e) {
         console.error(e);
         if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
@@ -1182,7 +1182,6 @@ export default {
       goToContactProfile,
       addTrainer,
       openTutorModal,
-      addTutor,
       openLearnerCreationModal,
       resetLearnerCreationModal,
       nextStepLearnerCreationModal,
