@@ -140,7 +140,7 @@
       @hide="resetContactAddition" :contact-options="contactOptions" />
 
     <interlocutor-modal v-model="tutorModal" v-model:interlocutor="tmpInterlocutorId" :validations="v$.tutor"
-      @submit="addTutor" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
+      @submit="validateTutorAddition" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
       :label="interlocutorLabel" :interlocutors-options="traineesOptions" display-no-options-slot
       @open-user-creation-modal="openLearnerCreationModal" />
 
@@ -1011,20 +1011,37 @@ export default {
 
     const addTutor = async () => {
       try {
+        interlocutorModalLoading.value = true;
+
         v$.value.tutor.$touch();
         if (v$.value.tutor.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         await Courses.addTutor(course.value._id, { tutor: tmpInterlocutorId.value });
 
-        tutorModal.value = false;
         await refreshCourse();
+        tutorModal.value = false;
         NotifyPositive('Tuteur ajouté.');
+        NotifyPositive('Email envoyé');
       } catch (e) {
         console.error(e);
         if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
 
         NotifyNegative('Erreur lors de l\'ajout du tuteur.');
+      } finally {
+        interlocutorModalLoading.value = false;
       }
+    };
+
+    const validateTutorAddition = () => {
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir ajouter l\'utilisateur comme tuteur de la formation&nbsp;? <br /><br />'
+        + ' Un email lui sera envoyé.',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => addTutor())
+        .onCancel(() => NotifyPositive('Ajout annulé.'));
     };
 
     const openLearnerCreationModal = async () => {
@@ -1170,6 +1187,7 @@ export default {
       resetLearnerCreationModal,
       nextStepLearnerCreationModal,
       submitLearnerCreationModal,
+      validateTutorAddition,
     };
   },
 };
