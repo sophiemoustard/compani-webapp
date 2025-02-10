@@ -28,7 +28,7 @@
           </div>
         </div>
         <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
-          error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
+          error-message="Numéro de téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="v$.userProfile.contact.phone.$error" />
       </div>
       <div class="account-button">
@@ -93,8 +93,8 @@ export default {
     const newPasswordModal = ref(false);
     const newPassword = ref({ password: '', confirm: '' });
     const loading = ref(false);
-    const backgroundClass = ref(/\/ad\//.test($route.path) ? 'vendor-background' : 'client-background');
     const isLoggingOut = ref(false);
+    const backgroundClass = /\/ad\//.test($route.path) ? 'vendor-background' : 'client-background';
 
     const userProfile = computed(() => $store.state.main.loggedUser);
 
