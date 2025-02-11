@@ -1,4 +1,4 @@
-import { ref, computed, nextTick, useTemplateRef } from 'vue';
+import { computed, nextTick, useTemplateRef } from 'vue';
 import { useStore } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -8,9 +8,8 @@ import { useValidations } from '@composables/validations';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatPhoneForPayload } from '@helpers/utils';
 
-export const useUser = (refreshUser, v$, emailLock) => {
+export const useUser = (refreshUser, v$, emailLock, tmpInput) => {
   const userEmail = useTemplateRef('userEmail');
-  const tmpInput = ref('');
 
   const $store = useStore();
   const userProfile = computed(() => $store.state.main.loggedUser);

@@ -13,15 +13,15 @@
       <div class="row gutter-profile q-mb-xl">
         <ni-input caption="Prénom" :error="v$.userProfile.identity.firstname.$error"
           v-model.trim="userProfile.identity.firstname" @blur="updateUser('identity.firstname')"
-          @focus="saveTmp('identity.firstname')" required-field />
+          @focus="saveTmp('identity.firstname')" />
         <ni-input caption="Nom" :error="v$.userProfile.identity.lastname.$error"
           v-model.trim="userProfile.identity.lastname" @blur="updateUser('identity.lastname')"
-          @focus="saveTmp('identity.lastname')" required-field />
+          @focus="saveTmp('identity.lastname')" />
         <div class="col-xs-12 col-md-6 row items-center">
           <div class="col-11">
             <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
               :error="v$.userProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
-              :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" required-field />
+              :error-message="emailError(v$.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
             <ni-button :icon="lockIcon" @click="toggleEmailLock(!emailLock)" color="copper-grey-500" />
@@ -118,7 +118,14 @@ export default {
 
     const v$ = useVuelidate(rules, { userProfile, newPassword });
 
-    const { toggleEmailLock, updateUser, emailError, lockIcon, userEmail } = useUser(refreshUser, v$, emailLock);
+    const {
+      toggleEmailLock,
+      updateUser,
+      emailError,
+      lockIcon,
+      userEmail,
+    } = useUser(refreshUser, v$, emailLock, tmpInput);
+
     const saveTmp = (path) => {
       if (tmpInput.value === '') tmpInput.value = get(userProfile.value, path);
     };
