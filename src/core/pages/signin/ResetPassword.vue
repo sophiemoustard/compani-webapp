@@ -45,10 +45,10 @@ export default {
 
     const { logInUser } = useLogin();
 
-    const { passwordValidation, passwordError, passwordConfirmError } = usePassword();
+    const { passwordError, passwordConfirmError, passwordValidation } = usePassword();
 
     const rules = computed(() => ({
-      password: { required, ...passwordValidation.value },
+      password: { ...passwordValidation.value },
       passwordConfirm: { required, sameAs: sameAs(password.value) },
     }));
 

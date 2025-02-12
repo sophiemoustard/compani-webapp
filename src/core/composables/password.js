@@ -1,9 +1,9 @@
 import { ref } from 'vue';
-import { minLength } from '@vuelidate/validators';
+import { required, minLength } from '@vuelidate/validators';
 import { REQUIRED_LABEL } from '@data/constants';
 
 export const usePassword = () => {
-  const passwordValidation = ref({ minLength: minLength(6) });
+  const passwordValidation = ref({ required, minLength: minLength(6) });
 
   const passwordError = (validationObj) => {
     if (validationObj.required.$response === false) return REQUIRED_LABEL;
