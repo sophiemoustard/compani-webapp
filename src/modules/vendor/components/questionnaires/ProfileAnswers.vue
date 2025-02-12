@@ -213,7 +213,9 @@ export default {
     });
 
     const startAnswersAverage = computed(() => {
-      const answers = startAnswers.value.flatMap(startAnswer => startAnswer.answers);
+      const answers = startAnswers.value
+        .filter(fu => fu.template === SURVEY)
+        .flatMap(startAnswer => startAnswer.answers);
       const average = answers.length
         ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
         : 0;
@@ -230,7 +232,7 @@ export default {
       })));
 
     const endAnswersAverage = computed(() => {
-      const answers = endAnswers.value.flatMap(endAnswer => endAnswer.answers);
+      const answers = endAnswers.value.filter(fu => fu.template === SURVEY).flatMap(endAnswer => endAnswer.answers);
       const average = answers.length
         ? divide(answers.reduce((accumulator, answer) => add(accumulator, answer), 0), answers.length)
         : 0;

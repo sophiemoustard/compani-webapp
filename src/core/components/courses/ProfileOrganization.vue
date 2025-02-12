@@ -37,9 +37,22 @@
       <div class="interlocutor-container">
         <interlocutor-cell v-for="trainer in course.trainers" :key="trainer._id" :interlocutor="trainer"
           caption="Intervenant" :contact="course.contact" :can-update="canUpdateInterlocutor"
-          :disable="isArchived" clearable interlocutor-is-trainer @open-modal="openTrainerModal" />
+          :disable="isArchived" clearable interlocutor-is-trainer-or-tutor @open-modal="openTrainerModal" />
         <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un intervenant"
           @click="() => openTrainerModal({ action: CREATION })" />
+      </div>
+      <div v-if="isSingleCourse">
+        <p class="text-weight-bold table-title q-mt-xl">Tuteurs</p>
+        <p v-if="!get(course, 'tutors', []).some(t => t._id)" class="text-italic q-mb-lg">
+          Aucun tuteur n'est défini pour cette formation.
+        </p>
+        <div class="interlocutor-container">
+          <interlocutor-cell v-for="tutor in course.tutors" :key="tutor._id" :interlocutor="tutor" caption="Tuteur"
+            :can-update="canUpdateInterlocutor" :disable="isArchived" interlocutor-is-trainer-or-tutor clearable
+            @open-modal="openTutorModal" />
+          <ni-secondary-button v-if="canUpdateInterlocutor" class="button-trainer" label="Ajouter un tuteur"
+            @click="() => openTutorModal({ action: CREATION })" />
+        </div>
       </div>
     </div>
     <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse"
@@ -48,7 +61,7 @@
     <ni-trainee-container :loading="courseLoading" @refresh="refreshTraineeTable" @update="updateCourse('maxTrainees')"
       :validations="v$.tmpCourse" :potential-trainees="potentialTrainees"
       v-model:max-trainees="tmpCourse.maxTrainees" />
-    <q-page-sticky expand position="right">
+    <q-page-sticky class="container-history" expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
@@ -125,6 +138,16 @@
     <contact-addition-modal v-model="contactAdditionModal" v-model:contact="tmpContactId"
       @submit="updateContact" :validations="v$.tmpContactId" :loading="contactModalLoading"
       @hide="resetContactAddition" :contact-options="contactOptions" />
+
+    <interlocutor-modal v-model="tutorModal" v-model:interlocutor="tmpInterlocutorId" :validations="v$.tutor"
+      @submit="validateTutorAddition" :loading="interlocutorModalLoading" @hide="resetInterlocutor(TUTOR)"
+      :label="interlocutorLabel" :interlocutors-options="traineesOptions" display-no-options-slot
+      @open-user-creation-modal="openLearnerCreationModal" />
+
+    <learner-creation-modal v-model="learnerCreationModal" v-model:new-user="newLearner" :first-step="firstStep"
+      @hide="resetLearnerCreationModal" @next-step="nextStepLearnerCreationModal" :company-options="companyOptions"
+      :learner-edition="learnerAlreadyExists" :validations="learnerValidation.newLearner"
+      :loading="learnerCreationModalLoading" @submit="submitLearnerCreationModal" />
   </div>
 </template>
 
@@ -161,6 +184,7 @@ import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import BiColorButton from '@components/BiColorButton';
 import SecondaryButton from '@components/SecondaryButton';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -181,15 +205,23 @@ import {
   INTRA_HOLDING,
   DELETION,
   CREATION,
+  TUTOR,
 } from '@data/constants';
 import { defineAbilitiesForCourse } from '@helpers/ability';
 import { composeCourseName } from '@helpers/courses';
-import { formatQuantity, formatIdentity, formatDownloadName } from '@helpers/utils';
+import {
+  formatQuantity,
+  formatIdentity,
+  formatDownloadName,
+  formatAndSortUserOptions,
+  formatAndSortCompanyOptions,
+} from '@helpers/utils';
 import { downloadFile } from '@helpers/file';
 import CompaniDate from '@helpers/dates/companiDates';
 import { descendingSortBy, ascendingSortBy } from '@helpers/dates/utils';
 import { strictPositiveNumber, integerNumber } from '@helpers/vuelidateCustomVal';
 import { useCourses } from '@composables/courses';
+import { useLearnersCreation } from '@composables/learnersCreation';
 
 export default {
   name: 'ProfileOrganization',
@@ -212,9 +244,12 @@ export default {
     'interlocutor-modal': InterlocutorModal,
     'contact-addition-modal': CourseContactAdditionModal,
     'training-contract-container': TrainingContractContainer,
+    'learner-creation-modal': LearnerCreationModal,
   },
   setup (props) {
     const { profileId } = toRefs(props);
+
+    const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
 
     const $store = useStore();
     const $router = useRouter();
@@ -271,6 +306,8 @@ export default {
 
     const course = computed(() => $store.state.course.course);
 
+    const courseCompanyIds = computed(() => course.value.companies.map(c => c._id));
+
     const {
       vendorRole,
       disableDocDownload,
@@ -282,7 +319,27 @@ export default {
       isArchived,
       followUpMissingInfo,
       downloadAttendanceSheet,
+      isIntraCourse,
     } = useCourses(course);
+
+    const refreshTraineeTable = async () => {
+      await refreshCourse();
+      await refreshPotentialTrainees();
+    };
+
+    const {
+      newLearner,
+      resetLearnerCreationModal,
+      firstStep,
+      nextStepLearnerCreationModal,
+      learnerAlreadyExists,
+      learnerValidation,
+      learnerCreationModal,
+      learnerCreationModalLoading,
+      submitLearnerCreationModal,
+      traineeAdditionModal: tutorModal,
+      newTraineeRegistration: newTutorRegistration,
+    } = useLearnersCreation(refreshTraineeTable, false, false, courseCompanyIds);
 
     const loggedUser = computed(() => $store.state.main.loggedUser);
 
@@ -293,6 +350,7 @@ export default {
       companyRepresentative: { required },
       operationsRepresentative: { required },
       trainer: { required },
+      tutor: { required },
     }));
 
     const v$ = useVuelidate(
@@ -304,6 +362,7 @@ export default {
         companyRepresentative: tmpInterlocutorId,
         operationsRepresentative: tmpInterlocutorId,
         trainer: tmpInterlocutorId,
+        tutor: tmpInterlocutorId,
       }
     );
 
@@ -380,10 +439,17 @@ export default {
       return Object.freeze(interlocutors.map(interlocutor => formatContactOption(interlocutor)));
     });
 
+    const isSingleCourse = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
+
     watch(course, async (newValue, oldValue) => {
       tmpCourse.value = pick(course.value, ['misc', 'estimatedStartDate', 'maxTrainees', 'hasCertifyingTest']);
 
       if (!oldValue) return;
+
+      if (displayHistory.value) {
+        await getCourseHistories();
+        courseHistoryFeed.value.resumeScroll();
+      }
 
       if (newValue.companies.length !== oldValue.companies.length) await refreshTrainingContracts();
       else {
@@ -391,6 +457,10 @@ export default {
         if (!newValue.companies.every(c => oldValueCompaniesIds.includes(c._id))) await refreshTrainingContracts();
       }
     }, { immediate: true });
+
+    const traineesOptions = computed(() => formatAndSortUserOptions(potentialTrainees.value, !isIntraCourse.value));
+
+    const companyOptions = computed(() => formatAndSortCompanyOptions(course.value.companies));
 
     const defineCourseAbilities = () => {
       const ability = defineAbilitiesForCourse(pick(loggedUser.value, ['role']));
@@ -411,15 +481,6 @@ export default {
 
     const toggleHistory = async () => {
       displayHistory.value = !displayHistory.value;
-      if (displayHistory.value) await getCourseHistories();
-      else courseHistories.value = [];
-    };
-
-    const refreshCourseHistories = async () => {
-      if (displayHistory.value) {
-        await getCourseHistories();
-        courseHistoryFeed.value.resumeScroll();
-      }
     };
 
     const getCourseHistories = async (createdAt = null) => {
@@ -442,22 +503,28 @@ export default {
       }
     };
 
-    const updateCourseHistories = async (done) => {
-      const lastCreatedAt = courseHistories.value.length
-        ? courseHistories.value[courseHistories.value.length - 1].createdAt
-        : null;
-      const olderCourseHistories = await getCourseHistories(lastCreatedAt);
+    const updateCourseHistories = async ({ index, done }) => {
+      if (index === 1) {
+        await getCourseHistories();
+        done(courseHistories.value.length);
+      } else {
+        const lastCreatedAt = courseHistories.value.length
+          ? courseHistories.value[courseHistories.value.length - 1].createdAt
+          : null;
+        const olderCourseHistories = await getCourseHistories(lastCreatedAt);
 
-      return done(!olderCourseHistories.length);
+        return done(!olderCourseHistories.length);
+      }
     };
 
     const refreshPotentialTrainees = async () => {
       try {
         if (isClientInterface && course.value.type === INTER_B2B) return;
-        const companies = course.value.companies.map(c => c._id);
 
-        potentialTrainees.value = !isEmpty(companies)
-          ? Object.freeze(await Users.learnerList({ companies, startDate: CompaniDate().toISO(), action: COURSE }))
+        potentialTrainees.value = !isEmpty(courseCompanyIds.value)
+          ? Object.freeze(await Users.learnerList(
+            { companies: courseCompanyIds.value, startDate: CompaniDate().toISO(), action: COURSE }
+          ))
           : [];
       } catch (error) {
         potentialTrainees.value = [];
@@ -469,17 +536,11 @@ export default {
       try {
         courseLoading.value = true;
         await $store.dispatch('course/fetchCourse', { courseId: profileId.value });
-        await refreshCourseHistories();
       } catch (e) {
         console.error(e);
       } finally {
         courseLoading.value = false;
       }
-    };
-
-    const refreshTraineeTable = async () => {
-      await refreshCourse();
-      await refreshPotentialTrainees();
     };
 
     const formatInterlocutorOption = interlocutor => ({
@@ -503,15 +564,17 @@ export default {
         }
         const loggedUserCompany = get(loggedUser.value, 'company._id');
         const loggedUserHoldingRole = get(loggedUser.value, 'role.holding.name');
-        const courseCompanies = course.value.companies.map(c => c._id);
 
-        if (loggedUserIsTrainer.value && !loggedUserHoldingRole && !courseCompanies.includes(loggedUserCompany)) {
+        if (loggedUserIsTrainer.value && !loggedUserHoldingRole &&
+        !courseCompanyIds.value.includes(loggedUserCompany)) {
           companyRepresentativeOptions.value = [];
           return;
         }
 
         const clientsUsersAllowedtoAccessCompany = course.value.type === INTRA
-          ? await Users.list({ role: [COACH, CLIENT_ADMIN], company: courseCompanies[0], includeHoldingAdmins: true })
+          ? await Users.list(
+            { role: [COACH, CLIENT_ADMIN], company: courseCompanyIds.value[0], includeHoldingAdmins: true }
+          )
           : await Users.list({ role: [HOLDING_ADMIN], holding: course.value.holding });
 
         companyRepresentativeOptions.value = Object.freeze(clientsUsersAllowedtoAccessCompany
@@ -821,10 +884,23 @@ export default {
       contactAdditionModal.value = true;
     };
 
+    const removeTutor = async (interlocutorId) => {
+      try {
+        await Courses.deleteTutor(course.value._id, interlocutorId);
+
+        await refreshCourse();
+        NotifyPositive('Tuteur détaché.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du détachement du tuteur.');
+      }
+    };
+
     const removeInterlocutor = (interlocutorType, interlocutorId) => {
       tmpInterlocutorId.value = '';
 
       if (interlocutorType === TRAINER) validateTrainerDeletion(interlocutorId);
+      else if (interlocutorType === TUTOR) removeTutor(interlocutorId);
       else updateInterlocutor(interlocutorType);
     };
 
@@ -912,7 +988,76 @@ export default {
       }
     };
 
+    const openTutorModal = (event) => {
+      if (isArchived.value) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation archivée.');
+      }
+
+      if (!course.value.companies.length) {
+        return NotifyWarning('Vous ne pouvez pas ajouter de tuteur à une formation sans structure.');
+      }
+
+      const { action, interlocutorId: tutorId } = event;
+
+      if (action === DELETION) {
+        const tutorToRemove = course.value.tutors.find(t => t._id === tutorId);
+        openInterlocutorDeletionValidationModal(get(tutorToRemove, 'identity'), TUTOR, tutorId);
+      } else {
+        tmpInterlocutorId.value = tutorId;
+        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
+        tutorModal.value = true;
+      }
+    };
+
+    const addTutor = async () => {
+      try {
+        interlocutorModalLoading.value = true;
+
+        await Courses.addTutor(course.value._id, { tutor: tmpInterlocutorId.value });
+
+        await refreshCourse();
+        tutorModal.value = false;
+        NotifyPositive('Tuteur ajouté.');
+        NotifyPositive('Email envoyé.');
+      } catch (e) {
+        console.error(e);
+        if ([409, 403].includes(e.status)) return NotifyNegative(e.data.message);
+
+        NotifyNegative('Erreur lors de l\'ajout du tuteur.');
+      } finally {
+        interlocutorModalLoading.value = false;
+      }
+    };
+
+    const validateTutorAddition = () => {
+      v$.value.tutor.$touch();
+      if (v$.value.tutor.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+      $q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir ajouter l\'utilisateur comme tuteur de la formation&nbsp;? <br /><br />'
+        + ' Un email lui sera envoyé.',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => addTutor())
+        .onCancel(() => NotifyPositive('Ajout annulé.'));
+    };
+
+    const openLearnerCreationModal = async () => {
+      tutorModal.value = false;
+      learnerCreationModal.value = true;
+    };
+
     const goToContactProfile = () => $router.push({ name: 'ni courses contacts' });
+
+    watch(tutorModal, () => {
+      if (tutorModal.value && newTutorRegistration.value.user) {
+        tmpInterlocutorId.value = newTutorRegistration.value.user;
+        interlocutorLabel.value = { action: 'Ajouter un ', interlocutor: 'tuteur' };
+        newTutorRegistration.value.user = '';
+      }
+    });
 
     const created = async () => {
       const promises = [];
@@ -974,6 +1119,14 @@ export default {
       TRAINER,
       SALES_REPRESENTATIVE,
       CREATION,
+      TUTOR,
+      tutorModal,
+      newLearner,
+      firstStep,
+      learnerAlreadyExists,
+      learnerValidation,
+      learnerCreationModalLoading,
+      learnerCreationModal,
       // Computed
       course,
       v$,
@@ -995,6 +1148,9 @@ export default {
       isCourseInter,
       isVendorInterface,
       isIntraHoldingCourse,
+      isSingleCourse,
+      traineesOptions,
+      companyOptions,
       // Methods
       get,
       formatQuantity,
@@ -1025,6 +1181,12 @@ export default {
       refreshTrainingContracts,
       goToContactProfile,
       addTrainer,
+      openTutorModal,
+      openLearnerCreationModal,
+      resetLearnerCreationModal,
+      nextStepLearnerCreationModal,
+      submitLearnerCreationModal,
+      validateTutorAddition,
     };
   },
 };
@@ -1041,4 +1203,6 @@ export default {
     padding: 0px 0px 16px 16px
 .button-trainer
   justify-self: start
+.container-history
+  z-index: 10
 </style>

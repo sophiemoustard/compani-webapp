@@ -17,7 +17,7 @@ const routes = [
         const userVendorRole = store.getters['main/getVendorRole'];
         const userClientRole = store.getters['main/getClientRole'];
         if (!userClientRole && !userVendorRole) return next({ name: 'account client' });
-        if (!userClientRole) return next({ path: '/ad' });
+        if (userVendorRole) return next({ path: '/ad' });
 
         if ([...AUXILIARY_ROLES, HELPER].includes(userClientRole)) return next({ name: 'account client' });
         if (COACH_ROLES.includes(userClientRole)) return next({ name: 'ni courses' });
@@ -154,7 +154,9 @@ const routes = [
         component: () => import('src/modules/client/pages/ni/courses/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni courses learners info') to.query.defaultTab = 'traineeFollowUp';
+            if (from.name === 'ni courses learners info' && !to.query.defaultTab) {
+              to.query.defaultTab = 'traineeFollowUp';
+            }
 
             return next();
           } catch (e) {

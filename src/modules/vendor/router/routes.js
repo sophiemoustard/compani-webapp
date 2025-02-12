@@ -190,7 +190,7 @@ const routes = [
               'ni users learners info',
               'ni pedagogy questionnaire answers',
             ].includes(from.name)) {
-              to.query.defaultTab = 'traineeFollowUp';
+              if (!to.query.defaultTab) to.query.defaultTab = 'traineeFollowUp';
             } else if (from.name === 'ni users companies info' && from.query.defaultTab === 'bills') {
               to.query.defaultTab = 'billing';
             }

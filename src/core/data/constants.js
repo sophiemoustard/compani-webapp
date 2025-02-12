@@ -44,6 +44,7 @@ export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planning_referent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
+export const TUTOR = 'tutor';
 
 // ROLES VENDOR
 export const VENDOR_ADMIN = 'vendor_admin';
@@ -314,6 +315,8 @@ export const VENDOR_EXPORT_HISTORY_TYPES = [
   { label: 'Questionnaires de satisfaction', value: END_OF_COURSE },
   { label: 'Factures et avoirs', value: COURSE_BILL },
   { label: 'Paiements et remboursements', value: COURSE_PAYMENT },
+  { label: 'Questionnaires d\'auto-positionnement par groupe', value: SELF_POSITIONNING },
+
 ];
 
 // COURSE_BILLS
