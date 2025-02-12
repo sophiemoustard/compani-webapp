@@ -6,23 +6,23 @@
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Raison sociale" v-model="vendorCompany.name" @focus="saveTmp('name')"
-            @blur="updateVendorCompany('name')" :error="validations.vendorCompany.name.$error" />
+            @blur="updateVendorCompany('name')" :error="validations.vendorCompany.name.$error" required-field />
           <ni-search-address v-model="vendorCompany.address" :error-message="addressErrorMessage"
-            @blur="updateVendorCompany('address')" @focus="saveTmp('address.fullAddress')"
+            @blur="updateVendorCompany('address')" @focus="saveTmp('address.fullAddress')" required-field
             :error="validations.vendorCompany.address.$error" />
-          <ni-input caption="SIRET" v-model="vendorCompany.siret" @focus="saveTmp('siret')"
+          <ni-input caption="SIRET" v-model="vendorCompany.siret" @focus="saveTmp('siret')" required-field
             @blur="updateVendorCompany('siret')" :error="validations.vendorCompany.siret.$error"
             :error-message="siretErrorMessage" />
           <ni-input caption="Numéro de déclaration d'activité" v-model="vendorCompany.activityDeclarationNumber"
             @focus="saveTmp('activityDeclarationNumber')" @blur="updateVendorCompany('activityDeclarationNumber')"
-            :error="validations.vendorCompany.activityDeclarationNumber.$error" />
-          <ni-input caption="IBAN" v-model="vendorCompany.iban" @blur="updateVendorCompany('iban')"
+            :error="validations.vendorCompany.activityDeclarationNumber.$error" required-field />
+          <ni-input caption="IBAN" v-model="vendorCompany.iban" @blur="updateVendorCompany('iban')" required-field
             :error="validations.vendorCompany.iban.$error" :error-message="ibanErrorMessage" @focus="saveTmp('iban')" />
           <ni-input caption="BIC" v-model="vendorCompany.bic" @focus="saveTmp('bic')" @blur="updateVendorCompany('bic')"
-            :error="validations.vendorCompany.bic.$error" :error-message="bicErrorMessage" />
+            :error="validations.vendorCompany.bic.$error" :error-message="bicErrorMessage" required-field />
           <ni-input caption="Capital social" v-model="vendorCompany.shareCapital" @focus="saveTmp('shareCapital')"
             @blur="updateVendorCompany('shareCapital')" :error="validations.vendorCompany.shareCapital.$error"
-            :error-message="shareCapitalErrorMessage" />
+            :error-message="shareCapitalErrorMessage" required-field />
         </div>
       </div>
       <p class="text-weight-bold">Contacts</p>
