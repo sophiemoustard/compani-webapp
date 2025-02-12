@@ -17,7 +17,7 @@ const routes = [
         const userVendorRole = store.getters['main/getVendorRole'];
         const userClientRole = store.getters['main/getClientRole'];
         if (!userClientRole && !userVendorRole) return next({ name: 'account client' });
-        if (!userClientRole) return next({ path: '/ad' });
+        if (userVendorRole) return next({ path: '/ad' });
 
         if ([...AUXILIARY_ROLES, HELPER].includes(userClientRole)) return next({ name: 'account client' });
         if (COACH_ROLES.includes(userClientRole)) return next({ name: 'ni courses' });
