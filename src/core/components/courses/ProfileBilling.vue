@@ -159,7 +159,9 @@ export default {
         + `Lieu : ${location} \r\n`
         + `Nom du / des intervenant·es : ${trainersName}`;
       }
-      const traineeName = formatIdentity(course.value.trainees[0].identity, 'FL');
+      const traineeName = course.value.trainees.length
+        ? formatIdentity(get(course.value.trainees[0], 'identity'), 'FL')
+        : '';
 
       return 'Facture liée à des frais pédagogiques \r\n'
       + 'Contrat de professionnalisation \r\n'
