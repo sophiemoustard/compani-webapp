@@ -107,6 +107,8 @@ export default {
     const newBill = ref({ payer: '', mainFee: { price: 0, count: 1, countUnit: GROUP, description: '' } });
     const areDetailsVisible = ref(Object.fromEntries(courseBills.value.map(bill => [bill._id, false])));
     const removeNewBillDatas = ref(true);
+    const SINGLE_COURSES_SUBPROGRAM_IDS = process.env.SINGLE_COURSES_SUBPROGRAM_IDS.split(';');
+
     const course = computed(() => $store.state.course.course);
 
     const companiesToBill = ref(course.value.type === INTRA ? [course.value.companies[0]._id] : []);
@@ -131,27 +133,41 @@ export default {
       companiesToBill: { minArrayLength: minArrayLength(1) },
     }));
 
-    const defaultDescription = computed(() => {
-      const slots = [...course.value.slots].sort(ascendingSortBy('startDate'));
+    const isSingleCourse = computed(() => SINGLE_COURSES_SUBPROGRAM_IDS.includes(course.value.subProgram._id));
 
-      const liveSteps = course.value.subProgram.steps.filter(s => s.type !== E_LEARNING);
-      const liveDuration = CompaniDuration(computeDuration(liveSteps)).format(LONG_DURATION_H_MM);
-      const eLearningSteps = course.value.subProgram.steps.filter(s => s.type === E_LEARNING);
-      const eLearningDuration = CompaniDuration(computeDuration(eLearningSteps)).format(LONG_DURATION_H_MM);
-      const startDate = slots.length ? CompaniDate(slots[0].startDate).format(DD_MM_YYYY) : '(date à planifier)';
-      const endDate = course.value.slotsToPlan.length
-        ? '(date à planifier)'
-        : CompaniDate(slots[slots.length - 1].startDate).format(DD_MM_YYYY);
-      const location = uniq(slots.map(s => get(s, 'address.city'))).join(', ');
+    const defaultDescription = computed(() => {
       const trainersName = course.value.trainers
         .map(trainer => formatIdentity(get(trainer, 'identity'), 'FL')).join(', ');
 
-      return 'Actions pour le développement des compétences \r\n'
+      if (!isSingleCourse.value) {
+        const slots = [...course.value.slots].sort(ascendingSortBy('startDate'));
+
+        const liveSteps = course.value.subProgram.steps.filter(s => s.type !== E_LEARNING);
+        const liveDuration = CompaniDuration(computeDuration(liveSteps)).format(LONG_DURATION_H_MM);
+        const eLearningSteps = course.value.subProgram.steps.filter(s => s.type === E_LEARNING);
+        const eLearningDuration = CompaniDuration(computeDuration(eLearningSteps)).format(LONG_DURATION_H_MM);
+        const startDate = slots.length ? CompaniDate(slots[0].startDate).format(DD_MM_YYYY) : '(date à planifier)';
+        const endDate = course.value.slotsToPlan.length
+          ? '(date à planifier)'
+          : CompaniDate(slots[slots.length - 1].startDate).format(DD_MM_YYYY);
+        const location = uniq(slots.map(s => get(s, 'address.city'))).join(', ');
+
+        return 'Actions pour le développement des compétences \r\n'
         + `Formation pour ${traineesQuantity.value} salarié-es\r\n`
         + `Durée : ${liveDuration} présentiel${eLearningSteps.length ? `, ${eLearningDuration} eLearning` : ''}\r\n`
         + `Dates : du ${startDate} au ${endDate} \r\n`
         + `Lieu : ${location} \r\n`
         + `Nom du / des intervenant·es : ${trainersName}`;
+      }
+      const traineeName = course.value.trainees.length
+        ? formatIdentity(get(course.value.trainees[0], 'identity'), 'FL')
+        : '';
+
+      return 'Facture liée à des frais pédagogiques \r\n'
+      + 'Contrat de professionnalisation \r\n'
+      + 'ACCOMPAGNEMENT \r\n'
+      + `Nom de l'apprenant·e: ${traineeName} \r\n`
+      + `Nom du / des intervenants: ${trainersName}`;
     });
 
     const v$ = useVuelidate(rules, { course, newBill, companiesToBill });
