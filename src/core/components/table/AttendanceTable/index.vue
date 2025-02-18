@@ -99,10 +99,12 @@
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">
             <template v-if="col.name === 'actions'">
-              <div v-if="!props.row.file" class="justify-end overflow-hidden-nowrap flex">
+              <div v-if="!props.row.file" class="justify-end overflow-hidden-nowrap flex items-center">
                 <div v-if="!props.row.signatures.trainee" class="text-italic text-primary">En attente de signature</div>
                 <ni-primary-button v-else label="Générer" icon="add" :disabled="modalLoading"
                   @click="generateAttendanceSheet(props.row._id)" />
+                <ni-button v-if="canUpdate" icon="delete" color="primary"
+                  @click="validateAttendanceSheetDeletion(props.row)" :disable="!!course.archivedAt" />
               </div>
               <div v-else class="row no-wrap table-actions justify-end">
                 <ni-button v-if="canUpdate && isSingleCourse" icon="edit" color="primary"
