@@ -22,6 +22,9 @@
       <ni-select v-if="isIntraHoldingCourse" in-modal :model-value="newCourse.holding"
         @blur="validations.holding.$touch" required-field caption="Société mère" :options="holdingOptions"
         :error="validations.holding.$error" @update:model-value="update($event, 'holding')" />
+      <ni-select :model-value="newCourse.certificateGenerationMode" caption="Mode de génération des certificats"
+        @update:model-value="update($event, 'certificateGenerationMode')" :options="certificateGenerationMode"
+        :error="validations.certificateGenerationMode.$error" />
       <ni-date-input caption="Date de démarrage souhaitée" :model-value="newCourse.estimatedStartDate" in-modal
         @update:model-value="update($event, 'estimatedStartDate')" />
       <ni-input v-if="isIntraCourse || isIntraHoldingCourse" in-modal required-field type="number"
@@ -53,7 +56,14 @@ import CompanySelect from '@components/form/CompanySelect';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES, REQUIRED_LABEL, INTRA, INTRA_HOLDING, PUBLISHED } from '@data/constants';
+import {
+  COURSE_TYPES,
+  REQUIRED_LABEL,
+  INTRA,
+  INTRA_HOLDING,
+  PUBLISHED,
+  CERTIFICATE_GENERATION_MODE,
+} from '@data/constants';
 import { formatAndSortOptions, formatAndSortCompanyOptions } from '@helpers/utils';
 
 export default {
@@ -81,6 +91,7 @@ export default {
     const { programs, validations, newCourse, companies } = toRefs(props);
 
     const courseTypes = COURSE_TYPES;
+    const certificateGenerationMode = CERTIFICATE_GENERATION_MODE;
     const subProgramOptions = ref([]);
     const disableSubProgram = ref(false);
 
@@ -167,6 +178,7 @@ export default {
     return {
       // Data
       courseTypes,
+      certificateGenerationMode,
       subProgramOptions,
       disableSubProgram,
       // Computed
